@@ -1,0 +1,14 @@
+[Disassemble mode]
+mode=0
+[Breakpoints]
+Count=0
+[Interrupts]
+Enabled=1
+[MemoryMap]
+Enabled=0
+TypeVolition=1
+UnspecRange=1
+ActionState=1
+[TraceHelper]
+Enabled=0
+ShowSource=1

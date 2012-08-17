@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><!-- saved from url=(0047)http://www.zygo.btinternet.co.uk/alarmdata.html --><title>RFID Alarm Data</title>
+<meta content="text/html; charset=windows-1252" http-equiv="Content-Type">
+<meta content="MSHTML 5.00.2614.3500" name="GENERATOR"></head>
+
+<body><pre>It consists of the following
+
+Part	Description
+2 off coded Key Fobs	Each FOB has a unique code
+1 Program Disk 	Add or Erase FOB’s
+1 Receiver Board	Including 125Khz Antenna + LED Pre-programed to accept FOBs supplied.
+
+To use, Connect 12V to 14V as follows. 
+
+With the 8 way connector facing you
+Connect +12 V to top row 2nd pin from left and top row right hand pin.
+Connect 0V to top row 3rd pin from left.
+
+Outputs, A unique code is created on the 1st pin from left on the top row
+when a valid Fob is present. 
+
+Pin 2 of HEROS1 chip is normally 0V.
+This will rise to +5V when a valid fob is placed near the Antenna. 
+
+Also Pin 20 of UM3758 is normally 0V.
+This will rise to +12V when a valid fob is placed near the Antenna.
+
+Note, the LED will be permanently on
+
+
+
+*********************** Modification 1 ***********************
+Make LED come on only when a valid Fob is present
+
+Cut track at point shown on diagram
+
+Solder a wire as shown on diagram
+
+Now the LED will light if a valid FOB is placed within 3” of Anntenna coil
+
+
+
+*********************** Modification 2 ***********************
+
+Drive 12V Relay, Solenoid or Door Mechanism
+
+You will require the following additional components
+1 Resistor     Suggest 1K 1/4W  
+2 Diode        Suggest 1N4002
+3 Transistor   Suggest BD237 (NPN) 
+
+Connect Resistor from Pin 20 of UM3758 to Base of Transistor.
+Connect Emmiter of Transistor to Ground
+Connect Collector of Transistor to one end of Relay/Door Mechanism
+Connect the other end of Relay/Door Mechanism to 12V
+Connect the Diode across the Relay Cathode to +12V, Anode to Transistor Collector.
+
+The above circuit has been tested with the BSTL 210 Door Mechanism
+available from Gardiner Security (Price 9.75 +VAT)
+
+
+
+   8 way Connector			
+Data	 +12V	  0V	  +12V			
+	0     0     0     0			
+N/C	  N/C	  N/C	  N/C
+	0     0     0     0	                                            |  |
+ ------------------------------------------------------------------------------		
+|                                      PCB                                     |
+ ------------------------------------------------------------------------------
+
+
+
+
+Adding a Fob to Memory
+1. Slowly pass Black Disk in front of Antenna, Then move away
+2. Slowly pass new FOB in front of Antenna
+
+
+Deleting All Fobs from memory
+Place Black Disk in front of Antenna hold for 20 seconds, Then move away
+
+
+
+Click <a href="http://home.btconnect.com/QTEKNOLOGY/rfid/rfidmod.jpg">rfidmod.jpg</a> for picture of board with connections shown.
+
+Please note the different signals available.
+
+Data
+This is a unique serial code created when a Valid Key Fob is presented. The code is unique to the PCB. 
+It is not related to the ID of the tag.
+To make a Key Fob Valid it should be added to memory as explained in Adding a Fob to Memory.
+
+RFID Data
+This is the Data of the Key Fob. Each Key Fob will produce a different Data Code here.
+Down load the <a href="http://home.btconnect.com/QTEKNOLOGY/rfid/H4102_C.pdf">EM H4102 Data sheet</a> for information on decoding this data.
+
+TTL Output
+This Output goes high only when a Valid Key Fob is near the Antenna.
+To make a Key Fob Valid it should be added to memory as explained in Adding a Fob to Memory.
+
+
+
+
+
+</pre></body></html>

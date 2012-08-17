@@ -1,0 +1,19 @@
+********************
+Modtronix TCP/IP Stack
+********************
+The Modtronix TCP/IP Stack is a modified version of the original Micorchip TCP/IP Stack.
+The licence of the original code still applies!
+
+Following is a list of items that will be improved in future versions of the stack.
+
+- Implement debug output on com port that outputs screens in ANSI format. These debug
+  sceens will display information about the current status of the TCP/IP stack. For
+  example, the current state of all TCP sockets.
+
+- Implement HTTP POST method.
+
+- Implement more FTP functionality.
+
+- Implement functions for sending Emails via stack.
+
+

@@ -1,0 +1,1 @@
+These schematics and board files were generated with P-CAD.

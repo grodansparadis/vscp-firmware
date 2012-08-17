@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$\LCD\lcd.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\LedBlink\LedBlink.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\MassStorage\MassStorage.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\VirtualCom\VirtualCom.ewp</path>
+  </project>
+  <batchBuild>
+    <batchDefinition>
+      <name>All</name>
+      <member>
+        <project>lcd</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>LedBlink</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>MassStorage</project>
+        <configuration>Debug KS</configuration>
+      </member>
+      <member>
+        <project>VirtualCom</project>
+        <configuration>Debug</configuration>
+      </member>
+    </batchDefinition>
+  </batchBuild>
+</workspace>
+
+

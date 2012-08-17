@@ -1,0 +1,326 @@
+<!--
+**** Debug project file ****
+Each new debug string starts with a "debug code" with a value from 128 - 255.
+
+The format of a "debug command" is:
+[debug code][message code][message parameters]
+
+ - The "message code" is a value from 0 to 127. When 0, it means that an "extended message
+   code" is to follow. This should only be used if there are more then 127 messages - if
+   message codes 1-127 are not enough! When "message code" 0 is used, the "debug command"
+   has the following format:
+   [debug code][0][extended message code][message parameters]
+ - The "message parameters" can be:
+   - %x = A two character ASCII hex value.
+          For example "00", "F0", "80", "8A"..... Will be displayed in lowercase hex.
+   - %X = A two character ASCII hex value.
+          For example "00", "F0", "80", "8A"..... Will be displayed in uppercase hex.
+   - %B = A two character ASCII hex value = Byte. Will be displayed in decimal.
+   - %W = A four character ASCII hex value = Word. Will be displayed in decimal.
+   - %d = A one character value from 0-127. Will be displayed in decimal.
+   - %s = A null terminated string, for example "filename.txt".
+
+The following "debug codes" are defined:
+ - 0x80 - 0x8F  = TCP
+ - 0x90 - 0x9F  = UDP
+ - 0xA0 - 0xAF  = HTTP
+ - 0xB0 - 0xBF  = Reserved
+ - 0xC0 - 0xCF  = Reserved
+ - 0xD0 - 0xDF  = Reserved for "Custom Debug Project File". User application should use this range!
+ - 0xE0         =
+ - 0xE1         = DHCP
+ - 0xE2         = FTP
+ - 0xE3         = FSEE
+ - 0xE4         = MAC
+ - 0xE5         = STATCKTST
+ - 0xE6         = IP
+ - 0xE7         = NBNS
+ - 0xE8         = DNS
+ - 0xE9         = UTILS (TCP and UDP utils files)
+ - 0xEA         =
+ - 0xEB         =
+ - 0xEC         =
+ - 0xED         =
+ - 0xEE         =
+ - 0xEF         =
+
+-->
+<mxdebug>
+
+<!-- Announce Debug Tab -->
+<debugHandler name="Announce" codeFrom="0xDD" codeTo="0xDD" offsetName="none">
+  <message code="1" type="error" param="Could not open UDP socket"/>
+  <message code="2" type="info" param=""/>
+  <message code="3" type="info" param=""/>
+</debugHandler>
+
+<!-- DHCP Debug Tab -->
+<debugHandler name="DHCP" codeFrom="0xE1" codeTo="0xE1" offsetName="none">
+  <message code="1" type="info" param="Broadcast"/>
+  <message code="2" type="info" param="Discover"/>
+  <message code="3" type="info" param="Offer Message"/>
+  <message code="4" type="warn" param="NAK recieved (RSS). DHCP server didn't like our DHCP Request format"/>
+  <message code="5" type="info" param="ACK Received"/>
+  <message code="6" type="warn" param="Timeout"/>
+  <message code="7" type="error" param="Could not open UDP socket"/>
+  <message code="8" type="info" param="Can not Broadcast, UDP Not ready!"/>
+  <message code="9" type="info" param="Discover time out"/>
+  <message code="10" type="info" param="Maxumum Broadcast tries, assigned static IP address"/>
+  <message code="11" type="info" param="Lease time expired"/>
+  <message code="12" type="info" param="Sending Request"/>
+  <message code="13" type="info" param="Reset"/>
+  <message code="14" type="info" param="Disabled"/>
+  <message code="15" type="info" param="Enabled"/>
+  <message code="16" type="info" param="Sending Renew Request"/>
+</debugHandler>
+
+<!-- DNS Debug Tab -->
+<debugHandler name="DNS" codeFrom="0xE8" codeTo="0xE8" offsetName="none">
+  <message code="1" type="error" param="Could not open UDP socket"/>
+  <message code="2" type="info" param=""/>
+  <message code="3" type="info" param=""/>
+</debugHandler>
+
+<!-- FTP Debug Tab -->
+<debugHandler name="FTP" codeFrom="0xE2" codeTo="0xE2" offsetName="none">
+  <message code="1" type="info" param="Received string on FTP port = %s"/>
+  <message code="2" type="info" param="Received command = 0x%x"/>
+  <message code="3" type="info" param="Sending Responce message = %s"/>
+  <message code="4" type="warn" param="FTP command truncated - command buffer too small!"/>
+  <message code="5" type="info" param="Received string on FTP port did NOT end with newline char!"/>
+  <message code="6" type="info" param="Parsed string, cmd=%s, found %d parameters"/>
+  <message code="7" type="info" param="Parameters: %s"/>
+  <message code="8" type="info" param="Received FTP Login (%s) and Password (%s)"/>
+  <message code="9" type="info" param=""/>
+  <message code="10" type="info" param=""/>
+</debugHandler>
+
+<!-- FSEE Debug Tab -->
+<debugHandler name="FSEE" codeFrom="0xE3" codeTo="0xE3" offsetName="none">
+  <message code="1" type="debug" param="fileOpen called for %s"/>
+  <message code="2" type="error" param="File System not available for fseeOpen() function"/>
+  <message code="3" type="error" param="No File handles available for fseeOpen() function"/>
+  <message code="4" type="debug" param="Read FAT Attributes during fseeOpen = %x"/>
+  <message code="5" type="info" param="fseeOpen() Found file, assigned to handle %d"/>
+  <message code="6" type="info" param="fseeClose() called for FILE handle %d"/>
+  <message code="7" type="info" param="fseeRelease() called for FILE handle %d"/>
+  <message code="8" type="error" param="FILE handle (%d) passed to fseeGetByte() is not used"/>
+  <message code="9" type="error" param="Err in fseeGetByte() while trying to place EEPROM in seq read mode"/>
+  <message code="10" type="info" param="fseeOpenImage() Successfully executed"/>
+  <message code="11" type="info" param="Err in fseePutByte() while trying to place EEPROM in seq write mode"/>
+  <message code="12" type="error" param="Currently busy reading or writing from another open file, can not open file!"/>
+  <message code="13" type="error" param="fseeClose() called with invalid FILE handle %d"/>
+  <message code="14" type="error" param="fseeRelease() called with invalid FILE handle %d"/>
+  <message code="15" type="error" param="fseeGetByte() called with invalid FILE handle %d"/>
+  <message code="16" type="info" param=""/>
+  <message code="17" type="info" param=""/>
+  <message code="18" type="info" param=""/>
+  <message code="19" type="info" param=""/>
+  <message code="20" type="info" param=""/>
+</debugHandler>
+
+<!-- HTTP Debug Tab -->
+<!-- Codes 0xA0 to 0xAD handle sockets 0 - 14 -->
+<!-- Code 0xAE handles given socket. Socket number will follow this code. -->
+<!-- Code 0xAF handles general HTTP debug messages -->
+<debugHandler name="HTTP" codeFrom="0xA0" codeTo="0xAF" offsetName="Handle">
+  <message code="1" type="info" param="Received GET command for '%s'"/>
+  <message code="2" type="info" param="Found requested file"/>
+  <message code="3" type="info" param="Received POST command"/>
+  <message code="4" type="debug" param="Sending HTTP GET commands body"/>
+  <message code="5" type="info" param="Successfully sent file"/>
+  <message code="6" type="info" param="Sending of file to be continued"/>
+  <message code="7" type="info" param="HTTP Disconnected"/>
+  <message code="8" type="info" param="Reached EOF"/>
+  <message code="9" type="error" param="Error while reading file"/>
+  <message code="10" type="info" param="Calling HTTPExecGetCmd() for GET parameters"/>
+  <message code="11" type="info" param="Filetype of requested resource is '%d'"/>
+  <message code="12" type="info" param="Received unknown HTTP command"/>
+  <message code="13" type="info" param="Sending GET Header"/>
+  <message code="14" type="info" param="Sending GET command body"/>
+  <message code="15" type="debug" param="Zipped file name = '%s'"/>
+  <message code="16" type="warn" param="Name-Value pair of GET command had to be truncated. Larger then buffer!"/>
+  <message code="17" type="debug" param="Read HTTP command, name='%s', value='%s'"/>
+  <message code="18" type="info" param="Receiving POST header"/>
+  <message code="19" type="debug" param="HTTPGetRqstRes() got '%s'"/>
+  <message code="20" type="info" param="Received following HTTP Header: '%s'"/>
+  <message code="21" type="warn" param="End of HTTP Header not found"/>
+  <message code="22" type="info" param="Page requested without Authentication given!"/>
+  <message code="23" type="info" param=""/>
+  <message code="24" type="info" param=""/>
+  <message code="25" type="info" param=""/>
+</debugHandler>
+
+<!-- IP Debug Tab -->
+<debugHandler name="IP" codeFrom="0xE6" codeTo="0xE6" offsetName="none">
+  <message code="1" type="info" param="Received IP header with ID=0x%x%x"/>
+  <message code="2" type="warn" param="IP Header contained too many options, discarding message!"/>
+  <message code="3" type="info" param=""/>
+  <message code="4" type="info" param=""/>
+  <message code="5" type="info" param=""/>
+  <message code="6" type="info" param=""/>
+  <message code="7" type="info" param=""/>
+  <message code="8" type="info" param=""/>
+  <message code="9" type="info" param=""/>
+  <message code="10" type="info" param=""/>
+</debugHandler>
+
+<!-- MAC Debug Tab -->
+<debugHandler name="MAC" codeFrom="0xE4" codeTo="0xE4" offsetName="none">
+  <message code="1" type="error" param="Frame Alignment=%s, CRC=%s, Missed Packets=%s"/>
+  <message code="2" type="error" param="MACGetArray() address error"/>
+  <message code="3" type="error" param="Overrun error! Reseting MAC!"/>
+  <message code="4" type="error" param="Invalid Packet Error!"/>
+  <message code="5" type="info" param="Reset MAC"/>
+  <message code="6" type="error" param="Invalid Packet Error, PRX not set!"/>
+  <message code="7" type="error" param="Invalid Packet Error, Frame too small = 0x%x%x"/>
+  <message code="8" type="error" param="Invalid Packet Error, Frame too large = 0x%x%x"/>
+  <message code="9" type="error" param="Invalid Packet Error, Next packet pointer too large = 0x%x"/>
+  <message code="10" type="error" param="Invalid Packet Error, Next packet pointer too small = 0x%x"/>
+  <message code="11" type="error" param="Value 1 = 0x%x%x, Value 2 = 0x%x%x"/>
+  <message code="12" type="error" param="MACGetArrayChr() address error"/>
+</debugHandler>
+
+<!-- NBNS Debug Tab -->
+<debugHandler name="NBNS" codeFrom="0xE7" codeTo="0xE7" offsetName="none">
+  <message code="1" type="error" param="Could not open UDP socket for NBNS!"/>
+  <message code="2" type="debug" param="Received NBNS request"/>
+  <message code="3" type="info" param="Received NBNS request for NetBIOS name '%s'"/>
+  <message code="4" type="debug" param="NBNS Name Match!"/>
+  <message code="5" type="error" param=""/>
+  <message code="6" type="error" param=""/>
+  <message code="7" type="error" param=""/>
+  <message code="8" type="error" param=""/>
+  <message code="9" type="error" param=""/>
+  <message code="10" type="error" param=""/>
+</debugHandler>
+
+<!-- STACKTSK Debug Tab -->
+<debugHandler name="STACKTSK" codeFrom="0xE5" codeTo="0xE5" offsetName="none">
+  <message code="1" type="info" param="DHCP Enabled but MAC not linked yet - set IP to 0.0.0.0"/>
+  <message code="2" type="info" param="Reading MAC IP header"/>
+  <message code="3" type="info" param="Reading MAC ARP header"/>
+  <message code="4" type="warn" param="Unknown MAC header read, MAC Frame Type = 0x%x"/>
+  <message code="5" type="info" param=""/>
+  <message code="6" type="info" param=""/>
+  <message code="7" type="info" param=""/>
+  <message code="8" type="info" param=""/>
+  <message code="9" type="info" param=""/>
+  <message code="10" type="info" param=""/>
+</debugHandler>
+
+<!-- TCP Debug Tab -->
+<!-- Codes 0x80 to 0x8D handle sockets 0 - 14 -->
+<!-- Code 0x8E handles given socket. Socket number will follow this code. -->
+<!-- Code 0x8F handles general TCP debug messages -->
+<debugHandler name="TCP" codeFrom="0x80" codeTo="0x8F" offsetName="Socket">
+  <message code="1" type="warn" param="TCP Packet Checksum error!"/>
+  <message code="2" type="info" param="Found Matching socket, assigned to TCP Handle %d"/>
+  <message code="3" type="warn" param="Could not find matching socket for destination port 0x%x%x"/>
+  <message code="4" type="info" param="state FIN-WAIT-1: Disconnect called, sent FIN|ACK message to target"/>
+  <message code="5" type="warn" param="state FIN-WAIT-1: Max Retries, connection closed! Sending ACK|FIN"/>
+  <message code="6" type="warn" param="Resending TCP Message. Previously sent data was NOT acknowledged!"/>
+  <message code="7" type="error" param="Could not connect, no free sockets available"/>
+  <message code="8" type="info" param="state SYN-SENT: In the process of doing an active open"/>
+  <message code="9" type="info" param="state LISTEN: Passive open done for port 0x%x%x"/>
+  <message code="10" type="warn" param="state LISTEN: Connection forcefully closed, no message was sent!"/>
+  <message code="11" type="warn" param="state CLOSED: Connection forcefully closed, no message was sent!"/>
+  <message code="12" type="info" param="state EST: Connection Established, ACK was received WITH DATA"/>
+  <message code="13" type="info" param="state EST: Connection Established, ACK was received (without data)"/>
+  <message code="14" type="info" param="state EST: Rcvd ACK|SYN with data, sending ACK"/>
+  <message code="15" type="info" param="state EST: Rcvd ACK|SYN (without data), sending ACK"/>
+  <message code="16" type="info" param="state SYN_RCVD: Rcvd ACK, waiting for SYN. Sending ACK|SYN"/>
+  <message code="17" type="warn" param="Discarding ACK, waiting for SYN"/>
+  <message code="18" type="warn" param="Discarding message, waiting for SYN"/>
+  <message code="19" type="info" param="state LAST_ACK: Received FIN, sending FIN|ACK"/>
+  <message code="20" type="info" param="state CLOSING: Received FIN, waiting for ACK. Sending ACK"/>
+  <message code="21" type="info" param="state SYN_RCVD: Received SYN while in LISTEN, sending ACK|SYN"/>
+  <message code="22" type="debug" param="Received not-SYN msg while in LISTEN, ignoring and sending RST"/>
+  <message code="23" type="debug" param="Received data, sending ACK"/>
+  <message code="24" type="error" param="RX Buffer overflow! Received data, but had to discard it"/>
+  <message code="25" type="warn" param="state LISTEN: TCPDisconnect clossed connection, no message was sent!"/>
+  <message code="26" type="warn" param="state CLOSED: TCPDisconnect clossed connection, no message was sent!"/>
+  <message code="27" type="warn" param="Timeout, did not rcv ACK. Resending ACK|SYN"/>
+  <message code="28" type="warn" param="state LISTEN: Max Retries, not receive ACK for SYS sent. Can not EST conn"/>
+  <message code="29" type="warn" param="state CLOSED: Max Retries, not receive ACK for SYS sent. Can not EST conn"/>
+  <message code="30" type="warn" param="state LISTEN: Max Retries, no responce to our close request, close forcefully!"/>
+  <message code="31" type="warn" param="state CLOSED: Max Retries, no responce to our close request, close forcefully!"/>
+  <message code="32" type="warn" param="state LISTEN: Max Retries, no responce to our close(2) request, close forcefully!"/>
+  <message code="33" type="warn" param="state CLOSED: Max Retries, no responce to our close(2) request, close forcefully!"/>
+  <message code="34" type="warn" param="state LISTEN: Received RST, close forcefully!"/>
+  <message code="35" type="warn" param="state CLOSED: Received RST, close forcefully!"/>
+  <message code="36" type="info" param="state LISTEN: Received ACK for FIN sent"/>
+  <message code="37" type="info" param="state CLOSED: Received ACK for FIN sent"/>
+  <message code="38" type="info" param="state LISTEN: Received ACK|FIN for FIN sent"/>
+  <message code="39" type="info" param="state CLOSED: Received ACK|FIN for FIN sent"/>
+  <message code="40" type="warn" param="Timeout to Active open, resending SYN"/>
+  <message code="41" type="warn" param="Timeout, resending ACK"/>
+  <message code="42" type="warn" param="Timeout, resending FIN"/>
+  <message code="43" type="info" param="FindMatchingSocket(), TCB[%d] - comparing local port 0x%x%x to destination port"/>
+  <message code="44" type="info" param="FindMatchingSocket() called for message addressed to port 0x%x%x"/>
+  <message code="45" type="error" param="Flush called with TxBuffer = INVALID_BUFFER!"/>
+  <message code="46" type="error" param="Flush called with bIsPutReady = FALSE!"/>
+  <message code="47" type="info" param="Sent TCP segment, AckNum=0x%x%x, SeqNum=0x%x%x, Len=0x%x%x"/>
+  <message code="48" type="warn" param="state LISTEN: Discarded received packet, out of sequence!"/>
+  <message code="49" type="info" param="Rcvd TCP segment, AckNum=0x%x%x, SeqNum=0x%x%x, Len=0x%x%x"/>
+  <message code="50" type="info" param="state FIN-WAIT-2: Received ACK, waiting for FIN"/>
+  <message code="51" type="info" param="state LISTEN: Received FIN"/>
+  <message code="52" type="info" param="state CLOSED: Received FIN"/>
+</debugHandler>
+
+<!-- Utils Debug Tab -->
+<debugHandler name="Utils" codeFrom="0xE9" codeTo="0xE9" offsetName="none">
+  <message code="1" type="error" param="File Not Found!"/>
+  <message code="2" type="error" param="File system not available!"/>
+  <message code="3" type="info" param="File read error!"/>
+  <message code="4" type="info" param=""/>
+  <message code="5" type="info" param=""/>
+  <message code="10" type="debug" param="ARP Not resolved, will try again!"/>
+  <message code="11" type="info" param="Sent ARP Request"/>
+  <message code="12" type="info" param="ARP Resolved"/>
+  <message code="13" type="info" param=""/>
+  <message code="14" type="info" param=""/>
+  <message code="20" type="error" param="Could not open TCP socket!"/>
+  <message code="21" type="error" param="TCPConnect timeout!"/>
+  <message code="22" type="info" param=""/>
+  <message code="23" type="info" param=""/>
+  <message code="30" type="error" param="Could not open UDP socket!"/>
+  <message code="31" type="info" param=""/>
+  <message code="32" type="info" param=""/>
+</debugHandler>
+
+<!-- TFTPc Debug Tab -->
+<debugHandler name="TFTPc" codeFrom="0xDC" codeTo="0xDC" offsetName="none">
+  <message code="1" type="error" param="Could not open UDP socket"/>
+  <message code="2" type="info" param=""/>
+  <message code="3" type="info" param=""/>
+</debugHandler>
+
+<!-- UDP Debug Tab -->
+<!-- Codes 0x90 to 0x9D handle sockets 0 - 14 -->
+<!-- Code 0x9E handles given socket. Socket number will follow this code. -->
+<!-- Code 0x9F handles general UDP debug messages -->
+<debugHandler name="UDP" codeFrom="0x90" codeTo="0x9F" offsetName="Socket">
+  <message code="1" type="warn" param="UDPIsPutReady called with remotePort = INVALID_UDP_PORT"/>
+  <message code="2" type="info" param=""/>
+  <message code="3" type="info" param=""/>
+  <message code="4" type="info" param=""/>
+  <message code="5" type="info" param=""/>
+  <message code="6" type="info" param=""/>
+  <message code="7" type="info" param=""/>
+  <message code="8" type="info" param=""/>
+  <message code="9" type="info" param=""/>
+  <message code="10" type="info" param=""/>
+  <message code="11" type="info" param=""/>
+  <message code="12" type="info" param=""/>
+  <message code="13" type="info" param=""/>
+  <message code="14" type="info" param=""/>
+  <message code="15" type="info" param=""/>
+  <message code="16" type="info" param=""/>
+  <message code="17" type="info" param=""/>
+  <message code="18" type="info" param=""/>
+  <message code="19" type="info" param=""/>
+  <message code="20" type="info" param=""/>
+</debugHandler>
+
+</mxdebug>

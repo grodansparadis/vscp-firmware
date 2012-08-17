@@ -1,0 +1,11 @@
+v1.0.1
+April 2008
+==============
+Added the Low voltage detection(LVD) error and NVM write error. 
+
+v1.0.0
+February 2008
+==============
+Released - see microchip_dee_emulation_library.pic32.chm for more info
+
+

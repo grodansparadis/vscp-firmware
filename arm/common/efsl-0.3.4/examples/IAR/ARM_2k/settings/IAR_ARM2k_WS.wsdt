@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<Workspace>
+  <ConfigDictionary>
+    
+    
+    
+  <CurrentConfigs><Project>IAR_EFSL/Release</Project><Project>IAR_LPC214x/Debug</Project></CurrentConfigs><CurrentProj>IAR_LPC214x</CurrentProj><OverviewSelected>0</OverviewSelected></ConfigDictionary>
+  <Desktop>
+    <Static>
+      <Workspace>
+        <ColumnWidths>
+          
+          
+          
+          
+        <Column0>270</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
+      </Workspace>
+      <Build>
+        
+        
+        
+        
+      <ColumnWidth0>20</ColumnWidth0><ColumnWidth1>1005</ColumnWidth1><ColumnWidth2>268</ColumnWidth2><ColumnWidth3>67</ColumnWidth3></Build>
+      <TerminalIO/>
+      <Profiling/>
+      <Find-in-Files>
+        
+        
+        
+      <ColumnWidth0>482</ColumnWidth0><ColumnWidth1>68</ColumnWidth1><ColumnWidth2>826</ColumnWidth2></Find-in-Files>
+    </Static>
+    <Windows>
+      
+      
+    <Wnd0>
+        <Tabs>
+          <Tab>
+            <Identity>TabID-30219-7786</Identity>
+            <TabName>Workspace</TabName>
+            <Factory>Workspace</Factory>
+            <Session>
+              
+            <NodeDict><ExpandedNode>IAR_EFSL</ExpandedNode><ExpandedNode>IAR_EFSL/base</ExpandedNode><ExpandedNode>IAR_EFSL/doc</ExpandedNode><ExpandedNode>IAR_EFSL/hardware</ExpandedNode><ExpandedNode>IAR_EFSL/hardware/arm2k_uart.c</ExpandedNode><ExpandedNode>IAR_EFSL/sd</ExpandedNode><ExpandedNode>IAR_EFSL/vfat</ExpandedNode><ExpandedNode>IAR_LPC214x</ExpandedNode><ExpandedNode>IAR_LPC214x/EFSL</ExpandedNode><ExpandedNode>IAR_LPC214x/LGPL</ExpandedNode><ExpandedNode>IAR_LPC214x/Libs</ExpandedNode><ExpandedNode>IAR_LPC214x/Libs/debug</ExpandedNode><ExpandedNode>IAR_LPC214x/Libs/release</ExpandedNode><ExpandedNode>IAR_LPC214x/doc</ExpandedNode></NodeDict></Session>
+          </Tab>
+        </Tabs>
+        
+      <SelectedTab>0</SelectedTab></Wnd0><Wnd1>
+        <Tabs>
+          <Tab>
+            <Identity>TabID-1466-8325</Identity>
+            <TabName>Build</TabName>
+            <Factory>Build</Factory>
+            <Session/>
+          </Tab>
+          <Tab>
+            <Identity>TabID-26539-11130</Identity>
+            <TabName>Find in Files</TabName>
+            <Factory>Find-in-Files</Factory>
+            <Session/>
+          </Tab>
+        </Tabs>
+        
+      <SelectedTab>0</SelectedTab></Wnd1></Windows>
+    <Editor>
+      
+      
+      
+      
+    <Pane/><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Positions>
+      
+      
+      
+      
+      
+    <Top><Row0><Sizes><Toolbar-008eeac8><key>iaridepm1</key></Toolbar-008eeac8></Sizes></Row0></Top><Left><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>816</Bottom><Right>344</Right><x>-2</x><y>-2</y><xscreen>145</xscreen><yscreen>145</yscreen><sizeHorzCX>103571</sizeHorzCX><sizeHorzCY>144422</sizeHorzCY><sizeVertCX>247142</sizeVertCX><sizeVertCY>814741</sizeVertCY></Rect></Wnd0></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd1><Rect><Top>-2</Top><Left>-2</Left><Bottom>144</Bottom><Right>1402</Right><x>-2</x><y>-2</y><xscreen>1404</xscreen><yscreen>146</yscreen><sizeHorzCX>1002857</sizeHorzCX><sizeHorzCY>145418</sizeHorzCY><sizeVertCX>104285</sizeVertCX><sizeVertCY>145418</sizeVertCY></Rect></Wnd1></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+  </Desktop>
+</Workspace>
+
+

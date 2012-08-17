@@ -1,0 +1,22 @@
+[Settings]
+Active Compiler=BoostC
+Target=PIC16F876A
+[Files]
+File0=eeprom.c
+Count=6
+File1=eeprom.h
+File2=eeprom_test.c
+File3=eeprom_test.h
+File4=serial.c
+File5=serial.h
+[Bookmarks]
+Count=0
+[Breakpoints]
+Count=0
+[Plugins]
+Bcd=506F727442000100000001000000
+Button=00706F727462000000000000000000
+Button Block=706F72746200000000000000000000000000
+Led=706F72746200000000000000000000000000
+Led Block=706F727462000000000000000000
+Speed Tester=6B094201040000004E6F6E65

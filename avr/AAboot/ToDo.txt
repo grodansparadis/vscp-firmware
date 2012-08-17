@@ -1,0 +1,10 @@
+todo list
+
+* test with ATmega32
+* add routines for BTL_FRESH
+* CRC checking!!
+* cleanup code
+* reduce codesize
+* add pc-side of software to vscpworks instead of stand-alone app.
+
+

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<Project>
+  <Desktop>
+    <Static>
+      <Debug-Log/>
+      <Build>
+        <ColumnWidth0>20</ColumnWidth0>
+        <ColumnWidth1>723</ColumnWidth1>
+        <ColumnWidth2>193</ColumnWidth2>
+        <ColumnWidth3>48</ColumnWidth3>
+      </Build>
+      <Workspace>
+        <ColumnWidths>
+          
+          
+          
+          
+        <Column0>124</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
+      </Workspace>
+      <Disassembly>
+        
+        
+      <MixedMode>1</MixedMode><CodeCovShow>0</CodeCovShow></Disassembly>
+    </Static>
+    <Windows>
+      
+      
+      
+    <Wnd0>
+        <Tabs>
+          <Tab>
+            <Identity>TabID-14394-3889</Identity>
+            <TabName>Debug Log</TabName>
+            <Factory>Debug-Log</Factory>
+            <Session/>
+          </Tab>
+          <Tab>
+            <Identity>TabID-13871-3899</Identity>
+            <TabName>Build</TabName>
+            <Factory>Build</Factory>
+            <Session/>
+          </Tab>
+        </Tabs>
+        
+      <SelectedTab>0</SelectedTab></Wnd0><Wnd1>
+        <Tabs>
+          <Tab>
+            <Identity>TabID-25142-3892</Identity>
+            <TabName>Workspace</TabName>
+            <Factory>Workspace</Factory>
+            <Session>
+              
+            <NodeDict><ExpandedNode>cantest</ExpandedNode><ExpandedNode>cantest/startup</ExpandedNode></NodeDict></Session>
+          </Tab>
+        </Tabs>
+        
+      <SelectedTab>0</SelectedTab></Wnd1><Wnd2>
+        <Tabs>
+          <Tab>
+            <Identity>TabID-3123-3895</Identity>
+            <TabName>Disassembly</TabName>
+            <Factory>Disassembly</Factory>
+            <Session/>
+          </Tab>
+        </Tabs>
+        
+      <SelectedTab>0</SelectedTab></Wnd2></Windows>
+    <Editor>
+      
+      
+      
+      
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>D:\development\vscp\firmware\arm\str\cantest_str73x_iar\main.c</Filename><XPos>0</XPos><YPos>236</YPos><SelStart>7386</SelStart><SelEnd>7386</SelEnd></Tab><ActiveTab>0</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>D:\development\vscp\firmware\arm\str\cantest_str73x_iar\str73x_lib\source\73x_rtc.c</Filename><XPos>0</XPos><YPos>35</YPos><SelStart>3569</SelStart><SelEnd>3569</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\development\vscp\firmware\arm\str\cantest_str73x_iar\str73x_lib\source\73x_can.c</Filename><XPos>0</XPos><YPos>42</YPos><SelStart>3302</SelStart><SelEnd>3312</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\development\vscp\firmware\arm\str\cantest_str73x_iar\Startup\73x_vect.s</Filename><XPos>0</XPos><YPos>315</YPos><SelStart>13197</SelStart><SelEnd>13197</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\development\vscp\firmware\arm\str\cantest_str73x_iar\73x_it.c</Filename><XPos>0</XPos><YPos>653</YPos><SelStart>23341</SelStart><SelEnd>23341</SelEnd></Tab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Positions>
+      
+      
+      
+      
+      
+    <Top><Row0><Sizes><Toolbar-01353a88><key>iaridepm.enu1</key></Toolbar-01353a88></Sizes></Row0><Row1><Sizes><Toolbar-05aba9b0><key>debuggergui.enu1</key></Toolbar-05aba9b0></Sizes></Row1></Top><Left><Row0><Sizes><Wnd1><Rect><Top>-2</Top><Left>-2</Left><Bottom>422</Bottom><Right>198</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>195313</sizeHorzCX><sizeHorzCY>290698</sizeHorzCY><sizeVertCX>195313</sizeVertCX><sizeVertCY>616279</sizeVertCY></Rect></Wnd1></Sizes></Row0></Left><Right><Row0><Sizes><Wnd2><Rect><Top>-2</Top><Left>-2</Left><Bottom>422</Bottom><Right>198</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>195313</sizeHorzCX><sizeHorzCY>290698</sizeHorzCY><sizeVertCX>195313</sizeVertCX><sizeVertCY>616279</sizeVertCY></Rect></Wnd2></Sizes></Row0></Right><Bottom><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>198</Bottom><Right>1026</Right><x>-2</x><y>-2</y><xscreen>1028</xscreen><yscreen>200</yscreen><sizeHorzCX>1003906</sizeHorzCX><sizeHorzCY>290698</sizeHorzCY><sizeVertCX>195313</sizeVertCX><sizeVertCY>290698</sizeVertCY></Rect></Wnd0></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+  </Desktop>
+</Project>
+
+

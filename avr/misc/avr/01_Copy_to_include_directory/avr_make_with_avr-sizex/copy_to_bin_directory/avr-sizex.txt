@@ -1,0 +1,167 @@
+
+-------------------------------------------------
+
+AVR-SIZEX
+Copyright 2002, Brian Low
+
+Calculates the amount of flash, sram and eeprom memory your avr-gcc
+program uses based on the gcc ELF file. This is meant as an upgrade
+to the generic avr-size/size which only gives generic information.
+
+-------------------------------------------------
+
+
+-------------------------------------------------
+Installing
+-------------------------------------------------
+Unzip and copy avr-sizex.exe anywhere in your default search path. 
+The preferred location is with the other avr tools:
+
+	c:\avrgcc\bin\
+
+
+
+-------------------------------------------------
+Replacing avr-size in your makefile
+-------------------------------------------------
+The avrfreaks distribution of avr-GCC has a pre-built makefile for
+your projects. This makefile runs avr-size at the end of a compile. 
+To use avr-sizex instead, replace the following line 
+in c:\avrgcc\avrfreaks\avr-make:
+
+	$(SIZE) $(TRG).elf
+
+with:
+
+	avr-sizex --mcu $(MCU) $(TRG).elf
+
+
+This line appears twice, catch them both. 
+
+Take a look at the the --long and --top options. You may want to
+include them in your makefile if you like more detail.
+
+
+
+-------------------------------------------------
+Compiling
+-------------------------------------------------
+This program was compiled with
+	Cygwin 1.3	(http://www.cygwin.org)
+	MinGW 2.0	(http://www.mingw.org)
+	GCC 3.2		(http://www.gnu.org/software/gcc/gcc.html)
+	WinXP
+You can use straight MinGW but Cygwin provides make.exe, the binutils
+source and a nice installer, so Cygwin is a little easier.
+
+
+1. Download and install Cygwin (http://www.cygwin.org)
+   Install at least: GCC, make, MinGW runtime and the binutils with SOURCE
+
+2. Copy getopt.h from c:\cygwin\usr\src\binutils-xxx\include\
+   and place it in c:\cygwin\usr\include\mingw\
+
+3. From the avr-size folder, run "make"
+
+
+I am not sure why getopt.h is not included in MinGW already, the
+regular Cygwin does. I used the MinGW libraries (-mno-cygwin) instead
+of Cygwin so avr-sizex doesn't depend on cygwin1.dll.
+
+This should compile under Linux. If anyone can get it going, send me
+the info and I'll add it.
+
+Remember to increase the version number if you release a new version.
+If I am still around, I'd appreciate it if you sent me your changes.
+
+
+
+-------------------------------------------------
+Calculations
+-------------------------------------------------
+This section describes the calculation this utility uses so that they
+can be reviewed for errors/omissions:
+
+	Flash used  = (.text + .data) / (Flash size of device
+	                                   - default boot area)
+	SRAM used   =  (.data + .bss) / (SRAM size of device)
+	EEPROM used =       (.eeprom) / (EEPROM size of device)
+
+The .text, .data, .bss and .eeprom sizes are retrieved from the user-
+specified ELF file. Each section is located by name and the size of
+the section stored in the section header is retrieved.
+
+ELF Sections 101:
+.text section contains program instructions
+
+.data contains the initialization data for pre-initialized global and
+static variables. e.g. If you define and init a variable outside of
+main() as in "int a = 5;", the .data section will contain 2 bytes =
+0x0005. When the program first starts this initial value is loaded
+into SRAM. That is why .data appears in the Flash and SRAM
+calculations above.
+
+.bss is for uninitialized global variables. I'm not sure what the
+actual bits mean in this section. Any info?
+
+
+
+-------------------------------------------------
+Questions
+-------------------------------------------------
+If you have any answers... brian.low@shaw.ca
+
+THE STACK
+Is there anyway to estimate the maximum size of the stack for a
+program? Any rules of thumb?
+
+ATTINY DEVICES
+I am not sure how GCC handles the ATtiny devices without SRAM. It
+looks like the devices use a fixed sized, hardware based stack. For
+now, I have set the SRAM size of these devices to 0. When I have some
+time I'll take a look. If anyone has info on how to handle these
+devices, please let me know (brian.low@shaw.ca).
+
+
+
+-------------------------------------------------
+History
+-------------------------------------------------
+
+2002-Nov-08	v0.1	- first test release
+2002-Nov-09	v0.2	- remove external dependency on cygwin
+			  (now using mingw)
+2002-Nov-12	v0.3	- fixed random "unable to find .text section" error
+			- fixed --long not recognized
+			- added --top option
+			- display usage if no cmd line args passed
+
+
+
+-------------------------------------------------
+GNU License
+-------------------------------------------------
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+02111-1307  USA
+
+
+
+-------------------------------------------------
+Contact
+-------------------------------------------------
+Feel free to send bugs, comments and suggestions to:
+brian.low@shaw.ca
+

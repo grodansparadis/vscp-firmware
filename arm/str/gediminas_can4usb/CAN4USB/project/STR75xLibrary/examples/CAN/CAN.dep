@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project>
+  <fileVersion>2</fileVersion>
+  <fileChecksum>3725257568</fileChecksum>
+  <configuration>
+    <name>Debug</name>
+    <outputs>
+      <file>$PROJ_DIR$\..\..\library\inc\75x_mrcc.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_it.pbi</file>
+      <file>$PROJ_DIR$\..\..\library\inc\75x_map.h</file>
+      <file>$PROJ_DIR$\..\..\library\inc\75x_can.h</file>
+      <file>$TOOLKIT_DIR$\lib\shs_l.a</file>
+      <file>$PROJ_DIR$\..\..\library\src\75x_mrcc.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_can.o</file>
+      <file>$TOOLKIT_DIR$\lib\dl4t_al_in.a</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
+      <file>$PROJ_DIR$\..\..\library\src\75x_gpio.c</file>
+      <file>$PROJ_DIR$\..\..\library\src\75x_eic.c</file>
+      <file>$PROJ_DIR$\..\..\library\src\75x_can.c</file>
+      <file>$PROJ_DIR$\..\..\library\src\75x_lib.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_lib.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_init.o</file>
+      <file>$PROJ_DIR$\75x_it.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_gpio.o</file>
+      <file>$PROJ_DIR$\main.c</file>
+      <file>$PROJ_DIR$\..\..\startup\75x_vect.s</file>
+      <file>$PROJ_DIR$\..\..\startup\75x_init.s</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_eic.o</file>
+      <file>$PROJ_DIR$\..\..\linker\STR75x_FLASH.icf</file>
+      <file>$PROJ_DIR$\Debug\Exe\CAN.out</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_vect.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_eic.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_mrcc.o</file>
+      <file>$PROJ_DIR$\..\..\library\inc\75x_lib.h</file>
+      <file>$PROJ_DIR$\..\..\library\inc\75x_gpio.h</file>
+      <file>$PROJ_DIR$\..\..\library\inc\75x_eic.h</file>
+      <file>$PROJ_DIR$\75x_conf.h</file>
+      <file>$PROJ_DIR$\..\..\library\inc\75x_type.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_mrcc.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_can.pbi</file>
+      <file>$TOOLKIT_DIR$\lib\rt4t_al.a</file>
+      <file>$PROJ_DIR$\Debug\Obj\CAN.pbd</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_gpio.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_lib.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\..\development\vscp\firmware\arm\str\cantest_str73x_gcc\project\main.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_it.o</file>
+    </outputs>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>ILINK</name>
+          <file> 23</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\library\src\75x_mrcc.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 32</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 26</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 0 2 30 31</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 0 2 30 31</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\library\src\75x_gpio.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 36</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 17</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 28 2 30 31 0</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 28 2 30 31 0</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\library\src\75x_eic.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 25</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 21</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 29 2 30 31</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 29 2 30 31</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\library\src\75x_can.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 33</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 6</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 3 2 30 31 0</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 3 2 30 31 0</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\library\src\75x_lib.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 37</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 14</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 27 2 30 31 0 3 28 29</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 27 2 30 31 0 3 28 29</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\75x_it.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 1</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 39</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 27 2 30 31 0 3 28 29</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 27 2 30 31 0 3 28 29</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\main.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 9</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 8</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 27 2 30 31 0 3 28 29</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 27 2 30 31 0 3 28 29</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\startup\75x_vect.s</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 24</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\startup\75x_init.s</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 15</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Exe\CAN.out</name>
+      <inputs>
+        <tool>
+          <name>ILINK</name>
+          <file> 22 6 21 17 15 39 14 26 24 8 4 34 7</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Obj\CAN.pbd</name>
+      <inputs>
+        <tool>
+          <name>BILINK</name>
+          <file> 33 25 36 1 37 32 9</file>
+        </tool>
+      </inputs>
+    </file>
+  </configuration>
+</project>
+
+

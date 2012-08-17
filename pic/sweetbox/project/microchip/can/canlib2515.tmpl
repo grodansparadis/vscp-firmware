@@ -1,0 +1,55 @@
+/*********************************************************************
+ *
+ *                  CAN Lib MCP2515 def File
+ *
+ *********************************************************************
+ * FileName:        canlib2515.def
+ * Dependencies:	
+ *
+ * Processor:       PIC32
+ *
+ * Complier:        MPLAB C32 1.0+
+ *                  MPLAB IDE 8.0+
+ * Company:         Microchip Technology, Inc.
+ *
+ * Software License Agreement
+ *
+ * The software supplied herewith by Microchip Technology Incorporated
+ * (the “Company”) for its PIC32/PIC24 Microcontroller is intended
+ * and supplied to you, the Company’s customer, for use solely and
+ * exclusively on Microchip PIC32/PIC24 Microcontroller products.
+ * The software is owned by the Company and/or its supplier, and is
+ * protected under applicable copyright laws. All rights are reserved.
+ * Any use in violation of the foregoing restrictions may subject the
+ * user to criminal sanctions under applicable laws, as well as to
+ * civil liability for the breach of the terms and conditions of this
+ * license.
+ *
+ * THIS SOFTWARE IS PROVIDED IN AN “AS IS” CONDITION. NO WARRANTIES,
+ * WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
+ * TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
+ * IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
+ * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+ *
+ *
+ * $Id: $
+ *
+ ********************************************************************/
+ 
+
+// Transmit buffer timeout
+#define XMIT_TIMEOUT 100	//milli sec
+
+//CAN Chip Select port configuration
+#define mCONFIG_CAN_CS() (mPORTBSetBits(BIT_5), mPORTBSetPinsDigitalOut(BIT_5))
+
+//Chip Select lines for CAN controller.  Channel is 1 based for SPI ports
+#define mASSERT_CS(Chn)		(Chn==1)?(mPORTBClearBits( BIT_5 )):(mPORTBClearBits( BIT_6 ))
+#define mDEASSERT_CS(Chn)	(Chn==1)?(mPORTBSetBits( BIT_5 ))  :(mPORTBSetBits( BIT_6 ))
+
+//Baudrate setting in CNF1 based on 16 MHz crystal
+#define CAN_500kbps 1       
+#define CAN_250kbps 3
+#define CAN_125kbps 7       
+

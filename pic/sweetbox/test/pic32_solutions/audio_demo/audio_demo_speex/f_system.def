@@ -1,0 +1,73 @@
+/*********************************************************************
+ *
+ *            File System Configuration File
+ *
+ *********************************************************************
+ * FileName:        f_system.def
+ * Description: 	Configurations for thje file system
+ * Company:         Microchip Technology, Inc.
+ *
+ * Software License Agreement
+ *
+ * The software supplied herewith by Microchip Technology Incorporated
+ * (the “Company”) for its PICmicro® Microcontroller is intended and
+ * supplied to you, the Company’s customer, for use solely and
+ * exclusively on Microchip PICmicro Microcontroller products. The
+ * software is owned by the Company and/or its supplier, and is
+ * protected under applicable copyright laws. All rights are reserved.
+ * Any use in violation of the foregoing restrictions may subject the
+ * user to criminal sanctions under applicable laws, as well as to
+ * civil liability for the breach of the terms and conditions of this
+ * license.
+ *
+ * THIS SOFTWARE IS PROVIDED IN AN “AS IS” CONDITION. NO WARRANTIES,
+ * WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
+ * TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
+ * IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
+ * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+ *$Id: $
+ ************************************************************************/
+
+//#define	FSE_DEMO_BOARD_V1	// board we are using
+
+
+//#define USE_USB_MSD		// define this to use USB
+				// otherwise, use FAT16
+
+
+
+#ifdef USE_USB_MSD
+
+	//#define	USB_HOST_PIM	// using the USB PIM
+	
+	// VBus Control Pins
+	#ifdef USB_HOST_PIM
+		#define VBUS_POWER_GOOD BIT_3    // Port B - Input
+		#define VBUS_SHUTDOWN_N BIT_5    // Port B - Output
+		#define VBUS_SELECT_3V3 BIT_0    // Port B - Output
+	#else
+		#define VBUS_SHUTDOWN_N BIT_15   // Port G - Output
+	#endif	
+
+	#include "usb_config_def.h"
+	#include "usb\usb.h"
+	#include "usb_client_msd\fsio.h"
+	#include "usb_client_msd\usb_client_msd.h"
+	#include "usb_client_msd\usb_client_msd_scsi.h"
+
+	#define FILE        FSFILE
+	#define fopen       FSfopen
+	#define fclose      FSfclose
+	#define fread       FSfread
+	#define fwrite      FSfwrite
+	#define	frewind     FSrewind
+
+#else	// FAT16
+	#include <mstimer.h>
+	#include "fat.def"
+	#include <fat16/fat.h>
+#endif	// USE_USB_MSD/FAT16
+ 
+
+

@@ -1,0 +1,9 @@
+/** \defgroup i2ceeprom i2ceeprom: Interface for standard I2C EEPROM memories
+
+	This library provides functions for reading and writing standard
+	24Cxxx/24LCxxx I2C EEPROM memories.  Memory sizes up to 64Kbytes are
+	supported.
+	
+	Future revisions may include page-write support.
+
+*/

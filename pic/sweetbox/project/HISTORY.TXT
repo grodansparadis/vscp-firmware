@@ -1,0 +1,17 @@
+Project History
+===============
+Rev. 273 1008-12-29 AKHE All treads except MiWi rolling.
+Rev. 226 2008-11-26 AKHE First version of lwIP + FreeRTOS working.
+Rev. 219 2008-11-19 AKHE Added RTCC functionality.
+Rev. 216 2008-11-16 AKHE lwip now moved outside of source tree. 
+Rev. 213 2008-11-15 AKHE VSCP Level II framework added.
+Rev. 212 2008-11-14 AKHE Added temperature reading task.AKHE
+Rev. 211 2008-11-14 AKHE queue and tasks for HMI control added.
+Rev. 207 2008-11-13 AKHE Removed the timebase and replaced it with FreeRTOS ticks.
+Rev. 202 2008-11-13 AKHE Updated to FreeRTOS 5.1.0 and moved FreeRTOS external to the project.
+Rev. 143 2008-09-22 AKHE CAN is working (testcode in test/CAN)
+Rev. 139 2008-09-20 AKHE Ethernet working (testcode in test/TCPIP)
+Rev. 136 2008-09-18 AKHE Tempsensor and EEPROM working
+
+
+

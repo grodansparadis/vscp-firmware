@@ -1,0 +1,246 @@
+<html>
+<head>
+<link href="mx.css" rel="stylesheet" type="text/css">
+<title>Commands</title>
+</head>
+
+<body>
+<p><div class=pgHdr>Commands</div>
+
+<p><div class=pgSec>Introduction</div>
+Commands can be sent to the target board via UDP messages, or the HTTP GET command.
+All commands follow the HTTP GET syntax of name=value.
+
+<p>For example, to set Port pin A2, we can:<br>
+Send the following <b>HTTP GET command</b> to the target board:
+<br><i>http://10.1.0.1/?a2=1</i>
+<br>Or we can send the following <b>UDP message</b> to the UDP Command Port:
+<br><i>a2=1</i>
+<p>In this example the name part is "a2" and the value part is '1'.
+
+<p><div class=pgSec>HTTP GET Command</div>
+Any of the commands listed below can be executed on the target by using the HTTP GET
+command. To issue a HTTP GET command, simply append the command to the web page
+address, after a '?' character.
+<p>For example, to set Port pin A2, we can send the following HTTP GET
+command to the target board:
+<br><i>http://10.1.0.1/?a2=1</i>
+<p>Multiple commands can be send by seperating each command with a '&' character.
+For example, to set Port pin A2, and clear Port C0, we can send the following HTTP GET
+command to the target board:
+<br><i>http://10.1.0.1/?a2=1&c0=0</i>
+
+<p><div class=pgSec>UDP Command</div>
+Any of the commands listed below can be executed on the target by sending them
+to UDP port 54123. This port is configurable, and can be changed.
+<p>For example, to set Port pin A2, we can send the following UDP message
+to the target board:
+<br><i>a2=1</i>
+<p>Multiple commands can be send by seperating each command with a '&' character.
+For example, to set Port pin A2, and clear Port C0, we can send the following UDP
+message to the target board:
+<br><i>a2=1&c0=0</i>
+
+<a name=port></a><div class=pgSec>The following <b>Port commands</b> are implemented:</div>
+<table class=compactTable cellspacing=0 cellpadding=2 border=1>
+<tr width="100%"><td nowrap align=center><i>Command Syntax</i></td><td align=center><i>Description</i></td></tr>
+<tr><td><code>p=XX</code></td><td><b>Set Port</b> - set the given PIC port to the given hex value. The given hex
+value (<i>XX</i> part or command) must be in uppercase! For example:
+    <br>"<code>a=8A</code>" will set PIC port A to 0x8A.
+</td></tr>
+<tr><td><code>p[0-7]=[1,0]</code></td><td><b>Set Port Pin</b> - set or clear the given PIC port pin. For example:
+    <br>"<code>a0=0</code>" will clear PIC port A0 (Port A, pin 0)
+    <br>"<code>f7=1</code>" will set PIC port F7 (Port F, pin 7)
+</td></tr>
+<tr><td><code>px[0-7]=[1,0]</code></td><td><b>Inverted Set Port Pin</b> - Set or clear the given PIC port pin. The value is inverted! For example:
+    <br>"<code>ax0=0</code>" will set PIC port A0 (Port A, pin 0)
+    <br>"<code>fx7=1</code>" will clear PIC port F7 (Port F, pin 7)
+</td></tr>
+<tr><td><code>p[0-7]r=[1,0]</code></td><td><b>Set Port Pin, Remember</b> -  - Same as "Set Port Pin" command, except that
+    the settings are saved to the application configuration, and are remembered after power up.
+</td></tr>
+<tr><td><code>p[0-7]p=[0-9]</code></td><td><b>Pulse Port Pin, Positive</b> - The given PIC port pin is set high and
+    then low again. The value gives the 'pulse width' specifying for how many micro seconds the pin should be kept
+    high. If 0, the pin is kept high for a minimum time, which is usually between 200ns to 400ns. For example:
+    <br>"<code>a0p=0</code>" will set PIC port A0 high and after 200ns to 400ns low again
+    <br>"<code>f7p=9</code>" will set PIC port F7 high and after 9us low again
+</td></tr>
+<tr><td><code>p[0-7]n=[0-9]</code></td><td><b>Pulse Port Pin, Negative</b> - The given PIC port pin is set low and
+    then high again. The value gives the 'pulse width' specifying for how many micro seconds the pin should be kept
+    low. If 0, the pin is kept low for a minimum time, which is usually about 200ns to 400ns. For example:
+    <br>"<code>a0n=0</code>" will set PIC port A0 low and after 200ns to 400ns high again
+    <br>"<code>f7n=5</code>" will set PIC port F7 low and after 5us high again
+</td></tr>
+<tr><td><code>pc[0-7]=[1,0]</code></td><td><b>Port Pin Configuration</b> - Configure given PIC port pin as input or output. '0' will configure
+    pin to be an output, and '1' an input. The port direction configured with this command will NOT be remembered
+    after the next power up, use the "Port Pin Configuration, Remember" command to achieve this!  Example to use this command:
+    <br>"<code>ac0=0</code>" will configure PIC port A0 (Port A, pin 0) to be an output.
+    <br>"<code>fc7=1</code>" will configure PIC port F7 (Port F, pin 7) to be an input
+</td></tr>
+<tr><td><code>pc[0-7]r=[1,0]</code></td><td><b>Port Pin Configuration, Remember</b> - Same as "Port Pin Configuration" command, except that
+    the settings are saved to the application configuration, and are remembered after power up.
+</td></tr>
+</table>
+
+<a name=config></a><p class=pgSec>The following <b>Config commands</b> are implemented:<br>
+<table class=compactTable cellspacing=0 cellpadding=2 border=1>
+<tr width="100%">
+    <td nowrap align=center><i>Command Syntax</i></td>
+    <td align=center><i>Description</i></td>
+</tr>
+<tr><td><code>kxx=[0-255]</code></td>
+    <td><b>Set Config Byte to given decimal value</b> - set the given config byte to the given decimal value. The 'xx' part
+    gives the offset (in uppercase hex) of the config byte in the
+    "Application Configuration bytes"
+    structure.
+    The value has to be a decimal number from 0 - 255.
+    <br>Examples to use this command:
+    <p>"k00=100" Will set the the "Application Configuration byte" at 0x00 (MSB of IP address) to 100
+    <p>"k2A=16" Will set the "Application Configuration byte" at 0x2A (Port F direction) to 16 (0x0f).
+        Address 0x2A contains the TRIS register for PIC Port F. Setting a bit to 0 will configure the port as
+        an output, and 1 as an input. In this example we set TRISF to 0x0f = binary 00001111. This will configure port F
+        pins 0-3 as inputs, and pins 4-7 as outputs.
+    <p>"k2F=16" Will set the "Application Configuration byte" at 0x2F (Port F default value) to 10 (0x0a).
+        Address 0x2F contains the default value for PIC Port F at power up. In this example we set it to 0x0a = binary 00001010. This will
+        set the default value of port F pins 1 and 3 to 1 (5V), and pins 0, 2, 4, 5, 6, 7 to 0 (0V) at power up.
+    </td>
+</tr>
+<tr><td><code>kxx=Hyy</code></td>
+    <td><b>Set Config Byte to given hex value</b> - set the given config byte to the given hex value. The 'xx' part
+    gives the offset (in uppercase hex) of the config byte in the
+    "Application Configuration bytes"
+    structure.
+    The value ('yy' part of command) has to be an uppercase hex value from 00 - FF.
+    <br>Examples to use this command:
+    <p>"k00=H1F" Will set the "Application Configuration byte" at 0x00 (MSB of IP address) to 0x1F
+    </td>
+</tr>
+<tr><td><code>kxxmzz=Hyy</code></td>
+    <td><b>Set Config Byte to given hex value, using mask</b> - set the given config byte to the
+    given hex value, using the given mask. The 'xx' part gives the offset (in uppercase hex) of
+    the config byte in the
+    "Application Configuration bytes"
+    structure. The 'zz' part gives the mask (in uppercase hex) of the bits in the config byte to change.
+    If the mask is 00, no bits are changed. If the mask is FF, all bits are set to the given value.
+    The value ('yy' part of command) has to be an uppercase hex value from 00 - FF.
+    <br>Examples to use this command:
+    <p>"k05m04=HFF" Will set the third bit (bit position 2) of the "Application Configuration byte" at
+    0x05.
+    <p>"k1Am80=H00" Will clear the eighth bit (bit position 7) of the "Application Configuration byte" at
+    0x1A.
+    </td>
+</tr>
+<tr><td><code>kxxby=[0,1]</code></td>
+    <td><b>Set or Clear bit in Config Byte</b> - set or clear a bit in the given config byte to the
+    given value. The 'xx' part gives the offset (in uppercase hex) of the config byte in the
+    "Application Configuration bytes"
+    structure. The 'y' part gives the position (value from '0' to '7') of the bit in the config byte to change.
+    The value has to be a '0' or '1' character, indicating if the given bit is to be cleared or set.
+    <br>Examples to use this command:
+    <p>"k05b6=1" Will set the seventh bit (bit position 6) of the "Application Configuration byte" at 0x05.
+    <p>"kA5b0=0" Will clear the first bit (bit position 0) of the "Application Configuration byte" at 0xA5.
+    </td>
+</tr>
+</table>
+
+<a name=general></a><p class=pgSec>The following <b>General commands</b> are implemented:<br>
+<table class=compactTable cellspacing=0 cellpadding=2 border=1>
+<tr width="100%">
+    <td nowrap align=center><i>Command Syntax</i></td>
+    <td align=center><i>Description</i></td>
+</tr>
+<tr><td><code>la=str</code></td>
+    <td><b>New Username</b> - assigns a new Username. The given "str" is the new username, and must be an alpha numeric
+        string of 1 to 8 characters. For example:
+        <br>"<code>la=wombat</code>" will set the new username to "wombat".</td>
+</tr>
+<tr><td><code>lb=str</code></td>
+    <td><b>New Password</b> - assigns a new Password. The given "str" is the new password, and must be an alpha numeric
+        string of 1 to 8 characters. For example:
+        <br>"<code>lb=gumtree</code>" will set the new username to "gumtree".</td>
+</tr>
+<tr><td><code>ln=str</code></td>
+    <td><b>New NetBIOS name</b> - assigns a new NetBIOS name. The given "str" is the new name, and must be an alpha numeric
+        string of 1 to 15 characters. For example:
+        <br>"<code>lb=CROC1</code>" will set the new username to "CROC1".</td>
+</tr>
+</table>
+
+<a name=short></a><p class=pgSec>The following <b>Short commands</b> are implemented:<br>
+<table class=compactTable cellspacing=0 cellpadding=2 border=1>
+<tr width="100%">
+    <td nowrap align=center><i>Command Syntax</i></td>
+    <td align=center><i>Logged<br>In</i></td>
+    <td align=center><i>Description</i></td>
+</tr>
+<tr><td><code>m=r</code></td>
+    <td><b>Reset Board</b> - reset's the board. This command can be used to remotely reset the board. This can
+    be used to update the firmware via the network bootloader for example.</td>
+</tr>
+<tr><td><code>m=o</code></td>
+    <td><b>Log Out</b> - log out the current user.</td>
+</tr>
+</table>
+
+
+<a name=pwm></a><p class=pgSec>The following <b>PWM commands</b> are implemented:<br>
+<table class=compactTable cellspacing=0 cellpadding=2 border=1>
+<tr width="100%">
+    <td nowrap align=center><i>Command Syntax</i></td>
+    <td align=center><i>Description</i></td>
+</tr>
+<tr><td nowrap><code>w[1-4]=[0-1023]</code></td>
+    <td><b>Set PWM Value</b>. This command will set the value (Duty Cycle) of the given PWM channel.
+    The possible values must be in the range 0-255 for 8-bit mode, and 0-1023 for 10-bit mode.
+    A value of 0 will give a duty cycle of 0% (output off), where a maximum value will give a duty
+    cycle of 100% (permanently on).
+    <br>Examples to use this command:
+    <br>"w1=128" will set the duty cycle of PWM channel 1 to 50% when in 8-bit mode
+    <br>"w3=256" will set the duty cycle of PWM channel 3 to 25% when in 10-bit mode
+    </td>
+</tr>
+<tr><td nowrap><code>w[1-4]r=[0-1023]</code></td>
+    <td><b>Set PWM Value, Remember</b>. Same as the <i>Set PWM Value</i> command, except that the
+    settings are saved to the application configuration, and are remembered after power up.</b></td>
+</tr>
+<tr><td><code>wf=[0-3]</code></td>
+    <td><b>Set PWM Frequency</b>. This command will set the PWM frequency. The available frequencies
+    depends on the PWM mode (8-bit or 10-bit) used. The frequency is given by a constant value between
+    0 to 3.
+    <br>For <b>8-bit mode</b>, the following values are defined: <i>0 and 1</i>=9.766kHz, <i>2</i>=39.062kHz, <i>3</i>=156.25kHz
+    <br>For <b>10-bit mode</b>, the following values are defined: <i>0</i>=2.441kHz, <i>1</i>=9.766kHz, <i>2 and 3</i>=39.062kHz
+    </td>
+</tr>
+<tr><td><code>wfr=[0-3]</code></td>
+    <td><b>Set PWM Frequency, Remember</b>. Same as the <i>Set PWM Frequency</i> command, except that the
+    settings are saved to the application configuration, and are remembered after power up.</b></td>
+</tr>
+<tr><td><code>we=XX</code></td>
+    <td><b>Enable PWM Channels</b>. This command will enable/disable the given PWM channels.
+    The command value (XX part) is a two character, uppercase hex value indicating which channels are to be enabled.
+    Each bit in the byte represents a PWM channel. Bit 0 represents PWM channel 1, bit 1 PWM channel 2, ...., and bit 7 PWM channel 8.
+    The SBC68EC has 2 PWM channels (C1, C2), so only the fist 2 bits are used.
+    <br>Examples to use this command:
+    <br>"we=00" will disable all channels
+    <br>"we=1F" will enable PWM channels 1 to 5, and disable all the rest (if any)
+    <br>"we=14" will enable PWM channel 3 and 5, and disable all the rest (if any)
+    </td>
+</tr>
+<tr><td><code>wer=XX</code></td>
+    <td><b>Enable PWM Channels,Remember</b>. Same as the <i>Enable PWM Channels</i> command, except that the
+    settings are saved to the application configuration, and are remembered after power up.</b></td>
+</tr>
+<tr><td><code>wm=[8,a]</code></td>
+    <td><b>Set PWM Mode</b>. This command will set the PWM mode. When the value is '8', the mode
+    is set to 8-bit mode. When the value is 'a', the mode is set to 10-bit mode.
+    </td>
+</tr>
+<tr><td><code>wmr=[8,a]</code></td>
+    <td><b>Set PWM Mode, Remember</b>. Same as the <i>Set PWM Mode</i> command, except that the
+    settings are saved to the application configuration, and are remembered after power up.</b></td>
+</tr>
+</table>
+
+
+</body>
+</html>

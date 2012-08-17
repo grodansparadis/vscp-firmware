@@ -1,0 +1,71 @@
+<!DOCTYPE CrossStudio_Project_File>
+<solution version="1" Name="uIP" >
+  <project Name="uIP-E2124" >
+    <configuration arm_target_loader_parameter="14745600" project_directory="uip" link_include_startup_code="No" project_type="Executable" arm_endian="Little" Name="Common" />
+    <folder Name="Source Files" >
+      <configuration filter="c;h;s;asm;inc;s" Name="Common" />
+      <file file_name="main.c" Name="main.c" >
+        <configuration Name="Flash Debug" />
+      </file>
+      <file file_name="uip_arp.c" Name="uip_arp.c" />
+      <file file_name="cgi.c" Name="cgi.c" />
+      <file file_name="cs8900a.c" Name="cs8900a.c" />
+      <file file_name="fs.c" Name="fs.c" />
+      <file file_name="httpd.c" Name="httpd.c" />
+      <file file_name="telnetd.c" Name="telnetd.c" />
+      <file file_name="telnetd-shell.c" Name="telnetd-shell.c" />
+      <file file_name="uip.c" Name="uip.c" >
+        <configuration gcc_optimization_level="None" Name="ARM Flash Debug" />
+      </file>
+      <file file_name="uip_arch.c" Name="uip_arch.c" />
+      <file file_name="cgi.h" Name="cgi.h" />
+      <file file_name="cs8900a.h" Name="cs8900a.h" />
+      <file file_name="fs.h" Name="fs.h" />
+      <file file_name="fsdata.h" Name="fsdata.h" />
+      <file file_name="httpd.h" Name="httpd.h" />
+      <file file_name="telnetd.h" Name="telnetd.h" />
+      <file file_name="uip.h" Name="uip.h" />
+      <file file_name="uip_arch.h" Name="uip_arch.h" />
+      <file file_name="uip_arp.h" Name="uip_arp.h" />
+      <file file_name="uipopt.h" Name="uipopt.h" />
+      <file file_name="memb.h" Name="memb.h" />
+      <file file_name="memb.c" Name="memb.c" />
+    </folder>
+    <folder Name="Startup Code" >
+      <configuration filter="" Name="Common" />
+      <file file_name="$(StudioDir)/source/crt0.s" Name="crt0.s" />
+      <file file_name="$(StudioDir)/targets/Philips_LPC210X/Philips_LPC210X_Startup.s" Name="Philips_LPC210X_Startup.s" />
+      <file file_name="$(StudioDir)/targets/Philips_LPC210X/Philips_LPC2124_MemoryMap.xml" Name="Philips_LPC2124_MemoryMap.xml" />
+      <file file_name="$(StudioDir)/targets/sram_placement.xml" Name="sram_placement.xml" >
+        <configuration build_exclude_from_build="Yes" Name="Flash" />
+      </file>
+      <file file_name="$(StudioDir)/targets/flash_placement.xml" Name="flash_placement.xml" >
+        <configuration build_exclude_from_build="Yes" Name="RAM" />
+      </file>
+      <file file_name="$(StudioDir)/targets/Philips_LPC210X/Philips_LPC210X_Target.js" Name="Philips_LPC210X_Target.js" >
+        <configuration Name="Common" file_type="Reset Script" />
+      </file>
+    </folder>
+    <configuration target_reset_script="SRAMReset()" Name="RAM" />
+    <configuration arm_target_flash_loader_file_path="$(StudioDir)/targets/Philips_LPC210X/Release/Loader.exe" target_reset_script="FLASHReset()" Name="Flash" />
+    <configuration Name="ARM RAM Debug" />
+    <file file_name="uip.hzs" Name="uip.hzs" />
+    <configuration arm_instruction_set="ARM" Name="ARM Flash Debug" />
+    <configuration arm_instruction_set="THUMB" Name="ARM Flash Release" />
+  </project>
+  <configuration c_preprocessor_definitions="DEBUG" hidden="Yes" Name="Debug" />
+  <configuration c_preprocessor_definitions="NDEBUG" gcc_optimization_level="Level 1" build_debug_information="No" hidden="Yes" Name="Release" />
+  <configuration c_preprocessor_definitions="__FLASH_BUILD" hidden="Yes" Name="Flash" />
+  <configuration c_preprocessor_definitions="__RAM_BUILD" hidden="Yes" Name="RAM" />
+  <configuration c_preprocessor_definitions="__ARM" arm_instruction_set="ARM" hidden="Yes" Name="ARM" />
+  <configuration c_preprocessor_definitions="__THUMB" arm_instruction_set="THUMB" hidden="Yes" Name="THUMB" />
+  <configuration inherited_configurations="ARM;Flash;Debug" Name="ARM Flash Debug" />
+  <configuration inherited_configurations="ARM;Flash;Release" Name="ARM Flash Release" />
+  <configuration inherited_configurations="ARM;RAM;Debug" Name="ARM RAM Debug" />
+  <configuration inherited_configurations="ARM;RAM;Release" Name="ARM RAM Release" />
+  <configuration inherited_configurations="THUMB;Flash;Debug" Name="THUMB Flash Debug" />
+  <configuration inherited_configurations="THUMB;Flash;Release" Name="THUMB Flash Release" />
+  <configuration inherited_configurations="THUMB;RAM;Debug" Name="THUMB RAM Debug" />
+  <configuration inherited_configurations="THUMB;RAM;Release" Name="THUMB RAM Release" />
+  <configuration c_preprocessor_definitions="OSCILLATOR_CLOCK_FREQUENCY=14745600 " Name="Common" />
+</solution>

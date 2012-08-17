@@ -1,0 +1,5 @@
+/** \defgroup driver_arm_at91 Drivers for Atmel AT91 ARM Processors
+
+Drivers for Atmel AT91 ARM Processors.
+
+*/

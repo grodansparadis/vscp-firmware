@@ -1,0 +1,7 @@
+wait_halt
+mww 0x60000010 0x7270E0
+flash protect 0 0 9 off
+flash erase 0 0 9
+flash write 0 main.bin 0
+reset
+shutdown

@@ -1,0 +1,152 @@
+	init();                             // Initialize Microcontroller	
+	
+	// Check VSCP persistent storage and
+	// restore if needed
+	if ( !vscp_check_pstorage() ) {
+		
+		// Spoiled or not initialized - reinitialize
+		init_app_eeprom();	
+	}
+
+	vscp_init();						// Initialize the VSCP functionality
+
+	while ( 1 ) {                     	// Loop Forever	
+		
+		ClrWdt();
+
+		if ( vscp_initbtncnt > 250 && ( VSCP_STATE_INIT != vscp_node_state ) ) {
+			// Init button pressed
+			vscp_nickname = VSCP_ADDRESS_FREE;
+			writeEEPROM( VSCP_EEPROM_NICKNAME, VSCP_ADDRESS_FREE );
+			vscp_init();
+		}
+
+		// Check for any valid CAN message
+		vscp_imsg.flags = 0;
+		vscp_getEvent();
+
+		// do a meaurement if needed
+		if ( measurement_clock > 1000 ) {
+			
+			measurement_clock = 0;
+			doMeasurement();
+			seconds++;
+			
+			// Temperature/hum/dew report timers are only updated if in active 
+			// state
+			if ( VSCP_STATE_ACTIVE == vscp_node_state ) {
+				seconds_temp++;
+				seconds_hum++;
+				seconds_dew++;
+			}
+
+			if ( seconds > 60 ) {
+			
+				seconds = 0;
+				
+				// If we have errors in sensor readings
+				// send out error event
+				if ( error_cnt_temp || error_cnt_hum ) {
+					sendErrorEvent( ERROR_SENSOR );
+				}
+			}				
+		}
+
+		switch ( vscp_node_state ) {
+
+			case VSCP_STATE_STARTUP:			// Cold/warm reset
+
+				// Get nickname from EEPROM
+				if ( VSCP_ADDRESS_FREE == vscp_nickname ) {
+					// new on segment need a nickname
+					vscp_node_state = VSCP_STATE_INIT; 	
+				}
+				else {
+					// been here before - go on
+					vscp_node_state = VSCP_STATE_ACTIVE;
+					vscp_active();
+				}
+				break;
+
+			case VSCP_STATE_INIT:			// Assigning nickname
+				vscp_probe();
+				break;
+
+			case VSCP_STATE_PREACTIVE:		// Waiting for host initialisation
+				vscp_rcv_preactive();					
+				break;
+
+			case VSCP_STATE_ACTIVE:			// The normal state
+				
+				if ( vscp_imsg.flags & VSCP_VALID_MSG ) {	// incoming message?
+					
+					// Yes, incoming message
+					if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.class ) {
+						switch( vscp_imsg.type ) {
+
+							case VSCP_TYPE_PROTOCOL_SEGCTRL_HEARTBEAT:
+								vscp_rcv_heartbeat();
+								break;
+
+							case VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE:
+								vscp_rcv_new_node_online();
+								break;
+							
+							case VSCP_TYPE_PROTOCOL_SET_NICKNAME:
+								vscp_rcv_set_nickname();
+								break;
+							
+							case VSCP_TYPE_PROTOCOL_DROP_NICKNAME:
+								vscp_rcv_drop_nickname();
+								break;
+
+							case VSCP_TYPE_PROTOCOL_READ_REGISTER:
+								if ( ( 2 == ( vscp_imsg.flags & 0x0f ) ) &&  // two databytes
+										( vscp_nickname == vscp_imsg.data[ 0 ] ) ) { 
+
+									if ( vscp_imsg.data[ 1 ] < 0x80 )  {
+										// Read application specific register
+										read_app_register( vscp_imsg.data[ 1 ] );
+									}
+									else {
+										// Read VSCP register
+										vscp_rcv_readreg();
+									}
+								}
+								break;
+
+							case VSCP_TYPE_PROTOCOL_WRITE_REGISTER:
+								if ( ( 3 == ( vscp_imsg.flags & 0x0f ) ) && 
+										( vscp_nickname == vscp_imsg.data[ 0 ] ) ) {
+									if ( vscp_imsg.data[ 1 ] < 0x80 ) {
+										// Write application specific register
+										write_app_register( vscp_imsg.data[ 1 ], vscp_imsg.data[ 2 ] );
+									}
+									else {
+										// Read VSCP register
+										vscp_rcv_writereg();
+									}
+								}
+								break;
+
+							default:
+								// Do work load
+								break;
+						}							
+					}
+				}
+				break;
+
+			case VSCP_STATE_ERROR:			// Everything is *very* *very* bad.
+				vscp_error();
+				break;
+
+			default:					// Should not be here...
+				vscp_node_state = VSCP_STATE_STARTUP;
+				break;
+
+		} 
+
+		doWork();
+
+	} // while

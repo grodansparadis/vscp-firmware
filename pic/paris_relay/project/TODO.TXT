@@ -1,0 +1,1 @@
+- Add status message sent on configurable even intervals.

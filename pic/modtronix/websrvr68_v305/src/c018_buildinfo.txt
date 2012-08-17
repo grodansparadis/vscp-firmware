@@ -1,0 +1,14 @@
+How to build the C018xxx.o files:
+
+1) Go to the "..\src\traditional\startup" folder of the MPLAB C18 compiler
+
+2) Rename all "*.c" files in this folder to "*_x800.c". For example,
+   rename "c018.c" to "c018_x800.c"......
+
+2) Modify the "#pragma code _entry_scn=0x000000" line in all "*_x800.c" files
+   to point to the new vector:
+   #pragma code _entry_scn=0x800
+
+3) Recompile files - run "makestartup_x800.bat" folder in "../src/traditional" folder
+
+4) Copy newly created c018xx_x800.o library files to this folder

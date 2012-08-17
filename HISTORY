@@ -1,0 +1,8 @@
+
+2009-03-21 - AKHE: Changed codes for bootloader algorithms.
+2009-03-21 - AKHE: PIC bootloader alogorithm 1 was always returned. Fixed.
+2009-03-15 - AKHE: Fixed problem with CLASS1_PROTOCOL, Type=33/34 (DM Properties).
+2009-03-14 - AKHE: vscp_getMatrixInfo call parameters changed. 
+2009-03-14 - AKHE: Beginning of history.
+
+

@@ -1,0 +1,101 @@
+/********************************************************************
+ * FileName:		http.def
+ * Dependencies:
+ * Processor:		PIC24FJ128
+ * Hardware:		N/A
+ * Assembler:		N/A
+ * Linker:		N/A
+ * Company:		Microchip Technology, Inc.
+ *
+ * Software License Agreement:
+ * The software supplied herewith by Microchip Technology Incorporated
+ * (the “Company”) for its PICmicro® Microcontroller is intended and
+ * supplied to you, the Company’s customer, for use solely and
+ * exclusively on Microchip PICmicro Microcontroller products. The
+ * software is owned by the Company and/or its supplier, and is
+ * protected under applicable copyright laws. All rights are reserved.
+ * Any use in violation of the foregoing restrictions may subject the
+ * user to criminal sanctions under applicable laws, as well as to
+ * civil liability for the breach of the terms and conditions of this
+ * license.
+ *
+ * THIS SOFTWARE IS PROVIDED IN AN “AS IS” CONDITION. NO WARRANTIES,
+ * WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
+ * TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
+ * IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
+ * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+ *
+ *********************************************************************
+ * File Description:
+ *
+ * HTTP Server Appilcation
+ *
+ * Change History:
+ * Name         Date            Changes
+ * S Justice    03/01/07        Initial Version
+ ********************************************************************/
+
+#ifndef _HTTP_DEF_FILE
+#define _HTTP_DEF_FILE
+
+// This is the max number of connects that can be handled at
+// one time.  The number of TCP sockets must be equal of 
+// greater.
+#define HTTP_MAX_CONNECTIONS        10
+
+// This is the size on bytes of the HTTP client cmd lengths that
+// will be handled at one time
+#define HTTP_HTML_CMD_LEN           80
+
+// This is the size of the variable name and value length in bytes
+// of data received in a post transaction
+#define HTTP_VAR_LEN                32
+#define HTTP_VALUE_LEN              32
+
+// This is the size of the file name that is value.  This includes the
+// extension.  The file system must be able to handle a file name that
+// is equal or greater than this
+#define HTTP_FILENAME_LEN           32
+
+// The size, in bytes, of the Tx buffer that is used when buffering up
+// TCP/IP response packets.  For maximun throughput, it is recommended
+// that the TCP/IP socket handled Tx buffers equal or greater.
+#define HTTP_SEND_BUF_LEN           512
+
+// Maximum number of arguments that can be passed in the "GET" command
+// Keep in mind that when you increase this number, you may need to increase the
+// size of HTTP_HTML_CMD_LEN to handle the size of the Rx packet
+#define HTTP_MAX_ARGS               5
+
+// This is the extension which is recognized by the HTTP server as 
+// a dymanically loaded page.
+// Please choose from the supported file extensions
+//    HTTP_TXT,
+//    HTTP_HTML,
+//    HTTP_GIF,
+//    HTTP_CGI,
+//    HTTP_JPG,
+//    HTTP_JAVA,
+//    HTTP_WAV,
+//    HTTP_JS,
+//    HTTP_CSS,
+//    HTTP_PNG
+#define HTTP_DYNAMIC_FILE_TYPE      HTTP_CGI
+
+// This is the default file that will be loaded by the server if no filename
+// is present in the HTTP command from the client
+#define HTTP_DEFAULT_FILE_STR       "Index.htm"
+
+// This is the type of authentication method that is used by the client to
+// encrypt the username and password.  The user must provide the decyption
+// in the "HTTPChkAuthorization" routine.  BASIC is a commonly used encryption
+// method and should be researched as to the decryption algorithym need.
+#define HTTP_AUTHENTICATION_METHOD  "Basic\r\n"
+
+// This is the file that is sent in responce to an un-authorized user
+#define HTTP_UNATHORIZED_FILE       "blocked.htm"
+
+
+
+#endif

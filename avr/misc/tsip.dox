@@ -1,0 +1,5 @@
+/** \defgroup tsip tsip: TSIP Packet Interface for Trimble GPS Receivers
+
+This library parses and decodes the TSIP data stream from a Trimble GPS and stores the position, velocity, and time solutions in the gps.c library.  The library also includes functions to transmit TSIP packets to the GPS for configuration and data request.
+
+*/

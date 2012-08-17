@@ -1,0 +1,87 @@
+/*********************************************************************
+ *
+ *            Audio Configuration File
+ *
+ *********************************************************************
+ * FileName:        audio.def
+ * Description: 	Configurations for audio API
+ * Company:         Microchip Technology, Inc.
+ *
+ * Software License Agreement
+ *
+ * The software supplied herewith by Microchip Technology Incorporated
+ * (the “Company”) for its PICmicro® Microcontroller is intended and
+ * supplied to you, the Company’s customer, for use solely and
+ * exclusively on Microchip PICmicro Microcontroller products. The
+ * software is owned by the Company and/or its supplier, and is
+ * protected under applicable copyright laws. All rights are reserved.
+ * Any use in violation of the foregoing restrictions may subject the
+ * user to criminal sanctions under applicable laws, as well as to
+ * civil liability for the breach of the terms and conditions of this
+ * license.
+ *
+ * THIS SOFTWARE IS PROVIDED IN AN “AS IS” CONDITION. NO WARRANTIES,
+ * WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
+ * TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
+ * IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
+ * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+ *$Id: $
+ ************************************************************************/
+
+
+#define	AUDIO_SAMPLES_BLK	1000	// number of audio samples that are processed per call
+					// gives the time the library has to work on samples
+					// For ex, 8KHz (125us), 10000 samples means the buffer output/input will take 1.25 seconds.
+
+
+#define	AUDIO_SAMPLE_FREQ	16000	// sampling audio frequency. Usually multiple of 8KHz.
+#define	AUDIO_PLAY_RATE		1	// how frequently the player output is updated: 1:1, 1:2, 1:4, etc
+#define	AUDIO_RECORD_RATE	1	// same thing for recording samples
+ 
+
+#define	AUDIO_MIN_WORK_FREQ	4000	// minimum value for basic audio frequency, playing or recording
+
+
+
+#define	AUDIO_LOW_RES_RETRIES	3	// number of retries to lower the timer frequency if the IO init
+					// returns AUDIO_RES_LOW_RESOLUTION 
+
+#define	AUDIO_ADPCM_NIBBLES_LE	0	// order of ADPCM nibbles in the file: BE or LE
+
+
+
+// select the sampling device to be used: one of the AUDIO_SDEV enum values
+#define AUDIO_SAMPLE_DEVICE	AUDIO_SDEV_TMR3
+
+
+// select audio play/record sampling interrupt level
+// standard IPL, between 1 lowest pri) and 7 (highest pri)
+#define	AUDIO_SAMPLE_IPL	6
+
+// define the Audio library usage of the DMA
+#define	AUDIO_DMA_ENABLED	1
+#define	AUDIO_DMA_CHN		0	// which channel to use
+#define AUDIO_DMA_CHN_PRI	0	// what DMA channel priority to use
+// the DMA ISR routine will use AUDIO_SAMPLE_IPL
+
+// instrument with profiling code
+//#define	PROFILING		1
+
+// operations supported
+#define AUDIO_SUPPORT_RECORD
+#define AUDIO_SUPPORT_PLAY
+
+
+// supported encoding formats
+#define PCM_ENCODING
+#define	ADPCM_ENCODING
+#define	SPEEX_ENCODING
+
+// supported streams
+#define	FREE_STREAMS
+#define	WAVE_STREAMS
+#define	SPEEX_OGG_STREAMS
+
+
+

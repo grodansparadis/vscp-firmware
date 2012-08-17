@@ -1,0 +1,91 @@
+/******************************************************************************
+ *
+ *       FAT16 FILESYSTEM USER CONFIGURATION FILE
+ *
+ ******************************************************************************
+ * FileName:        fat.def
+ * Dependencies:    None
+ * Processor:       Daytona
+ * Compiler:        Daytona
+ * Company:         Microchip Technology, Inc.
+ *
+ * Software License Agreement
+ *
+ * The software supplied herewith by Microchip Technology Incorporated
+ * (the “Company”) for its PICmicro® Microcontroller is intended and
+ * supplied to you, the Company’s customer, for use solely and
+ * exclusively on Microchip PICmicro Microcontroller products. The
+ * software is owned by the Company and/or its supplier, and is
+ * protected under applicable copyright laws. All rights are reserved.
+ * Any use in violation of the foregoing restrictions may subject the
+ * user to criminal sanctions under applicable laws, as well as to
+ * civil liability for the breach of the terms and conditions of this
+ * license.
+ *
+ * THIS SOFTWARE IS PROVIDED IN AN “AS IS” CONDITION. NO WARRANTIES,
+ * WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
+ * TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
+ * IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
+ * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+ *
+ * ****************************************************************************
+ *
+ * $Id: fat.def,v 1.12 2006/10/24 16:37:51 C12923 Exp $
+ *
+ * $Name:  $
+ *
+ *****************************************************************************/
+#ifndef _FAT_DEF_
+
+
+
+// Define FAT16_DYNAMIC_MEM to use malloc for dynamically
+// allocating FILE structure space (uncomment all three lines).
+//#define FAT16_DYNAMIC_MEM
+//#define FAT16_malloc   malloc
+//#define FAT16_free   free
+
+// The FAT16_MAX_FILES_OPEN define is only applicable when Dynamic
+// Memeory Allocation is NOT used (FAT16_DYNAMIC_MEM is NOT defined).
+// Defines how many concurrent open files can exist at the same time.
+// This takes up static memory. If you do not need to open more than
+// one file at the same time, then you should set this to 1 to reduce
+// memory usage.
+#define FAT16_MAX_FILES_OPEN   20
+
+// The MS_FILENAME_SPECIFICATION define is to adhere to the Microsoft
+// standard for filename size.  The CUSTOM_FILE_NAME_SIZE define is
+// used to customize your own filename size (which may deviate from
+// the Microsoft standard).  If CUSTOM_FILE_NAME_SIZE is to be used,
+// then a value MUST be defined for CUSTOM_FILE_NAME_SIZE_VAL (if
+// CUSTOM_FILE_NAME_SIZE_VAL is not defined, then a compiler error
+// will occur).  If neither MS_FILENAME_SPECIFICATION nor 
+// CUSTOM_FILE_NAME_SIZE is defined, then the default filename size is
+// used.  The default is currently set to 25 in FAT.h.
+//#define MS_FILENAME_SPECIFICATION
+// OR
+#define CUSTOM_FILE_NAME_SIZE
+// AND
+#define CUSTOM_FILE_NAME_SIZE_VAL 25
+
+// Select appropriate media interface port based on your hardware.
+//#define MEDIASD_IF_SPI1
+#define MEDIASD_IF_SPI2
+
+// Select demo hardware name.
+#define EXPLORER16_REV_5
+
+// provide a msec wait macro
+#ifndef SleepMS
+#include <mstimer.h>
+#define SleepMS(msec)               MSTimerWait((msec))
+#endif
+
+// FAT16 SPI configuration defines (see spi.h)
+#define FAT16_SPI_START_CFG_1		(PRI_PRESCAL_64_1 | SEC_PRESCAL_8_1 | MASTER_ENABLE_ON | SPI_CKE_ON | SPI_SMP_ON)
+#define FAT16_SPI_START_CFG_2		(SPI_ENABLE)
+
+#define FAT16_SPI_BRG_2             (0)
+
+#endif   /* _FAT_DEF_ */

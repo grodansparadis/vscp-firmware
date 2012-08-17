@@ -1,0 +1,1019 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.5.4	//
+!_TAG_REVISION_NAME	MCHPTags	//
+!_TAG_REVISION_VERSION	6.0.1	//
+ACKRequest	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	186;"	m	line:186	struct:_MAC_FRAME_CONTROL::_MAC_FRAME_CONTROL_bits
+ACK_REPORT_TYPE::0x30	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	166;"	d	line:166
+AD1CHS::AD1CHS0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	115;"	d	line:115
+AD1CHS::ADCHS	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	118;"	d	line:118
+AD1CON1::ADCON1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	119;"	d	line:119
+AD1CON2::ADCON2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	120;"	d	line:120
+AD1CON3::ADCON3	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	121;"	d	line:121
+AD1CSSL::ADCSSL	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	123;"	d	line:123
+AD1IE::ADIE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	125;"	d	line:125
+AD1IF::ADIF	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	124;"	d	line:124
+AD1PCFGbits::AD1PCFGLbits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	114;"	d	line:114
+AD1PCFGbits::ADPCFGbits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	122;"	d	line:122
+ADC1BUF0::ADCBUF0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	117;"	d	line:117
+ALLOCATE_ADDRESS::1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	171;"	d	line:171
+ALLOWED_CHANNELS::CHANNEL_12	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	177;"	d	line:177
+ALTERNATE_PAN_COORDINATOR::0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	167;"	d	line:167
+ASSOCIATION_ACCESS_DENIED::0x02	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	106;"	d	line:106
+ASSOCIATION_PAN_FULL::0x01	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	105;"	d	line:105
+ASSOCIATION_SUCCESSFUL::0x00	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	104;"	d	line:104
+AVAILABLE_CHANNELS_SIZE::1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	178;"	d	line:178
+AddNodeToNetworkTable	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3990;"	f	line:3990	signature:(void)
+AddNodeToNetworkTable	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	71;"	p	line:71	signature:(void)
+AttemptingToJoinNetwork::MiWiStateMachine.attemptingToJ	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	404;"	d	line:404
+AttemptingToRejoinNetwork::MiWiStateMachine.attemptingToR	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	405;"	d	line:405
+BAUD_RATE::19200	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	160;"	d	line:160
+BEACON_SUPERFRAME	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	206;"	t	line:206
+BEACON_TX_FIFO::(0x080)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	103;"	d	line:103
+BOOL	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	50;"	t	line:50
+BYTE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	52;"	t	line:52
+BYTE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	188;"	m	line:188	struct:_MAC_FRAME_CONTROL::_MAC_FRAME_CONTROL_bits
+BYTE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	202;"	m	line:202	struct:_BEACON_SUPERFRAME::_BEACON_SUPERFRAME_bits
+BYTE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	228;"	m	line:228	struct:_MRF24J40_IFS::_MRF24J40_IFS_bits
+BYTE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	231;"	m	line:231	struct:_MRF24J40_IFS::_MRF24J40_IFS_bits
+BYTE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	277;"	m	line:277	struct:_NETWORK_TABLE_ENTRY::_NETWORK_TABLE_ENTRY_INFO::_NETWORK_TABLE_ENTRY_INFO_NETWORK::_NETWORK_TABLE_ENTRY_INFO_NETWORK_STRUCT::_NETWORK_TABLE_ENTRY_INFO_NETWORK_STRUCT_bits
+BYTE_VAL	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	73;"	t	line:73
+BY_HANDLE_TRANSMISSION::0x02	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	153;"	d	line:153
+BY_LONG_ADDRESS_TRANSMISSION::0x04	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	154;"	d	line:154
+CAL1::(0x209)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	61;"	d	line:61
+CAL2::(0x20a)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	62;"	d	line:62
+CAL3::(0x20b)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	63;"	d	line:63
+CAP_INFO::((((BYTE)ALLOCATE_ADDRESS)<<7)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	172;"	d	line:172
+CHANNEL_11::0x00	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	248;"	d	line:248
+CHANNEL_12::0x10	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	249;"	d	line:249
+CHANNEL_13::0x20	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	250;"	d	line:250
+CHANNEL_14::0x30	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	251;"	d	line:251
+CHANNEL_15::0x40	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	252;"	d	line:252
+CHANNEL_16::0x50	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	253;"	d	line:253
+CHANNEL_17::0x60	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	254;"	d	line:254
+CHANNEL_18::0x70	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	255;"	d	line:255
+CHANNEL_19::0x80	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	256;"	d	line:256
+CHANNEL_20::0x90	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	257;"	d	line:257
+CHANNEL_21::0xa0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	258;"	d	line:258
+CHANNEL_22::0xb0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	259;"	d	line:259
+CHANNEL_23::0xc0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	260;"	d	line:260
+CHANNEL_24::0xd0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	261;"	d	line:261
+CHANNEL_25::0xe0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	262;"	d	line:262
+CHANNEL_26::0xf0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	263;"	d	line:263
+CHAR	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	55;"	t	line:55
+CIPHER_ERROR	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	358;"	e	line:358	enum:_CIPHER_STATUS
+CIPHER_MIC_ERROR	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	359;"	e	line:359	enum:_CIPHER_STATUS
+CIPHER_MODE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	353;"	t	line:353
+CIPHER_RETRY::3	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	174;"	d	line:174
+CIPHER_STATUS	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	360;"	t	line:360
+CIPHER_SUCCESS	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	357;"	e	line:357	enum:_CIPHER_STATUS
+CLEAR_ALL_ENTRIES::0b11111111	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	127;"	d	line:127
+CLEAR_ALL_ENTRIES::0xFF	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	119;"	d	line:119
+CLEAR_NEIGHBORS::0b00100000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	133;"	d	line:133
+CLEAR_NEIGHBORS::0x20	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	125;"	d	line:125
+CLEAR_NETWORKS::0b00010000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	132;"	d	line:132
+CLEAR_NETWORKS::0x10	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	124;"	d	line:124
+CLEAR_NON_DIRECT_CONNECTIONS::0b00000001	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	128;"	d	line:128
+CLEAR_NON_DIRECT_CONNECTIONS::0x01	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	120;"	d	line:120
+CLEAR_NO_LONG_ADDRESS::0b00000010	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	129;"	d	line:129
+CLEAR_NO_LONG_ADDRESS::0x02	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	121;"	d	line:121
+CLEAR_NO_SHORT_ADDRESS::0b00000100	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	130;"	d	line:130
+CLEAR_NO_SHORT_ADDRESS::0x04	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	122;"	d	line:122
+CLEAR_P2P::0b00001000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	131;"	d	line:131
+CLEAR_P2P::0x08	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	123;"	d	line:123
+CLKIRQCR::(0x211)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	69;"	d	line:69
+CLOCK_DIVIDER::1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	109;"	d	line:109
+CLOCK_DIVIDER::1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	134;"	d	line:134
+CLOCK_DIVIDER::1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	64;"	d	line:64
+CLOCK_DIVIDER::128	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	92;"	d	line:92
+CLOCK_DIVIDER::16	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	80;"	d	line:80
+CLOCK_DIVIDER::2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	68;"	d	line:68
+CLOCK_DIVIDER::256	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	121;"	d	line:121
+CLOCK_DIVIDER::256	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	146;"	d	line:146
+CLOCK_DIVIDER::256	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	150;"	d	line:150
+CLOCK_DIVIDER::256	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	96;"	d	line:96
+CLOCK_DIVIDER::32	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	84;"	d	line:84
+CLOCK_DIVIDER::4	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	72;"	d	line:72
+CLOCK_DIVIDER::64	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	117;"	d	line:117
+CLOCK_DIVIDER::64	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	142;"	d	line:142
+CLOCK_DIVIDER::64	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	88;"	d	line:88
+CLOCK_DIVIDER::8	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	113;"	d	line:113
+CLOCK_DIVIDER::8	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	138;"	d	line:138
+CLOCK_DIVIDER::8	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	76;"	d	line:76
+CLOCK_DIVIDER_SETTING::0x00	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	69;"	d	line:69
+CLOCK_DIVIDER_SETTING::0x0000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	110;"	d	line:110
+CLOCK_DIVIDER_SETTING::0x0000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	135;"	d	line:135
+CLOCK_DIVIDER_SETTING::0x0010	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	114;"	d	line:114
+CLOCK_DIVIDER_SETTING::0x0020	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	118;"	d	line:118
+CLOCK_DIVIDER_SETTING::0x0030	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	122;"	d	line:122
+CLOCK_DIVIDER_SETTING::0x0030	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	139;"	d	line:139
+CLOCK_DIVIDER_SETTING::0x0060	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	143;"	d	line:143
+CLOCK_DIVIDER_SETTING::0x0070	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	147;"	d	line:147
+CLOCK_DIVIDER_SETTING::0x01	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	73;"	d	line:73
+CLOCK_DIVIDER_SETTING::0x02	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	77;"	d	line:77
+CLOCK_DIVIDER_SETTING::0x03	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	81;"	d	line:81
+CLOCK_DIVIDER_SETTING::0x04	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	85;"	d	line:85
+CLOCK_DIVIDER_SETTING::0x05	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	89;"	d	line:89
+CLOCK_DIVIDER_SETTING::0x06	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	93;"	d	line:93
+CLOCK_DIVIDER_SETTING::0x07	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	97;"	d	line:97
+CLOCK_DIVIDER_SETTING::0x08	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	65;"	d	line:65
+CLOCK_DIVIDER_SETTING::0x70	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	151;"	d	line:151
+CLOCK_FREQ::16000000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	69;"	d	line:69
+CLOCK_FREQ::8000000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	94;"	d	line:94
+CLOCK_FREQ::80000000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	119;"	d	line:119
+CLUSTER_SOCKET::0x00	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	141;"	d	line:141
+Channel	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	268;"	m	line:268	struct:_NETWORK_TABLE_ENTRY::_NETWORK_TABLE_ENTRY_INFO::_NETWORK_TABLE_ENTRY_INFO_NETWORK
+CheckForData::MiWiStateMachine.dataRequestNe	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	411;"	d	line:411
+CheckForDataComplete::MiWiStateMachine.dataRequestCo	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	412;"	d	line:412
+CipherRetry	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4461;"	l	line:4461
+ClearNetworkTable	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3187;"	f	line:3187	signature:(BYTE options)
+ClearNetworkTable	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	64;"	p	line:64	signature:(BYTE options)
+ClearToSend::!MiWiStatus.bits.TX_BUSY	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	407;"	d	line:407
+ConsoleGet	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	91;"	p	line:91	signature:(void)
+ConsoleGet::'a'	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	103;"	d	line:103
+ConsoleGet::'a'	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	76;"	d	line:76
+ConsoleGetString	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	92;"	p	line:92	signature:(char *buffer, BYTE bufferLen)
+ConsoleGetString::(buffer,bufferLen)0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	104;"	d	line:104
+ConsoleGetString::(buffer,bufferLen)0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	77;"	d	line:77
+ConsoleInit	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	57;"	p	line:57	signature:(void)
+ConsoleInit	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	84;"	p	line:84	signature:(void)
+ConsoleInit::	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	69;"	d	line:69
+ConsoleInit::	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	96;"	d	line:96
+ConsoleIsGetReady::(PIR1bits.RCIF)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	90;"	d	line:90
+ConsoleIsGetReady::1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	102;"	d	line:102
+ConsoleIsGetReady::1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	75;"	d	line:75
+ConsoleIsPutReady::(TXSTAbits.TRMT)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	85;"	d	line:85
+ConsoleIsPutReady::(U2STAbits.TRMT)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	58;"	d	line:58
+ConsoleIsPutReady::1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	70;"	d	line:70
+ConsoleIsPutReady::1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	97;"	d	line:97
+ConsolePut	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	59;"	p	line:59	signature:(BYTE c)
+ConsolePut	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	86;"	p	line:86	signature:(BYTE c)
+ConsolePut::(c)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	71;"	d	line:71
+ConsolePut::(c)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	98;"	d	line:98
+ConsolePutROMString	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	61;"	p	line:61	signature:(ROM char* str)
+ConsolePutROMString	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	88;"	p	line:88	signature:(ROM char* str)
+ConsolePutROMString::(str)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	100;"	d	line:100
+ConsolePutROMString::(str)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	73;"	d	line:73
+ConsolePutString	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	87;"	p	line:87	signature:(BYTE *s)
+ConsolePutString::(s)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	72;"	d	line:72
+ConsolePutString::(s)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	99;"	d	line:99
+CoordAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	1092;"	l	line:1092
+Counter	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4669;"	l	line:4669
+Counter	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4756;"	l	line:4756
+DATA_REQUEST_ASSOCIATION_RESPONSE::0x00	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	148;"	d	line:148
+DATA_REQUEST_SHORT_ADDRESSES::0x01	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	149;"	d	line:149
+DEST_INFO	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	323;"	t	line:323
+DEVICE_TYPE::1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	165;"	d	line:165
+DWORD	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	54;"	t	line:54
+DWORD_VAL	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	157;"	t	line:157
+DataDecrypt	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4752;"	f	line:4752	signature:(IOPUT BYTE *Input, IOPUT BYTE *DataLen, INPUT BYTE *Header, INPUT BYTE HeaderLen)
+DataDecrypt	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	75;"	p	line:75	file:	signature:(IOPUT BYTE *Input, IOPUT BYTE *DataLen, INPUT BYTE *Header, INPUT BYTE HeaderLen)
+DataEncrypt	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4664;"	f	line:4664	signature:(IOPUT BYTE *Input, IOPUT BYTE *DataLen, INPUT BYTE *Header, INPUT BYTE HeaderLen)
+DataEncrypt	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	74;"	p	line:74	file:	signature:(IOPUT BYTE *Input, IOPUT BYTE *DataLen, INPUT BYTE *Header, INPUT BYTE HeaderLen)
+DataLen	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	431;"	l	line:431
+DiscardPacket	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2506;"	f	line:2506	signature:(void)
+DiscardPacket	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	55;"	p	line:55	signature:(void)
+DiscoverNetworks::MiWiStateMachine.searchingForN	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	397;"	d	line:397
+DiscoverNodeByEUI	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3048;"	f	line:3048	signature:(void)
+DiscoverNodeByEUI	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	75;"	p	line:75	signature:(void)
+DumpNetworkTable	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2811;"	f	line:2811	signature:(void)
+DumpNetworkTable	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3027;"	f	line:3027	signature:(void)
+DumpNetworkTable	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	62;"	p	line:62	signature:(void)
+ENABLE_CONSOLE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	37;"	d	line:37
+EUI_0::0x93	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	156;"	d	line:156
+EUI_1::0x78	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	155;"	d	line:155
+EUI_2::0x56	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	154;"	d	line:154
+EUI_3::0x34	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	153;"	d	line:153
+EUI_4::0x12	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	152;"	d	line:152
+EUI_5::0xA3	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	151;"	d	line:151
+EUI_6::0x04	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	150;"	d	line:150
+EUI_7::0x00	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	149;"	d	line:149
+EUI_ADDRESS_SEARCH_REQUEST::0x20	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	164;"	d	line:164
+EUI_ADDRESS_SEARCH_RESPONSE::0x21	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	165;"	d	line:165
+EXPLORER16	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	49;"	d	line:49
+EncryptedLen	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4667;"	l	line:4667
+FALSE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	50;"	e	line:50	enum:_BOOL
+FLEN::(0x21f)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	83;"	d	line:83
+FRAME_TYPE_ACK::0b010	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	99;"	d	line:99
+FRAME_TYPE_ACK::0x02	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	94;"	d	line:94
+FRAME_TYPE_BEACON::0b000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	98;"	d	line:98
+FRAME_TYPE_BEACON::0x00	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	93;"	d	line:93
+FRAME_TYPE_COMMAND::0b011	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	96;"	d	line:96
+FRAME_TYPE_COMMAND::0x03	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	91;"	d	line:91
+FRAME_TYPE_DATA::0b001	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	97;"	d	line:97
+FRAME_TYPE_DATA::0x01	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	92;"	d	line:92
+FREQUENCY_BAND::2400	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	176;"	d	line:176
+FlushTx::{TxData=0;TxHeader=TX_BUFFER_S	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	414;"	d	line:414
+FormNetwork	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3277;"	f	line:3277	signature:(WORD PANID)
+FormNetwork	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	65;"	p	line:65	signature:(WORD PANID)
+FrameCounter	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4757;"	l	line:4757
+FrameCounter	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	369;"	m	line:369	struct:_SECURITY_INPUT
+GTS1_TX_FIFO::(0x100)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	104;"	d	line:104
+GTS2_TX_FIFO::(0x180)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	105;"	d	line:105
+HB	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	118;"	m	line:118	struct:_DWORD_VAL::<anonymous>
+HB	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	82;"	m	line:82	struct:_WORD_VAL::<anonymous>
+HLEN::(0x21e)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	82;"	d	line:82
+HW	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	113;"	m	line:113	struct:_DWORD_VAL::<anonymous>
+Header	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	366;"	m	line:366	struct:_SECURITY_INPUT
+HeaderLen	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	367;"	m	line:367	struct:_SECURITY_INPUT
+HighISR	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4331;"	f	line:4331	signature:(void)
+HighVector	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4841;"	f	line:4841	signature:(void)
+IEEESeqNum	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	105;"	v	line:105
+INDIRECT_BUFFER_SIZE::80	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	191;"	d	line:191
+INDIRECT_BUFFER_TIMEOUT::0x00012424	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	192;"	d	line:192
+INPUT	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	65;"	d	line:65	file:
+INSTR_FREQ::(CLOCK_FREQ/2)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	58;"	d	line:58
+INSTR_FREQ::(CLOCK_FREQ/2)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	62;"	d	line:62
+INSTR_FREQ::(CLOCK_FREQ/2)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	66;"	d	line:66
+INSTR_FREQ::(CLOCK_FREQ/4)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	54;"	d	line:54
+INSTR_FREQ::(CLOCK_FREQ/4)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	70;"	d	line:70
+INSTR_FREQ::(CLOCK_FREQ/4)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	74;"	d	line:74
+IOPUT	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	67;"	d	line:67	file:
+I_AM_COORDINATOR_CAPABLE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	166;"	d	line:166
+I_AM_FFD	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	163;"	d	line:163
+IncomingFrameCount	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	78;"	v	line:78
+IncomingFrameCounter	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	259;"	m	line:259	struct:_NETWORK_TABLE_ENTRY
+InitSymbolTimer	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.c	86;"	f	line:86
+InitSymbolTimer	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	185;"	p	line:185	signature:(void)
+InputText	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	364;"	m	line:364	struct:_SECURITY_INPUT
+ItsMe	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	457;"	l	line:457
+JoinNetwork	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3743;"	f	line:3743	signature:(BYTE handle)
+JoinNetwork	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	66;"	p	line:66	signature:(BYTE handle)
+KEY_SEQUENCE_NUMBER::0x00	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	215;"	d	line:215
+KeySeq	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4758;"	l	line:4758
+LB	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	117;"	m	line:117	struct:_DWORD_VAL::<anonymous>
+LB	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	81;"	m	line:81	struct:_WORD_VAL::<anonymous>
+LED_1::LATAbits.LATA7	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	109;"	d	line:109
+LED_1::PORTAbits.RA0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	133;"	d	line:133
+LED_1::PORTAbits.RA0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	82;"	d	line:82
+LED_1_TRIS::TRISA0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	138;"	d	line:138
+LED_1_TRIS::TRISA0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	87;"	d	line:87
+LED_1_TRIS::TRISAbits.TRISA7	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	114;"	d	line:114
+LED_2::LATAbits.LATA6	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	110;"	d	line:110
+LED_2::PORTAbits.RA1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	134;"	d	line:134
+LED_2::PORTAbits.RA1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	83;"	d	line:83
+LED_2_TRIS::TRISA1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	139;"	d	line:139
+LED_2_TRIS::TRISA1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	88;"	d	line:88
+LED_2_TRIS::TRISAbits.TRISA6	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	115;"	d	line:115
+LIGHT_OFF::0x00	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	171;"	d	line:171
+LIGHT_ON::0xFF	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	172;"	d	line:172
+LIGHT_REPORT::0x34	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	169;"	d	line:169
+LIGHT_TOGGLE::0x55	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	170;"	d	line:170
+LONG	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	57;"	t	line:57
+LW	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	112;"	m	line:112	struct:_DWORD_VAL::<anonymous>
+LongAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	265;"	m	line:265	union:_NETWORK_TABLE_ENTRY::_NETWORK_TABLE_ENTRY_INFO
+LongAddress1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	344;"	m	line:344	struct:_OPEN_SOCKET
+LongAddress2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	342;"	m	line:342	struct:_OPEN_SOCKET
+LowVector	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4850;"	f	line:4850	signature:(void)
+MAC_COMMAND_ASSOCIATION_REQUEST::0x01	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	102;"	d	line:102
+MAC_COMMAND_ASSOCIATION_RESPONSE::0x02	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	103;"	d	line:103
+MAC_COMMAND_BEACON_REQUEST::0x07	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	111;"	d	line:111
+MAC_COMMAND_COORDINATOR_REALIGNMENT::0x08	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	112;"	d	line:112
+MAC_COMMAND_DATA_REQUEST::0x04	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	108;"	d	line:108
+MAC_COMMAND_DISASSOCIATION_NOTIFICATION::0x03	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	107;"	d	line:107
+MAC_COMMAND_ORPHAN_NOTIFICATION::0x06	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	110;"	d	line:110
+MAC_COMMAND_PAN_ID_CONFLICT_NOTIFICATION::0x05	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	109;"	d	line:109
+MAC_FRAME_CONTROL	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	190;"	t	line:190
+MAX_HOPS::4	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	196;"	d	line:196
+MB	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	120;"	m	line:120	struct:_DWORD_VAL::<anonymous>
+MIC_check	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4584;"	l	line:4584
+MIWI_ACK_REQ::0x04	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	116;"	d	line:116
+MIWI_PROTOCOL_ID::0x4D	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	114;"	d	line:114
+MIWI_STACK_REPORT_TYPE::0x00	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	159;"	d	line:159
+MIWI_STATE_MACHINE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	297;"	t	line:297
+MIWI_STATUS	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	312;"	t	line:312
+MIWI_VERSION_NUM::0x10	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	115;"	d	line:115
+MODE_DECRYPTION	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	352;"	e	line:352	enum:_CIPHER_MODE
+MODE_ENCRYPTION	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	351;"	e	line:351	enum:_CIPHER_MODE
+MRF24J40Sleep	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4235;"	f	line:4235	signature:(void)
+MRF24J40Sleep	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	78;"	p	line:78	signature:(void)
+MRF24J40Wake	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4265;"	f	line:4265	signature:(void)
+MRF24J40Wake	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	79;"	p	line:79	signature:(void)
+MRF24J40_IFREG	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	233;"	t	line:233
+MemberOfNetwork::MiWiStateMachine.memberOfNetwo	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	403;"	d	line:403
+MiWiInit	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4165;"	f	line:4165	signature:(void)
+MiWiInit	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	53;"	p	line:53	signature:(void)
+MiWiSeqNum	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	106;"	v	line:106
+MiWiStateMachine	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	133;"	v	line:133
+MiWiStatus	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	118;"	v	line:118
+MiWiTasks	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	154;"	f	line:154	signature:(void)
+MiWiTasks	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	54;"	p	line:54	signature:(void)
+NEIGHBOR::1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	137;"	d	line:137
+NETWORK::0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	136;"	d	line:136
+NETWORKED_TRANSMISSION::0x00	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	151;"	d	line:151
+NETWORK_DISCOVERY_TIMEOUT::0x00007A12	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	186;"	d	line:186
+NETWORK_STATUS_INFO	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	250;"	t	line:250
+NETWORK_TABLE_ENTRY	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	284;"	t	line:284
+NETWORK_TABLE_SIZE::10	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	195;"	d	line:195
+NORMAL_TX_FIFO::(0x000)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	102;"	d	line:102
+NeighborOrNetwork	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	245;"	m	line:245	struct:_NETWORK_TABLE_ENTRY_status::_NETWORK_TABLE_ENTRY_bits
+Nop::asm("NOP");	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	131;"	d	line:131
+ONE_SECOND::(((DWORD)INSTR_FREQ/1000*62500	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	155;"	d	line:155
+ONE_SECOND::((CLOCK_FREQ/1000*62500)/(SYMB	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	101;"	d	line:101
+ONE_SECOND::((CLOCK_FREQ/1000*62500)/(SYMB	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	126;"	d	line:126
+OPEN_CLUSTER_SOCKET_REQUEST::0x10	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	160;"	d	line:160
+OPEN_CLUSTER_SOCKET_RESPONSE::0x11	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	161;"	d	line:161
+OPEN_CLUSTER_SOCKET_TIMEOUT::0x0002DC6C	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	187;"	d	line:187
+OPEN_P2P_SOCKET_REQUEST::0x12	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	162;"	d	line:162
+OPEN_P2P_SOCKET_RESPONSE::0x13	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	163;"	d	line:163
+OPEN_SOCKET	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	346;"	t	line:346
+OUTPUT	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	66;"	d	line:66	file:
+OpenSocket	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3428;"	f	line:3428	signature:(BYTE socketType)
+OpenSocket	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	76;"	p	line:76	signature:(BYTE socketType)
+OpenSocketComplete::(!openSocketInfo.status.bits.r	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	408;"	d	line:408
+OpenSocketHandle::openSocketInfo.socketHandle	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	410;"	d	line:410
+OpenSocketSuccessful::openSocketInfo.status.bits.mat	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	409;"	d	line:409
+OutgoingFrameCount	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	77;"	v	line:77
+OutgoingFrameCounter	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	72;"	v	line:72
+P2PConnection	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	244;"	m	line:244	struct:_NETWORK_TABLE_ENTRY_status::_NETWORK_TABLE_ENTRY_bits
+P2P_SOCKET::0x01	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	142;"	d	line:142
+P2P_TRANSMISSION::0x01	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	152;"	d	line:152
+PANCoordinator	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	203;"	m	line:203	struct:_BEACON_SUPERFRAME::_BEACON_SUPERFRAME_bits
+PANID	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	256;"	m	line:256	struct:_NETWORK_TABLE_ENTRY
+PANID	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	320;"	m	line:320	struct:_DEST_INFO::_DEST_INFO_NETWORKED
+PANcoordinator	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3435;"	l	line:3435
+PANcoordinator	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	278;"	m	line:278	struct:_NETWORK_TABLE_ENTRY::_NETWORK_TABLE_ENTRY_INFO::_NETWORK_TABLE_ENTRY_INFO_NETWORK::_NETWORK_TABLE_ENTRY_INFO_NETWORK_STRUCT::_NETWORK_TABLE_ENTRY_INFO_NETWORK_STRUCT_bits
+PA_LEVEL::0x00	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	175;"	d	line:175
+PHYCipher	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4459;"	f	line:4459	signature:(INPUT CIPHER_MODE CipherMode, INPUT SECURITY_INPUT SecurityInput, OUTPUT BYTE *OutData, OUTPUT BYTE *OutDataLen)
+PHYDumpRegisters	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	86;"	p	line:86	signature:(void)
+PHYDumpTxFIFO	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	87;"	p	line:87	signature:(void)
+PHYGetLongRAMAddr	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2778;"	f	line:2778	signature:(WORD address)
+PHYGetLongRAMAddr	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	84;"	p	line:84	signature:(WORD address)
+PHYGetShortRAMAddr	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2749;"	f	line:2749	signature:(BYTE address)
+PHYGetShortRAMAddr	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	83;"	p	line:83	signature:(BYTE address)
+PHYSetLongRAMAddr	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2687;"	f	line:2687	signature:(WORD address, BYTE value)
+PHYSetLongRAMAddr	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	81;"	p	line:81	signature:(WORD address, BYTE value)
+PHYSetShortRAMAddr	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2719;"	f	line:2719	signature:(BYTE address, BYTE value)
+PHYSetShortRAMAddr	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	82;"	p	line:82	signature:(BYTE address, BYTE value)
+PHY_CS::LATBbits.LATB2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	100;"	d	line:100
+PHY_CS::LATCbits.LATC0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	124;"	d	line:124
+PHY_CS::LATCbits.LATC0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	73;"	d	line:73
+PHY_CS_TRIS::TRISBbits.TRISB2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	101;"	d	line:101
+PHY_CS_TRIS::TRISCbits.TRISC0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	125;"	d	line:125
+PHY_CS_TRIS::TRISCbits.TRISC0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	74;"	d	line:74
+PHY_RESETn::LATCbits.LATC2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	126;"	d	line:126
+PHY_RESETn::LATCbits.LATC2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	75;"	d	line:75
+PHY_RESETn::LATGbits.LATG2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	102;"	d	line:102
+PHY_RESETn_TRIS::TRISCbits.TRISC2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	127;"	d	line:127
+PHY_RESETn_TRIS::TRISCbits.TRISC2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	76;"	d	line:76
+PHY_RESETn_TRIS::TRISGbits.TRISG2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	103;"	d	line:103
+PHY_SLEEPING	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	310;"	m	line:310	struct:_MIWI_STATUS::_MIWI_STATUS_bits
+PHY_WAKE::LATCbits.LATC1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	128;"	d	line:128
+PHY_WAKE::LATCbits.LATC1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	77;"	d	line:77
+PHY_WAKE::LATGbits.LATG3	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	104;"	d	line:104
+PHY_WAKE_TRIS::TRISCbits.TRISC1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	129;"	d	line:129
+PHY_WAKE_TRIS::TRISCbits.TRISC1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	78;"	d	line:78
+PHY_WAKE_TRIS::TRISGbits.TRISG3	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	105;"	d	line:105
+PICDEMZ	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	45;"	d	line:45
+POWER_SOURCE::1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	169;"	d	line:169
+PUSH_BUTTON_1::PORTBbits.RB5	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	131;"	d	line:131
+PUSH_BUTTON_1::PORTBbits.RB5	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	80;"	d	line:80
+PUSH_BUTTON_1::PORTDbits.RD6	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	107;"	d	line:107
+PUSH_BUTTON_1_TRIS::TRISB5	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	136;"	d	line:136
+PUSH_BUTTON_1_TRIS::TRISB5	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	85;"	d	line:85
+PUSH_BUTTON_1_TRIS::TRISDbits.TRISD6	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	112;"	d	line:112
+PUSH_BUTTON_2::PORTBbits.RB4	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	132;"	d	line:132
+PUSH_BUTTON_2::PORTBbits.RB4	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	81;"	d	line:81
+PUSH_BUTTON_2::PORTDbits.RD7	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	108;"	d	line:108
+PUSH_BUTTON_2_TRIS::TRISB4	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	137;"	d	line:137
+PUSH_BUTTON_2_TRIS::TRISB4	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	86;"	d	line:86
+PUSH_BUTTON_2_TRIS::TRISDbits.TRISD5	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	113;"	d	line:113
+PrintChar	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	66;"	p	line:66	signature:(BYTE)
+PrintChar	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	93;"	p	line:93	signature:(BYTE)
+PrintChar::(a)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	105;"	d	line:105
+PrintChar::(a)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	78;"	d	line:78
+PrintDec	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	67;"	p	line:67	signature:(BYTE)
+PrintDec	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	94;"	p	line:94	signature:(BYTE)
+PrintDec::(a)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	106;"	d	line:106
+PrintDec::(a)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	79;"	d	line:79
+Protocol	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	270;"	m	line:270	struct:_NETWORK_TABLE_ENTRY::_NETWORK_TABLE_ENTRY_INFO::_NETWORK_TABLE_ENTRY_INFO_NETWORK
+ProtocolId	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	957;"	l	line:957
+RCREG::RCREG1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	99;"	d	line:99
+RCSTA::RCSTA1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	97;"	d	line:97
+READ_ACKTMOUT::(0x24)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	134;"	d	line:134
+READ_BBREG0::(0x70)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	172;"	d	line:172
+READ_BBREG1::(0x72)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	173;"	d	line:173
+READ_BBREG2::(0x74)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	174;"	d	line:174
+READ_BBREG3::(0x76)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	175;"	d	line:175
+READ_BBREG4::(0x78)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	176;"	d	line:176
+READ_BBREG5::(0x7A)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	177;"	d	line:177
+READ_BBREG6::(0x7C)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	178;"	d	line:178
+READ_BISTCR::(0x56)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	159;"	d	line:159
+READ_CSMACR::(0x32)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	141;"	d	line:141
+READ_EADR0::(0x0A)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	121;"	d	line:121
+READ_EADR1::(0x0C)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	122;"	d	line:122
+READ_EADR2::(0x0E)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	123;"	d	line:123
+READ_EADR3::(0x10)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	124;"	d	line:124
+READ_EADR4::(0x12)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	125;"	d	line:125
+READ_EADR5::(0x14)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	126;"	d	line:126
+READ_EADR6::(0x16)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	127;"	d	line:127
+READ_EADR7::(0x18)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	128;"	d	line:128
+READ_ESLOTG23::(0x3C)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	146;"	d	line:146
+READ_ESLOTG45::(0x3E)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	147;"	d	line:147
+READ_ESLOTG67::(0x40)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	148;"	d	line:148
+READ_FFOEN::(0x30)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	140;"	d	line:140
+READ_FRMOFFSET::(0x46)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	151;"	d	line:151
+READ_GATE_CLK::(0x4C)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	154;"	d	line:154
+READ_GPIO::(0x66)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	167;"	d	line:167
+READ_GPIODIR::(0x68)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	168;"	d	line:168
+READ_HSYMTMR0::(0x50)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	156;"	d	line:156
+READ_HSYMTMR1::(0x52)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	157;"	d	line:157
+READ_INTMSK::(0x64)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	166;"	d	line:166
+READ_ISRSTS::(0x62)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	165;"	d	line:165
+READ_ORDER::(0x20)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	132;"	d	line:132
+READ_PANIDH::(0x04)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	118;"	d	line:118
+READ_PANIDL::(0x02)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	117;"	d	line:117
+READ_PAONSETUP::(0x2E)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	139;"	d	line:139
+READ_PAONTIME::(0x2C)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	138;"	d	line:138
+READ_RFCTL::(0x6C)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	170;"	d	line:170
+READ_RSSITHCCA::(0x7E)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	179;"	d	line:179
+READ_RXFLUSH::(0x1a)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	129;"	d	line:129
+READ_RXMCR::(0x00)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	116;"	d	line:116
+READ_RXSR::(0x60)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	164;"	d	line:164
+READ_SADRH::(0x08)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	120;"	d	line:120
+READ_SADRL::(0x06)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	119;"	d	line:119
+READ_SECCR0::(0x58)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	160;"	d	line:160
+READ_SECCR1::(0x5A)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	161;"	d	line:161
+READ_SECCR2::(0x6E)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	171;"	d	line:171
+READ_SECISR::(0x5E)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	163;"	d	line:163
+READ_SLALLOC::(0x26)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	135;"	d	line:135
+READ_SLPACK::(0x6A)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	169;"	d	line:169
+READ_SOFTRST::(0x54)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	158;"	d	line:158
+READ_SYMTICKH::(0x2A)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	137;"	d	line:137
+READ_SYMTICKL::(0x28)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	136;"	d	line:136
+READ_TXBCNINTL::(0x44)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	150;"	d	line:150
+READ_TXBCNTRIG::(0x34)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	142;"	d	line:142
+READ_TXG1TRIG::(0x38)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	144;"	d	line:144
+READ_TXG2TRIG::(0x3A)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	145;"	d	line:145
+READ_TXLERR::(0x4A)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	153;"	d	line:153
+READ_TXMCR::(0x22)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	133;"	d	line:133
+READ_TXNMTRIG::(0x36)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	143;"	d	line:143
+READ_TXOFFSET::(0x4E)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	155;"	d	line:155
+READ_TXPEMISP::(0x5C)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	162;"	d	line:162
+READ_TXPEND::(0x42)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	149;"	d	line:149
+READ_TXSR::(0x48)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	152;"	d	line:152
+READ_TXSTATE0::(0x1c)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	130;"	d	line:130
+READ_TXSTATE1::(0x1e)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	131;"	d	line:131
+RFCTRL0::(0x200)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	52;"	d	line:52
+RFCTRL1::(0x201)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	53;"	d	line:53
+RFCTRL2::(0x202)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	54;"	d	line:54
+RFCTRL3::(0x203)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	55;"	d	line:55
+RFCTRL4::(0x204)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	56;"	d	line:56
+RFCTRL5::(0x205)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	57;"	d	line:57
+RFCTRL6::(0x206)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	58;"	d	line:58
+RFCTRL7::(0x207)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	59;"	d	line:59
+RFCTRL8::(0x208)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	60;"	d	line:60
+RFD_DATA_WAIT::0x00003FFF	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	188;"	d	line:188
+RFIE::IEC1bits.INT2IE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	99;"	d	line:99
+RFIE::INTCONbits.INT0IE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	123;"	d	line:123
+RFIE::INTCONbits.INT0IE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	72;"	d	line:72
+RFIF::IFS1bits.INT2IF	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	98;"	d	line:98
+RFIF::INTCONbits.INT0IF	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	122;"	d	line:122
+RFIF::INTCONbits.INT0IF	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	71;"	d	line:71
+RFMANUALCTRL2::(0x22d)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	98;"	d	line:98
+RFMANUALCTRL::(0x22b)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	95;"	d	line:95
+RFMANUALCTRLEN::(0x22a)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	94;"	d	line:94
+RFRXCTRL::RFMANUALCTRL	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	96;"	d	line:96
+RFSTATE::(0x20f)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	67;"	d	line:67
+RF_INT_PIN::PORTBbits.RB0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	141;"	d	line:141
+RF_INT_PIN::PORTBbits.RB0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	90;"	d	line:90
+RF_INT_PIN::PORTBbits.RB0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	95;"	d	line:95
+RF_RXIF	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	229;"	m	line:229	struct:_MRF24J40_IFS::_MRF24J40_IFS_bits
+RF_TXIF	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	227;"	m	line:227	struct:_MRF24J40_IFS::_MRF24J40_IFS_bits
+ROLE_COORDINATOR::0x01	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	145;"	d	line:145
+ROLE_FFD_END_DEVICE::0x00	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	144;"	d	line:144
+ROLE_PAN_COORDINATOR::0x02	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	146;"	d	line:146
+ROM::const	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	105;"	d	line:105
+ROM::const	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	130;"	d	line:130
+ROM::rom	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	86;"	d	line:86
+RSSI::(0x210)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	68;"	d	line:68
+RSSI_SAMPLES_PER_CHANNEL::5	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	179;"	d	line:179
+RXFRAMESTATE::(0x21b)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	79;"	d	line:79
+RXOnWhenIdle	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	246;"	m	line:246	struct:_NETWORK_TABLE_ENTRY_status::_NETWORK_TABLE_ENTRY_bits
+RX_BUFFERED	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	305;"	m	line:305	struct:_MIWI_STATUS::_MIWI_STATUS_bits
+RX_BUFFER_SIZE::50	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	183;"	d	line:183
+RX_ENABLED	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	306;"	m	line:306	struct:_MIWI_STATUS::_MIWI_STATUS_bits
+RX_FIFO::(0x300)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	107;"	d	line:107
+RX_ON_WHEN_IDLE::1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	168;"	d	line:168
+RX_PENDING	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	304;"	m	line:304	struct:_MIWI_STATUS::_MIWI_STATUS_bits
+RejoinNetwork::MiWiStateMachine.attemptingToR	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	401;"	d	line:401
+Reset::asm("reset")	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	111;"	d	line:111
+RoutingTable	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	110;"	v	line:110
+RxBuffer	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	90;"	v	line:90
+RxData	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	129;"	v	line:129
+RxHasUserData	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	294;"	m	line:294	struct:_MIWI_STATE_MACHINE
+RxPacket::MiWiStateMachine.RxHasUserData	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	406;"	d	line:406
+RxSize	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	102;"	v	line:102
+SCLKDIV::(0x220)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	84;"	d	line:84
+SECSTATUS::(0x21c)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	80;"	d	line:80
+SECURITY_CAPABLE::0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	170;"	d	line:170
+SECURITY_FIFO::(0x280)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	109;"	d	line:109
+SECURITY_INPUT	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	370;"	t	line:370
+SECURITY_KEY_0::0x00	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	199;"	d	line:199
+SECURITY_KEY_10::0x0a	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	209;"	d	line:209
+SECURITY_KEY_11::0x0b	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	210;"	d	line:210
+SECURITY_KEY_12::0x0c	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	211;"	d	line:211
+SECURITY_KEY_13::0x0d	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	212;"	d	line:212
+SECURITY_KEY_14::0x0e	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	213;"	d	line:213
+SECURITY_KEY_15::0x0f	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	214;"	d	line:214
+SECURITY_KEY_1::0x01	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	200;"	d	line:200
+SECURITY_KEY_2::0x02	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	201;"	d	line:201
+SECURITY_KEY_3::0x03	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	202;"	d	line:202
+SECURITY_KEY_4::0x04	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	203;"	d	line:203
+SECURITY_KEY_5::0x05	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	204;"	d	line:204
+SECURITY_KEY_6::0x06	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	205;"	d	line:205
+SECURITY_KEY_7::0x07	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	206;"	d	line:206
+SECURITY_KEY_8::0x08	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	207;"	d	line:207
+SECURITY_KEY_9::0x09	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	208;"	d	line:208
+SECURITY_LEVEL::0x04	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	216;"	d	line:216
+SEND_REPORT_STATUS	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	220;"	t	line:220
+SFCNTRH::(0x20c)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	64;"	d	line:64
+SFCNTRL::(0x20e)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	66;"	d	line:66
+SFCNTRM::(0x20d)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	65;"	d	line:65
+SHORT	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	56;"	t	line:56
+SPBRG::SPBRG1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	98;"	d	line:98
+SPICON::SSP1CON1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	100;"	d	line:100
+SPIGet	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MSPI.c	100;"	f	line:100	signature:(void)
+SPIGet	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MSPI.c	159;"	f	line:159	signature:(void)
+SPIGet	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MSPI.h	57;"	p	line:57	signature:(void)
+SPIInit::SSPIF=1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MSPI.h	60;"	d	line:60
+SPIPut	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MSPI.c	132;"	f	line:132	signature:(BYTE v)
+SPIPut	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MSPI.c	70;"	f	line:70	signature:(BYTE v)
+SPIPut	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MSPI.h	56;"	p	line:56	signature:(BYTE v)
+SPISTATbits::SPI1STATbits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	101;"	d	line:101
+SRCADDR0::(0x213)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	71;"	d	line:71
+SRCADDR1::(0x214)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	72;"	d	line:72
+SRCADDR2::(0x215)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	73;"	d	line:73
+SRCADDR3::(0x216)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	74;"	d	line:74
+SRCADDR4::(0x217)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	75;"	d	line:75
+SRCADDR5::(0x218)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	76;"	d	line:76
+SRCADDR6::(0x219)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	77;"	d	line:77
+SRCADDR7::(0x21a)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	78;"	d	line:78
+SRCADRMODE::(0x212)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	70;"	d	line:70
+STCCMP::(0x21d)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	81;"	d	line:81
+SUPPORT_CLUSTER_SOCKETS	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	144;"	d	line:144
+SUPPORT_EUI_ADDRESS_SEARCH	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	146;"	d	line:146
+SUPPORT_P2P_SOCKETS	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	145;"	d	line:145
+SYMBOLS_TO_TICKS::(a)(((DWORD)(INSTR_FREQ/1000)*	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	157;"	d	line:157
+SYMBOLS_TO_TICKS::(a)((CLOCK_FREQ/1000)/(SYMBOL_	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	103;"	d	line:103
+SYMBOLS_TO_TICKS::(a)((CLOCK_FREQ/1000)/(SYMBOL_	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	128;"	d	line:128
+SYMBOL_TO_TICK_RATE::1000000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	115;"	d	line:115
+SYMBOL_TO_TICK_RATE::1000000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	140;"	d	line:140
+SYMBOL_TO_TICK_RATE::1000000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	74;"	d	line:74
+SYMBOL_TO_TICK_RATE::125000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	111;"	d	line:111
+SYMBOL_TO_TICK_RATE::125000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	136;"	d	line:136
+SYMBOL_TO_TICK_RATE::16000000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	90;"	d	line:90
+SYMBOL_TO_TICK_RATE::2000000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	78;"	d	line:78
+SYMBOL_TO_TICK_RATE::250000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	66;"	d	line:66
+SYMBOL_TO_TICK_RATE::32000000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	123;"	d	line:123
+SYMBOL_TO_TICK_RATE::32000000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	94;"	d	line:94
+SYMBOL_TO_TICK_RATE::32000000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	98;"	d	line:98
+SYMBOL_TO_TICK_RATE::4000000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	82;"	d	line:82
+SYMBOL_TO_TICK_RATE::500000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	70;"	d	line:70
+SYMBOL_TO_TICK_RATE::8000000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	119;"	d	line:119
+SYMBOL_TO_TICK_RATE::8000000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	144;"	d	line:144
+SYMBOL_TO_TICK_RATE::8000000	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	86;"	d	line:86
+SYMBOL_TO_TICK_RATE::INSTR_FREQ	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	148;"	d	line:148
+SYMBOL_TO_TICK_RATE::INSTR_FREQ	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	152;"	d	line:152
+SearchForLongAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3943;"	f	line:3943	signature:(void)
+SearchForLongAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	68;"	p	line:68	signature:(void)
+SearchForShortAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3904;"	f	line:3904	signature:(BYTE entryType)
+SearchForShortAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	69;"	p	line:69	signature:(BYTE entryType)
+SearchingForNetworks::MiWiStateMachine.searchingForN	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	402;"	d	line:402
+SecurityInput	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4666;"	l	line:4666
+SecurityInput	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4754;"	l	line:4754
+SendIndirectMessage	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3813;"	f	line:3813	signature:(BYTE handle)
+SendIndirectMessage	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	67;"	p	line:67	signature:(BYTE handle)
+SendIndirectPacket	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2378;"	f	line:2378	signature:(BYTE handle,BYTE dataRequestType)
+SendIndirectPacket	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	70;"	p	line:70	signature:(BYTE handle, BYTE dataRequestType)
+SendReportByHandle	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2124;"	f	line:2124	signature:(BYTE handle, BOOL forwardPacket)
+SendReportByHandle	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	74;"	p	line:74	signature:(BYTE handle, BOOL forwardPacket)
+SendReportByLongAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2008;"	f	line:2008	signature:(BYTE *pLongAddress)
+SendReportByLongAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	73;"	p	line:73	signature:(BYTE *pLongAddress)
+SendReportByShortAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	1788;"	f	line:1788	signature:(WORD_VAL PANID, WORD_VAL ShortAddress, BOOL forwardPacket)
+SendReportByShortAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	72;"	p	line:72	signature:(WORD_VAL PANID, WORD_VAL ShortAddress, BOOL forwardPacket)
+SendTxBuffer	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2570;"	f	line:2570	signature:(BOOL AckRequested, BOOL SecurityOn)
+SendTxBuffer	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	57;"	p	line:57	signature:(BOOL AckRequested, BOOL SecurityOn)
+SendTxBuffer	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	59;"	p	line:59	signature:(BOOL AckRequested)
+SetChannel	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3874;"	f	line:3874	signature:(BYTE channel)
+SetChannel	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	63;"	p	line:63	signature:(BYTE channel)
+ShortAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	257;"	m	line:257	struct:_NETWORK_TABLE_ENTRY
+ShortAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	321;"	m	line:321	struct:_DEST_INFO::_DEST_INFO_NETWORKED
+ShortAddress1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	339;"	m	line:339	struct:_OPEN_SOCKET
+ShortAddress2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	341;"	m	line:341	struct:_OPEN_SOCKET
+SourceAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	368;"	m	line:368	struct:_SECURITY_INPUT
+TESTMODE::(0x22f)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	100;"	d	line:100
+TESTRSSI::(0x22e)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	99;"	d	line:99
+TICK	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	183;"	t	line:183
+TMRL::TMR0L	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	142;"	d	line:142
+TMRL::TMR0L	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	91;"	d	line:91
+TMRL::TMR2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	96;"	d	line:96
+TRUE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	50;"	e	line:50	enum:_BOOL
+TXMAINCNTH0::(0x228)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	92;"	d	line:92
+TXMAINCNTH1::(0x229)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	93;"	d	line:93
+TXMAINCNTL::(0x226)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	90;"	d	line:90
+TXMAINCNTM::(0x227)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	91;"	d	line:91
+TXREG::TXREG1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	95;"	d	line:95
+TXREMCNTH::(0x225)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	89;"	d	line:89
+TXREMCNTL::(0x224)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	88;"	d	line:88
+TXSTA::TXSTA1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	96;"	d	line:96
+TXSTAbits::TXSTA1bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	94;"	d	line:94
+TX_BUFFER_SIZE::40	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	182;"	d	line:182
+TX_BUSY	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	307;"	m	line:307	struct:_MIWI_STATUS::_MIWI_STATUS_bits
+TX_PENDING_ACK	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	308;"	m	line:308	struct:_MIWI_STATUS::_MIWI_STATUS_bits
+TX_SECURITY	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	309;"	m	line:309	struct:_MIWI_STATUS::_MIWI_STATUS_bits
+TextLen	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	365;"	m	line:365	struct:_SECURITY_INPUT
+TickGet	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.c	136;"	f	line:136	signature:(void)
+TickGet	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	186;"	p	line:186	signature:(void)
+TickGetDiff::(a,b)(a.Val-b.Val)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	163;"	d	line:163
+TxBuffer	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	91;"	v	line:91
+TxDACMANUALCTRL::(0x22c)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	97;"	d	line:97
+TxData	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	100;"	v	line:100
+TxHeader	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	99;"	v	line:99
+TxPayLoad::TxData=11	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	415;"	d	line:415
+UB	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	119;"	m	line:119	struct:_DWORD_VAL::<anonymous>
+USER_REPORT_TYPE::0x12	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	168;"	d	line:168
+Val	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	107;"	m	line:107	union:_DWORD_VAL
+Val	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	61;"	m	line:61	union:_BYTE_VAL
+Val	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	77;"	m	line:77	union:_WORD_VAL
+Val	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	180;"	m	line:180	union:_MAC_FRAME_CONTROL
+Val	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	219;"	m	line:219	union:_SEND_REPORT_STATUS
+Val	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	224;"	m	line:224	union:_MRF24J40_IFS
+Val	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	237;"	m	line:237	union:_NETWORK_TABLE_ENTRY_status
+Val	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	274;"	m	line:274	union:_NETWORK_TABLE_ENTRY::_NETWORK_TABLE_ENTRY_INFO::_NETWORK_TABLE_ENTRY_INFO_NETWORK::_NETWORK_TABLE_ENTRY_INFO_NETWORK_STRUCT
+Val	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	301;"	m	line:301	union:_MIWI_STATUS
+Val	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	336;"	m	line:336	union:_OPEN_SOCKET::_OPEN_SOCKET_STATUS
+Val	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	169;"	m	line:169	union:_TICK
+Version	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	271;"	m	line:271	struct:_NETWORK_TABLE_ENTRY::_NETWORK_TABLE_ENTRY_INFO::_NETWORK_TABLE_ENTRY_INFO_NETWORK
+VersionNumber	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	958;"	l	line:958
+WAKETIMEH::(0x223)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	87;"	d	line:87
+WAKETIMEL::(0x222)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	86;"	d	line:86
+WORD	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	53;"	t	line:53
+WORD_VAL	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	103;"	t	line:103
+WRITE_ACKTMOUT::(0x25)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	201;"	d	line:201
+WRITE_BBREG0::(0x71)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	239;"	d	line:239
+WRITE_BBREG1::(0x73)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	240;"	d	line:240
+WRITE_BBREG2::(0x75)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	241;"	d	line:241
+WRITE_BBREG3::(0x77)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	242;"	d	line:242
+WRITE_BBREG4::(0x79)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	243;"	d	line:243
+WRITE_BBREG5::(0x7B)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	244;"	d	line:244
+WRITE_BBREG6::(0x7D)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	245;"	d	line:245
+WRITE_BISTCR::(0x57)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	226;"	d	line:226
+WRITE_CSMACR::(0x33)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	208;"	d	line:208
+WRITE_EADR0::(0x0B)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	188;"	d	line:188
+WRITE_EADR1::(0x0D)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	189;"	d	line:189
+WRITE_EADR2::(0x0F)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	190;"	d	line:190
+WRITE_EADR3::(0x11)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	191;"	d	line:191
+WRITE_EADR4::(0x13)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	192;"	d	line:192
+WRITE_EADR5::(0x15)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	193;"	d	line:193
+WRITE_EADR6::(0x17)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	194;"	d	line:194
+WRITE_EADR7::(0x19)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	195;"	d	line:195
+WRITE_ESLOTG23::(0x3D)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	213;"	d	line:213
+WRITE_ESLOTG45::(0x3F)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	214;"	d	line:214
+WRITE_ESLOTG67::(0x41)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	215;"	d	line:215
+WRITE_FFOEN::(0x31)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	207;"	d	line:207
+WRITE_FRMOFFSET::(0x47)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	218;"	d	line:218
+WRITE_GATE_CLK::(0x4D)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	221;"	d	line:221
+WRITE_GPIO::(0x67)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	234;"	d	line:234
+WRITE_GPIODIR::(0x69)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	235;"	d	line:235
+WRITE_HSYMTMR0::(0x51)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	223;"	d	line:223
+WRITE_HSYMTMR1::(0x53)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	224;"	d	line:224
+WRITE_INTMSK::(0x65)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	233;"	d	line:233
+WRITE_ISRSTS::(0x63)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	232;"	d	line:232
+WRITE_ORDER::(0x21)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	199;"	d	line:199
+WRITE_PANIDH::(0x05)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	185;"	d	line:185
+WRITE_PANIDL::(0x03)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	184;"	d	line:184
+WRITE_PAONSETUP::(0x2F)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	206;"	d	line:206
+WRITE_PAONTIME::(0x2D)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	205;"	d	line:205
+WRITE_RFCTL::(0x6D)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	237;"	d	line:237
+WRITE_RSSITHCCA::(0x7F)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	246;"	d	line:246
+WRITE_RXFLUSH::(0x1B)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	196;"	d	line:196
+WRITE_RXMCR::(0x01)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	183;"	d	line:183
+WRITE_RXSR::(0x61)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	231;"	d	line:231
+WRITE_SADRH::(0x09)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	187;"	d	line:187
+WRITE_SADRL::(0x07)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	186;"	d	line:186
+WRITE_SECCR0::(0x59)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	227;"	d	line:227
+WRITE_SECCR1::(0x5B)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	228;"	d	line:228
+WRITE_SECCR2::(0x6F)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	238;"	d	line:238
+WRITE_SECISR::(0x5F)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	230;"	d	line:230
+WRITE_SLALLOC::(0x27)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	202;"	d	line:202
+WRITE_SLPACK::(0x6B)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	236;"	d	line:236
+WRITE_SOFTRST::(0x55)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	225;"	d	line:225
+WRITE_SYMTICKH::(0x2B)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	204;"	d	line:204
+WRITE_SYMTICKL::(0x29)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	203;"	d	line:203
+WRITE_TXBCNINTL::(0x45)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	217;"	d	line:217
+WRITE_TXBCNTRIG::(0x35)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	209;"	d	line:209
+WRITE_TXG1TRIG::(0x39)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	211;"	d	line:211
+WRITE_TXG2TRIG::(0x3B)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	212;"	d	line:212
+WRITE_TXLERR::(0x4B)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	220;"	d	line:220
+WRITE_TXMCR::(0x23)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	200;"	d	line:200
+WRITE_TXNMTRIG::(0x37)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	210;"	d	line:210
+WRITE_TXOFFSET::(0x4F)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	222;"	d	line:222
+WRITE_TXPEMISP::(0x5D)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	229;"	d	line:229
+WRITE_TXPEND::(0x43)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	216;"	d	line:216
+WRITE_TXSR::(0x49)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	219;"	d	line:219
+WRITE_TXSTATE0::(0x1D)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	197;"	d	line:197
+WRITE_TXSTATE1::(0x1F)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	198;"	d	line:198
+WriteData::(a)TxBuffer[TxData++]=a	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	413;"	d	line:413
+_ADC1Interrupt::_ADCInterrupt	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	126;"	d	line:126
+_BEACON_SUPERFRAME	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	192;"	u	line:192
+_BEACON_SUPERFRAME_bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	196;"	s	line:196	union:_BEACON_SUPERFRAME
+_BOOL	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	50;"	g	line:50
+_BYTE_VAL	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	59;"	u	line:59
+_CIPHER_MODE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	349;"	g	line:349
+_CIPHER_STATUS	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	355;"	g	line:355
+_CONSOLE_H_	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	46;"	d	line:46
+_DEST_INFO	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	314;"	u	line:314
+_DEST_INFO_NETWORKED	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	318;"	s	line:318	union:_DEST_INFO
+_DWORD_VAL	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	105;"	u	line:105
+_MAC_FRAME_CONTROL	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	178;"	u	line:178
+_MAC_FRAME_CONTROL_bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	181;"	s	line:181	union:_MAC_FRAME_CONTROL
+_MIWI_DEFS_H_	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWiDefs.h	40;"	d	line:40
+_MIWI_STATE_MACHINE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	286;"	s	line:286
+_MIWI_STATUS	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	299;"	u	line:299
+_MIWI_STATUS_bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	302;"	s	line:302	union:_MIWI_STATUS
+_MRF24J40_IFS	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	222;"	u	line:222
+_MRF24J40_IFS_bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	225;"	s	line:225	union:_MRF24J40_IFS
+_NETWORK_TABLE_ENTRY	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	253;"	s	line:253
+_NETWORK_TABLE_ENTRY_INFO	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	263;"	u	line:263	struct:_NETWORK_TABLE_ENTRY
+_NETWORK_TABLE_ENTRY_INFO_NETWORK	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	266;"	s	line:266	union:_NETWORK_TABLE_ENTRY::_NETWORK_TABLE_ENTRY_INFO
+_NETWORK_TABLE_ENTRY_INFO_NETWORK_STRUCT	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	272;"	u	line:272	struct:_NETWORK_TABLE_ENTRY::_NETWORK_TABLE_ENTRY_INFO::_NETWORK_TABLE_ENTRY_INFO_NETWORK
+_NETWORK_TABLE_ENTRY_INFO_NETWORK_STRUCT_bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	275;"	s	line:275	union:_NETWORK_TABLE_ENTRY::_NETWORK_TABLE_ENTRY_INFO::_NETWORK_TABLE_ENTRY_INFO_NETWORK::_NETWORK_TABLE_ENTRY_INFO_NETWORK_STRUCT
+_NETWORK_TABLE_ENTRY_bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	238;"	s	line:238	union:_NETWORK_TABLE_ENTRY_status
+_NETWORK_TABLE_ENTRY_status	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	235;"	u	line:235
+_OPEN_SOCKET	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	325;"	s	line:325
+_OPEN_SOCKET_STATUS	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	327;"	u	line:327	struct:_OPEN_SOCKET
+_OPEN_SOCKET_STATUS_bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	329;"	s	line:329	union:_OPEN_SOCKET::_OPEN_SOCKET_STATUS
+_SECURITY_INPUT	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	362;"	s	line:362
+_SEND_REPORT_STATUS	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	209;"	u	line:209
+_SEND_REPORT_STATUS_bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	211;"	s	line:211	union:_SEND_REPORT_STATUS
+_SPI_H_	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MSPI.h	48;"	d	line:48
+_TICK	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	167;"	u	line:167
+_TICK_bytes	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	170;"	s	line:170	union:_TICK
+_TICK_words	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	178;"	s	line:178	union:_TICK
+_WORD_VAL	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	75;"	u	line:75
+_ZMRF24J40_H_	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MRF24J40.h	49;"	d	line:49
+__C32__	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	75;"	d	line:75
+__COMPILER_H	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	44;"	d	line:44
+__GENERIC_TYPE_DEFS_H_	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	48;"	d	line:48
+__MIWI_H_	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	46;"	d	line:46
+__SYMBOL_TIME_H_	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	50;"	d	line:50
+__attribute__::(a)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	91;"	d	line:91
+aResponseWaitTime::30720	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	139;"	d	line:139
+addrMode	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	236;"	l	line:236
+appAck	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	217;"	m	line:217	struct:_SEND_REPORT_STATUS::_SEND_REPORT_STATUS_bits
+appAckValid	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	216;"	m	line:216	struct:_SEND_REPORT_STATUS::_SEND_REPORT_STATUS_bits
+associationPermit	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	204;"	m	line:204	struct:_BEACON_SUPERFRAME::_BEACON_SUPERFRAME_bits
+associationPermit	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	279;"	m	line:279	struct:_NETWORK_TABLE_ENTRY::_NETWORK_TABLE_ENTRY_INFO::_NETWORK_TABLE_ENTRY_INFO_NETWORK::_NETWORK_TABLE_ENTRY_INFO_NETWORK_STRUCT::_NETWORK_TABLE_ENTRY_INFO_NETWORK_STRUCT_bits
+attemptingToJoin	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	289;"	m	line:289	struct:_MIWI_STATE_MACHINE
+attemptingToRejoin	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	293;"	m	line:293	struct:_MIWI_STATE_MACHINE
+b0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	124;"	m	line:124	struct:_DWORD_VAL::<anonymous>
+b0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	64;"	m	line:64	struct:_BYTE_VAL::<anonymous>
+b0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	86;"	m	line:86	struct:_WORD_VAL::<anonymous>
+b0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	172;"	m	line:172	struct:_TICK::_TICK_bytes
+b1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	125;"	m	line:125	struct:_DWORD_VAL::<anonymous>
+b1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	65;"	m	line:65	struct:_BYTE_VAL::<anonymous>
+b1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	87;"	m	line:87	struct:_WORD_VAL::<anonymous>
+b1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	173;"	m	line:173	struct:_TICK::_TICK_bytes
+b10	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	134;"	m	line:134	struct:_DWORD_VAL::<anonymous>
+b10	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	96;"	m	line:96	struct:_WORD_VAL::<anonymous>
+b11	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	135;"	m	line:135	struct:_DWORD_VAL::<anonymous>
+b11	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	97;"	m	line:97	struct:_WORD_VAL::<anonymous>
+b12	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	136;"	m	line:136	struct:_DWORD_VAL::<anonymous>
+b12	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	98;"	m	line:98	struct:_WORD_VAL::<anonymous>
+b13	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	137;"	m	line:137	struct:_DWORD_VAL::<anonymous>
+b13	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	99;"	m	line:99	struct:_WORD_VAL::<anonymous>
+b14	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	100;"	m	line:100	struct:_WORD_VAL::<anonymous>
+b14	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	138;"	m	line:138	struct:_DWORD_VAL::<anonymous>
+b15	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	101;"	m	line:101	struct:_WORD_VAL::<anonymous>
+b15	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	139;"	m	line:139	struct:_DWORD_VAL::<anonymous>
+b16	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	140;"	m	line:140	struct:_DWORD_VAL::<anonymous>
+b17	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	141;"	m	line:141	struct:_DWORD_VAL::<anonymous>
+b18	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	142;"	m	line:142	struct:_DWORD_VAL::<anonymous>
+b19	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	143;"	m	line:143	struct:_DWORD_VAL::<anonymous>
+b2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	126;"	m	line:126	struct:_DWORD_VAL::<anonymous>
+b2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	66;"	m	line:66	struct:_BYTE_VAL::<anonymous>
+b2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	88;"	m	line:88	struct:_WORD_VAL::<anonymous>
+b2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	174;"	m	line:174	struct:_TICK::_TICK_bytes
+b20	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	144;"	m	line:144	struct:_DWORD_VAL::<anonymous>
+b21	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	145;"	m	line:145	struct:_DWORD_VAL::<anonymous>
+b22	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	146;"	m	line:146	struct:_DWORD_VAL::<anonymous>
+b23	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	147;"	m	line:147	struct:_DWORD_VAL::<anonymous>
+b24	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	148;"	m	line:148	struct:_DWORD_VAL::<anonymous>
+b25	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	149;"	m	line:149	struct:_DWORD_VAL::<anonymous>
+b26	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	150;"	m	line:150	struct:_DWORD_VAL::<anonymous>
+b27	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	151;"	m	line:151	struct:_DWORD_VAL::<anonymous>
+b28	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	152;"	m	line:152	struct:_DWORD_VAL::<anonymous>
+b29	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	153;"	m	line:153	struct:_DWORD_VAL::<anonymous>
+b3	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	127;"	m	line:127	struct:_DWORD_VAL::<anonymous>
+b3	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	67;"	m	line:67	struct:_BYTE_VAL::<anonymous>
+b3	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	89;"	m	line:89	struct:_WORD_VAL::<anonymous>
+b3	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	175;"	m	line:175	struct:_TICK::_TICK_bytes
+b30	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	154;"	m	line:154	struct:_DWORD_VAL::<anonymous>
+b31	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	155;"	m	line:155	struct:_DWORD_VAL::<anonymous>
+b4	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	128;"	m	line:128	struct:_DWORD_VAL::<anonymous>
+b4	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	68;"	m	line:68	struct:_BYTE_VAL::<anonymous>
+b4	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	90;"	m	line:90	struct:_WORD_VAL::<anonymous>
+b5	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	129;"	m	line:129	struct:_DWORD_VAL::<anonymous>
+b5	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	69;"	m	line:69	struct:_BYTE_VAL::<anonymous>
+b5	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	91;"	m	line:91	struct:_WORD_VAL::<anonymous>
+b6	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	130;"	m	line:130	struct:_DWORD_VAL::<anonymous>
+b6	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	70;"	m	line:70	struct:_BYTE_VAL::<anonymous>
+b6	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	92;"	m	line:92	struct:_WORD_VAL::<anonymous>
+b7	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	131;"	m	line:131	struct:_DWORD_VAL::<anonymous>
+b7	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	71;"	m	line:71	struct:_BYTE_VAL::<anonymous>
+b7	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	93;"	m	line:93	struct:_WORD_VAL::<anonymous>
+b8	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	132;"	m	line:132	struct:_DWORD_VAL::<anonymous>
+b8	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	94;"	m	line:94	struct:_WORD_VAL::<anonymous>
+b9	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	133;"	m	line:133	struct:_DWORD_VAL::<anonymous>
+b9	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	95;"	m	line:95	struct:_WORD_VAL::<anonymous>
+batteryLifeExt	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	201;"	m	line:201	struct:_BEACON_SUPERFRAME::_BEACON_SUPERFRAME_bits
+beaconOrder	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	198;"	m	line:198	struct:_BEACON_SUPERFRAME::_BEACON_SUPERFRAME_bits
+beaconRequestSent	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	291;"	m	line:291	struct:_MIWI_STATE_MACHINE
+beaconSuperframe	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	956;"	l	line:956
+bestChannel	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3285;"	l	line:3285
+bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	102;"	m	line:102	union:_WORD_VAL
+bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	156;"	m	line:156	union:_DWORD_VAL
+bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	72;"	m	line:72	union:_BYTE_VAL
+bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	189;"	m	line:189	union:_MAC_FRAME_CONTROL
+bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	205;"	m	line:205	union:_BEACON_SUPERFRAME
+bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	218;"	m	line:218	union:_SEND_REPORT_STATUS
+bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	232;"	m	line:232	union:_MRF24J40_IFS
+bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	248;"	m	line:248	union:_NETWORK_TABLE_ENTRY_status
+bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	280;"	m	line:280	union:_NETWORK_TABLE_ENTRY::_NETWORK_TABLE_ENTRY_INFO::_NETWORK_TABLE_ENTRY_INFO_NETWORK::_NETWORK_TABLE_ENTRY_INFO_NETWORK_STRUCT
+bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	311;"	m	line:311	union:_MIWI_STATUS
+bits	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	335;"	m	line:335	union:_OPEN_SOCKET::_OPEN_SOCKET_STATUS
+byte	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	121;"	m	line:121	union:_DWORD_VAL
+byte	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	83;"	m	line:83	union:_WORD_VAL
+byte	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	176;"	m	line:176	union:_TICK
+clearOptions	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3190;"	l	line:3190
+coordinatorNumber	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	964;"	l	line:964
+currentChannel	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	134;"	v	line:134
+currentDifference	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4269;"	l	line:4269
+currentSearchChannel	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	104;"	v	line:104
+currentTime	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.c	138;"	l	line:138
+data	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	981;"	l	line:981
+dataRequestComplete	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	296;"	m	line:296	struct:_MIWI_STATE_MACHINE
+dataRequestNeeded	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	295;"	m	line:295	struct:_MIWI_STATE_MACHINE
+dataRequestSent	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	292;"	m	line:292	struct:_MIWI_STATE_MACHINE
+destInfo	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	81;"	v	line:81
+destPANID	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	308;"	l	line:308
+destShortAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	309;"	l	line:309
+directConnection	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	241;"	m	line:241	struct:_NETWORK_TABLE_ENTRY_status::_NETWORK_TABLE_ENTRY_bits
+dummy	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MSPI.c	103;"	l	line:103
+dummy	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MSPI.c	72;"	l	line:72
+entry	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	1006;"	l	line:1006
+entry	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	1093;"	l	line:1093
+extraLen	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2590;"	l	line:2590
+failureCounter	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	132;"	v	line:132
+failureTimer	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4268;"	l	line:4268
+filler	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	261;"	m	line:261	struct:_NETWORK_TABLE_ENTRY
+finalCAPslot	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	200;"	m	line:200	struct:_BEACON_SUPERFRAME::_BEACON_SUPERFRAME_bits
+findNextNetworkEntry	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2537;"	f	line:2537	signature:(void)
+findNextNetworkEntry	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	61;"	p	line:61	signature:(void)
+flags	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4350;"	l	line:4350
+flags	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	281;"	m	line:281	struct:_NETWORK_TABLE_ENTRY::_NETWORK_TABLE_ENTRY_INFO::_NETWORK_TABLE_ENTRY_INFO_NETWORK
+forMe	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	259;"	l	line:259
+framePending	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	185;"	m	line:185	struct:_MAC_FRAME_CONTROL::_MAC_FRAME_CONTROL_bits
+frameType	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	183;"	m	line:183	struct:_MAC_FRAME_CONTROL::_MAC_FRAME_CONTROL_bits
+handle	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	1060;"	l	line:1060
+handle	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	1243;"	l	line:1243
+handle	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	1309;"	l	line:1309
+handle	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	1790;"	l	line:1790
+handle	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2010;"	l	line:2010
+handle	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3618;"	l	line:3618
+handle	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3992;"	l	line:3992
+handle	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	456;"	l	line:456
+handle	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	610;"	l	line:610
+handle	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	317;"	m	line:317	union:_DEST_INFO
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	156;"	l	line:156
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	1628;"	l	line:1628
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2126;"	l	line:2126
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2380;"	l	line:2380
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2539;"	l	line:2539
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2585;"	l	line:2585
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2813;"	l	line:2813
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3189;"	l	line:3189
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3279;"	l	line:3279
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3430;"	l	line:3430
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3618;"	l	line:3618
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3815;"	l	line:3815
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3906;"	l	line:3906
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3945;"	l	line:3945
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4062;"	l	line:4062
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4167;"	l	line:4167
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4462;"	l	line:4462
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4668;"	l	line:4668
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4755;"	l	line:4755
+i	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	610;"	l	line:610
+inUse	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	213;"	m	line:213	struct:_SEND_REPORT_STATUS::_SEND_REPORT_STATUS_bits
+indirectBuffer	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	109;"	v	line:109
+info	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	283;"	m	line:283	struct:_NETWORK_TABLE_ENTRY
+initMRF24J40	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4060;"	f	line:4060	signature:(void)
+initMRF24J40	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	77;"	p	line:77	signature:(void)
+intraPAN	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	187;"	m	line:187	struct:_MAC_FRAME_CONTROL::_MAC_FRAME_CONTROL_bits
+isFamily	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	247;"	m	line:247	struct:_NETWORK_TABLE_ENTRY_status::_NETWORK_TABLE_ENTRY_bits
+isValid	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	240;"	m	line:240	struct:_NETWORK_TABLE_ENTRY_status::_NETWORK_TABLE_ENTRY_bits
+itIsMe	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	333;"	m	line:333	struct:_OPEN_SOCKET::_OPEN_SOCKET_STATUS::_OPEN_SOCKET_STATUS_bits
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	1091;"	l	line:1091
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	1628;"	l	line:1628
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	1718;"	l	line:1718
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2380;"	l	line:2380
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2585;"	l	line:2585
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	258;"	l	line:258
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2988;"	l	line:2988
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3280;"	l	line:3280
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	335;"	l	line:335
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3444;"	l	line:3444
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3551;"	l	line:3551
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3815;"	l	line:3815
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3945;"	l	line:3945
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4063;"	l	line:4063
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	456;"	l	line:456
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	603;"	l	line:603
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	714;"	l	line:714
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	743;"	l	line:743
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	759;"	l	line:759
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	865;"	l	line:865
+j	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	982;"	l	line:982
+k	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	1628;"	l	line:1628
+k	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2380;"	l	line:2380
+k	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3281;"	l	line:3281
+knownCoordinators	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	111;"	v	line:111
+loc	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4463;"	l	line:4463
+longAddressValid	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	242;"	m	line:242	struct:_NETWORK_TABLE_ENTRY_status::_NETWORK_TABLE_ENTRY_bits
+macAck	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	215;"	m	line:215	struct:_SEND_REPORT_STATUS::_SEND_REPORT_STATUS_bits
+macAckValid	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	214;"	m	line:214	struct:_SEND_REPORT_STATUS::_SEND_REPORT_STATUS_bits
+macFrameControl	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	237;"	l	line:237
+mask	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	965;"	l	line:965
+matchFound	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	331;"	m	line:331	struct:_OPEN_SOCKET::_OPEN_SOCKET_STATUS::_OPEN_SOCKET_STATUS_bits
+memberOfNetwork	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	290;"	m	line:290	struct:_MIWI_STATE_MACHINE
+memcmppgm2ram::(a,b,c)memcmp(a,b,c)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	106;"	d	line:106
+memcpypgm2ram::(a,b,c)memcpy(a,b,c)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	107;"	d	line:107
+minRSSI	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3282;"	l	line:3282
+myPANID	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	131;"	v	line:131
+myParent	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	135;"	v	line:135
+myShortAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	130;"	v	line:130
+network	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	322;"	m	line:322	union:_DEST_INFO
+networkInfo	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	282;"	m	line:282	union:_NETWORK_TABLE_ENTRY::_NETWORK_TABLE_ENTRY_INFO
+networkStatus	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	127;"	v	line:127
+networkTable	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	123;"	v	line:123
+openSocketInfo	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	115;"	v	line:115
+p	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	1228;"	l	line:1228
+pLongAddr	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	316;"	m	line:316	union:_DEST_INFO
+pRxData	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	101;"	v	line:101
+previousEntry	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3619;"	l	line:3619
+previousEntry	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	611;"	l	line:611
+printf::(x)ConsolePutROMString((ROMcha	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Console.h	112;"	d	line:112
+requestIsOpen	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	332;"	m	line:332	struct:_OPEN_SOCKET::_OPEN_SOCKET_STATUS::_OPEN_SOCKET_STATUS_bits
+results	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4267;"	l	line:4267
+results	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	4367;"	l	line:4367
+role	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	112;"	v	line:112
+sampleRSSI	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3284;"	l	line:3284
+sampleRSSI	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	269;"	m	line:269	struct:_NETWORK_TABLE_ENTRY::_NETWORK_TABLE_ENTRY_INFO::_NETWORK_TABLE_ENTRY_INFO_NETWORK
+searchingForNetwork	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	288;"	m	line:288	struct:_MIWI_STATE_MACHINE
+securityEnabled	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	184;"	m	line:184	struct:_MAC_FRAME_CONTROL::_MAC_FRAME_CONTROL_bits
+sendReportStatus	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	117;"	v	line:117
+shortAddressValid	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	243;"	m	line:243	struct:_NETWORK_TABLE_ENTRY_status::_NETWORK_TABLE_ENTRY_bits
+socketHandle	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	338;"	m	line:338	struct:_OPEN_SOCKET
+socketStart	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	345;"	m	line:345	struct:_OPEN_SOCKET
+sourcePANID	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	310;"	l	line:310
+sourceShortAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	311;"	l	line:311
+startTick	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	103;"	v	line:103
+status	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	337;"	m	line:337	struct:_OPEN_SOCKET
+strcpypgm2ram::(a,b)strcpy(a,b)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	108;"	d	line:108
+strcpypgm2ram::(a,b)strcpypgm2ram(a,(farromch	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	87;"	d	line:87
+strlenpgm::(a)strlen(a)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	109;"	d	line:109
+strstrrampgm::(a,b)strstr(a,b)	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\Compiler.h	110;"	d	line:110
+superframeOrder	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	199;"	m	line:199	struct:_BEACON_SUPERFRAME::_BEACON_SUPERFRAME_bits
+t	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3816;"	l	line:3816
+tempLongAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	82;"	v	line:82
+tempNodeStatus	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	83;"	v	line:83
+tempPANID	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	85;"	v	line:85
+tempShortAddress	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	84;"	v	line:84
+tickCurrentTime	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	103;"	v	line:103
+tickDifference	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	103;"	v	line:103
+timerExtension1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.c	59;"	v	line:59
+timerExtension2	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.c	59;"	v	line:59
+tmpBuf	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	93;"	v	line:93
+tmpRFIE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2689;"	l	line:2689
+tmpRFIE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2721;"	l	line:2721
+tmpRFIE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2752;"	l	line:2752
+tmpRFIE	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2781;"	l	line:2781
+toReturn	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2011;"	l	line:2011
+toReturn	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2751;"	l	line:2751
+toReturn	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	2780;"	l	line:2780
+type	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	334;"	m	line:334	struct:_OPEN_SOCKET::_OPEN_SOCKET_STATUS::_OPEN_SOCKET_STATUS_bits
+v	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	109;"	m	line:109	union:_DWORD_VAL
+v	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	78;"	m	line:78	union:_WORD_VAL
+v	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	177;"	m	line:177	union:_TICK
+w	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	108;"	m	line:108	union:_DWORD_VAL
+w0	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	180;"	m	line:180	struct:_TICK::_TICK_words
+w1	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	181;"	m	line:181	struct:_TICK::_TICK_words
+word	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\GenericTypeDefs.h	114;"	m	line:114	union:_DWORD_VAL
+word	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.h	194;"	m	line:194	union:_BEACON_SUPERFRAME
+word	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\SymbolTime.h	182;"	m	line:182	union:_TICK
+worstRSSI	C:\development\m2m\firmware\pic\sweetbox\test\pic32_miwi_node\MiWi.c	3283;"	l	line:3283

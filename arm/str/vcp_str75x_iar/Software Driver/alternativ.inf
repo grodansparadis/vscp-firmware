@@ -1,0 +1,42 @@
+[Version]
+DriverVer=22/07/2002,5.0.2195.4858
+Signature=$CHICAGO$
+Class=Ports
+ClassGUID={4d36e978-e325-11ce-bfc1-08002be10318}
+Provider=%String0%
+; Port Class Install
+[ClassInstall]
+AddReg=USBClassInstall
+[USBClassInstall]
+HKR,,,,%Enumerator%
+HKR,,Icon,,"-23"
+HKR,,Installer32,,"MsPorts.Dll,PortsClassInstaller"
+[Manufacturer]
+%String0%=Microsoft
+[Microsoft]
+%String1%=MicrosoftUSB,USB\VID_1150&PID_0100
+; Win 2000
+[MicrosoftUSB]
+;CopyFiles=WDM.Drvrs
+AddReg=MicrosoftUSB.AddReg
+;[WDM.Drvrs]
+;usbser.sys,,,0x00000020
+[MicrosoftUSB.AddReg]
+HKR,,DevLoader,0,*ntkern
+HKR,,NTMPDriver,,"usbser.sys"
+[MicrosoftUSB.HW]
+AddReg=MicrosoftUSBAddReg.HW
+[MicrosoftUSB.Services]
+AddService=usbser, 0x00000002, FuncDrv_Service_Inst
+[FuncDrv_Service_Inst]
+DisplayName=%USBFilterString%
+ServiceType= 1
+StartType = 3
+ErrorControl = 0
+ServiceBinary = %12%\usbser.sys
+[MicrosoftUSBAddReg.HW]
+[Strings]
+String0="Microsoft Corporation"
+String1="USB SERIAL ENUMERATOR"
+Enumerator = "USB Serial Enumerator"
+%USBFilterString% = "USB Serial Service" 

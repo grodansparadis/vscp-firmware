@@ -1,0 +1,10 @@
+/** \defgroup bitbuf bitbuf: Generic Bit-Buffer Structure and Function Library
+
+	This bit-buffer structure provides an easy and efficient way to store and
+	process bits. You can create as many bit buffers as you like (within memory
+	limits), and then use this common set of functions to access each buffer.
+	Supported functions include sequential getting and storing of bits,
+	array-like get, buffer flush (dump data), and reset-to-beginning.
+	This buffer is not dynamically allocated, it has a user-defined fixed 
+	maximum size.
+*/

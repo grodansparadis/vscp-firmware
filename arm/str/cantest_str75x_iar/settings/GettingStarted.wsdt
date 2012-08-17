@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<Workspace>
+  <ConfigDictionary>
+    
+  <CurrentConfigs><Project>GettingStarted/Debug</Project><Project>cantest/Debug</Project></CurrentConfigs><CurrentProj>cantest</CurrentProj><OverviewSelected>0</OverviewSelected></ConfigDictionary>
+  <Desktop>
+    <Static>
+      <Workspace>
+        <ColumnWidths>
+          
+          
+          
+          
+        <Column0>107</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
+      </Workspace>
+      <Build>
+        
+        
+        
+        
+      <ColumnWidth0>20</ColumnWidth0><ColumnWidth1>723</ColumnWidth1><ColumnWidth2>193</ColumnWidth2><ColumnWidth3>48</ColumnWidth3></Build>
+      <TerminalIO/>
+    <Disassembly><MixedMode>1</MixedMode><CodeCovShow>0</CodeCovShow></Disassembly></Static>
+    <Windows>
+      
+      
+    <Wnd2>
+        <Tabs>
+          <Tab>
+            <Identity>TabID-1908-27066</Identity>
+            <TabName>Workspace</TabName>
+            <Factory>Workspace</Factory>
+            <Session>
+              
+            <NodeDict><ExpandedNode>GettingStarted</ExpandedNode><ExpandedNode>GettingStarted/source</ExpandedNode><ExpandedNode>cantest</ExpandedNode><ExpandedNode>cantest/source</ExpandedNode><ExpandedNode>cantest/startup</ExpandedNode></NodeDict></Session>
+          </Tab>
+        </Tabs>
+        
+      <SelectedTab>0</SelectedTab></Wnd2><Wnd3>
+        <Tabs>
+          <Tab>
+            <Identity>TabID-863-27086</Identity>
+            <TabName>Build</TabName>
+            <Factory>Build</Factory>
+            <Session/>
+          </Tab>
+        </Tabs>
+        
+      <SelectedTab>0</SelectedTab></Wnd3></Windows>
+    <Editor>
+      
+      
+      
+      
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>D:\Program\IAR Systems\Embedded Workbench 5.0\ARM\examples\ST\STR73x\STR730\GettingStarted\main.c</Filename><XPos>0</XPos><YPos>54</YPos><SelStart>2527</SelStart><SelEnd>2527</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\Program\IAR Systems\Embedded Workbench 5.0\ARM\examples\ST\STR73x\STR730\GettingStarted\73x_lcd.c</Filename><XPos>0</XPos><YPos>440</YPos><SelStart>13753</SelStart><SelEnd>13753</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\development\vscp\firmware\arm\str\cantest_str73x_iar\main.c</Filename><XPos>0</XPos><YPos>331</YPos><SelStart>10386</SelStart><SelEnd>10386</SelEnd></Tab><ActiveTab>2</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>D:\development\vscp\firmware\arm\str\cantest_str73x_iar\Kopia av main.c</Filename><XPos>0</XPos><YPos>47</YPos><SelStart>1788</SelStart><SelEnd>2203</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\development\vscp\firmware\arm\str\cantest_str73x_iar\str73x_lib\source\73x_can.c</Filename><XPos>0</XPos><YPos>338</YPos><SelStart>22916</SelStart><SelEnd>22916</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\development\vscp\firmware\arm\str\cantest_str73x_iar\str73x_lib\include\73x_rtc.h</Filename><XPos>0</XPos><YPos>12</YPos><SelStart>1476</SelStart><SelEnd>1491</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\development\vscp\firmware\arm\str\cantest_str73x_gcc\project\main.c</Filename><XPos>0</XPos><YPos>157</YPos><SelStart>4851</SelStart><SelEnd>4851</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\development\vscp\firmware\arm\str\cantest_str73x_gcc\project\tttt.txt</Filename><XPos>0</XPos><YPos>182</YPos><SelStart>0</SelStart><SelEnd>6049</SelEnd></Tab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Positions>
+      
+      
+      
+      
+      
+    <Top><Row0><Sizes><Toolbar-01353c28><key>iaridepm.enu1</key></Toolbar-01353c28></Sizes></Row0></Top><Left><Row0><Sizes><Wnd2><Rect><Top>-2</Top><Left>-2</Left><Bottom>446</Bottom><Right>198</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>195313</sizeHorzCX><sizeHorzCY>290698</sizeHorzCY><sizeVertCX>195313</sizeVertCX><sizeVertCY>651163</sizeVertCY></Rect></Wnd2></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd3><Rect><Top>-2</Top><Left>-2</Left><Bottom>198</Bottom><Right>1026</Right><x>-2</x><y>-2</y><xscreen>1028</xscreen><yscreen>200</yscreen><sizeHorzCX>1003906</sizeHorzCX><sizeHorzCY>290698</sizeHorzCY><sizeVertCX>195313</sizeVertCX><sizeVertCY>290698</sizeVertCY></Rect></Wnd3></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+  </Desktop>
+</Workspace>
+
+

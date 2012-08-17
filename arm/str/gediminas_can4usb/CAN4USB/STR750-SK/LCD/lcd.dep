@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project>
+  <fileVersion>2</fileVersion>
+  <fileChecksum>739413299</fileChecksum>
+  <configuration>
+    <name>Debug</name>
+    <outputs>
+      <file>$PROJ_DIR$\app\75x_conf.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
+      <file>$PROJ_DIR$\app\75x_it.c</file>
+      <file>$PROJ_DIR$\module\drv_hd44780_l.c</file>
+      <file>$PROJ_DIR$\..\..\STR75xLibrary\library\src\75x_adc.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_lib.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_tim.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\stdlib.h</file>
+      <file>$TOOLKIT_DIR$\examples\ST\STR75x\STR75xLibrary\library\inc\75x_map.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_it.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\string.h</file>
+      <file>$TOOLKIT_DIR$\inc\xlocale_c.h</file>
+      <file>$PROJ_DIR$\..\..\STR75xLibrary\library\src\75x_tim.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_adc.pbi</file>
+      <file>$PROJ_DIR$\..\..\STR75xLibrary\library\src\75x_lib.c</file>
+      <file>$TOOLKIT_DIR$\examples\ST\STR75x\STR75xLibrary\library\inc\75x_tim.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\drv_hd44780_l.o</file>
+      <file>$PROJ_DIR$\..\..\STR75xLibrary\library\src\75x_gpio.c</file>
+      <file>$PROJ_DIR$\board\arm_comm.h</file>
+      <file>$PROJ_DIR$\app\includes.h</file>
+      <file>$TOOLKIT_DIR$\inc\stdio.h</file>
+      <file>$PROJ_DIR$\module\drv_hd44780_l.h</file>
+      <file>$PROJ_DIR$\Debug\Exe\lcd.out</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.o</file>
+      <file>$TOOLKIT_DIR$\inc\DLib_Product_string.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_gpio.pbi</file>
+      <file>$PROJ_DIR$\module\drv_hd44780.h</file>
+      <file>$TOOLKIT_DIR$\inc\ctype.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_init.o</file>
+      <file>$PROJ_DIR$\..\..\STR75xLibrary\library\src\75x_eic.c</file>
+      <file>$TOOLKIT_DIR$\examples\ST\STR75x\STR75xLibrary\library\inc\75x_cfg.h</file>
+      <file>$TOOLKIT_DIR$\examples\ST\STR75x\STR75xLibrary\library\inc\75x_type.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_cfg.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_lib.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\drv_hd44780.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\drv_hd44780.o</file>
+      <file>$TOOLKIT_DIR$\examples\ST\STR75x\STR75xLibrary\library\inc\75x_mrcc.h</file>
+      <file>$TOOLKIT_DIR$\inc\yvals.h</file>
+      <file>$TOOLKIT_DIR$\inc\wchar.h</file>
+      <file>$TOOLKIT_DIR$\inc\xtls.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_gpio.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\drv_hd44780_l.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_vect.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_mrcc.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\lcd.pbd</file>
+      <file>$TOOLKIT_DIR$\inc\xmtx.h</file>
+      <file>$PROJ_DIR$\..\..\STR75xLibrary\library\src\75x_mrcc.c</file>
+      <file>$PROJ_DIR$\..\..\STR75xLibrary\startup\75x_init.s</file>
+      <file>$PROJ_DIR$\module\drv_hd44780.c</file>
+      <file>$TOOLKIT_DIR$\examples\ST\STR75x\STR75xLibrary\library\inc\75x_lib.h</file>
+      <file>$TOOLKIT_DIR$\inc\xencoding_limits.h</file>
+      <file>$TOOLKIT_DIR$\examples\ST\STR75x\STR75xLibrary\library\inc\75x_adc.h</file>
+      <file>$PROJ_DIR$\..\..\STR75xLibrary\library\src\75x_cfg.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_mrcc.o</file>
+      <file>$TOOLKIT_DIR$\examples\ST\STR75x\STR75xLibrary\library\inc\75x_gpio.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_tim.o</file>
+      <file>$TOOLKIT_DIR$\inc\xlocaleuse.h</file>
+      <file>$TOOLKIT_DIR$\inc\DLib_Defaults.h</file>
+      <file>$PROJ_DIR$\..\..\STR75xLibrary\startup\75x_vect.s</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_eic.o</file>
+      <file>$TOOLKIT_DIR$\inc\ycheck.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_adc.o</file>
+      <file>$TOOLKIT_DIR$\inc\xlocale.h</file>
+      <file>$TOOLKIT_DIR$\inc\DLib_Threads.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_eic.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_it.o</file>
+      <file>$TOOLKIT_DIR$\inc\DLib_Product.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\75x_cfg.pbi</file>
+      <file>$TOOLKIT_DIR$\examples\ST\STR75x\STR75xLibrary\library\inc\75x_eic.h</file>
+      <file>$TOOLKIT_DIR$\inc\ysizet.h</file>
+      <file>$PROJ_DIR$\app\main.c</file>
+      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
+      <file>$PROJ_DIR$\module\drv_hd44780_cnfg.h</file>
+    </outputs>
+    <file>
+      <name>$PROJ_DIR$\app\75x_it.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 9</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 65</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 49 8 0 31 30 36 51 15 54 68</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\module\drv_hd44780_l.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 41</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 16</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 21 19 20 60 37 57 66 50 63 69 10 24 27 62 39 45 7 56 11 38 71 0 49 8 31 30 36 51 15 54 68 18 72 26</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\STR75xLibrary\library\src\75x_adc.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 13</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 61</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 51 8 0 31 36</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>ILINK</name>
+          <file> 22</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\STR75xLibrary\library\src\75x_tim.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 6</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 55</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 15 8 0 31 36</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\STR75xLibrary\library\src\75x_lib.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 5</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 33</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 49 8 0 31 30 36 51 15 54 68</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\STR75xLibrary\library\src\75x_gpio.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 25</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 40</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 54 8 0 31 36</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\STR75xLibrary\library\src\75x_eic.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 64</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 59</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 68 8 0 31</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Obj\lcd.pbd</name>
+      <inputs>
+        <tool>
+          <name>BILINK</name>
+          <file> 13 67 64 25 9 5 43 6 34 41 1</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\STR75xLibrary\library\src\75x_mrcc.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 43</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 53</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 36 8 0 31</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\STR75xLibrary\startup\75x_init.s</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 28</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\module\drv_hd44780.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 34</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 35</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 26 19 20 60 37 57 66 50 63 69 10 24 27 62 39 45 7 56 11 38 71 0 49 8 31 30 36 51 15 54 68 18 72 21</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\STR75xLibrary\library\src\75x_cfg.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 67</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 32</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 30 8 0 31</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\STR75xLibrary\startup\75x_vect.s</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 42</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\app\main.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 1</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 23</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 19 20 60 37 57 66 50 63 69 10 24 27 62 39 45 7 56 11 38 71 0 49 8 31 30 36 51 15 54 68 18 72 21 26</file>
+        </tool>
+      </inputs>
+    </file>
+    <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>ILINK</tool>
+    </forcedrebuild>
+  </configuration>
+</project>
+
+

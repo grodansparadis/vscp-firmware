@@ -1,0 +1,57 @@
+<html>
+<head>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<title>Modtronix SBC65EC Demo Webserver</title>
+<link href="mx.css" rel="stylesheet" type="text/css">
+</head>
+
+<!-- Replace "<td><input type=text size=5 maxlength=3 name=" with %NF0 -->
+
+<body>
+<p class="pgHdr">Network Settings</p>
+<hr>
+<br>
+<form method=GET action=NCFG.CGI>
+<table>
+<tr><td width="150">IP Address:</td>
+<td><input type=text size=5 maxlength=3 name=A value=%N00> . </td>
+<td><input type=text size=5 maxlength=3 name=B value=%N01> . </td>
+<td><input type=text size=5 maxlength=3 name=C value=%N02> . </td>
+<td><input type=text size=5 maxlength=3 name=D value=%N03></td>
+</table>
+<br>
+<table>
+<tr><td width="150">Subnet Mask:</td>
+<td><input type=text size=5 maxlength=3 name=E value=%N04> . </td>
+<td><input type=text size=5 maxlength=3 name=F value=%N05> . </td>
+<td><input type=text size=5 maxlength=3 name=G value=%N06> . </td>
+<td><input type=text size=5 maxlength=3 name=H value=%N07></td>
+</table>
+<br>
+<table>
+<tr><td width="150">Gateway Address:</td>
+<td><input type=text size=5 maxlength=3 name=I value=%N08> . </td>
+<td><input type=text size=5 maxlength=3 name=J value=%N09> . </td>
+<td><input type=text size=5 maxlength=3 name=K value=%N0A> . </td>
+<td><input type=text size=5 maxlength=3 name=L value=%N0B></td>
+</table>
+<br>
+<table>
+<tr><td width="150">MAC Address:</td>
+<td><input type=text size=5 maxlength=3 name=M value=%N10 %NE0> . </td>
+<td><input type=text size=5 maxlength=3 name=N value=%N11 %NE0> . </td>
+<td><input type=text size=5 maxlength=3 name=O value=%N12 %NE0> . </td>
+<td><input type=text size=5 maxlength=3 name=P value=%N13 %NE0> . </td>
+<td><input type=text size=5 maxlength=3 name=Q value=%N14 %NE0> . </td>
+<td><input type=text size=5 maxlength=3 name=R value=%N15 %NE0></td>
+</table>
+<br>
+<hr>
+<table>
+<tr><td width="20"></td><td><input type=submit value="Submit"></td>
+</table>
+
+</form>
+
+</body>
+</html>

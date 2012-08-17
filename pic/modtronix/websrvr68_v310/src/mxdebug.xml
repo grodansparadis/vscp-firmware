@@ -1,0 +1,151 @@
+<!--
+**** Custom Debug project file ****
+This file contains custom definitions for debug messages! Only use "debug codes" from
+0xD0 to 0xDF for custom debug messages! Other codes are reserved by the application.
+Each new debug string starts with a "debug code" with a value from 128 - 255.
+
+The format of a "debug command" is:
+[debug code][message code][message parameters]
+
+ - The "message code" is a value from 0 to 127. When 0, it means that an "extended message
+   code" is to follow. This should only be used if there are more then 127 messages - if
+   message codes 1-127 are not enough! When "message code" 0 is used, the "debug command"
+   has the following format:
+   [debug code][0][extended message code][message parameters]
+ - The "message parameters" can be:
+   - %x = A two character ASCII hex value.
+          For example "00", "F0", "80", "8A"..... Will be displayed in lowercase hex.
+   - %X = A two character ASCII hex value.
+          For example "00", "F0", "80", "8A"..... Will be displayed in uppercase hex.
+   - %B = A two character ASCII hex value = Byte. Will be displayed in decimal.
+   - %W = A four character ASCII hex value = Word. Will be displayed in decimal.
+   - %d = A one character value from 0-127. Will be displayed in decimal.
+   - %s = A null terminated string, for example "filename.txt".
+
+The following "debug codes" are defined:
+ - 0xD0         = APPCFG (Application Configuration)
+ - 0xD1         = HTTPX
+ - 0xD2         = BUS
+ - 0xD3         = 
+ - 0xD4         = 
+ - 0xD5         = 
+ - 0xD6         = Main
+ - 0xD7         = 
+ - 0xD8         = 
+ - 0xD9         = General
+ - 0xDA         = CMD
+ - 0xDB         =
+ - 0xDC         =
+ - 0xDD         =
+ - 0xDE         =
+ - 0xDF         =
+
+-->
+<mxdebug>
+
+<!-- APPCFG Debug Tab -->
+<debugHandler name="APPCFG" codeFrom="0xD0" codeTo="0xD0" offsetName="none">
+  <message code="1" type="info" param=""/>
+  <message code="2" type="info" param=""/>
+  <message code="3" type="info" param=""/>
+  <message code="4" type="info" param=""/>
+  <message code="5" type="info" param=""/>
+  <message code="6" type="info" param=""/>
+  <message code="7" type="info" param=""/>
+  <message code="8" type="info" param=""/>
+  <message code="9" type="info" param=""/>
+  <message code="10" type="info" param=""/>
+</debugHandler>
+
+<!-- BUS Debug Tab -->
+<debugHandler name="BUS" codeFrom="0xD1" codeTo="0xD1" offsetName="none">
+  <message code="1" type="debug" param="Initialized Serial Buses"/>
+  <message code="2" type="error" param="Could not open UDP1 port"/>
+  <message code="3" type="error" param="Could not open UDP2 port"/>
+  <message code="4" type="debug" param=""/>
+  <message code="5" type="debug" param=""/>
+  <message code="6" type="debug" param=""/>
+  <message code="7" type="debug" param=""/>
+  <message code="8" type="info" param=""/>
+  <message code="9" type="info" param=""/>
+  <message code="10" type="info" param=""/>
+  <message code="11" type="info" param=""/>
+  <message code="12" type="info" param=""/>
+  <message code="13" type="info" param=""/>
+  <message code="14" type="info" param=""/>
+  <message code="15" type="warn" param=""/>
+  <message code="16" type="info" param=""/>
+  <message code="17" type="info" param=""/>
+  <message code="18" type="info" param=""/>
+  <message code="19" type="info" param=""/>
+  <message code="20" type="info" param=""/>
+</debugHandler>
+
+<!-- CMD Debug Tab -->
+<debugHandler name="CMD" codeFrom="0xDA" codeTo="0xDA" offsetName="none">
+  <message code="1" type="warn" param="Invalid offset for configuration byte = %s"/>
+  <message code="2" type="debug" param="Received Command to modify configuration byte 0x%x"/>
+  <message code="3" type="debug" param="Received Command to modify port pin"/>
+  <message code="4" type="error" param="Could not open UDP command port"/>
+  <message code="5" type="debug" param="Received PWM command"/>
+  <message code="6" type="debug" param="Received Expansion Board command"/>
+  <message code="7" type="debug" param=""/>
+  <message code="8" type="info" param="Received General Command"/>
+  <message code="9" type="info" param="Received valid Username and Password"/>
+  <message code="10" type="info" param="Received General Command without value"/>
+  <message code="11" type="info" param="Received new Password = %s"/>
+  <message code="12" type="info" param="Received new Username = %s"/>
+  <message code="13" type="info" param="Received Reset command"/>
+  <message code="14" type="info" param="Received Log Off command"/>
+  <message code="15" type="warn" param=""/>
+  <message code="16" type="info" param="Received Get Tag Command: %s"/>
+  <message code="17" type="error" param="Could not open UDP event port"/>
+  <message code="18" type="info" param=""/>
+  <message code="19" type="info" param=""/>
+  <message code="20" type="info" param=""/>
+</debugHandler>
+
+<!-- General purpose Debug Tab -->
+<!-- Use these messages together with the debugPutGenMsg() and debugPutGenRomStr() macros defined in projdefs.h -->
+<debugHandler name="General" codeFrom="0xD9" codeTo="0xD9" offsetName="none">
+  <message code="1" type="debug" param="%s"/>
+  <message code="2" type="info" param="%s"/>
+  <message code="3" type="warn" param="%s"/>
+  <message code="4" type="error" param="%s"/>
+  <message code="5" type="debug" param="%s%s"/>
+  <message code="6" type="info" param="%s%s"/>
+  <message code="7" type="warn" param="%s%s"/>
+  <message code="8" type="error" param="%s%s"/>
+  <message code="9" type="debug" param="Value 1 = 0x%x%x, Value 2 = 0x%x%x"/>
+  <message code="10" type="info" param="Value 1 = 0x%x%x, Value 2 = 0x%x%x"/>
+  <message code="11" type="warn" param="Value 1 = 0x%x%x, Value 2 = 0x%x%x"/>
+  <message code="12" type="error" param="Value 1 = 0x%x%x, Value 2 = 0x%x%x"/>
+  <message code="13" type="info" param=""/>
+</debugHandler>
+
+<!-- HTTPEXEC Debug Tab -->
+<debugHandler name="HTTPX" codeFrom="0xD1" codeTo="0xD1" offsetName="none">
+  <message code="1" type="info" param="HTTPExecGetCmd() called for file %s"/>
+  <message code="2" type="debug" param="HTTPGetParam returned name=%s, value=%s"/>
+  <message code="3" type="info" param="Super User successfully logged in"/>
+  <message code="4" type="info" param="Admin User successfully logged in"/>
+  <message code="5" type="info" param="Guest User successfully logged in"/>
+  <message code="6" type="info" param="---not used---"/>
+  <message code="7" type="info" param="---not used---"/>
+</debugHandler>
+
+<!-- MAIN Debug Tab -->
+<debugHandler name="MAIN" codeFrom="0xD6" codeTo="0xD6" offsetName="none">
+  <message code="1" type="debug" param="Starting main loop"/>
+  <message code="2" type="info" param="DHCP Bind Count = %B"/>
+  <message code="3" type="info" param="DHCP complete, IP = %B.%B.%B.%B"/>
+  <message code="4" type="info" param="Received FTP Login (%s) and Password (%s)"/>
+  <message code="5" type="info" param="Bootloader version = V%d.%d"/>
+  <message code="6" type="info" param="HTTP User Authenticated"/>
+  <message code="7" type="info" param=""/>
+  <message code="8" type="info" param=""/>
+  <message code="9" type="info" param=""/>
+  <message code="10" type="info" param=""/>
+</debugHandler>
+
+</mxdebug>

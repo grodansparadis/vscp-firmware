@@ -1,0 +1,88 @@
+<html>
+<head>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<title>Modtronix SBC65EC Demo Webserver</title>
+<link href="../mx.css" rel="stylesheet" type="text/css">
+</head>
+
+<!-- Change file extension to .cgi -->
+<!-- Replace "<td align="center"><input type="checkbox" name=" with %I00 -->
+<!-- Replace "<td width="40" align="center">" with %I01 -->
+
+<body>
+<p class="pgHdr">PIC Port Settings</p>
+<hr>
+<br><b>Port Direction:</b><br>This section is used to set the direction of
+ the spare I/O pins on the CPU.<br>
+<br><i>Checked = Output pin, Unchecked = Input pin</i>
+<form method=GET action=../IOCFG.CGI>
+
+<table class="tbrd" cellpadding="3" cellspacing="0">
+<tr bgcolor="#CCCCCC" style="font-weight:bold">
+<td width="100">&nbsp;</td>
+<td width="40" align="center">7</td>
+<td width="40" align="center">6</td>
+<td width="40" align="center">5</td>
+<td width="40" align="center">4</td>
+<td width="40" align="center">3</td>
+<td width="40" align="center">2</td>
+<td width="40" align="center">1</td>
+<td width="40" align="center">0</td>
+
+<tr bgcolor="#FFFFFF">
+<td>Port A:</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td align="center"><input type="checkbox" name="A5" %a45></td>
+<td align="center"><input type="checkbox" name="A4" %a44></td>
+<td align="center"><input type="checkbox" name="A3" %a43></td>
+<td align="center"><input type="checkbox" name="A2" %a42></td>
+<td align="center"><input type="checkbox" name="A1" %a41></td>
+<td align="center"><input type="checkbox" name="A0" %a40></td>
+</tr>
+
+<tr bgcolor="#EEEEEE">
+<td>Port B:</td>
+<td align="center"><input type="checkbox" name="B7" %b47></td>
+<td align="center"><input type="checkbox" name="B6" %b46></td>
+<td align="center"><input type="checkbox" name="B5" %b45></td>
+<td align="center"><input type="checkbox" name="B4" %b44></td>
+<td align="center"><input type="checkbox" name="B3" %b43></td>
+<td align="center"><input type="checkbox" name="B2" %b42></td>
+<td align="center"><input type="checkbox" name="B1" %b41></td>
+<td>&nbsp;</td>
+</tr>
+
+<tr bgcolor="#FFFFFF">
+<td>Port C:</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td align="center"><input type="checkbox" name="C5" %c45></td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td align="center"><input type="checkbox" name="C2" %c42></td>
+<td align="center"><input type="checkbox" name="C1" %c41></td>
+<td align="center"><input type="checkbox" name="C0" %c40></td>
+</tr>
+
+<tr bgcolor="#EEEEEE">
+<td>Port F:</td>
+<td align="center"><input type="checkbox" name="F7" %f47></td>
+<td align="center"><input type="checkbox" name="F6" %f46></td>
+<td align="center"><input type="checkbox" name="F5" %f45></td>
+<td align="center"><input type="checkbox" name="F4" %f44></td>
+<td align="center"><input type="checkbox" name="F3" %f43></td>
+<td align="center"><input type="checkbox" name="F2" %f42></td>
+<td align="center"><input type="checkbox" name="F1" %f41></td>
+<td align="center"><input type="checkbox" name="F0" %f40></td>
+</tr></table>
+
+<br>
+<hr>
+<table>
+<tr><td width="20"></td><td><input type=submit value="Submit"></td>
+</table>
+
+</form>
+</body>
+</html>

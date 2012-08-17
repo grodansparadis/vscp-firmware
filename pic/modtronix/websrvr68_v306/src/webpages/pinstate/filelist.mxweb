@@ -1,0 +1,11 @@
+;This file is used by the Modtronix Web Page Uploading program. It contains
+;a list of all files that should be uploaded to the web server.
+
+reserved_block = 64
+
+fsys_id = 1
+
+outfile = D:\prj\pic\boards\sbc65ec\websrvr\src\webpages\pinstate\..\pinstate.img
+
+file = main.cgi
+file = index.htm

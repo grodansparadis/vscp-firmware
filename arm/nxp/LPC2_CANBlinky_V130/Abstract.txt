@@ -1,0 +1,25 @@
+CONTAINS:  Minimal MicroCANopen implementation
+COPYRIGHT: Embedded Systems Academy, Inc. 2002-2004.
+           All rights reserved. www.microcanopen.com
+DISCLAIM:  Read and understand our disclaimer before using this code!
+           www.esacademy.com/disclaim.htm
+LICENSE:   THIS VERSION CREATED FOR FREE DISTRIBUTION
+           FOR KEIL SOFTWARE www.keil.com
+		       FOR PHILIPS SEMICONDUCTORS www.philipsmcu.com
+VERSION:   1.30, Pf 05-APR-05
+
+The Blinky program is available for different targets:
+
+  Simulator:     configured for software Simulator
+
+  MCB2100 Flash: configured for on-chip Flash ROM
+                 (used for production or target debugging)
+
+
+INSTRUCTIONS:
+
+The Blinky sequence displayed on ports P1_16 to P1_23 can be controlled 
+via the analog input on channel 0, if CAN ports 1 and 2 are connected.
+
+The data from the ADC unit gets transmitted on CAN2.
+The data received on CAN1 influences the Blinky sequence.

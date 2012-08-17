@@ -1,0 +1,8 @@
+
+2010-03-21 AKHE  Version 0.2.1
+==============================
+Verified against new speed 125Kbps
+
+2005-07-24 AKHE  Version 0.2.0
+==============================
+Made it fully compatible with the VSCP protocol.

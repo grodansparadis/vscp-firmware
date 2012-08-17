@@ -1,0 +1,182 @@
+### uVision2 Project, (C) Keil Software
+### Do not modify !
+
+Target (Simulator), 0x0003 // Tools: 'ARM-GNU'
+Target (MCB2100 Flash), 0x0003 // Tools: 'ARM-GNU'
+
+Group (System)
+Group (Source)
+Group (Documentation)
+
+File 1,2,<.\Startup.s><Startup.s> 0x4020A1A4 
+File 2,1,<.\mco.c><mco.c> 0x4084D41E 
+File 2,1,<.\mcohw_LPC2.c><mcohw_LPC2.c> 0x41DBDA91 
+File 2,1,<.\user_LPC2.c><user_LPC2.c> 0x4084D4B4 
+File 2,1,<.\BlinkyCAN.c><BlinkyCAN.c> 0x4072C344 
+File 3,5,<.\Abstract.txt><Abstract.txt> 0x41DBDAA5 
+
+
+Options 1,0,0  // Target 'Simulator'
+ Device (LPC2129)
+ Vendor (Philips)
+ Cpu (IRAM(0x40000000-0x40003FFF) IROM(0-0x3FFFF) CLOCK(60000000) CPUTYPE(ARM7TDMI))
+ FlashUt (LPC210x_ISP.EXE ("#H" $X $D COM1: 9600 1))
+ StupF ()
+ FlashDR ()
+ Rgf (LPC21xx.H)
+ Mem ()
+ C ()
+ A ()
+ RL ()
+ OH ()
+ DBC_IFX ()
+ DBC_CMS ()
+ DBC_AMS ()
+ DBC_LMS ()
+ UseEnv=0
+ EnvBin ()
+ EnvInc ()
+ EnvLib ()
+ EnvReg (ÿPhilips\)
+ OrgReg (ÿPhilips\)
+ TgStat=16
+ OutDir (.\Flash\)
+ OutName (BlinkyCAN)
+ GenApp=1
+ GenLib=0
+ GenHex=1
+ Debug=1
+ Browse=1
+ LstDir (.\Flash\)
+ HexSel=1
+ MG32K=0
+ TGMORE=0
+ RunUsr 0 0 <>
+ RunUsr 1 0 <>
+ BrunUsr 0 0 <>
+ BrunUsr 1 0 <>
+ SVCSID <>
+ GLFLAGS=2046
+ GCPUTYP (ARM7TDMI)
+ TFlagsA { 0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ OCMARM { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ OCMARAM { 0,0,0,0,64,0,64,0,0 }
+ OCMAROM { 1,0,0,0,0,0,0,4,0 }
+ OCMXRAM { 0,0,0,0,0,0,0,0,0 }
+ ACCFLG { 1,0,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ ACMISC ()
+ ACDEFN ()
+ ACUDEF ()
+ ACINCD ()
+ AASFLG { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ AAMISC ()
+ AADEFN ()
+ AAUDEF ()
+ AAINCD ()
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=1
+ AlwaysBuild=0
+ GenAsm=0
+ AsmAsm=0
+ PublicsOnly=0
+ StopCode=3
+ CustArgs ()
+ LibMods ()
+ ALDFLAG { 15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ ALDTADR (0x00000000)
+ ALDDADR (0x40000000)
+ ALDBSSR ()
+ ALDICLB ()
+ ALDICDR ()
+ ALDMISC ()
+ ALDSCAT (.\Flash.ld)
+  OPTDL (SARM.DLL)()(DARMP.DLL)(-pLPC21x9)(SARM.DLL)()(TARMP.DLL)(-pLPC21x9)
+  OPTDBG 44029,-1,()()()()()()()()()() (BIN\UL2ARM.DLL)()()()
+ FLASH1 { 1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ FLASH2 ()
+ FLASH3 ("LPC210x_ISP.EXE" ("#H" $X $D COM1: 9600 1))
+ FLASH4 ()
+EndOpt
+
+Options 2,0,0  // Target 'MCB2100 Flash'
+ Device (LPC2129)
+ Vendor (Philips)
+ Cpu (IRAM(0x40000000-0x40003FFF) IROM(0-0x3FFFF) CLOCK(60000000) CPUTYPE(ARM7TDMI))
+ FlashUt (LPC210x_ISP.EXE ("#H" $X $D COM1: 9600 1))
+ StupF ()
+ FlashDR ()
+ Rgf (LPC21xx.H)
+ Mem ()
+ C ()
+ A ()
+ RL ()
+ OH ()
+ DBC_IFX ()
+ DBC_CMS ()
+ DBC_AMS ()
+ DBC_LMS ()
+ UseEnv=0
+ EnvBin ()
+ EnvInc ()
+ EnvLib ()
+ EnvReg (ÿPhilips\)
+ OrgReg (ÿPhilips\)
+ TgStat=16
+ OutDir (.\Flash\)
+ OutName (BlinkyCAN)
+ GenApp=1
+ GenLib=0
+ GenHex=1
+ Debug=1
+ Browse=1
+ LstDir (.\Flash\)
+ HexSel=1
+ MG32K=0
+ TGMORE=0
+ RunUsr 0 0 <>
+ RunUsr 1 0 <>
+ BrunUsr 0 0 <>
+ BrunUsr 1 0 <>
+ SVCSID <>
+ GLFLAGS=2046
+ GCPUTYP (ARM7TDMI)
+ TFlagsA { 0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ OCMARM { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ OCMARAM { 0,0,0,0,64,0,64,0,0 }
+ OCMAROM { 1,0,0,0,0,0,0,4,0 }
+ OCMXRAM { 0,0,0,0,0,0,0,0,0 }
+ ACCFLG { 5,16,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ ACMISC ()
+ ACDEFN ()
+ ACUDEF ()
+ ACINCD ()
+ AASFLG { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ AAMISC ()
+ AADEFN ()
+ AAUDEF ()
+ AAINCD ()
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=1
+ AlwaysBuild=0
+ GenAsm=0
+ AsmAsm=0
+ PublicsOnly=0
+ StopCode=3
+ CustArgs ()
+ LibMods ()
+ ALDFLAG { 15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ ALDTADR ()
+ ALDDADR ()
+ ALDBSSR ()
+ ALDICLB ()
+ ALDICDR ()
+ ALDMISC ()
+ ALDSCAT (.\Flash.ld)
+  OPTDL (SARM.DLL)()(DARMP.DLL)(-pLPC21x9)(SARM.DLL)()(TARMP.DLL)(-pLPC21x9)
+  OPTDBG 45054,-1,()()()()()()()()()() (BIN\UL2ARM.DLL)()()()
+ FLASH1 { 9,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ FLASH2 (BIN\UL2ARM.DLL)
+ FLASH3 ("LPC210x_ISP.EXE" ("#H" $X $D COM1: 9600 1))
+ FLASH4 ()
+EndOpt
+

@@ -1,0 +1,15 @@
+.pgHdr {font-size: large; color: #0000FF; white-space: nowrap;}
+
+.helpbox {border: 2px solid #999999; width:100%;}
+
+.mxlink {color: #0000FF; text-decoration: underline;}
+
+.tbrd {border: 2px solid #999999; padding: 0px;}
+
+.pinbtn {font-weight:bold; width: 38px;}
+
+.pinlbl {font-weight:bold;}
+
+.scfgLbl {font-weight:bold; text-align:right;}
+
+.scfgLbli {font-style:italic;}

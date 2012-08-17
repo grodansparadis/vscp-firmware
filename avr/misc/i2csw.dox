@@ -1,0 +1,7 @@
+/** \defgroup i2csw i2csw: Software-driven I2C Serial Interface Function Library
+
+This library provides a very simple bit-banged I2C serial interface.  The library supports MASTER mode send and receive of single or multiple bytes.  Thanks to the standardization of the I2C protocol and register access, the send and receive commands are everything you need to talk to thousands of different I2C devices including: EEPROMS, Flash memory, MP3 players, A/D and D/A converters, electronic potentiometers, etc.
+
+Although some AVR processors have built-in hardware to help create an I2C interface, this library does not require or use that hardware.
+
+*/

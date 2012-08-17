@@ -1,0 +1,62 @@
+
+Port 0
+==============================================================================
+
+p0.00 - TX2 - Lawicel CAN232
+p0.01 - RX2 - Lawicel CAN232
+p0.02 - 
+p0.03 - 
+p0.04 - DB4 LCD
+p0.05 - DB5 LCD 
+p0.06 - DB6 LCD 
+p0.07 - DB7 LCD 
+
+p0.08 - TX1
+p0.09 - RX1
+p0.10 - _RS LCD
+p0.11 - Light LCD
+p0.12 - E for LCS
+p0.13 - R/W for LCD
+p0.14 - Enable ISP
+p0.15 - 
+
+p0.16 - 
+p0.17 - Furnace Temp (Smarttemp) 
+p0.18 -  
+p0.19 -  
+p0.20 -  
+p0.21 - Set State 0 (Furnace start state)
+p0.22 - Force Motors on button. 
+p0.23 - Reserved for CAN LPC 212x
+
+p0.24 - Reserved for CAN LPC 212x
+p0.25 - AOUT - Sound    - CANRX0 on LPC 212x
+p0.26 - 		- CAN TX0 on LPC 212x
+p0.27 - 
+p0.28 - AVIN - POT (Sensivity for fire detector)
+p0.29 - 
+p0.30 - Stove Fire Detector
+p0.31 - Reserved
+
+
+Port 1
+==============================================================================
+
+p0.16 - LED 16 - OUT - Transport Motor relay 1.
+p0.17 - LED 17 - OUT - Transport Motor relay 2.
+p0.18 - LED 18 - OUT - Fan relay.
+p0.19 - LED 19 - OUT - Heater element relay.
+p0.20 - LED 20 - 
+p0.21 - LED 21 - 
+p0.22 - LED 22 - OUT - Electric water heater element 0
+p0.23 - LED 23 - OUT - Electric water heater element 2
+
+p0.24 - INPUT - Run both transport motors.
+p0.25 - DISPLAY (  )
+p0.26 - DISPLAY (  )
+p0.27 - DISPLAY (  )
+p0.28 - DISPLAY (  )
+p0.29 - DISPLAY (  )
+p0.30 - DISPLAY (  )
+p0.32 - DISPLAY (  )
+

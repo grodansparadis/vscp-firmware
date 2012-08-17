@@ -1,0 +1,790 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><HTML>
+<HEAD>
+  <STYLE><!-- 
+.cch1{background:#FFFFCC;} 
+--></STYLE>
+  <TITLE>Colorized Source Code</TITLE>
+</HEAD>
+<BODY bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><A HREF='/techref/indexok.asp?38159.2231597222' onClick='return false;'><img src='/images/null.gif' ALIGN=LEFT HEIGHT=1 WIDTH=1 BORDER=0 ALT='please dont rip this site'></A>
+<PRE><FONT COLOR=GREEN><I>/*</I></FONT>
+<FONT COLOR=GREEN><I> *	LCD interface example</I></FONT>
+<FONT COLOR=GREEN><I> *	Uses routines from delay.c</I></FONT>
+<FONT COLOR=GREEN><I> *	This code will interface to a standard LCD controller</I></FONT>
+<FONT COLOR=GREEN><I> *	like the Hitachi HD44780. It uses it in 4 bit mode, with</I></FONT>
+<FONT COLOR=GREEN><I> *	the hardware connected as follows (the standard 14 pin </I></FONT>
+<FONT COLOR=GREEN><I> *	LCD connector is used):</I></FONT>
+<FONT COLOR=GREEN><I> *	</I></FONT>
+<FONT COLOR=GREEN><I> *	PORTB bits 0-3 are connected to the LCD data bits 4-7 (high nibble)</I></FONT>
+<FONT COLOR=GREEN><I> *	PORTA bit 2 is connected to the LCD RS input (register select)</I></FONT>
+<FONT COLOR=GREEN><I> *	PORTA bit 3 is connected to the LCD EN bit (enable)</I></FONT>
+<FONT COLOR=GREEN><I> *	</I></FONT>
+<FONT COLOR=GREEN><I> *	To use these routines, set up the port I/O (TRISA, TRISB) then</I></FONT>
+<FONT COLOR=GREEN><I> *	call lcd_init(), then other routines as required.</I></FONT>
+<FONT COLOR=GREEN><I> *</I></FONT>
+<FONT COLOR=GREEN><I> * Copywrite Craig Lee 1998</I></FONT>
+<FONT COLOR=GREEN><I> *	</I></FONT>
+<FONT COLOR=GREEN><I> */</I></FONT>
+
+#include	<FONT COLOR=BLUE SIZE=+1>&lt;</FONT>pic<FONT COLOR=BLUE SIZE=+1><B>.</B></FONT>h<FONT COLOR=BLUE SIZE=+1>&gt;</FONT>
+#include	<FONT COLOR=PURPLE>"<A HREF="lcd_h.htm">lcd.h</A>"</FONT>
+#include	<FONT COLOR=PURPLE>"delay.h"</FONT>
+
+#define LCD_RS	RA5	<FONT COLOR=GREEN><I>// Register select</I></FONT>
+#define LCD_EN	RB4	<FONT COLOR=GREEN><I>// Enable</I></FONT>
+#define LCD_D4 RB5	<FONT COLOR=GREEN><I>// Data bits</I></FONT>
+#define LCD_D5 RC5	<FONT COLOR=GREEN><I>// Data bits</I></FONT>
+#define LCD_D6 RC4	<FONT COLOR=GREEN><I>// Data bits</I></FONT>
+#define LCD_D7 RC3	<FONT COLOR=GREEN><I>// Data bits</I></FONT>
+
+#define	LCD_STROBE	<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=BLUE SIZE=+1><B>(</B></FONT>LCD_EN <FONT COLOR=BLUE SIZE=+1>=</FONT> <FONT COLOR=BROWN>1</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>,</B></FONT><FONT COLOR=BLUE SIZE=+1><B>(</B></FONT>LCD_EN<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>0</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT>
+
+
+<FONT COLOR=GREEN><I>/* write a byte to the LCD in 4 bit mode */</I></FONT>
+
+<FONT COLOR=RED><B>void</B></FONT>
+lcd_write<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=RED><B>unsigned</B></FONT> <FONT COLOR=RED><B>char</B></FONT> c<FONT COLOR=BLUE SIZE=+1><B>)</B></FONT>
+<FONT COLOR=BLUE SIZE=+1><B>{</B></FONT>
+	<FONT COLOR=RED><B>if</B></FONT><FONT COLOR=BLUE SIZE=+1><B>(</B></FONT>c <FONT COLOR=BLUE SIZE=+1>&amp;</FONT> <FONT COLOR=PINK>0x80</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT> LCD_D7<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>1</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT> <FONT COLOR=RED><B>else</B></FONT> LCD_D7<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>0</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+	<FONT COLOR=RED><B>if</B></FONT><FONT COLOR=BLUE SIZE=+1><B>(</B></FONT>c <FONT COLOR=BLUE SIZE=+1>&amp;</FONT> <FONT COLOR=PINK>0x40</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT> LCD_D6<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>1</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT> <FONT COLOR=RED><B>else</B></FONT> LCD_D6<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>0</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+	<FONT COLOR=RED><B>if</B></FONT><FONT COLOR=BLUE SIZE=+1><B>(</B></FONT>c <FONT COLOR=BLUE SIZE=+1>&amp;</FONT> <FONT COLOR=PINK>0x20</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT> LCD_D5<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>1</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT> <FONT COLOR=RED><B>else</B></FONT> LCD_D5<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>0</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+	<FONT COLOR=RED><B>if</B></FONT><FONT COLOR=BLUE SIZE=+1><B>(</B></FONT>c <FONT COLOR=BLUE SIZE=+1>&amp;</FONT> <FONT COLOR=PINK>0x10</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT> LCD_D4<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>1</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT> <FONT COLOR=RED><B>else</B></FONT> LCD_D4<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>0</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+	LCD_STROBE<FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+	<FONT COLOR=RED><B>if</B></FONT><FONT COLOR=BLUE SIZE=+1><B>(</B></FONT>c <FONT COLOR=BLUE SIZE=+1>&amp;</FONT> <FONT COLOR=PINK>0x08</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT> LCD_D7<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>1</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT> <FONT COLOR=RED><B>else</B></FONT> LCD_D7<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>0</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+	<FONT COLOR=RED><B>if</B></FONT><FONT COLOR=BLUE SIZE=+1><B>(</B></FONT>c <FONT COLOR=BLUE SIZE=+1>&amp;</FONT> <FONT COLOR=PINK>0x04</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT> LCD_D6<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>1</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT> <FONT COLOR=RED><B>else</B></FONT> LCD_D6<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>0</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+	<FONT COLOR=RED><B>if</B></FONT><FONT COLOR=BLUE SIZE=+1><B>(</B></FONT>c <FONT COLOR=BLUE SIZE=+1>&amp;</FONT> <FONT COLOR=PINK>0x02</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT> LCD_D5<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>1</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT> <FONT COLOR=RED><B>else</B></FONT> LCD_D5<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>0</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+	<FONT COLOR=RED><B>if</B></FONT><FONT COLOR=BLUE SIZE=+1><B>(</B></FONT>c <FONT COLOR=BLUE SIZE=+1>&amp;</FONT> <FONT COLOR=PINK>0x01</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT> LCD_D4<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>1</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT> <FONT COLOR=RED><B>else</B></FONT> LCD_D4<FONT COLOR=BLUE SIZE=+1>=</FONT><FONT COLOR=BROWN>0</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+	LCD_STROBE<FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>	
+	DelayUs<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=BROWN>40</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+<FONT COLOR=BLUE SIZE=+1><B>}</B></FONT>
+
+<FONT COLOR=GREEN><I>/*</I></FONT>
+<FONT COLOR=GREEN><I> * 	Clear and home the LCD</I></FONT>
+<FONT COLOR=GREEN><I> */</I></FONT>
+
+<FONT COLOR=RED><B>void</B></FONT>
+lcd_clear<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=RED><B>void</B></FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT>
+<FONT COLOR=BLUE SIZE=+1><B>{</B></FONT>
+	LCD_RS <FONT COLOR=BLUE SIZE=+1>=</FONT> <FONT COLOR=BROWN>0</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+
+	lcd_write<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=PINK>0x1</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+	DelayMs<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=BROWN>2</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+<FONT COLOR=BLUE SIZE=+1><B>}</B></FONT>
+
+<FONT COLOR=GREEN><I>/* write a string of chars to the LCD */</I></FONT>
+
+<FONT COLOR=RED><B>void</B></FONT>
+lcd_puts<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=RED><B>const</B></FONT> <FONT COLOR=RED><B>char</B></FONT> <FONT COLOR=BLUE SIZE=+1>*</FONT> s<FONT COLOR=BLUE SIZE=+1><B>)</B></FONT>
+<FONT COLOR=BLUE SIZE=+1><B>{</B></FONT>
+	LCD_RS <FONT COLOR=BLUE SIZE=+1>=</FONT> <FONT COLOR=BROWN>1</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>	<FONT COLOR=GREEN><I>// write characters</I></FONT>
+
+	<FONT COLOR=RED><B>while</B></FONT><FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=BLUE SIZE=+1>*</FONT>s<FONT COLOR=BLUE SIZE=+1><B>)</B></FONT> lcd_write<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=BLUE SIZE=+1>*</FONT>s<FONT COLOR=BLUE SIZE=+1><FONT COLOR=BLUE SIZE=+1>+</FONT><FONT COLOR=BLUE SIZE=+1>+</FONT></FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+<FONT COLOR=BLUE SIZE=+1><B>}</B></FONT>
+
+<FONT COLOR=GREEN><I>/* write one character to the LCD */</I></FONT>
+
+<FONT COLOR=RED><B>void</B></FONT>
+lcd_putch<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=RED><B>unsigned</B></FONT> <FONT COLOR=RED><B>char</B></FONT> c<FONT COLOR=BLUE SIZE=+1><B>)</B></FONT>
+<FONT COLOR=BLUE SIZE=+1><B>{</B></FONT>
+	LCD_RS <FONT COLOR=BLUE SIZE=+1>=</FONT> <FONT COLOR=BROWN>1</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>	<FONT COLOR=GREEN><I>// write characters</I></FONT>
+
+	lcd_write<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT>c<FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+<FONT COLOR=BLUE SIZE=+1><B>}</B></FONT>
+
+
+<FONT COLOR=GREEN><I>/*</I></FONT>
+<FONT COLOR=GREEN><I> * Go to the specified position</I></FONT>
+<FONT COLOR=GREEN><I> */</I></FONT>
+
+<FONT COLOR=RED><B>void</B></FONT>
+lcd_goto<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=RED><B>unsigned</B></FONT> <FONT COLOR=RED><B>char</B></FONT> pos<FONT COLOR=BLUE SIZE=+1><B>)</B></FONT>
+<FONT COLOR=BLUE SIZE=+1><B>{</B></FONT>
+	LCD_RS <FONT COLOR=BLUE SIZE=+1>=</FONT> <FONT COLOR=BROWN>0</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+
+	lcd_write<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=PINK>0x80</FONT> <FONT COLOR=BLUE SIZE=+1>+</FONT> pos<FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+<FONT COLOR=BLUE SIZE=+1><B>}</B></FONT>
+	
+<FONT COLOR=GREEN><I>/* initialise the LCD - put into 4 bit mode */</I></FONT>
+
+<FONT COLOR=RED><B>void</B></FONT>
+lcd_init<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=RED><B>void</B></FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT>
+<FONT COLOR=BLUE SIZE=+1><B>{</B></FONT>
+	LCD_RS <FONT COLOR=BLUE SIZE=+1>=</FONT> <FONT COLOR=BROWN>0</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>	<FONT COLOR=GREEN><I>// write control bytes</I></FONT>
+
+	DelayMs<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=BROWN>15</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT><FONT COLOR=GREEN><I>// power on delay</I></FONT>
+
+	LCD_D4 <FONT COLOR=BLUE SIZE=+1>=</FONT> <FONT COLOR=BROWN>1</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>	<FONT COLOR=GREEN><I>// init!	</I></FONT>
+	LCD_D5 <FONT COLOR=BLUE SIZE=+1>=</FONT> <FONT COLOR=BROWN>1</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT> <FONT COLOR=GREEN><I>//</I></FONT>
+	LCD_STROBE<FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>	
+	DelayMs<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=BROWN>5</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+
+	LCD_STROBE<FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>	<FONT COLOR=GREEN><I>// init!	</I></FONT>
+	DelayUs<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=BROWN>100</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+
+	LCD_STROBE<FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>	<FONT COLOR=GREEN><I>// init!	</I></FONT>
+	DelayMs<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=BROWN>5</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+
+	LCD_D4 <FONT COLOR=BLUE SIZE=+1>=</FONT> <FONT COLOR=BROWN>0</FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>	<FONT COLOR=GREEN><I>// set 4 bit mode</I></FONT>
+	LCD_STROBE<FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>	
+	DelayUs<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=BROWN>40</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT>
+	
+	lcd_write<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=PINK>0x28</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT><FONT COLOR=GREEN><I>// 4 bit mode, 1/16 duty, 5x8 font, 2lines</I></FONT>
+	lcd_write<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT>0x0C<FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT><FONT COLOR=GREEN><I>// display on</I></FONT>
+	lcd_write<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=PINK>0x06</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT><FONT COLOR=GREEN><I>// entry mode advance cursor</I></FONT>
+	lcd_write<FONT COLOR=BLUE SIZE=+1><B>(</B></FONT><FONT COLOR=PINK>0x01</FONT><FONT COLOR=BLUE SIZE=+1><B>)</B></FONT><FONT COLOR=BLUE SIZE=+1><B>;</B></FONT><FONT COLOR=GREEN><I>// clear display and reset cursor</I></FONT>
+<FONT COLOR=BLUE SIZE=+1><B>}</B></FONT>
+
+
+</PRE>
+
+<P>Questions:
+<UL><LI>
+<A TITLE="62.254.0.4" HREF="mailto:nickomalley@ntlworld.com">nickomalley@ntlworld.com</A> asks: <BLOCKQUOTE><A NAME="62.254.0.4">
+</A> 
+Hello,
+
+Has anyone had experience with driving a Laptop LCD display, I have a one from an old laptop as was wondering if a PIC could be used to drive it, It is a panasonic cf27 laptop  and the dispaly is a standard 640x480 lcd, any ideas and or source code would be very appreciated.
+
+Best regards
+
+Nick</BLOCKQUOTE>
+<!-- EOR --></UL>
+
+<P>
+Code:
+<UL><LI>
+<A TITLE="CDB-optusnet-AE5" HREF="/techref/member/CDB-optusnet-AE5/index.htm">Colin D Barnard</A> shares this code: <PRE><A NAME="CDB-optusnet-AE5">
+</A> 
+//**Project Name: VFD
+//**File Name   : vfd0_3.c
+//**Version     : 0.3
+//**Date        : 24/02/2002	
+//**Revision	: 28/02/2002 added bit swap routine
+//**		: 02/03/2002 fixed error in display routine and added delay to
+//**		: 	     WR_PIN strobe.
+//**		:	
+//**		
+//**Processor	:16F84/628
+//**
+//** Copyright CDB.  email bodgy1@optusnet.com.au
+
+// Program to display data on a Futoba M202SD08GL vacuum fluorescent display.
+// Using parallel mode. Data is on port B and control on port A.
+// Connections as follows
+//
+// Display Pins. 1 3 5 7 9 11 13 15
+//    Data Bits. 7 6 5 4 3 2  1  0
+//
+// Control Pins.  20   18  17  16   8
+//  Signal Name. Busy  SEL WR TEST RST
+//
+// Pins 2 4 6 +5v; 10 12 14 Gnd
+
+// Pic Pins    B7 B6 B5 B4 B3 B2 B1 B0
+//	       D0 D1 D2 D3 D4 D5 D6 D7
+//
+// PortA       A0  A1  A2   A3  A4
+//             WR SEL TEST RST BUSY
+// A0-A3 output A4 input.
+//
+// WR, SEL active low. data latched on WR 0->1; RST must be momentarily grounded 
+// at start up to activate display.
+
+#define F628
+#ifdef F628
+  #include <P16F628.h>
+#else	
+ #include <P16F84.h>
+#endif
+
+#include "uS_delay.c"
+
+	
+#define CONTROL_PORT PORTA
+#define DATA_PORT    PORTB
+#define WR_PIN  PA.B0
+#define SEL_PIN PA.B1
+#define TEST_PIN PA.B2
+#define RST_PIN PA.B3
+#define BUSY_PIN PA.B4
+#define HIGH 1
+#define LOW 0
+#define STROBE (PORTA^=1)
+#define MAX_ROW 20
+#define LINES 2
+
+// VFD Control Commands
+#define LF 0x0A		//Line Feed
+#define CR 0x0D		//Carriage Return
+#define CUROFF 0x14	//DC4
+#define CURON  0x13	//DC3
+#define DIMM 0x04	//Dimming uses vfd_command
+#define DIM2 0x20	//Dimm 20%
+#define DIM4 0x40	//Dimm 40%
+#define DIM8 0x80	//Dimm 80%
+#define DIMF 0xFF	//Dimm 100%
+#define VTS  0x12	//DC2 Mode
+#define NORM 0x11	//DC1 Mode
+#define HTS  0x09	//Tab right  one space
+#define BSP  0x09	//Backspace
+#define DP   0x10	//Display position  uses vfd_command
+#define RST  0x1F	//Soft reset
+
+#ifdef F628
+   # __config 0x3F61	//16F628  fuse 
+#else
+   # __config 0x3FF1	//16F84(a) fuse
+#endif
+
+
+//Prototypes 
+		
+void main();	
+void setup();
+void reset_vfd();
+void test_vfd();
+void vfd_display(unsigned char *disp_string);
+void vfd_out(unsigned char *text);
+void vfd_ch(unsigned char ch);
+void vfd_command(unsigned char com, unsigned char action);
+void vfd_position(unsigned char line,unsigned char pos);
+
+void main()
+{
+  
+ setup();
+ big_delay(10);		//settling time
+ reset_vfd();		//Hard reset
+ test_vfd();		//Run inbuilt test routine
+ SEL_PIN=LOW;		//Enable display for data
+ big_delay(10);
+ 
+ vfd_ch(CUROFF);
+ vfd_display("Futoba VFD Display");
+ big_delay(3000);
+ vfd_command(LF,CR);
+ vfd_display("Dimming 20%");
+ vfd_command(DIMM,DIM2); 		//20% brightness
+ big_delay(5000);
+ vfd_command(DIMM,DIMF);	       //Full brightness
+ vfd_ch(RST);			      // Clear display	
+ vfd_ch(CUROFF);
+ vfd_command(CR,LF);
+ vfd_display("pos");
+ vfd_position(2,5);
+ vfd_display("2,5");
+ big_delay(5000);
+ vfd_ch(VTS);
+ vfd_display(" vertical tab");
+ big_delay(5000);
+ vfd_ch(RST);
+ vfd_ch(CUROFF);
+ vfd_display("Futoba VFD Display");
+ vfd_position(2,5);
+ vfd_display("End of Demo");
+ vfd_command(DIMM,DIM4);	//40% brightness	
+ 
+ while(1)
+ {
+ }				//forever!
+}
+
+// cmcon=(1<<CM2) |(1<<CM1) |(1<<CM0)
+void setup()
+{
+ #ifdef F628
+    CMCON=0x07; 		// switch comparators off
+ #endif
+ CONTROL_PORT=0x0E;		//    RST=1 TEST=1 SEL=1 WR=0
+ DATA_PORT=0;
+ TRISA=0x10;			//PortA  A4=in a4:a0 out
+ TRISB=0x00;
+ 
+}
+
+void reset_vfd()
+{
+  RST_PIN=LOW;			//Take reset pin low to awake VFD
+  small_delay(1);		//12 microsecond settling time
+  RST_PIN=HIGH;			//Return reset pin to operating state
+}
+
+void test_vfd()
+{
+  TEST_PIN=LOW;
+  big_delay(28000);		// delay 20 seconds approx
+  TEST_PIN=HIGH;
+}
+
+void vfd_display(unsigned char *string)
+{
+  
+   
+   while(*string)		//while not end of string
+   {
+     	
+    
+     vfd_out(string);
+     *string++; 		//move to next character
+   }
+   
+}
+
+
+// Following routine only required due to pin out chosen. This was chosen from 
+// a PCB perspective.
+//
+// D7 D6 D5 D4 D3 D2 D1 D0 -> D0 D1 D2 D3 D4 D5 D6 D7
+//
+// Using the extra variable 'original1' saves 3 program words
+
+unsigned char buffer,original;
+
+void vfd_out(unsigned char *text)
+{
+   const unsigned char table[16]=      
+   {0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E,
+   
+    0x01, 0x09, 0x05, 0x0D, 0x03, 0x0B, 0x07,0x0F};
+    
+    unsigned char original1;
+        
+    original=*text;
+    original1=original & 0x0f;	// Mask off lower nibble
+    buffer=table[original1];	//look up conversion pattern lower nibble
+    #asmline swapf buffer,f	;swap places make it high nibble
+    #asmline swapf original,f   ;swap original byte around
+    original&=0x0f;
+    buffer|=table[original];    //look up pattern for new lower nibble
+    				//IOR with current contents
+    DATA_PORT=buffer;		//Bung it on to PORTB
+    while (BUSY_PIN)
+    {
+    }
+    STROBE;		//Clock the data into the VFD
+    small_delay(30);   //100 microseconds
+    STROBE;	       //Return pin low	
+
+}
+
+void vfd_ch(unsigned char ch)
+{
+  unsigned char *text;
+  
+  text=&ch;
+  vfd_out(text);
+  
+}
+
+void vfd_command(unsigned char com, unsigned char action)
+{
+  vfd_ch(com);
+  vfd_ch(action);
+}
+
+void vfd_position(unsigned char line,unsigned char pos)
+{
+  
+    if (line==LINES)
+    {
+      pos+=(MAX_ROW-1);
+    } 
+    else
+    {
+      pos=-1;
+    }     
+    vfd_command(DP,pos);
+ 
+  
+}
+</PRE>
+<!-- EOR --><LI>
+<A TITLE="211.28.107.219">
+</A> <PRE>
+Code for a vacuum flourescent display in C
+
+
+//**Project Name: VFD
+//**File Name   : vfd0_3.c
+//**Version     : 0.3
+//**Date        : 24/02/2002	
+//**Revision	: 28/02/2002 added bit swap routine
+//**		: 02/03/2002 fixed error in display routine and added delay to
+//**		: 	     WR_PIN strobe.
+//**		:	
+//**		
+//**Processor	:16F84/628
+//**
+//** Copyright CDB.  email bodgy1@optusnet.com.au
+
+// Program to display data on a Futoba M202SD08GL vacuum fluorescent display.
+// Using parallel mode. Data is on port B and control on port A.
+// Connections as follows
+//
+// Display Pins. 1 3 5 7 9 11 13 15
+//    Data Bits. 7 6 5 4 3 2  1  0
+//
+// Control Pins.  20   18  17  16   8
+//  Signal Name. Busy  SEL WR TEST RST
+//
+// Pins 2 4 6 +5v; 10 12 14 Gnd
+
+// Pic Pins    B7 B6 B5 B4 B3 B2 B1 B0
+//	       D0 D1 D2 D3 D4 D5 D6 D7
+//
+// PortA       A0  A1  A2   A3  A4
+//             WR SEL TEST RST BUSY
+// A0-A3 output A4 input.
+//
+// WR, SEL active low. data latched on WR 0->1; RST must be momentarily grounded 
+// at start up to activate display.
+
+#define F628
+#ifdef F628
+  #include <P16F628.h>
+#else	
+ #include <P16F84.h>
+#endif
+
+#include "uS_delay.c"
+
+	
+#define CONTROL_PORT PORTA
+#define DATA_PORT    PORTB
+#define WR_PIN  PA.B0
+#define SEL_PIN PA.B1
+#define TEST_PIN PA.B2
+#define RST_PIN PA.B3
+#define BUSY_PIN PA.B4
+#define HIGH 1
+#define LOW 0
+#define STROBE (PORTA^=1)
+#define MAX_ROW 20
+#define LINES 2
+
+// VFD Control Commands
+#define LF 0x0A		//Line Feed
+#define CR 0x0D		//Carriage Return
+#define CUROFF 0x14	//DC4
+#define CURON  0x13	//DC3
+#define DIMM 0x04	//Dimming uses vfd_command
+#define DIM2 0x20	//Dimm 20%
+#define DIM4 0x40	//Dimm 40%
+#define DIM8 0x80	//Dimm 80%
+#define DIMF 0xFF	//Dimm 100%
+#define VTS  0x12	//DC2 Mode
+#define NORM 0x11	//DC1 Mode
+#define HTS  0x09	//Tab right  one space
+#define BSP  0x09	//Backspace
+#define DP   0x10	//Display position  uses vfd_command
+#define RST  0x1F	//Soft reset
+
+#ifdef F628
+   # __config 0x3F61	//16F628  fuse 
+#else
+   # __config 0x3FF1	//16F84(a) fuse
+#endif
+
+
+//Prototypes 
+		
+void main();	
+void setup();
+void reset_vfd();
+void test_vfd();
+void vfd_display(unsigned char *disp_string);
+void vfd_out(unsigned char *text);
+void vfd_ch(unsigned char ch);
+void vfd_command(unsigned char com, unsigned char action);
+void vfd_position(unsigned char line,unsigned char pos);
+
+void main()
+{
+  
+ setup();
+ big_delay(10);		//settling time
+ reset_vfd();		//Hard reset
+ test_vfd();		//Run inbuilt test routine
+ SEL_PIN=LOW;		//Enable display for data
+ big_delay(10);
+ 
+ vfd_ch(CUROFF);
+ vfd_display("Futoba VFD Display");
+ big_delay(3000);
+ vfd_command(LF,CR);
+ vfd_display("Dimming 20%");
+ vfd_command(DIMM,DIM2); 		//20% brightness
+ big_delay(5000);
+ vfd_command(DIMM,DIMF);	       //Full brightness
+ vfd_ch(RST);			      // Clear display	
+ vfd_ch(CUROFF);
+ vfd_command(CR,LF);
+ vfd_display("pos");
+ vfd_position(2,5);
+ vfd_display("2,5");
+ big_delay(5000);
+ vfd_ch(VTS);
+ vfd_display(" vertical tab");
+ big_delay(5000);
+ vfd_ch(RST);
+ vfd_ch(CUROFF);
+ vfd_display("Futoba VFD Display");
+ vfd_position(2,5);
+ vfd_display("End of Demo");
+ vfd_command(DIMM,DIM4);	//40% brightness	
+ 
+ while(1)
+ {
+ }				//forever!
+}
+
+// cmcon=(1<<CM2) |(1<<CM1) |(1<<CM0)
+void setup()
+{
+ #ifdef F628
+    CMCON=0x07; 		// switch comparators off
+ #endif
+ CONTROL_PORT=0x0E;		//    RST=1 TEST=1 SEL=1 WR=0
+ DATA_PORT=0;
+ TRISA=0x10;			//PortA  A4=in a4:a0 out
+ TRISB=0x00;
+ 
+}
+
+void reset_vfd()
+{
+  RST_PIN=LOW;			//Take reset pin low to awake VFD
+  small_delay(1);		//12 microsecond settling time
+  RST_PIN=HIGH;			//Return reset pin to operating state
+}
+
+void test_vfd()
+{
+  TEST_PIN=LOW;
+  big_delay(28000);		// delay 20 seconds approx
+  TEST_PIN=HIGH;
+}
+
+void vfd_display(unsigned char *string)
+{
+  
+   
+   while(*string)		//while not end of string
+   {
+     	
+    
+     vfd_out(string);
+     *string++; 		//move to next character
+   }
+   
+}
+
+
+// Following routine only required due to pin out chosen. This was chosen from 
+// a PCB perspective.
+//
+// D7 D6 D5 D4 D3 D2 D1 D0 -> D0 D1 D2 D3 D4 D5 D6 D7
+//
+// Using the extra variable 'original1' saves 3 program words
+
+unsigned char buffer,original;
+
+void vfd_out(unsigned char *text)
+{
+   const unsigned char table[16]=      
+   {0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E,
+   
+    0x01, 0x09, 0x05, 0x0D, 0x03, 0x0B, 0x07,0x0F};
+    
+    unsigned char original1;
+        
+    original=*text;
+    original1=original & 0x0f;	// Mask off lower nibble
+    buffer=table[original1];	//look up conversion pattern lower nibble
+    #asmline swapf buffer,f	;swap places make it high nibble
+    #asmline swapf original,f   ;swap original byte around
+    original&=0x0f;
+    buffer|=table[original];    //look up pattern for new lower nibble
+    				//IOR with current contents
+    DATA_PORT=buffer;		//Bung it on to PORTB
+    while (BUSY_PIN)
+    {
+    }
+    STROBE;		//Clock the data into the VFD
+    small_delay(30);   //100 microseconds
+    STROBE;	       //Return pin low	
+
+}
+
+void vfd_ch(unsigned char ch)
+{
+  unsigned char *text;
+  
+  text=&ch;
+  vfd_out(text);
+  
+}
+
+void vfd_command(unsigned char com, unsigned char action)
+{
+  vfd_ch(com);
+  vfd_ch(action);
+}
+
+void vfd_position(unsigned char line,unsigned char pos)
+{
+  
+    if (line==LINES)
+    {
+      pos+=(MAX_ROW-1);
+    } 
+    else
+    {
+      pos=-1;
+    }     
+    vfd_command(DP,pos);
+ 
+  
+}
+<!-- EOR --></UL>
+</PRE>
+
+
+<FORM ACTION='/techref/postsearch.asp' METHOD=POST><HR><SMALL>file: /techref/microchip/language/c/io/lcd/hitachilcd-cl/lcd_c.htm, updated: 3/4/02 9:38:46 PM, <A HREF="/techref/member.asp?actid=">you</A> (<A HREF="/techref/member//index.htm"></A>) own this page.
+</SMALL><DIV NAME="upperright" ID="upperright" 
+	onMouseOver="this.style.backgroundColor='#FFFF00';this.style.borderStyle='outset';" 
+	onMouseOut="this.style.backgroundColor='#FFFFFF';this.style.borderStyle='ridge';" 
+	style="position:absolute;top:0;right:0;width:200;text-align:right;text-justify:right;color:gray;background-color:#FFFFFF;border-width:2px;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=75);"><SMALL><SUP>
+<A style="color:#AF4040;text-decoration:none;" TITLE="Go to the top page" HREF="/techref/index.htm">TOP</A> 
+<A style="color:#AF4040;text-decoration:none;" TITLE="Monthly Change Log for this folder" HREF="new200406.txt">NEW</A>
+
+<A style="color:#AF4040;text-decoration:none;" TITLE="More pages like this." HREF="/techref/postsearch.asp?from=%2Ftechref%2Fmicrochip%2Flanguage%2Fc%2Fio%2Flcd%2Fhitachilcd%2Dcl%2Flcd%5Fc%2Ehtm">
+MORE</A> 
+<A style="color:#AF4040;text-decoration:none;" TITLE="I'm willing to pay for help, please refer me to a qualified consultant" HREF="mailto:webmaster@piclist?subject=I%20need%20someone%20to%20help%20me%20with%3A%20">
+HELP</A>
+<A style="color:#AF4040;text-decoration:none;" TITLE="Advanced search" HREF="/techref/postsearch.asp">
+FIND:</A>&nbsp;<BR>
+<INPUT style="background-color:transparent;padding:0px;border-width:1px;font-size:small;border-style:solid;border-color:#AF0000" TITLE="Free text search" TYPE="TEXT" ID="search" NAME="SearchString" SIZE="20" MAXLENGTH="100" VALUE="Search" onClick="this.value='';">
+<INPUT NAME="FreeText" TYPE="HIDDEN" VALUE="ON"> 
+</SUP></SMALL></DIV>
+
+<DIV NAME="upperleft" ID="upperleft" 
+	onMouseOver="this.style.backgroundColor='#FFFF00';this.style.borderStyle='outset';" 
+	onMouseOut="this.style.backgroundColor='transparent';this.style.borderStyle='none';" 
+	style="position:absolute;top:0;left:0;color:gray;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=75);"><SMALL>
+<A HREF="/techref/indexok.asp?top"> </A>
+<SUP>80.65.200.74:<A style="color:#AF4040" HREF="/techref/login/default.asp?req=403%3Bhttp%3A%2F%2Fwww%2Epiclist%2Ecom%2Ftechref%2Fmicrochip%2Flanguage%2Fc%2Fio%2Flcd%2Fhitachilcd%2Dcl%2Flcd%5Fc%2Ehtm">LOG IN</A></SUP></SMALL></DIV><DIV ALIGN=CENTER VALIGN=TOP style="position:absolute;top:0;left:25%;width:25%"><SMALL><SUP><FONT COLOR=#FF0000><B><A TITLE='Why does RIP/GRAB/SPIDERing lead to ads and sponsors? Click here.' HREF='/dontripthissite.htm' style='color:red'>PLEASE DON'T RIP!</A></B></FONT></SUP>
+</SMALL></DIV>
+<script LANGUAGE="JavaScript">
+<!--- Hide script from old browsers.
+var old = 1;
+var to;
+
+function scrollHold() {
+var pos=1;
+	if (to) clearTimeout(to);
+	if (window.innerHeight) {
+		pos = window.pageYOffset;
+		}
+	else if (document.documentElement && document.documentElement.scrollTop) {
+		pos = document.documentElement.scrollTop;
+		}
+	else if (document.body) {
+		pos = document.body.scrollTop;
+		}
+	if (pos < 0) pos = 1;
+	else pos += 1;
+	if (pos != old) {
+		upperright.style.top = pos;
+		upperleft.style.top = pos;
+		}
+	old = pos;
+	if (window.onscroll==null) {to=setInterval('scrollHold()',100);}
+}
+
+window.onscroll = scrollHold;
+scrollHold();
+
+// End the hiding here. -->
+</script>
+</FORM>
+<HR><DIV STYLE='eznav'><TABLE ALIGN=RIGHT WIDTH='30%'><TR><TD>&nbsp;</TD><TD>These pages are served without commercial sponsorship. (No popup ads, etc...).Bandwidth abuse increases hosting cost forcing sponsorship or shutdown. This server aggressively defends against automated copying for any reason including offline viewing, duplication, etc... Please respect this requirement and <FONT FACE='Comic Sans MS' COLOR='#FF0000'>DO NOT RIP THIS SITE</FONT>.<A HREF='/dontripthissite.htm'>Questions?</A></TD></TR></TABLE>Did you find what you needed? From: &quot;<I><A HREF='http://www.piclist.com/techref/microchip/language/c/io/lcd/hitachilcd-cl/index.htm'>/microchip/language/c/io/lcd/hitachilcd-cl/index.htm</A></I>&quot; <UL>
+<LI><I>&quot;Not quite. <A HREF="/techref/postsearch.asp?from=%2Ftechref%2Fmicrochip%2Flanguage%2Fc%2Fio%2Flcd%2Fhitachilcd%2Dcl%2Flcd%5Fc%2Ehtm">
+ Look for more pages like this one.&quot;</A></I>
+<LI><FORM ACTION="/techref/postsearch.asp#result" METHOD=POST>
+ <I>&quot;No. I'm looking for: 
+<INPUT TYPE="TEXT" NAME="SearchString" SIZE="40" MAXLENGTH="100" VALUE="">
+<INPUT NAME="FreeText" TYPE="HIDDEN" VALUE="on"> 
+<INPUT NAME="from" TYPE="HIDDEN" VALUE="/techref/microchip/language/c/io/lcd/hitachilcd-cl/lcd_c.htm">
+<INPUT TYPE="SUBMIT" NAME="Action" VALUE="Fetch">&quot;</I>
+<LI><A HREF="/techref/postsearch.asp">
+<I>&quot;No. Take me to the search page.&quot;</I></A>
+<LI><A HREF="/techref/index.htm">
+<I>&quot;No. Take me to the top so I can drill down by catagory&quot;</I></A>
+<LI><A HREF="mailto:webmaster@piclist?subject=I%20need%20someone%20to%20help%20me%20with%3A%20">
+<I>&quot;No. I'm willing to pay for help, please refer me to a qualified consultant&quot;</I></A>
+
+<LI></FORM><FORM ACTION="/techref/update.asp" METHOD="POST">
+
+<INPUT NAME="action" TYPE="HIDDEN" VALUE="Interested:">
+<INPUT NAME="private" TYPE="HIDDEN" VALUE="on">
+<INPUT NAME="id" TYPE=HIDDEN VALUE="80.65.200.74">
+<INPUT NAME="url" TYPE=HIDDEN VALUE="/techref/microchip/language/c/io/lcd/hitachilcd-cl/lcd_c.htm">
+<I>&quot;No. But I'm interested. <INPUT TYPE="Submit" VALUE="Email"> me 
+
+at <INPUT NAME="email" TYPE="TEXT" VALUE="">
+
+when this page is expanded.&quot;</I></FORM>
+
+</UL>
+</DIV>
+
+<A NAME="form"><HR></A>
+<FORM ACTION="/techref/update.asp" METHOD="POST">
+
+<INPUT NAME="private" TYPE=HIDDEN VALUE="on">
+<INPUT NAME="id" TYPE=HIDDEN VALUE="80.65.200.74">
+<INPUT NAME="url" TYPE=HIDDEN VALUE="/techref/microchip/language/c/io/lcd/hitachilcd-cl/lcd_c.htm">
+After you find an appropriate page, you are invited to 
+<INPUT TYPE="Submit" VALUE="Post"> your 
+<SELECT SIZE=4 NAME="action">
+  <OPTION VALUE="Questions:" SELECTED>question</OPTION>
+  <OPTION VALUE="Comments:">comment</OPTION>
+  <OPTION VALUE="See also:">link</OPTION>
+  <OPTION VALUE="Code:">program listing</OPTION>
+	</SELECT>
+to this <A HREF="/idea/websites.htm"><I>massmind</I></A> site! <SMALL>(posts will be reviewed)</SMALL>
+Just type in the box and press the Post button.
+(<A href="/techref/language/html/index.htm">HTML</A> welcomed!): 
+<A href="/techref/idea/website/codetutorial.htm">A tutorial is available</A>
+<A HREF="/techref/private.asp?req=membership">Members</A> can 
+<A HREF="/techref/login/default.asp?req=403%3Bhttp%3A%2F%2Fwww%2Epiclist%2Ecom%2Ftechref%2Fmicrochip%2Flanguage%2Fc%2Fio%2Flcd%2Fhitachilcd%2Dcl%2Flcd%5Fc%2Ehtm%23form">login</A> 
+to post directly, become page editors, and be credited for their posts. 
+<BR><TEXTAREA NAME="text" ROWS="4" COLS="65">
+</TEXTAREA>
+<SMALL>
+	<BR>Link?&nbsp;Put&nbsp;it&nbsp;here:&nbsp;<INPUT NAME="file" TYPE="TEXT" SIZE="60">
+	<BR>if&nbsp;you&nbsp;want&nbsp;a&nbsp;response, 
+	please&nbsp;enter&nbsp;your&nbsp;email&nbsp;address:&nbsp;<INPUT NAME="email" TYPE="TEXT" SIZE="40">
+	</SMALL>
+</FORM>
+
+
+<HR>
+<TABLE WIDTH=30% BGCOLOR=#F0F0F0 ALIGN=LEFT><TR><TD>&nbsp;</TD><TD>
+<CENTER>
+<FONT FACE="Impact" SIZE="+3" COLOR="#C0C0C0"><A HREF="http://www.piclist.com/techref/piclist/support.htm">
+HALL OF FAME!</A></FONT>
+<BR><I>Support the PICList by honoring its finest.</I>
+</CENTER>
+</TD></TR></TABLE>
+<TABLE WIDTH=30% BGCOLOR=#F0F0F0 ALIGN=RIGHT><TR><TD>&nbsp;</TD><TD>
+<CENTER>
+<BIG><B>Internet enable your X-10 controllers!</B></BIG>
+<BR><A HREF="http://www.sxlist.com" target="_top">SXList.com</A> 
+<B><A HREF="http://www.sxlist.com/techref/ubicom/contests.htm" target="_top"><FONT COLOR="#fc0335">Andrew Millers virtual X-10 controller</FONT></A></B>
+</CENTER>
+
+</TABLE>
+</TD></TR></TABLE>
+</BODY>
+</HTML>

@@ -1,0 +1,35 @@
+[Settings]
+Target=PIC16F876A
+Active Compiler=BoostC
+Profiling=0
+[Files]
+File0=serial.h
+Count=6
+File1=oo.h
+File2=oo_test.c
+File3=oo_test.h
+File4=serial.c
+File5=oo.c
+[Bookmarks]
+Count=0
+[Breakpoints]
+Count=0
+[Watch]
+test_fmt=1
+Sym0=test
+Count=1
+[Watchpoint]
+Count=0
+[Register]
+Core=1
+Ports=1
+Interrupt=1
+Eeprom=1
+Misc=1
+[Plugins]
+Bcd=506F727442000100000001000000
+Button=00706F727462000000000000000000
+Button Block=706F72746200000000000000000000000000
+Led=706F72746200000000000000000000000000
+Led Block=706F727462000000000000000000
+Speed Tester=6B094201040000004E6F6E65

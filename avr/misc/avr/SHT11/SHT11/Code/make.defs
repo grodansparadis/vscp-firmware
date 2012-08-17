@@ -1,0 +1,18 @@
+	DIR 	= d:/avrgcc/bin
+
+	CC		= $(DIR)/avr-gcc
+	AS		= $(DIR)/avr-gcc -x assembler-with-cpp	
+	RM		= $(DIR)/rm -f
+	RN		= $(DIR)/mv
+	OUT		= coff
+	ELFCOF	= $(DIR)/elfcoff
+	BIN		= $(DIR)/avr-objcopy
+	SIZE	= $(DIR)/avr-size
+	DUMP	= $(DIR)/avr-objdump
+	INCDIR	= .
+	LIBDIR	= $(DIR)/avr/lib
+	SHELL   = $(DIR)/bin/sh.exe
+
+
+###### output format can be srec, ihex (avrobj is always created) #######
+	FORMAT = srec

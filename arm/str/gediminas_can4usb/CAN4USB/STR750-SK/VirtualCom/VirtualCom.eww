@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$\VirtualCom.ewp</path>
+  </project>
+  <batchBuild>
+    <batchDefinition>
+      <name>All</name>
+      <member>
+        <project>VirtualCom</project>
+        <configuration>Debug Rev A</configuration>
+      </member>
+      <member>
+        <project>VirtualCom</project>
+        <configuration>Debug Rev B</configuration>
+      </member>
+    </batchDefinition>
+  </batchBuild>
+</workspace>
+
+

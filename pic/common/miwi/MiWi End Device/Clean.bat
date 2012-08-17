@@ -1,0 +1,20 @@
+rm *.o
+rm *.lst
+rm *.obj
+rm *.rlf
+rm *.cof
+rm *.cod
+rm *.hex
+rm *.lst
+rm *.mptags
+rm *.tagsrc
+rm *.map
+rm *.cce
+rm *.sdb
+rm *.sym
+rm *.mcs
+rm *.hxl
+rm *.lde
+rm *.err
+rm untitled.mcw
+rm -r Objects*

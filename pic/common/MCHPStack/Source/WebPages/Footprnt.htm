@@ -1,0 +1,139 @@
+<html>
+
+<head>
+<title>Footprint</title>
+</head>
+
+<body bgcolor="#FFFFFF">
+
+<table border="1" cellpadding="0" cellspacing="0" width="100%"
+bordercolor="#000000">
+    <tr>
+        <td width="20%" bgcolor="#FFFF00"><strong>Layer</strong></td>
+        <td width="20%" bgcolor="#FFFF00"><strong>Component</strong></td>
+        <td width="20%" bgcolor="#FFFF00"><strong>ROM (Words)</strong></td>
+        <td width="20%" bgcolor="#FFFF00"><strong>RAM (bytes)</strong></td>
+        <td width="20%" bgcolor="#FFFF00"><strong>Comment</strong></td>
+    </tr>
+    <tr>
+        <td rowspan="2" width="20%" bgcolor="#D1D1D1">Physical</td>
+        <td width="20%" bgcolor="#D1D1D1">Ethernet</td>
+        <td width="20%" bgcolor="#D1D1D1">818</td>
+        <td width="20%" bgcolor="#D1D1D1">5</td>
+        <td width="20%" bgcolor="#D1D1D1">RTL8019AS</td>
+    </tr>
+    <tr>
+        <td bgcolor="#D1D1D1">USART</td>
+        <td bgcolor="#D1D1D1">-</td>
+        <td bgcolor="#D1D1D1">-</td>
+        <td bgcolor="#D1D1D1">See SLIP</td>
+    </tr>
+    <tr>
+        <td rowspan="3">Network</td>
+        <td>SLIP</td>
+        <td>780</td>
+        <td>12 + Tx & Rx Buffers</td>
+        <td>Buffer size is user defined</td>
+    </tr>
+    <tr>
+        <td>ARP</td>
+        <td>392</td>
+        <td>0</td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <td>ARPTask</td>
+        <td>181</td>
+        <td>11</td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <td rowspan="2" bgcolor="#D1D1D1">Internet</td>
+        <td bgcolor="#D1D1D1">IP</td>
+        <td bgcolor="#D1D1D1">396</td>
+        <td bgcolor="#D1D1D1">2</td>
+        <td bgcolor="#D1D1D1">&nbsp;</td>
+    </tr>
+    <tr>
+        <td bgcolor="#D1D1D1">ICMP</td>
+        <td bgcolor="#D1D1D1">318</td>
+        <td bgcolor="#D1D1D1">0</td>
+        <td bgcolor="#D1D1D1">&nbsp;</td>
+    </tr>
+    <tr>
+        <td rowspan="2">Transport</td>
+        <td>TCP</td>
+        <td>2524</td>
+        <td>42</td>
+        <td>Each extra socket consumes 36 bytes of RAM</td>
+    </tr>
+    <tr>
+        <td>UDP</td>
+        <td>608</td>
+        <td>20</td>
+        <td>Each extra socket consumes 19 bytes of RAM</td>
+    </tr>
+    <tr>
+        <td rowspan=4 bgcolor="#D1D1D1">Application</td>
+        <td bgcolor="#D1D1D1">HTTP</td>
+        <td bgcolor="#D1D1D1">920</td>
+        <td bgcolor="#D1D1D1">10</td>
+        <td bgcolor="#D1D1D1">Must include TCP, MPFS</td>
+    </tr>
+    <tr>
+        <td bgcolor="#D1D1D1">DHCP</td>
+        <td bgcolor="#D1D1D1">785</td>
+        <td bgcolor="#D1D1D1">26</td>
+        <td bgcolor="#D1D1D1">Must include UDP</td>
+    </tr>
+    <tr>
+        <td bgcolor="#D1D1D1">SNMP</td>
+        <td bgcolor="#D1D1D1">2819</td>
+        <td bgcolor="#D1D1D1">28</td>
+        <td bgcolor="#D1D1D1">Must include UDP, MPFS</td>
+    </tr>
+    <tr>
+        <td bgcolor="#D1D1D1">FTP Server</td>
+        <td bgcolor="#D1D1D1">649</td>
+        <td bgcolor="#D1D1D1">35</td>
+        <td bgcolor="#D1D1D1">Must include TCP, MPFS</td>
+    </tr>
+    <tr>
+        <td bgcolor="#D1D1D1">IP Gleaning</td>
+        <td bgcolor="#D1D1D1">20</td>
+        <td bgcolor="#D1D1D1">1</td>
+        <td bgcolor="#D1D1D1">Approx. size - Part of Stack Manager</td>
+    </tr>
+    <tr>
+        <td rowspan=4>Other</td>
+        <td>File System (MPFS)</td>
+        <td>276</td>
+        <td>5</td>
+        <td>Internal Program Memory Storage</td>
+    </tr>
+    <tr>
+        <td>Stack Manager</td>
+        <td>249</td>
+        <td>12 + ICMP Buffer</td>
+        <td>ICMP Buffer size is user defined</td>
+    </tr>
+    <tr>
+        <td>Tick Manager</td>
+        <td>37</td>
+        <td>2</td>
+        <td>User may use custom Tick Manager too.</td>
+    </tr>
+    <tr>
+        <td>Helper/Common functions</td>
+        <td>290</td>
+        <td>0</td>
+        <td>None</td>
+    </tr>
+    <tr>
+        <td colspan="5" bordercolor="#FFFFFF"><em><strong>Note:</strong></em><em>
+        Using Microchip C18 v2.10 Compiler with all optimization. These values may vary as new features and optimizations
+        are added.</em></td>
+    </tr>
+</table>
+</body>
+</html>

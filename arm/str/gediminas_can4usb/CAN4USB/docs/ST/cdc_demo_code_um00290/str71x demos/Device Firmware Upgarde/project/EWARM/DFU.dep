@@ -1,0 +1,629 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project>
+  <fileVersion>2</fileVersion>
+  <configuration>
+    <name>Debug</name>
+    <outputs>
+      <file>$PROJ_DIR$\..\..\source\hw_config.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\hw_config.r79</file>
+      <file>$PROJ_DIR$\Debug\Obj\xti.pbi</file>
+      <file>$PROJ_DIR$\..\..\source\main.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\library\inc\usb_type.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\71x_it.r79</file>
+      <file>$PROJ_DIR$\..\..\include\hw_config.h</file>
+      <file>$PROJ_DIR$\..\..\include\71x_conf.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\include\71x_map.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\apb.r79</file>
+      <file>$PROJ_DIR$\Debug\Obj\wdg.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\pcu.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\source\flash.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_prop.r79</file>
+      <file>$PROJ_DIR$\Debug\Obj\71x_it.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\include\71x_lib.h</file>
+      <file>$PROJ_DIR$\lnkarm_flash.xcl</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_pwr.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\library\inc\usb_lib.h</file>
+      <file>$PROJ_DIR$\..\..\include\usb_pwr.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\gpio.pbi</file>
+      <file>$PROJ_DIR$\..\..\source\71x_it.c</file>
+      <file>$PROJ_DIR$\..\..\include\usb_prop.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\71x_lib.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_core.r79</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_regs.r79</file>
+      <file>$PROJ_DIR$\Debug\Obj\init_tab.r79</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_int.r79</file>
+      <file>$PROJ_DIR$\Debug\Obj\pcu.r79</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_prop.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\include\71x_type.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\include\wdg.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_desc.r79</file>
+      <file>$PROJ_DIR$\Debug\Obj\wdg.r79</file>
+      <file>$PROJ_DIR$\Debug\Obj\gpio.r79</file>
+      <file>$PROJ_DIR$\Debug\Obj\71x_lib.r79</file>
+      <file>$PROJ_DIR$\Debug\Exe\DFU.d79</file>
+      <file>$PROJ_DIR$\..\..\..\..\library\inc\usb_int.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\include\flash.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\rccu.pbi</file>
+      <file>$PROJ_DIR$\Debug\List\DFU.map</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_core.pbi</file>
+      <file>$TOOLKIT_DIR$\lib\dl4tptinl8n.r79</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\include\rccu.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\71x_init.r79</file>
+      <file>$PROJ_DIR$\..\..\include\usb_desc.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.r79</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\include\pcu.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_istr.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\DFU.pbd</file>
+      <file>$PROJ_DIR$\Debug\Obj\flash.r79</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_pwr.r79</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\include\apb.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_mem.r79</file>
+      <file>$PROJ_DIR$\Debug\Obj\apb.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\include\xti.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\library\inc\usb_mem.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\71x_vect.r79</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\include\eic.h</file>
+      <file>$PROJ_DIR$\..\..\include\usb_conf.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_regs.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\library\inc\usb_init.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\library\inc\usb_core.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\library\inc\usb_regs.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_istr.r79</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_int.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_desc.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\rccu.r79</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_init.r79</file>
+      <file>$PROJ_DIR$\Debug\Obj\xti.r79</file>
+      <file>$PROJ_DIR$\Debug\Exe\DFU.sim</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_mem.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\usb_init.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\hw_config.pbi</file>
+      <file>$PROJ_DIR$\71x_init.s</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\source\71x_lib.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\source\apb.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\source\gpio.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\source\pcu.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\source\rccu.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\source\wdg.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\source\xti.c</file>
+      <file>$PROJ_DIR$\71x_vect.s</file>
+      <file>$PROJ_DIR$\init_tab.s</file>
+      <file>$PROJ_DIR$\..\..\..\..\stdlib\str71x\include\gpio.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\flash.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\library\inc\usb_def.h</file>
+      <file>$PROJ_DIR$\..\..\source\usb_desc.c</file>
+      <file>$PROJ_DIR$\..\..\source\usb_istr.c</file>
+      <file>$PROJ_DIR$\..\..\source\usb_prop.c</file>
+      <file>$PROJ_DIR$\..\..\source\usb_pwr.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\library\src\usb_core.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\library\src\usb_init.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\library\src\usb_int.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\library\src\usb_mem.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\library\src\usb_regs.c</file>
+    </outputs>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\hw_config.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 1</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 74</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 15 8 7 30 53 59 39 85 48 44 32 56 6 4 60</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 15 8 7 30 53 59 39 85 48 44 32 56 6 4 60</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\main.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 47</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 31</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 18 4 60 64 87 63 62 57 38 22 19 6</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18 4 60 64 87 63 62 57 38 22 19 6</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\stdlib\str71x\source\flash.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 51</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 86</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 39 8 7 30</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 39 8 7 30</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\71x_it.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 5</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 14</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 15 8 7 30 53 59 39 85 48 44 32 56 18 4 60 64 87 63 62 57 38 19</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 15 8 7 30 53 59 39 85 48 44 32 56 18 4 60 64 87 63 62 57 38 19</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Exe\DFU.d79</name>
+      <outputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 41 71</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 16 45 5 36 58 9 35 1 26 47 28 68 24 33 69 27 65 54 13 52 25 34 70 43</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Obj\DFU.pbd</name>
+      <inputs>
+        <tool>
+          <name>BILINK</name>
+          <file> 14 23 55 20 74 31 11 40 42 67 73 66 49 72 29 17 61 10 2</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 37 41 71</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\71x_init.s</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 45</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\stdlib\str71x\source\71x_lib.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 36</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 23</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 8 7 30</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 8 7 30</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\stdlib\str71x\source\apb.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 9</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 55</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 53 8 7 30</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 53 8 7 30</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\stdlib\str71x\source\gpio.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 35</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 20</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 85 8 7 30</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 85 8 7 30</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\stdlib\str71x\source\pcu.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 28</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 11</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 48 8 7 30 44</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 48 8 7 30 44</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\stdlib\str71x\source\rccu.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 68</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 40</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 44 8 7 30</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 44 8 7 30</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\stdlib\str71x\source\wdg.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 34</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 10</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 32 8 7 30 44</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 32 8 7 30 44</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\stdlib\str71x\source\xti.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 70</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 2</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 56 8 7 30</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 56 8 7 30</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\71x_vect.s</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 58</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\init_tab.s</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 26</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\usb_desc.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 33</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 67</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 18 4 60 64 87 63 62 57 38 46</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18 4 60 64 87 63 62 57 38 46</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\usb_istr.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 65</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 49</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 18 4 60 64 87 63 62 57 38 22 19</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18 4 60 64 87 63 62 57 38 22 19</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\usb_prop.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 13</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 29</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 18 4 60 64 87 63 62 57 38 6 22 46 19</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18 4 60 64 87 63 62 57 38 6 22 46 19</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\usb_pwr.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 52</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 17</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 18 4 60 64 87 63 62 57 38 19 6</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18 4 60 64 87 63 62 57 38 19 6</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\library\src\usb_core.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 24</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 42</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 18 4 60 64 87 63 62 57 38</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18 4 60 64 87 63 62 57 38</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\library\src\usb_init.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 69</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 73</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 18 4 60 64 87 63 62 57 38</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18 4 60 64 87 63 62 57 38</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\library\src\usb_int.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 27</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 66</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 18 4 60 64 87 63 62 57 38</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18 4 60 64 87 63 62 57 38</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\library\src\usb_mem.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 54</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 72</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 18 4 60 64 87 63 62 57 38</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18 4 60 64 87 63 62 57 38</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\library\src\usb_regs.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 25</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 61</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 18 4 60 64 87 63 62 57 38</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18 4 60 64 87 63 62 57 38</file>
+        </tool>
+      </inputs>
+    </file>
+  </configuration>
+</project>
+
+

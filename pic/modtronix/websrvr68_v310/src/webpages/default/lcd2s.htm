@@ -1,0 +1,82 @@
+<html>
+<head>
+<meta http-equiv="Pragma" content="no-cache">
+<link href="mx.css" rel="stylesheet" type="text/css">
+<script src="lib01.js"></script>
+<script type="text/javascript">
+function enable(id,v) {
+	document.getElementById(id).disabled=(v==0?true:false);
+}
+function disIfEmpty(id1,id2) {
+	if ( !document.getElementById(id1).value) {
+		document.getElementById(id2).disabled=true;
+	}
+}
+function disIfNCheck(id1,id2) {
+	if ( !document.getElementById(id1).checked) {
+		document.getElementById(id2).disabled=true;
+	}
+}
+function cvt(id,s) {
+	document.getElementById(id).value = s + toHex(document.getElementById(id).value);
+}
+function doSubmit() {
+	if (!document.getElementById("str").value) {
+		enable("str",0);
+	}
+
+	disIfEmpty("arr","arr");
+	disIfEmpty("arr","arrRem");
+	disIfNCheck("cbArr","arrRem");
+
+	disIfEmpty("cont","cont");
+	disIfEmpty("cont","contRem");
+	disIfNCheck("cbPar","contRem");
+	cvt("cont","_82_");
+
+	disIfEmpty("bl","bl");
+	disIfEmpty("bl","blRem");
+	disIfNCheck("cbPar","blRem");
+	cvt("bl","_81_");
+}
+</script>
+</head>
+
+<body class=ifrmBody>
+<form method=GET id=formLcd2s action=LCD2S.HTM onsubmit="doSubmit();">
+<br>
+<table class=bBox cellpadding=3 cellspacing=1>
+<tr><td class=bHdr colspan=2>LCD2S Serial LCD Display</td></tr>
+<tr><td class=bDesc colspan=2>This section is used to communicate with a LCD2S serial LCD display. The
+LCD2S must be configured for I2C mode (DIP switch on LCD2S set to 00 - both off).</td></tr>
+<tr><td class=bSec colspan=2>String</td></tr>
+<tr><td class=bDesc colspan=2>Write string to LCD display. For details, see "ll" command.
+	<a href="cmd.htm#lcd">here</a>
+	<br>For example, the following string will write "Hello" to row 1, and "World" to row two:
+	<br><i>_fhello_nworld</i></td></tr>
+<tr><td class=bLbl>String:</td><td class=bCtr width=100%%><input type=text size=30 maxlength=30 name=ll id=str></td></tr>
+<tr><td class=bLbl colspan=2><input type=submit value="Send String"></td></tr>
+<tr><td class=bSec colspan=2>Byte Array</td></tr>
+<tr><td class=bDesc colspan=2>Write bytes to LCD display. For details, see "lk" command
+	<a href="cmd.htm#lcd">here</a>
+	<br>For example, the following string will send a "Blink Block Cursor On" command (hex 18) to the display:
+	<br><i>_18</i></td></tr>
+<tr><td class=bLbl>Byte Array:</td><td class=bCtr width=100%%>
+	<input type=hidden name=lk id=arrRem value="_8D">
+	<input type=text size=30 maxlength=30 name=lk id=arr></td></tr>
+<tr><td class=bLbl colspan=2><input type=submit value="Send Bytes">&nbsp;  &nbsp; Remember Settings After Power Up <input type=checkbox id=cbArr></td></tr>
+<tr><td class=bSec colspan=2>Parameters</td></tr>
+<tr><td class=bDesc colspan=2>The following commands can all be achieved by writing a byte array to
+the LCD2S, but are included here for convenience.</td></tr>
+<tr><td class=bLbl>Contrast:</td><td class=bCtr width=100%%>
+	<input type=hidden name=lk id=contRem value="_8D">
+	<input type=text size=3 maxlength=3 name=lk id=cont>&nbsp; Value from 0-255</td></tr>
+<tr><td class=bLbl>Backlight:</td><td class=bCtr width=100%%>
+	<input type=hidden name=lk id=blRem value="_8D">
+	<input type=text size=3 maxlength=3 name=lk id=bl>&nbsp; Value from 0-255</td></tr>
+<tr><td class=bLbl colspan=2><input type=submit value="Send Parameters">&nbsp;  &nbsp; Remember Settings After Power Up <input type=checkbox id=cbPar></td></tr>
+</table>
+<hr>
+</form>
+</body>
+</html>

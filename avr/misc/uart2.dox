@@ -1,0 +1,7 @@
+/** \defgroup uart2 uart2: Dual UART (serial port) Driver/Function Library for the Mega161 and Mega128
+
+This library provides both buffered and unbuffered transmit and receive functions for AVR processors with two UARTs.  Buffered access means that the UART can transmit and receive data in the "background", while your code continues executing.  Also included are functions to initialize the UART, set the baud rate, flush the buffers, and check buffer status.
+
+\note For full text output functionality, you may wish to use the rprintf functions along with this driver.
+
+*/

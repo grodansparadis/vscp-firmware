@@ -1,0 +1,26 @@
+***  Installation Started 01/12/2009 20:30  ***
+Title: Microchip MRF24J40 Radio Driver v2.1 Installation
+Source: C:\DOCUME~1\gpakhe\LOKALA~1\Temp\Temporär katalog 1 för MRF24J40 Radio Driver v2.1.zip\MRF24J40 Radio Driver v2.1.exe | 07-21-2008 | 13:19:54 | 1225240
+Made Dir: C:\development\m2m\firmware\pic\sweetbox\test\MRF24J40 Radio Driver
+File Copy: C:\development\m2m\firmware\pic\sweetbox\test\MRF24J40 Radio Driver\UNWISE.EXE | 06-25-1999 | 10:55:30 | | 149504 | 30fdd633
+RegDB Key: Software\Microsoft\Windows\CurrentVersion\Uninstall\Microchip MRF24J40 Radio Driver v2.1
+RegDB Val: Microchip MRF24J40 Radio Driver v2.1
+RegDB Name: DisplayName
+RegDB Root: 2
+RegDB Key: Software\Microsoft\Windows\CurrentVersion\Uninstall\Microchip MRF24J40 Radio Driver v2.1
+RegDB Val: C:\DEVELO~1\m2m\firmware\pic\sweetbox\test\MRF24J~1\UNWISE.EXE C:\DEVELO~1\m2m\firmware\pic\sweetbox\test\MRF24J~1\INSTALL.LOG
+RegDB Name: UninstallString
+RegDB Root: 2
+File Copy: C:\development\m2m\firmware\pic\sweetbox\test\MRF24J40 Radio Driver\AN1192 MRF24J40 Driver User Guide.pdf | 05-27-2008 | 10:27:50 | | 1051776 | bbeda2b
+File Copy: C:\development\m2m\firmware\pic\sweetbox\test\MRF24J40 Radio Driver\MRF24J40 Driver.hex | 07-21-2008 | 10:33:34 | | 56204 | 28563d3
+File Copy: C:\development\m2m\firmware\pic\sweetbox\test\MRF24J40 Radio Driver\18f4620i.lkr | 02-25-2005 | 09:47:12 | | 1969 | 23f5bc56
+File Copy: C:\development\m2m\firmware\pic\sweetbox\test\MRF24J40 Radio Driver\BasicDriver.c | 03-14-2008 | 13:48:54 | | 73818 | f340fa7c
+File Copy: C:\development\m2m\firmware\pic\sweetbox\test\MRF24J40 Radio Driver\BasicDriverDefs.h | 03-07-2008 | 17:13:02 | | 2347 | bd82ff31
+File Copy: C:\development\m2m\firmware\pic\sweetbox\test\MRF24J40 Radio Driver\Compiler.h | 03-10-2008 | 08:40:06 | | 12950 | 61ef46ec
+File Copy: C:\development\m2m\firmware\pic\sweetbox\test\MRF24J40 Radio Driver\Console.c | 03-10-2008 | 13:43:46 | | 5066 | 4d80f8c0
+File Copy: C:\development\m2m\firmware\pic\sweetbox\test\MRF24J40 Radio Driver\Console.h | 03-10-2008 | 13:42:52 | | 3204 | b4cd17ee
+File Copy: C:\development\m2m\firmware\pic\sweetbox\test\MRF24J40 Radio Driver\GenericTypeDefs.h | 08-10-2006 | 17:01:00 | | 4362 | c799cd42
+File Copy: C:\development\m2m\firmware\pic\sweetbox\test\MRF24J40 Radio Driver\MRF24J40 Driver.mcp | 07-11-2008 | 14:42:30 | | 1548 | be3cef9e
+File Copy: C:\development\m2m\firmware\pic\sweetbox\test\MRF24J40 Radio Driver\MRF24J40.h | 11-26-2007 | 15:21:28 | | 9883 | d76c35ff
+File Copy: C:\development\m2m\firmware\pic\sweetbox\test\MRF24J40 Radio Driver\MSPI.c | 08-18-2006 | 08:52:26 | | 2646 | 6ca50ec3
+File Copy: C:\development\m2m\firmware\pic\sweetbox\test\MRF24J40 Radio Driver\MSPI.h | 08-14-2006 | 14:24:42 | | 2472 | 11d6b7a

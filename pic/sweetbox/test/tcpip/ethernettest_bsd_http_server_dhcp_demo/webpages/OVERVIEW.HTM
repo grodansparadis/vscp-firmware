@@ -1,0 +1,91 @@
+<html>
+<head>
+    <title>PIC32MX TCP/IP Web Server Demo</title>
+    <link href="stylesheet.css" type="text/css" rel="stylesheet" />
+	
+	
+</head>
+<body>
+    <!-- HEADERS -->
+    <table>
+        <tr>
+        <!-- TOP LEFT HEADERS -->
+            <td >
+                <a href="http://www.microchip.com">
+                <img class="picture_left" src="mchp.gif" alt="welcome to microchip" />
+                </a>
+                <br style="clear:left" />
+                <span class="heading0" style="color:blue">HTTP Web Server  </span>
+                <br />
+                <span class="title_large">Featuring Microchip BSD TCP/IP Stack</span>
+                <br />
+                <b>Powered By </b>
+                <span class="title_super">PIC32MX</span>
+                <span style="font-size:0.8em"> and HPMD 32-Bit Applications</span>
+            </td>
+        <!-- TOP RIGHT HEADERS -->
+            <td style="width:50%; vertical-align:top">
+                <img  class="picture_right" src="pic32mx.gif" alt="PIC32MX" />
+                <span class="heading0" style="color:blue">PIC32MX Real-Time Application</span>
+             
+                <br />
+                <span style="color:green; font-size:9pt">
+                The awesome power of our new 32-Bit <b>PIC32MX</b> is unleashed with this
+                HTTP Web Server running a Real-time monitoring and control
+                application using Microchip's BSD TCP/IP stack. 
+                <br /><br />
+                <span style="color:red; font-weight:bold; font-style:italic">Try the interactive controls below.</span>
+                </span>
+             </td>
+        </tr>
+    </table>
+    
+    <!-- MENU -->
+    <table class="navbar">
+        <tr class="navbar">
+            <td style="width:25%">
+                <a href="overview.htm">Home</a>
+            </td>
+            <td style="width:25%;">
+                <a href="Features.htm">Features</a>
+            </td>
+            <td style="width:25%;">
+                <a href="Arch.htm">Architecture</a>
+            </td>
+            <td style="width:25%;">
+                <a href="Footprnt.htm">Stack Footprint</a>
+            </td>
+        </tr>
+    </table>
+    <!-- MESSAGES -->
+    <table class="description">
+        <tr>
+        <!-- LEFT MESSAGE -->
+            <td class="description">
+				<p>
+				    You are watching a real-time web server application powered by the Microchip PIC32MX&trade;
+				    microcontroller running the Microchip BSD TCP/IP Stack. Everything you see is served through
+				    a Microchip ENC28J60 10Base-T Ethernet controller using an SD memory card with FAT16.
+				</p>
+                
+            </td>
+            <td style="width:5%;"></td>
+            <!-- RIGHT MESSAGE -->
+            <td class="description">
+                <p>
+                    The System Status web interface in the lower left portion of this page illustrates real-time 
+                    status updates of the two LEDS (D10 and D9) and LCD text (if LCD module is present)
+                    status. This section is refreshed with the system information periodically using JavaScript.
+                </p>
+                <p>
+                    The System Control web interface in the lower right portion of this page illustrates real-time
+                    control of the LED and LCD parameters.  Toggling the LEDs are as simple as clicking the 
+					&quot;Toggle&quot; button.  While displaying messages on the LCD is as easy as typing in the text
+					and clicking  &quot;Submit Query&quot;.
+                </p>
+ 
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

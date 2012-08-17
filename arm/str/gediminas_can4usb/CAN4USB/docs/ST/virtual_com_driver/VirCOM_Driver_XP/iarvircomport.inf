@@ -1,0 +1,67 @@
+;**************************************************
+;*                                                *
+;* iarport.inf - Virtual COM Port to USB          *
+;* Driver for Windows NT family                   *
+;*                                                *
+;* Copyright 2006 IAR Systems                     *
+;*                                                *
+;**************************************************
+[Version]
+Signature="$Windows NT$"
+Class=Ports
+ClassGUID={4d36e978-e325-11ce-bfc1-08002be10318}
+Provider=%IAR%
+DriverVer=19/03/2007,1.0.1
+
+[SourceDisksFiles]
+
+[SourceDisksNames]
+
+[Manufacturer]
+%IAR%=IAR_Systems
+
+[IAR_Systems]
+%IAR_CDC&PID_0008%=IarVirCOM,USB\VID_FFFF&PID_0008
+%IAR_CDC&PID_000B%=IarVirCOM,USB\VID_FFFF&PID_000B
+%IAR_CDC&PID_000F%=IarVirCOM,USB\VID_FFFF&PID_000F
+%IAR_CDC&PID_0011%=IarVirCOM,USB\VID_FFFF&PID_0011
+%IAR_CDC&PID_0015%=IarVirCOM,USB\VID_FFFF&PID_0015
+%IAR_CDC&PID_0019%=IarVirCOM,USB\VID_FFFF&PID_0019
+
+
+;**************************************************
+;*   Windows NT family                            *
+;**************************************************
+[IarVirCOM.NT]
+include=mdmcpq.inf
+CopyFiles=FakeModemCopyFileSection
+AddReg=IarVirCOM.NT.AddReg
+
+[IarVirCOM.NT.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,usbser.sys
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+
+[IarVirCOM.NT.Services]
+AddService=usbser, 0x00000002,IarVirCOMService_Inst
+
+[IarVirCOMService_Inst]
+DisplayName=%IarVirCOM.SvcDesc%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\usbser.sys
+LoadOrderGroup=Base
+
+;**************************************************
+;* Strings                                        *
+;**************************************************
+[Strings]
+IAR="IAR Systems"
+IAR_CDC&PID_0008="IAR Virtual COM port, IAR STR750-SK board"
+IAR_CDC&PID_000B="IAR Virtual COM port, IAR STR912-SK board"
+IAR_CDC&PID_000F="IAR Virtual COM port, IAR LPC-2378-SK board"
+IAR_CDC&PID_0011="IAR Virtual COM port, IAR LPC-P2378-SK board"
+IAR_CDC&PID_1015="IAR Virtual COM port, IAR STM32-SK board"
+IAR_CDC&PID_0019="IAR Virtual COM port, IAR LPC-2468 board"
+IarVirCOM.SvcDesc="IAR Virtual COM port"

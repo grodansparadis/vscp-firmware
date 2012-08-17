@@ -1,0 +1,205 @@
+/******************************************************************************
+ *
+ *       FAT16 FILESYSTEM USER CONFIGURATION FILE
+ *
+ ******************************************************************************
+ * FileName:        fat.def
+ * Dependencies:    None
+ * Processor:       Daytona
+ * Compiler:        Daytona
+ * Company:         Microchip Technology, Inc.
+ *
+ * Software License Agreement
+ *
+ * The software supplied herewith by Microchip Technology Incorporated
+ * (the “Company”) for its PICmicro® Microcontroller is intended and
+ * supplied to you, the Company’s customer, for use solely and
+ * exclusively on Microchip PICmicro Microcontroller products. The
+ * software is owned by the Company and/or its supplier, and is
+ * protected under applicable copyright laws. All rights are reserved.
+ * Any use in violation of the foregoing restrictions may subject the
+ * user to criminal sanctions under applicable laws, as well as to
+ * civil liability for the breach of the terms and conditions of this
+ * license.
+ *
+ * THIS SOFTWARE IS PROVIDED IN AN “AS IS” CONDITION. NO WARRANTIES,
+ * WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
+ * TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
+ * IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
+ * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+ *
+ * ****************************************************************************
+ *
+ * $Id: fat.def,v 1.12 2006/10/24 16:37:51 C12923 Exp $
+ *
+ * $Name:  $
+ *
+ *****************************************************************************/
+#ifndef _FAT_DEF_
+
+#define _FAT_DEF_
+
+// Select the type of your processor
+#ifdef PIC24
+#define PIC24F
+#define __PIC24_ES_A0__
+#define DSPIC
+#endif
+
+#ifndef PIC24
+#ifndef DAYTONA
+#define DAYTONA
+#endif
+#endif
+
+// Define FAT16_DYNAMIC_MEM to use malloc for dynamically
+// allocating FILE structure space (uncomment all three lines).
+#define FAT16_DYNAMIC_MEM
+#define FAT16_malloc   malloc
+#define FAT16_free   free
+
+// The FAT16_MAX_FILES_OPEN define is only applicable when Dynamic
+// Memeory Allocation is NOT used (FAT16_DYNAMIC_MEM is NOT defined).
+// Defines how many concurrent open files can exist at the same time.
+// This takes up static memory. If you do not need to open more than
+// one file at the same time, then you should set this to 1 to reduce
+// memory usage.
+#define FAT16_MAX_FILES_OPEN   20
+
+// The MS_FILENAME_SPECIFICATION define is to adhere to the Microsoft
+// standard for filename size.  The CUSTOM_FILE_NAME_SIZE define is
+// used to customize your own filename size (which may deviate from
+// the Microsoft standard).  If CUSTOM_FILE_NAME_SIZE is to be used,
+// then a value MUST be defined for CUSTOM_FILE_NAME_SIZE_VAL (if
+// CUSTOM_FILE_NAME_SIZE_VAL is not defined, then a compiler error
+// will occur).  If neither MS_FILENAME_SPECIFICATION nor 
+// CUSTOM_FILE_NAME_SIZE is defined, then the default filename size is
+// used.  The default is currently set to 25 in FAT.h.
+// #define MS_FILENAME_SPECIFICATION
+// OR
+#define CUSTOM_FILE_NAME_SIZE
+// AND
+#define CUSTOM_FILE_NAME_SIZE_VAL 25
+
+// Select appropriate media interface port based on your hardware.
+//#define MEDIASD_IF_SPI1
+#define MEDIASD_IF_SPI2
+
+
+#define  _USE_STANDARD_LIB_API
+
+
+// Select demo hardware name.
+#define	CUSTOM_BOARD_FAT16
+
+#define _SetChipSelect(on)      {\
+                              mPORTBSetPinsDigitalOut(BIT_9);\
+                              if(on)\
+                                 mPORTBClearBits(BIT_9);\
+                              else\
+                                   mPORTBSetBits(BIT_9);\
+                                }
+
+#define SD_CD                   (0)               // Card detect - Read Only
+#define SDSetCDDirection() 
+
+#define SD_WE                   (0)               // Write enable - Read Only
+#define SDSetWEDirection() 
+
+
+
+// provide a msec wait macro
+#include <mstimer.h>
+#define SleepMS(msec)               MSTimerWait((msec))
+
+// FAT16 SPI configuration defines (see spi.h)
+#define FAT16_SPI_START_CFG_1		(PRI_PRESCAL_64_1 | SEC_PRESCAL_8_1 | MASTER_ENABLE_ON | SPI_CKE_ON | SPI_SMP_ON)
+#define FAT16_SPI_START_CFG_2		(SPI_ENABLE)
+
+#define FAT16_SPI_BRG_2             (0)
+
+/****************************************************************************
+  Section: Media Device Data
+
+  To be able to use multiple media sources, you will need to provide infomation
+  that the FAT code can use to access the data.
+
+  1.  Media Header Files - please provide the media source's header file(s)
+  2.  Callback funcitons - provide the callback function for media access
+  3.  Place the index value, should match the callback structure idx.  
+  ***************************************************************************/
+#ifdef _MEDIA_CONFIGURATION
+
+#include <fat16\media.h>
+
+/****************************************************************************
+  Section: Media Include Files
+  1.  Media Header Files - please provide the media source's header file(s)
+  ***************************************************************************/
+#include <fat16\sdcard_spi.h>
+
+/****************************************************************************
+  Section:
+
+  2.  Callback funcitons - provide the callback function for media access
+
+  Place your media device strcuture here.
+  A SD Card interface is shown
+
+  Structure
+        typedef struct __MEDIA_DATA
+        {
+            const unsigned char     *name;
+            MEDIA_INIT_FUNC         init;
+            unsigned long           init_flags;
+            MEDIA_READ_SECTOR_FUNC  read;
+            MEDIA_WRITE_SECTOR_FUNC write;
+            MEDIA_CLOSE_FUNC        close;
+            unsigned long           close_flags;
+            MEDIA_DISKMOUNT_INIT    disk_mount_init;
+            MEDIA_CALLBACK_FUNC     callback;
+        }MEDIA_DATA;
+
+  ***************************************************************************/
+const MEDIA_DATA _media[] =
+{
+    {   "C:\\",   
+        SDInit, 0,  
+        SDReadSector,   
+        SDWriteSector,  
+        SDShutDown, 0,  
+        NULL, 
+        SDCallBack    
+    }
+};
+#endif
+
+/****************************************************************************
+  Section:
+
+  3.  Place the index value, should match the callback structure idx.  
+
+  Place the media devices here for an idx
+  ***************************************************************************/
+typedef enum __MEDIA_IDX
+{
+    MEDIA_IDX_SD,
+    MEDIA_IDX_NUM
+}MEDIA_IDX;
+
+/****************************************************************************
+  Section:
+
+  You may add commands to the callback function
+  ***************************************************************************/
+typedef enum    __MEDIA_CMD
+{
+    MEDIA_CMD_DISK,
+    MEDIA_CMD_SECTOR,
+    MEDIA_CMD_PRESENT,
+    MEDIA_CMD_WRITE_PROTECTED
+}MEDIA_CMD;
+
+
+#endif   /* _FAT_DEF_ */

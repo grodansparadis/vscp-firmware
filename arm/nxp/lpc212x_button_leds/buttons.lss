@@ -1,0 +1,760 @@
+
+buttons.elf:     file format elf32-littlearm
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000318  00000000  00000000  00008000  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .stack        00000400  40000000  40000000  00008318  2**0
+                  ALLOC
+  2 .comment      0000006c  00000000  00000000  00008318  2**0
+                  CONTENTS, READONLY
+  3 .debug_aranges 000000a0  00000000  00000000  00008388  2**3
+                  CONTENTS, READONLY, DEBUGGING
+  4 .debug_pubnames 0000010a  00000000  00000000  00008428  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   000003ad  00000000  00000000  00008532  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 000001ae  00000000  00000000  000088df  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   000001b3  00000000  00000000  00008a8d  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000150  00000000  00000000  00008c40  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    0000012b  00000000  00000000  00008d90  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    00000039  00000000  00000000  00008ebb  2**0
+                  CONTENTS, READONLY, DEBUGGING
+Disassembly of section .text:
+
+00000000 <_boot>:
+
+// Runtime Interrupt Vectors
+// -------------------------
+Vectors:
+        b     _start                    // reset - _start
+   0:	ea000012 	b	50 <_mainCRTStartup>
+        ldr   pc,_undf                  // undefined - _undf
+   4:	e59ff014 	ldr	pc, [pc, #20]	; 20 <_undf>
+        ldr   pc,_swi                   // SWI - _swi
+   8:	e59ff014 	ldr	pc, [pc, #20]	; 24 <_swi>
+        ldr   pc,_pabt                  // program abort - _pabt
+   c:	e59ff014 	ldr	pc, [pc, #20]	; 28 <_pabt>
+        ldr   pc,_dabt                  // data abort - _dabt
+  10:	e59ff014 	ldr	pc, [pc, #20]	; 2c <_dabt>
+        nop                             // reserved
+  14:	e1a00000 	nop			(mov r0,r0)
+        ldr   pc,[pc,#-0xFF0]           // IRQ - read the VIC
+  18:	e51ffff0 	ldr	pc, [pc, #-4080]	; fffff030 <_stack+0xbfffec30>
+        ldr   pc,_fiq                   // FIQ - _fiq
+  1c:	e59ff010 	ldr	pc, [pc, #16]	; 34 <_fiq>
+
+00000020 <_undf>:
+  20:	00000038 	andeq	r0, r0, r8, lsr r0
+
+00000024 <_swi>:
+  24:	0000003c 	andeq	r0, r0, ip, lsr r0
+
+00000028 <_pabt>:
+  28:	00000040 	andeq	r0, r0, r0, asr #32
+
+0000002c <_dabt>:
+  2c:	00000044 	andeq	r0, r0, r4, asr #32
+
+00000030 <_irq>:
+  30:	00000048 	andeq	r0, r0, r8, asr #32
+
+00000034 <_fiq>:
+  34:	0000004c 	andeq	r0, r0, ip, asr #32
+
+00000038 <__undf>:
+
+#if 0
+// Use this group for production
+_undf:  .word _reset                    // undefined - _reset
+_swi:   .word _reset                    // SWI - _reset
+_pabt:  .word _reset                    // program abort - _reset
+_dabt:  .word _reset                    // data abort - _reset
+_irq:   .word _reset                    // IRQ - _reset
+_fiq:   .word _reset                    // FIQ - _reset
+
+#else
+// Use this group for development
+_undf:  .word __undf                    // undefined
+_swi:   .word __swi                     // SWI
+_pabt:  .word __pabt                    // program abort
+_dabt:  .word __dabt                    // data abort
+_irq:   .word __irq                     // IRQ
+_fiq:   .word __fiq                     // FIQ
+
+__undf: b     .                         // undefined
+  38:	eafffffe 	b	38 <__undf>
+
+0000003c <__swi>:
+__swi:  b     .                         // SWI
+  3c:	eafffffe 	b	3c <__swi>
+
+00000040 <__pabt>:
+__pabt: b     .                         // program abort
+  40:	eafffffe 	b	40 <__pabt>
+
+00000044 <__dabt>:
+__dabt: b     .                         // data abort
+  44:	eafffffe 	b	44 <__dabt>
+
+00000048 <__irq>:
+__irq:  b     .                         // IRQ
+  48:	eafffffe 	b	48 <__irq>
+
+0000004c <__fiq>:
+__fiq:  b     .                         // FIQ
+  4c:	eafffffe 	b	4c <__fiq>
+
+00000050 <_mainCRTStartup>:
+#endif
+        .size _boot, . - _boot
+        .endfunc
+
+
+// Setup the operating mode & stack.
+// ---------------------------------
+        .global _start, start, _mainCRTStartup
+        .func   _start
+
+_start:
+start:
+_mainCRTStartup:
+
+// Initialize Interrupt System
+// - Set stack location for each mode
+// - Leave in System Mode with Interrupts Disabled
+// -----------------------------------------------
+        ldr   r0,=_stack
+  50:	e59f00c0 	ldr	r0, [pc, #192]	; 118 <.text+0x118>
+        msr   CPSR_c,#MODE_UND|I_BIT|F_BIT // Undefined Instruction Mode
+  54:	e321f0db 	msr	CPSR_c, #219	; 0xdb
+        mov   sp,r0
+  58:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#UND_STACK_SIZE
+  5c:	e2400004 	sub	r0, r0, #4	; 0x4
+        msr   CPSR_c,#MODE_ABT|I_BIT|F_BIT // Abort Mode
+  60:	e321f0d7 	msr	CPSR_c, #215	; 0xd7
+        mov   sp,r0
+  64:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#ABT_STACK_SIZE
+  68:	e2400004 	sub	r0, r0, #4	; 0x4
+        msr   CPSR_c,#MODE_FIQ|I_BIT|F_BIT // FIQ Mode
+  6c:	e321f0d1 	msr	CPSR_c, #209	; 0xd1
+        mov   sp,r0
+  70:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#FIQ_STACK_SIZE
+  74:	e2400004 	sub	r0, r0, #4	; 0x4
+        msr   CPSR_c,#MODE_IRQ|I_BIT|F_BIT // IRQ Mode
+  78:	e321f0d2 	msr	CPSR_c, #210	; 0xd2
+        mov   sp,r0
+  7c:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#IRQ_STACK_SIZE
+  80:	e2400080 	sub	r0, r0, #128	; 0x80
+        msr   CPSR_c,#MODE_SVC|I_BIT|F_BIT // Supervisor Mode
+  84:	e321f0d3 	msr	CPSR_c, #211	; 0xd3
+        mov   sp,r0
+  88:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#SVC_STACK_SIZE
+  8c:	e2400004 	sub	r0, r0, #4	; 0x4
+        msr   CPSR_c,#MODE_SYS|I_BIT|F_BIT // System Mode
+  90:	e321f0df 	msr	CPSR_c, #223	; 0xdf
+        mov   sp,r0
+  94:	e1a0d000 	mov	sp, r0
+
+// Copy initialized data to its execution address in RAM
+// -----------------------------------------------------
+#ifdef ROM_RUN
+        ldr   r1,=_etext                // -> ROM data start
+  98:	e59f107c 	ldr	r1, [pc, #124]	; 11c <.text+0x11c>
+        ldr   r2,=_data                 // -> data start
+  9c:	e59f207c 	ldr	r2, [pc, #124]	; 120 <.text+0x120>
+        ldr   r3,=_edata                // -> end of data
+  a0:	e59f307c 	ldr	r3, [pc, #124]	; 124 <.text+0x124>
+1:      cmp   r2,r3                     // check if data to move
+  a4:	e1520003 	cmp	r2, r3
+        ldrlo r0,[r1],#4                // copy it
+  a8:	34910004 	ldrcc	r0, [r1], #4
+        strlo r0,[r2],#4
+  ac:	34820004 	strcc	r0, [r2], #4
+        blo   1b                        // loop until done
+  b0:	3afffffb 	bcc	a4 <IRQ_STACK_SIZE+0x24>
+#endif
+// Clear .bss
+// ----------
+        mov   r0,#0                     // get a zero
+  b4:	e3a00000 	mov	r0, #0	; 0x0
+        ldr   r1,=__bss_start           // -> bss start
+  b8:	e59f1068 	ldr	r1, [pc, #104]	; 128 <.text+0x128>
+        ldr   r2,=__bss_end__           // -> bss end
+  bc:	e59f2068 	ldr	r2, [pc, #104]	; 12c <.text+0x12c>
+2:      cmp   r1,r2                     // check if data to clear
+  c0:	e1510002 	cmp	r1, r2
+        strlo r0,[r1],#4                // clear 4 bytes
+  c4:	34810004 	strcc	r0, [r1], #4
+        blo   2b                        // loop until done
+  c8:	3afffffc 	bcc	c0 <IRQ_STACK_SIZE+0x40>
+		
+/*
+   Call C++ constructors (for objects in "global scope")
+   ctor loop added by Martin Thomas 4/2005 
+   based on a Anglia Design example-application for ST ARM
+*/
+
+		LDR 	r0, =__ctors_start__
+  cc:	e59f005c 	ldr	r0, [pc, #92]	; 130 <.text+0x130>
+		LDR 	r1, =__ctors_end__
+  d0:	e59f105c 	ldr	r1, [pc, #92]	; 134 <.text+0x134>
+
+000000d4 <ctor_loop>:
+ctor_loop:
+		CMP 	r0, r1
+  d4:	e1500001 	cmp	r0, r1
+		BEQ 	ctor_end
+  d8:	0a000005 	beq	f4 <ctor_end>
+		LDR 	r2, [r0], #4
+  dc:	e4902004 	ldr	r2, [r0], #4
+		STMFD 	sp!, {r0-r1}
+  e0:	e92d0003 	stmdb	sp!, {r0, r1}
+		MOV 	lr, pc
+  e4:	e1a0e00f 	mov	lr, pc
+		MOV 	pc, r2
+  e8:	e1a0f002 	mov	pc, r2
+		LDMFD 	sp!, {r0-r1}
+  ec:	e8bd0003 	ldmia	sp!, {r0, r1}
+		B 		ctor_loop
+  f0:	eafffff7 	b	d4 <ctor_loop>
+
+000000f4 <ctor_end>:
+ctor_end:
+
+// Call main program: main(0)
+// --------------------------
+        mov   r0,#0                     // no arguments (argc = 0)
+  f4:	e3a00000 	mov	r0, #0	; 0x0
+        mov   r1,r0
+  f8:	e1a01000 	mov	r1, r0
+        mov   r2,r0
+  fc:	e1a02000 	mov	r2, r0
+        mov   fp,r0                     // null frame pointer
+ 100:	e1a0b000 	mov	fp, r0
+        mov   r7,r0                     // null frame pointer for thumb
+ 104:	e1a07000 	mov	r7, r0
+        ldr   r10,=main
+ 108:	e59fa028 	ldr	sl, [pc, #40]	; 138 <.text+0x138>
+        mov   lr,pc
+ 10c:	e1a0e00f 	mov	lr, pc
+        bx    r10                       // enter main()
+ 110:	e12fff1a 	bx	sl
+
+00000114 <_reset>:
+
+/* "global object"-dtors are never called and it should not be 
+   needed since there is no OS to exit to. */
+   
+        .size   _start, . - _start
+        .endfunc
+
+        .global _reset, reset, exit, abort
+        .func   _reset
+_reset:
+reset:
+exit:
+abort:
+#if 0
+// Disable interrupts, then force a hardware reset by driving P23 low
+// -------------------------------------------------------------------
+        mrs   r0,cpsr                   // get PSR
+        orr   r0,r0,#I_BIT|F_BIT        // disable IRQ and FIQ
+        msr   cpsr,r0                   // set up status register
+
+        ldr   r1,=(PS_BASE)             // PS Base Address
+        ldr   r0,=(PS_PIO)              // PIO Module
+        str   r0,[r1,#PS_PCER_OFF]      // enable its clock
+        ldr   r1,=(PIO_BASE)            // PIO Base Address
+        ldr   r0,=(1<<23)               // P23
+        str   r0,[r1,#PIO_PER_OFF]      // make sure pin is contolled by PIO
+        str   r0,[r1,#PIO_CODR_OFF]     // set the pin low
+        str   r0,[r1,#PIO_OER_OFF]      // make it an output
+#endif
+        b     .                         // loop until reset
+ 114:	eafffffe 	b	114 <_reset>
+ 118:	40000400 	andmi	r0, r0, r0, lsl #8
+ 11c:	00000318 	andeq	r0, r0, r8, lsl r3
+ 120:	40000000 	andmi	r0, r0, r0
+ 124:	00000318 	andeq	r0, r0, r8, lsl r3
+ 128:	40000000 	andmi	r0, r0, r0
+ 12c:	00000318 	andeq	r0, r0, r8, lsl r3
+ 130:	00000318 	andeq	r0, r0, r8, lsl r3
+ 134:	00000318 	andeq	r0, r0, r8, lsl r3
+ 138:	00000159 	andeq	r0, r0, r9, asr r1
+
+0000013c <InitButtons>:
+
+
+// init buttons port
+void InitButtons(void) {
+	IODIR0 = PIO0_BUTTON1 | PIO0_BUTTON2 ;
+ 13c:	4a02      	ldr	r2, [pc, #8]	(148 <.text+0x148>)
+ 13e:	2382      	movs	r3, #130
+ 140:	021b      	lsls	r3, r3, #8
+ 142:	6013      	str	r3, [r2, #0]
+}
+ 144:	4770      	bx	lr
+ 146:	0000      	lsls	r0, r0, #0
+ 148:	8008      	strh	r0, [r1, #0]
+ 14a:	e002      	b.n	152 <DelayS+0x6>
+
+0000014c <DelayS>:
+#include "led.h"
+#include "buttons.h"
+
+// simple delay
+void DelayS (unsigned long a) { while (--a!=0); };
+ 14c:	2300      	movs	r3, #0
+ 14e:	3301      	adds	r3, #1
+ 150:	4283      	cmp	r3, r0
+ 152:	d1fc      	bne.n	14e <DelayS+0x2>
+ 154:	4770      	bx	lr
+	...
+
+00000158 <main>:
+
+int main()
+{
+ 158:	b500      	push	{lr}
+	/**** INITIALIZATION ****/
+	// Frequency initialization
+	//FrecInit();
+
+	sysInit();
+ 15a:	f000 f8c3 	bl	2e4 <sysInit>
+	
+	// Led initialization
+	//LedsInit();
+	
+	// Buttons initialization
+	//InitButtons();
+
+	Led1On();
+ 15e:	f000 f817 	bl	190 <Led1On>
+	
+	// loop forever
+	while ( TRUE ) {
+
+		// if button 1 is pressed
+		if ( !BUT1_PRESSED ) {
+ 162:	4b02      	ldr	r3, [pc, #8]	(16c <.text+0x16c>)
+ 164:	681a      	ldr	r2, [r3, #0]
+			Led1Off();
+			Led1Blink();
+			Led2Blink();
+			Led3Blink();
+		}
+
+		// if button 2 is pressed
+		if ( !BUT2_PRESSED ) {
+ 166:	681b      	ldr	r3, [r3, #0]
+ 168:	e7fb      	b.n	162 <main+0xa>
+ 16a:	0000      	lsls	r0, r0, #0
+ 16c:	8000      	strh	r0, [r0, #0]
+ 16e:	e002      	b.n	176 <Delay+0x6>
+
+00000170 <Delay>:
+#include "config.h"
+#include "led.h"
+
+//it's a simple delay
+void Delay (unsigned long a) {
+ 170:	2300      	movs	r3, #0
+ 172:	3301      	adds	r3, #1
+	while (--a!=0);
+ 174:	4283      	cmp	r3, r0
+ 176:	d1fc      	bne.n	172 <Delay+0x2>
+}
+ 178:	4770      	bx	lr
+	...
+
+0000017c <LedsInit>:
+
+// init led port
+void LedsInit(void) {
+	//IO0DIR_bit.P0_8 = 1;     //set port0.8 to output
+	//IO0DIR_bit.P0_10 = 1;    //set port0.10 to output
+	//IO0DIR_bit.P0_11 = 1;    //set port0.11 to output
+	IODIR0 = PIO0_LED1 | PIO0_LED1 | PIO0_LED1;
+ 17c:	4a03      	ldr	r2, [pc, #12]	(18c <.text+0x18c>)
+ 17e:	2380      	movs	r3, #128
+ 180:	005b      	lsls	r3, r3, #1
+ 182:	6013      	str	r3, [r2, #0]
+	
+	//IO0SET_bit.P0_8 = 1;     //led1 off
+	//IO0SET_bit.P0_10 = 1;    //led2 off
+	//IO0SET_bit.P0_11 = 1;    //led3 off
+	IOSET0 = PIO0_LED1 | PIO0_LED1 | PIO0_LED1;
+ 184:	3a04      	subs	r2, #4
+ 186:	6013      	str	r3, [r2, #0]
+}
+ 188:	4770      	bx	lr
+ 18a:	0000      	lsls	r0, r0, #0
+ 18c:	8008      	strh	r0, [r1, #0]
+ 18e:	e002      	b.n	196 <Led1On+0x6>
+
+00000190 <Led1On>:
+
+// single blink led 1
+void Led1Blink(void) {
+	//IO0CLR_bit.P0_8 = 1;    	//on led
+	IOCLR0 = PIO0_LED1;
+	Delay(500000);      		//delay
+	//IO0SET_bit.P0_8 = 1;     	//off led
+	IOSET0 = PIO0_LED1;
+	//Delay(500000);           	//delay
+}
+
+// turn on led 1
+void Led1On(void) {
+	//IO0CLR_bit.P0_8 = 1;     //on led
+	IOCLR0 = PIO0_LED1;
+ 190:	4a02      	ldr	r2, [pc, #8]	(19c <.text+0x19c>)
+ 192:	2380      	movs	r3, #128
+ 194:	005b      	lsls	r3, r3, #1
+ 196:	6013      	str	r3, [r2, #0]
+}
+ 198:	4770      	bx	lr
+ 19a:	0000      	lsls	r0, r0, #0
+ 19c:	800c      	strh	r4, [r1, #0]
+ 19e:	e002      	b.n	1a6 <Led1Off+0x6>
+
+000001a0 <Led1Off>:
+
+// turn off led 1
+void Led1Off(void) {
+	//IO0SET_bit.P0_8 = 1;     //off led
+	IOSET0 = PIO0_LED1;
+ 1a0:	4a02      	ldr	r2, [pc, #8]	(1ac <.text+0x1ac>)
+ 1a2:	2380      	movs	r3, #128
+ 1a4:	005b      	lsls	r3, r3, #1
+ 1a6:	6013      	str	r3, [r2, #0]
+}
+ 1a8:	4770      	bx	lr
+ 1aa:	0000      	lsls	r0, r0, #0
+ 1ac:	8004      	strh	r4, [r0, #0]
+ 1ae:	e002      	b.n	1b6 <Led2On+0x6>
+
+000001b0 <Led2On>:
+
+
+// single blink led 2
+void Led2Blink(void) {
+	//IO0CLR_bit.P0_10 = 1;    //on led
+	IOCLR0 = PIO0_LED2;
+	Delay(500000);           //delay
+	//IO0SET_bit.P0_10 = 1;    //off led
+	IOSET0 = PIO0_LED2;
+	//Delay(500000);           //delay
+}
+
+// turn on led 2
+void Led2On(void) {
+	//IO0CLR_bit.P0_10 = 1;    //on led
+	IOCLR0 = PIO0_LED2;
+ 1b0:	4a02      	ldr	r2, [pc, #8]	(1bc <.text+0x1bc>)
+ 1b2:	2380      	movs	r3, #128
+ 1b4:	00db      	lsls	r3, r3, #3
+ 1b6:	6013      	str	r3, [r2, #0]
+}
+ 1b8:	4770      	bx	lr
+ 1ba:	0000      	lsls	r0, r0, #0
+ 1bc:	800c      	strh	r4, [r1, #0]
+ 1be:	e002      	b.n	1c6 <Led2Off+0x6>
+
+000001c0 <Led2Off>:
+
+// turn off led 2
+void Led2Off(void) {
+	//IO0SET_bit.P0_10 = 1;    //off led
+	IOSET0 = PIO0_LED2;
+ 1c0:	4a02      	ldr	r2, [pc, #8]	(1cc <.text+0x1cc>)
+ 1c2:	2380      	movs	r3, #128
+ 1c4:	00db      	lsls	r3, r3, #3
+ 1c6:	6013      	str	r3, [r2, #0]
+}
+ 1c8:	4770      	bx	lr
+ 1ca:	0000      	lsls	r0, r0, #0
+ 1cc:	8004      	strh	r4, [r0, #0]
+ 1ce:	e002      	b.n	1d6 <Led3On+0x6>
+
+000001d0 <Led3On>:
+
+
+// single blink led 3
+void Led3Blink(void) {
+	//IO0CLR_bit.P0_11 = 1;    //on led
+	IOCLR0 = PIO0_LED3;
+	Delay(500000);           //delay
+	//IO0SET_bit.P0_11 = 1;    //off led
+	IOSET0 = PIO0_LED3;
+	//Delay(500000);           //delay
+}
+
+// turn on led 3
+void Led3On(void) {
+	//IO0CLR_bit.P0_11 = 1;    //on led
+	IOCLR0 = PIO0_LED3;
+ 1d0:	4a02      	ldr	r2, [pc, #8]	(1dc <.text+0x1dc>)
+ 1d2:	2380      	movs	r3, #128
+ 1d4:	011b      	lsls	r3, r3, #4
+ 1d6:	6013      	str	r3, [r2, #0]
+}
+ 1d8:	4770      	bx	lr
+ 1da:	0000      	lsls	r0, r0, #0
+ 1dc:	800c      	strh	r4, [r1, #0]
+ 1de:	e002      	b.n	1e6 <Led3Off+0x6>
+
+000001e0 <Led3Off>:
+
+// turn off led 3
+void Led3Off(void) {
+	//IO0SET_bit.P0_11 = 1;    //off led
+	IOSET0 = PIO0_LED3;
+ 1e0:	4a02      	ldr	r2, [pc, #8]	(1ec <.text+0x1ec>)
+ 1e2:	2380      	movs	r3, #128
+ 1e4:	011b      	lsls	r3, r3, #4
+ 1e6:	6013      	str	r3, [r2, #0]
+}
+ 1e8:	4770      	bx	lr
+ 1ea:	0000      	lsls	r0, r0, #0
+ 1ec:	8004      	strh	r4, [r0, #0]
+ 1ee:	e002      	b.n	1f6 <Led1Blink+0x6>
+
+000001f0 <Led1Blink>:
+ 1f0:	2380      	movs	r3, #128
+ 1f2:	4a06      	ldr	r2, [pc, #24]	(20c <.text+0x20c>)
+ 1f4:	005b      	lsls	r3, r3, #1
+ 1f6:	6013      	str	r3, [r2, #0]
+ 1f8:	4b05      	ldr	r3, [pc, #20]	(210 <.text+0x210>)
+ 1fa:	3b01      	subs	r3, #1
+ 1fc:	2b00      	cmp	r3, #0
+ 1fe:	d1fc      	bne.n	1fa <Led1Blink+0xa>
+ 200:	4a04      	ldr	r2, [pc, #16]	(214 <.text+0x214>)
+ 202:	2380      	movs	r3, #128
+ 204:	005b      	lsls	r3, r3, #1
+ 206:	6013      	str	r3, [r2, #0]
+ 208:	4770      	bx	lr
+ 20a:	0000      	lsls	r0, r0, #0
+ 20c:	800c      	strh	r4, [r1, #0]
+ 20e:	e002      	b.n	216 <.text+0x216>
+ 210:	a120      	add	r1, pc, #128	(adr r1,294 <lowInit+0x2c>)
+ 212:	0007      	lsls	r7, r0, #0
+ 214:	8004      	strh	r4, [r0, #0]
+ 216:	e002      	b.n	21e <Led2Blink+0x6>
+
+00000218 <Led2Blink>:
+ 218:	2380      	movs	r3, #128
+ 21a:	4a06      	ldr	r2, [pc, #24]	(234 <.text+0x234>)
+ 21c:	00db      	lsls	r3, r3, #3
+ 21e:	6013      	str	r3, [r2, #0]
+ 220:	4b05      	ldr	r3, [pc, #20]	(238 <.text+0x238>)
+ 222:	3b01      	subs	r3, #1
+ 224:	2b00      	cmp	r3, #0
+ 226:	d1fc      	bne.n	222 <Led2Blink+0xa>
+ 228:	4a04      	ldr	r2, [pc, #16]	(23c <.text+0x23c>)
+ 22a:	2380      	movs	r3, #128
+ 22c:	00db      	lsls	r3, r3, #3
+ 22e:	6013      	str	r3, [r2, #0]
+ 230:	4770      	bx	lr
+ 232:	0000      	lsls	r0, r0, #0
+ 234:	800c      	strh	r4, [r1, #0]
+ 236:	e002      	b.n	23e <.text+0x23e>
+ 238:	a120      	add	r1, pc, #128	(adr r1,2bc <lowInit+0x54>)
+ 23a:	0007      	lsls	r7, r0, #0
+ 23c:	8004      	strh	r4, [r0, #0]
+ 23e:	e002      	b.n	246 <Led3Blink+0x6>
+
+00000240 <Led3Blink>:
+ 240:	2380      	movs	r3, #128
+ 242:	4a06      	ldr	r2, [pc, #24]	(25c <.text+0x25c>)
+ 244:	011b      	lsls	r3, r3, #4
+ 246:	6013      	str	r3, [r2, #0]
+ 248:	4b05      	ldr	r3, [pc, #20]	(260 <.text+0x260>)
+ 24a:	3b01      	subs	r3, #1
+ 24c:	2b00      	cmp	r3, #0
+ 24e:	d1fc      	bne.n	24a <Led3Blink+0xa>
+ 250:	4a04      	ldr	r2, [pc, #16]	(264 <.text+0x264>)
+ 252:	2380      	movs	r3, #128
+ 254:	011b      	lsls	r3, r3, #4
+ 256:	6013      	str	r3, [r2, #0]
+ 258:	4770      	bx	lr
+ 25a:	0000      	lsls	r0, r0, #0
+ 25c:	800c      	strh	r4, [r1, #0]
+ 25e:	e002      	b.n	266 <.text+0x266>
+ 260:	a120      	add	r1, pc, #128	(adr r1,2e4 <sysInit>)
+ 262:	0007      	lsls	r7, r0, #0
+ 264:	8004      	strh	r4, [r0, #0]
+ 266:	e002      	b.n	26e <lowInit+0x6>
+
+00000268 <lowInit>:
+void lowInit( void )
+{
+	// set PLL multiplier & divisor.
+	// values computed from config.h
+	PLLCFG = PLLCFG_MSEL | PLLCFG_PSEL;
+ 268:	4b17      	ldr	r3, [pc, #92]	(2c8 <.text+0x2c8>)
+ 26a:	2223      	movs	r2, #35
+ 26c:	701a      	strb	r2, [r3, #0]
+
+	// enable PLL
+	PLLCON = PLLCON_PLLE;
+ 26e:	2201      	movs	r2, #1
+ 270:	3b04      	subs	r3, #4
+ 272:	701a      	strb	r2, [r3, #0]
+	PLLFEED = 0xAA;      		// Make it happen.  These two updates
+ 274:	4a15      	ldr	r2, [pc, #84]	(2cc <.text+0x2cc>)
+ 276:	2356      	movs	r3, #86
+ 278:	425b      	negs	r3, r3
+ 27a:	7013      	strb	r3, [r2, #0]
+	PLLFEED = 0x55;             // MUST occur in sequence.
+ 27c:	2355      	movs	r3, #85
+ 27e:	7013      	strb	r3, [r2, #0]
+	
+	// setup the PIO0 port pin
+	IOCLR0 = PIO0_ZERO_BITS;                // clear the ZEROs output
+ 280:	4a13      	ldr	r2, [pc, #76]	(2d0 <.text+0x2d0>)
+ 282:	2380      	movs	r3, #128
+ 284:	00db      	lsls	r3, r3, #3
+ 286:	6013      	str	r3, [r2, #0]
+	IOSET0 = PIO0_ONE_BITS;                 // set the ONEs output
+ 288:	2390      	movs	r3, #144
+ 28a:	011b      	lsls	r3, r3, #4
+ 28c:	3a08      	subs	r2, #8
+ 28e:	6013      	str	r3, [r2, #0]
+	IODIR0 = PIO0_OUTPUT_BITS;              // set the output bit direction
+ 290:	23d0      	movs	r3, #208
+ 292:	011b      	lsls	r3, r3, #4
+ 294:	3204      	adds	r2, #4
+ 296:	6013      	str	r3, [r2, #0]
+
+	// wait for PLL lock
+	while ( !(PLLSTAT & PLLSTAT_LOCK ) ) {
+ 298:	4b0e      	ldr	r3, [pc, #56]	(2d4 <.text+0x2d4>)
+ 29a:	881a      	ldrh	r2, [r3, #0]
+ 29c:	2380      	movs	r3, #128
+ 29e:	00db      	lsls	r3, r3, #3
+ 2a0:	4213      	tst	r3, r2
+ 2a2:	d0f9      	beq.n	298 <lowInit+0x30>
+		continue;
+	}
+
+	// enable & connect PLL
+	PLLCON = PLLCON_PLLE | PLLCON_PLLC;
+ 2a4:	4b0c      	ldr	r3, [pc, #48]	(2d8 <.text+0x2d8>)
+ 2a6:	2103      	movs	r1, #3
+ 2a8:	7019      	strb	r1, [r3, #0]
+	PLLFEED = 0xAA;                       // Make it happen.  These two updates
+ 2aa:	4a08      	ldr	r2, [pc, #32]	(2cc <.text+0x2cc>)
+ 2ac:	2356      	movs	r3, #86
+ 2ae:	425b      	negs	r3, r3
+ 2b0:	7013      	strb	r3, [r2, #0]
+	PLLFEED = 0x55;                       // MUST occur in sequence.
+ 2b2:	2355      	movs	r3, #85
+ 2b4:	7013      	strb	r3, [r2, #0]
+	
+	// setup & enable the MAM
+	MAMTIM = MAMTIM_CYCLES;
+ 2b6:	4b09      	ldr	r3, [pc, #36]	(2dc <.text+0x2dc>)
+	MAMCR = MAMCR_FULL;
+ 2b8:	2202      	movs	r2, #2
+ 2ba:	7019      	strb	r1, [r3, #0]
+ 2bc:	3b04      	subs	r3, #4
+ 2be:	701a      	strb	r2, [r3, #0]
+
+	// set the peripheral bus speed
+	// value computed from config.h
+	VPBDIV = VPBDIV_VALUE;                // set the peripheral bus clock speed
+ 2c0:	4b07      	ldr	r3, [pc, #28]	(2e0 <.text+0x2e0>)
+ 2c2:	701a      	strb	r2, [r3, #0]
+}
+ 2c4:	4770      	bx	lr
+ 2c6:	0000      	lsls	r0, r0, #0
+ 2c8:	c084      	stmia	r0!, {r2, r7}
+ 2ca:	e01f      	b.n	30c <.text+0x30c>
+ 2cc:	c08c      	stmia	r0!, {r2, r3, r7}
+ 2ce:	e01f      	b.n	310 <.text+0x310>
+ 2d0:	800c      	strh	r4, [r1, #0]
+ 2d2:	e002      	b.n	2da <.text+0x2da>
+ 2d4:	c088      	stmia	r0!, {r3, r7}
+ 2d6:	e01f      	b.n	318 <__bss_end__>
+ 2d8:	c080      	stmia	r0!, {r7}
+ 2da:	e01f      	b.n	31c <__bss_end__+0x4>
+ 2dc:	c004      	stmia	r0!, {r2}
+ 2de:	e01f      	b.n	320 <__bss_end__+0x8>
+ 2e0:	c100      	stmia	r1!, {}
+ 2e2:	e01f      	b.n	324 <__bss_end__+0xc>
+
+000002e4 <sysInit>:
+
+/******************************************************************************
+ *
+ * Function Name: sysInit()
+ *
+ * Description:
+ *    This function is responsible for initializing the program
+ *    specific hardware
+ *
+ * Calling Sequence: 
+ *    void
+ *
+ * Returns:   
+ *    void
+ *
+ *****************************************************************************/
+void sysInit( void )
+{
+ 2e4:	b500      	push	{lr}
+	lowInit();                            	// setup clocks and processor port pins
+ 2e6:	f7ff ffbf 	bl	268 <lowInit>
+
+	// set the interrupt controller defaults
+#if defined(RAM_RUN)
+	MEMMAP = MEMMAP_SRAM;                 	// map interrupt vectors space into SRAM
+#elif defined(ROM_RUN)
+	MEMMAP = MEMMAP_FLASH;                	// map interrupt vectors space into FLASH
+ 2ea:	4b07      	ldr	r3, [pc, #28]	(308 <.text+0x308>)
+ 2ec:	2201      	movs	r2, #1
+ 2ee:	701a      	strb	r2, [r3, #0]
+#else
+#error RUN_MODE not defined!
+#endif
+	VICIntEnClr = 0xFFFFFFFF;  				// clear all interrupts
+ 2f0:	4a06      	ldr	r2, [pc, #24]	(30c <.text+0x30c>)
+ 2f2:	2301      	movs	r3, #1
+ 2f4:	425b      	negs	r3, r3
+ 2f6:	6013      	str	r3, [r2, #0]
+	VICIntSelect = 0x00000000;           	// clear all FIQ selections
+ 2f8:	4b05      	ldr	r3, [pc, #20]	(310 <.text+0x310>)
+ 2fa:	2200      	movs	r2, #0
+ 2fc:	601a      	str	r2, [r3, #0]
+	VICDefVectAddr = (uint32_t)reset;   	// point unvectored IRQs to reset
+ 2fe:	4a05      	ldr	r2, [pc, #20]	(314 <.text+0x314>)
+ 300:	3328      	adds	r3, #40
+ 302:	601a      	str	r2, [r3, #0]
+
+	//WDTC = 15000000;						// One second = 15000000
+	//WDTV = 0;
+	//WDMOD = WDEN | WDRESET;  				// Activate watchdog
+	//WDFEED = 0xAA; WDFEED = 0x55;
+	
+}
+ 304:	bc01      	pop	{r0}
+ 306:	4700      	bx	r0
+ 308:	c040      	stmia	r0!, {r6}
+ 30a:	e01f      	b.n	34c <__bss_end__+0x34>
+ 30c:	f014 ffff 	bl	1530e <STACK_SIZE+0x14f0e>
+ 310:	f00c ffff 	bl	d312 <STACK_SIZE+0xcf12>
+ 314:	0114      	lsls	r4, r2, #4
+	...

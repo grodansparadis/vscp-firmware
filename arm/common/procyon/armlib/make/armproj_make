@@ -1,0 +1,104 @@
+#----------------------------------------------------------------------------------
+# ARM-GCC standard Makefile
+# This makefile is to be used by including it from a project-specific makefile
+# which defines the source files and compiler/linker options
+#
+# Written by Pascal Stang
+# Based on Volker Oth's AVR makefiles of jan.2000
+# ---------------------------------------------------------------------------------
+
+###### BLOCK 1) define some variables based on the toolchain to be used #######
+
+	CC		= arm-elf-gcc
+	AS		= arm-elf-gcc -x assembler-with-cpp	
+	LD		= arm-elf-gcc
+	RM		= rm -f
+	RN		= mv
+	CP		= cp
+	BIN		= arm-elf-objcopy
+	SIZE	= arm-elf-size
+	INCDIR	= .
+#	LIBDIR	= $(GNUDE)/arm-elf/lib
+	SHELL   = $(GNUDE)/bin/sh.exe
+#	SHELL   = $(AVR)/utils/bin/sh.exe
+
+
+###### BLOCK 2) output format can be srec, ihex (bin is always created) #######
+
+	FORMAT = ihex
+
+
+###### BLOCK 3) define all project specific object files ######
+
+	ARMLIB_ARCH = $(ARMLIB)/arch/$(arch)
+
+	SRC	+= $(addprefix $(ARMLIB)/,$(ARMLIB_SRC))
+	SRC	+= $(addprefix $(ARMLIB)/arch/$(ARCH)/,$(ARMLIB_ARCH_SRC))
+
+	OBJ	= $(ASRC:.s=.o) $(SRC:.c=.o) 
+	CPFLAGS += -mcpu=$(CPU)
+	ASFLAGS += -mcpu=$(CPU)
+#	LDFLAGS += -mcpu=$(CPU)
+  
+###### BLOCK 4) this defines the aims of the make process ######
+
+#all:	$(TRG).obj $(TRG).elf $(TRG).hex  $(TRG).cof $(TRG).eep $(TRG).ok
+all:	$(TRG).bin $(TRG).elf $(TRG).hex $(TRG).ok
+
+
+###### BLOCK 5) compile: instructions to create assembler and/or object files from C source ######
+
+%.o : %.c 
+	$(CC) -c $(CPFLAGS) -I$(INCDIR) $< -o $@
+
+%.s : %.c
+	$(CC) -S $(CPFLAGS) -I$(INCDIR) $< -o $@
+
+
+###### BLOCK 6) assemble: instructions to create object file from assembler files ######
+
+%.o : %.s
+	$(AS) -c $(ASFLAGS) -I$(INCDIR) $< -o $@
+
+
+###### BLOCK 7)  link: instructions to create elf output file from object files ######
+%.elf: $(OBJ)
+	$(LD) $(OBJ) $(LIB) $(LDFLAGS) -o $@
+#	$(CC) $(OBJ) $(LIB) $(LDFLAGS) -o $@
+
+###### BLOCK 8) create binary file from elf output file ######
+
+%.bin: %.elf
+	$(BIN) -O binary $< $@
+
+
+###### BLOCK 9) create hex file from elf output file ######
+
+%.hex: %.elf
+	$(BIN) -O $(FORMAT) $< $@
+
+
+###### BLOCK 10) If all other steps compile ok then echo "Errors: none" ######
+
+%ok:
+	$(SIZE) $(TRG).elf
+	@echo "Errors: none" 
+
+
+###### BLOCK 11)  make instruction to delete created files ######
+
+clean:
+	$(RM) $(OBJ)
+	$(RM) $(SRC:.c=.s)
+	$(RM) $(SRC:.c=.lst)
+	$(RM) $(TRG).map
+	$(RM) $(TRG).elf
+	$(RM) $(TRG).obj
+	$(RM) $(TRG).hex
+	$(RM) $(TRG).bin
+	$(RM) $(TRG).hex
+	@echo "Errors: none"
+	
+size:
+	$(SIZE) $(TRG).elf
+

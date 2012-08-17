@@ -1,0 +1,6 @@
+/** \defgroup pwmsw pwmsw: Software Interrupt-driven Multi-output PWM Function Library
+
+Provides up to 8 channels of PWM output at frequencies up to several hundred hertz.
+\note Works, but not fully completed.
+
+*/

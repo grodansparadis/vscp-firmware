@@ -1,0 +1,2 @@
+ - Check that Node contol startup flags are 01000000 when initialized.
+ - bit five should be set in Node control register for R/W

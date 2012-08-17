@@ -1,0 +1,5 @@
+/** \defgroup driver_arm_aduc7000 Drivers for Analog Devices ADuC7000 ARM Processors
+
+Drivers for Analog Devices ADuC7000 ARM Processors.
+
+*/

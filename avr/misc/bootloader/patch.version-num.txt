@@ -1,0 +1,46 @@
+----------------------------------------------------------------------
+Patch name: patch.version-num
+Author: Bryce Denney <bryce at tlw dot com>
+Date: Thu Feb 28 13:09:41 EST 2002
+
+Detailed description:
+This patch adjusts the reported software and hardware version number 
+for the avr109 code.  The original code returns 1.0 for software version
+and has no response for hardware version.  With the uisp programmer,
+and perhaps others, the software version is used to determine if
+the autoincrement feature is supported by the programmer.  Avr109 does
+support autoincrement, so I needed to increase the reported software
+version number to 2.0 or greater to allow uisp to use autoinc.  I just
+set it to 2.3, which corresponds to the latest version of the avr910
+assembly code from 'http://www.amelek.gda.pl/avr/uisp/at90isp23.asm'.
+
+With this patch, the hardware version command returns 1.0.  Before,
+the hardware version command was unimplemented, causing uisp to abort.
+
+Apply patch to:
+  avr109 code
+Instructions:
+  To patch, unzip the avr109.zip file.
+  All the source files land in the current directory.
+  Type "patch -p1 < THIS_PATCH_FILE" to apply this patch.
+
+Index: main.c
+===================================================================
+RCS file: /usr/src/CVSROOT/designs/avr109/main.c,v
+retrieving revision 1.2.2.4
+diff -u -r1.2.2.4 main.c
+--- main.c	2002/02/28 05:54:29	1.2.2.4
++++ main.c	2002/02/28 17:42:32
+@@ -250,6 +250,12 @@
+         
+         else if (val=='V')                  // Return Software Version
+         {
++          sendchar('2');
++          sendchar('3');
++        }        
++
++        else if (val=='v')                  // Return Hardware Version
++        {
+           sendchar('1');
+           sendchar('0');
+         }        

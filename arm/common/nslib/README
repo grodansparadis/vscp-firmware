@@ -1,0 +1,87 @@
+
+		Netslate - A Handheld Web Browser
+		---------------------------------
+
+    nslib 0.1 - Netslate Development Library
+
+    http://celab21.pc.elec.uq.edu.au/~ben/netslate/nslib-0.1.tar.gz
+
+
+Description:
+
+	This is the README for nslib version 0.1, a library for the ARM7500-
+	based Netslate Development Board.  More information on the Netslate
+	project at the University of Queensland, Australia, is available at:
+
+		http://celab21.pc.elec.uq.edu.au/~ben/netslate/
+	or
+		http://www.elec.uq.edu.au/~marks/
+
+	The files in this distribution build libns-0.1.a, a library of
+	general purpose routines including simple exception handling,
+	interrupt dispatching, heap management, and interfaces to video
+	display, mouse and serial port.
+
+	There is a lot of work to be done on this library before it is
+	really up to scratch, but it has served its purpose for the
+	Netslate project and I hope it can be of use to other people
+	starting out with the ARM7500.
+
+Installation:
+
+	To use this library, you will need the GNU gcc and gas packages,
+	and the semilib library from ARM.  I use gcc 2.6.3 and gas 2.5.2,
+	both configured with arm-semi-aout targets.  Copies of these
+	distributions are available from the same ftp site as nslib, above.
+
+	You will need to edit the Makefile to suit your site.  Note that
+	a small start file crt0.S comes with this library, containing
+	the exception vector table when linking straight to a ROM image.
+	You may not wish to overwrite the crt0.o installed by semilib.  You
+	will probably need to make other arrangements to call the exception
+	handlers if you are using a debug monitor etc.
+
+Usage:
+
+	It goes without saying that this package is written specifically
+	for the Netslate hardware.  Unless you happen to have access to
+	the Netslate prototype (of which there is only one) you will
+	need to make various changes to make the library work with your
+	hardware.
+
+	It is more likely that the various functions and modules will
+	be useful as guides to writing your own code for the ARM7500
+	I/O subsystems.  The thesis report document describes each
+	of the modules and how it works.
+
+Acknowledgements:
+
+	Portions of the serial port and interrupt dispatch modules are
+	based on code from Marco Graziano's port to the ARM600 of
+	Jean Labrosse's uC/OS kernel, available at
+
+		ftp://ftp.cygnus.com/pub/embedded/ucos/
+
+
+
+- Ben Williamson
+  November 1996.
+
+
+
+IMPORTANT:
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+

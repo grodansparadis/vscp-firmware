@@ -1,0 +1,5 @@
+/** \defgroup fat fat: FAT16/32 File System Interface
+
+This FAT16/32 interface allows you to detect and mount FAT16/32 partitions, browse directories and files, and read file data.  The interface is design to operate with the avrlib IDE/ATA driver.  Reading FAT efficiently requires at least 512+ bytes of RAM so this interface may not be suitable for processors with less than 1K of RAM.  This interface will properly follow a file's cluster chain so files need not be defragmented.
+
+*/

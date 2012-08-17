@@ -1,0 +1,115 @@
+----------------------------------------------------------------------
+Patch name: patch.mword-write
+Author: Bryce Denney (bryce@tlw.com)
+Date: Fri Mar  1 15:52:24 EST 2002
+
+Detailed description:
+
+Add a multiword write command to AVR109.  This command is equivalent to 
+doing a series of 'c' and 'C' commands.  Because the speed of code
+download is almost certainly baudrate limited, it pays to reduce the
+overhead of sending 'c' and 'C'.  Also, add a command 'n' which return
+a character 'Y' if multiword write is supported by the programmer.
+Programmers that do not understand multiword write will return '?'
+because they do not understand the 'n' command.
+
+Format of 'M' command:
+  byte 0 is the 'M'
+  byte 1 is the number of words to be written
+  byte 2 is word 0, low byte
+  byte 3 is word 0, low byte
+  byte 4 is word 1, low byte
+  byte 5 is word 1, low byte, etc.
+
+The protocol does not limit the number of words that can be written,
+but for correct programming you must write only one page at a time
+and then issue a page write ('e').
+
+Response to 'M' command:
+  byte 0 is a copy of the length byte
+  byte 1 is the high word of the first address written
+  byte 2 is the low word of the first address written
+  byte 3 is the high word of the last address written + 2
+  byte 4 is the low word of the last address written + 2
+  byte 5 is the character \r
+
+Performance testing:
+
+I measured the time required to program 8K of flash, using different
+baud rates, using several different download methods.  Uisp programmer
+was used in all cases.
+
+                   AVR109         AVR109 w/
+Baud    AVR910     boot loader    multiword
+rate    download   download       patch       Speedup
+------  --------   ----------     ---------   -------
+2400               258.7 sec      46.8 sec     5.5x   
+4800               171.6 sec      24.4 sec     7.0x   
+9600                86.3 sec      12.6 sec     6.8x   
+19200   88.3 sec    86.3 sec       8.0 sec    10.8x
+
+
+Patch was created with:
+  diff -u
+Apply patch to:
+  avr109.zip source code
+Instructions:
+  Type "patch < THIS_PATCH_FILE".
+----------------------------------------------------------------------
+
+Index: main.c
+===================================================================
+RCS file: /usr/src/CVSROOT/designs/avr109/main.c,v
+retrieving revision 1.2.2.7
+diff -u -r1.2.2.7 main.c
+--- main.c	2002/02/28 18:18:04	1.2.2.7
++++ main.c	2002/03/01 18:58:09
+@@ -108,6 +108,48 @@
+           address+=2;  
+           sendchar('\r');
+         }
++
++	else if(val == 'n')                 //Is multiword write supported? yes
++	{
++	  sendchar('Y');
++	}
++
++        else if(val== 'M')                  //Write many words at once
++        {
++	  // Let PGSZ = size of one page of program memory, in words.
++	  // 
++	  // The 'M' is followed by the length byte, which must be
++	  // between 0 and the PGSZ.  The length specifies how many words of
++	  // data will follow.  After the length byte, there must an even
++	  // number of bytes of data:
++	  //   low  byte for address offset 0
++	  //   high byte for address offset 0
++	  //   low  byte for address offset 1
++	  //   high byte for address offset 1, etc.
++	  // There can be between 0 and PGSZ.  The exact number is determined
++	  // from the length byte.  The response sent back to the programmer is
++	  // a copy of the length byte, the address of the first word (2
++	  // bytes), then the address of the last word+2 (2 bytes), then a
++	  // return.
++	  //
++	  // NOTE: The 'M' command is equivalent to a series of 'c' and
++	  // 'C' commands with autoincrementing address.  You still must stop
++	  // at page boundaries and do the page write ('m').
++	  unsigned char i, len = recchar();
++	  unsigned int startaddr = address;
++	  for (i=0; i<len; i++) {
++	    ldata = recchar();
++            data=ldata|(recchar()<<8);
++	    fill_temp_buffer(data,address); //call asm routine. 
++	    address+=2;  
++	  }
++	  sendchar(len);
++	  sendchar(startaddr>>8);
++	  sendchar(startaddr & 0xff);
++	  sendchar(address>>8);
++	  sendchar(address & 0xff);
++          sendchar('\r');
++        }
+         
+         else if(val=='e')                   //Chip erase 
+         {

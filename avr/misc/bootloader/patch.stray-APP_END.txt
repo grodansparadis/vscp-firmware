@@ -1,0 +1,35 @@
+----------------------------------------------------------------------
+Patch name: patch.stray-APP_END
+Author: Bryce Denney (bryce@tlw.com)
+Date: Mon Mar  4 03:32:09 EST 2002
+
+Detailed description:
+In defines.h APP_END is redefined to the wrong value (1024).  With
+APP_END=1024, chip erase only clears addresses 0-0x3ff.  0x400 and beyond are
+not cleared, so they cannot be reprogrammed correctly.
+
+Removing the #define fixes the problem, and chip erase works correctly again.
+
+Patch was created with:
+  diff -u
+Apply patch to:
+  avr109.zip source code
+Instructions:
+  Type "patch < THIS_PATCH_FILE".
+----------------------------------------------------------------------
+
+Index: defines.h
+===================================================================
+RCS file: /usr/src/CVSROOT/designs/avr109/defines.h,v
+retrieving revision 1.1.4.1
+diff -u -r1.1.4.1 defines.h
+--- defines.h	2002/03/01 21:15:02	1.1.4.1
++++ defines.h	2002/03/04 07:55:11
+@@ -95,7 +95,6 @@
+   #ifdef _B512
+     #define APP_PAGES ((2*(unsigned int)8192 / PAGESIZE)- (2*512 / PAGESIZE )) 
+     #define APP_END APP_PAGES * PAGESIZE 
+- #define APP_END 1024
+   #endif
+    #ifdef _B1024
+     #define APP_PAGES ((2*(unsigned int)8192 / PAGESIZE)- (2*1024 / PAGESIZE )) 

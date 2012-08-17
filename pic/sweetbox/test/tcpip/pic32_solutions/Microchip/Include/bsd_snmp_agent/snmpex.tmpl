@@ -1,0 +1,199 @@
+/********************************************************************
+ * FileName:		SNMPEx.h		
+ * Dependencies:
+ * Processor:				
+ * Hardware:		
+ * Assembler:		
+ * Linker:		
+ * Company:		Microchip Technology, Inc.
+ *
+ * Software License Agreement:
+ * The software supplied herewith by Microchip Technology Incorporated
+ * (the “Company”) for its PICmicro® Microcontroller is intended and
+ * supplied to you, the Company’s customer, for use solely and
+ * exclusively on Microchip PICmicro Microcontroller products. The
+ * software is owned by the Company and/or its supplier, and is
+ * protected under applicable copyright laws. All rights are reserved.
+ * Any use in violation of the foregoing restrictions may subject the
+ * user to criminal sanctions under applicable laws, as well as to
+ * civil liability for the breach of the terms and conditions of this
+ * license.
+ *
+ * THIS SOFTWARE IS PROVIDED IN AN “AS IS” CONDITION. NO WARRANTIES,
+ * WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
+ * TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
+ * IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
+ * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+ *
+ *********************************************************************
+ * File Description:
+ *
+ * HTTP Server Appilcation
+ *
+ * Change History:
+ * Name				Date            Changes
+ * Sean Justice		02/21/06		Initial Version
+ ********************************************************************/
+#ifndef _SNMP_EX_HEADER
+#define _SNMP_EX_HEADER
+
+#include <plib.h>
+
+#define MICROCHIP				(255)		// This is an Agent ID for use in SNMPNotify() only.
+#define SYS_UP_TIME				(250)		// 43.6.1.2.1.1.3: READONLY TIME_TICKS.
+#define TRAP_RECEIVER_ID		(1)			// 43.6.1.4.1.17095.2.1.1.1: READWRITE BYTE.
+#define TRAP_RECEIVER_ENABLED	(2)			// 43.6.1.4.1.17095.2.1.1.2: READWRITE BYTE.
+#define TRAP_RECEIVER_IP		(3)			// 43.6.1.4.1.17095.2.1.1.3: READWRITE IP_ADDRESS.
+#define TRAP_COMMUNITY			(4)			// 43.6.1.4.1.17095.2.1.1.4: READWRITE ASCII_STRING.
+#define LED_D5					(5)			// 43.6.1.4.1.17095.3.1: READWRITE BYTE.
+#define LED_D6					(6)			// 43.6.1.4.1.17095.3.2: READWRITE BYTE.
+#define PUSH_BUTTON				(7)			// 43.6.1.4.1.17095.3.3: READONLY BYTE.
+#define ANALOG_POT0				(8)			// 43.6.1.4.1.17095.3.4: READONLY WORD.
+#define ANALOG_POT1				(9)			// 43.6.1.4.1.17095.3.5: READONLY WORD.
+#define LCD_DISPLAY				(10)		// 43.6.1.4.1.17095.3.6: READWRITE ASCII_STRING.
+
+#ifndef LCD_DISPLAY_LEN
+#define LCD_DISPLAY_LEN			(16)
+#endif
+
+#define TRAP_TABLE_SIZE         (2)
+
+#ifndef _WINDOWS
+#define mSetupLed5()            mPORTAOutputConfig(IOPORT_BIT_2)
+#define mGetLed5()              (mPORTAReadLatchBit(IOPORT_BIT_2) == IOPORT_BIT_2)
+#define mSetLed5()              mPORTASetBits(IOPORT_BIT_2)
+#define mClearLed5()            mPORTAClearBits(IOPORT_BIT_2)
+
+#define mSetupLed6()            mPORTAOutputConfig(IOPORT_BIT_3)
+#define mGetLed6()              (mPORTAReadLatchBit(IOPORT_BIT_3) == IOPORT_BIT_3)
+#define mSetLed6()              mPORTASetBits(IOPORT_BIT_3)
+#define mClearLed6()            mPORTAClearBits(IOPORT_BIT_3)
+
+#define mSetupSwitch3()         mPORTDInputConfig(IOPORT_BIT_6)
+#define mGetSwitch3()           (mPORTDReadBit(IOPORT_BIT_6) == IOPORT_BIT_6)
+#endif
+
+
+typedef struct _TRAP_INFO
+{
+    BYTE Size;
+    struct
+    {
+        BYTE communityLen;
+        char community[SNMP_COMMUNITY_MAX_LEN];
+        IP_ADDR IPAddress;
+        struct
+        {
+            unsigned int bEnabled : 1;
+        } Flags;
+    } table[TRAP_TABLE_SIZE];
+} TRAP_INFO;
+
+/*********************************************************************
+ * Function:       PUBLIC void SNMPProcessIO(void)
+ *
+ * PreCondition:    None
+ *
+ * Input:           None
+ *
+ * Output:          None
+ *
+ * Side Effects:    None
+ *
+ * Overview:        This functions handles SNMP example variables
+ **********************************************************************/
+PUBLIC void SNMPProcessIO(void);
+/*********************************************************************
+ * Function:       PUBLIC BOOL SNMPGetVar(	SNMP_ID id, 
+ *											BYTE index, 
+ *											BYTE *ref, 
+ *											SNMP_VAL *value)
+ *
+ * PreCondition:    None
+ *
+ * Input:           id			- id of the variable
+ *					index		- index if multipul estances
+ *					ref			- pointer to the callback times
+ *					value		- return value
+ *
+ * Output:          true if processed, else false
+ *
+ * Side Effects:    none
+ *
+ * Overview:        This gets requested information from the SNMP
+ *					manager.
+ ********************************************************************/
+PUBLIC BOOL SNMPGetVar(SNMP_ID id, BYTE index, BYTE *ref, SNMP_VAL *value);
+/*********************************************************************
+ * Function:       PUBLIC BOOL SNMPGetNextIndex(BYTE id, BYTE *index)
+ *
+ * PreCondition:    None
+ *
+ * Input:           id		- id of varible
+ *					index	- pointer of the current index
+ *
+ * Output:          true if processed, else false
+ *
+ * Side Effects:    None
+ *
+ * Overview:        This function get the next id from the current one.
+ *					If there is no other index, than it returns FALSE
+ ********************************************************************/
+PUBLIC BOOL SNMPGetNextIndex(BYTE id, BYTE *index);
+/*********************************************************************
+ * Function:		PUBLIC BOOL SNMPSetVar(	BYTE id, 
+ *											BYTE index, 
+ *											BYTE reference, 
+ *											SNMP_VAL value)       
+ *
+ * PreCondition:    None
+ *
+ * Input:           id			- id of the variable
+ *					index		- index if multipul estances
+ *					ref			- pointer to the callback times
+ *					value		- return value
+ *
+ * Output:          true if processed, else false
+ *
+ * Side Effects:    none
+ *
+ * Overview:        This sets requested information from the SNMP
+ *					manager.
+ ********************************************************************/
+PUBLIC BOOL SNMPSetVar(BYTE id, BYTE idx, BYTE reference, SNMP_VAL value);
+/*********************************************************************
+ * Function:		PUBLIC BOOL SNMPIsValidSetLen(BYTE id, BYTE length) 
+ *
+ * PreCondition:    None
+ *
+ * Input:           id			- id of the variable
+ *					length		- length in question
+ *
+ * Output:          true if the length is valid, else false
+ *
+ * Side Effects:    None
+ *
+ * Overview:        This function checks the length based on the id
+ ********************************************************************/
+PUBLIC BOOL SNMPIsValidSetLen(BYTE id, BYTE length);
+/*********************************************************************
+ * Function:       PUBLIC BOOL SNMPValidate(	SNMP_ACTION pdu, 
+ *												BYTE *community)
+ *
+ * PreCondition:    None
+ *
+ * Input:           pdu			- protocol data unit
+ *					community	- string of the community
+ *
+ * Output:          true if pdu and community are valid, else false
+ *
+ * Side Effects:    None
+ *
+ * Overview:        This function checks the PDU and community of the 
+ *					request to make sure that it is valid
+ ********************************************************************/
+PUBLIC BOOL SNMPValidate(SNMP_ACTION pdu, BYTE *community);
+
+#endif
+

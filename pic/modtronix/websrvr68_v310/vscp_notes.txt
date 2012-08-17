@@ -1,0 +1,4 @@
+This code has been changed to handle VSCP raw Ethernet frames
+
+This code is in arp.c (at the bottom) and in mac.c.  It will notify an incoming VSCP raw ethernet frame but do 
+nothing with it and it will send out frames periodically.  

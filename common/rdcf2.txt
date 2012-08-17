@@ -1,0 +1,5005 @@
+This file is a concatenation of the following files:
+
+     name and extension  description
+     ------------------  ------------------------------------------------
+     RDCF2.DOC           Documentation for Reentrant DOS-Compatible Files
+     RDCF2.H             Header for Reentrant DOS-Compatible Files
+     RDCF2.C             Source code for Reentrant DOS-Compatible Files
+     CACHE.DOC           Documentation for Reentrant DOS-Compatible Files
+     CACHE.H             Header for Reentrant DOS-Compatible Files
+     CACHE.C             Source code for Reentrant DOS-Compatible Files
+     FILES.DOC           Documentation for Files utility
+     FILES.C             Source code for Files utility
+
+=============================== CACHE.C      ===============================
+
+/* Reentrant Cache System 1.1 */
+
+#include "cache.h"
+#include <alloc.h>
+#include <mem.h>
+
+enum buffer_status {EMPTY, CLEAN, DIRTY};
+
+static unsigned access(struct cache *q, int write, struct cache_block *b)
+{
+  unsigned e = (*q->drive_access)(write, b->drive, b->sector, b->data);
+  if (e!=0)
+  {
+    q->error_sector = b->sector;
+    q->error_drive = b->drive;
+  }
+  return e;
+}
+
+unsigned cache_access(struct cache *q, int write, unsigned drive,
+  unsigned sector, void *buffer)
+{
+  struct
+  {
+    struct cache_block *previous;
+    struct cache_block *current;
+  } b, empty, clean, dirty;
+  /* find the matching block, and also the first empty, clean and dirty  */
+  /* blocks, all with a single pass through the list                     */
+  b.previous = empty.current = clean.current = dirty.current = NULL;
+  b.current = q->first;
+  do
+  {
+    if (b.current->status == EMPTY)
+    {
+      if (empty.current == NULL) empty = b;
+    }
+    else if (b.current->sector == sector && b.current->drive == drive)
+      break;
+    else
+    {
+      if (b.current->status == CLEAN)
+      {
+        if (clean.current == NULL) clean = b;
+      }
+      else if (dirty.current == NULL) dirty = b;
+    }
+    b.previous = b.current;
+    b.current = b.current->next;
+  } while (b.current != NULL);
+  /* if there is no matching block, assign one according to the rules */
+  if (b.current == NULL)
+  {
+    if (empty.current != NULL) {b = empty; q->empty--;}
+    else if (clean.current != NULL) {b = clean; q->clean--;}
+    else
+    {
+      unsigned e;
+      b = dirty;
+      e = access(q, 1, b.current);
+      if (e) return e;
+      q->dirty--;
+    }
+    b.current->status = EMPTY;
+    b.current->sector = sector;
+    b.current->drive = drive;
+    q->empty++;
+  }
+  if (write)
+  {
+    if (b.current->status == EMPTY) {q->empty--; q->dirty++;}
+    else if (b.current->status == CLEAN) {q->clean--; q->dirty++;}
+    memcpy(b.current->data, buffer, q->sector_size);
+    b.current->status = DIRTY;
+  }
+  else 
+  {
+    if (b.current->status == EMPTY)
+    {
+      unsigned e = access(q, 0, b.current);
+      if (e) return e;
+      q->empty--;
+      q->clean++;
+      b.current->status = CLEAN;
+    }
+    memcpy(buffer, b.current->data, q->sector_size);
+  }
+  /* put block at the end of the line */
+  if (b.current != q->last)
+  {
+    if (b.previous == NULL) q->first = b.current->next;
+    else b.previous->next = b.current->next;
+    q->last->next = b.current;
+    b.current->next = NULL;
+    q->last = b.current;
+  }
+  return 0;
+}
+
+unsigned cache_flush_and_or_clear(struct cache *q, int drive, int options)
+{
+  unsigned return_value = 0;
+  struct cache_block *b;
+  for (b=q->first; b!=NULL; b=b->next)
+  {
+    if (drive<0 || b->drive==drive)
+    {
+      if (options&CACHE_FLUSH && b->status==DIRTY)
+      {
+        unsigned e = access(q, 1, b);
+        if (e) return_value = e;
+        b->status = CLEAN;
+        q->dirty--;
+        q->clean++;
+      }
+      if (options&CACHE_CLEAR)
+      {
+        if (b->status == CLEAN)
+        {
+          q->clean--;
+          q->empty++;
+        }
+        else if (b->status == DIRTY)
+        {
+          q->dirty--;
+          q->empty++;
+        }
+        b->status = EMPTY;
+      }
+    }
+  }
+  return return_value;
+}
+
+void cache_free(struct cache *q)
+{
+  struct cache_block *b = q->first;
+  while (b!=NULL)
+  {
+    struct cache_block *next = b->next;
+    free(b);
+    b = next;
+  }
+  free(q);
+}
+
+struct cache *cache_initialize(unsigned (*drive_access)(int, unsigned,
+  unsigned, void *), unsigned number_of_sectors, unsigned sector_size)
+{
+  struct cache *q = malloc(sizeof(struct cache));
+  if (q!=NULL)
+  {
+    struct cache_block *b;
+    q->empty = number_of_sectors;
+    b = q->first = malloc(sizeof(struct cache_block)+sector_size-1);
+    while (1)
+    {
+      if (b==NULL)
+      {
+        cache_free(q);
+        return NULL;
+      }
+      b->status = EMPTY;
+      if (--number_of_sectors == 0) break;
+      b = b->next = malloc(sizeof(struct cache_block)+sector_size-1);
+    }
+    b->next = NULL;
+    q->last = b;
+    q->drive_access = drive_access;
+    q->sector_size = sector_size;
+    q->clean = q->dirty = 0;
+  }
+  return q;
+}
+
+
+=============================== CACHE.DOC    ===============================
+
+                    A Simple Reentrant Cache System
+                             Version 1.1
+
+                       by Philip J. Erdelsky
+                            pje@acm.org
+
+                        September 15, 1992
+
+               PUBLIC DOMAIN -- NO RESTRICTIONS ON USE
+
+0. What's New
+-------------
+
+The following features were not in version 1.0:
+
+  (1) The cache system keeps track of the number of empty, clean and dirty
+      sectors.
+
+  (2) When flushing the cache, the cache system does not quit on the first
+      error. It continues flushing.
+
+1. Introduction
+---------------
+
+Many applications that use disks tend to read and write the same sectors
+repeatedly. A technique called caching can make such applications run much
+faster. With this technique, frequently used sectors are read into memory
+buffers when the application begins. The application then reads and writes the
+memory buffers. When the application terminates, the buffers are written to
+the disk. Since reading and writing memory buffers is much faster than reading
+or writing disk sectors, the application can run much faster. There are some
+problems with caching. For example, it can be difficult to determine which
+sectors will be used frequently. However, the technique is widely used because
+the improvement is often quite substantial.
+
+This cache system is a simple one, designed to be placed between the Reentrant
+DOS-Compatible File System (RDCF) and a disk driver.
+
+A single cache can be used for two or more drives, as long as they all have
+the same sector size. The cache system is not reentrant with respect to
+different drives in this case, so access to it must be serialized.
+
+The cache system can handle as many separate caches as available memory
+permits. It is fully reentrant with respect to different caches. However,
+separate caches may not access the same drive.
+
+The cache system calls the standard C functions malloc() and free() when a
+cache is being initialized or freed, so reentrancy of those functions is
+required at those times. However, it does no memory allocation or deallocation
+at other times.
+
+The number of sectors in the cache and the size of each sector are determined
+at run time and need not be the same for all caches. The only limit to the
+number of sectors in the cache is available memory. A cached sector need not
+correspond to a single sector on disk, but it must be treated as such by
+functions that call and are called by the cache system.
+
+Each cache can handle up to 32,768 drives, numbered from 0 to 32,767, and up to
+65,536 sectors on each drive, numbered from 0 to 65,535. The use of larger
+numbers will produce numeric overflow and catastrophic failure. Drive numbers
+and sector numbers need not be consecutive.
+
+No cache system can be optimal in every conceivable case, no matter how
+cleverly it is programmed. This cache system uses one of the simplest methods,
+and it is apparently adequate for some purposes. You are welcome to make your
+own improvements, but you must assume responsibility for the results if you
+make a mistake.
+
+In this cache system, each cached sector may exist in any of three states:
+
+     (1) An EMPTY sector bears no relation to any disk sector.
+
+     (2) A CLEAN sector contains the same data as the corresponding disk
+         sector.
+
+     (3) A DIRTY sector contains data which is to be written to the
+         corresponding disk sector but has not yet been written.
+
+The cache system attempts to keep each sector in the cache as long as it can,
+and it uses the least-recently-used criterion when cached sectors must be
+reused. The process is explained in greater detail in Section 4.
+
+The source code for the cache system consists of the file CACHE.C and the
+header file CACHE.H. The latter should be #included in any source file that
+calls on the cache system, because it contains prototypes for all cache
+functions and other necessary information.
+
+The cache system calls on the following standard C functions:
+
+     malloc()
+     free()
+     memcpy()
+
+To prevent identifier conflicts, all publicly defined identifiers in the cache
+system begin with the characters "cache", "CACHE" or "_CACHE".
+
+
+2. How the Cache Reads and Writes a Sector
+------------------------------------------
+
+The cache system does not read or write the disk directly. You must provide it
+with a pointer to a function that you have written for your implementation. The
+cache system then calls this function whenever it needs to read or write a disk
+sector. The format of the function call is as follows:
+
+     e = (*drive_access)(write, drive, sector, buffer);
+
+     int write;        nonzero (true) for a write operation; zero (false)
+                       for a read operation
+
+     unsigned drive;   drive to be read or written
+
+     unsigned sector;  sector to be read or written
+
+     void *buffer;     address of memory buffer to receive or supply data
+
+     unsigned e;       zero for a successful operation, or an
+                       implementation-defined nonzero error code
+
+When the cache receives a nonzero value from this function, it aborts the cache
+operation and returns the value as its own functional value. The cache control
+block contains the drive and sector numbers of the offending operation in the
+members error_drive and error_sector, respectively. This is especially helpful
+for diagnostic purpose, because the error almost always occurs in a sector
+other than the one currently being accessed by the application.
+
+
+3. Creating and Initializing a Cache
+------------------------------------
+
+The following function call creates and initializes a cache:
+
+     q = cache_initialize(drive_access, number_of_sectors, sector_size);
+
+     unsigned (*drive_access)();  pointer to function called by cache
+                                  to read or write a sector
+
+     unsigned number_of_sectors;  number of sectors to be stored in cache
+                                  (must be at least 1)
+
+     unsigned sector_size;        number of bytes in a sector (1-65,535)
+
+     struct cache *q;             pointer to cache control block, or NULL
+                                  if there was insufficient memory
+
+The function calls on malloc() to allocate memory for the cache storage. If
+malloc() returns NULL at any point in the process, the function calls free()
+to release any memory that it has allocated and returns a NULL pointer.
+Otherwise, it returns a pointer that can be passed to other cache functions.
+It marks all sectors in the cache as empty.
+
+A sector size near the upper limit of 65,535 may cause numeric overflow and
+catastrophic failure if the implementation does not permit allocation of single
+objects larger than 65,535 bytes.
+
+
+4. Reading or Writing Through the Cache
+---------------------------------------
+
+The heart of the cache system is the following function call:
+
+     e = cache_access(q, write, drive, sector, buffer);
+
+     struct cache *q;  pointer to cache control block received from
+                       cache_initialize()
+
+     int write;        nonzero (true) for a write operation; zero (false)
+                       for a read operation
+
+     unsigned drive;   drive to be read or written
+
+     unsigned sector;  sector to be read or written
+
+     void *buffer;     address of memory buffer to receive or supply data
+
+     unsigned e;       zero for a successful operation, or an
+                       implementation-defined nonzero error code
+
+This function writes or reads the specified sector to or from the specified
+drive, using the cache as follows:
+
+    (1) If the specified sector is not already in the cache, a cache sector
+        is assigned to it as follows:
+
+         (a) If there are still empty sectors in the cache, one of them is
+             assigned to the specified sector.
+
+         (b) If there are no empty sectors, but there are some clean ones,
+             the least-recently used clean sector is marked as empty and
+             assigned to the specified sector.
+
+         (c) In other cases, the least-recently used dirty sector is written
+             to disk, marked as empty, and assigned to the specified sector.
+
+     (2) When reading,
+
+         (a) If the sector is empty, it is read from the disk and marked as
+             clean.
+
+         (b) The sector is then copied from the cache to the calling program's
+             buffer.
+
+     (3) When writing, the calling program's buffer is copied to the cache and
+         the sector is marked as dirty. IT IS NOT WRITTEN TO DISK.
+
+     (4) The sector is marked as the most recently used.
+
+If an error is detected on an actual disk access, this function aborts the
+operation, puts the drive and sector numbers of the offending sector into
+q->error_drive and q->error sector, and returns the implementation-defined
+nonzero error code passed to it by (*drive_access)(). Otherwise, it returns
+zero.
+
+
+5. Flushing the Cache
+---------------------
+
+Before a disk can be changed or removed, the dirty sectors must be written out.
+The following function call does that, either for a specified drive or for all
+drives:
+
+     e = cache_flush(q, drive);
+
+     struct cache *q;  pointer to cache control block received from
+                       cache_initialize()
+
+     int drive;        drive to be flushed; if drive<0, all drives are
+                       flushed
+
+     unsigned e;       zero for a successful operation, or an
+                       implementation-defined nonzero error code
+
+If the drive number is nonnegative, this function writes all dirty sectors to
+the specified drive and marks them as clean. Sectors on other drives are not
+affected. If the drive number is negative, it writes all dirty sectors to all
+drives and marks them as clean.
+
+The sectors are not written in any specified order, and their usage order is
+not changed.
+
+If an error is detected while writing a sector, this function puts the drive
+and sector numbers of the offending sector into q->error_drive and q->error
+sector, and saves the implementation-defined nonzero error code passed to it by
+(*drive_access)(). Then in continues flushing. When it has finished flushing,
+it returns an error code, if any was received. Otherwise, it returns zero. If
+more than one error was detected, it returns last error code, drive and sector.
+
+This function is implemented as a macro which generates a call on the function
+cache_flush_and_or_clear().
+
+
+6. Clearing the Cache
+---------------------
+
+After a disk is changed, the cached sectors on that drive become invalid. The
+following function call informs the cache system of that fact:
+
+     cache_clear(q, drive);
+
+     struct cache *q;  pointer to cache control block received from
+                       cache_initialize()
+
+     int drive;        drive to be cleared; if drive<0, all drives are
+                       cleared
+
+If the drive number is nonnegative, this function marks all cached sectors on
+the specified drive as empty. Sectors on other drives are not affected. If the
+drive number is negative, it marks all cached sectors on all drives as empty.
+
+THIS FUNCTION DOES NOT WRITE THE CACHED SECTORS TO DISK, EVEN IF THEY ARE
+DIRTY.
+
+This function is implemented as a macro which generates a call on the function
+cache_flush_and_or_clear().
+
+ 
+7. Flushing and Clearing the Cache
+----------------------------------
+
+Before a disk can be changed and removed, the dirty sectors must be written
+out, and the cached sectors on the drive must be marked as invalid. The
+following function call does that, either for a specified drive or for all
+drives:
+
+     e = cache_flush_and_clear(q, drive);
+
+     struct cache *q;  pointer to cache control block received from
+                       cache_initialize()
+
+     int drive;        drive to be flushed and cleared; if drive<0, all
+                       drives are flushed and cleared
+
+     unsigned e;       zero for a successful operation, or an
+                       implementation-defined nonzero error code
+
+If the drive number is nonnegative, this function first finds all sectors
+assigned to the specified drive. It writes the dirty sectors to the specified
+drive and then marks both clean and dirty sectors as empty. Sectors on other
+drives are not affected. If the drive number is negative, it does the same
+thing to all sectors on all drives.
+
+The sectors are not written in any specified order.
+
+If an error is detected while writing a sector, this function puts the drive
+and sector numbers of the offending sector into q->error_drive and q->error
+sector, and saves the implementation-defined nonzero error code passed to it by
+(*drive_access)(). Then in continues flushing. When it has finished flushing,
+it returns an error code, if any was received. Otherwise, it returns zero. If
+more than one error was detected, it returns last error code, drive and sector.
+
+This function is equivalent to calls on cache_flush() and cache_clear(), but it
+is more efficient because it makes only a single pass through the cache.
+
+This function is implemented as a macro which generates a call on the function
+cache_flush_and_or_clear().
+
+
+8. Freeing the Cache
+--------------------
+
+The following function calls free() to release all memory allocated for a
+cache:
+
+     cache_free(q);
+
+     struct cache *q;  pointer to cache control block received from
+                       cache_initialize()
+
+
+9. Sector Counts
+----------------
+
+The following cache control block members contain the current numbers of empty,
+clean and dirty sectors in the cache:
+
+     unsigned q->empty;   number of empty sectors in cache
+     unsigned q->clean;   number of clean sectors in cache
+     unsigned q->dirty;   number of dirty sectors in cache
+
+     struct cache *q;    pointer to cache control block received from
+                         cache_initialize()
+
+In some applications you may want to use these numbers to decide when to flush
+the cache.
+
+                       
+
+=============================== CACHE.H      ===============================
+
+/* Reentrant Cache System 1.1 */
+
+#ifndef _CACHE
+#define _CACHE
+
+struct cache_block
+{
+  struct cache_block *next;
+  unsigned short sector;
+  unsigned char drive;
+  unsigned char status;
+  unsigned char data[1];
+};
+
+struct cache
+{
+  unsigned short error_sector;
+  unsigned short error_drive;
+  unsigned short sector_size;
+  unsigned (*drive_access)(int, unsigned, unsigned, void *);
+  struct cache_block *first;
+  struct cache_block *last;
+  unsigned empty;
+  unsigned clean;
+  unsigned dirty;
+};
+
+#define CACHE_FLUSH (1<<0)
+#define CACHE_CLEAR (1<<1)
+
+struct cache *cache_initialize(unsigned (*)(int, unsigned, unsigned, void *),
+  unsigned, unsigned);
+unsigned cache_access(struct cache *, int, unsigned, unsigned, void *);
+unsigned cache_flush_and_or_clear(struct cache *, int, int);
+void cache_free(struct cache *);
+
+#define cache_flush(q,d) cache_flush_and_or_clear(q,d,CACHE_FLUSH)
+#define cache_clear(q,d) cache_flush_and_or_clear(q,d,CACHE_CLEAR)
+#define cache_flush_and_clear(q,d) \
+  cache_flush_and_or_clear(q,d,CACHE_FLUSH+CACHE_CLEAR)
+
+#endif
+
+
+=============================== FILES.C      ===============================
+
+/* example of file access with RDCF 2.0 and CACHE 1.1 */
+/* public domain - no restrictions on use */
+/* Philip J. Erdelsky - January 15, 1993 */
+
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+#include <process.h>
+#include <dos.h>
+#include <io.h>
+#include <alloc.h>
+#include "rdcf2.h"
+#include "cache.h"
+
+static unsigned drive_access(int write, unsigned drive, unsigned LSN,
+  void *buffer)
+{
+  _SI; _DI;
+  return write ? abswrite(drive, 1, LSN, buffer) :
+    absread(drive, 1, LSN, buffer);
+}
+
+struct cache *cache;
+
+static unsigned cached_drive_access(int write, unsigned drive,
+  unsigned sector, void *buffer)
+{
+  return write && drive > 1 ? 1 :
+    cache_access(cache, write, drive, sector, buffer);
+}
+
+static char *ERROR_MESSAGE[] =
+{
+  "NO ERROR           ",
+  "ACCESS DENIED      ",
+  "DIRECTORY CONFLICT ",
+  "DIRECTORY FULL     ",
+  "DISK FORMAT ERROR  ",
+  "DRIVE ERROR        ",
+  "FILE FORMAT ERROR  ",
+  "INVALID DIRECTORY  ",
+  "INVALID SPEC       ",
+  "MODE ERROR         ",
+  "FILE NOT FOUND     ",
+  "RENAMING ERROR     ",
+  "SEEK OUT OF RANGE  ",
+  "UNRECOVERABLE FILE "
+};
+
+static char HELP[] =
+  "  COPY     source  destination\n"
+  "  DATE     file  month-day-year  hour:min:sec\n"
+  "  DEL      file\n"
+  "  DIR      directory\n"
+  "  DIRSORT  directory\n"
+  "  EXIT\n"
+  "  HELP\n"
+  "  MD       directory\n"
+  "  MCOPY    files directory\n"
+  "  MOVE     source  destination\n"
+  "  RECOVER  file\n"
+  "  REN      old  new\n"
+  "  TYPE     file\n"
+  "  UNDEL    file\n"
+  "  VOLUME   name\n"
+  "  WIPE     drive\n";
+
+static void rdcf_error_message(int n)
+{
+  if (n == RDCF_DRIVE_ERROR)
+    printf("DRIVE ERROR ON DRIVE %c:\n", cache->error_drive + 'A');
+  else
+    puts(ERROR_MESSAGE[-n]);
+}
+
+static void disk_write_error(void)
+{
+  printf("Disk write error on drive %c:\n", cache->error_drive + 'A');
+}
+
+void rdcf_get_date_and_time(struct rdcf_date_and_time *p)
+{
+  struct date d;
+  struct time t;
+  int day;
+  getdate(&d);
+  day = d.da_day;
+  gettime(&t);
+  getdate(&d);
+  if (day != d.da_day) gettime(&t);
+  p->month = d.da_mon;
+  p->day = d.da_day;
+  p->year = d.da_year;
+  p->hour = t.ti_hour;
+  p->minute = t.ti_min;
+  p->second = t.ti_sec;
+}
+
+static unsigned char scratch_buffer[RDCF_SECTOR_SIZE];
+struct rdcf f = {scratch_buffer, cached_drive_access};
+struct rdcf g = {scratch_buffer, cached_drive_access};
+static char buffer[1024];
+
+static void three_numbers(char *s, unsigned *n1, unsigned *n2, unsigned *n3)
+{
+  if (isdigit(*s))
+  {
+    *n1 = 0;
+    do *n1 = 10 * (*n1) + *s++ - '0'; while (isdigit(*s));
+  }
+  if (*s != 0) s++;
+  if (isdigit(*s))
+  {
+    *n2 = 0;
+    do *n2 = 10 * (*n2) + *s++ - '0'; while (isdigit(*s));
+  }
+  if (*s != 0) s++;
+  if (isdigit(*s))
+  {
+    *n3 = 0;
+    do *n3 = 10 * (*n3) + *s++ - '0'; while (isdigit(*s));
+  }
+}
+
+
+static int break_flag;
+
+static void interrupt Ctrl_C_handler() {break_flag = 1;}
+
+static int copy(char *source, char *destination)
+{
+  if (rdcf_open(&f, source, RDCF_READ))
+  {
+    rdcf_error_message(f.result);
+    return 0;
+  }
+  if (rdcf_open(&g, destination, RDCF_CREATE))
+  {
+    rdcf_error_message(g.result);
+    return 0;
+  }
+  while (!break_flag)
+  {
+    int n = rdcf_read(&f, buffer, sizeof(buffer));
+    if (n<0)
+    {
+      rdcf_error_message(n);
+      return 0;
+    }
+    if (n==0) break;
+    n = rdcf_write(&g, buffer, n);
+    if (n<0)
+    {
+      rdcf_error_message(n);
+      return 0;
+    }
+    if (n==0) break;
+  }
+  rdcf_close(&f);
+  rdcf_close(&g);
+  rdcf_date_and_time(&g, destination, &f.file.date_and_time);
+  return 1;
+}
+
+static char *directory_and_specs(char *directory, char *specs)
+{
+  static char s[82];
+  char *p = s;
+  int c;
+  while (*directory != 0) c = *p++ = *directory++;
+  if (c != ':') *p++ = '\\';
+  strcpy(p, specs);
+  return s;
+}
+
+static void command(void)
+{
+  char *arg[4];
+  {
+    static struct
+    {
+      unsigned char capacity;
+      unsigned char count;
+      char text[70];
+    } buffer = {sizeof(buffer.text), 0, '\r'};
+    static char buffer2[sizeof(buffer.text)];
+    unsigned i;
+    register char *p;
+    fputs("FILES>", stdout);
+    bdos(10, (unsigned)(&buffer), 0);
+    bdos(2, '\n', 0);
+    for (i=0, p=buffer2; i<buffer.count; i++)
+      *p++ = toupper(buffer.text[i]);
+    *p = 0;
+    p = buffer2;
+    for (i=0; i<4; i++)
+    {
+      while (*p==' ' || *p=='\t') p++;
+      arg[i] = p;
+      while (*p!=' ' && *p!='\t' && *p!=0) p++;
+      if (*p!=0) *p++ = 0;
+    }
+  }
+  if (strcmp(arg[0],"COPY")==0)
+  {
+    break_flag = 0;
+    copy (arg[1], arg[2]);
+  }
+  else if (strcmp(arg[0],"DATE")==0)
+  {
+    unsigned month = 1;
+    unsigned day = 1;
+    unsigned year = 1980;
+    unsigned hour = 0;
+    unsigned minute = 0;
+    unsigned second = 0;
+    struct rdcf_date_and_time d;
+    three_numbers(arg[2], &month, &day, &year);
+    d.month = month;
+    d.day = day;
+    if (80 <= year && year <= 99) year += 1900;
+    else if (year < 70) year += 2000;
+    d.year = year;
+    three_numbers(arg[3], &hour, &minute, &second);
+    d.hour = hour;
+    d.minute = minute;
+    d.second = second;
+    if (rdcf_date_and_time(&f, arg[1], &d) != 0)
+    {
+      rdcf_error_message(f.result);
+      return;
+    }
+  }
+  else if (strcmp(arg[0],"DEL")==0)
+  {
+    if (rdcf_delete(&f, arg[1]) != 0)
+    {
+      rdcf_error_message(f.result);
+      return;
+    }
+  }
+  else if (strcmp(arg[0],"DIR")==0)
+  {
+    static char drive[] = "X:";
+		struct
+		{
+      struct
+      {
+        unsigned current;
+        unsigned deleted;
+      } file, directory, volume;
+		} count;
+		memset(&count, 0, sizeof(count));
+    break_flag = 0;
+    if (rdcf_get_file_information(&f, arg[1], 0) != RDCF_DIRECTORY_FULL) do
+    {
+      if (f.result == RDCF_FILE_NOT_FOUND || f.result == 0)
+      {
+        if (f.result == RDCF_FILE_NOT_FOUND) f.file.spec[0] = '?';
+        printf("%-12s ", f.file.spec);
+        if (f.file.attribute & RDCF_DIRECTORY)
+				{
+					if (f.result == 0) count.directory.current++;
+          else count.directory.deleted++;
+          printf("   <DIR> ");
+				}
+        else if (f.file.attribute & RDCF_VOLUME)
+				{
+					if (f.result == 0) count.volume.current++;
+          else count.volume.deleted++;
+          printf("   <VOL> ");
+				}
+				else
+				{
+					if (f.result == 0) count.file.current++;
+          else count.file.deleted++;
+          printf("%8ld ", f.file.size);
+				}
+        printf("%c%c%c%c%c%c ",
+          f.file.attribute&RDCF_ARCHIVE   ? 'A' : ' ',
+          f.file.attribute&RDCF_DIRECTORY ? 'D' : ' ',
+          f.file.attribute&RDCF_HIDDEN    ? 'H' : ' ',
+          f.file.attribute&RDCF_READ_ONLY ? 'R' : ' ',
+          f.file.attribute&RDCF_SYSTEM    ? 'S' : ' ',
+          f.file.attribute&RDCF_VOLUME    ? 'V' : ' ');
+        printf("%02d-%02d-%04d %02d:%02d:%02d%s\n",
+          f.file.date_and_time.month, f.file.date_and_time.day,
+          f.file.date_and_time.year, f.file.date_and_time.hour,
+          f.file.date_and_time.minute, f.file.date_and_time.second,
+          f.result == RDCF_FILE_NOT_FOUND ? " DELETED" : "");
+      }
+      else
+      {
+        rdcf_error_message(f.result);
+        return;
+      }
+    } while (rdcf_next_file_information(&f) != RDCF_DIRECTORY_FULL &&
+      !break_flag);
+    printf("\n                current  deleted   total\n");
+    printf("                -------  -------  -------\n");
+    printf("  files         %7d  %7d  %7d\n", count.file.current,
+			count.file.deleted, count.file.current+count.file.deleted);
+    printf("  directories   %7d  %7d  %7d\n", count.directory.current,
+			count.directory.deleted, count.directory.current+count.directory.deleted);
+    printf("  volume labels %7d  %7d  %7d\n", count.volume.current,
+			count.volume.deleted, count.volume.current+count.volume.deleted);
+    printf("                -------  -------  -------\n");
+    printf("  total         %7d  %7d  %7d\n",
+      count.file.current+count.directory.current+count.volume.current,
+      count.file.deleted+count.directory.deleted+count.volume.deleted,
+      count.file.current+count.directory.current+count.volume.current+
+      count.file.deleted+count.directory.deleted+count.volume.deleted);
+    printf("                =======  =======  =======\n");
+    drive[0] = arg[1][0];
+    printf("\n  %ld bytes free\n", rdcf_free_space(&f, drive));
+  }
+  else if (strcmp(arg[0],"DIRSORT")==0)
+  {
+    int mode = RDCF_NAME_EXTENSION;
+    char *p = arg[2];
+    if (*p == 'E') mode = RDCF_EXTENSION_NAME;
+    else if (*p == 'D') mode = RDCF_DATE_TIME;
+    else if (*p == 'S') mode = RDCF_SIZE;
+    if (*p != 0 && *++p == 'R') mode += RDCF_REVERSE;
+    if (rdcf_sort_directory(&f, arg[1], mode))
+    {
+      rdcf_error_message(f.result);
+      return;
+    }
+  }
+  else if (strcmp(arg[0],"EXIT")==0)
+  {
+    if (cache_flush_and_clear(cache, -1)) disk_write_error();
+    bdos(13,0,0);
+    exit(0);
+  }
+  else if (strcmp(arg[0],"HELP")==0)
+    puts(HELP);
+  else if (strcmp(arg[0],"MD")==0)
+  {
+    if (rdcf_directory(&f, arg[1]) != 0)
+      rdcf_error_message(f.result);
+  }
+  else if (strcmp(arg[0],"MOVE")==0)
+  {
+    if (rdcf_move(&f, arg[1], arg[2]) != 0)
+      rdcf_error_message(f.result);
+  }
+  else if (strcmp(arg[0],"MCOPY")==0)
+  {
+    unsigned k = 0;
+    unsigned number_of_files = 0;
+    char *old_directory = arg[1];
+    char *pattern = NULL;
+    /* find end of directory path */
+    {
+      char *p;
+      for (p = arg[1]; *p != 0; p++)
+        if (*p == ':' || *p == '\\') pattern = p;
+    }
+    old_directory = arg[1];
+    if (pattern == NULL)
+    {
+      puts("Invalid specifications or missing pattern");
+      return;
+    }
+    if (*pattern == ':')
+    {
+      old_directory--;
+      old_directory[0] = old_directory[1];
+      old_directory[1] = ':';
+    }
+    *pattern++ = 0;
+    if (*pattern == 0)
+    {
+      puts("Missing pattern\n");
+      return;
+    }
+    break_flag = 0;
+    while (rdcf_get_file_information(&f, old_directory, k++) !=
+      RDCF_DIRECTORY_FULL && !break_flag)
+    {
+      if (f.result != RDCF_FILE_NOT_FOUND &&
+        (f.file.attribute & RDCF_DIRECTORY+RDCF_VOLUME) == 0 &&
+        rdcf_match(f.file.spec, pattern))
+      {
+        static char old_specs[82];
+        strcpy(old_specs, directory_and_specs(old_directory, f.file.spec));
+        printf("%s  -->  %s\n", old_specs,
+          directory_and_specs(arg[2], f.file.spec));
+        if (!copy(old_specs, directory_and_specs(arg[2], f.file.spec))) return;
+        number_of_files++;
+        if (cache->dirty >= cache->empty+cache->clean && cache_flush(cache, -1))
+        {
+          disk_write_error();
+          return;
+        }
+      }
+    }
+    printf("%d file(s) copied\n", number_of_files);
+  }
+  else if (strcmp(arg[0],"RECOVER")==0)
+  {
+    if (rdcf_recover(&f, arg[1]) != 0)
+      rdcf_error_message(f.result);
+  }
+  else if (strcmp(arg[0],"REN")==0)
+  {
+    if (rdcf_rename(&f, arg[1], arg[2]) != 0)
+      rdcf_error_message(f.result);
+  }
+  else if (strcmp(arg[0],"TYPE")==0)
+  {
+    if (rdcf_open(&f, arg[1], RDCF_READ))
+    {
+      rdcf_error_message(f.result);
+      return;
+    }
+    break_flag = 0;
+    while (!break_flag)
+    {
+      int n = rdcf_read(&f, buffer, sizeof(buffer));
+      if (n<0)
+      {
+        rdcf_error_message(n);
+        return;
+      }
+      if (n==0) break;
+      _write(1, buffer, n);
+    }
+    fputs("\n", stdout);
+    rdcf_close(&f);
+  }
+  else if (strcmp(arg[0],"UNDEL")==0)
+  {
+    if (rdcf_open(&f, arg[1], RDCF_READ) == 0)
+    {
+      printf("File exists and is not deleted\n");
+      return;
+    }
+    if (f.result != RDCF_FILE_NOT_FOUND)
+    {
+      rdcf_error_message(f.result);
+      return;
+    }
+    if (rdcf_undelete(&f, arg[1]))
+    {
+      rdcf_error_message(f.result);
+      return;
+    }
+    printf("File was %s recovered\n", f.position == 0 ? "fully" : "partly");
+  }
+  else if (strcmp(arg[0],"VOLUME")==0)
+  {
+    if (*arg[2] == 0)
+    {
+      if (rdcf_get_volume(&f, arg[1]) ==
+        RDCF_FILE_NOT_FOUND)
+      {
+        printf("No volume label\n");
+      }
+      else if (f.result != 0)
+      {
+        rdcf_error_message(f.result);
+        return;
+      }
+      else
+        printf("Volume label is %s\n", f.file.spec);
+    }
+    else
+    {
+      char s[132];
+      strcpy(s, arg[1]);
+      strcpy(s+2, arg[2]);
+      if (rdcf_set_volume(&f, s) != 0)
+      {
+        rdcf_error_message(f.result);
+        return;
+      }
+    }
+  }
+  else if (strcmp(arg[0],"WIPE")==0)
+  {
+    if (rdcf_wipe_drive(&f, arg[1]))
+      rdcf_error_message(f.result);
+  }
+  else if (*arg[0] != 0)
+    puts("?????");
+}
+
+void main()
+{
+  unsigned n;
+  for (n = 80; n > 0 ; n -= 10)
+  {
+    cache = cache_initialize(drive_access, n, RDCF_SECTOR_SIZE);
+    if (cache != NULL)
+    {
+      int input_from_device = ioctl(0, 0) & 0x80;
+      setvect(0x23, Ctrl_C_handler);
+      printf("Using %d cache buffers\n", n);
+      while (1)
+      {
+        command();
+        if (input_from_device)
+        {
+          if (cache_flush_and_clear(cache, -1))
+            disk_write_error();
+        }
+        else
+        {
+          if (cache->dirty >= cache->empty+cache->clean &&
+            cache_flush(cache, -1))
+          {
+            disk_write_error();
+            return;
+          }
+        }
+      }
+    }
+  }
+  puts("Insufficient memory");
+}
+
+
+=============================== FILES.DOC    ===============================
+
+       FILES - A Small File and Directory Manipulation Utility for DOS
+
+                            by Philip J. Erdelsky
+                          pje@acm.org
+
+                               January 15, 1993
+
+                   PUBLIC DOMAIN -- NO RESTRICTIONS ON USE
+
+1. Introduction
+---------------
+
+The FILES utility is a small file and directory manipulation utility for DOS
+(versions 2.00 and later).  It was written mainly to test RDCF 2.0 and
+duplicates a number of DOS internal and external commands, but it adds enough
+functions to DOS to be useful in itself.
+
+Here is what you can do with the FILES utility that you cannot do with DOS
+commands alone:
+
+     (1) You can see hidden, system and deleted files and volume labels in
+         directory listings. (You can see hidden and system files, but not
+         deleted files, with DOS 5.0.)
+
+     (2) You can change the date and time of a file, directory or volume
+         label.
+
+     (3) You can sort a directory.
+
+     (4) You can restore a deleted file, if the file is not fragmented and has
+         not been overwritten.
+
+     (5) You can move a file or subdirectory from one directory to another
+         without copying its data.
+
+     (6) You can recover remnants of deleted files in the empty data clusters.
+
+     (7) You can wipe out remnants of deleted files in empty data clusters so
+         they cannot be recovered later.
+
+Some of these things can't be done even by special programs that issue DOS
+calls.  The FILES utility can do them only because it goes around the DOS file
+system and accesses the disk on a sector-by-sector basis.
+
+The FILES utility works with diskettes and hard disk partitions smaller than
+32 megabytes.  It will not work with larger partitions, such as those used by
+DOS 4.00 and later versions of DOS, and it will not work with LAN drives.
+
+IMPORTANT: The FILES utility does not recognize any current drive or
+subdirectory.  You will have to type an explicit drive specification for every
+file, and, for a file not in the root directory, a complete directory path.
+Contrary to the usual DOS practice, the directory path must NOT begin with a
+backslash.  Sorry about that.
+
+The FILES utility and its source code are in the public domain, but the RDCF
+2.0 file package is copyrighted.  If you want to make changes to the FILES
+utility for your own use, you will have to obtain RDCF 2.0.  You may make
+copies for your own use, but commercial use of RDCF 2.0 requires permission.
+You will also need a third package called the Reentrant Cache System 1.1, but
+that is also in the public domain.
+
+The current version of the FILES utility treats drives other than A: and B: as
+read-only.  You can change that if you know what you're doing.
+
+
+2. Bringing up the FILES Utility
+--------------------------------
+
+The FILES utility resides in the file FILES.EXE.  Copy this file from the
+distribution diskette, or download it from a BBS.
+
+Make sure the file FILES.EXE is in the current directory, or in a directory
+made accessible by the DOS PATH command, and type
+
+     FILES
+
+in response to the DOS prompt.
+
+The FILES utility will then display its prompt:
+
+     FILES>
+
+Enter FILES commands just as you would enter DOS commands, using the backspace
+key to make corrections.  If you have installed a DOS command line editor, it
+will probably work with the FILES utility because the utility uses the same
+DOS system call (number 10) as the DOS command line interpreter.
+
+It is presumed that you are reasonably conversant with DOS commands. 
+
+You can execute FILES commands from a file by simply redirecting the file to
+the FILES utility as its standard input; e.g.,
+
+     FILES  <file
+
+Be sure to end the file with an EXIT command, or you'll have to reboot to
+regain control of your computer!
+
+If you use this technique, remember that the command file is being read by DOS,
+not by the FILES utility.  Do not include FILES commands that write to the
+drive on which the command file resides.  The FILES utility and DOS will not
+cooperate.
+
+If you can't remember the FILES commands, just type HELP in response to the
+FILES> prompt.  Here is what you'll see:
+
+     COPY     source  destination
+     DATE     file  month-day-year  hour:min:sec
+     DEL      file
+     DIR      directory
+     DIRSORT  directory
+     EXIT
+     HELP
+     MD       directory
+     MCOPY    files directory
+     MOVE     source  destination
+     RECOVER  file
+     REN      old  new
+     TYPE     file
+     UNDEL    file
+     VOLUME   name
+     WIPE     drive
+
+
+2.1. COPY - Copy a File
+-----------------------
+
+The FILES command
+
+     COPY  source  destination
+
+copies one file to another, just the way DOS does.  However, you cannot copy
+multiple files, and you must supply complete file specifications.  For
+example, to copy the file FOO.C from drive A: to the subdirectory \PROG on
+drive B:, you must type
+
+     COPY  A:FOO.C  B:PROG\FOO.C
+
+For file copying, you'll probably prefer to use DOS.
+
+
+2.2. DATE - Change the Date and Time of a File, Directory or Volume
+-------------------------------------------------------------------
+
+The FILES command
+
+     DATE  file  month-day-year  hour:min:sec
+
+changes the date and time of a file or subdirectory.  The date and time are
+expressed in numerical form, and a 24-hour clock is used.  To change the date
+and time of the file A:FOO.C to September 15, 1992, 3:15 PM, type
+
+     DATE  A:FOO.C  9-15-92 15:13:00
+
+If the file specifications represent a subdirectory, its date and time will be
+changed.  That's something DOS won't do!
+
+If you use a drive specification only, the date and time of the volume label
+will be changed.
+
+
+2.3 DEL - Delete a File, Directory or Volume
+--------------------------------------------
+
+The FILES command
+
+     DEL  file
+
+deletes the specified file.  If the file specifications represent a
+subdirectory, it deletes the subdirectory (provided it is empty).  Hence it
+does the work of both the DOS DEL and RD commands.
+
+If you use a drive specification only, the volume label will be deleted.
+
+
+2.4. DIR - Directory Listing
+----------------------------
+
+The FILES command
+
+     DIR  directory
+
+lists the contents of the specified directory, including volume labels, hidden
+and system files, subdirectories and deleted volume labels, files and
+subdirectories.
+
+If you use a drive specification only, contents of the root directory will be
+displayed.
+
+To pause the display, type Ctrl-S; to abort the display, type Ctrl-C.
+
+
+2.5. DIRSORT - Sort a Directory
+-------------------------------
+
+The FILES command
+
+     DIRSORT  directory  mode
+
+sorts the entries in the specified directory in the specified manner.
+
+The mode may be any ONE of the following:
+
+     mode  manner of sort
+     ----  -----------------------------------------------------------------
+     E     sort by extension, then among files that have the same extension,
+             sort by name
+     D     sort by date and time (earlier files first)
+     N     sort by name, then among files that have the same name, sort by
+             extension
+     S     sort by size (smallest files first)
+
+The letter R may be appended to any of these modes to sort in the opposite
+order.  For example, SR sorts the files by size, but it puts the largest files
+first.
+
+If you omit the mode, N is presumed.
+
+Actually, before the FILES utility sorts the directory entries, it first
+divides them into five groups and arranges them in the following order:
+
+     (1) The two system files at the beginning of the root directory and the
+         two special files "." and ".." at the beginning of a subdirectory are
+         always left where they are.
+
+     (2) The volume label, if any, is put next.
+
+     (3) The subdirectory entries, if any, are sorted and put next.
+
+     (4) The file entries are sorted and put next.
+
+     (5) The entries for deleted files, volume labels and subdirectories, if
+         any, are sorted and put last.
+
+Within each category, if two entries are identical according to the sorting
+criterion, their relative position is left unchanged.
+
+If you supply only a drive specification, the root directory will be sorted.
+
+The sorting algorithm is fairly unsophisticated, so sorting a long
+subdirectory may take quite some time.  Please be patient.
+
+
+2.6. EXIT - Return to DOS
+-------------------------
+
+The following FILES command returns control to DOS:
+
+     EXIT
+
+If you redirect commands from a file to the FILES utility, be sure to end it
+with an EXIT command.  Otherwise, the utility will hang up at the end of the
+file and you'll have to reboot to regain control of your computer.
+
+
+2.7. HELP - Display a List of FILES Commands
+--------------------------------------------
+
+The following FILES command displays a list of FILES commands:
+
+     HELP
+
+
+2.8. MD - Make Directory
+------------------------
+
+The FILES command
+
+     MD  directory
+
+creates the specified directory, just like the corresponding DOS command.
+
+
+2.9. MOVE - Move a File or Subdirectory
+---------------------------------------
+
+The FILES command
+
+     MOVE  source  destination
+
+moves the source file to the destination file.  Since it is not possible to
+move a file from one drive to another with this command, the destination file
+specifications must NOT contain a drive specification.
+
+For example, to move the file FOO.C from the root directory to the
+subdirectory PROG on drive B:, type
+
+     MOVE  B:FOO.C  PROG\FOO.C
+
+The effect of this command is the same (in almost all cases) as the following
+two commands, but it is much more efficient because the data is not copied:
+
+     COPY  source  destination
+     DEL   source
+
+(Slight differences occur when the disk is nearly full.  The COPY-DEL sequence
+may fail for lack of disk space but MOVE will succeed.)
+
+You can rename a file as you move it merely by giving it a different name in
+the new directory.  You could also use this command to rename a file without
+moving it, but it would be less efficient than the REN command and might fail
+for lack of directory space when then REN command wouldn't.
+
+If the source file specifications represent a subdirectory, it and all of the
+files and subdirectories in it will be moved.  That's something that DOS won't
+do, and it can be quite handy.  However, be sure not to corrupt the file
+system by moving a directory into itself or one of its own subdirectories.
+The FILES utility won't protect you from such folly.
+
+
+2.10. RECOVER - Recover Deleted File Remnants in Empty Clusters
+---------------------------------------------------------------
+
+The FILES command
+
+     RECOVER  file
+
+creates the specified file as a new file, gathers all the empty data clusters
+on drive and links them together as the new file contents.  The new file will
+then contain all the data from deleted files and subdirectories that has not
+been reused by other files or subdirectories.
+
+If you want to use a text editor or word processor on the new file to find the
+desired information, you will probably have to copy the file to another disk or
+a hard drive that has room for the temporary and backup files that most text
+editors and word processors require.  For obvious reasons, there won't be any
+room on the same disk!
+
+The new file must not be the same as an existing file.  It may reside in a
+subdirectory, but the FILES utility will not lengthen the subdirectory to
+accommodate it, since that would destroy some of the information that you want
+to recover.
+
+
+2.11. REN - Rename a File
+-------------------------
+
+The FILES command
+
+     REN  old  new
+
+renames a file, without moving it to another directory or drive.  The new file
+specifications may include a name and extension only.  For example, the
+following command changes the file A:PROG\FOO.C into A:PROG\BAH.C:
+
+     REN  A:PROG\FOO.C  BAH.C
+
+
+2.12. TYPE - Display a File
+---------------------------
+
+The FILES command
+
+     TYPE  file
+
+displays the contents of a file.
+
+To pause the display, type Ctrl-S; to abort the display, type Ctrl-C.
+
+
+2.13. UNDEL - Undelete a File
+-----------------------------
+
+The FILES command
+
+     UNDEL  file
+
+attempts to restore a deleted file.  The FILES utility will tell you whether
+the file is unrecoverable, partly recoverable or fully recoverable.
+
+Even if the file appears to have been fully recovered, there is no guarantee
+that the original file contents have been restored.  For example, if another
+file has been written over the original contents and then deleted, there is no
+way that the FILES utility can determine that the original contents have been
+changed.  Even if this has not happened, the FILES utility may not know
+exactly where to look for the contents.  It just does the best it can.
+
+
+2.14. VOLUME - Add or Change Volume Label
+-----------------------------------------
+
+The FILES command
+
+     VOLUME  drive:
+
+displays the volume label for the specified drive, or tells you that the drive
+has no volume label.
+
+The FILES command
+
+     VOLUME  drive:  label
+
+changes the volume label on the specified drive to the specified text, or adds
+a new volume label with the specified text.
+
+DOS file and directory names and extensions are case-insensitive, but the same
+is NOT true of volume labels.  They can contain small letters, spaces and
+some special characters.  Command syntax will prevent you from embedding a
+space in a volume label, even though DOS might permit it on a disk.
+
+
+2.15. WIPE - Wipe Empty Data Clusters
+-------------------------------------
+
+The FILES command
+
+     WIPE  d:
+
+writes nonsense into all unused data clusters on the specified drive, so any
+remnants of deleted files on the drive cannot be recovered by either the UNDEL
+or the RECOVER command.
+
+CAUTION: If the drive uses data clusters consisting of more than one sector,
+there may be some remnants of deleted files in the last clusters of files that
+are not long enough to occupy all sectors of their last clusters.  These
+little snippets of information cannot be recovered by the FILES utility, but
+they can be recovered by more sophisticated utilities.
+
+
+
+=============================== RDCF2.C      ===============================
+
+/*-----------------------------------------------------------------------------
+          RDCF: A Reentrant DOS-Compatible File System, Version 2.0
+
+                    Public Domain - No Restrictions on Use
+
+                            by Philip J. Erdelsky
+                          pje@acm.org
+
+                               January 15, 1993
+
+-----------------------------------------------------------------------------*/
+
+/* #define _BIG_ENDIAN */
+
+#include "rdcf2.h"
+#include <mem.h>
+#include <ctype.h>
+#include <stdio.h>
+
+#define NAME_SIZE       8
+#define EXTENSION_SIZE  3
+
+/* Directory structure as it appears on the diskette. */
+
+struct directory
+{
+  unsigned char name_extension[NAME_SIZE+EXTENSION_SIZE];
+  unsigned char attribute;
+  unsigned char reserved[10];
+  unsigned short time;
+  unsigned short date;
+  unsigned short first_cluster;
+  unsigned long size;
+};
+
+#ifdef RDCF_SECTOR_SIZE
+  #define SECTOR_SIZE RDCF_SECTOR_SIZE
+#else
+  #define SECTOR_SIZE f->sector_size
+#endif
+
+#define ENTRIES_PER_SECTOR  (SECTOR_SIZE/sizeof(struct directory))
+#define NO_DIRECTORY_INDEX  0xFFFF
+
+/* Special values for first byte of name. */
+
+#define END_DIRECTORY     0x00
+#define DELETED_FILE      0xE5
+
+/* Special values for FAT entries. */
+
+#define EMPTY_CLUSTER            0
+#define RESERVED_CLUSTER_12_BIT  0xFF0
+#define LAST_CLUSTER_12_BIT      0xFF8
+#define LAST_CLUSTER_16_BIT      0xFFF8
+
+/* buffer status */
+
+enum buffer_status {EMPTY, CLEAN, DIRTY};
+
+/* additional mode bit */
+
+#define WRITTEN    (1<<7)
+
+/*-----------------------------------------------------------------------------
+Layout of first sector when read into buffer[].  A simple structure would not
+be portable because some words are not aligned on even addresses.
+-----------------------------------------------------------------------------*/
+
+#define BYTES_PER_SECTOR     (buffer[11]|buffer[12]<<8)
+#define SECTORS_PER_CLUSTER   buffer[13]
+#define RESERVED_SECTORS     (buffer[14]|buffer[15]<<8)
+#define NUMBER_OF_FATS        buffer[16]
+#define ROOT_ENTRIES         (buffer[17]|buffer[18]<<8)
+#define TOTAL_SECTORS        (buffer[19]|buffer[20]<<8)
+#define MEDIA_DESCRIPTOR      buffer[21]
+#define SECTORS_PER_FAT      (buffer[22]|buffer[23]<<8)
+#define SECTORS_PER_TRACK    (buffer[24]|buffer[25]<<8)
+#define HEADS                (buffer[26]|buffer[27]<<8)
+#define HIDDEN_SECTORS       (buffer[28]|buffer[29]<<8)
+
+/*-----------------------------------------------------------------------------
+The following functions and macros convert words and double words from "big
+endian" to "little endian" form or vice-versa.
+-----------------------------------------------------------------------------*/
+
+#ifdef _BIG_ENDIAN
+
+  static void swap_two(unsigned char *p)
+  {
+    unsigned char x = p[0];
+    p[0] = p[1];
+    p[1] = x;
+  }
+
+  static void swap_four(unsigned char *p)
+  {
+    unsigned char x = p[0];
+    p[0] = p[3];
+    p[3] = x;
+    swap_two(p+1);
+  }
+
+  #define convert_short(x) swap_two((unsigned char *)(&(x)))
+  #define convert_long(x)  swap_four((unsigned char *)(&(x)))
+
+#endif
+
+/*-----------------------------------------------------------------------------
+This function calls longjmp() to specify an error code and exit from the RDCF
+function originally called.
+-----------------------------------------------------------------------------*/
+
+static void error_exit(struct rdcf *f, int error)
+{
+  longjmp(f->error, error);
+}
+ 
+/*-----------------------------------------------------------------------------
+This function reads or writes a sector and bails out if the function
+(*drive_access)() returns an error.
+-----------------------------------------------------------------------------*/
+
+static void access_sector(struct rdcf *f, int write, unsigned sector,
+  void *buffer)
+{
+  f->drive_error = (*f->drive_access)(write, f->drive, sector, buffer);
+  if (f->drive_error != 0)
+    error_exit(f, RDCF_DRIVE_ERROR);
+}
+
+/*-----------------------------------------------------------------------------
+These macros make the calls on access_sector() more readable.
+-----------------------------------------------------------------------------*/
+
+#define read_sector(f,s,b)   access_sector(f,0,s,b)
+#define write_sector(f,s,b)  access_sector(f,1,s,b)
+
+/*-----------------------------------------------------------------------------
+This function writes the buffer in the FCB if it is marked as "dirty".
+-----------------------------------------------------------------------------*/
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  static void flush_buffer(struct rdcf *f)
+  {
+    if (f->buffer_status == DIRTY)
+    {
+      write_sector(f, f->sector_in_buffer, f->buffer);
+      f->buffer_status = CLEAN;
+    }
+  }
+
+#endif
+
+/*-----------------------------------------------------------------------------
+This function reads a sector into the buffer in the FCB, if it is not already
+there.  If another sector is there, the buffer is first flushed.
+-----------------------------------------------------------------------------*/
+
+static void read_buffer(struct rdcf *f, unsigned sector)
+{
+  if (f->buffer_status == EMPTY || sector != f->sector_in_buffer)
+  {
+    #ifndef RDCF_SYSTEM_READ_ONLY
+      flush_buffer(f);
+    #endif
+    read_sector(f, sector, f->buffer);
+    f->sector_in_buffer = sector;
+    f->buffer_status = CLEAN;
+  }
+}
+
+/*-----------------------------------------------------------------------------
+This function checks to see if a cluster number is valid and declares an error
+if it is not.
+-----------------------------------------------------------------------------*/
+
+static void check_cluster(struct rdcf *f, unsigned cluster)
+{
+  if (cluster < 2 || cluster > f->maximum_cluster_number)
+    error_exit(f, RDCF_FILE_FORMAT_ERROR);
+}
+
+/*-----------------------------------------------------------------------------
+This function returns the FAT entry for the specified cluster.
+-----------------------------------------------------------------------------*/
+
+static unsigned FAT_entry(struct rdcf *f, unsigned cluster)
+{
+  check_cluster(f, cluster);
+  if (f->maximum_cluster_number < RESERVED_CLUSTER_12_BIT)
+  {
+    unsigned byte_index = cluster + (cluster>>1);
+    unsigned char p[2];
+    read_buffer(f, f->first_FAT_sector + byte_index/SECTOR_SIZE);
+    p[0] = f->buffer[byte_index%SECTOR_SIZE];
+    byte_index++;
+    read_buffer(f, f->first_FAT_sector + byte_index/SECTOR_SIZE);
+    p[1] = f->buffer[byte_index%SECTOR_SIZE];
+    return cluster&1 ? p[1]<<4 | p[0]>>4 : p[0] | p[1]<<8&0xF00;
+  }
+  else
+  {
+    unsigned short x;
+    read_buffer(f, f->first_FAT_sector + cluster/(SECTOR_SIZE/2));
+    x = ((unsigned short *)(f->buffer))[cluster%(SECTOR_SIZE/2)];
+    #ifdef _BIG_ENDIAN
+      convert_short(x);
+    #endif
+    return x;
+  }
+}
+
+/*-----------------------------------------------------------------------------
+This function sets the FAT entry for the specified cluster to the specified
+value.  The 12-bit FAT entry always occupies two consecutive bytes, filling one
+byte completely and filling only one nibble of the other byte.  Since these
+bytes may be in different sectors, two separate calls on read_buffer() are
+used.  The one-sector caching implemented by read_buffer() prevents multiple
+disk accesses when both bytes are in the same sector.  Every copy of the FAT is
+updated in the same way.
+-----------------------------------------------------------------------------*/
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  static void set_FAT_entry(struct rdcf *f, unsigned cluster, unsigned x)
+  {
+    unsigned sector;
+    check_cluster(f, cluster);
+    #ifdef _BIG_ENDIAN
+      if (f->maximum_cluster_number >= RESERVED_CLUSTER_12_BIT)
+        convert_short(x);
+    #endif
+    for (sector = f->first_FAT_sector; sector < f->first_directory_sector;
+      sector += f->sectors_per_FAT)
+    {
+      if (f->maximum_cluster_number < RESERVED_CLUSTER_12_BIT)
+      {
+        unsigned byte_index = cluster + (cluster>>1);
+        unsigned char *p;
+        read_buffer(f, sector + byte_index/SECTOR_SIZE);
+        p = f->buffer + byte_index%SECTOR_SIZE;
+        *p = cluster&1 ? *p&0x0F | x<<4 : x;
+        f->buffer_status = DIRTY;
+        read_buffer(f, sector + (byte_index+1)/SECTOR_SIZE);
+        p = f->buffer + (byte_index+1)%SECTOR_SIZE;
+        *p = cluster&1 ? x>>4 : *p&0xF0 | x>>8;
+      }
+      else
+      {
+        read_buffer(f, sector + cluster/(SECTOR_SIZE/2));
+        ((unsigned short *)(f->buffer))[cluster%(SECTOR_SIZE/2)] = x;
+      }
+      f->buffer_status = DIRTY;
+    }
+  }
+
+#endif
+
+/*-----------------------------------------------------------------------------
+This function checks the value of c (which is always in the range from 0 to
+255, inclusive). If it represents a character that cannot appear in a valid
+file name or extension, it bails out.
+-----------------------------------------------------------------------------*/
+
+static void check_file_character(struct rdcf *f, unsigned c)
+{
+  static unsigned char table[32] =
+  {
+    0xFF, 0xFF, 0xFF, 0xFF, 0x05, 0xDC, 0x00, 0xFC,
+    0x00, 0x00, 0x00, 0x38, 0x00, 0x00, 0x00, 0x90,
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+  };
+  if (table[c>>3] & 1<<(c&7)) error_exit(f, RDCF_INVALID_SPEC);
+}
+
+/*-----------------------------------------------------------------------------
+This function edits a file or directory spec into the name-extension form used
+in the file directory entry.  It returns a pointer to the character
+following the last one of the spec.
+-----------------------------------------------------------------------------*/
+
+static char *spec_to_name_extension(struct rdcf *f,
+  unsigned char *name_extension, unsigned char *spec)
+{
+  unsigned i = 0;
+  unsigned c;
+  while ((c=(*spec++))!=0 && c!='\\' && c!='.')
+  {
+    check_file_character(f,c);
+    if (i<NAME_SIZE) name_extension[i++] = toupper(c);
+  }
+  if (i==0) error_exit(f, RDCF_INVALID_SPEC);
+  while (i<NAME_SIZE) name_extension[i++] = ' ';
+  if (c=='.') while ((c=(*spec++))!=0 && c!='\\')
+  {
+    check_file_character(f,c);
+    if (i<NAME_SIZE+EXTENSION_SIZE) name_extension[i++] = toupper(c);
+  }
+  while (i<NAME_SIZE+EXTENSION_SIZE) name_extension[i++] = ' ';
+  return spec-1;
+}
+
+/*-----------------------------------------------------------------------------
+This function edits the name-extension form used in a file entry to file spec.
+-----------------------------------------------------------------------------*/
+
+static void name_extension_to_spec(unsigned char *spec,
+  unsigned char *name_extension)
+{
+  unsigned i;
+  unsigned char *s = spec;
+  for (i=0; i<NAME_SIZE && name_extension[i]!=' '; i++)
+    *s++ = name_extension[i];
+  if (name_extension[NAME_SIZE]!=' ')
+  {
+    *s++ = '.';
+    for (i=NAME_SIZE;
+      i<NAME_SIZE+EXTENSION_SIZE && name_extension[i]!=' '; i++)
+    {
+      *s++ = name_extension[i];
+    }
+  }
+  *s = 0;
+}
+
+/*-----------------------------------------------------------------------------
+This function calculates the number of the first sector in the specified
+cluster.
+-----------------------------------------------------------------------------*/
+
+static unsigned first_sector_in_cluster(struct rdcf *f, unsigned cluster)
+{
+  check_cluster(f, cluster);
+  return f->first_data_sector + (cluster-2) * f->sectors_per_cluster;
+}
+
+/*-----------------------------------------------------------------------------
+This function finds the directory entry referred to by f->directory_cluster and
+f->directory_index, reads it into f->buffer, and returns a pointer to it.
+-----------------------------------------------------------------------------*/
+
+static struct directory *find_directory(struct rdcf *f)
+{
+  read_buffer(f, (f->directory_cluster == 0 ? f->first_directory_sector :
+    first_sector_in_cluster(f, f->directory_cluster)) +
+    f->directory_index/ENTRIES_PER_SECTOR);
+  return
+    (struct directory *)(f->buffer) + f->directory_index%ENTRIES_PER_SECTOR;
+}
+ 
+/*-----------------------------------------------------------------------------
+This function updates a directory entry.  If the "delete_entry" parameter is
+true (nonzero), it also marks the entry as deleted.
+-----------------------------------------------------------------------------*/
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  static void update_directory_entry(struct rdcf *f, int delete_entry)
+  {
+    unsigned i;
+    struct directory *d = find_directory(f);
+    if (f->file.attribute & RDCF_VOLUME || f->file.spec[0] == '.')
+      memcpy(d->name_extension, f->file.spec, NAME_SIZE+EXTENSION_SIZE);
+    else
+      spec_to_name_extension(f, d->name_extension, f->file.spec);
+    if (delete_entry) d->name_extension[0] = DELETED_FILE;
+    d->attribute = f->file.attribute;
+    d->date = (f->file.date_and_time.year-1980)<<9 |
+      f->file.date_and_time.month<<5 | f->file.date_and_time.day;
+    d->time = f->file.date_and_time.hour<<11 |
+      f->file.date_and_time.minute<<5 | f->file.date_and_time.second>>1;
+    d->first_cluster = f->file.first_cluster;
+    d->size = f->file.size;
+    memset(d->reserved, 0, sizeof(d->reserved));
+    #ifdef _BIG_ENDIAN
+      convert_short(d->date);
+      convert_short(d->time);
+      convert_short(d->first_cluster);
+      convert_long(d->size);
+    #endif
+    f->buffer_status = DIRTY;
+  }
+
+#endif
+
+/*-----------------------------------------------------------------------------
+This function reads directory information into an FCB.
+-----------------------------------------------------------------------------*/
+
+static void read_directory_entry(struct rdcf *f)
+{
+  struct directory *d = find_directory(f);
+  if (d->attribute&RDCF_VOLUME)
+  {
+    memcpy(f->file.spec, d->name_extension, NAME_SIZE+EXTENSION_SIZE);
+    f->file.spec[NAME_SIZE+EXTENSION_SIZE] = 0;
+  }
+  else
+    name_extension_to_spec(f->file.spec, d->name_extension);
+  f->file.attribute = d->attribute;
+  {
+    unsigned short date = d->date;
+    #ifdef _BIG_ENDIAN
+      convert_short(date);
+    #endif
+    f->file.date_and_time.year = (date>>9)+1980;
+    f->file.date_and_time.month = date>>5&0xF;
+    f->file.date_and_time.day = date&0x1F;
+  }
+  {
+    unsigned short time = d->time;
+    #ifdef _BIG_ENDIAN
+      convert_short(time);
+    #endif
+    f->file.date_and_time.hour = time>>11;
+    f->file.date_and_time.minute = time>>5&0x3F;
+    f->file.date_and_time.second = time<<1&0x1F<<1;
+  }
+  f->file.first_cluster = d->first_cluster;
+  f->file.size = d->size;
+  #ifdef _BIG_ENDIAN
+    convert_short(f->file.first_cluster);
+    convert_long(f->file.size);
+  #endif
+}
+
+/*-----------------------------------------------------------------------------
+If the parameter "name_extension" is not NULL, this function looks up the name
+and extension in the directory specified by f->directory_cluster (the entire
+root directory if f->directory_cluster == 0). If found, it puts the appropriate
+information into the file structure and returns a true (nonzero) result. If not
+found, it returns a false (zero) value and also puts the cluster and index of
+the first empty entry, if any, into f->directory_cluster and
+f->directory_index.  In any case, the name and extension are left in
+f->file.spec, and the first directory cluster is left in
+f->directory_first_cluster.
+
+If the parameter name_extension is NULL, this function looks up the volume
+label in the same way (although in this case the calling function looks only in
+the root directory, of course).
+
+If the file or volume label is not found and there is no empty entry, the
+special value NO_DIRECTORY_INDEX is left in f->directory_index.
+-----------------------------------------------------------------------------*/
+
+static int find_file_in_directory_or_find_volume(struct rdcf *f,
+  unsigned char *name_extension)
+{
+  unsigned empty_cluster;
+  unsigned empty_index = NO_DIRECTORY_INDEX;
+  unsigned number_of_directory_entries = f->directory_cluster == 0 ?
+    (f->first_data_sector - f->first_directory_sector)*ENTRIES_PER_SECTOR :
+    ENTRIES_PER_SECTOR*f->sectors_per_cluster;
+  f->directory_first_cluster = f->directory_cluster;
+  while (1)
+  {
+    for (f->directory_index = 0;
+      f->directory_index < number_of_directory_entries; f->directory_index++)
+    {
+      unsigned j;
+      struct directory *d = find_directory(f);
+      if ((d->name_extension[0] == DELETED_FILE ||
+        d->name_extension[0] == END_DIRECTORY) &&
+        empty_index == NO_DIRECTORY_INDEX)
+      {
+        empty_cluster = f->directory_cluster;
+        empty_index = f->directory_index;
+      }
+      if (d->name_extension[0] == END_DIRECTORY) break;
+      if (name_extension == NULL &&
+        (d->name_extension[0] != DELETED_FILE && d->attribute & RDCF_VOLUME) ||
+        name_extension != NULL &&
+        (memcmp(d->name_extension, name_extension, NAME_SIZE+EXTENSION_SIZE)
+        == 0 && (d->attribute&RDCF_VOLUME) == 0))
+      {
+        read_directory_entry(f);
+        return 1;
+      }
+    }
+    if (f->directory_index < number_of_directory_entries ||
+      f->directory_cluster == 0)
+    {
+      break;
+    }
+    {
+      unsigned x = FAT_entry(f, f->directory_cluster);
+      if (x >= f->last_cluster_mark) break;
+      f->directory_cluster = x;
+    }
+  }
+  f->directory_index = empty_index;
+  if (f->directory_index != NO_DIRECTORY_INDEX)
+    f->directory_cluster = empty_cluster;
+  if (name_extension != NULL)
+    name_extension_to_spec(f->file.spec, name_extension);
+  return 0;
+}
+
+/*-----------------------------------------------------------------------------
+This function follows the directory path and finds the directory entry for the
+file (or directory) with the spec provided.  If found, it reads the directory
+information into the FCB and returns a true (nonzero) value.  Otherwise, it
+returns a false (zero) value and also puts the cluster and index of the first
+available directory entry, if any, into f->directory_cluster and
+f->directory_index.  If there is no available directory entry, it puts the
+special value NO_DIRECTORY_INDEX into f->directory_index. In any case, the
+number of the first cluster of the directory is left in
+f->directory_first_cluster and the name and extension are left in f->file.spec.
+-----------------------------------------------------------------------------*/
+
+static int find_file(struct rdcf *f, char *spec)
+{
+  /* start with root directory */
+  f->directory_cluster = 0;
+  while (1)
+  {
+    int found;
+    unsigned char name_extension[NAME_SIZE+EXTENSION_SIZE];
+    /* scan name and extension */
+    spec = spec_to_name_extension(f, name_extension, spec);
+    /* look it up in directory */
+    found = find_file_in_directory_or_find_volume(f, name_extension);
+    /* if this is the end of the file specification, return */
+    if (*spec == 0) return found;
+    /* otherwise, the name and extension were a subdirectory in the path */
+    if (!found || (f->file.attribute&RDCF_DIRECTORY) == 0)
+      error_exit(f, RDCF_INVALID_DIRECTORY);
+    f->directory_cluster = f->file.first_cluster;
+    /* skip over the \ after the subdirectory */
+    spec++;
+  }
+}
+
+/*-----------------------------------------------------------------------------
+This function reads the file system information from the first sector.
+-----------------------------------------------------------------------------*/
+
+static void read_file_system_information(struct rdcf *f)
+{
+  unsigned total_sectors;
+  unsigned i;
+  unsigned char *buffer = f->buffer;
+  read_buffer(f, 0);
+  /* make a perfunctory sanity check to prevent later division by zero */
+  if ((total_sectors = TOTAL_SECTORS) == 0 ||
+    #ifdef RDCF_SECTOR_SIZE
+      BYTES_PER_SECTOR != SECTOR_SIZE ||
+    #else
+      (SECTOR_SIZE = BYTES_PER_SECTOR) == 0 ||
+    #endif
+    (f->first_FAT_sector = RESERVED_SECTORS) == 0 ||
+    (f->sectors_per_FAT = SECTORS_PER_FAT) == 0 ||
+    (f->sectors_per_cluster = SECTORS_PER_CLUSTER) == 0)
+  {
+    error_exit(f, RDCF_DISK_FORMAT_ERROR);
+  }
+  f->first_directory_sector =
+    f->first_FAT_sector + f->sectors_per_FAT * NUMBER_OF_FATS;
+  f->first_data_sector = f->first_directory_sector +
+    ROOT_ENTRIES/ENTRIES_PER_SECTOR;
+  f->maximum_cluster_number =
+    (total_sectors-f->first_data_sector) / SECTORS_PER_CLUSTER + 1;
+  f->last_cluster_mark =
+    f->maximum_cluster_number < RESERVED_CLUSTER_12_BIT ?
+    LAST_CLUSTER_12_BIT : LAST_CLUSTER_16_BIT;
+}
+
+/*-----------------------------------------------------------------------------
+This function gets the drive specifications and returns a pointer to the
+character following the drive specifications.
+-----------------------------------------------------------------------------*/
+
+#ifdef RDCF_MULTIPLE_DRIVE
+
+  static char *get_drive(struct rdcf *f, char *spec)
+  {
+    if (spec[0] != 0 && spec[1] == ':')
+    {
+      if (isalpha(spec[0])) f->drive = toupper(spec[0])-'A';
+      else error_exit(f, RDCF_INVALID_SPEC);
+      return spec + 2;
+    }
+    error_exit(f, RDCF_INVALID_SPEC);
+  }
+
+#endif
+
+/*-----------------------------------------------------------------------------
+This function scans the file spec and sets up the file control block for
+further file operations.  It returns a pointer to the character following the
+drive specifications.
+-----------------------------------------------------------------------------*/
+
+static char *initialize_fcb(struct rdcf *f, char *spec)
+{
+  #ifdef RDCF_MULTIPLE_DRIVE
+    spec = get_drive(f, spec);
+  #endif
+  f->buffer_status = EMPTY;
+  read_file_system_information(f);
+  return spec;
+}
+
+/*-----------------------------------------------------------------------------
+This function checks write access and generates an error if write access is
+denied.
+-----------------------------------------------------------------------------*/
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  static void check_write_access(struct rdcf *f)
+  {
+    if (f->file.attribute & (RDCF_READ_ONLY+RDCF_HIDDEN+RDCF_SYSTEM))
+      error_exit(f, RDCF_ACCESS_DENIED);
+  }
+
+#endif
+
+/*-----------------------------------------------------------------------------
+This function releases all the FAT entries of a file.
+-----------------------------------------------------------------------------*/
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  static void release_FAT_entries(struct rdcf *f)
+  {
+    unsigned j;
+    j = f->file.first_cluster;
+    if (j != EMPTY_CLUSTER)
+    {
+      while (j < f->last_cluster_mark)
+      {
+        unsigned k = FAT_entry(f,j);
+        set_FAT_entry(f,j,EMPTY_CLUSTER);
+        j = k;
+      }
+    }
+    f->mode |= WRITTEN;
+  }
+
+#endif
+
+/*-----------------------------------------------------------------------------
+This function finds a new cluster, if possible, and adds it to a chain ending
+with the specified cluster.  It returns the new cluster number, or
+EMPTY_CLUSTER if there are no free clusters.
+-----------------------------------------------------------------------------*/
+
+static unsigned add_new_cluster(struct rdcf *f, unsigned cluster,
+  unsigned first_possibly_empty_cluster)
+{
+  unsigned new_cluster;
+  for (new_cluster = first_possibly_empty_cluster;
+    new_cluster <= f->maximum_cluster_number; new_cluster++)
+  {
+    if (FAT_entry(f, new_cluster)==EMPTY_CLUSTER) break;
+  }
+  if (new_cluster > f->maximum_cluster_number) return EMPTY_CLUSTER;
+  if (cluster != EMPTY_CLUSTER) set_FAT_entry(f, cluster, new_cluster);
+  set_FAT_entry(f, new_cluster, f->last_cluster_mark);
+  return new_cluster;
+}
+
+/*-----------------------------------------------------------------------------
+This function writes zeros into a cluster.
+-----------------------------------------------------------------------------*/
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  static void clear_cluster(struct rdcf *f, unsigned cluster)
+  {
+    unsigned count = f->sectors_per_cluster;
+    unsigned sector = first_sector_in_cluster(f, cluster);
+    flush_buffer(f);
+    f->buffer_status = EMPTY;
+    memset(f->buffer, 0, SECTOR_SIZE);
+    do write_sector(f, sector++, f->buffer); while (--count != 0);
+  }
+
+#endif
+
+/*-----------------------------------------------------------------------------
+This function adds another cluster to the directory if necessary to accommodate
+a new file or subdirectory.
+-----------------------------------------------------------------------------*/
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  static void lengthen_directory_if_necessary(struct rdcf *f)
+  {
+    if (f->directory_index == NO_DIRECTORY_INDEX)
+    {
+      if (f->directory_cluster == 0)
+        error_exit(f, RDCF_DIRECTORY_FULL);
+      f->directory_cluster = add_new_cluster(f, f->directory_cluster, 2);
+      if (f->directory_cluster == 0)
+        error_exit(f, RDCF_DIRECTORY_FULL);
+      f->directory_index = 0;
+      clear_cluster(f, f->directory_cluster);
+    }
+  }
+
+#endif
+
+/*-----------------------------------------------------------------------------
+When f represents a subdirectory, this function updates the . and .. entries at
+the beginning of its first cluster.
+-----------------------------------------------------------------------------*/
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  static void update_dot_and_dot_dot(struct rdcf *f)
+  {
+    f->directory_cluster = f->file.first_cluster;
+    f->directory_index = 0;
+    memset(f->file.spec, ' ', NAME_SIZE+EXTENSION_SIZE);
+    f->file.spec[0] = '.';
+    update_directory_entry(f, 0);
+    f->file.first_cluster = f->directory_first_cluster;
+    f->directory_index = 1;
+    f->file.spec[1] = '.';
+    update_directory_entry(f, 0);
+  }
+
+#endif
+
+/*-----------------------------------------------------------------------------
+This function contains the common code from rdcf_get_file_information() and
+rdcf_set_file_information().  It finds the directory entry specified by the
+spec and index, and puts its cluster and index into f->directory_cluster and
+f->directory_index.
+-----------------------------------------------------------------------------*/
+
+static void find_entry(struct rdcf *f, char *spec, unsigned index)
+{
+  spec = initialize_fcb(f, spec);
+  if (*spec == 0)
+  {
+    if (index >=
+      (f->first_data_sector - f->first_directory_sector)*ENTRIES_PER_SECTOR)
+    {
+      error_exit(f, RDCF_DIRECTORY_FULL);
+    }
+    f->directory_first_cluster = f->directory_cluster = 0;
+  }
+  else
+  {
+    if (!find_file(f, spec) || (f->file.attribute&RDCF_DIRECTORY) == 0)
+      error_exit(f, RDCF_INVALID_DIRECTORY);
+    f->directory_first_cluster = f->directory_cluster = f->file.first_cluster;
+    while (index >= ENTRIES_PER_SECTOR*f->sectors_per_cluster)
+    {
+      f->directory_cluster = FAT_entry(f, f->directory_cluster);
+      if (f->directory_cluster >= f->last_cluster_mark)
+        error_exit(f,RDCF_DIRECTORY_FULL);
+      index -= ENTRIES_PER_SECTOR*f->sectors_per_cluster;
+    }
+  }
+  f->directory_index = index;
+}
+
+/*-----------------------------------------------------------------------------
+This function is called by rdcf_sort_directory() to determine the class of a
+directory entry.
+-----------------------------------------------------------------------------*/
+
+static int entry_class(struct directory *d)
+{
+  enum {VOLUME_ENTRY, DIRECTORY_ENTRY, FILE_ENTRY, ERASED_ENTRY};
+  return d->name_extension[0] == DELETED_FILE ? ERASED_ENTRY :
+    d->attribute & RDCF_DIRECTORY ? DIRECTORY_ENTRY :
+    d->attribute & RDCF_VOLUME ? VOLUME_ENTRY : FILE_ENTRY;
+}
+
+/*-----------------------------------------------------------------------------
+This function is called by rdcf_sort_directory() to compare two four-byte
+fields.
+-----------------------------------------------------------------------------*/
+
+static int compare_four_bytes(unsigned char *p, unsigned char *q)
+{
+  int i, n;
+  for (i=3; i>=0 && (n=p[i]-q[i]) == 0; i--);
+  return n;
+}
+   
+/*-----------------------------------------------------------------------------
+The following functions are publicly defined.  They do not call each other and
+any of them may be removed without making changes to those that remain.  The
+functions are defined in alphabetical order.
+-----------------------------------------------------------------------------*/
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  #define CHANGEABLE_ATTRIBUTES \
+    (RDCF_ARCHIVE+RDCF_HIDDEN+RDCF_READ_ONLY+RDCF_SYSTEM)
+
+  int rdcf_attribute(struct rdcf *f, char *spec, unsigned attribute)
+  {
+    if ((f->result=setjmp(f->error)) != 0) return f->result;
+    if (!find_file(f, initialize_fcb(f, spec)) ||
+      f->file.attribute & RDCF_DIRECTORY)
+    {
+      error_exit(f, RDCF_FILE_NOT_FOUND);
+    }
+    f->file.attribute = f->file.attribute & ~CHANGEABLE_ATTRIBUTES |
+      attribute & CHANGEABLE_ATTRIBUTES;
+    update_directory_entry(f, 0);
+    flush_buffer(f);
+    return 0;
+  }
+
+#endif
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  int rdcf_close(struct rdcf *f)
+  {
+    if ((f->result=setjmp(f->error)) != 0) return f->result;
+    if (f->mode&WRITTEN)
+    {
+      f->buffer_status = EMPTY;
+      f->file.attribute |= RDCF_ARCHIVE;
+      rdcf_get_date_and_time(&f->file.date_and_time);
+      update_directory_entry(f, 0);
+      flush_buffer(f);
+    }
+    return 0;
+  }
+
+#endif
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  int rdcf_date_and_time(struct rdcf *f, char *spec,
+    struct rdcf_date_and_time *p)
+  {
+    if ((f->result=setjmp(f->error)) != 0) return f->result;
+    spec = initialize_fcb(f, spec);
+    if (*spec == 0)
+    {
+      f->directory_cluster = 0;
+      if (!find_file_in_directory_or_find_volume(f, NULL))
+        error_exit(f, RDCF_FILE_NOT_FOUND);
+    }
+    else
+    {
+      if (!find_file(f, spec)) error_exit(f, RDCF_FILE_NOT_FOUND);
+    }
+    f->file.date_and_time = *p;
+    if ((f->file.attribute & RDCF_DIRECTORY+RDCF_VOLUME) == 0)
+    {
+      check_write_access(f);
+      f->file.attribute |= RDCF_ARCHIVE;
+    }
+    update_directory_entry(f, 0);
+    if (f->file.attribute & RDCF_DIRECTORY) update_dot_and_dot_dot(f);
+    flush_buffer(f);
+    return 0;
+  }
+
+#endif
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  int rdcf_delete(struct rdcf *f, char *spec)
+  {
+    if ((f->result=setjmp(f->error)) != 0) return f->result;
+    spec = initialize_fcb(f, spec);
+    if (*spec == 0) /* delete volume label */
+    {
+      if (!find_file_in_directory_or_find_volume(f, NULL))
+        error_exit(f, RDCF_FILE_NOT_FOUND);
+    }
+    else if (!find_file(f, spec))
+      error_exit(f, RDCF_FILE_NOT_FOUND);
+    /* check to see that a directory is empty before deleting it */
+    else if (f->file.attribute & RDCF_DIRECTORY)
+    {
+      unsigned cluster = f->file.first_cluster;
+      while (cluster != EMPTY_CLUSTER && cluster < f->last_cluster_mark)
+      {
+        unsigned sector = first_sector_in_cluster(f, cluster);
+        unsigned sector_count = f->sectors_per_cluster;
+        unsigned next_cluster = FAT_entry(f, cluster);
+        do
+        {
+          unsigned entry_count = ENTRIES_PER_SECTOR;
+          unsigned char *p = f->buffer;
+          read_buffer(f, sector);
+          do
+          {
+            unsigned c = *p;
+            if (c == END_DIRECTORY) break;
+            if (c != DELETED_FILE && c != '.')
+              error_exit(f, RDCF_ACCESS_DENIED);
+            p += sizeof(struct directory);
+          } while (--entry_count != 0);
+          if (entry_count != 0) break;
+        } while (--sector_count != 0);
+        cluster = next_cluster;
+      }
+    }
+    else
+      check_write_access(f);
+    release_FAT_entries(f);
+    update_directory_entry(f, 1);
+    flush_buffer(f);
+    return 0;
+  }
+
+#endif
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  int rdcf_directory(struct rdcf *f, char *spec)
+  {
+    /* unsigned char name_extension[NAME_SIZE+EXTENSION_SIZE]; ??? */
+    if ((f->result=setjmp(f->error)) != 0) return f->result;
+    if (find_file(f, initialize_fcb(f, spec)))
+      error_exit(f,RDCF_DIRECTORY_CONFLICT);
+    /* spec_to_name_extension(f, name_extension, f->file.spec); ??? */
+    /* name_extension_to_spec(f->file.spec, name_extension); ??? */
+    /* determine whether there is enough free space for directory */
+    {
+      unsigned cluster = 2;
+      unsigned required_clusters =
+        f->directory_index == NO_DIRECTORY_INDEX ? 2 : 1;
+      for (cluster = 2; required_clusters != 0; cluster++)
+      {
+        if (cluster > f->maximum_cluster_number)
+          error_exit(f,RDCF_DIRECTORY_FULL);
+        if (FAT_entry(f, cluster)==EMPTY_CLUSTER) required_clusters--;
+      }
+    }
+    lengthen_directory_if_necessary(f);
+    f->file.attribute = RDCF_DIRECTORY;
+    f->file.first_cluster = add_new_cluster(f, EMPTY_CLUSTER, 2);
+    clear_cluster(f, f->file.first_cluster);
+    f->file.size = 0L;
+    rdcf_get_date_and_time(&f->file.date_and_time);
+    update_directory_entry(f, 0);
+    update_dot_and_dot_dot(f);
+    flush_buffer(f);
+    return 0;
+  }
+
+#endif
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  struct rdcf_format rdcf_format_360 =
+  {
+    0,2,2,1,0,2,112,0,208,2,253,2,0,9,0,2,0,0,0
+  };
+
+  struct rdcf_format rdcf_format_720 =
+  {
+    0,2,2,1,0,2,112,0,160,5,249,3,0,9,0,2,0,0,0
+  };
+
+  struct rdcf_format rdcf_format_1200 =
+  {
+    0,2,1,1,0,2,224,0,96,9,249,7,0,15,0,2,0,0,0
+  };
+
+  struct rdcf_format rdcf_format_1440 =
+  {
+    0,2,1,1,0,2,224,0,64,11,240,9,0,18,0,2,0,0,0
+  };
+
+  int rdcf_format(struct rdcf *f,
+    #ifdef RDCF_MULTIPLE_DRIVE
+      char *spec,
+    #endif
+    struct rdcf_format *format)
+  {
+    static char bootstrap_header[] =
+    {
+      235,254,144,'R','D','C','F','2','0',' ',' '
+    };
+    unsigned char *buffer = f->buffer;
+    unsigned char media_descriptor;
+    if ((f->result=setjmp(f->error)) != 0) return f->result;
+    #ifdef RDCF_MULTIPLE_DRIVE
+      if (*get_drive(f, spec) != 0) error_exit(f, RDCF_INVALID_SPEC);
+    #endif
+    memset(buffer, 0, SECTOR_SIZE);
+    memcpy(buffer, bootstrap_header, sizeof(bootstrap_header));
+    memcpy(buffer + sizeof(bootstrap_header), format,
+      sizeof(struct rdcf_format));
+    buffer[SECTOR_SIZE-2] = 0x55;
+    buffer[SECTOR_SIZE-1] = 0xAA;
+    write_sector(f, 0, buffer);
+    f->buffer_status = CLEAN;
+    f->sector_in_buffer = 0;
+    read_file_system_information(f);
+    media_descriptor = MEDIA_DESCRIPTOR;
+    memset(buffer, 0, SECTOR_SIZE);
+    {
+      unsigned sector = f->first_FAT_sector;
+      while (sector < f->first_directory_sector)
+      {
+        unsigned count = f->sectors_per_FAT;
+        buffer[0] = media_descriptor;
+        buffer[1] = buffer[2] = 0xFF;
+        write_sector(f, sector++, buffer);
+        buffer[0] = buffer[1] = buffer[2] = 0;
+        while (--count != 0)
+          write_sector(f, sector++, buffer);
+      }
+      buffer[0] = buffer[1] = buffer[2] = 0;
+      while (sector < f->first_data_sector)
+         write_sector(f, sector++, buffer);
+    }
+    return 0;
+  }
+
+#endif
+
+long int rdcf_free_space(struct rdcf *f
+  #ifdef RDCF_MULTIPLE_DRIVE
+    , char *spec
+  #endif
+  )
+{
+  unsigned cluster;
+  unsigned number_of_empty_clusters = 0;
+  if ((f->result=setjmp(f->error)) != 0) return (long)(f->result);
+  #ifndef RDCF_MULTIPLE_DRIVE
+    initialize_fcb(f, NULL);
+  #else
+    if (*initialize_fcb(f, spec) != 0) error_exit(f, RDCF_INVALID_SPEC);
+  #endif
+  for (cluster = 2; cluster <= f->maximum_cluster_number; cluster++)
+  {
+    if (FAT_entry(f, cluster) == EMPTY_CLUSTER) number_of_empty_clusters++;
+  }
+  f->file.size = (unsigned long) number_of_empty_clusters *
+    (f->sectors_per_cluster * SECTOR_SIZE);
+  return (long)(f->file.size);
+}
+
+int rdcf_get_file_information(struct rdcf *f, char *spec, unsigned index)
+{
+  if ((f->result=setjmp(f->error)) != 0) return f->result;
+  find_entry(f, spec, index);
+  read_directory_entry(f);
+  return f->result = f->file.spec[0] == DELETED_FILE ? RDCF_FILE_NOT_FOUND :
+    f->file.spec[0] == 0 ? RDCF_DIRECTORY_FULL : 0;
+}
+
+int rdcf_get_volume(struct rdcf *f
+  #ifdef RDCF_MULTIPLE_DRIVE
+    , char *spec
+  #endif
+  )
+{
+  if ((f->result=setjmp(f->error)) != 0) return f->result;
+  #ifndef RDCF_MULTIPLE_DRIVE
+    initialize_fcb(f, NULL);
+  #else
+    if (*initialize_fcb(f, spec) != 0) error_exit(f, RDCF_INVALID_SPEC);
+  #endif
+  f->directory_cluster = 0;
+  if (!find_file_in_directory_or_find_volume(f, NULL))
+    error_exit(f, RDCF_FILE_NOT_FOUND);
+  return 0;
+}
+
+int rdcf_match(char *specs, char *pattern)
+{
+  unsigned size = NAME_SIZE;
+  while (1)
+  {
+    unsigned count = size;
+    do
+    {
+      int c1, c2;
+      if (*specs == '.' || *specs == 0) c1 = ' ';
+      else c1 = *specs++;
+      if (*pattern == '*') c2 = '?';
+      else if (*pattern == '.' || *pattern == 0) c2 = ' ';
+      else c2 = *pattern++;
+      if (c2 != '?' && toupper(c1) != toupper(c2)) return 0;
+    } while (--count != 0);
+    while (*specs != '.' && *specs != 0) specs++;
+    if (*specs == '.') ++specs;
+    if (*pattern == '*') while (*++pattern != '.' && *pattern != 0);
+    if (*pattern == '.') ++pattern;
+    if (size == NAME_SIZE) size = EXTENSION_SIZE;
+    else return 1;
+  }
+}
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  int rdcf_move(struct rdcf *f, char *old_spec, char *new_spec)
+  {
+    unsigned char spec[13];
+    unsigned short first_cluster;
+    unsigned char attribute;
+    struct rdcf_date_and_time date_and_time;
+    unsigned long size;
+    unsigned short directory_cluster;
+    unsigned short directory_index;
+    if ((f->result=setjmp(f->error)) != 0) return f->result;
+    if (!find_file(f, initialize_fcb(f, old_spec)))
+      error_exit(f, RDCF_FILE_NOT_FOUND);
+    /* save all needed information about old spec */
+    memcpy(spec, f->file.spec, sizeof(spec));
+    attribute = f->file.attribute;
+    date_and_time = f->file.date_and_time;
+    size = f->file.size;
+    first_cluster = f->file.first_cluster;
+    directory_cluster = f->directory_cluster;
+    directory_index = f->directory_index;
+    if (find_file(f, new_spec)) error_exit(f, RDCF_RENAMING_ERROR);
+    f->file.first_cluster = first_cluster;
+    f->file.attribute = attribute;
+    f->file.date_and_time = date_and_time;
+    f->file.size = size;
+    lengthen_directory_if_necessary(f);
+    update_directory_entry(f, 0);
+    if (f->file.attribute & RDCF_DIRECTORY)
+      update_dot_and_dot_dot(f);
+    memcpy(f->file.spec, spec, sizeof(spec));
+    f->directory_cluster = directory_cluster;
+    f->directory_index = directory_index;
+    update_directory_entry(f, 1);
+    flush_buffer(f);
+    return 0;
+  }
+
+
+#endif
+
+int rdcf_next_file_information(struct rdcf *f)
+{
+  if ((f->result=setjmp(f->error)) != 0) return f->result;
+  f->directory_index++;
+  if (f->directory_cluster == 0)
+  {
+    if (f->directory_index >=
+      (f->first_data_sector - f->first_directory_sector)*ENTRIES_PER_SECTOR)
+    {
+      error_exit(f, RDCF_DIRECTORY_FULL);
+    }
+  }
+  else
+  {
+    if (f->directory_index >= ENTRIES_PER_SECTOR*f->sectors_per_cluster)
+    {
+      f->directory_cluster = FAT_entry(f, f->directory_cluster);
+      if (f->directory_cluster >= f->last_cluster_mark)
+        error_exit(f,RDCF_DIRECTORY_FULL);
+      f->directory_index = 0;
+    }
+  }
+  read_directory_entry(f);
+  return f->result = f->file.spec[0] == DELETED_FILE ? RDCF_FILE_NOT_FOUND :
+    f->file.spec[0] == 0 ? RDCF_DIRECTORY_FULL : 0;
+}
+
+
+int rdcf_open(struct rdcf *f, char *spec
+  #ifndef RDCF_SYSTEM_READ_ONLY
+    , unsigned mode
+  #endif
+  )
+{
+  int found;
+  if ((f->result=setjmp(f->error)) != 0) return f->result;
+  #ifndef RDCF_SYSTEM_READ_ONLY
+    f->mode = mode;
+  #endif
+  found = find_file(f, initialize_fcb(f, spec));
+  if (found && f->file.attribute&RDCF_DIRECTORY)
+    error_exit(f,RDCF_DIRECTORY_CONFLICT);
+  #ifdef RDCF_SYSTEM_READ_ONLY
+    if (!found) error_exit(f, RDCF_FILE_NOT_FOUND);
+  #else
+    switch (mode)
+    {
+      case RDCF_READ_WRITE:
+        check_write_access(f);
+        /* fall through to case RDCF_READ */
+      case RDCF_READ:
+        if (!found)
+          error_exit(f,RDCF_FILE_NOT_FOUND);
+        break;
+      case RDCF_CREATE:
+        if (found)
+        {
+          check_write_access(f);
+          release_FAT_entries(f);
+        }
+        else
+          lengthen_directory_if_necessary(f);
+        f->file.attribute = RDCF_ARCHIVE;
+        f->file.first_cluster = EMPTY_CLUSTER;
+        f->file.size = 0L;
+        rdcf_get_date_and_time(&f->file.date_and_time);
+        f->mode |= WRITTEN;
+        update_directory_entry(f, 0);
+        flush_buffer(f);
+        break;
+      default:
+        error_exit(f,RDCF_MODE_ERROR);
+    }
+  #endif
+  f->position = 0;
+  f->last_cluster = EMPTY_CLUSTER;
+  f->cluster = f->file.first_cluster;
+  return 0;
+}
+
+int rdcf_read(struct rdcf *f, void *buf, int count)
+{
+  unsigned long size = f->file.size;
+  unsigned unread_bytes = count;
+  unsigned long position = f->position;
+  char *buffer = buf;
+  if ((f->result=setjmp(f->error)) != 0) return f->result;
+  #ifndef RDCF_SYSTEM_READ_ONLY
+    if (f->mode != RDCF_READ) error_exit(f,RDCF_MODE_ERROR);
+  #endif
+  f->buffer_status = EMPTY;
+  while (unread_bytes>0)
+  {
+    unsigned n = unread_bytes;
+    unsigned rest_of_sector = SECTOR_SIZE - position%SECTOR_SIZE;
+    unsigned sector;
+    if (size<position+n) n = size-position;
+    if (n==0) break;
+    sector = first_sector_in_cluster(f, f->cluster) +
+      (position/SECTOR_SIZE)%f->sectors_per_cluster;
+    if (n>rest_of_sector) n = rest_of_sector;
+    if (position%SECTOR_SIZE==0 && n==SECTOR_SIZE)
+      read_sector(f, sector, buffer);
+    else /* read a partial sector */
+    {
+      read_buffer(f, sector);
+      memcpy(buffer, f->buffer+position%SECTOR_SIZE, n);
+    }
+    buffer += n;
+    position += n;
+    unread_bytes -= n;
+    if (position%(f->sectors_per_cluster*SECTOR_SIZE)==0 && position<size)
+    {
+      unsigned next_cluster = FAT_entry(f, f->cluster);
+      if (next_cluster >= f->last_cluster_mark) f->last_cluster = f->cluster;
+      f->cluster = next_cluster;
+    }
+  }
+  f->position = position;
+  return f->result = count - unread_bytes;
+}
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  int rdcf_recover(struct rdcf *f, char *spec)
+  {
+    if ((f->result=setjmp(f->error)) != 0) return f->result;
+    if (find_file(f, initialize_fcb(f, spec)))
+      error_exit(f,RDCF_ACCESS_DENIED);
+    if (f->directory_index == NO_DIRECTORY_INDEX)
+      error_exit(f,RDCF_DIRECTORY_FULL);
+    f->file.attribute = RDCF_ARCHIVE;
+    rdcf_get_date_and_time(&f->file.date_and_time);
+    f->file.first_cluster = add_new_cluster(f, EMPTY_CLUSTER, 2);
+    f->file.size = 0L;
+    {
+      unsigned cluster;
+      for (cluster = f->file.first_cluster; cluster != EMPTY_CLUSTER;
+        cluster = add_new_cluster(f, cluster, cluster))
+      {
+        f->file.size += f->sectors_per_cluster * SECTOR_SIZE;
+      }
+    }
+    update_directory_entry(f, 0);
+    flush_buffer(f);
+    return 0;
+  }
+
+#endif
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  int rdcf_rename(struct rdcf *f, char *old_spec, char *new_spec)
+  {
+    unsigned char name_extension[NAME_SIZE+EXTENSION_SIZE];
+    if ((f->result=setjmp(f->error)) != 0) return f->result;
+    old_spec = initialize_fcb(f, old_spec);
+    if (!find_file(f, old_spec))
+      error_exit(f,RDCF_FILE_NOT_FOUND);
+    if (f->file.attribute & (RDCF_HIDDEN+RDCF_SYSTEM))
+      error_exit(f, RDCF_ACCESS_DENIED);
+    spec_to_name_extension(f, name_extension, new_spec);
+    f->directory_cluster = f->directory_first_cluster;
+    if (find_file_in_directory_or_find_volume(f, name_extension))
+      error_exit(f,RDCF_RENAMING_ERROR);
+    find_file(f, old_spec);
+    name_extension_to_spec(f->file.spec, name_extension);
+    update_directory_entry(f, 0);
+    flush_buffer(f);
+    return 0;
+  }
+
+#endif
+
+int rdcf_seek(struct rdcf *f, unsigned long offset)
+{
+  unsigned i, cluster;
+  if ((f->result=setjmp(f->error)) != 0) return f->result;
+  if (offset>f->file.size) error_exit(f,RDCF_SEEK_OUT_OF_RANGE);
+  f->buffer_status = EMPTY;
+  cluster = f->file.first_cluster;
+  for (i=offset/(f->sectors_per_cluster*SECTOR_SIZE); i>0; i--)
+  {
+    unsigned new_cluster = FAT_entry(f, cluster);
+    if (new_cluster >= f->last_cluster_mark) f->last_cluster = cluster;
+    cluster = new_cluster;
+  }
+  f->cluster = cluster;
+  f->position = offset;
+  return 0;
+}
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  int rdcf_set_file_information(struct rdcf *f, char *spec, unsigned index,
+    struct rdcf_file_information *file_information)
+  {
+    if ((f->result=setjmp(f->error)) != 0) return f->result;
+    find_entry(f, spec, index);
+    f->file = *file_information;
+    if (f->file.spec[0] == 0)
+      memset(find_directory(f), 0, sizeof(struct directory));
+    else if (f->file.spec[0] == DELETED_FILE)
+    {
+      f->file.spec[0] = 'X';
+      update_directory_entry(f, 1);
+    }
+    else
+      update_directory_entry(f, 0);
+    flush_buffer(f);
+    return 0;
+  }
+
+#endif
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  int rdcf_set_volume(struct rdcf *f, char *spec)
+  {
+    unsigned char name_extension[NAME_SIZE+EXTENSION_SIZE];
+    if ((f->result=setjmp(f->error)) != 0) return f->result;
+    spec = initialize_fcb(f, spec);
+    {
+      unsigned i = 0;
+      for (i = 0; i < sizeof(name_extension); i++)
+        name_extension[i] = *spec != 0 ? *spec++ : ' ';
+    }
+    if (name_extension[0] == DELETED_FILE)
+      error_exit(f, RDCF_INVALID_SPEC);
+    find_file_in_directory_or_find_volume(f, NULL);
+    if (f->directory_index == NO_DIRECTORY_INDEX)
+      error_exit(f,RDCF_DIRECTORY_FULL);
+    memcpy(f->file.spec, name_extension, sizeof(name_extension));
+    rdcf_get_date_and_time(&f->file.date_and_time);
+    f->file.attribute = RDCF_VOLUME;
+    f->file.size = 0;
+    f->file.first_cluster = 0;
+    update_directory_entry(f, 0);
+    flush_buffer(f);
+    return 0;
+  }
+
+#endif
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  int rdcf_sort_directory(struct rdcf *f, char *spec, int mode)
+  {
+    int sorting = 1;
+    unsigned first_index;
+    unsigned number_of_directory_entries;
+    if ((f->result=setjmp(f->error)) != 0) return f->result;
+    find_entry(f, spec, 0);
+    read_directory_entry(f);
+    if (f->file.spec[0] == 0) return 0; /* empty directory */
+    /* do not sort subdirectories . and .. or system files */
+    while (f->file.spec[0] == '.' || f->file.spec[0] != 0 &&
+      f->file.spec[0] != DELETED_FILE && f->file.attribute & RDCF_SYSTEM)
+    {
+      if (++f->directory_index > 2) error_exit(f, RDCF_FILE_FORMAT_ERROR);
+      read_directory_entry(f);
+    }
+    if (f->file.spec[0] == 0) return 0;
+    first_index = f->directory_index;
+    number_of_directory_entries = f->directory_cluster == 0 ?
+      (f->first_data_sector - f->first_directory_sector)*ENTRIES_PER_SECTOR :
+      ENTRIES_PER_SECTOR*f->sectors_per_cluster;
+    while (sorting)
+    {
+      struct directory *d, previous_entry;
+      unsigned previous_directory_cluster;
+      unsigned previous_directory_index;
+      f->directory_index = first_index;
+      f->directory_cluster = f->directory_first_cluster;
+      sorting = 0;
+      d = find_directory(f);
+      while (1)
+      {
+        int comparison;
+        previous_entry = *d;
+        previous_directory_cluster = f->directory_cluster;
+        previous_directory_index = f->directory_index;
+        if (++f->directory_index == number_of_directory_entries)
+        {
+          if (f->directory_cluster == 0) break;
+          {
+            unsigned x = FAT_entry(f, f->directory_cluster);
+            if (x >= f->last_cluster_mark) break;
+            f->directory_cluster = x;
+            f->directory_index = 0;
+          }
+        }
+        d = find_directory(f);
+        if (d->name_extension[0] == 0) break;
+        comparison = entry_class(d) - entry_class(&previous_entry);
+        if (comparison == 0)
+        {
+          switch (mode & RDCF_REVERSE-1)
+          {
+            case RDCF_EXTENSION_NAME:
+              comparison =
+                memcmp(d->name_extension+NAME_SIZE,
+                previous_entry.name_extension+NAME_SIZE, EXTENSION_SIZE);
+              if (comparison != 0) break;
+              /* else fall through to case RDCF_NAME_EXTENSION */
+            case RDCF_NAME_EXTENSION:
+              comparison =
+                memcmp(d->name_extension, previous_entry.name_extension,
+                NAME_SIZE+EXTENSION_SIZE);
+              break;
+            case RDCF_DATE_TIME:
+              comparison =
+                compare_four_bytes((unsigned char *)(&d->time),
+                (unsigned char *)(&previous_entry.time));
+              break;
+            case RDCF_SIZE:
+              comparison =
+                compare_four_bytes((unsigned char *)(&d->size),
+                (unsigned char *)(&previous_entry.size));
+              break;
+          }
+          if (mode & RDCF_REVERSE) comparison = -comparison;
+        }
+        if (comparison < 0)
+        {
+          struct directory this_entry = *d;
+          unsigned this_directory_cluster = f->directory_cluster;
+          unsigned this_directory_index = f->directory_index;
+          f->directory_cluster = previous_directory_cluster;
+          f->directory_index = previous_directory_index;
+          d = find_directory(f);
+          *d = this_entry;
+          f->buffer_status = DIRTY;
+          f->directory_cluster = this_directory_cluster;
+          f->directory_index = this_directory_index;
+          d = find_directory(f);
+          *d = previous_entry;
+          f->buffer_status = DIRTY;
+          sorting = 1;
+        }
+      }
+    }
+    flush_buffer(f);
+    return 0;
+  }
+
+#endif
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  int rdcf_undelete(struct rdcf *f, char *spec)
+  {
+    unsigned char name_extension[NAME_SIZE+EXTENSION_SIZE];
+    int first_character;
+    if ((f->result=setjmp(f->error)) != 0) return f->result;
+    spec = initialize_fcb(f, spec);
+    if (find_file(f, spec))
+    {
+      if (f->file.attribute & RDCF_DIRECTORY)
+        error_exit(f, RDCF_DIRECTORY_CONFLICT);
+      error_exit(f, RDCF_FILE_NOT_FOUND);
+    }
+    first_character = f->file.spec[0];
+    spec = spec_to_name_extension(f, name_extension, f->file.spec);
+    name_extension[0] = DELETED_FILE;
+    f->directory_cluster = f->directory_first_cluster;
+    if (!find_file_in_directory_or_find_volume(f, name_extension) ||
+      f->file.attribute & RDCF_VOLUME+RDCF_DIRECTORY)
+    {
+      error_exit(f, RDCF_FILE_NOT_FOUND);
+    }
+    f->position = 0;
+    if (f->file.size != 0)
+    {
+      unsigned cluster_size = SECTOR_SIZE * f->sectors_per_cluster;
+      unsigned long recovered_size = cluster_size;
+      unsigned cluster = f->file.first_cluster;
+      if (FAT_entry(f, cluster) != EMPTY_CLUSTER)
+        error_exit(f, RDCF_UNRECOVERABLE_FILE);
+      set_FAT_entry(f, cluster, f->last_cluster_mark);
+      f->file.spec[0] = first_character;
+      {
+        while (recovered_size < f->file.size &&
+          cluster < f->maximum_cluster_number)
+        {
+          cluster = add_new_cluster(f, cluster, cluster+1);
+          if (cluster == EMPTY_CLUSTER)
+          {
+            f->position = f->file.size - recovered_size;
+            f->file.size = recovered_size;
+            break;
+          }
+          recovered_size += cluster_size;
+        }
+      }
+    }
+    f->file.spec[0] = first_character;
+    update_directory_entry(f, 0);
+    flush_buffer(f);
+    return 0;
+  }
+
+#endif
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  int rdcf_wipe_drive(struct rdcf *f
+    #ifdef RDCF_MULTIPLE_DRIVE
+      , char *spec
+    #endif
+    )
+  {
+    unsigned cluster;
+    if ((f->result=setjmp(f->error)) != 0) return (long)(f->result);
+    #ifndef RDCF_MULTIPLE_DRIVE
+      initialize_fcb(f, NULL);
+    #else
+      if (*initialize_fcb(f, spec) != 0) error_exit(f, RDCF_INVALID_SPEC);
+    #endif
+    for (cluster = 2; cluster <= f->maximum_cluster_number; cluster++)
+    {
+      if (FAT_entry(f, cluster) == EMPTY_CLUSTER)
+      {
+        unsigned sector = first_sector_in_cluster(f, cluster);
+        unsigned count = f->sectors_per_cluster;
+        do write_sector(f, sector++, f->buffer); while (--count != 0);
+      }
+    }
+    return 0;
+  }
+
+#endif
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+
+  int rdcf_write(struct rdcf *f, void *buf, int count)
+  {
+    unsigned long size = f->file.size;
+    unsigned long position = f->position;
+    unsigned unwritten_bytes = count;
+    unsigned first_possibly_empty_cluster = 2;
+    char *buffer = buf;
+    if ((f->result=setjmp(f->error)) != 0) return f->result;
+    f->buffer_status = EMPTY;
+    if (f->mode == RDCF_READ) error_exit(f,RDCF_MODE_ERROR);
+    while (unwritten_bytes>0)
+    {
+      unsigned sector;
+      unsigned n = unwritten_bytes;
+      unsigned rest_of_sector = SECTOR_SIZE - position%SECTOR_SIZE;
+      if (n>rest_of_sector) n = rest_of_sector;
+      if (f->cluster == EMPTY_CLUSTER || f->cluster >= f->last_cluster_mark)
+      {
+        unsigned new_cluster =
+          add_new_cluster(f, f->last_cluster, first_possibly_empty_cluster);
+        if (new_cluster == EMPTY_CLUSTER) break;
+        first_possibly_empty_cluster = new_cluster+1;
+        f->cluster = f->last_cluster = new_cluster;
+        if (f->file.first_cluster==EMPTY_CLUSTER)
+          f->file.first_cluster = new_cluster;
+      }
+      sector = first_sector_in_cluster(f, f->cluster) +
+          (position/SECTOR_SIZE)%f->sectors_per_cluster;
+      if (position%SECTOR_SIZE==0 &&
+        (n==SECTOR_SIZE || position+n>=size))
+      {
+        write_sector(f, sector, buffer);
+      }
+      else /* write a partial sector */
+      {
+        read_buffer(f, sector);
+        memcpy(f->buffer+position%SECTOR_SIZE, buffer, n);
+        f->buffer_status = DIRTY;
+      }
+      buffer += n;
+      position += n;
+      unwritten_bytes -= n;
+      if (position>size) size = position;
+      if (position%(f->sectors_per_cluster*SECTOR_SIZE)==0)
+      {
+        unsigned next_cluster = FAT_entry(f, f->cluster);
+        if (next_cluster >= f->last_cluster_mark) f->last_cluster = f->cluster;
+        f->cluster = next_cluster;
+      }
+    }
+    flush_buffer(f);
+    f->position = position;
+    f->file.size = size;
+    f->mode |= WRITTEN;
+    return f->result = count-unwritten_bytes;
+  }
+
+#endif
+
+
+=============================== RDCF2.DOC    ===============================
+
+          RDCF: A Reentrant DOS-Compatible File System, Version 2.0
+
+                    Public Domain - No Restrictions on Use
+
+                            by Philip J. Erdelsky
+                                 pje@acm.org
+
+                               January 15, 1993
+
+
+
+
+1. Introduction
+---------------
+
+RDCF is a reentrant and ROMable DOS-compatible file system designed for use
+with floppy diskettes and hard disk partitions that do not exceed 32 Mbytes in
+size.
+
+For users who are familiar with version 1.0, here is a summary of the
+differences between versions 1.0 and 2.0:
+
+  (1) Version 2.0 supports subdirectories and volume names.  This is by far
+      the most important difference.
+
+  (2) Version 2.0 can be compiled to adapt to different sector sizes at run
+      time.
+
+  (3) Version 2.0 has no default drive option, but it can be compiled with or
+      without multiple drive support.
+
+  (4) The parameters to some functions have been changed slightly to make them
+      more uniform.
+
+  (5) Version 2.0 requires access to the system clock, although a dummy access
+      function will suffice for systems without clocks.
+
+  (6) In version 2.0, the drive access function pointer is stored in the file
+      control block by the calling program, instead of being passed as a
+      parameter.
+
+  (7) In version 2.0, direct access to the file control block is not encouraged
+      to the extent it was in version 1.0.
+
+  (8) Version 2.0 has a few additional features, such as a directory sort
+      function, that were not in version 1.0 and are not in most
+      implementations of DOS.
+
+  (9) Although I no longer claim copyright protection on RDCF2, I would
+      like to know when and where it is being used.
+
+Although DOS 3 permits characters from the IBM extended character set in file
+names, most DOS applications don't, and neither does RDCF.
+
+Since DOS 1 is now obsolete, RDCF does not support DOS 1 diskette formats.
+
+RDCF is fully reentrant with respect to files on different drives. It is also
+reentrant with respect to files on the same drive, provided they are opened for
+reading only. It is not reentrant with respect to different files on the same
+drive, if any of them are being written. Therefore, access to it in this case
+must be serialized on a drive-by-drive basis when it is used in a multitasking
+system.
+
+RDCF does not call on the memory allocator. All working storage for an open
+file is contained in a file control block and a scratch buffer that you must
+allocate in some manner before calling on RDCF. In a manner of speaking, this
+is a reversion to the old CP/M standard, but it permits complete reentrancy
+and does not limit the number of open files.
+
+Since RDCF treats each open file as though it were the only open file, it
+cannot detect collisions. For example, in a multitasking system, if a file is
+written by two tasks at the same time, it will be corrupted. The disk may end
+up with lost clusters and cross-linked chains, but other files on the same disk
+should keep their integrity.
+
+RDCF requires access to a real-time clock.  If your system does not have a
+real-time clock, you can write a dummy clock interface that always returns some
+standard date and time, such as the notorious 1/1/80 00:00:00, which will be
+applied whenever a file is created or modified.
+
+RDCF accesses a disk one sector at a time. While this may seem appallingly
+inefficient, it appears adequate in some cases where only minimal file
+operations are required. A simple cache system, which is also available from
+the same source, will improve its efficiency in other cases. With simple
+interfaces and full source code, you can make other changes that you deem
+necessary for your own application.
+
+RDCF can be compiled as a read-only file system. This eliminates much of the
+code and is suitable for devices that load operating code and other data from
+DOS diskettes but do not write anything on them.
+
+RDCF can be compiled to handle multiple drives, in which case every file
+specification must begin with a drive letter (followed by a colon).  If your
+system has only one drive, or if you prefer to handle drive selection outside
+RDCF, you can compile RDCF without multiple drives, in which case a file
+specification must NOT begin with a drive letter.
+
+The interface to RDCF is not ANSI-compliant, although you could put an ANSI
+compliant interface on top of it.
+
+
+2. Compilation Instructions
+---------------------------
+
+The source code for RDCF 2.0 consists of the files RDCF2.C and RDCF2.H. The
+header file RDCF2.H should be #included in any source file that calls on the
+RDCF, because it contains function prototypes and other necessary definitions.
+
+Since a DOS diskette contains a number of fields of specific sizes, your C
+compiler must have types of the same sizes. Here is what is required:
+
+     type   number of bits
+     -----  --------------
+     char         8
+     short       16
+     long        32
+     int     at least 16
+
+If your application is to run on a CPU with "big endian" byte ordering, such as
+one of the Motorola 68000 series, RDCF will have to do some byte swapping
+because DOS diskettes contain fields with "little endian" ordering. You can do
+this by #defining the variable _BIG_ENDIAN.
+
+If you do not need to write anything on disk, you can save a great deal of code
+by #defining the variable RDCF_SYSTEM_READ_ONLY. This eliminates almost all
+code devoted to writing.
+
+If you system has multiple drives, you can #define the variable
+RDCF_MULTIPLE_DRIVES.  In this case RDCF will require each file specification
+to begin with a drive letter (followed by a colon), and it will pass the drive
+number to the drive interface.
+
+If your application has only one drive, or if it has more than one drive but
+you want to handle drive selection outside RDCF, leave the variable
+RDCF_MULTIPLE_DRIVES undefined.  In this case a file specification passed to
+RDCF must NOT begin with a drive letter.
+
+All DOS diskettes (and nearly all DOS hard disks) use 512-byte sectors, so the
+following definition is included in the header file RDCF2.H:
+
+     #define RDCF_SECTOR_SIZE 512
+
+If you change this value, RDCF won't be compatible with DOS, but it can operate
+in a consistent manner on disks that it has formatted.
+
+If you leave RDCF_SECTOR_SIZE undefined, then RDCF will read the sector size
+from the bootstrap sector of each disk.  This produces less efficient code,
+because expressions involving the sector size cannot be evaluated at compile
+time.  However, it enables RDCF to adapt itself to different sector sizes at
+run time.
+
+You can cut out the code for any RDCF function that you don't need. The
+publicly defined functions in RDCF2.C do not call each other, so one or more
+may be removed without difficulty. For example, if you do only sequential file
+access, you can cut out the function rdcf_seek(). In fact, RDCF probably has
+more functions than most applications require.
+
+RDCF calls on the following standard C functions and macros, which are widely
+available and are usually reentrant:
+
+     isalpha() longjmp() memcmp() memcpy() memset() setjmp() toupper()
+
+RDCF presumes that all file specifications are expressed in ASCII and that the
+C compiler uses ASCII for characters and strings.
+
+To prevent identifier conflicts, all publicly defined RDCF labels begin with
+the characters "RDCF", "_RDCF" or "rdcf".
+
+The following public domain packages are usually distributed along with RDCF
+2.0:
+
+     package    files
+     ---------  -----------------------------
+     CACHE 1.1  CACHE.C, CACHE.DOC, CACHE.H
+     FILES      FILES.C, FILES.COM, FILES.DOC
+
+The FILES package contains examples of the use of RDCF. It is also a rather
+handy diskette utility.
+
+
+3. Drive Access
+---------------
+
+RDCF does not read or write disks directly. You must supply it with a pointer
+to a function that you have written or adapted for this purpose. RDCF then
+calls this function whenever it needs to read or write a disk sector. The
+format of the function call is as follows:
+
+     e = (*drive_access)(write, drive, LSN, buffer);
+
+     int write;       nonzero (true) for a write operation; zero (false)
+                      for a read operation
+
+     unsigned drive;  drive (0=A, 1=B, etc)
+
+     unsigned LSN;    logical sector number
+
+     void *buffer;    memory buffer for data
+
+     unsigned e;      0 for a successful read or write, or an
+                      implementation-defined nonzero error code
+
+The function is called to read or write only one sector at a time. However,
+you may want to implement some kind of read-ahead, caching or delayed writing
+at a lower level to improve efficiency.
+
+The function may be required to convert the LSN into side, track and sector
+numbers, although many disk controllers will make the conversion internally.
+The layout of LSN's is fairly standard, and is designed to minimize head
+motion when LSN's are accessed in ascending numerical order. On DOS systems,
+the conversion is made as follows:
+
+     sector number = LSN % (number of sectors per track) + 1
+
+     side number = (LSN / (number of sectors per track)) % (number of sides)
+
+     track number = LSN / ((number of sectors per track) * (number of sides))
+
+The sector size, the number of sectors per track and the number of sides are
+written into the following bytes of LSN 0 (where byte 0 is the first byte):
+
+     byte  contents
+     ----  --------------------------------------
+      11   LS byte of number of bytes per sector
+      12   MS byte of number of bytes per sector
+      24   LS byte of number of sectors per track
+      25   MS byte of number of sectors per track
+      26   LS byte of number of sides
+      27   MS byte of number of sides
+
+If RDCF is to adapt automatically to diskettes of different formats in the same
+drive, the function (*drive_access)() can simply record these values whenever
+LSN 0 is read or written and then use them to find other sectors. Notice that
+LSN 0 is always sector 1 of track 0 on side 0.
+
+An error code must be a 16-bit nonzero unsigned value. Its format is
+implementation-dependent. When RDCF receives a nonzero return value from the
+function (*drive_access)(), it aborts the current operation, puts the return
+value into the file control block member called "drive_error" and returns the
+error code RDCF_DRIVE_ERROR.
+
+Error correction and retries, if any, must be implemented at a lower level.
+
+If RDCF is used in a reentrant fashion, the function (*drive_access)() must
+also have the required reentrancy.
+
+Here is a drive access function that can be used with Turbo C 2.0 (or a
+compatible later version of Borland or Turbo C++) under DOS:
+
+     #include <dos.h>
+
+     unsigned drive_access(int write, unsigned drive, unsigned LSN,
+       void *buffer)
+     {
+       _SI; _DI;
+       return write ? abswrite(drive, 1, LSN, buffer) :
+         absread(drive, 1, LSN, buffer);
+     }
+
+The strange-looking first line of the function goads the compiler into saving
+and restoring the SI and DI registers, something that absread() and abswrite()
+should do but don't always do, especially when a drive error is detected.
+
+DOS does a little bit of caching when you access disks in this manner.
+Therefore, you should call bdos(13,0,0) to flush the buffers before returning
+control to DOS.  Otherwise DOS may not recognize the changes RDCF has made.
+
+
+4. Real Time Clock Access
+-------------------------
+
+When RDCF needs the date and time, it calls a function as follows:
+
+     rdcf_get_date_and_time(p);
+
+     struct rdcf_date_and_time *p;  pointer to structure to receive
+                                    date and time
+
+You must write a version of rdcf_date_and_time() for your own system.  If your
+system has no real-time clock, the following function will supply the notorious
+1-1-80 00:00:00 as the current date and time:
+
+     struct rdcf_date_and_time(struct rdcf_date_and_time *p)
+     {
+       static struct rdcf_date_and_time DT = {0,0,0,1,1,1980};
+       memcpy(p, &DT, sizeof(DT));
+     }
+
+If you run RDCF under DOS and use Turbo C 2.0 (or a compatible later version of
+Turbo or Borland C++), the following function will supply the date and time
+taken from the system clock:
+
+     void rdcf_get_date_and_time(struct rdcf_date_and_time *p)
+     {
+       struct date d;
+       struct time t;
+       int day;
+       getdate(&d);
+       day = d.da_day;
+       gettime(&t);
+       getdate(&d);
+       if (day != d.da_day) gettime(&t);
+       p->month = d.da_mon;
+       p->day = d.da_day;
+       p->year = d.da_year;
+       p->hour = t.ti_hour;
+       p->minute = t.ti_min;
+       p->second = t.ti_sec;
+     }
+
+Notice that it is sometimes necessary to read the date and time twice to be
+sure of getting a consistent reading when the function is called at midnight.
+
+DOS files always have dates in the period 1980-2107.
+
+
+5. The File Control Block
+-------------------------
+
+All working storage for an open file is contained in a file control block of
+type "struct rdcf", which is defined in the header file RDCF2.H, and a scratch
+buffer described below.  You must allocate space for file control blocks and
+scratch buffers before calling on RDCF, since RDCF itself does not call on the
+memory allocator.
+
+The first element of a file control block is a pointer to a scratch buffer
+with room for RDCF_SECTOR_SIZE unsigned characters. The second element is a
+pointer to the drive access function defined above. You must initialize these
+pointers, perhaps as follows:
+
+        static unsigned char my_buffer[RDCF_SECTOR_SIZE];
+        static struct rdcf f = {my_buffer, drive_access};
+
+If your implementation has a memory allocator, you can use that instead:
+
+        struct rcdf f;
+        f.buffer = malloc(RDCF_SECTOR_SIZE);
+        f.drive_access = drive_access;
+
+If you leave RDCF_SECTOR_SIZE undefined because your system uses different
+sector sizes on different disks, the buffer must be large enough to hold the
+largest sector.
+
+If RDCF_MULTIPLE_DRIVES is undefined, but your system has more than one drive,
+you must also put the appropriate drive number into the member f.drive so that
+it can be passed to the drive access function. 
+
+With one exception involving the function rdcf_next_file_information(), neither
+the scratch buffer contents nor the scratch buffer pointer needs to be
+maintained from one call on RDCF to the next.  However, if RDCF is to be used
+in a multitasking system, tasks that can call RDCF in a reentrant fashion must
+use different scratch buffers. In most cases, it is sufficient to allocate one
+scratch buffer for each drive, and to serialize calls on RDCF for each drive.
+
+The drive access function pointer must not be changed while the file
+corresponding to the file control block is open.
+
+You don't have to perform any other initialization on your file control
+blocks; RDCF does that for you.
+
+The file control block for a successfully opened file contains a number of
+members that you can (safely) read and/or write directly, without calling on
+RDCF:
+
+     member           permitted
+                       access     meaning
+     ---------------  ----------  ----------------------------------------
+     buffer           read/write  pointer to scratch buffer
+     drive_access     read/write  pointer to drive access function
+     drive            read/write  drive (0=A, 1=B, etc.)
+     file               read      file information block, described below
+     position           read      file pointer
+     drive_error        read      error when RDCF_DRIVE_ERROR is returned
+     result             read      result returned by most recent operation
+
+Of course, you should write into the "drive" member only if you have left
+RDCF_MULTIPLE_DRIVES undefined but your system has more than one drive.
+
+The file information block is described more fully in Section 6 below.
+
+File control blocks of the same format are also used by some RDCF functions for
+working storage, although nothing more than result codes are returned in them.
+
+
+6. The File Information Block
+-----------------------------
+
+The "file" member of a file control block, when filled by RDCF, contains the
+following information about a file:
+
+     member         meaning
+     ---------      ---------------------------------------------------
+     spec[13]       name and extension in ASCII, terminated by \0
+     attribute      DOS file attribute byte (see below)
+     date_and_time  file date and time
+     first_cluster  number of first cluster
+     size           file length in bytes (0 for volume or subdirectory)
+
+The name and extension are at most eight and three characters long,
+respectively, they are separated by a period (.) if the extension is
+non-blank, and they are terminated by a nul (\0).  RDCF always converts small
+letters in file names and extensions to the corresponding capital letters
+before putting them into the file information block.
+
+If the information block represents a volume name, however, then the spec[]
+member contains the name, which is eleven characters long and may contain
+small letters and special characters.
+
+The date_and_time member is itself a structure with the following members:
+
+     member  meaning    range
+     ------  ---------  -----------------
+     second  file time  0-58, always even
+     minute  file time  0-59
+     hour    file time  0-23
+     day     file date  1-31
+     month   file date  1-12
+     year    file date  1980-2107
+
+The bits of the attribute byte are represented by mnemonics defined in RDCF2.H:
+
+    #define RDCF_READ_ONLY  0x01
+    #define RDCF_HIDDEN     0x02
+    #define RDCF_SYSTEM     0x04
+    #define RDCF_VOLUME     0x08
+    #define RDCF_DIRECTORY  0x10
+    #define RDCF_ARCHIVE    0x20
+
+The file information and date-and-time blocks also appear outside the file
+control block in some contexts.
+
+
+7. RDCF File Specifications
+---------------------------
+
+A file specification under RDCF is almost the same as its DOS counterpart.
+
+As in DOS, case is not significant in file specifications.  Moreover, every
+name is truncated to eight characters, and every extension is truncated to
+three characters.  Hence "A:MYPROGRAM.PASCAL", "A:MYPROGRA.PAS", and
+"a:myprogra.pas" all represent the same file.
+
+In a multiple-drive system, the file specification MUST begin with a drive
+specification (a drive letter followed by a colon). In systems with only one
+drive, the file specification must NOT begin with a drive letter.  If you want
+to handle drive selection outside RDCF, adjust the drive access pointer and
+the drive number in the file control block to select the desired drive, and
+then remove the drive letter and colon from the file specification before
+calling on RDCF.
+
+Since there is no "current directory", the file specification must begin at the
+root and contain the names of all intermediate subdirectories.  The backslash
+at the beginning of the directory path is superfluous and is NOT used.  Hence
+a file specification such as "C:\UTIL\CHKDSK.COM", which is quite familiar
+under DOS, is invalid under RDCF.  The RDCF specification is
+"C:UTIL\CHKDSK.COM".
+
+For the same reason, RDCF does not permit the special subdirectories "." and
+".." in a directory path, but to maintain disk-level compatibility with DOS, it
+puts them into subdirectories that it creates.
+
+A directory specification is the same as a file specification, except that it
+refers to a subdirectory.
+
+Where required, a root directory is represented by a drive specification alone;
+e.g., "B:" represents the root directory on drive B:.  In single-drive systems,
+the empty string "" represents the root directory.
+
+RDCF treats all file and drive specifications supplied to it as read-only
+strings.  They may reside in ROM.
+
+
+8. The Program Interface
+------------------------
+
+The RDCF program interface consists of the following functions:
+
+     function                     description
+     ---------------------------  -------------------------------------
+     rdcf_attribute()             change a file attribute
+     rdcf_close()                 close a file
+     rdcf_date_and_time()         change a file, volume or subdirectory
+                                    date and time
+     rdcf_delete()                delete a file, volume name or
+                                    subdirectory
+     rdcf_directory()             create a subdirectory
+     rdcf_format()                format a disk
+     rdcf_free_space()            get disk free space
+     rdcf_get_file_information()  get a directory entry
+     rdcf_get_volume()            get volume name
+     rdcf_match()                 match name and extension
+     rdcf_move()                  move a file or subdirectory
+     rdcf_next_file_information() get next directory entry
+     rdcf_open()                  open a file
+     rdcf_read()                  read from a file
+     rdcf_recover()               recover erased data
+     rdcf_rename()                rename a file or directory
+     rdcf_seek()                  move a file pointer
+     rdcf_set_file_information()  write into a directory entry
+     rdcf_set_volume()            write volume name
+     rdcf_sort_directory()        sort a directory
+     rdcf_undelete()              restore a deleted file
+     rdcf_wipe_drive()            wipe out erased data
+     rdcf_write()                 write into a file
+
+There are also four externally defined variables, which for reentrancy must be
+considered read-only:
+
+     rdcf_format_360    rdcf_format_1200
+     rdcf_format_720    rdcf_format_1440
+
+
+8.1. rdcf_attribute() - Change a File Attribute
+-----------------------------------------------
+
+The following function call changes a file's attribute byte:
+
+     e = rdcf_attribute(fcb, filespec, attribute);
+
+     struct rdcf *fcb;            pointer to file control block
+
+     char *filespec;              file specification string, with
+                                  terminating \0
+
+     unsigned attribute;          new attribute byte
+
+     int e;                       0 if file was successfully modified,
+                                  or negative error code
+
+Only the following attribute bits are affected by this function:
+
+     RDCF_ARCHIVE     RDCF_READ_ONLY
+     RDCF_HIDDEN      RDCF_SYSTEM
+
+Possible return values are as follows:
+
+     return value             meaning
+     -----------------------  -------------------------------------
+     0                        successful operation
+     RDCF_DIRECTORY_CONFLICT  file name conflicts with subdirectory
+     RDCF_DISK_FORMAT_ERROR   disk improperly formatted
+     RDCF_DRIVE_ERROR         error in reading or writing disk
+     RDCF_FILE_FORMAT_ERROR   corrupt file allocation table
+     RDCF_FILE_NOT_FOUND      file not found
+     RDCF_INVALID_SPEC        invalid drive or file specification
+     RDCF_INVALID_DIRECTORY   nonexistent subdirectory in path
+
+If RDCF is compiled as a read-only file system, this function is not defined.
+
+
+8.2. rdcf_close() - Close a File
+--------------------------------
+
+If a file has been written or otherwise modified, you must close it in order to
+update its directory entry. Here is the appropriate function call:
+
+     e = rdcf_close(fcb);
+
+     struct rdcf *fcb;     pointer to open file control block
+
+     int e;                0 for a successful operation, or a negative error
+                           code
+
+The file control block must have been successfully opened by rdcf_open().
+
+If the file has been modified, its date and time will be set to the value
+returned by rdcf_get_date_and_time().
+
+If a file has not been written or otherwise modified, there is no need to close
+it, and this function will do nothing to it. If RDCF is compiled as a read-only
+file system, this function is not even defined.
+
+Possible return values are as follows:
+
+     return value            meaning
+     -----------------       --------------------------------
+     0                       successful operation
+     RDCF_DISK_FORMAT_ERROR  disk improperly formatted
+     RDCF_DRIVE_ERROR        error in reading or writing disk
+
+
+8.3. rdcf_date_and_time() - Change Date and Time
+------------------------------------------------
+
+The following function call changes the date and time of a file, volume name
+or subdirectory:
+
+     e = rdcf_date_and_time(fcb, filespec, t);
+
+     struct rdcf *fcb;             pointer to file control block
+
+     char *filespec;               file specification string, with
+                                   terminating \0
+
+     struct rdcf_date_and_time *t; pointer to block containing desired
+                                   date and time
+
+     int e;                        0 if operation was successful,
+                                   or negative error code
+
+If RDCF_MULTIPLE_DRIVE is defined, the file specification for a volume name
+consists of a drive specification alone, e.g., "A:" for drive A:, "B:" for
+drive B:, etc.  In other cases, the file specification for a volume name is
+the empty string ("").
+
+When the time and date of a subdirectory are changed, the time and date of its
+special subdirectories "." and ".." are also changed.
+
+Possible return values are as follows:
+
+     return value             meaning
+     -----------------------  ----------------------------------
+     0                        successful operation
+     RDCF_DISK_FORMAT_ERROR   disk improperly formatted
+     RDCF_DRIVE_ERROR         error in reading or writing disk
+     RDCF_FILE_FORMAT_ERROR   corrupt file allocation table
+     RDCF_FILE_NOT_FOUND      file not found
+     RDCF_INVALID_SPEC        invalid drive or file specification
+     RDCF_INVALID_DIRECTORY   nonexistent subdirectory in path
+
+If RDCF is compiled as a read-only file system, this function is not defined.
+
+
+8.4. rdcf_delete() - Delete a File, Volume Name or Subdirectory
+----------------------------------------------------------------
+
+The following function call deletes a file, volume name or subdirectory:
+
+     e = rdcf_delete(fcb, filespec);
+
+     struct rdcf *fcb;            pointer to file control block
+
+     char *filespec;              file specification string, with
+                                  terminating \0
+
+     int e;                       0 if file was successfully opened,
+                                  or negative error code
+
+If RDCF_MULTIPLE_DRIVE is defined, the file specification for a volume name
+consists of a drive specification alone, e.g., "A:" for drive A:, "B:" for
+drive B:, etc.  In other cases, the file specification for a volume name is
+the empty string ("").
+
+Possible return values are as follows:
+
+     return value             meaning
+     -----------------------  ----------------------------------------
+     0                        successful operation
+     RDCF_ACCESS_DENIED       attempt to delete a read-only file or a
+                                subdirectory that is not empty
+     RDCF_DISK_FORMAT_ERROR   disk improperly formatted
+     RDCF_DRIVE_ERROR         error in reading or writing disk
+     RDCF_FILE_NOT_FOUND      file, volume name or directory not found
+     RDCF_INVALID_SPEC        invalid drive or file specification
+     RDCF_INVALID_DIRECTORY   nonexistent subdirectory in path
+
+If RDCF is compiled as a read-only file system, this function is not defined.
+
+
+8.5. rdcf_directory() - Create a New Subdirectory
+-------------------------------------------------
+
+The following function call creates a new subdirectory:
+
+     e = rdcf_directory(fcb, filespec);
+
+     struct rdcf *fcb;             pointer to file control block
+
+     char *filespec;               file specification string, with
+                                   terminating \0
+
+     int e;                        0 if operation was successful,
+                                   or negative error code
+
+The new directory, and its special subdirectories "." and "..", will bear the
+current date and time as determined by a call on rdcf_get_date_and_time().
+
+Possible return values are as follows:
+
+     return value             meaning
+     -----------------------  ----------------------------------------
+     0                        successful operation
+     RDCF_DIRECTORY_CONFLICT  name conflicts with file or subdirectory
+     RDCF_DIRECTORY_FULL      insufficient directory or data space
+     RDCF_DISK_FORMAT_ERROR   disk improperly formatted
+     RDCF_DRIVE_ERROR         error in reading or writing disk
+     RDCF_INVALID_SPEC        invalid drive or file specification
+     RDCF_INVALID_DIRECTORY   nonexistent subdirectory in path
+
+If RDCF is compiled as a read-only file system, this function is not defined.
+
+
+8.6. rdcf_format() - Format a Disk
+----------------------------------
+
+Formatting a disk usually involves two operations, both of which are performed
+by most DOS formatting utilities for diskettes.
+
+The first operation, called physical formatting, divides the tracks up into
+sectors and writes the necessary sector numbers into them. The sectors are
+filled with meaningless bytes. RDCF has no provision for physical formatting
+because the procedure is highly hardware-dependent.
+
+The second operation, called logical formatting, writes the required
+information into the bootstrap sector, the file allocation table, and the root
+directory. RDCF performs logical formatting with the following function call:
+
+     e = rdcf_format(fcb, spec, format);
+
+     struct rdcf *fcb;            pointer to file control block
+
+     char *spec;                  drive specification ("A:", "B:", etc.),
+                                  omitted if RDCF_MULTIPLE_DRIVE is undefined
+
+     struct rdcf_format *format;  pointer to descriptor block for desired
+                                  format
+
+     int e;                       0 if operation was successful,
+                                  or negative error code
+
+The format parameter has any of four values, depending on the type of disk
+being formatted:
+
+     value of format    physical size  density  capacity
+     -----------------  -------------  -------  --------
+     &rdcf_format_360     5-1/4 inch   double   360K
+     &rdcf_format_720     3-1/2 inch   double   720K
+     &rdcf_format_1200    5-1/4 inch    high    1.2M
+     &rdcf_format_1440    3-1/2 inch    high    1.44M
+
+Logical formatting deletes all files, subdirectories and the volume name. Some
+of this information can be reconstructed by rdcf_recover() or by special
+recovery programs if it has not been overwritten. However, all the information
+becomes inaccessible through normal DOS and RDCF calls. The disk also becomes
+unbootable and cannot be made bootable with the DOS SYS utility.
+
+This function is especially useful if the data storage device is not a
+DOS-compatible disk. You can use it to format a RAM disk, a portion of a hard
+disk, or even a file and use it as though it were a disk.  The function
+(*drive_access)() usually needs to be modified, but no other changes are
+required.
+
+If you want to use a nonstandard format, you can make up your own format
+descriptor block.  Here is what is in it:
+
+     byte  contents
+     ----  ------------------------------------------------------
+      0    LS byte of number of bytes per sector
+      1    MS byte of number of bytes per sector
+      2    number of sectors per data cluster
+      3    1
+      4    0
+      5    number of file allocation tables
+      6    LS byte of number of root directory entries
+      7    MS byte of number of root directory entries
+      8    LS byte of total number of sectors
+      9    MS byte of total number of sectors
+     10    unused
+     11    LS byte of number of sectors per file allocation table
+     12    MS byte of number of sectors per file allocation table
+     13    LS byte of number of sectors per track
+     14    MS byte of number of sectors per track
+     15    LS byte of number of sides
+     16    MS byte of number of sides
+     17    unused
+     18    unused
+
+NOTICE that some two-byte parameters are not aligned on even boundaries.
+
+Of course, if you format a disk in a nonstandard manner, DOS may not be able to
+read it.  There are a number of limitations on the parameters to guarantee a
+self-consistent format that RDCF can use:
+
+     (1) None of the parameters can be zero (although the MS byte of a two-byte
+         parameter can be zero).
+
+     (2) The sector size must be a multiple of 32; but if RDCF_SECTOR_SIZE is
+         defined, RDCF ignores this field.
+
+     (3) The number of root directory entries must be a multiple of the number
+         of entries in a sector.  Each entry occupies 32 bytes, so if 512-byte
+         sectors are used, the number of entries per sector is 16.
+
+     (4) The disk contains the following areas, which must add up to the
+         specified total number of sectors:
+
+          (a) one bootstrap sector,
+
+          (b) the specified number of file allocation tables, each containing
+              the specified number of sectors,
+
+          (c) the root directory, and
+
+          (d) the data sectors.
+
+     (5) The number of data sectors must be a multiple of the number of sectors
+         per data cluster.  Their quotient is the number of data clusters.
+
+     (6) The number of data clusters must not exceed 65,517.
+
+     (6) If the number of data clusters is 4077 or less, then each file
+         allocation table must contain at least 3 bytes plus one and one-half
+         bytes for each data cluster.  Otherwise, each file allocation table
+         must contain at least 4 bytes plus 2 bytes for each data cluster.
+
+Parameters described as "unused" are not used by RDCF, although they may have
+meanings on a DOS diskette.  The rdcf_format() function makes only a
+perfunctory consistency check on the parameters.
+
+RDCF does not use the number of sectors per track or the number of sides, but
+the function (*drive_access)() may need them.
+
+Possible return values are as follows:
+
+     return value               meaning
+     ------------------------   -----------------------------
+     0                          successful operation
+     RDCF_DISK_FORMAT_ERROR     improper format control block
+     RDCF_DRIVE_ERROR           error in writing disk
+     RDCF_INVALID_SPEC          invalid drive specification
+
+If RDCF is compiled as a read-only file system, this function is not defined.
+
+
+8.7. rdcf_free_space() -  Get Disk Free Space
+---------------------------------------------
+
+The following function call returns the number of bytes of free space on a
+disk:
+
+     n = rdcf_free_space(fcb, char *spec);
+
+     struct rdcf *fcb;            pointer to file control block
+
+     char *spec;                  drive specification ("A:", "B:", etc.),
+                                  omitted if RDCF_MULTIPLE_DRIVE is undefined
+
+     long n;                      number of free bytes, or a
+                                  negative error code
+
+If the operation is successful, the number of free bytes is also left in the
+member fcb->file.size.
+
+In the absence of drive errors, the number of free bytes returned by this
+function is the maximum number of bytes that can be added to an existing file
+that fills a whole number of data clusters. The number of additional bytes
+that can be written to existing files may be larger, because each file may
+have some empty space in its last cluster that is not counted as free by this
+function.
+
+The number of bytes that can be written to a newly created file is also the
+same as the value returned by this function, except in one peculiar case.  If
+a new file is added to a subdirectory, it may be necessary to add a cluster to
+the subdirectory to accommodate the new file entry.  This cluster is not
+available for file data.
+
+Possible error codes are as follows:
+
+     return value            meaning
+     ----------------------  ---------------------------
+     RDCF_DISK_FORMAT_ERROR  disk improperly formatted
+     RDCF_DRIVE_ERROR        error in reading disk
+     RDCF_INVALID_SPEC       invalid drive specification
+
+
+8.8. rdcf_get_file_information() - Get a Directory Entry
+--------------------------------------------------------
+
+The following function reads a directory entry:
+
+     e = rdcf_get_file_information(fcb, specs, index);
+
+     struct rdcf *fcb;            pointer to file control block
+
+     char *filespec;              directory specification string, with
+                                  terminating \0
+
+     unsigned index;              index of desired entry (0 = first entry,
+                                  1 = second entry, etc.)
+
+     int e;                       0 if entry was successfully read,
+                                  or negative error code
+
+If RDCF_MULTIPLE_DRIVE is defined, the directory specification string for the
+root directory consists of a drive specification alone, such as "D:".
+Otherwise, the empty string ("") represents the root directory.
+
+If the operation is successful, useful information about the file, volume name
+or subdirectory will be found in the file information block fcb->file.
+
+If the return value is RDCF_FILE_NOT_FOUND, the entry represents an erased
+file, volume name or subdirectory.  The first character in the name is invalid
+but other information is valid and reflects the status of the file, volume
+name or subdirectory before it was deleted.
+
+If the entry represents a volume name or subdirectory, the RDCF_VOLUME or
+RDCF_DIRECTORY bit will be set in the attribute byte.
+
+Entries 0 and 1 in a subdirectory represent the special directory entries named
+"." and "..".  RDCF makes no use of these special entries, but it faithfully
+emulates this DOS feature.
+
+The value RDCF_DIRECTORY_FULL is returned if the index would put the entry
+beyond the end of the directory area, or if the entry lies inside this area but
+has never been used since the directory was created. In either case, the entry
+is invalid and there are no valid entries with any higher index value.
+
+Even if the entry is valid and represents a file, the file control block may
+not be used to read, write or otherwise manipulate the file until it is
+successfully opened by rdcf_open().
+
+If you call this function repeatedly to scan the directory, you should
+probably use some kind of caching. Otherwise, both the bootstrap block and the
+directory will be read from disk with each function call. Even without
+caching, this function produced acceptable results when used to display a
+directory listing of a floppy diskette, although the process was a little
+slower than most people would prefer.
+
+The companion function rdcf_next_file_information(), which is described below,
+can also be called to obtain the following entry without repeating the entire
+directory search.
+
+Possible return values are as follows:
+
+     return value            meaning
+     ----------------------  ------------------------------
+     0                       successful operation
+     RDCF_DIRECTORY_FULL     index is past end of directory
+     RDCF_DISK_FORMAT_ERROR  disk improperly formatted
+     RDCF_DRIVE_ERROR        error in reading disk
+     RDCF_FILE_NOT_FOUND     entry represents deleted file
+     RDCF_INVALID_SPEC       invalid drive specification
+     RDCF_INVALID_DIRECTORY  nonexistent subdirectory in path
+
+
+8.9. rdcf_get_volume() - Get Volume Name
+----------------------------------------
+
+The following function call scans the root directory for the volume name, if
+any:
+
+     e = rdcf_get_volume(fcb, char *spec);
+
+     struct rdcf *fcb;            pointer to file control block
+
+     char *spec;                  drive specification ("A:", "B:", etc.),
+                                  omitted if RDCF_MULTIPLE_DRIVE is undefined
+
+     int e;                       0 if volume name was successfully read,
+                                  or negative error code
+
+If the operation is successful, information regarding the volume name is left
+in the file information block fcb->file.
+
+Possible return values are as follows:
+
+     return value            meaning
+     ----------------------  ------------------------------
+     0                       successful operation
+     RDCF_DISK_FORMAT_ERROR  disk improperly formatted
+     RDCF_DRIVE_ERROR        error in reading disk
+     RDCF_FILE_NOT_FOUND     disk has no volume name
+     RDCF_INVALID_SPEC       invalid drive specification
+
+
+8.10. rdcf_next_file_information() - Get Next Directory Entry
+-------------------------------------------------------------
+
+The following function reads the next directory entry after the one read by the
+most recent call on rdcf_get_file_information() or rdcf_next_file_information()
+using the same file control block:
+
+     e = rdcf_next_file_information(fcb);
+
+     struct rdcf *fcb;            pointer to the same file control block used
+                                  by a previous call on this function or
+                                  rdcf_get_file_information()
+
+     int e;                       0 if entry was successfully read,
+                                  or negative error code
+
+The file control block and scratch buffer must be the same ones used by the
+preceding call on rdcf_get_file_information() or this function, and the
+directory structure on the disk must not have changed.  The preceding call must
+not have returned RDCF_DIRECTORY_FULL.  This function uses information left in
+the file control block to find the next directory entry without rescanning the
+directory.
+
+If the operation is successful, useful information about the file, volume name
+or subdirectory will be found in the file information block fcb->file.
+
+If the return value is RDCF_FILE_NOT_FOUND, the entry represents an erased
+file, volume name or subdirectory.  The first character in the name is invalid
+but other information is valid and reflects the status of the file, volume
+name or subdirectory before it was deleted.
+
+If the entry represents a volume name or subdirectory, the RDCF_VOLUME or
+RDCF_DIRECTORY bit will be set in the attribute byte.
+
+Entries 0 and 1 in a subdirectory represent the special directory entries named
+"." and "..".  RDCF makes no use of these special entries, but it faithfully
+emulates this DOS quirk.
+
+The value RDCF_DIRECTORY_FULL is returned if the index would put the entry
+beyond the end of the directory area, or if the entry lies inside this area but
+has never been used since the directory was created. In either case, the entry
+is invalid and there are no valid entries with any higher index value.
+
+Even if the entry is valid and represents a file, the file control block may
+not be used to read, write or otherwise manipulate the file until it is
+successfully opened by rdcf_open().
+
+Possible return values are as follows:
+
+     return value            meaning
+     ----------------------  ------------------------------
+     0                       successful operation
+     RDCF_DIRECTORY_FULL     index is past end of directory
+     RDCF_DISK_FORMAT_ERROR  disk improperly formatted
+     RDCF_DRIVE_ERROR        error in reading disk
+     RDCF_FILE_NOT_FOUND     entry represents deleted file
+
+
+8.11. rdcf_match() - Match Name and Extension
+---------------------------------------------
+
+The following function determines whether a DOS file name and extension match
+a DOS pattern, which may include the special characters ? and *:
+
+     match = rdcf_match(name_extension, pattern);
+
+     char *name_extension;  DOS name and extension, with separating . and
+                            terminating \0
+
+     char *pattern;         DOS name and extension, with separating . and
+                            terminating \0, possibly including the special
+                            characters ? and *
+
+     int match;             true (nonzero) if the name and extension match
+                            the pattern; false (zero) otherwise
+
+The function follows all the usual DOS quirks.  Small letters are converted to
+capital letters before comparison.  The name is truncated to eight characters,
+and the extension is truncated to three characters.
+
+The function does not check the validity of the name and extension or the
+pattern.
+
+
+8.12. rdcf_move() - Move a File or Subdirectory
+-----------------------------------------------
+
+The following function call moves a file or subdirectory from one directory to
+another ON THE SAME DRIVE:
+
+     e = rdcf_move(fcb, old_filespec, new_filespec);
+
+     struct rdcf *fcb;            pointer to file control block
+
+     char *old_filespec;          old file specification string, with
+                                  terminating \0
+
+     char *new_filespec;          new file specification, with
+                                  terminating \0
+
+     int e;                       0 if file was successfully opened,
+                                  or negative error code
+
+The new file specification may not begin with a drive specification, even if
+RDCF_MULTIPLE_DRIVE is defined.  However, it may, and often does, begin with a
+directory path.
+
+The file name and extension in the new file specification need not be the same
+as those in the old file specification.  The file or subdirectory can be
+renamed as it is moved.
+
+The file or directory entry in the old position will be marked as deleted.
+
+You may use this function to move a subdirectory, but you must be careful not
+to corrupt the tree structure by moving a subdirectory into itself or one of
+its subdirectories.  RDCF will not protect you from such folly.
+
+Possible return values are as follows:
+
+     return value             meaning
+     -----------------------  ------------------------------------------
+     0                        successful operation
+     RDCF_DIRECTORY_FULL      insufficient directory space for new entry
+     RDCF_DISK_FORMAT_ERROR   disk improperly formatted
+     RDCF_DRIVE_ERROR         error in reading or writing disk
+     RDCF_FILE_NOT_FOUND      file not found
+     RDCF_INVALID_DIRECTORY   nonexistent subdirectory in path
+     RDCF_INVALID_SPEC        invalid drive or file specification
+     RDCF_RENAMING_ERROR      new file specification is already in use
+
+If RDCF is compiled as a read-only file system, this function is not defined.
+
+
+8.13. rdcf_open() - Open a File
+-------------------------------
+
+The following function call opens a file:
+
+     e = rdcf_open(fcb, filespec, mode);
+
+     struct rdcf *fcb;            pointer to file control block
+
+     char *filespec;              file specification string, with
+                                  terminating \0
+
+     unsigned mode;               file mode (not used if RDCF is read-only)
+
+     int e;                       0 if file was successfully opened,
+                                  or negative error code
+
+If the file is successfully opened, the file pointer is set to the beginning
+of the file and the file control block is initialized for use by other RDCF
+operations on the file.  The file information block fcb->file then contains
+meaningful information about the file.
+
+The mode may be as follows:
+
+     mode             operation
+     ---------------  ------------------------------------------------
+     RDCF_CREATE      create file for writing, deleting the file if it
+                        already exists
+     RDCF_READ        open file for reading only
+     RDCF_READ_WRITE  open file for reading and writing
+
+In read-only file systems, RDCF_READ is the only mode permitted, so the mode
+parameter is absent.
+
+You may wish to open a file in the RDCF_READ mode merely to obtain information
+from its file control block.  Then you can abandon or re-use the file control
+block; there is no need to close the file.
+
+You can emulate the full panoply of DOS open() modes by calling this function
+more than once.
+
+Possible return values are as follows:
+
+     return value             meaning
+     -----------------------  ----------------------------------------------
+     0                        successful operation
+     RDCF_ACCESS_DENIED       attempt to write a read-only file
+     RDCF_DIRECTORY_CONFLICT  file name conflicts with subdirectory
+     RDCF_DIRECTORY_FULL      insufficient directory space to create a file
+     RDCF_DISK_FORMAT_ERROR   disk improperly formatted
+     RDCF_DRIVE_ERROR         error in reading or writing disk
+     RDCF_FILE_NOT_FOUND      file not found in RDCF_READ or RDCF_READ_WRITE
+     RDCF_INVALID_DIRECTORY   nonexistent subdirectory in path
+     RDCF_INVALID_SPEC        invalid drive or file specification
+     RDCF_MODE_ERROR          invalid mode
+
+
+8.14. rdcf_read() - Read from a File
+------------------------------------
+
+The following function call reads a block of bytes from an open file:
+
+     n = rdcf_read(fcb, buffer, count);
+
+     struct rdcf *fcb;   pointer to open file control block
+
+     void *buffer;       memory buffer to receive data
+
+     int count;          number of bytes to be read
+
+     int n;              number of bytes actually read, or a negative
+                         error code
+
+The file control block must have been successfully opened in mode RDCF_READ or
+RDCF_READ_WRITE by rdcf_open().
+
+Reading starts at the current file pointer position. If the operation is
+successful, the file pointer is advanced to the byte immediately following the
+last byte read.
+
+The return value is the number of bytes actually read. If this nonnegative but
+less than the count, the end of the file was encountered.
+
+Errors are indicated by the following negative return values:
+
+     return value            meaning
+     ----------------------  ------------------------------------------
+     RDCF_DISK_FORMAT_ERROR  disk improperly formatted
+     RDCF_DRIVE_ERROR        error in reading disk
+     RDCF_FILE_FORMAT_ERROR  corrupt file allocation table
+     RDCF_MODE_ERROR         file mode not RDCF_READ or RDCF_READ_WRITE
+
+
+8.15. rdcf_recover() - Recover Erased Data
+------------------------------------------
+
+The following function call creates a new file and puts all unused data
+clusters into it:
+
+     e = rdcf_recover(fcb, filespec);
+
+     struct rdcf *fcb;            pointer to file control block
+
+     char *filespec;              file specification string, with
+                                  terminating \0
+
+     int e;                       0 if file was successfully opened,
+                                  or negative error code
+
+When a file is deleted by DOS or RDCF, the information contained in the file is
+not actually erased.  The data clusters containing the information are merely
+marked as unused.  Until these clusters are actually used for other files, the
+information is still there, and can be recovered and assembled into a single
+file by calling this function.
+
+The file specifications must be for a new file.  If you try to use an existing
+file, this function will return the error code RDCF_ACCESS_DENIED.
+
+If you specify a file in a subdirectory, it will NOT be lengthened to
+accommodate the new file, as it would be when you call rdcf_open().  That would
+destroy information and partially defeat the purpose of this function.  If
+there is no empty space in the subdirectory, this function will return the
+error code RDCF_DIRECTORY_FULL.
+
+If this function is successfully called, the new file will contain all the data
+in all unused clusters on the specified drive.  Of course, the unused clusters
+will no longer be unused, and the drive will then be completely full.  If you
+want to edit the information, you may have to copy the file to another drive
+that has room for the backup and scratch files that most text editors require.
+Some kind of editing is usually required because the new file will typically
+contain information from a number of old deleted files or subdirectories, and
+the information will be slightly mixed up if the old files were fragmented.
+
+Possible return values are as follows:
+
+     return value             meaning
+     -----------------------  -----------------------------------
+     0                        successful operation
+     RDCF_ACCESS_DENIED       attempt to use an existing file
+     RDCF_DIRECTORY_FULL      insufficient directory space
+     RDCF_DISK_FORMAT_ERROR   disk improperly formatted
+     RDCF_DRIVE_ERROR         error in reading or writing disk
+     RDCF_INVALID_DIRECTORY   nonexistent subdirectory in path
+     RDCF_INVALID_SPEC        invalid drive or file specification
+
+If RDCF is compiled as a read-only file system, this function is not defined.
+
+
+8.16. rdcf_rename() - Rename a File or Subdirectory
+---------------------------------------------------
+
+The following function call changes the name and/or extension of a file or
+subdirectory:
+
+     e = rdcf_rename(fcb, old_filespec, new_filespec);
+
+     struct rdcf *fcb;            pointer to file control block
+
+     char *old_filespec;          old file specification string, with
+                                  terminating \0
+
+     char *new_filespec;          new name and extension, with
+                                  terminating \0
+
+     int e;                       0 if file was successfully opened,
+                                  or negative error code
+
+The new file specification may not begin with a drive specification or
+directory path.
+
+Possible return values are as follows:
+
+     return value             meaning
+     -----------------------  ----------------------------------------
+     0                        successful operation
+     RDCF_ACCESS_DENIED       attempt to rename a hidden or system file
+     RDCF_DISK_FORMAT_ERROR   disk improperly formatted
+     RDCF_DRIVE_ERROR         error in reading or writing disk
+     RDCF_FILE_NOT_FOUND      file not found
+     RDCF_INVALID_DIRECTORY   nonexistent subdirectory in path
+     RDCF_INVALID_SPEC        invalid drive or file specification
+     RDCF_RENAMING_ERROR      new file specification is already in use
+
+If RDCF is compiled as a read-only file system, this function is not defined.
+
+
+8.17. rdcf_seek() - Move a File Pointer
+---------------------------------------
+
+The following function call moves a file pointer:
+
+     e = rdcf_seek(fcb, offset);
+
+     struct rdcf *fcb;     pointer to open file control block
+
+     unsigned long offset; desired file pointer offset,
+                           relative to beginning of file
+
+     int e;                0 for a successful operation,
+                           or a negative error code
+
+The file control block must have been successfully opened by rdcf_open() in any
+mode.
+
+If the operation is successful, the function returns zero. The next call on
+rdcf_read() or rcdf_write() will start at the specified position, relative to
+the beginning of the file.
+
+The file control block entry fcb->position or fcb->file.size can be used to
+convert an offset from the file pointer or end of file to an offset from the
+beginning of the file.
+
+A file cannot be lengthened by moving the file pointer past the end of the
+file.  To lengthen a file, you must move the file pointer to the end of the
+file and then write enough data to it to make it the desired length.
+
+Possible return values are as follows:
+
+     return value            meaning
+     -----------------       -------------------------
+     0                       successful operation
+     RDCF_DISK_FORMAT_ERROR  disk improperly formatted
+     RDCF_DRIVE_ERROR        error in reading disk
+     RDCF_SEEK_OUT_OF_RANGE  offset exceeds file size
+
+
+8.18. rdcf_set_file_information() - Set File Information
+--------------------------------------------------------
+
+The following function writes new information into a directory entry:
+
+     e = rdcf_set_file_information(fcb, filespec, index, p);
+
+     struct rdcf *fcb;            pointer to file control block
+
+     char *filespec;              directory specification string, with
+                                  terminating \0
+
+     unsigned index;              index of desired entry (0 = first entry,
+                                  1 = second entry, etc.)
+
+     struct rdcf_file_information *p;
+                                  pointer to block with new directory
+                                  information
+
+     int e;                       0 if entry was successfully written,
+                                  or negative error code
+
+If RDCF_MULTIPLE_DRIVE is defined, the directory specification string for the
+root directory consists of a drive specification alone, such as "A:".
+Otherwise, the empty string ("") represents the root directory.
+
+This function takes a block of information, converts it to DOS directory
+format, and writes it into the specified directory entry.  The block of
+information is usually supplied by rdcf_get_file_information.  This function is
+used almost exclusively for special disk utilities.
+
+If p->spec[0] is zero, the entire entry will be cleared to zeros.
+
+This function will not lengthen a subdirectory if the index is past its current
+end.
+
+Possible return values are as follows:
+
+     return value             meaning
+     -----------------------  ----------------------------------------
+     0                        successful operation
+     RDCF_DIRECTORY_FULL      index is past end of directory
+     RDCF_DISK_FORMAT_ERROR   disk improperly formatted
+     RDCF_DRIVE_ERROR         error in reading or writing disk
+     RDCF_INVALID_DIRECTORY   nonexistent subdirectory in path
+     RDCF_INVALID_SPEC        invalid drive or file specification
+
+If RDCF is compiled as a read-only file system, this function is not defined.
+
+
+8.19. rdcf_set_volume() - Write Volume Name
+-------------------------------------------
+
+The following function writes a new volume name:
+
+     e = rdcf_set_volume(fcb, drive_name);
+
+     struct rdcf *fcb;            pointer to file control block
+
+     char *drive_name;            string of form "d:name" that specifies
+                                  drive and name, with terminating \0
+
+     int e;                       0 if name was successfully written,
+                                  or negative error code
+
+If RDCF_MULTIPLE_DRIVE is defined, the string drive_name begins with a drive
+specification (a drive letter, followed by a colon).  Otherwise, it contains
+only the volume name.  In any case, it is terminated by \0.
+
+If the volume name is less than 11 characters long, RDCF will pad it with
+blanks at the end before writing it to the disk.
+
+Notice that the volume name may contain small letters, which are NOT converted
+to capital letters by RDCF.  Volume names in DOS are case-sensitive.  RDCF will
+reject the volume name and return RDCF_INVALID_SPEC if the first character of
+the name is 0xE5, which indicates a deleted file or volume name.
+
+If there is already a volume name on the drive, it is replaced by the specified
+one.
+
+The new volume name will bear the current date and time as determined by a call
+on rdcf_get_date_and_time().
+
+     return value            meaning
+     ----------------------  -----------------------------------
+     0                       successful operation
+     RDCF_DIRECTORY_FULL     insufficient directory space
+     RDCF_DISK_FORMAT_ERROR  disk improperly formatted
+     RDCF_DRIVE_ERROR        error in reading disk
+     RDCF_INVALID_SPEC       invalid drive specification or name
+
+If RDCF is compiled as a read-only file system, this function is not defined.
+
+
+8.20. rdcf_sort_directory() - Sort a Directory
+----------------------------------------------
+
+The following function call sorts a directory:
+
+     e = rdcf_sort_directory(f, filespec, mode);
+
+     struct rdcf *fcb;            pointer to file control block
+
+     char *filespec;              directory specification string, with
+                                  terminating \0
+
+     int mode;                    code to indicate the kind of sort
+
+     int e;                       0 if directory was successfully sorted,
+                                  or negative error code
+
+If RDCF_MULTIPLE_DRIVE is defined, the directory specification string for the
+root directory consists of a drive specification alone, such as "A:".
+Otherwise, the empty string ("") represents the root directory.
+
+The sorting mode may be any ONE of the following:
+
+     mode                 manner of sort
+     -------------------  ---------------------------------------------
+     RDCF_EXTENSION_NAME  sort by extension, then among files that have
+                          the same extension, sort by name
+     RDCF_NAME_EXTENSION  sort by name, then among files that have
+                          the same name, sort by extension
+     RDCF_DATE_TIME       sort by date and time (earlier files first)
+     RDCF_SIZE            sort by size (smallest files first)
+
+The modifier RDCF_REVERSE may be added to any of these modes to sort in the
+opposite order.  For example, RDCF_SIZE+RDCF_REVERSE sorts the files by size,
+but it puts the largest files first.
+
+Actually, before the function sorts the directory entries, it first divides
+them into five groups and arranges them in the following order:
+
+     (1) The two system files at the beginning of the root directory and the
+         two special files "." and ".." at the beginning of a subdirectory are
+         always left where they are.
+
+     (2) The volume label, if any, is put next.
+
+     (3) The subdirectory entries, if any, are sorted and put next.
+
+     (4) The file entries are sorted and put next.
+
+     (5) The entries for deleted files, volume labels and subdirectories, if
+         any, are sorted and put last.
+
+Within each category, if two entries are identical according to the sorting
+criterion, their relative position is left unchanged.
+
+Some kind of caching is strongly recommended when using this function.  The
+sorting algorithm is rather primitive one called a "bubble sort", so it may
+take a noticeable amount of time to sort a long directory, even with caching.
+
+Possible return values are as follows:
+
+     return value             meaning
+     -----------------------  ----------------------------------------
+     0                        successful operation
+     RDCF_DISK_FORMAT_ERROR   disk improperly formatted
+     RDCF_DRIVE_ERROR         error in reading or writing disk
+     RDCF_INVALID_DIRECTORY   nonexistent subdirectory in path
+     RDCF_INVALID_SPEC        invalid drive or file specification
+
+If RDCF is compiled as a read-only file system, this function is not defined.
+
+
+8.21. rdcf_undelete() - Restore a Deleted File
+----------------------------------------------
+
+When you delete a file, with either DOS or RDCF, the information in the file is
+not erased, although it may become rather difficult to find.
+
+The following function call restores the original contents of a deleted file,
+to the extent possible:
+
+     e = rdcf_undelete(fcb, filespec);
+
+     struct rdcf *fcb;            pointer to file control block
+
+     char *filespec;              file specification string, with
+                                  terminating \0
+
+     int e;                       0 if file was even partially recovered,
+                                  or negative error code
+
+The function will attempt to restore as much of the file as possible.  If only
+part of the file can be restored, the value in fcb->position will indicate how
+much of the file was NOT restored.  If the entire file was restored, this entry
+will be zero. If nothing can be restored because the first data cluster of the
+file is in use by another file, the function will return
+RDCF_UNRECOVERABLE_FILE.
+
+Even an apparently successful restoration may not restore the original file
+contents.  For example, if another file was written over the original file
+contents and then deleted, RDCF may have no way of knowing that the file
+contents have changed.
+
+Complete restoration of a file can be assured if the original file was
+unfragmented before it was deleted and nothing has been written to the disk
+after it was deleted.
+
+Possible return values are as follows:
+
+     return value             meaning
+     -----------------------  ---------------------------------------
+     0                        fully or partially successful operation
+     RDCF_DIRECTORY_FULL      index is past end of directory
+     RDCF_DISK_FORMAT_ERROR   disk improperly formatted
+     RDCF_DRIVE_ERROR         error in reading or writing disk
+     RDCF_FILE_NOT_FOUND      entry did not represent a deleted file
+     RDCF_INVALID_DIRECTORY   nonexistent subdirectory in path
+     RDCF_INVALID_SPEC        invalid drive or file specification
+     RDCF_UNRECOVERABLE_FILE  none of the file can be restored
+
+If RDCF is compiled as a read-only file system, this function is not defined.
+
+
+8.22. rdcf_wipe_disk() - Wipe Out Erased Data
+---------------------------------------------
+
+The following function call writes nonsense over all unused clusters of the
+specified drive:
+
+     e = rdcf_wipe_disk(fcb, spec);
+
+     struct rdcf *fcb;            pointer to file control block
+
+     char *spec;                  drive specification ("A:", "B:", etc.),
+                                  omitted if RDCF_MULTIPLE_DRIVE is undefined
+
+     int e;                       0 if operation was successful,
+                                  or negative error code
+
+When a file is deleted by DOS or RDCF, the information contained in the file is
+not actually erased.  The data clusters containing the information are merely
+marked as unused.  Until these clusters are actually used for other files, the
+information is still there, and can often be recovered by calling
+rdcf_undelete() or rdcf_recover() or by using a file recovery utility.
+
+For security reasons, you may want to make sure your erased files are really
+erased.  This function does that by writing nonsense into every cluster marked
+as unused.
+
+The information is not completely destroyed. It may be possible to read some of
+it by subjecting the disk to a special analysis in a laboratory, but it cannot
+be read by an ordinary file recovery utility.
+
+Even erasing every unused cluster won't necessarily remove all the information
+from erased files.  There may be unused sectors at the ends of files that are
+not erased.  The last cluster of such a file is not marked as unused, because
+part of it is being used.  But the part that is not being used may contain
+information from an older file that did use the entire cluster.
+
+Possible return values are as follows:
+
+     return value             meaning
+     -----------------------  ------------------------------------------
+     0                        fully or partially successful operation
+     RDCF_DISK_FORMAT_ERROR   disk improperly formatted
+     RDCF_DRIVE_ERROR         error in reading or writing disk
+     RDCF_INVALID_SPEC        invalid drive specification
+
+If RDCF is compiled as a read-only file system, this function is not defined.
+
+
+8.23. rdcf_write() - Write to a File
+------------------------------------
+
+The following function call writes a block of bytes to an open file:
+
+     n = rdcf_write(fcb, buffer, count);
+
+     struct rdcf *fcb;   pointer to open file control block
+
+     void *buffer;       memory buffer to supply data
+
+     int count;          number of bytes to be written
+
+     int n;              number of bytes actually written, or a negative
+                         error code
+
+The file control block must have been successfully opened in mode RDCF_CREATE
+or RDCF_READ_WRITE by rdcf_open().
+
+Writing starts at the current file pointer position. If the operation is
+successful, the file pointer is advanced to the byte immediately following the
+last byte written.
+
+If necessary, the file is lengthened to accommodate the bytes being written.
+
+The return value is the number of bytes actually written. If this is
+nonnegative but less than the count, there was insufficient disk space to write
+all the data.
+
+Other errors are indicated by the following negative return values:
+
+     return value            meaning
+     ---------------------   --------------------------------------------
+     RDCF_DISK_FORMAT_ERROR  disk improperly formatted
+     RDCF_DRIVE_ERROR        error in reading or writing disk
+     RDCF_FILE_FORMAT_ERROR  corrupt file allocation table
+     RDCF_MODE_ERROR         file mode not RDCF_CREATE or RDCF_READ_WRITE
+
+This function also sets an internal flag to indicate that the file has been
+written, which causes RDCF to update the directory when the file is later
+closed. If the count is zero, setting the flag is all it does.
+
+If RDCF is compiled as a read-only file system, this function is not defined.
+
+=============================== RDCF2.H      ===============================
+
+/*-----------------------------------------------------------------------------
+          RDCF: A Reentrant DOS-Compatible File System, Version 2.0
+
+                          by Philip J. Erdelsky
+                               pje@acm.org
+
+                           September 15, 1992
+
+                  Copyright (c) 1992 Philip J. Erdelsky
+-----------------------------------------------------------------------------*/
+
+#ifndef _RDCF
+#define _RDCF
+
+#include <setjmp.h>
+
+/* #define RDCF_SYSTEM_READ_ONLY  */
+#define RDCF_MULTIPLE_DRIVE
+#define RDCF_SECTOR_SIZE    512
+
+struct rdcf_date_and_time
+{
+  unsigned char second;
+  unsigned char minute;
+  unsigned char hour;
+  unsigned char day;
+  unsigned char month;
+  unsigned short year;
+};
+
+struct rdcf_file_information
+{
+  unsigned char spec[13];
+  unsigned char attribute;
+    #define RDCF_READ_ONLY  0x01
+    #define RDCF_HIDDEN     0x02
+    #define RDCF_SYSTEM     0x04
+    #define RDCF_VOLUME     0x08
+    #define RDCF_DIRECTORY  0x10
+    #define RDCF_ARCHIVE    0x20
+  struct rdcf_date_and_time date_and_time;
+  unsigned short first_cluster;
+  unsigned long size;
+};
+
+/* FCB (File Control Block) */
+
+struct rdcf
+{
+
+  /* values that must be initialized by the calling program */
+
+  unsigned char *buffer;
+  unsigned (*drive_access)(int, unsigned, unsigned, void *);
+
+  /* file information */
+
+  struct rdcf_file_information file;
+
+  /* result codes */
+
+  unsigned long position;
+  unsigned short drive_error;
+  short result;
+
+  /* file system information */
+
+  unsigned char drive;
+  #ifndef RDCF_SECTOR_SIZE
+    unsigned short sector_size;
+  #endif
+  unsigned short first_FAT_sector;
+  unsigned short sectors_per_FAT;
+  unsigned short first_directory_sector;
+  unsigned short first_data_sector;
+  unsigned short sectors_per_cluster;
+  unsigned short maximum_cluster_number;
+  unsigned short last_cluster_mark;
+
+  /* internal use only */
+
+  #ifndef RDCF_SYSTEM_READ_ONLY
+    unsigned char mode;
+  #endif
+  unsigned short directory_first_cluster;
+  unsigned short directory_cluster;
+  unsigned short directory_index;
+  unsigned char buffer_status;
+  unsigned short cluster;
+  unsigned short last_cluster;
+  unsigned short sector_in_buffer;
+  jmp_buf error;
+};
+
+struct rdcf_format
+{
+  unsigned char x[19];
+};
+
+/* error codes */
+
+#define RDCF_ACCESS_DENIED        (-1)
+#define RDCF_DIRECTORY_CONFLICT   (-2)
+#define RDCF_DIRECTORY_FULL       (-3)
+#define RDCF_DISK_FORMAT_ERROR    (-4)
+#define RDCF_DRIVE_ERROR          (-5)
+#define RDCF_FILE_FORMAT_ERROR    (-6)
+#define RDCF_INVALID_DIRECTORY    (-7)
+#define RDCF_INVALID_SPEC         (-8)
+#define RDCF_MODE_ERROR           (-9)
+#define RDCF_FILE_NOT_FOUND       (-10)
+#define RDCF_RENAMING_ERROR       (-11)
+#define RDCF_SEEK_OUT_OF_RANGE    (-12)
+#define RDCF_UNRECOVERABLE_FILE   (-13)
+
+/* prototype for function defined in application */
+
+void rdcf_get_date_and_time(struct rdcf_date_and_time *);
+
+/* formatting types */
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+  extern struct rdcf_format rdcf_format_360;
+  extern struct rdcf_format rdcf_format_720;
+  extern struct rdcf_format rdcf_format_1200;
+  extern struct rdcf_format rdcf_format_1440;
+#endif
+
+/* modes for rdcf_open() */
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+  #define RDCF_CREATE      0
+  #define RDCF_READ        1
+  #define RDCF_READ_WRITE  2
+#endif
+
+/* modes for rdcf_sort_directory() */
+
+#ifndef RDCF_SYSTEM_READ_ONLY
+  #define RDCF_EXTENSION_NAME  0
+  #define RDCF_NAME_EXTENSION  1
+  #define RDCF_DATE_TIME       2
+  #define RDCF_SIZE            3
+  #define RDCF_REVERSE         8
+#endif
+
+/* prototypes for functions defined in RDCF */
+
+#ifdef RDCF_SYSTEM_READ_ONLY
+  int rdcf_open(struct rdcf *, char *);
+#else
+  int rdcf_attribute(struct rdcf *, char *, unsigned);
+  int rdcf_close(struct rdcf *);
+  int rdcf_date_and_time(struct rdcf *, char *, struct rdcf_date_and_time *);
+  int rdcf_delete(struct rdcf *, char *);
+  int rdcf_directory(struct rdcf *, char *);
+  int rdcf_format(struct rdcf *,
+    #ifdef RDCF_MULTIPLE_DRIVE
+      char *,
+    #endif
+    struct rdcf_format *);
+  int rdcf_move(struct rdcf *, char *, char *);
+  int rdcf_open(struct rdcf *, char *, unsigned);
+  int rdcf_recover(struct rdcf *, char *);
+  int rdcf_rename(struct rdcf *, char *, char *);
+  int rdcf_set_file_information(struct rdcf *, char *, unsigned,
+    struct rdcf_file_information *);
+  int rdcf_set_volume(struct rdcf *, char *);
+  int rdcf_sort_directory(struct rdcf *, char *, int);
+  int rdcf_undelete(struct rdcf *, char *);
+  int rdcf_wipe_drive(struct rdcf *
+    #ifdef RDCF_MULTIPLE_DRIVE
+      , char *
+    #endif
+    );
+  int rdcf_write(struct rdcf *, void *, int);
+#endif
+
+int rdcf_get_file_information(struct rdcf *, char *, unsigned);
+int rdcf_next_file_information(struct rdcf *);
+int rdcf_get_volume(struct rdcf *
+  #ifdef RDCF_MULTIPLE_DRIVE
+    , char *
+  #endif
+  );
+long rdcf_free_space(struct rdcf *
+  #ifdef RDCF_MULTIPLE_DRIVE
+    , char *
+  #endif
+  );
+int rdcf_match(char *, char *);
+int rdcf_read(struct rdcf *, void *, int);
+int rdcf_seek(struct rdcf *, unsigned long);
+
+#endif
+
+

@@ -1,0 +1,387 @@
+<HTML>
+<HEAD>
+<TITLE> Countdown Timer with Memory </TITLE>
+<BODY>
+<IMG SRC="worktime.gif">
+<H2>Program #8 - LCD display of Timer</H2>
+<PRE>
+;-------------------------------------------------------------------------;
+; WORKTIME.ASM     Pushbutton toggles clock keeping track of time on LCD  ;                    
+;-------------------------------------------------------------------------;
+
+;  Note: must add additional time digit to run over 99 hrs.
+
+           LIST P=16F84           ;  16F84 Runs at 4 MHz
+           INCLUDE "p16f84.inc"
+           __CONFIG _PWRTE_ON & _LP_OSC & _WDT_OFF  ; uses 32.768 kHz crystal
+           ERRORLEVEL -224        ;  supress annoying message because of tris
+
+;  Define Information
+     #DEFINE RS PORTA, 0
+     #DEFINE E  PORTA, 1
+     #DEFINE TOGGLESW PORTB, 4
+
+;  Macro
+
+EStrobe MACRO                   ;  Strobe the "E" Bit
+  bsf    E
+  bcf    E
+ ENDM
+
+            CBLOCK     0CH
+                sec             ; seconds digit
+                sec10           ; 10's of second digit
+                mins            ; minutes digit
+                min10           ; 10's of minutes digit
+                hr              ; hours digit
+                hr10            ; 10's of hours digit
+                highlim         ; high limit + 1 of digit
+                w_temp          ; holds W during interrupt
+                status_temp     ; holds STATUS during interrupt
+                fsr_temp        ; holds FSR during interrupt
+                Dlay            ; 8 Bit Delay Variable
+                working         ; working flag 0 not working, 1 working
+                ptr             ; used in displaying message
+                Temp            ; a temporary variable
+                bin             ; a temporary variable
+                oset            ; offset of time register
+                oldtime         ; holds last value of sec
+               ENDC
+          
+            ORG 0               ; start at location 0
+
+            goto main           ; jump over to main routine       
+
+            ORG 4
+             
+            goto isr            ; jump to interrupt routine
+
+;-------------------------------------------------------------------------;
+;                      High limit + 1 of digits at position W             ;
+;-------------------------------------------------------------------------;
+sethi:
+            addwf PCL, f
+         dt H'A',H'6',H'A',H'6',H'A',H'A'
+
+;-------------------------------------------------------------------------;
+;                    Data for message to be output                        ;
+;-------------------------------------------------------------------------;
+shomsg                          ;  Message to Output
+  addwf  PCL, f                 ;  Output the Characters
+  dt     "Working Time:", 0
+
+;-------------------------------------------------------------------------;
+;      Interrupt routine, increments time by one second  (BCD)            ;
+;-------------------------------------------------------------------------;
+isr:
+            movwf w_temp             ; save W
+            swapf STATUS,W           ; save status
+            movwf status_temp        ; without changing flags
+            swapf FSR,W              ; save FSR
+            movwf fsr_temp           ; without changing flags
+
+            movf working, f          ; check working flag
+            btfsc STATUS, Z          ; if not zero then increment time
+            goto restore             ; else get out of interrupt routine            
+
+            movlw sec                ; point at sec register
+            movwf FSR
+newdigit:   incf INDF, f             ; current digit up one
+            movlw sec                ; get difference between sec and FSR
+            subwf FSR, W
+            call sethi               ; use to get high limit + 1
+            subwf INDF, W            ; reached that number yet?
+            btfss STATUS, Z          ; skip over if yes
+            goto restore             ; else exit isr
+            clrf INDF                ; set current digit to 0
+            incf FSR, f               ; point at next digit
+            goto newdigit            ; no, increment the next digit
+restore: 
+            swapf status_temp,W      ; get original status back
+            movwf STATUS             ; into status register
+            swapf fsr_temp,W         ; get original fsr back
+            movwf FSR                ; into status register
+            swapf w_temp,f           ; old no flags trick again
+            swapf w_temp,W           ; to restore W
+            bcf INTCON,T0IF          ; clear the TMR0 interrupt flag
+            retfie                   ; finished reset GIE
+
+;-------------------------------------------------------------------------;
+;                       Initialize the ports                              ;
+;-------------------------------------------------------------------------;
+init:
+            clrf   PORTA
+            clrf   PORTB
+
+            movlw  0                   ;  Port A all outputs
+            tris PORTA
+            movlw B'00010000'          ; RB4 input, others outputs
+            tris PORTB
+            movlw B'00000100'          ; pull-ups enabled                                    
+                                       ; prescaler assigned to TMR0
+                                       ; prescaler set to 1:32
+                                       ; rolls over each second
+            option                
+ 
+            movlw 0                    ; zero out all registers
+            movwf hr10
+            movwf hr
+            movwf min10                
+            movwf mins
+            movwf sec10
+            movwf sec
+            clrf working               ; working flag to zero
+
+            movlw B'10100000'          ; GIE set T0IE set, T0IF cleared
+            movwf INTCON
+   return
+
+;-------------------------------------------------------------------------;
+;                 Initialize the LCD                                      ;
+;-------------------------------------------------------------------------;
+initlcd:
+  movlw D'40'
+  call   nmsec                  ;  Wait 40 msecs before Reset
+  bcf    RS                     ;  send an 8 bit instruction
+  movlw  0x03                   ;  Reset Command
+  call   NybbleOut              ;  Send the Nybble
+  call   Dlay5                  ;  Wait 5 msecs before Sending Again
+  EStrobe
+  nop  
+  nop                           ;  Wait 244 usecs before Sending the Second Time
+  EStrobe
+  nop
+  nop                           ;  Wait 244 usecs before Sending the Third Time
+  bcf    RS                     ; send an 8 bit instruction
+  movlw  0x02                   ;  Set 4 Bit Mode
+  call   NybbleOut              
+  nop
+  nop                
+  movlw  0x028                  ;  4 bit, 2 Line, 5x7 font
+  call   SendINS
+  movlw  0x010                  ;  display shift off
+  call   SendINS
+  movlw  0x001                  ;  Clear the Display RAM
+  call   SendINS
+  call   Dlay5                  ;  Note, Can take up to 4.1 msecs
+  movlw  0x006                  ;  increment cursor
+  call   SendINS
+  movlw  0x00C                  ;  display on cursor off
+  call   SendINS
+  return
+
+;-------------------------------------------------------------------------;
+;              Send the character in W out to the LCD                     ;
+;-------------------------------------------------------------------------;
+SendASCII
+  addlw '0'                     ;  Send nbr as ASCII character
+SendCHAR                        ;  Send the Character to the LCD
+  movwf  Temp                   ;  Save the Temporary Value
+  swapf  Temp, w                ;  Send the High Nybble
+  bsf    RS                     ;  RS = 1
+  call   NybbleOut
+  movf   Temp, w                ;  Send the Low Nybble
+  bsf    RS
+  call   NybbleOut
+  return
+
+;-------------------------------------------------------------------------;
+;              Send an instruction in W out to the LCD                    ;
+;-------------------------------------------------------------------------;
+SendINS                         ;  Send the Instruction to the LCD
+  movwf  Temp                   ;  Save the Temporary Value
+  swapf  Temp, w                ;  Send the High Nybble
+  bcf    RS                     ;  RS = 0
+  call   NybbleOut
+  movf   Temp, w                ;  Send the Low Nybble
+  bcf    RS
+  call   NybbleOut
+  return
+
+;-------------------------------------------------------------------------;
+;              Send the nibble in W out to the LCD                        ;
+;-------------------------------------------------------------------------;
+NybbleOut                       ;  Send a Nybble to the LCD
+  movwf  PORTB                            
+  EStrobe                       ;  Strobe out the LCD Data
+  nop
+  nop
+  return
+
+;-------------------------------------------------------------------------;
+;                   Output the message on the LCD                           ;
+;-------------------------------------------------------------------------;
+OutMessage:
+  movwf  FSR                    ;  Point at first letter
+OutLoop:
+  movf   FSR, w                 ;  Get pointer into W
+  incf   FSR, f                 ;  Set up for next letter
+  call   shomsg                 ;  Get character to output
+  iorlw  0                      ;  At the End of the Message?
+  btfsc  STATUS, Z              ;  Skip if not at end
+  return                        ;  Yes - Equal to Zero
+  call   SendCHAR               ;  Output the ASCII Character
+  goto   OutLoop                ;  Get the next character
+
+
+;-------------------------------------------------------------------------;
+;                Wait until button is released                            ;
+;-------------------------------------------------------------------------;
+waitup:    
+            btfss TOGGLESW           ; test toggle switch
+            goto $ -1                ; ck again if pressed
+            movlw 20                 ; wait 20 msec for debounce
+            call nmsec              
+            btfss TOGGLESW           ; check again, still up?
+            goto $ -4                ; no start over
+            return                   ; yes, finished
+
+;-----------------------------------------------------------------------;
+;                           Delay routine                               ;
+;-----------------------------------------------------------------------;
+Dlay5    movlw 5               ; delay for 5 milliseconds
+nmsec:                         ; delay for # msec in W on entry
+         nop                   ; each nop is 0.122 milliseconds
+         nop
+         nop                   ; each total loop is 8 X 0.122 = 0.976 msec
+         nop
+         addlw H'FF'           ; same as subtracting 1 from W
+         btfss STATUS, Z       ; skip if result is zero
+         goto nmsec            ; this is  2 X 0.122 msec  
+         return                ; back to calling point
+
+;-------------------------------------------------------------------------;
+;                       Display the Time                                  ;
+;-------------------------------------------------------------------------;
+DispTime
+              MOVLW H'C0'
+              CALL SendINS
+              MOVF hr10, W
+              CALL SendASCII
+              MOVF hr, W
+              CALL SendASCII
+              MOVLW ":"
+              CALL SendCHAR
+              MOVF min10, W
+              CALL SendASCII
+              MOVF mins, W
+              CALL SendASCII
+              MOVLW ":"
+              CALL SendCHAR
+              MOVF sec10, W
+              CALL SendASCII
+              MOVF sec, W
+              CALL SendASCII
+              RETURN
+ 
+;-------------------------------------------------------------------------;
+;                            Toggle Work Flag                             ;
+;-------------------------------------------------------------------------;
+togglewk:
+            movf working, f   ; set zero flag if zero
+            btfss STATUS, Z   ; skip if working is zero
+            goto turnoff
+            incf working, f   ; set working to 1
+            call waitup       ; wait for button release
+            return
+turnoff:
+            clrf working      ; working set to zero
+            call waitup       ; wait for button to be released
+            return
+
+;-------------------------------------------------------------------------;
+;                           The Main routine                              ;
+;-------------------------------------------------------------------------;
+main:
+       call init               ; initialize ports, set up timer
+       call initlcd            ; initialize the LCD
+       movlw 0                 ; display 'Working Time:'
+       call OutMessage
+ckbutton:                      ; check for a press of the TOGGLE button
+       btfss TOGGLESW          ; skip if not pressed
+       call togglewk           ; else change the mode of timer
+       movf oldtime, W         ; is oldtime the same as sec?
+       subwf sec, W
+       btfsc STATUS, Z         ; if not, skip over next instruction
+       goto ckbutton           ; else continue checking
+       call DispTime           ; sec has changed, display the time
+       movf sec, W             ; make sec and oldsec the same
+       movwf oldtime
+       goto ckbutton           ; and continue checking
+
+       end 
+</PRE>
+<H3>Worktime Program</H3>
+This program is a timer with pushbutton to start and stop accumulating time. 
+The output is displayed on a Liquid Crystal Display, (LCD).  An interrupt 
+service routine, (isr), runs in the background.  Every second it checks a 
+flag called 'working'.  The register 'sec' is incremented if the flag is set.  
+An overflow of sec increments sec10 and so forth through tens of hours.
+<P>
+The display will flicker if the main loop displays the time continuously.  
+Instead, the current seconds values is checked against the last displayed 
+seconds value in 'oldtime'.  Only if they are different is the display and 
+oldtime updated.
+<P>
+Notice that there are two entry point to the subroutine that displays 
+characters.  At the entry point 'SendASCII', the value of the character 
+'0' is added to W changing a binary number to an ASCII character.  Sending 
+instructions differs from sending characters.  The RS line is high when 
+sending characters, low for instructions.
+<P>
+Tables are used twice in this program.  One table holds overflow values for each 
+time register.  The second holds the characters of a message to be displayed 
+on the LCD.  In both cases, the value of W on entry determines the value 
+returned in W.
+<P>
+This is the first program to use a macro.  The two instructions of the macro 
+'EStrobe' are inserted at each location in the program where the name of the 
+macro, (EStrobe), appears.  The puropose of the macro is to make the program 
+easier to read.
+<H3>LCD as an Output Device</H3>
+Surplus LCD units that use the Hitachi 44870 controller can be purchased from 
+B.G. Micro, (<A HREF="http://www.bgmicro.com">http://www.bgmicro.com</A>), for
+as little as $3. Another supplier is Marlin P. Jones, 
+(<A HREF="http://www.mpja.com">http://www.mpja.com</A>). This program requires
+at least a two line by 16 character unit.
+<H3>Hooking it up, contrast voltage</H3>
+The first thing to do when you get your LCD is to confirm that it works.  
+Apply +5 volts to pin 2 and ground pin 1. Also ground pin 3 which is the 
+contrast voltage.  You should see a line of squares where the characters 
+appear.  You may have to look at a low angle to see these.  If you see 
+nothing, the contrast voltage may not be right.  Put a 10K, (or so), pot 
+between +5 and ground and run the wiper to pin 3.  Adjust the pot and see 
+if you can make the squares appear and disappear.  Some units require a 
+negative contrast voltage.  
+<H3>Initialization</H3>
+We must go through a complex procedure just to initialize the display.  We 
+also put it into 4 bit mode so only six control 6 wires are needed instead of
+ten.  If you want to read more about the 44780, here are some URL's:
+<UL>
+<LI> Myke Predko at <A HREF="http://www.myke.com/engres/lcd.htm">
+   http://www.myke.com/engres/lcd.htm</A>
+<LI> Christopher Burian at <A HREF="http://mil.ufl.edu/imdl/handouts/lcd-faq.htm">
+http://mil.ufl.edu/imdl/handouts/lcd-faq.htm</A>
+<LI> Ian Harris at <A HREF="http://www.doc.ic.ac.uk/~ih/doc/lcd/">
+   http://www.doc.ic.ac.uk/~ih/doc/lcd/</A>
+<LI> Peer Ouwehand at <A HREF="http://home.iae.nl/users/pouweha/lcd.htm">
+   http://home.iae.nl/users/pouweha/lcd.htm</A>
+<LI> Scott M. Bruck has a physics description of the LCD at
+   <A HREF="http://www.flat-panel.com/lcdfaq.txt">http://www.flat-panel.com/lcdfaq.txt</A>
+</UL>
+<H3>Your Turn</H3>
+The purpose of this program was to demonstrate a simple application that uses 
+a LCD display.  It does contain many elements you would use in any program
+with a LCD display unit.  Among these are:
+<UL>
+<LI>initialization of a 44780 based LCD and putting it in 4 bit mode
+<LI>sending characters and instructions to the LCD
+<LI>outputting an ASCII string to the LCD
+<LI>outputting numbers to the LCD by displaying individual ASCII characters
+</UL>
+Try to use subroutines from this program to change some of the previous
+programs to use a LCD display as an output device.
+
+
+
+

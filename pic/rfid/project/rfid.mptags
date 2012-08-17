@@ -1,0 +1,941 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.5.4	//
+!_TAG_REVISION_NAME	MCHPTags	//
+!_TAG_REVISION_VERSION	6.0.1	//
+ACTION_DISABLE::16	C:\development\m2m\firmware\pic\rfid\project\rfid.h	82;"	d	line:82
+ACTION_NOOP::0	C:\development\m2m\firmware\pic\rfid\project\rfid.h	75;"	d	line:75
+ACTION_OFF::2	C:\development\m2m\firmware\pic\rfid\project\rfid.h	77;"	d	line:77
+ACTION_ON::1	C:\development\m2m\firmware\pic\rfid\project\rfid.h	76;"	d	line:76
+ACTION_PULSE::3	C:\development\m2m\firmware\pic\rfid\project\rfid.h	78;"	d	line:78
+ACTION_STATUS::10	C:\development\m2m\firmware\pic\rfid\project\rfid.h	80;"	d	line:80
+ADCLastValue	C:\development\m2m\firmware\pic\rfid\project\main.c	1218;"	l	line:1218
+ADCValue	C:\development\m2m\firmware\pic\rfid\project\main.c	1218;"	l	line:1218
+BIT_0_75::3840	C:\development\m2m\firmware\pic\rfid\project\main.h	41;"	d	line:41
+BIT_1::5120	C:\development\m2m\firmware\pic\rfid\project\main.h	42;"	d	line:42
+BIT_1_25::6400	C:\development\m2m\firmware\pic\rfid\project\main.h	43;"	d	line:43
+BIT_1_5::7680	C:\development\m2m\firmware\pic\rfid\project\main.h	44;"	d	line:44
+BIT_1_75::8960	C:\development\m2m\firmware\pic\rfid\project\main.h	45;"	d	line:45
+BIT_2::10240	C:\development\m2m\firmware\pic\rfid\project\main.h	46;"	d	line:46
+BIT_2_25::11250	C:\development\m2m\firmware\pic\rfid\project\main.h	47;"	d	line:47
+BOOL	C:\development\m2m\firmware\pic\common\can18f.h	75;"	t	line:75
+BYTE1	C:\development\m2m\firmware\pic\common\can18f.h	136;"	m	line:136	struct:_CAN_MESSAGE_ID::<anonymous>
+BYTE2	C:\development\m2m\firmware\pic\common\can18f.h	141;"	m	line:141	struct:_CAN_MESSAGE_ID::<anonymous>
+BYTE3	C:\development\m2m\firmware\pic\common\can18f.h	146;"	m	line:146	struct:_CAN_MESSAGE_ID::<anonymous>
+BYTE4	C:\development\m2m\firmware\pic\common\can18f.h	152;"	m	line:152	struct:_CAN_MESSAGE_ID::<anonymous>
+BYTES	C:\development\m2m\firmware\pic\common\can18f.h	162;"	m	line:162	union:_CAN_MESSAGE_ID
+BYTE_1	C:\development\m2m\firmware\pic\common\can18f.h	158;"	m	line:158	struct:_CAN_MESSAGE_ID::<anonymous>
+BYTE_2	C:\development\m2m\firmware\pic\common\can18f.h	159;"	m	line:159	struct:_CAN_MESSAGE_ID::<anonymous>
+BYTE_3	C:\development\m2m\firmware\pic\common\can18f.h	160;"	m	line:160	struct:_CAN_MESSAGE_ID::<anonymous>
+BYTE_4	C:\development\m2m\firmware\pic\common\can18f.h	161;"	m	line:161	struct:_CAN_MESSAGE_ID::<anonymous>
+BeeperOn	C:\development\m2m\firmware\pic\rfid\project\main.c	64;"	p	line:64	file:	signature:( unsigned int time )
+BeeperTimer	C:\development\m2m\firmware\pic\rfid\project\main.c	122;"	v	line:122
+CAN18F_H	C:\development\m2m\firmware\pic\common\can18f.h	56;"	d	line:56
+CAN18F_MODE_BITS::0b11100000	C:\development\m2m\firmware\pic\common\can18f.h	78;"	d	line:78
+CAN18F_MODE_CONFIG::0b10000000	C:\development\m2m\firmware\pic\common\can18f.h	83;"	d	line:83
+CAN18F_MODE_LISTEN::0b01100000	C:\development\m2m\firmware\pic\common\can18f.h	82;"	d	line:82
+CAN18F_MODE_LOOP::0b01000000	C:\development\m2m\firmware\pic\common\can18f.h	81;"	d	line:81
+CAN18F_MODE_NORMAL::0b00000000	C:\development\m2m\firmware\pic\common\can18f.h	79;"	d	line:79
+CAN18F_MODE_SLEEP::0b00100000	C:\development\m2m\firmware\pic\common\can18f.h	80;"	d	line:80
+CAN_FILTER_B1_F1::0	C:\development\m2m\firmware\pic\common\can18f.h	90;"	d	line:90
+CAN_FILTER_B1_F2::1	C:\development\m2m\firmware\pic\common\can18f.h	91;"	d	line:91
+CAN_FILTER_B2_F1::2	C:\development\m2m\firmware\pic\common\can18f.h	92;"	d	line:92
+CAN_FILTER_B2_F2::3	C:\development\m2m\firmware\pic\common\can18f.h	93;"	d	line:93
+CAN_FILTER_B2_F3::4	C:\development\m2m\firmware\pic\common\can18f.h	94;"	d	line:94
+CAN_FILTER_B2_F4::5	C:\development\m2m\firmware\pic\common\can18f.h	95;"	d	line:95
+CAN_MASK_B1::0	C:\development\m2m\firmware\pic\common\can18f.h	86;"	d	line:86
+CAN_MASK_B2::1	C:\development\m2m\firmware\pic\common\can18f.h	87;"	d	line:87
+CAN_MESSAGE_ID	C:\development\m2m\firmware\pic\common\can18f.h	163;"	t	line:163
+CAN_RX_DBL_BUFFERED::0b10000000	C:\development\m2m\firmware\pic\common\can18f.h	123;"	d	line:123
+CAN_RX_INVALID_MSG::0b00010000	C:\development\m2m\firmware\pic\common\can18f.h	120;"	d	line:120
+CAN_RX_OVERFLOW::0b00001000	C:\development\m2m\firmware\pic\common\can18f.h	119;"	d	line:119
+CAN_RX_RTR_FRAME::0b01000000	C:\development\m2m\firmware\pic\common\can18f.h	122;"	d	line:122
+CAN_RX_XTD_FRAME::0b00100000	C:\development\m2m\firmware\pic\common\can18f.h	121;"	d	line:121
+CAN_TX_PRIORITY_0::0b00000000	C:\development\m2m\firmware\pic\common\can18f.h	110;"	d	line:110
+CAN_TX_PRIORITY_1::0b00000001	C:\development\m2m\firmware\pic\common\can18f.h	111;"	d	line:111
+CAN_TX_PRIORITY_2::0b00000010	C:\development\m2m\firmware\pic\common\can18f.h	112;"	d	line:112
+CAN_TX_PRIORITY_3::0b00000011	C:\development\m2m\firmware\pic\common\can18f.h	113;"	d	line:113
+CAN_TX_RTR_FRAME::0b01000000	C:\development\m2m\firmware\pic\common\can18f.h	117;"	d	line:117
+CAN_TX_XTD_FRAME::0b00001000	C:\development\m2m\firmware\pic\common\can18f.h	115;"	d	line:115
+DATA	C:\development\m2m\firmware\pic\rfid\project\main.c	130;"	e	line:130	enum:RXSTATE	file:
+DESCION_MATRIX_ELEMENTS::7	C:\development\m2m\firmware\pic\rfid\project\rfid.h	68;"	d	line:68
+Data	C:\development\m2m\firmware\pic\rfid\project\main.c	110;"	v	line:110
+DataBitCounter	C:\development\m2m\firmware\pic\rfid\project\main.c	113;"	v	line:113
+DataReadIndex	C:\development\m2m\firmware\pic\rfid\project\main.c	112;"	v	line:112
+DataWriteIndex	C:\development\m2m\firmware\pic\rfid\project\main.c	111;"	v	line:111
+ECANSetBaudRate::(sjw,brp,phseg1,phseg2,propseg	C:\development\m2m\firmware\pic\common\can18f.h	195;"	d	line:195
+ECANSetBaudRate::(sjw,brp,phseg1,phseg2,propseg	C:\development\m2m\firmware\pic\common\can18f.h	200;"	d	line:200
+EEPROM_CONFIG::0x6E	C:\development\m2m\firmware\pic\rfid\project\rfid.h	94;"	d	line:94
+EEPROM_H	C:\development\m2m\firmware\pic\common\eeprom.h	11;"	d	line:11
+EEPROM_ONTIME_KEY::0x6D	C:\development\m2m\firmware\pic\rfid\project\rfid.h	93;"	d	line:93
+EEPROM_ONTIME_LED_GREEN::0x6C	C:\development\m2m\firmware\pic\rfid\project\rfid.h	92;"	d	line:92
+EEPROM_ONTIME_LED_RED::0x6B	C:\development\m2m\firmware\pic\rfid\project\rfid.h	91;"	d	line:91
+EEPROM_STRING	C:\development\m2m\firmware\pic\common\eeprom.h	16;"	d	line:16
+EEPROM_SUBZONE::0x67	C:\development\m2m\firmware\pic\rfid\project\rfid.h	87;"	d	line:87
+EEPROM_SUBZONE_KEY::0x6A	C:\development\m2m\firmware\pic\rfid\project\rfid.h	90;"	d	line:90
+EEPROM_SUBZONE_LED_GREEN::0x69	C:\development\m2m\firmware\pic\rfid\project\rfid.h	89;"	d	line:89
+EEPROM_SUBZONE_LED_RED::0x68	C:\development\m2m\firmware\pic\rfid\project\rfid.h	88;"	d	line:88
+EEPROM_UL	C:\development\m2m\firmware\pic\common\eeprom.h	19;"	d	line:19
+EEPROM_ZONE::0x66	C:\development\m2m\firmware\pic\rfid\project\rfid.h	86;"	d	line:86
+EIDHU	C:\development\m2m\firmware\pic\common\can18f.h	150;"	m	line:150	struct:_CAN_MESSAGE_ID::<anonymous>::<anonymous>
+EIDH_LN	C:\development\m2m\firmware\pic\common\can18f.h	145;"	m	line:145	struct:_CAN_MESSAGE_ID::<anonymous>::<anonymous>
+EIDH_UN	C:\development\m2m\firmware\pic\common\can18f.h	149;"	m	line:149	struct:_CAN_MESSAGE_ID::<anonymous>::<anonymous>
+EIDL_LN	C:\development\m2m\firmware\pic\common\can18f.h	140;"	m	line:140	struct:_CAN_MESSAGE_ID::<anonymous>::<anonymous>
+EIDL_UN	C:\development\m2m\firmware\pic\common\can18f.h	144;"	m	line:144	struct:_CAN_MESSAGE_ID::<anonymous>::<anonymous>
+END::1	C:\development\m2m\firmware\pic\rfid\project\main.h	56;"	d	line:56
+EmData	C:\development\m2m\firmware\pic\rfid\project\main.c	116;"	v	line:116
+EmDataFlags	C:\development\m2m\firmware\pic\rfid\project\main.c	128;"	v	line:128
+EmDataIndex	C:\development\m2m\firmware\pic\rfid\project\main.c	117;"	v	line:117
+EmDataReceived	C:\development\m2m\firmware\pic\rfid\project\main.c	127;"	m	line:127	struct:_EmDataFlags	file:
+EmDataTimer	C:\development\m2m\firmware\pic\rfid\project\main.c	118;"	v	line:118
+EmDataTrue	C:\development\m2m\firmware\pic\rfid\project\main.c	126;"	m	line:126	struct:_EmDataFlags	file:
+FALSE	C:\development\m2m\firmware\pic\common\can18f.h	75;"	e	line:75	enum:_BOOL
+FALSE::0	C:\development\m2m\firmware\common\vscp.c	50;"	d	line:50	file:
+FALSE::0	C:\development\m2m\firmware\pic\rfid\project\main.h	39;"	d	line:39
+FIRMWARE_MAJOR_VERSION::0	C:\development\m2m\firmware\pic\rfid\project\version.h	36;"	d	line:36
+FIRMWARE_MINOR_VERSION::0	C:\development\m2m\firmware\pic\rfid\project\version.h	37;"	d	line:37
+FIRMWARE_SUB_MINOR_VERSION::3	C:\development\m2m\firmware\pic\rfid\project\version.h	38;"	d	line:38
+GreenLedOff	C:\development\m2m\firmware\pic\rfid\project\main.c	63;"	p	line:63	file:	signature:( void )
+GreenLedOn	C:\development\m2m\firmware\pic\rfid\project\main.c	62;"	p	line:62	file:	signature:( unsigned int time )
+GreenLedTimer	C:\development\m2m\firmware\pic\rfid\project\main.c	121;"	v	line:121
+HEADER	C:\development\m2m\firmware\pic\rfid\project\main.c	130;"	e	line:130	enum:RXSTATE	file:
+HITECH_C18	C:\development\m2m\firmware\pic\common\can18f.h	62;"	d	line:62
+HeaderCounter	C:\development\m2m\firmware\pic\rfid\project\main.c	108;"	v	line:108
+ID	C:\development\m2m\firmware\pic\common\can18f.h	128;"	m	line:128	union:_CAN_MESSAGE_ID
+ID_VALS	C:\development\m2m\firmware\pic\common\can18f.h	153;"	m	line:153	union:_CAN_MESSAGE_ID
+InitFSKData	C:\development\m2m\firmware\pic\rfid\project\main.c	57;"	p	line:57	file:	signature:( void )
+KELVIN_SMART_COMPILER_H	C:\development\m2m\firmware\pic\rfid\project\vscp_compiler.h	30;"	d	line:30
+KELVIN_SMART_PROJDEFS_H	C:\development\m2m\firmware\pic\rfid\project\vscp_projdefs.h	30;"	d	line:30
+KeyOff	C:\development\m2m\firmware\pic\rfid\project\main.c	59;"	p	line:59	file:	signature:( void )
+KeyOn	C:\development\m2m\firmware\pic\rfid\project\main.c	58;"	p	line:58	file:	signature:( unsigned int time )
+KeyTimer	C:\development\m2m\firmware\pic\rfid\project\main.c	123;"	v	line:123
+LESS::3	C:\development\m2m\firmware\pic\rfid\project\main.h	53;"	d	line:53
+MAIN_H	C:\development\m2m\firmware\pic\rfid\project\main.h	35;"	d	line:35
+MASK_BEEP::2	C:\development\m2m\firmware\pic\rfid\project\rfid.h	72;"	d	line:72
+MASK_GREEN_LED::1	C:\development\m2m\firmware\pic\rfid\project\rfid.h	71;"	d	line:71
+MCHP_C18	C:\development\m2m\firmware\pic\common\can18f.h	64;"	d	line:64
+MIDDLE::0	C:\development\m2m\firmware\pic\rfid\project\main.h	55;"	d	line:55
+OFF	C:\development\m2m\firmware\pic\rfid\project\main.c	103;"	e	line:103	enum:_PWM_enable	file:
+OFF::FALSE	C:\development\m2m\firmware\common\vscp.c	62;"	d	line:62	file:
+ON	C:\development\m2m\firmware\pic\rfid\project\main.c	103;"	e	line:103	enum:_PWM_enable	file:
+ON::!FALSE	C:\development\m2m\firmware\common\vscp.c	58;"	d	line:58	file:
+ONE_AND_HALF_BIT::1	C:\development\m2m\firmware\pic\rfid\project\main.h	51;"	d	line:51
+ONE_BIT::0	C:\development\m2m\firmware\pic\rfid\project\main.h	50;"	d	line:50
+PWM_Calibr	C:\development\m2m\firmware\pic\rfid\project\main.c	1215;"	f	line:1215	signature:( unsigned char *pwm_f, unsigned char *pwm_adc )
+PWM_Calibr	C:\development\m2m\firmware\pic\rfid\project\main.c	84;"	p	line:84	file:	signature:(unsigned char *pwm_f,unsigned char *pwm_adc)
+PWM_adc	C:\development\m2m\firmware\pic\rfid\project\main.c	102;"	v	line:102
+PWM_enable	C:\development\m2m\firmware\pic\rfid\project\main.c	103;"	v	line:103
+PWM_f	C:\development\m2m\firmware\pic\rfid\project\main.c	101;"	v	line:101
+ParityCounter	C:\development\m2m\firmware\pic\rfid\project\main.c	114;"	v	line:114
+REG_DESCION_MATRIX::72	C:\development\m2m\firmware\pic\rfid\project\rfid.h	67;"	d	line:67
+REG_DEV_CONFIG::8	C:\development\m2m\firmware\pic\rfid\project\rfid.h	53;"	d	line:53
+REG_EMDATA0::11	C:\development\m2m\firmware\pic\rfid\project\rfid.h	60;"	d	line:60
+REG_EMDATA1::12	C:\development\m2m\firmware\pic\rfid\project\rfid.h	61;"	d	line:61
+REG_EMDATA2::13	C:\development\m2m\firmware\pic\rfid\project\rfid.h	62;"	d	line:62
+REG_EMDATA3::14	C:\development\m2m\firmware\pic\rfid\project\rfid.h	63;"	d	line:63
+REG_EMDATA4::15	C:\development\m2m\firmware\pic\rfid\project\rfid.h	64;"	d	line:64
+REG_EMDATA5::16	C:\development\m2m\firmware\pic\rfid\project\rfid.h	65;"	d	line:65
+REG_GREEN_LED_ON_TIME::6	C:\development\m2m\firmware\pic\rfid\project\rfid.h	51;"	d	line:51
+REG_KEY_ON_TIME::7	C:\development\m2m\firmware\pic\rfid\project\rfid.h	52;"	d	line:52
+REG_PWM_ADC::10	C:\development\m2m\firmware\pic\rfid\project\rfid.h	57;"	d	line:57
+REG_PWM_VALUE::9	C:\development\m2m\firmware\pic\rfid\project\rfid.h	56;"	d	line:56
+REG_RED_LED_ON_TIME::5	C:\development\m2m\firmware\pic\rfid\project\rfid.h	50;"	d	line:50
+REG_SUBZONE::1	C:\development\m2m\firmware\pic\rfid\project\rfid.h	46;"	d	line:46
+REG_SUBZONE_KEY::4	C:\development\m2m\firmware\pic\rfid\project\rfid.h	49;"	d	line:49
+REG_SUBZONE_LED_GREEN::3	C:\development\m2m\firmware\pic\rfid\project\rfid.h	48;"	d	line:48
+REG_SUBZONE_LED_RED::2	C:\development\m2m\firmware\pic\rfid\project\rfid.h	47;"	d	line:47
+REG_ZONE::0	C:\development\m2m\firmware\pic\rfid\project\rfid.h	45;"	d	line:45
+RFID_H	C:\development\m2m\firmware\pic\rfid\project\rfid.h	35;"	d	line:35
+RFID_VERSION_H	C:\development\m2m\firmware\pic\rfid\project\version.h	32;"	d	line:32
+RND::6	C:\development\m2m\firmware\pic\rfid\project\c018.c	15;"	d	line:15	file:
+RXSTATE	C:\development\m2m\firmware\pic\rfid\project\main.c	130;"	g	line:130	file:
+ReadData	C:\development\m2m\firmware\pic\rfid\project\main.c	56;"	p	line:56	file:	signature:( unsigned char Index )
+RedLedOff	C:\development\m2m\firmware\pic\rfid\project\main.c	61;"	p	line:61	file:	signature:( void )
+RedLedOn	C:\development\m2m\firmware\pic\rfid\project\main.c	60;"	p	line:60	file:	signature:( unsigned int time )
+RedLedTimer	C:\development\m2m\firmware\pic\rfid\project\main.c	120;"	v	line:120
+RisingPosition	C:\development\m2m\firmware\pic\rfid\project\main.c	107;"	v	line:107
+RotateLeftEmData	C:\development\m2m\firmware\pic\rfid\project\main.c	91;"	p	line:91	file:	signature:(void)
+RotateLeftEmData	C:\development\m2m\firmware\pic\rfid\project\rfid.asm	10;"	l	line:10
+RotateRightEmData	C:\development\m2m\firmware\pic\rfid\project\main.c	92;"	p	line:92	file:	signature:(void)
+RotateRightEmData	C:\development\m2m\firmware\pic\rfid\project\rfid.asm	20;"	l	line:20
+RxState	C:\development\m2m\firmware\pic\rfid\project\main.c	131;"	v	line:131
+SIDH	C:\development\m2m\firmware\pic\common\can18f.h	135;"	m	line:135	struct:_CAN_MESSAGE_ID::<anonymous>::<anonymous>
+SIDHU	C:\development\m2m\firmware\pic\common\can18f.h	139;"	m	line:139	struct:_CAN_MESSAGE_ID::<anonymous>::<anonymous>
+SIDL	C:\development\m2m\firmware\pic\common\can18f.h	134;"	m	line:134	struct:_CAN_MESSAGE_ID::<anonymous>::<anonymous>
+SendInformationEvent	C:\development\m2m\firmware\pic\rfid\project\main.c	1329;"	f	line:1329	signature:( unsigned char idx, unsigned char eventClass, unsigned char eventTypeId )
+SendInformationEvent	C:\development\m2m\firmware\pic\rfid\project\main.h	138;"	p	line:138	signature:( unsigned char idx, unsigned char eventClass, unsigned char eventTypeId )
+TEMPERATURE_ARRAY_SIZE::0x0A	C:\development\m2m\firmware\pic\rfid\project\main.h	88;"	d	line:88
+TIMER2_RELOAD_VALUE::156	C:\development\m2m\firmware\pic\rfid\project\main.h	83;"	d	line:83
+TRUE	C:\development\m2m\firmware\pic\common\can18f.h	75;"	e	line:75	enum:_BOOL
+TRUE::!FALSE	C:\development\m2m\firmware\common\vscp.c	54;"	d	line:54	file:
+TRUE::1	C:\development\m2m\firmware\pic\rfid\project\main.h	38;"	d	line:38
+TWO_BITS::2	C:\development\m2m\firmware\pic\rfid\project\main.h	52;"	d	line:52
+VSCP2_TYPE_CONTROL_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	406;"	d	line:406
+VSCP2_TYPE_CUSTOM_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	417;"	d	line:417
+VSCP2_TYPE_DISPLAY_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	420;"	d	line:420
+VSCP2_TYPE_INFORMATION_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	409;"	d	line:409
+VSCP2_TYPE_INFORMATION_TOKEN_ACTIVITY::1	C:\development\m2m\src\vscp\common\vscp_type.h	410;"	d	line:410
+VSCP2_TYPE_PROTOCOL_CONFIG_CHANGED::6	C:\development\m2m\src\vscp\common\vscp_type.h	399;"	d	line:399
+VSCP2_TYPE_PROTOCOL_CONFIG_PARAM_REQUEST::9	C:\development\m2m\src\vscp\common\vscp_type.h	402;"	d	line:402
+VSCP2_TYPE_PROTOCOL_CONFIG_PARAM_RESPONSE::10	C:\development\m2m\src\vscp\common\vscp_type.h	403;"	d	line:403
+VSCP2_TYPE_PROTOCOL_CONFIG_READ_REQUEST::4	C:\development\m2m\src\vscp\common\vscp_type.h	397;"	d	line:397
+VSCP2_TYPE_PROTOCOL_CONFIG_READ_RESPONSE::5	C:\development\m2m\src\vscp\common\vscp_type.h	398;"	d	line:398
+VSCP2_TYPE_PROTOCOL_CONFIG_UPDATE_REQUEST::7	C:\development\m2m\src\vscp\common\vscp_type.h	400;"	d	line:400
+VSCP2_TYPE_PROTOCOL_CONFIG_UPDATE_RESPONSE::8	C:\development\m2m\src\vscp\common\vscp_type.h	401;"	d	line:401
+VSCP2_TYPE_PROTOCOL_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	393;"	d	line:393
+VSCP2_TYPE_PROTOCOL_READ_REGISTER::1	C:\development\m2m\src\vscp\common\vscp_type.h	394;"	d	line:394
+VSCP2_TYPE_PROTOCOL_READ_WRITE_RESPONSE::3	C:\development\m2m\src\vscp\common\vscp_type.h	396;"	d	line:396
+VSCP2_TYPE_PROTOCOL_WRITE_REGISTER::2	C:\development\m2m\src\vscp\common\vscp_type.h	395;"	d	line:395
+VSCP2_TYPE_TEXT2SPEECH_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	413;"	d	line:413
+VSCP2_TYPE_TEXT2SPEECH_TALK::1	C:\development\m2m\src\vscp\common\vscp_type.h	414;"	d	line:414
+VSCP2_TYPE_VSCPD_ACTIVATE::4	C:\development\m2m\src\vscp\common\vscp_type.h	426;"	d	line:426
+VSCP2_TYPE_VSCPD_DAWN::22	C:\development\m2m\src\vscp\common\vscp_type.h	443;"	d	line:443
+VSCP2_TYPE_VSCPD_DUSK::21	C:\development\m2m\src\vscp\common\vscp_type.h	442;"	d	line:442
+VSCP2_TYPE_VSCPD_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	423;"	d	line:423
+VSCP2_TYPE_VSCPD_HOUR::7	C:\development\m2m\src\vscp\common\vscp_type.h	429;"	d	line:429
+VSCP2_TYPE_VSCPD_LOOP::1	C:\development\m2m\src\vscp\common\vscp_type.h	424;"	d	line:424
+VSCP2_TYPE_VSCPD_MIDNIGHT::9	C:\development\m2m\src\vscp\common\vscp_type.h	431;"	d	line:431
+VSCP2_TYPE_VSCPD_MINUTE::6	C:\development\m2m\src\vscp\common\vscp_type.h	428;"	d	line:428
+VSCP2_TYPE_VSCPD_MONTH::12	C:\development\m2m\src\vscp\common\vscp_type.h	433;"	d	line:433
+VSCP2_TYPE_VSCPD_NOON::8	C:\development\m2m\src\vscp\common\vscp_type.h	430;"	d	line:430
+VSCP2_TYPE_VSCPD_PAUSE::3	C:\development\m2m\src\vscp\common\vscp_type.h	425;"	d	line:425
+VSCP2_TYPE_VSCPD_QUARTER::13	C:\development\m2m\src\vscp\common\vscp_type.h	434;"	d	line:434
+VSCP2_TYPE_VSCPD_RANDOM_DAY::17	C:\development\m2m\src\vscp\common\vscp_type.h	438;"	d	line:438
+VSCP2_TYPE_VSCPD_RANDOM_HOUR::16	C:\development\m2m\src\vscp\common\vscp_type.h	437;"	d	line:437
+VSCP2_TYPE_VSCPD_RANDOM_MINUTE::15	C:\development\m2m\src\vscp\common\vscp_type.h	436;"	d	line:436
+VSCP2_TYPE_VSCPD_RANDOM_MONTH::19	C:\development\m2m\src\vscp\common\vscp_type.h	440;"	d	line:440
+VSCP2_TYPE_VSCPD_RANDOM_WEEK::18	C:\development\m2m\src\vscp\common\vscp_type.h	439;"	d	line:439
+VSCP2_TYPE_VSCPD_RANDOM_YEAR::20	C:\development\m2m\src\vscp\common\vscp_type.h	441;"	d	line:441
+VSCP2_TYPE_VSCPD_SECOND::5	C:\development\m2m\src\vscp\common\vscp_type.h	427;"	d	line:427
+VSCP2_TYPE_VSCPD_SHUTTING_DOWN::24	C:\development\m2m\src\vscp\common\vscp_type.h	445;"	d	line:445
+VSCP2_TYPE_VSCPD_STARTING_UP::23	C:\development\m2m\src\vscp\common\vscp_type.h	444;"	d	line:444
+VSCP2_TYPE_VSCPD_WEEK::11	C:\development\m2m\src\vscp\common\vscp_type.h	432;"	d	line:432
+VSCP2_TYPE_VSCPD_YEAR::14	C:\development\m2m\src\vscp\common\vscp_type.h	435;"	d	line:435
+VSCPNODE_CAN_BRP::9	C:\development\m2m\firmware\pic\common\can18f.c	75;"	d	line:75	file:
+VSCPNODE_CAN_FILTER1_BUF1::0	C:\development\m2m\firmware\pic\common\can18f.c	85;"	d	line:85	file:
+VSCPNODE_CAN_FILTER1_BUF2::0	C:\development\m2m\firmware\pic\common\can18f.c	87;"	d	line:87	file:
+VSCPNODE_CAN_FILTER2_BUF1::0	C:\development\m2m\firmware\pic\common\can18f.c	86;"	d	line:86	file:
+VSCPNODE_CAN_FILTER2_BUF2::0	C:\development\m2m\firmware\pic\common\can18f.c	88;"	d	line:88	file:
+VSCPNODE_CAN_FILTER3_BUF2::0	C:\development\m2m\firmware\pic\common\can18f.c	89;"	d	line:89	file:
+VSCPNODE_CAN_FILTER4_BUF2::0	C:\development\m2m\firmware\pic\common\can18f.c	90;"	d	line:90	file:
+VSCPNODE_CAN_MASK_BUF1::0x0000000	C:\development\m2m\firmware\pic\common\can18f.c	82;"	d	line:82	file:
+VSCPNODE_CAN_MASK_BUF2::0x0000000	C:\development\m2m\firmware\pic\common\can18f.c	83;"	d	line:83	file:
+VSCPNODE_CAN_PHSEG1::8	C:\development\m2m\firmware\pic\common\can18f.c	76;"	d	line:76	file:
+VSCPNODE_CAN_PHSEG2::6	C:\development\m2m\firmware\pic\common\can18f.c	77;"	d	line:77	file:
+VSCPNODE_CAN_PROPSEG::1	C:\development\m2m\firmware\pic\common\can18f.c	78;"	d	line:78	file:
+VSCPNODE_CAN_SJW::1	C:\development\m2m\firmware\pic\common\can18f.c	74;"	d	line:74	file:
+VSCP_ADDRESS_FREE::0xff	C:\development\m2m\firmware\common\vscp.h	79;"	d	line:79
+VSCP_ADDRESS_MASTER::0x00	C:\development\m2m\firmware\common\vscp.h	78;"	d	line:78
+VSCP_BOOTLOADER_LPC1::0x10	C:\development\m2m\firmware\common\vscp.h	91;"	d	line:91
+VSCP_BOOTLOADER_NONE::0xff	C:\development\m2m\firmware\common\vscp.h	92;"	d	line:92
+VSCP_BOOTLOADER_PIC1::0x01	C:\development\m2m\firmware\common\vscp.h	90;"	d	line:90
+VSCP_BOOTLOADER_VSCP::0x00	C:\development\m2m\firmware\common\vscp.h	89;"	d	line:89
+VSCP_BOOT_FLAG::0xff	C:\development\m2m\firmware\common\vscp.h	84;"	d	line:84
+VSCP_BOOT_LOADER_ALGORITHM::0x97	C:\development\m2m\firmware\common\vscp.h	162;"	d	line:162
+VSCP_BUFFER_SIZE::0x98	C:\development\m2m\firmware\common\vscp.h	163;"	d	line:163
+VSCP_CLASS1_ALARM::1	C:\development\m2m\src\vscp\common\vscp_class.h	45;"	d	line:45
+VSCP_CLASS1_AOL::50	C:\development\m2m\src\vscp\common\vscp_class.h	52;"	d	line:52
+VSCP_CLASS1_CONTROL::30	C:\development\m2m\src\vscp\common\vscp_class.h	50;"	d	line:50
+VSCP_CLASS1_DATA::15	C:\development\m2m\src\vscp\common\vscp_class.h	48;"	d	line:48
+VSCP_CLASS1_DISPLAY::102	C:\development\m2m\src\vscp\common\vscp_class.h	55;"	d	line:55
+VSCP_CLASS1_EIB::203	C:\development\m2m\src\vscp\common\vscp_class.h	60;"	d	line:60
+VSCP_CLASS1_INFORMATION::20	C:\development\m2m\src\vscp\common\vscp_class.h	49;"	d	line:49
+VSCP_CLASS1_LAB::510	C:\development\m2m\src\vscp\common\vscp_class.h	64;"	d	line:64
+VSCP_CLASS1_LIN::101	C:\development\m2m\src\vscp\common\vscp_class.h	54;"	d	line:54
+VSCP_CLASS1_LOCAL::511	C:\development\m2m\src\vscp\common\vscp_class.h	65;"	d	line:65
+VSCP_CLASS1_LOG::509	C:\development\m2m\src\vscp\common\vscp_class.h	63;"	d	line:63
+VSCP_CLASS1_LON::202	C:\development\m2m\src\vscp\common\vscp_class.h	59;"	d	line:59
+VSCP_CLASS1_MEASUREMENT::10	C:\development\m2m\src\vscp\common\vscp_class.h	47;"	d	line:47
+VSCP_CLASS1_MULTIMEDIA::40	C:\development\m2m\src\vscp\common\vscp_class.h	51;"	d	line:51
+VSCP_CLASS1_MUMIN::205	C:\development\m2m\src\vscp\common\vscp_class.h	62;"	d	line:62
+VSCP_CLASS1_ONEWIRE::200	C:\development\m2m\src\vscp\common\vscp_class.h	57;"	d	line:57
+VSCP_CLASS1_PHONE::100	C:\development\m2m\src\vscp\common\vscp_class.h	53;"	d	line:53
+VSCP_CLASS1_PROTOCOL::0	C:\development\m2m\src\vscp\common\vscp_class.h	44;"	d	line:44
+VSCP_CLASS1_RC5::110	C:\development\m2m\src\vscp\common\vscp_class.h	56;"	d	line:56
+VSCP_CLASS1_SECURITY::2	C:\development\m2m\src\vscp\common\vscp_class.h	46;"	d	line:46
+VSCP_CLASS1_SNAP::204	C:\development\m2m\src\vscp\common\vscp_class.h	61;"	d	line:61
+VSCP_CLASS1_X10::201	C:\development\m2m\src\vscp\common\vscp_class.h	58;"	d	line:58
+VSCP_CLASS2_CONTROL::(1025)	C:\development\m2m\src\vscp\common\vscp_class.h	93;"	d	line:93
+VSCP_CLASS2_CUSTOM::(1029)	C:\development\m2m\src\vscp\common\vscp_class.h	96;"	d	line:96
+VSCP_CLASS2_DISPLAY::(1030)	C:\development\m2m\src\vscp\common\vscp_class.h	97;"	d	line:97
+VSCP_CLASS2_INFORMATION::(1026)	C:\development\m2m\src\vscp\common\vscp_class.h	94;"	d	line:94
+VSCP_CLASS2_LEVEL1_ALARM::(512+1)	C:\development\m2m\src\vscp\common\vscp_class.h	70;"	d	line:70
+VSCP_CLASS2_LEVEL1_AOL::(512+50)	C:\development\m2m\src\vscp\common\vscp_class.h	77;"	d	line:77
+VSCP_CLASS2_LEVEL1_CONTROL::(512+30)	C:\development\m2m\src\vscp\common\vscp_class.h	75;"	d	line:75
+VSCP_CLASS2_LEVEL1_DATA::(512+15)	C:\development\m2m\src\vscp\common\vscp_class.h	73;"	d	line:73
+VSCP_CLASS2_LEVEL1_EIB::(512+203)	C:\development\m2m\src\vscp\common\vscp_class.h	84;"	d	line:84
+VSCP_CLASS2_LEVEL1_INFORMATION::(512+20)	C:\development\m2m\src\vscp\common\vscp_class.h	74;"	d	line:74
+VSCP_CLASS2_LEVEL1_LAB::(512+510)	C:\development\m2m\src\vscp\common\vscp_class.h	88;"	d	line:88
+VSCP_CLASS2_LEVEL1_LIN::(512+101)	C:\development\m2m\src\vscp\common\vscp_class.h	79;"	d	line:79
+VSCP_CLASS2_LEVEL1_LOCAL::(512+511)	C:\development\m2m\src\vscp\common\vscp_class.h	89;"	d	line:89
+VSCP_CLASS2_LEVEL1_LOG::(512+509)	C:\development\m2m\src\vscp\common\vscp_class.h	87;"	d	line:87
+VSCP_CLASS2_LEVEL1_LON::(512+202)	C:\development\m2m\src\vscp\common\vscp_class.h	83;"	d	line:83
+VSCP_CLASS2_LEVEL1_MEASUREMENT::(512+10)	C:\development\m2m\src\vscp\common\vscp_class.h	72;"	d	line:72
+VSCP_CLASS2_LEVEL1_MULTIMEDIA::(512+40)	C:\development\m2m\src\vscp\common\vscp_class.h	76;"	d	line:76
+VSCP_CLASS2_LEVEL1_MUMIN::(512+205)	C:\development\m2m\src\vscp\common\vscp_class.h	86;"	d	line:86
+VSCP_CLASS2_LEVEL1_ONEWIRE::(512+200)	C:\development\m2m\src\vscp\common\vscp_class.h	81;"	d	line:81
+VSCP_CLASS2_LEVEL1_PHONE::(512+100)	C:\development\m2m\src\vscp\common\vscp_class.h	78;"	d	line:78
+VSCP_CLASS2_LEVEL1_PROTOCOL::(512+0)	C:\development\m2m\src\vscp\common\vscp_class.h	69;"	d	line:69
+VSCP_CLASS2_LEVEL1_RC5::(512+110)	C:\development\m2m\src\vscp\common\vscp_class.h	80;"	d	line:80
+VSCP_CLASS2_LEVEL1_SECURITY::(512+2)	C:\development\m2m\src\vscp\common\vscp_class.h	71;"	d	line:71
+VSCP_CLASS2_LEVEL1_SNAP::(512+204)	C:\development\m2m\src\vscp\common\vscp_class.h	85;"	d	line:85
+VSCP_CLASS2_LEVEL1_X10::(512+201)	C:\development\m2m\src\vscp\common\vscp_class.h	82;"	d	line:82
+VSCP_CLASS2_PROTOCOL::(1024)	C:\development\m2m\src\vscp\common\vscp_class.h	92;"	d	line:92
+VSCP_CLASS2_TEXT2SPEECH::(1028)	C:\development\m2m\src\vscp\common\vscp_class.h	95;"	d	line:95
+VSCP_CLASS2_VSCPD::(65535)	C:\development\m2m\src\vscp\common\vscp_class.h	98;"	d	line:98
+VSCP_CLASS_H	C:\development\m2m\src\vscp\common\vscp_class.h	42;"	d	line:42
+VSCP_DM_FLAG_CHECK_OADDR::0x40	C:\development\m2m\firmware\common\vscp.h	243;"	d	line:243
+VSCP_DM_FLAG_CHECK_SUBZONE::0x08	C:\development\m2m\firmware\common\vscp.h	246;"	d	line:246
+VSCP_DM_FLAG_CHECK_ZONE::0x10	C:\development\m2m\firmware\common\vscp.h	245;"	d	line:245
+VSCP_DM_FLAG_CLASS_FILTER::0x01	C:\development\m2m\firmware\common\vscp.h	248;"	d	line:248
+VSCP_DM_FLAG_CLASS_MASK::0x02	C:\development\m2m\firmware\common\vscp.h	247;"	d	line:247
+VSCP_DM_FLAG_ENABLED::0x80	C:\development\m2m\firmware\common\vscp.h	242;"	d	line:242
+VSCP_DM_FLAG_HARDCODED::0x20	C:\development\m2m\firmware\common\vscp.h	244;"	d	line:244
+VSCP_DM_POS_ACTION::6	C:\development\m2m\firmware\common\vscp.h	239;"	d	line:239
+VSCP_DM_POS_ACTIONPARAM::7	C:\development\m2m\firmware\common\vscp.h	240;"	d	line:240
+VSCP_DM_POS_CLASSFILTER::3	C:\development\m2m\firmware\common\vscp.h	236;"	d	line:236
+VSCP_DM_POS_CLASSMASK::2	C:\development\m2m\firmware\common\vscp.h	235;"	d	line:235
+VSCP_DM_POS_FLAGS::1	C:\development\m2m\firmware\common\vscp.h	234;"	d	line:234
+VSCP_DM_POS_OADDR::0	C:\development\m2m\firmware\common\vscp.h	233;"	d	line:233
+VSCP_DM_POS_TYPEFILTER::5	C:\development\m2m\firmware\common\vscp.h	238;"	d	line:238
+VSCP_DM_POS_TYPEMASK::4	C:\development\m2m\firmware\common\vscp.h	237;"	d	line:237
+VSCP_EEPROM_BOOTLOADER_FLAG::0x00	C:\development\m2m\firmware\pic\rfid\project\main.h	92;"	d	line:92
+VSCP_EEPROM_CONTROL::0x03	C:\development\m2m\firmware\pic\rfid\project\main.h	96;"	d	line:96
+VSCP_EEPROM_END::0x41	C:\development\m2m\firmware\pic\rfid\project\main.h	124;"	d	line:124
+VSCP_EEPROM_NICKNAME::0x01	C:\development\m2m\firmware\pic\rfid\project\main.h	94;"	d	line:94
+VSCP_EEPROM_REG_DEVICE_URL::0x21	C:\development\m2m\firmware\pic\rfid\project\main.h	121;"	d	line:121
+VSCP_EEPROM_REG_GUID::0x11	C:\development\m2m\firmware\pic\rfid\project\main.h	118;"	d	line:118
+VSCP_EEPROM_REG_MANUFACTUR_ID0::0x09	C:\development\m2m\firmware\pic\rfid\project\main.h	106;"	d	line:106
+VSCP_EEPROM_REG_MANUFACTUR_ID1::0x0A	C:\development\m2m\firmware\pic\rfid\project\main.h	107;"	d	line:107
+VSCP_EEPROM_REG_MANUFACTUR_ID2::0x0B	C:\development\m2m\firmware\pic\rfid\project\main.h	108;"	d	line:108
+VSCP_EEPROM_REG_MANUFACTUR_ID3::0x0C	C:\development\m2m\firmware\pic\rfid\project\main.h	109;"	d	line:109
+VSCP_EEPROM_REG_MANUFACTUR_SUBID0::0x0D	C:\development\m2m\firmware\pic\rfid\project\main.h	111;"	d	line:111
+VSCP_EEPROM_REG_MANUFACTUR_SUBID1::0x0E	C:\development\m2m\firmware\pic\rfid\project\main.h	112;"	d	line:112
+VSCP_EEPROM_REG_MANUFACTUR_SUBID2::0x0F	C:\development\m2m\firmware\pic\rfid\project\main.h	113;"	d	line:113
+VSCP_EEPROM_REG_MANUFACTUR_SUBID3::0x10	C:\development\m2m\firmware\pic\rfid\project\main.h	114;"	d	line:114
+VSCP_EEPROM_REG_USERID1::0x05	C:\development\m2m\firmware\pic\rfid\project\main.h	99;"	d	line:99
+VSCP_EEPROM_REG_USERID2::0x06	C:\development\m2m\firmware\pic\rfid\project\main.h	100;"	d	line:100
+VSCP_EEPROM_REG_USERID3::0x07	C:\development\m2m\firmware\pic\rfid\project\main.h	101;"	d	line:101
+VSCP_EEPROM_REG_USERID4::0x08	C:\development\m2m\firmware\pic\rfid\project\main.h	102;"	d	line:102
+VSCP_EEPROM_REG_USERID::0x04	C:\development\m2m\firmware\pic\rfid\project\main.h	98;"	d	line:98
+VSCP_EEPROM_SEGMENT_CRC::0x02	C:\development\m2m\firmware\pic\rfid\project\main.h	95;"	d	line:95
+VSCP_FIRMWARE_MAJOR_VERSION::0x94	C:\development\m2m\firmware\common\vscp.h	158;"	d	line:158
+VSCP_FIRMWARE_MINOR_VERSION::0x95	C:\development\m2m\firmware\common\vscp.h	159;"	d	line:159
+VSCP_FIRMWARE_SUB_MINOR_VERSION::0x96	C:\development\m2m\firmware\common\vscp.h	160;"	d	line:160
+VSCP_H	C:\development\m2m\firmware\common\vscp.h	41;"	d	line:41
+VSCP_LED_BLINK1::0x02	C:\development\m2m\firmware\common\vscp.h	171;"	d	line:171
+VSCP_LED_OFF::0x00	C:\development\m2m\firmware\common\vscp.h	169;"	d	line:169
+VSCP_LED_ON::0x01	C:\development\m2m\firmware\common\vscp.h	170;"	d	line:170
+VSCP_LEVEL1_COMMON_REGISTER_START::0x80	C:\development\m2m\firmware\common\vscp.h	94;"	d	line:94
+VSCP_MAJOR_VERSION::1	C:\development\m2m\firmware\common\vscp.h	75;"	d	line:75
+VSCP_MINOR_VERSION::5	C:\development\m2m\firmware\common\vscp.h	76;"	d	line:76
+VSCP_PRIORITY0::0x07	C:\development\m2m\firmware\common\vscp.h	121;"	d	line:121
+VSCP_PRIORITY1::0x06	C:\development\m2m\firmware\common\vscp.h	120;"	d	line:120
+VSCP_PRIORITY2::0x05	C:\development\m2m\firmware\common\vscp.h	119;"	d	line:119
+VSCP_PRIORITY3::0x04	C:\development\m2m\firmware\common\vscp.h	118;"	d	line:118
+VSCP_PRIORITY4::0x03	C:\development\m2m\firmware\common\vscp.h	115;"	d	line:115
+VSCP_PRIORITY5::0x02	C:\development\m2m\firmware\common\vscp.h	114;"	d	line:114
+VSCP_PRIORITY6::0x01	C:\development\m2m\firmware\common\vscp.h	113;"	d	line:113
+VSCP_PRIORITY7::0x00	C:\development\m2m\firmware\common\vscp.h	111;"	d	line:111
+VSCP_PRIORITY_HIGH::0x00	C:\development\m2m\firmware\common\vscp.h	112;"	d	line:112
+VSCP_PRIORITY_LOW::0x07	C:\development\m2m\firmware\common\vscp.h	122;"	d	line:122
+VSCP_PRIORITY_MEDIUM::0x03	C:\development\m2m\firmware\common\vscp.h	116;"	d	line:116
+VSCP_PRIORITY_NORMAL::0x03	C:\development\m2m\firmware\common\vscp.h	117;"	d	line:117
+VSCP_PROBE_TIMEOUT::1000	C:\development\m2m\firmware\common\vscp.h	124;"	d	line:124
+VSCP_PROBE_TIMEOUT_COUNT::3	C:\development\m2m\firmware\common\vscp.h	125;"	d	line:125
+VSCP_REG_ALARMSTATUS::0x80	C:\development\m2m\firmware\common\vscp.h	131;"	d	line:131
+VSCP_REG_DEVICE_URL::0xE0	C:\development\m2m\firmware\common\vscp.h	166;"	d	line:166
+VSCP_REG_GUIID::0xD0	C:\development\m2m\firmware\common\vscp.h	165;"	d	line:165
+VSCP_REG_MANUFACTUR_ID0::0x89	C:\development\m2m\firmware\common\vscp.h	143;"	d	line:143
+VSCP_REG_MANUFACTUR_ID1::0x8A	C:\development\m2m\firmware\common\vscp.h	144;"	d	line:144
+VSCP_REG_MANUFACTUR_ID2::0x8B	C:\development\m2m\firmware\common\vscp.h	145;"	d	line:145
+VSCP_REG_MANUFACTUR_ID3::0x8C	C:\development\m2m\firmware\common\vscp.h	146;"	d	line:146
+VSCP_REG_MANUFACTUR_SUBID0::0x8D	C:\development\m2m\firmware\common\vscp.h	148;"	d	line:148
+VSCP_REG_MANUFACTUR_SUBID1::0x8E	C:\development\m2m\firmware\common\vscp.h	149;"	d	line:149
+VSCP_REG_MANUFACTUR_SUBID2::0x8F	C:\development\m2m\firmware\common\vscp.h	150;"	d	line:150
+VSCP_REG_MANUFACTUR_SUBID3::0x90	C:\development\m2m\firmware\common\vscp.h	151;"	d	line:151
+VSCP_REG_NICKNAME_ID::0x91	C:\development\m2m\firmware\common\vscp.h	153;"	d	line:153
+VSCP_REG_NODE_CONTROL::0x83	C:\development\m2m\firmware\common\vscp.h	135;"	d	line:135
+VSCP_REG_PAGE_SELECT_LSB::0x93	C:\development\m2m\firmware\common\vscp.h	156;"	d	line:156
+VSCP_REG_PAGE_SELECT_MSB::0x92	C:\development\m2m\firmware\common\vscp.h	155;"	d	line:155
+VSCP_REG_USERID0::0x84	C:\development\m2m\firmware\common\vscp.h	137;"	d	line:137
+VSCP_REG_USERID1::0x85	C:\development\m2m\firmware\common\vscp.h	138;"	d	line:138
+VSCP_REG_USERID2::0x86	C:\development\m2m\firmware\common\vscp.h	139;"	d	line:139
+VSCP_REG_USERID3::0x87	C:\development\m2m\firmware\common\vscp.h	140;"	d	line:140
+VSCP_REG_USERID4::0x88	C:\development\m2m\firmware\common\vscp.h	141;"	d	line:141
+VSCP_REG_VSCP_MAJOR_VERSION::0x81	C:\development\m2m\firmware\common\vscp.h	132;"	d	line:132
+VSCP_REG_VSCP_MINOR_VERSION::0x82	C:\development\m2m\firmware\common\vscp.h	133;"	d	line:133
+VSCP_SIZE_DEVURL::32	C:\development\m2m\firmware\common\vscp.h	82;"	d	line:82
+VSCP_SIZE_GUID::16	C:\development\m2m\firmware\common\vscp.h	81;"	d	line:81
+VSCP_STATE_ACTIVE::0x03	C:\development\m2m\firmware\common\vscp.h	100;"	d	line:100
+VSCP_STATE_ERROR::0x04	C:\development\m2m\firmware\common\vscp.h	101;"	d	line:101
+VSCP_STATE_INIT::0x01	C:\development\m2m\firmware\common\vscp.h	98;"	d	line:98
+VSCP_STATE_PREACTIVE::0x02	C:\development\m2m\firmware\common\vscp.h	99;"	d	line:99
+VSCP_STATE_STARTUP::0x00	C:\development\m2m\firmware\common\vscp.h	97;"	d	line:97
+VSCP_SUBSTATE_INIT_PROBE_ACK::0x02	C:\development\m2m\firmware\common\vscp.h	106;"	d	line:106
+VSCP_SUBSTATE_INIT_PROBE_SENT::0x01	C:\development\m2m\firmware\common\vscp.h	105;"	d	line:105
+VSCP_SUBSTATE_NONE::0x00	C:\development\m2m\firmware\common\vscp.h	104;"	d	line:104
+VSCP_TYPE_1WIRE_CONDITIONAL_SEARCH_ROM::7	C:\development\m2m\src\vscp\common\vscp_type.h	338;"	d	line:338
+VSCP_TYPE_1WIRE_CONVERT::2	C:\development\m2m\src\vscp\common\vscp_type.h	333;"	d	line:333
+VSCP_TYPE_1WIRE_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	331;"	d	line:331
+VSCP_TYPE_1WIRE_MATCH_ROM::4	C:\development\m2m\src\vscp\common\vscp_type.h	335;"	d	line:335
+VSCP_TYPE_1WIRE_NEW_ID::1	C:\development\m2m\src\vscp\common\vscp_type.h	332;"	d	line:332
+VSCP_TYPE_1WIRE_OVERDRIVE_MATCH_ROM::10	C:\development\m2m\src\vscp\common\vscp_type.h	341;"	d	line:341
+VSCP_TYPE_1WIRE_OVERDRIVE_READ_MEMORY::11	C:\development\m2m\src\vscp\common\vscp_type.h	342;"	d	line:342
+VSCP_TYPE_1WIRE_OVERDRIVE_SKIP_ROM::9	C:\development\m2m\src\vscp\common\vscp_type.h	340;"	d	line:340
+VSCP_TYPE_1WIRE_OVERDRIVE_WRITE_MEMORY::12	C:\development\m2m\src\vscp\common\vscp_type.h	343;"	d	line:343
+VSCP_TYPE_1WIRE_PROGRAM::8	C:\development\m2m\src\vscp\common\vscp_type.h	339;"	d	line:339
+VSCP_TYPE_1WIRE_READ_ROM::3	C:\development\m2m\src\vscp\common\vscp_type.h	334;"	d	line:334
+VSCP_TYPE_1WIRE_SEARCH_ROM::6	C:\development\m2m\src\vscp\common\vscp_type.h	337;"	d	line:337
+VSCP_TYPE_1WIRE_SKIP_ROM::5	C:\development\m2m\src\vscp\common\vscp_type.h	336;"	d	line:336
+VSCP_TYPE_ALARM_ALARM::2	C:\development\m2m\src\vscp\common\vscp_type.h	89;"	d	line:89
+VSCP_TYPE_ALARM_EMERGENCY_PAUSE::7	C:\development\m2m\src\vscp\common\vscp_type.h	94;"	d	line:94
+VSCP_TYPE_ALARM_EMERGENCY_RESET::8	C:\development\m2m\src\vscp\common\vscp_type.h	95;"	d	line:95
+VSCP_TYPE_ALARM_EMERGENCY_RESUME::9	C:\development\m2m\src\vscp\common\vscp_type.h	96;"	d	line:96
+VSCP_TYPE_ALARM_EMERGENCY_STOP::6	C:\development\m2m\src\vscp\common\vscp_type.h	93;"	d	line:93
+VSCP_TYPE_ALARM_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	87;"	d	line:87
+VSCP_TYPE_ALARM_LIGHT::4	C:\development\m2m\src\vscp\common\vscp_type.h	91;"	d	line:91
+VSCP_TYPE_ALARM_POWER::5	C:\development\m2m\src\vscp\common\vscp_type.h	92;"	d	line:92
+VSCP_TYPE_ALARM_SOUND::3	C:\development\m2m\src\vscp\common\vscp_type.h	90;"	d	line:90
+VSCP_TYPE_ALARM_WARNING::1	C:\development\m2m\src\vscp\common\vscp_type.h	88;"	d	line:88
+VSCP_TYPE_AOL_CHASSIS_INTRUSION::3	C:\development\m2m\src\vscp\common\vscp_type.h	285;"	d	line:285
+VSCP_TYPE_AOL_COMPONENT_FAILURE::12	C:\development\m2m\src\vscp\common\vscp_type.h	294;"	d	line:294
+VSCP_TYPE_AOL_ENVIRONMENT_ERROR::5	C:\development\m2m\src\vscp\common\vscp_type.h	287;"	d	line:287
+VSCP_TYPE_AOL_FAN_SPEED::7	C:\development\m2m\src\vscp\common\vscp_type.h	289;"	d	line:289
+VSCP_TYPE_AOL_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	282;"	d	line:282
+VSCP_TYPE_AOL_HIGH_TEMPERATURE::6	C:\development\m2m\src\vscp\common\vscp_type.h	288;"	d	line:288
+VSCP_TYPE_AOL_OS_ERROR::9	C:\development\m2m\src\vscp\common\vscp_type.h	291;"	d	line:291
+VSCP_TYPE_AOL_POWER_ON_ERROR::10	C:\development\m2m\src\vscp\common\vscp_type.h	292;"	d	line:292
+VSCP_TYPE_AOL_PROCESSOR_REMOVAL::4	C:\development\m2m\src\vscp\common\vscp_type.h	286;"	d	line:286
+VSCP_TYPE_AOL_REBOOT_UPON_FAILURE::13	C:\development\m2m\src\vscp\common\vscp_type.h	295;"	d	line:295
+VSCP_TYPE_AOL_REPAIR_OPERATING_SYSTEM::14	C:\development\m2m\src\vscp\common\vscp_type.h	296;"	d	line:296
+VSCP_TYPE_AOL_SYSTEM_HUNG::11	C:\development\m2m\src\vscp\common\vscp_type.h	293;"	d	line:293
+VSCP_TYPE_AOL_UNPLUGGED_LAN::2	C:\development\m2m\src\vscp\common\vscp_type.h	284;"	d	line:284
+VSCP_TYPE_AOL_UNPLUGGED_POWER::1	C:\development\m2m\src\vscp\common\vscp_type.h	283;"	d	line:283
+VSCP_TYPE_AOL_UPDATE_BIOS_IMAGE::15	C:\development\m2m\src\vscp\common\vscp_type.h	297;"	d	line:297
+VSCP_TYPE_AOL_UPDATE_DIAGNOSTIC_PROCEDURE::16	C:\development\m2m\src\vscp\common\vscp_type.h	298;"	d	line:298
+VSCP_TYPE_AOL_VOLTAGE_FLUCTUATIONS::8	C:\development\m2m\src\vscp\common\vscp_type.h	290;"	d	line:290
+VSCP_TYPE_CBUS_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	364;"	d	line:364
+VSCP_TYPE_CONTROL_ACTIVATE::15	C:\development\m2m\src\vscp\common\vscp_type.h	231;"	d	line:231
+VSCP_TYPE_CONTROL_ALL_LAMPS::2	C:\development\m2m\src\vscp\common\vscp_type.h	218;"	d	line:218
+VSCP_TYPE_CONTROL_CHANGE_CHANNEL::21	C:\development\m2m\src\vscp\common\vscp_type.h	234;"	d	line:234
+VSCP_TYPE_CONTROL_CHANGE_LEVEL::22	C:\development\m2m\src\vscp\common\vscp_type.h	235;"	d	line:235
+VSCP_TYPE_CONTROL_CLOSE::4	C:\development\m2m\src\vscp\common\vscp_type.h	220;"	d	line:220
+VSCP_TYPE_CONTROL_DEACTIVATE::16	C:\development\m2m\src\vscp\common\vscp_type.h	232;"	d	line:232
+VSCP_TYPE_CONTROL_DIM_LAMPS::20	C:\development\m2m\src\vscp\common\vscp_type.h	233;"	d	line:233
+VSCP_TYPE_CONTROL_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	216;"	d	line:216
+VSCP_TYPE_CONTROL_INTERRUPT::10	C:\development\m2m\src\vscp\common\vscp_type.h	226;"	d	line:226
+VSCP_TYPE_CONTROL_MEASUREMENT_REQUEST::24	C:\development\m2m\src\vscp\common\vscp_type.h	237;"	d	line:237
+VSCP_TYPE_CONTROL_MUTE::1	C:\development\m2m\src\vscp\common\vscp_type.h	217;"	d	line:217
+VSCP_TYPE_CONTROL_OPEN::3	C:\development\m2m\src\vscp\common\vscp_type.h	219;"	d	line:219
+VSCP_TYPE_CONTROL_PAUSE::14	C:\development\m2m\src\vscp\common\vscp_type.h	230;"	d	line:230
+VSCP_TYPE_CONTROL_RELATIVE_CHANGE_LEVEL::23	C:\development\m2m\src\vscp\common\vscp_type.h	236;"	d	line:236
+VSCP_TYPE_CONTROL_RESET::9	C:\development\m2m\src\vscp\common\vscp_type.h	225;"	d	line:225
+VSCP_TYPE_CONTROL_RESUME::13	C:\development\m2m\src\vscp\common\vscp_type.h	229;"	d	line:229
+VSCP_TYPE_CONTROL_SET_PRESET::28	C:\development\m2m\src\vscp\common\vscp_type.h	241;"	d	line:241
+VSCP_TYPE_CONTROL_SLEEP::11	C:\development\m2m\src\vscp\common\vscp_type.h	227;"	d	line:227
+VSCP_TYPE_CONTROL_START::7	C:\development\m2m\src\vscp\common\vscp_type.h	223;"	d	line:223
+VSCP_TYPE_CONTROL_STOP::8	C:\development\m2m\src\vscp\common\vscp_type.h	224;"	d	line:224
+VSCP_TYPE_CONTROL_STREAM_DATA::25	C:\development\m2m\src\vscp\common\vscp_type.h	238;"	d	line:238
+VSCP_TYPE_CONTROL_SYNC::26	C:\development\m2m\src\vscp\common\vscp_type.h	239;"	d	line:239
+VSCP_TYPE_CONTROL_TURNOFF::6	C:\development\m2m\src\vscp\common\vscp_type.h	222;"	d	line:222
+VSCP_TYPE_CONTROL_TURNON::5	C:\development\m2m\src\vscp\common\vscp_type.h	221;"	d	line:221
+VSCP_TYPE_CONTROL_WAKEUP::12	C:\development\m2m\src\vscp\common\vscp_type.h	228;"	d	line:228
+VSCP_TYPE_CONTROL_ZONED_STREAM_DATA::27	C:\development\m2m\src\vscp\common\vscp_type.h	240;"	d	line:240
+VSCP_TYPE_DATA_AD::2	C:\development\m2m\src\vscp\common\vscp_type.h	158;"	d	line:158
+VSCP_TYPE_DATA_DA::3	C:\development\m2m\src\vscp\common\vscp_type.h	159;"	d	line:159
+VSCP_TYPE_DATA_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	156;"	d	line:156
+VSCP_TYPE_DATA_IO::1	C:\development\m2m\src\vscp\common\vscp_type.h	157;"	d	line:157
+VSCP_TYPE_DATA_RELATIVE_STRENGTH::4	C:\development\m2m\src\vscp\common\vscp_type.h	160;"	d	line:160
+VSCP_TYPE_DATA_SIGNAL_LEVEL::5	C:\development\m2m\src\vscp\common\vscp_type.h	161;"	d	line:161
+VSCP_TYPE_DATA_SIGNAL_QUALITY::6	C:\development\m2m\src\vscp\common\vscp_type.h	162;"	d	line:162
+VSCP_TYPE_DIPLAY_CLEAR_DISPLAY::1	C:\development\m2m\src\vscp\common\vscp_type.h	313;"	d	line:313
+VSCP_TYPE_DIPLAY_POSITION_CURSOR::2	C:\development\m2m\src\vscp\common\vscp_type.h	314;"	d	line:314
+VSCP_TYPE_DIPLAY_SET_DISPLAY_BUFFER_PARAM::6	C:\development\m2m\src\vscp\common\vscp_type.h	318;"	d	line:318
+VSCP_TYPE_DIPLAY_SHOW_DISPLAY_BUFFER::5	C:\development\m2m\src\vscp\common\vscp_type.h	317;"	d	line:317
+VSCP_TYPE_DIPLAY_SHOW_LED::48	C:\development\m2m\src\vscp\common\vscp_type.h	320;"	d	line:320
+VSCP_TYPE_DIPLAY_SHOW_LED_COLOR::49	C:\development\m2m\src\vscp\common\vscp_type.h	321;"	d	line:321
+VSCP_TYPE_DIPLAY_SHOW_TEXT::32	C:\development\m2m\src\vscp\common\vscp_type.h	319;"	d	line:319
+VSCP_TYPE_DIPLAY_WRITE_DISPLAY::3	C:\development\m2m\src\vscp\common\vscp_type.h	315;"	d	line:315
+VSCP_TYPE_DIPLAY_WRITE_DISPLAY_BUFFER::4	C:\development\m2m\src\vscp\common\vscp_type.h	316;"	d	line:316
+VSCP_TYPE_DISPLAY_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	312;"	d	line:312
+VSCP_TYPE_EIB_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	358;"	d	line:358
+VSCP_TYPE_GPS_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	367;"	d	line:367
+VSCP_TYPE_GPS_POSITION::1	C:\development\m2m\src\vscp\common\vscp_type.h	368;"	d	line:368
+VSCP_TYPE_GPS_SATELLITES::2	C:\development\m2m\src\vscp\common\vscp_type.h	369;"	d	line:369
+VSCP_TYPE_INFORMATION_ABOVE_LIMIT::11	C:\development\m2m\src\vscp\common\vscp_type.h	176;"	d	line:176
+VSCP_TYPE_INFORMATION_ACTION_TRIGGER::43	C:\development\m2m\src\vscp\common\vscp_type.h	207;"	d	line:207
+VSCP_TYPE_INFORMATION_ACTIVE::32	C:\development\m2m\src\vscp\common\vscp_type.h	196;"	d	line:196
+VSCP_TYPE_INFORMATION_ALIVE::5	C:\development\m2m\src\vscp\common\vscp_type.h	170;"	d	line:170
+VSCP_TYPE_INFORMATION_BELOW_LIMIT::10	C:\development\m2m\src\vscp\common\vscp_type.h	175;"	d	line:175
+VSCP_TYPE_INFORMATION_BUSY::34	C:\development\m2m\src\vscp\common\vscp_type.h	198;"	d	line:198
+VSCP_TYPE_INFORMATION_BUTTON::1	C:\development\m2m\src\vscp\common\vscp_type.h	166;"	d	line:166
+VSCP_TYPE_INFORMATION_CLOSED::8	C:\development\m2m\src\vscp\common\vscp_type.h	173;"	d	line:173
+VSCP_TYPE_INFORMATION_CONFIRM::39	C:\development\m2m\src\vscp\common\vscp_type.h	203;"	d	line:203
+VSCP_TYPE_INFORMATION_DAWN::31	C:\development\m2m\src\vscp\common\vscp_type.h	195;"	d	line:195
+VSCP_TYPE_INFORMATION_DETECT::49	C:\development\m2m\src\vscp\common\vscp_type.h	213;"	d	line:213
+VSCP_TYPE_INFORMATION_DUSK::30	C:\development\m2m\src\vscp\common\vscp_type.h	194;"	d	line:194
+VSCP_TYPE_INFORMATION_END_OF_RECORD::47	C:\development\m2m\src\vscp\common\vscp_type.h	211;"	d	line:211
+VSCP_TYPE_INFORMATION_ERROR::13	C:\development\m2m\src\vscp\common\vscp_type.h	178;"	d	line:178
+VSCP_TYPE_INFORMATION_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	165;"	d	line:165
+VSCP_TYPE_INFORMATION_GOODBYE::23	C:\development\m2m\src\vscp\common\vscp_type.h	187;"	d	line:187
+VSCP_TYPE_INFORMATION_GOOD_AFTERNOON::19	C:\development\m2m\src\vscp\common\vscp_type.h	183;"	d	line:183
+VSCP_TYPE_INFORMATION_GOOD_DAY::18	C:\development\m2m\src\vscp\common\vscp_type.h	182;"	d	line:182
+VSCP_TYPE_INFORMATION_GOOD_EVENING::20	C:\development\m2m\src\vscp\common\vscp_type.h	184;"	d	line:184
+VSCP_TYPE_INFORMATION_GOOD_MORNING::17	C:\development\m2m\src\vscp\common\vscp_type.h	181;"	d	line:181
+VSCP_TYPE_INFORMATION_GOOD_NIGHT::21	C:\development\m2m\src\vscp\common\vscp_type.h	185;"	d	line:185
+VSCP_TYPE_INFORMATION_IDLE::35	C:\development\m2m\src\vscp\common\vscp_type.h	199;"	d	line:199
+VSCP_TYPE_INFORMATION_INACTIVE::33	C:\development\m2m\src\vscp\common\vscp_type.h	197;"	d	line:197
+VSCP_TYPE_INFORMATION_INTERRUPTED::27	C:\development\m2m\src\vscp\common\vscp_type.h	191;"	d	line:191
+VSCP_TYPE_INFORMATION_LEVEL_CHANGED::40	C:\development\m2m\src\vscp\common\vscp_type.h	204;"	d	line:204
+VSCP_TYPE_INFORMATION_MOUSE::2	C:\development\m2m\src\vscp\common\vscp_type.h	167;"	d	line:167
+VSCP_TYPE_INFORMATION_NODE_HEARTBEAT::9	C:\development\m2m\src\vscp\common\vscp_type.h	174;"	d	line:174
+VSCP_TYPE_INFORMATION_OFF::4	C:\development\m2m\src\vscp\common\vscp_type.h	169;"	d	line:169
+VSCP_TYPE_INFORMATION_ON::3	C:\development\m2m\src\vscp\common\vscp_type.h	168;"	d	line:168
+VSCP_TYPE_INFORMATION_OPENED::7	C:\development\m2m\src\vscp\common\vscp_type.h	172;"	d	line:172
+VSCP_TYPE_INFORMATION_PAUSED::15	C:\development\m2m\src\vscp\common\vscp_type.h	180;"	d	line:180
+VSCP_TYPE_INFORMATION_PREPARING_TO_SLEEP::28	C:\development\m2m\src\vscp\common\vscp_type.h	192;"	d	line:192
+VSCP_TYPE_INFORMATION_PRESET_ACTIVE::48	C:\development\m2m\src\vscp\common\vscp_type.h	212;"	d	line:212
+VSCP_TYPE_INFORMATION_PULSE::12	C:\development\m2m\src\vscp\common\vscp_type.h	177;"	d	line:177
+VSCP_TYPE_INFORMATION_RESET_COMPLETED::26	C:\development\m2m\src\vscp\common\vscp_type.h	190;"	d	line:190
+VSCP_TYPE_INFORMATION_RESUMED::14	C:\development\m2m\src\vscp\common\vscp_type.h	179;"	d	line:179
+VSCP_TYPE_INFORMATION_SEE_YOU_SOON::22	C:\development\m2m\src\vscp\common\vscp_type.h	186;"	d	line:186
+VSCP_TYPE_INFORMATION_START::25	C:\development\m2m\src\vscp\common\vscp_type.h	189;"	d	line:189
+VSCP_TYPE_INFORMATION_START_OF_RECORD::46	C:\development\m2m\src\vscp\common\vscp_type.h	210;"	d	line:210
+VSCP_TYPE_INFORMATION_STATE::42	C:\development\m2m\src\vscp\common\vscp_type.h	206;"	d	line:206
+VSCP_TYPE_INFORMATION_STOP::24	C:\development\m2m\src\vscp\common\vscp_type.h	188;"	d	line:188
+VSCP_TYPE_INFORMATION_STREAM_DATA::36	C:\development\m2m\src\vscp\common\vscp_type.h	200;"	d	line:200
+VSCP_TYPE_INFORMATION_STREAM_DATA_WITH_ZONE::38	C:\development\m2m\src\vscp\common\vscp_type.h	202;"	d	line:202
+VSCP_TYPE_INFORMATION_SUNRISE::44	C:\development\m2m\src\vscp\common\vscp_type.h	208;"	d	line:208
+VSCP_TYPE_INFORMATION_SUNSET::45	C:\development\m2m\src\vscp\common\vscp_type.h	209;"	d	line:209
+VSCP_TYPE_INFORMATION_TERMINATING::6	C:\development\m2m\src\vscp\common\vscp_type.h	171;"	d	line:171
+VSCP_TYPE_INFORMATION_TOKEN_ACTIVITY::37	C:\development\m2m\src\vscp\common\vscp_type.h	201;"	d	line:201
+VSCP_TYPE_INFORMATION_WARNING::41	C:\development\m2m\src\vscp\common\vscp_type.h	205;"	d	line:205
+VSCP_TYPE_INFORMATION_WOKEN_UP::29	C:\development\m2m\src\vscp\common\vscp_type.h	193;"	d	line:193
+VSCP_TYPE_LABORATORY_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	383;"	d	line:383
+VSCP_TYPE_LOCAL_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	386;"	d	line:386
+VSCP_TYPE_LOG_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	376;"	d	line:376
+VSCP_TYPE_LOG_LEVEL::4	C:\development\m2m\src\vscp\common\vscp_type.h	380;"	d	line:380
+VSCP_TYPE_LOG_MESSAGE::1	C:\development\m2m\src\vscp\common\vscp_type.h	377;"	d	line:377
+VSCP_TYPE_LOG_START::2	C:\development\m2m\src\vscp\common\vscp_type.h	378;"	d	line:378
+VSCP_TYPE_LOG_STOP::3	C:\development\m2m\src\vscp\common\vscp_type.h	379;"	d	line:379
+VSCP_TYPE_LON_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	355;"	d	line:355
+VSCP_TYPE_MEASUREMENT_ABSORBED_DOSE::46	C:\development\m2m\src\vscp\common\vscp_type.h	149;"	d	line:149
+VSCP_TYPE_MEASUREMENT_ACCELERATION::33	C:\development\m2m\src\vscp\common\vscp_type.h	136;"	d	line:136
+VSCP_TYPE_MEASUREMENT_ALTITUDE::51	C:\development\m2m\src\vscp\common\vscp_type.h	153;"	d	line:153
+VSCP_TYPE_MEASUREMENT_AMOUNT_OF_SUBSTANCE::7	C:\development\m2m\src\vscp\common\vscp_type.h	110;"	d	line:110
+VSCP_TYPE_MEASUREMENT_ANGLE::30	C:\development\m2m\src\vscp\common\vscp_type.h	133;"	d	line:133
+VSCP_TYPE_MEASUREMENT_CATALYTIC_ACITIVITY::27	C:\development\m2m\src\vscp\common\vscp_type.h	130;"	d	line:130
+VSCP_TYPE_MEASUREMENT_CHEMICAL_CONCENTRATION::45	C:\development\m2m\src\vscp\common\vscp_type.h	148;"	d	line:148
+VSCP_TYPE_MEASUREMENT_COUNT::1	C:\development\m2m\src\vscp\common\vscp_type.h	104;"	d	line:104
+VSCP_TYPE_MEASUREMENT_DEWPOINT::49	C:\development\m2m\src\vscp\common\vscp_type.h	151;"	d	line:151
+VSCP_TYPE_MEASUREMENT_DOSE_EQVIVALENT::47	C:\development\m2m\src\vscp\common\vscp_type.h	150;"	d	line:150
+VSCP_TYPE_MEASUREMENT_DYNAMIC_VISCOSITY::39	C:\development\m2m\src\vscp\common\vscp_type.h	142;"	d	line:142
+VSCP_TYPE_MEASUREMENT_ELECTRICAL_CAPACITANCE::17	C:\development\m2m\src\vscp\common\vscp_type.h	120;"	d	line:120
+VSCP_TYPE_MEASUREMENT_ELECTRICAL_CHARGE::15	C:\development\m2m\src\vscp\common\vscp_type.h	118;"	d	line:118
+VSCP_TYPE_MEASUREMENT_ELECTRICAL_CONDUCTANCE::19	C:\development\m2m\src\vscp\common\vscp_type.h	122;"	d	line:122
+VSCP_TYPE_MEASUREMENT_ELECTRICAL_POTENTIAL::16	C:\development\m2m\src\vscp\common\vscp_type.h	119;"	d	line:119
+VSCP_TYPE_MEASUREMENT_ELECTRICAL_RECISTANCE::18	C:\development\m2m\src\vscp\common\vscp_type.h	121;"	d	line:121
+VSCP_TYPE_MEASUREMENT_ELECTRIC_CURRENT::5	C:\development\m2m\src\vscp\common\vscp_type.h	108;"	d	line:108
+VSCP_TYPE_MEASUREMENT_ELECTRIC_ELASTANCE::42	C:\development\m2m\src\vscp\common\vscp_type.h	145;"	d	line:145
+VSCP_TYPE_MEASUREMENT_ENERGY::13	C:\development\m2m\src\vscp\common\vscp_type.h	116;"	d	line:116
+VSCP_TYPE_MEASUREMENT_FLOW::36	C:\development\m2m\src\vscp\common\vscp_type.h	139;"	d	line:139
+VSCP_TYPE_MEASUREMENT_FLUX_OF_LIGHT::24	C:\development\m2m\src\vscp\common\vscp_type.h	127;"	d	line:127
+VSCP_TYPE_MEASUREMENT_FORCE::11	C:\development\m2m\src\vscp\common\vscp_type.h	114;"	d	line:114
+VSCP_TYPE_MEASUREMENT_FREQUENCY::9	C:\development\m2m\src\vscp\common\vscp_type.h	112;"	d	line:112
+VSCP_TYPE_MEASUREMENT_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	103;"	d	line:103
+VSCP_TYPE_MEASUREMENT_HUMIDITY::35	C:\development\m2m\src\vscp\common\vscp_type.h	138;"	d	line:138
+VSCP_TYPE_MEASUREMENT_ILLUMINANCE::25	C:\development\m2m\src\vscp\common\vscp_type.h	128;"	d	line:128
+VSCP_TYPE_MEASUREMENT_INDUCTANCE::23	C:\development\m2m\src\vscp\common\vscp_type.h	126;"	d	line:126
+VSCP_TYPE_MEASUREMENT_INTENSITY_OF_LIGHT::8	C:\development\m2m\src\vscp\common\vscp_type.h	111;"	d	line:111
+VSCP_TYPE_MEASUREMENT_LENGTH::2	C:\development\m2m\src\vscp\common\vscp_type.h	105;"	d	line:105
+VSCP_TYPE_MEASUREMENT_LUMINANCE::44	C:\development\m2m\src\vscp\common\vscp_type.h	147;"	d	line:147
+VSCP_TYPE_MEASUREMENT_LUMINOUS_ENERGY::43	C:\development\m2m\src\vscp\common\vscp_type.h	146;"	d	line:146
+VSCP_TYPE_MEASUREMENT_MAGNETIC_FIELD_STRENGTH::20	C:\development\m2m\src\vscp\common\vscp_type.h	123;"	d	line:123
+VSCP_TYPE_MEASUREMENT_MAGNETIC_FLUX::21	C:\development\m2m\src\vscp\common\vscp_type.h	124;"	d	line:124
+VSCP_TYPE_MEASUREMENT_MAGNETIC_FLUX_DENSITY::22	C:\development\m2m\src\vscp\common\vscp_type.h	125;"	d	line:125
+VSCP_TYPE_MEASUREMENT_MASS::3	C:\development\m2m\src\vscp\common\vscp_type.h	106;"	d	line:106
+VSCP_TYPE_MEASUREMENT_POSITION::31	C:\development\m2m\src\vscp\common\vscp_type.h	134;"	d	line:134
+VSCP_TYPE_MEASUREMENT_POWER::14	C:\development\m2m\src\vscp\common\vscp_type.h	117;"	d	line:117
+VSCP_TYPE_MEASUREMENT_PRESSURE::12	C:\development\m2m\src\vscp\common\vscp_type.h	115;"	d	line:115
+VSCP_TYPE_MEASUREMENT_RADIATION_DOSE::26	C:\development\m2m\src\vscp\common\vscp_type.h	129;"	d	line:129
+VSCP_TYPE_MEASUREMENT_RADIOACTIVITY::10	C:\development\m2m\src\vscp\common\vscp_type.h	113;"	d	line:113
+VSCP_TYPE_MEASUREMENT_REFRACTIVE_POWER::38	C:\development\m2m\src\vscp\common\vscp_type.h	141;"	d	line:141
+VSCP_TYPE_MEASUREMENT_RELATIVE_LEVEL::50	C:\development\m2m\src\vscp\common\vscp_type.h	152;"	d	line:152
+VSCP_TYPE_MEASUREMENT_SOUND_IMPEDANCE::40	C:\development\m2m\src\vscp\common\vscp_type.h	143;"	d	line:143
+VSCP_TYPE_MEASUREMENT_SOUND_INTENSITY::29	C:\development\m2m\src\vscp\common\vscp_type.h	132;"	d	line:132
+VSCP_TYPE_MEASUREMENT_SOUND_RESISTANCE::41	C:\development\m2m\src\vscp\common\vscp_type.h	144;"	d	line:144
+VSCP_TYPE_MEASUREMENT_SPEED::32	C:\development\m2m\src\vscp\common\vscp_type.h	135;"	d	line:135
+VSCP_TYPE_MEASUREMENT_TEMPERATURE::6	C:\development\m2m\src\vscp\common\vscp_type.h	109;"	d	line:109
+VSCP_TYPE_MEASUREMENT_TENSION::34	C:\development\m2m\src\vscp\common\vscp_type.h	137;"	d	line:137
+VSCP_TYPE_MEASUREMENT_THERMAL_RESISTANCE::37	C:\development\m2m\src\vscp\common\vscp_type.h	140;"	d	line:140
+VSCP_TYPE_MEASUREMENT_TIME::4	C:\development\m2m\src\vscp\common\vscp_type.h	107;"	d	line:107
+VSCP_TYPE_MEASUREMENT_VOLUME::28	C:\development\m2m\src\vscp\common\vscp_type.h	131;"	d	line:131
+VSCP_TYPE_MULTIMEDIA_ADJUST_BASS::9	C:\development\m2m\src\vscp\common\vscp_type.h	253;"	d	line:253
+VSCP_TYPE_MULTIMEDIA_ADJUST_BRIGHTNESS::7	C:\development\m2m\src\vscp\common\vscp_type.h	251;"	d	line:251
+VSCP_TYPE_MULTIMEDIA_ADJUST_CENTRE_VOLUME::13	C:\development\m2m\src\vscp\common\vscp_type.h	257;"	d	line:257
+VSCP_TYPE_MULTIMEDIA_ADJUST_COLOUR_BALANCE::6	C:\development\m2m\src\vscp\common\vscp_type.h	250;"	d	line:250
+VSCP_TYPE_MULTIMEDIA_ADJUST_CONTRAST::3	C:\development\m2m\src\vscp\common\vscp_type.h	247;"	d	line:247
+VSCP_TYPE_MULTIMEDIA_ADJUST_FOCUS::4	C:\development\m2m\src\vscp\common\vscp_type.h	248;"	d	line:248
+VSCP_TYPE_MULTIMEDIA_ADJUST_FRONT_VOLUME::12	C:\development\m2m\src\vscp\common\vscp_type.h	256;"	d	line:256
+VSCP_TYPE_MULTIMEDIA_ADJUST_HUE::8	C:\development\m2m\src\vscp\common\vscp_type.h	252;"	d	line:252
+VSCP_TYPE_MULTIMEDIA_ADJUST_MASTER_VOLUME::11	C:\development\m2m\src\vscp\common\vscp_type.h	255;"	d	line:255
+VSCP_TYPE_MULTIMEDIA_ADJUST_REAR_VOLUME::14	C:\development\m2m\src\vscp\common\vscp_type.h	258;"	d	line:258
+VSCP_TYPE_MULTIMEDIA_ADJUST_SELECT_ALBUM::22	C:\development\m2m\src\vscp\common\vscp_type.h	262;"	d	line:262
+VSCP_TYPE_MULTIMEDIA_ADJUST_SELECT_CHANNEL::23	C:\development\m2m\src\vscp\common\vscp_type.h	263;"	d	line:263
+VSCP_TYPE_MULTIMEDIA_ADJUST_SELECT_CHAPTER::25	C:\development\m2m\src\vscp\common\vscp_type.h	265;"	d	line:265
+VSCP_TYPE_MULTIMEDIA_ADJUST_SELECT_DISK::20	C:\development\m2m\src\vscp\common\vscp_type.h	260;"	d	line:260
+VSCP_TYPE_MULTIMEDIA_ADJUST_SELECT_INPUT_SOURCE::27	C:\development\m2m\src\vscp\common\vscp_type.h	267;"	d	line:267
+VSCP_TYPE_MULTIMEDIA_ADJUST_SELECT_OUTPUT::28	C:\development\m2m\src\vscp\common\vscp_type.h	268;"	d	line:268
+VSCP_TYPE_MULTIMEDIA_ADJUST_SELECT_PAGE::24	C:\development\m2m\src\vscp\common\vscp_type.h	264;"	d	line:264
+VSCP_TYPE_MULTIMEDIA_ADJUST_SELECT_SCREEN_FORMAT::26	C:\development\m2m\src\vscp\common\vscp_type.h	266;"	d	line:266
+VSCP_TYPE_MULTIMEDIA_ADJUST_SELECT_TRACK::21	C:\development\m2m\src\vscp\common\vscp_type.h	261;"	d	line:261
+VSCP_TYPE_MULTIMEDIA_ADJUST_SIDE_VOLUME::15	C:\development\m2m\src\vscp\common\vscp_type.h	259;"	d	line:259
+VSCP_TYPE_MULTIMEDIA_ADJUST_TINT::5	C:\development\m2m\src\vscp\common\vscp_type.h	249;"	d	line:249
+VSCP_TYPE_MULTIMEDIA_ADJUST_TREBLE::10	C:\development\m2m\src\vscp\common\vscp_type.h	254;"	d	line:254
+VSCP_TYPE_MULTIMEDIA_CONTROL::60	C:\development\m2m\src\vscp\common\vscp_type.h	278;"	d	line:278
+VSCP_TYPE_MULTIMEDIA_CONTROL_RESPONSE::61	C:\development\m2m\src\vscp\common\vscp_type.h	279;"	d	line:279
+VSCP_TYPE_MULTIMEDIA_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	244;"	d	line:244
+VSCP_TYPE_MULTIMEDIA_GET_CURRENT_TITLE::50	C:\development\m2m\src\vscp\common\vscp_type.h	272;"	d	line:272
+VSCP_TYPE_MULTIMEDIA_GET_MEDIA_INFO::52	C:\development\m2m\src\vscp\common\vscp_type.h	274;"	d	line:274
+VSCP_TYPE_MULTIMEDIA_NAVIGATOR_KEY_ENG::2	C:\development\m2m\src\vscp\common\vscp_type.h	246;"	d	line:246
+VSCP_TYPE_MULTIMEDIA_PLAYBACK::1	C:\development\m2m\src\vscp\common\vscp_type.h	245;"	d	line:245
+VSCP_TYPE_MULTIMEDIA_RECORD::29	C:\development\m2m\src\vscp\common\vscp_type.h	269;"	d	line:269
+VSCP_TYPE_MULTIMEDIA_REMOVE_ALL_ITEMS::54	C:\development\m2m\src\vscp\common\vscp_type.h	276;"	d	line:276
+VSCP_TYPE_MULTIMEDIA_REMOVE_ITEM::53	C:\development\m2m\src\vscp\common\vscp_type.h	275;"	d	line:275
+VSCP_TYPE_MULTIMEDIA_SAVE_ALBUM::55	C:\development\m2m\src\vscp\common\vscp_type.h	277;"	d	line:277
+VSCP_TYPE_MULTIMEDIA_SET_POSITION::51	C:\development\m2m\src\vscp\common\vscp_type.h	273;"	d	line:273
+VSCP_TYPE_MULTIMEDIA_SET_RECORDING_VOLUME::30	C:\development\m2m\src\vscp\common\vscp_type.h	270;"	d	line:270
+VSCP_TYPE_MULTIMEDIA_TIVO_FUNCTION::40	C:\development\m2m\src\vscp\common\vscp_type.h	271;"	d	line:271
+VSCP_TYPE_PHONE_ANSWERE::4	C:\development\m2m\src\vscp\common\vscp_type.h	305;"	d	line:305
+VSCP_TYPE_PHONE_DATABASE_INFO::8	C:\development\m2m\src\vscp\common\vscp_type.h	309;"	d	line:309
+VSCP_TYPE_PHONE_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	301;"	d	line:301
+VSCP_TYPE_PHONE_GIVEUP::6	C:\development\m2m\src\vscp\common\vscp_type.h	307;"	d	line:307
+VSCP_TYPE_PHONE_HANGUP::5	C:\development\m2m\src\vscp\common\vscp_type.h	306;"	d	line:306
+VSCP_TYPE_PHONE_INCOMING_CALL::1	C:\development\m2m\src\vscp\common\vscp_type.h	302;"	d	line:302
+VSCP_TYPE_PHONE_OUTGOING_CALL::2	C:\development\m2m\src\vscp\common\vscp_type.h	303;"	d	line:303
+VSCP_TYPE_PHONE_RING::3	C:\development\m2m\src\vscp\common\vscp_type.h	304;"	d	line:304
+VSCP_TYPE_PHONE_TRANSFER::7	C:\development\m2m\src\vscp\common\vscp_type.h	308;"	d	line:308
+VSCP_TYPE_PROTOCOL_ACK_BOOT_LOADER::13	C:\development\m2m\src\vscp\common\vscp_type.h	58;"	d	line:58
+VSCP_TYPE_PROTOCOL_ACTIVATE_NEW_IMAGE::22	C:\development\m2m\src\vscp\common\vscp_type.h	67;"	d	line:67
+VSCP_TYPE_PROTOCOL_BLOCK_DATA::16	C:\development\m2m\src\vscp\common\vscp_type.h	61;"	d	line:61
+VSCP_TYPE_PROTOCOL_BLOCK_DATA_ACK::17	C:\development\m2m\src\vscp\common\vscp_type.h	62;"	d	line:62
+VSCP_TYPE_PROTOCOL_BLOCK_DATA_NACK::18	C:\development\m2m\src\vscp\common\vscp_type.h	63;"	d	line:63
+VSCP_TYPE_PROTOCOL_DECREMENT_REGISTER::30	C:\development\m2m\src\vscp\common\vscp_type.h	75;"	d	line:75
+VSCP_TYPE_PROTOCOL_DROP_NICKNAME::8	C:\development\m2m\src\vscp\common\vscp_type.h	53;"	d	line:53
+VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER::12	C:\development\m2m\src\vscp\common\vscp_type.h	57;"	d	line:57
+VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_READ::37	C:\development\m2m\src\vscp\common\vscp_type.h	82;"	d	line:82
+VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE::39	C:\development\m2m\src\vscp\common\vscp_type.h	84;"	d	line:84
+VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_WRITE::38	C:\development\m2m\src\vscp\common\vscp_type.h	83;"	d	line:83
+VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF::35	C:\development\m2m\src\vscp\common\vscp_type.h	80;"	d	line:80
+VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE::36	C:\development\m2m\src\vscp\common\vscp_type.h	81;"	d	line:81
+VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO::33	C:\development\m2m\src\vscp\common\vscp_type.h	78;"	d	line:78
+VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE::34	C:\development\m2m\src\vscp\common\vscp_type.h	79;"	d	line:79
+VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_PROBE::27	C:\development\m2m\src\vscp\common\vscp_type.h	72;"	d	line:72
+VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_RESPONSE::28	C:\development\m2m\src\vscp\common\vscp_type.h	73;"	d	line:73
+VSCP_TYPE_PROTOCOL_INCREMENT_REGISTER::29	C:\development\m2m\src\vscp\common\vscp_type.h	74;"	d	line:74
+VSCP_TYPE_PROTOCOL_NACK_BOOT_LOADER::14	C:\development\m2m\src\vscp\common\vscp_type.h	59;"	d	line:59
+VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE::2	C:\development\m2m\src\vscp\common\vscp_type.h	49;"	d	line:49
+VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED::7	C:\development\m2m\src\vscp\common\vscp_type.h	52;"	d	line:52
+VSCP_TYPE_PROTOCOL_PAGE_READ::24	C:\development\m2m\src\vscp\common\vscp_type.h	69;"	d	line:69
+VSCP_TYPE_PROTOCOL_PAGE_WRITE::25	C:\development\m2m\src\vscp\common\vscp_type.h	70;"	d	line:70
+VSCP_TYPE_PROTOCOL_PROBE_ACK::3	C:\development\m2m\src\vscp\common\vscp_type.h	50;"	d	line:50
+VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA::19	C:\development\m2m\src\vscp\common\vscp_type.h	64;"	d	line:64
+VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA_ACK::20	C:\development\m2m\src\vscp\common\vscp_type.h	65;"	d	line:65
+VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA_NACK::21	C:\development\m2m\src\vscp\common\vscp_type.h	66;"	d	line:66
+VSCP_TYPE_PROTOCOL_READ_REGISTER::9	C:\development\m2m\src\vscp\common\vscp_type.h	54;"	d	line:54
+VSCP_TYPE_PROTOCOL_RESET_DEVICE::23	C:\development\m2m\src\vscp\common\vscp_type.h	68;"	d	line:68
+VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE::26	C:\development\m2m\src\vscp\common\vscp_type.h	71;"	d	line:71
+VSCP_TYPE_PROTOCOL_RW_RESPONSE::10	C:\development\m2m\src\vscp\common\vscp_type.h	55;"	d	line:55
+VSCP_TYPE_PROTOCOL_SEGCTRL_HEARTBEAT::1	C:\development\m2m\src\vscp\common\vscp_type.h	48;"	d	line:48
+VSCP_TYPE_PROTOCOL_SET_NICKNAME::6	C:\development\m2m\src\vscp\common\vscp_type.h	51;"	d	line:51
+VSCP_TYPE_PROTOCOL_START_BLOCK::15	C:\development\m2m\src\vscp\common\vscp_type.h	60;"	d	line:60
+VSCP_TYPE_PROTOCOL_WHO_IS_THERE::31	C:\development\m2m\src\vscp\common\vscp_type.h	76;"	d	line:76
+VSCP_TYPE_PROTOCOL_WHO_IS_THERE_RESPONSE::32	C:\development\m2m\src\vscp\common\vscp_type.h	77;"	d	line:77
+VSCP_TYPE_PROTOCOL_WRITE_REGISTER::11	C:\development\m2m\src\vscp\common\vscp_type.h	56;"	d	line:56
+VSCP_TYPE_REMOTE_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	324;"	d	line:324
+VSCP_TYPE_REMOTE_LIRC::32	C:\development\m2m\src\vscp\common\vscp_type.h	327;"	d	line:327
+VSCP_TYPE_REMOTE_RC5::1	C:\development\m2m\src\vscp\common\vscp_type.h	325;"	d	line:325
+VSCP_TYPE_REMOTE_SONY12::2	C:\development\m2m\src\vscp\common\vscp_type.h	326;"	d	line:326
+VSCP_TYPE_REMOTE_VSCP::48	C:\development\m2m\src\vscp\common\vscp_type.h	328;"	d	line:328
+VSCP_TYPE_SECURITY_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	99;"	d	line:99
+VSCP_TYPE_SECURITY_MOTION::1	C:\development\m2m\src\vscp\common\vscp_type.h	100;"	d	line:100
+VSCP_TYPE_SNAP_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	361;"	d	line:361
+VSCP_TYPE_UNDEFINED::0	C:\development\m2m\src\vscp\common\vscp_type.h	45;"	d	line:45
+VSCP_TYPE_WIRELESS_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	372;"	d	line:372
+VSCP_TYPE_WIRELESS_GSM_CELL::1	C:\development\m2m\src\vscp\common\vscp_type.h	373;"	d	line:373
+VSCP_TYPE_X10_EXTENDED_MESSAGE_RECEIVE::2	C:\development\m2m\src\vscp\common\vscp_type.h	348;"	d	line:348
+VSCP_TYPE_X10_EXTENDED_MESSAGE_SEND::4	C:\development\m2m\src\vscp\common\vscp_type.h	350;"	d	line:350
+VSCP_TYPE_X10_GENERAL::0	C:\development\m2m\src\vscp\common\vscp_type.h	346;"	d	line:346
+VSCP_TYPE_X10_SIMPLE_MESSAGE::5	C:\development\m2m\src\vscp\common\vscp_type.h	351;"	d	line:351
+VSCP_TYPE_X10_STANDARD_MESSAGE_RECEIVE::1	C:\development\m2m\src\vscp\common\vscp_type.h	347;"	d	line:347
+VSCP_TYPE_X10_STANDARD_MESSAGE_SEND::3	C:\development\m2m\src\vscp\common\vscp_type.h	349;"	d	line:349
+VSCP_TYPE__H	C:\development\m2m\src\vscp\common\vscp_type.h	43;"	d	line:43
+VSCP_VALID_MSG::0x80	C:\development\m2m\firmware\common\vscp.h	109;"	d	line:109
+Value	C:\development\m2m\firmware\pic\common\can18f.c	163;"	l	line:163
+Value	C:\development\m2m\firmware\pic\common\can18f.c	196;"	l	line:196
+WriteData	C:\development\m2m\firmware\pic\rfid\project\main.c	55;"	p	line:55	file:	signature:( unsigned char Index,unsigned char Value )
+_BOOL	C:\development\m2m\firmware\pic\common\can18f.h	75;"	g	line:75
+_CAN_MESSAGE_ID	C:\development\m2m\firmware\pic\common\can18f.h	126;"	u	line:126
+_EmDataFlags	C:\development\m2m\firmware\pic\rfid\project\main.c	125;"	s	line:125	file:
+_PWM_enable	C:\development\m2m\firmware\pic\rfid\project\main.c	103;"	g	line:103	file:
+_RxState	C:\development\m2m\firmware\pic\rfid\project\main.c	130;"	t	line:130	file:
+__init	C:\development\m2m\firmware\pic\rfid\project\c018.c	8;"	p	line:8	file:	signature:(void)
+_dmrow	C:\development\m2m\firmware\common\vscp.h	252;"	s	line:252
+_entry	C:\development\m2m\firmware\pic\rfid\project\c018.c	12;"	p	line:12	file:	signature:(void)
+_entry	C:\development\m2m\firmware\pic\rfid\project\c018.c	19;"	f	line:19	signature:(void)
+_imsg	C:\development\m2m\firmware\common\vscp.h	173;"	s	line:173
+_omsg	C:\development\m2m\firmware\common\vscp.h	192;"	s	line:192
+_startup	C:\development\m2m\firmware\pic\rfid\project\c018.c	13;"	p	line:13	file:	signature:(void)
+_startup	C:\development\m2m\firmware\pic\rfid\project\c018.c	27;"	f	line:27	signature:(void)
+action	C:\development\m2m\firmware\common\vscp.h	259;"	m	line:259	struct:_dmrow
+action_param	C:\development\m2m\firmware\common\vscp.h	260;"	m	line:260	struct:_dmrow
+bInfoEvent	C:\development\m2m\firmware\pic\rfid\project\main.c	1286;"	l	line:1286
+bOn	C:\development\m2m\firmware\pic\rfid\project\main.c	1287;"	l	line:1287
+bSent	C:\development\m2m\firmware\common\vscp.c	898;"	l	line:898
+char_read	C:\development\m2m\firmware\pic\common\eeprom.c	131;"	l	line:131
+checksum	C:\development\m2m\firmware\pic\rfid\project\main.c	1261;"	l	line:1261
+checksum	C:\development\m2m\firmware\pic\rfid\project\main.c	1285;"	l	line:1285
+class_filter	C:\development\m2m\firmware\common\vscp.h	256;"	m	line:256	struct:_dmrow
+class_filter	C:\development\m2m\firmware\pic\rfid\project\main.c	1353;"	l	line:1353
+class_mask	C:\development\m2m\firmware\common\vscp.h	255;"	m	line:255	struct:_dmrow
+class_mask	C:\development\m2m\firmware\pic\rfid\project\main.c	1354;"	l	line:1354
+data	C:\development\m2m\firmware\common\vscp.h	189;"	m	line:189	struct:_imsg
+data	C:\development\m2m\firmware\common\vscp.h	208;"	m	line:208	struct:_omsg
+data	C:\development\m2m\firmware\pic\common\eeprom.c	85;"	l	line:85
+dlc	C:\development\m2m\firmware\common\vscp.c	1159;"	l	line:1159
+dmflags	C:\development\m2m\firmware\pic\rfid\project\main.c	1352;"	l	line:1352
+doActionDisable	C:\development\m2m\firmware\pic\rfid\project\main.h	146;"	p	line:146	signature:( unsigned char dmflags, unsigned char arg )
+doActionOff	C:\development\m2m\firmware\pic\rfid\project\main.h	143;"	p	line:143	signature:( unsigned char dmflags, unsigned char arg )
+doActionOn	C:\development\m2m\firmware\pic\rfid\project\main.h	142;"	p	line:142	signature:( unsigned char dmflags, unsigned char arg )
+doActionPulse	C:\development\m2m\firmware\pic\rfid\project\main.c	1422;"	f	line:1422	signature:( unsigned char dmflags, unsigned char arg )
+doActionPulse	C:\development\m2m\firmware\pic\rfid\project\main.h	144;"	p	line:144	signature:( unsigned char dmflags, unsigned char arg )
+doActionStatus	C:\development\m2m\firmware\pic\rfid\project\main.h	145;"	p	line:145	signature:( unsigned char dmflags, unsigned char arg )
+doDM	C:\development\m2m\firmware\pic\rfid\project\main.c	1349;"	f	line:1349	signature:( void )
+doDM	C:\development\m2m\firmware\pic\rfid\project\main.h	140;"	p	line:140	signature:( void )
+doWork	C:\development\m2m\firmware\pic\rfid\project\main.c	1115;"	f	line:1115	signature:( void )
+doWork	C:\development\m2m\firmware\pic\rfid\project\main.h	131;"	p	line:131	signature:( void )
+flags	C:\development\m2m\firmware\common\vscp.h	183;"	m	line:183	struct:_imsg
+flags	C:\development\m2m\firmware\common\vscp.h	202;"	m	line:202	struct:_omsg
+flags	C:\development\m2m\firmware\common\vscp.h	254;"	m	line:254	struct:_dmrow
+flags	C:\development\m2m\firmware\pic\rfid\project\main.c	1687;"	l	line:1687
+fsk_tmr_value	C:\development\m2m\firmware\pic\rfid\project\main.c	106;"	v	line:106
+getCANFrame	C:\development\m2m\firmware\pic\rfid\project\main.c	1685;"	f	line:1685	signature:( uint32_t *pid, uint8_t *pdlc, uint8_t *pdata )
+getCANFrame	C:\development\m2m\firmware\pic\rfid\project\main.h	164;"	p	line:164	signature:( uint32_t *pid, uint8_t *psize, uint8_t *pData )
+getVSCPFrame	C:\development\m2m\firmware\common\vscp.h	437;"	p	line:437	signature:( uint16_t *pvscpclass, uint8_t *pvscptype, uint8_t *pNodeId, uint8_t *pPriority, uint8_t *pSize, uint8_t *pData )
+getVSCPFrame	C:\development\m2m\firmware\pic\rfid\project\main.c	1640;"	f	line:1640	signature:( uint16_t *pvscpclass, uint8_t *pvscptype, uint8_t *pNodeId, uint8_t *pPriority, uint8_t *pSize, uint8_t *pData )
+i	C:\development\m2m\firmware\common\vscp.c	1007;"	l	line:1007
+i	C:\development\m2m\firmware\common\vscp.c	1054;"	l	line:1054
+i	C:\development\m2m\firmware\common\vscp.c	1088;"	l	line:1088
+i	C:\development\m2m\firmware\common\vscp.c	896;"	l	line:896
+i	C:\development\m2m\firmware\common\vscp.c	944;"	l	line:944
+i	C:\development\m2m\firmware\pic\common\can18f.c	292;"	l	line:292
+i	C:\development\m2m\firmware\pic\common\can18f.c	380;"	l	line:380
+i	C:\development\m2m\firmware\pic\common\eeprom.c	110;"	l	line:110
+i	C:\development\m2m\firmware\pic\common\eeprom.c	132;"	l	line:132
+i	C:\development\m2m\firmware\pic\common\eeprom.c	53;"	l	line:53
+i	C:\development\m2m\firmware\pic\common\eeprom.c	69;"	l	line:69
+i	C:\development\m2m\firmware\pic\rfid\project\main.c	1283;"	l	line:1283
+i	C:\development\m2m\firmware\pic\rfid\project\main.c	1351;"	l	line:1351
+id	C:\development\m2m\firmware\common\vscp.c	1158;"	l	line:1158
+id	C:\development\m2m\firmware\pic\rfid\project\main.c	1621;"	l	line:1621
+id	C:\development\m2m\firmware\pic\rfid\project\main.c	1647;"	l	line:1647
+init	C:\development\m2m\firmware\pic\rfid\project\main.h	132;"	p	line:132	signature:( void )
+init_app_eeprom	C:\development\m2m\firmware\pic\rfid\project\main.h	134;"	p	line:134	signature:( void )
+init_app_ram	C:\development\m2m\firmware\pic\rfid\project\main.h	133;"	p	line:133	signature:( void )
+interrupt_at_low_vector	C:\development\m2m\firmware\pic\rfid\project\main.c	154;"	f	line:154	signature:( void )
+isr_high	C:\development\m2m\firmware\pic\rfid\project\main.c	88;"	p	line:88	file:	signature:( void )
+isr_low	C:\development\m2m\firmware\pic\rfid\project\main.c	87;"	p	line:87	file:	signature:( void )
+j	C:\development\m2m\firmware\common\vscp.c	1007;"	l	line:1007
+lbIsItBuffer0	C:\development\m2m\firmware\pic\common\can18f.c	382;"	l	line:382
+long_read	C:\development\m2m\firmware\pic\common\eeprom.c	109;"	l	line:109
+main	C:\development\m2m\firmware\pic\rfid\project\c018.c	10;"	p	line:10	file:	signature:(void)
+measurement_clock	C:\development\m2m\firmware\pic\rfid\project\main.c	99;"	v	line:99
+oaddr	C:\development\m2m\firmware\common\vscp.h	188;"	m	line:188	struct:_imsg
+oaddr	C:\development\m2m\firmware\common\vscp.h	253;"	m	line:253	struct:_dmrow
+page_lsb	C:\development\m2m\firmware\common\vscp.c	1057;"	l	line:1057
+page_lsb	C:\development\m2m\firmware\common\vscp.c	1091;"	l	line:1091
+page_msb	C:\development\m2m\firmware\common\vscp.c	1056;"	l	line:1056
+page_msb	C:\development\m2m\firmware\common\vscp.c	1090;"	l	line:1090
+page_save	C:\development\m2m\firmware\common\vscp.c	1055;"	l	line:1055
+page_save	C:\development\m2m\firmware\common\vscp.c	1089;"	l	line:1089
+parity1	C:\development\m2m\firmware\pic\rfid\project\main.c	1118;"	l	line:1118
+parity2	C:\development\m2m\firmware\pic\rfid\project\main.c	1118;"	l	line:1118
+parity3	C:\development\m2m\firmware\pic\rfid\project\main.c	1118;"	l	line:1118
+parity4	C:\development\m2m\firmware\pic\rfid\project\main.c	1118;"	l	line:1118
+pos	C:\development\m2m\firmware\common\vscp.c	897;"	l	line:897
+pos	C:\development\m2m\firmware\common\vscp.c	945;"	l	line:945
+priority	C:\development\m2m\firmware\common\vscp.h	185;"	m	line:185	struct:_imsg
+priority	C:\development\m2m\firmware\common\vscp.h	204;"	m	line:204	struct:_omsg
+ptr	C:\development\m2m\firmware\pic\common\can18f.c	230;"	l	line:230
+ptr	C:\development\m2m\firmware\pic\common\can18f.c	250;"	l	line:250
+ptr	C:\development\m2m\firmware\pic\common\can18f.c	293;"	l	line:293
+ptr	C:\development\m2m\firmware\pic\common\can18f.c	381;"	l	line:381
+readEEPROM	C:\development\m2m\firmware\pic\common\eeprom.c	83;"	f	line:83	signature:( uint16_t address )
+readEEPROM	C:\development\m2m\firmware\pic\common\eeprom.h	23;"	p	line:23	signature:( uint16_t address )
+readEEPROM	C:\development\m2m\firmware\pic\rfid\project\main.c	1425;"	p	line:1425	file:
+readEEPROM	C:\development\m2m\firmware\pic\rfid\project\main.c	1428;"	p	line:1428	file:
+readEEPROM	C:\development\m2m\firmware\pic\rfid\project\main.c	1431;"	p	line:1431	file:
+readStringEEPROM	C:\development\m2m\firmware\pic\common\eeprom.c	127;"	f	line:127	signature:( uint16_t address, uint8_t string[], uint8_t final_character )
+readStringEEPROM	C:\development\m2m\firmware\pic\common\eeprom.h	32;"	p	line:32	signature:( uint16_t address, uint8_t string[], uint8_t final_character )
+readULongEEPROM	C:\development\m2m\firmware\pic\common\eeprom.c	107;"	f	line:107	signature:( uint16_t address )
+readULongEEPROM	C:\development\m2m\firmware\pic\common\eeprom.h	27;"	p	line:27	signature:( uint16_t address )
+read_app_register	C:\development\m2m\firmware\pic\rfid\project\main.c	1258;"	f	line:1258	signature:( unsigned char reg )
+read_app_register	C:\development\m2m\firmware\pic\rfid\project\main.h	135;"	p	line:135	signature:( unsigned char reg )
+rez	C:\development\m2m\firmware\pic\rfid\project\main.c	1217;"	l	line:1217
+rez_temp	C:\development\m2m\firmware\pic\rfid\project\main.c	1217;"	l	line:1217
+rv	C:\development\m2m\firmware\common\vscp.c	1137;"	l	line:1137
+rv	C:\development\m2m\firmware\common\vscp.c	1157;"	l	line:1157
+rv	C:\development\m2m\firmware\common\vscp.c	519;"	l	line:519
+rv	C:\development\m2m\firmware\common\vscp.c	655;"	l	line:655
+sendCANFrame	C:\development\m2m\firmware\pic\rfid\project\main.c	1665;"	f	line:1665	signature:( uint32_t id, uint8_t dlc, uint8_t *pdata )
+sendCANFrame	C:\development\m2m\firmware\pic\rfid\project\main.h	155;"	p	line:155	signature:( uint32_t id, uint8_t size, uint8_t *pData )
+sendDMatrixInfo	C:\development\m2m\firmware\pic\rfid\project\main.c	1312;"	f	line:1312	signature:( void )
+sendDMatrixInfo	C:\development\m2m\firmware\pic\rfid\project\main.h	137;"	p	line:137	signature:( void )
+sendVSCPFrame	C:\development\m2m\firmware\common\vscp.h	452;"	p	line:452	signature:( uint16_t vscpclass, uint8_t vscptype, uint8_t nodeid, uint8_t priority, uint8_t size, uint8_t *pData )
+sendVSCPFrame	C:\development\m2m\firmware\pic\rfid\project\main.c	1614;"	f	line:1614	signature:( uint16_t vscpclass, uint8_t vscptype, uint8_t nodeid, uint8_t priority, uint8_t size, uint8_t *pData )
+string_len	C:\development\m2m\firmware\pic\common\eeprom.c	69;"	l	line:69
+temp	C:\development\m2m\firmware\pic\rfid\project\main.c	105;"	v	line:105
+tmp	C:\development\m2m\firmware\pic\rfid\project\main.c	1117;"	l	line:1117
+tmpval	C:\development\m2m\firmware\pic\rfid\project\main.c	1260;"	l	line:1260
+tmpval	C:\development\m2m\firmware\pic\rfid\project\main.c	1284;"	l	line:1284
+type	C:\development\m2m\firmware\common\vscp.h	187;"	m	line:187	struct:_imsg
+type	C:\development\m2m\firmware\common\vscp.h	206;"	m	line:206	struct:_omsg
+type_filter	C:\development\m2m\firmware\common\vscp.h	258;"	m	line:258	struct:_dmrow
+type_filter	C:\development\m2m\firmware\pic\rfid\project\main.c	1355;"	l	line:1355
+type_mask	C:\development\m2m\firmware\common\vscp.h	257;"	m	line:257	struct:_dmrow
+type_mask	C:\development\m2m\firmware\pic\rfid\project\main.c	1356;"	l	line:1356
+val	C:\development\m2m\firmware\pic\rfid\project\main.c	1261;"	l	line:1261
+vscp18F_readRegs	C:\development\m2m\firmware\pic\common\can18f.c	194;"	f	line:194	file:	signature:( uint8_t* ptr, uint32_t *val, BOOL bExtended )
+vscp18F_readRegs	C:\development\m2m\firmware\pic\common\can18f.c	65;"	p	line:65	file:	signature:( uint8_t* ptr, uint32_t *val, BOOL bExtended )
+vscp18F_writeRegs	C:\development\m2m\firmware\pic\common\can18f.c	161;"	f	line:161	file:	signature:( uint8_t* ptr, uint32_t val, BOOL bExtended )
+vscp18F_writeRegs	C:\development\m2m\firmware\pic\common\can18f.c	64;"	p	line:64	file:	signature:( uint8_t* ptr, uint32_t val, BOOL bExtended )
+vscp18f_cansetmode	C:\development\m2m\firmware\pic\common\can18f.c	149;"	f	line:149	signature:( uint8_t opmode )
+vscp18f_cansetmode	C:\development\m2m\firmware\pic\common\can18f.h	206;"	p	line:206	signature:( uint8_t opmode )
+vscp18f_init	C:\development\m2m\firmware\pic\common\can18f.c	96;"	f	line:96	signature:( BOOL bExtended )
+vscp18f_init	C:\development\m2m\firmware\pic\common\can18f.h	205;"	p	line:205	signature:( BOOL bExtended )
+vscp18f_readMsg	C:\development\m2m\firmware\pic\common\can18f.c	378;"	f	line:378	signature:( uint32_t *id, uint8_t *data, uint8_t *dlc, uint8_t *flags )
+vscp18f_readMsg	C:\development\m2m\firmware\pic\common\can18f.h	210;"	p	line:210	signature:( uint32_t *id, uint8_t *data, uint8_t *dlc, uint8_t *flags )
+vscp18f_sendMsg	C:\development\m2m\firmware\pic\common\can18f.c	290;"	f	line:290	signature:( uint32_t id, uint8_t* data, uint8_t dlc, uint8_t flags )
+vscp18f_sendMsg	C:\development\m2m\firmware\pic\common\can18f.h	209;"	p	line:209	signature:( uint32_t id, uint8_t* data, uint8_t dlc, uint8_t flags )
+vscp18f_setfilter	C:\development\m2m\firmware\pic\common\can18f.c	248;"	f	line:248	signature:( uint8_t nfilter, uint32_t val, BOOL bExtended )
+vscp18f_setfilter	C:\development\m2m\firmware\pic\common\can18f.h	208;"	p	line:208	signature:( uint8_t nfilter, uint32_t val, BOOL bExtended )
+vscp18f_setmask	C:\development\m2m\firmware\pic\common\can18f.c	228;"	f	line:228	signature:( uint8_t nmask, uint32_t val, BOOL bExtended )
+vscp18f_setmask	C:\development\m2m\firmware\pic\common\can18f.h	207;"	p	line:207	signature:( uint8_t nmask, uint32_t val, BOOL bExtended )
+vscp_alarmstatus	C:\development\m2m\firmware\common\vscp.c	72;"	v	line:72
+vscp_check_pstorage	C:\development\m2m\firmware\common\vscp.c	167;"	f	line:167	signature:( void )
+vscp_check_pstorage	C:\development\m2m\firmware\common\vscp.h	403;"	p	line:403	signature:( void )
+vscp_deviceURL	C:\development\m2m\firmware\pic\rfid\project\main.c	95;"	v	line:95
+vscp_doOneSecondWork	C:\development\m2m\firmware\common\vscp.c	468;"	f	line:468	signature:( void )
+vscp_doOneSecondWork	C:\development\m2m\firmware\common\vscp.h	398;"	p	line:398	signature:( void )
+vscp_error	C:\development\m2m\firmware\common\vscp.c	192;"	f	line:192	signature:( void )
+vscp_error	C:\development\m2m\firmware\common\vscp.h	294;"	p	line:294	signature:( void )
+vscp_errorcnt	C:\development\m2m\firmware\common\vscp.c	71;"	v	line:71
+vscp_getBootLoaderAlgorithm	C:\development\m2m\firmware\common\vscp.h	503;"	p	line:503	signature:( void )
+vscp_getBootLoaderAlgorithm	C:\development\m2m\firmware\pic\rfid\project\main.c	1540;"	f	line:1540	signature:( void )
+vscp_getBufferSize	C:\development\m2m\firmware\common\vscp.h	508;"	p	line:508	signature:( void )
+vscp_getBufferSize	C:\development\m2m\firmware\pic\rfid\project\main.c	1549;"	f	line:1549	signature:( void )
+vscp_getControlByte	C:\development\m2m\firmware\common\vscp.h	546;"	p	line:546	signature:( void )
+vscp_getControlByte	C:\development\m2m\firmware\pic\rfid\project\main.c	1605;"	f	line:1605	signature:( void )
+vscp_getEmbeddedMdfInfo	C:\development\m2m\firmware\common\vscp.h	591;"	p	line:591	signature:( void )
+vscp_getEvent	C:\development\m2m\firmware\common\vscp.c	1155;"	f	line:1155	signature:( void )
+vscp_getEvent	C:\development\m2m\firmware\common\vscp.h	417;"	p	line:417	signature:( void )
+vscp_getGUID	C:\development\m2m\firmware\common\vscp.h	472;"	p	line:472	signature:( uint8_t idx )
+vscp_getGUID	C:\development\m2m\firmware\pic\rfid\project\main.c	1479;"	f	line:1479	signature:( uint8_t idx )
+vscp_getMDF_URL	C:\development\m2m\firmware\common\vscp.h	514;"	p	line:514	signature:( uint8_t idx )
+vscp_getMDF_URL	C:\development\m2m\firmware\pic\rfid\project\main.c	1491;"	f	line:1491	signature:( uint8_t idx )
+vscp_getMajorVersion	C:\development\m2m\firmware\common\vscp.h	465;"	p	line:465	signature:( void )
+vscp_getMajorVersion	C:\development\m2m\firmware\pic\rfid\project\main.c	1450;"	f	line:1450
+vscp_getManufacturerId	C:\development\m2m\firmware\common\vscp.h	497;"	p	line:497	signature:( uint8_t idx )
+vscp_getManufacturerId	C:\development\m2m\firmware\pic\rfid\project\main.c	1520;"	f	line:1520	signature:( uint8_t idx )
+vscp_getMatrixInfo	C:\development\m2m\firmware\common\vscp.h	583;"	p	line:583	signature:( void )
+vscp_getMinorVersion	C:\development\m2m\firmware\common\vscp.h	466;"	p	line:466	signature:( void )
+vscp_getMinorVersion	C:\development\m2m\firmware\pic\rfid\project\main.c	1459;"	f	line:1459
+vscp_getNickname	C:\development\m2m\firmware\pic\rfid\project\main.c	1559;"	f	line:1559	signature:( void )
+vscp_getPageSelect	C:\development\m2m\firmware\common\vscp.h	553;"	p	line:553	signature:( uint8_t idx )
+vscp_getSegmentCRC	C:\development\m2m\firmware\common\vscp.h	531;"	p	line:531	signature:( void )
+vscp_getSegmentCRC	C:\development\m2m\firmware\pic\rfid\project\main.c	1577;"	f	line:1577	signature:( void )
+vscp_getSubMinorVersion	C:\development\m2m\firmware\common\vscp.h	467;"	p	line:467	signature:( void )
+vscp_getSubMinorVersion	C:\development\m2m\firmware\pic\rfid\project\main.c	1468;"	f	line:1468
+vscp_getSubzone	C:\development\m2m\firmware\common\vscp.c	477;"	p	line:477	file:
+vscp_getSubzone	C:\development\m2m\firmware\common\vscp.h	610;"	p	line:610	signature:( void )
+vscp_getUserID	C:\development\m2m\firmware\common\vscp.h	481;"	p	line:481	signature:( uint8_t idx )
+vscp_getUserID	C:\development\m2m\firmware\pic\rfid\project\main.c	1500;"	f	line:1500	signature:( uint8_t idx )
+vscp_getZone	C:\development\m2m\firmware\common\vscp.c	476;"	p	line:476	file:
+vscp_getZone	C:\development\m2m\firmware\common\vscp.h	604;"	p	line:604	signature:( void )
+vscp_goActiveState	C:\development\m2m\firmware\common\vscp.c	354;"	f	line:354	signature:( void )
+vscp_goActiveState	C:\development\m2m\firmware\common\vscp.h	330;"	p	line:330	signature:( void )
+vscp_goBootloaderMode	C:\development\m2m\firmware\common\vscp.h	598;"	p	line:598	signature:( void )
+vscp_guid_reset	C:\development\m2m\firmware\common\vscp.c	107;"	v	line:107
+vscp_handleDropNickname	C:\development\m2m\firmware\common\vscp.c	429;"	f	line:429	signature:( void )
+vscp_handleDropNickname	C:\development\m2m\firmware\common\vscp.h	355;"	p	line:355	signature:( void )
+vscp_handleHeartbeat	C:\development\m2m\firmware\common\vscp.c	392;"	f	line:392	signature:( void )
+vscp_handleHeartbeat	C:\development\m2m\firmware\common\vscp.h	345;"	p	line:345	signature:( void )
+vscp_handlePeActiveState	C:\development\m2m\firmware\common\vscp.h	315;"	p	line:315	signature:( void )
+vscp_handlePreActiveState	C:\development\m2m\firmware\common\vscp.c	322;"	f	line:322	signature:( void )
+vscp_handleProbeState	C:\development\m2m\firmware\common\vscp.c	201;"	f	line:201	signature:( void )
+vscp_handleProbeState	C:\development\m2m\firmware\common\vscp.h	302;"	p	line:302	signature:( void )
+vscp_handleProtocolEvent	C:\development\m2m\firmware\common\vscp.c	724;"	f	line:724	signature:( void )
+vscp_handleProtocolEvent	C:\development\m2m\firmware\common\vscp.h	322;"	p	line:322	signature:( void )
+vscp_handleSetNickname	C:\development\m2m\firmware\common\vscp.c	413;"	f	line:413	signature:( void )
+vscp_handleSetNickname	C:\development\m2m\firmware\common\vscp.h	350;"	p	line:350	signature:( void )
+vscp_hour	C:\development\m2m\firmware\common\vscp.c	112;"	v	line:112
+vscp_imsg	C:\development\m2m\firmware\common\vscp.c	80;"	v	line:80
+vscp_init	C:\development\m2m\firmware\common\vscp.c	119;"	f	line:119	signature:( void )
+vscp_init	C:\development\m2m\firmware\common\vscp.h	288;"	p	line:288	signature:( void )
+vscp_initbtncnt	C:\development\m2m\firmware\common\vscp.c	91;"	v	line:91
+vscp_initledfunc	C:\development\m2m\firmware\common\vscp.c	86;"	v	line:86
+vscp_minute	C:\development\m2m\firmware\common\vscp.c	111;"	v	line:111
+vscp_newNodeOnline	C:\development\m2m\firmware\common\vscp.c	446;"	f	line:446	signature:( void )
+vscp_newNodeOnline	C:\development\m2m\firmware\common\vscp.h	360;"	p	line:360	signature:( void )
+vscp_nickname	C:\development\m2m\firmware\common\vscp.c	69;"	v	line:69
+vscp_node_state	C:\development\m2m\firmware\common\vscp.c	74;"	v	line:74
+vscp_node_substate	C:\development\m2m\firmware\common\vscp.c	75;"	v	line:75
+vscp_omsg	C:\development\m2m\firmware\common\vscp.c	83;"	v	line:83
+vscp_page_select	C:\development\m2m\firmware\common\vscp.c	100;"	v	line:100
+vscp_probe_address	C:\development\m2m\firmware\common\vscp.c	85;"	v	line:85
+vscp_probe_cnt	C:\development\m2m\firmware\common\vscp.c	77;"	v	line:77
+vscp_readAppReg	C:\development\m2m\firmware\common\vscp.h	561;"	p	line:561	signature:( uint8_t reg )
+vscp_readNicknamePermanent	C:\development\m2m\firmware\common\vscp.h	520;"	p	line:520	signature:( void )
+vscp_readRegister	C:\development\m2m\firmware\common\vscp.c	503;"	f	line:503	signature:( uint8_t reg )
+vscp_readRegister	C:\development\m2m\firmware\common\vscp.h	367;"	p	line:367	signature:( uint8_t reg )
+vscp_readStdReg	C:\development\m2m\firmware\common\vscp.c	517;"	f	line:517	signature:( uint8_t reg )
+vscp_readStdReg	C:\development\m2m\firmware\common\vscp.h	374;"	p	line:374	signature:( uint8_t reg )
+vscp_second	C:\development\m2m\firmware\common\vscp.c	110;"	v	line:110
+vscp_sendEvent	C:\development\m2m\firmware\common\vscp.c	1135;"	f	line:1135	signature:( void )
+vscp_sendEvent	C:\development\m2m\firmware\common\vscp.h	411;"	p	line:411	signature:( void )
+vscp_sendHeartBeat	C:\development\m2m\firmware\common\vscp.c	374;"	f	line:374	signature:( uint8_t zone, uint8_t subzone )
+vscp_sendHeartBeat	C:\development\m2m\firmware\common\vscp.h	340;"	p	line:340	signature:( uint8_t zone, uint8_t subzone )
+vscp_setControlByte	C:\development\m2m\firmware\common\vscp.h	541;"	p	line:541	signature:( uint8_t ctrl )
+vscp_setControlByte	C:\development\m2m\firmware\pic\rfid\project\main.c	1595;"	f	line:1595	signature:( uint8_t ctrl )
+vscp_setGUID	C:\development\m2m\firmware\common\vscp.h	473;"	p	line:473	signature:( uint8_t idx, uint8_t data )
+vscp_setManufacturerId	C:\development\m2m\firmware\common\vscp.h	498;"	p	line:498	signature:( uint8_t idx, uint8_t data )
+vscp_setManufacturerId	C:\development\m2m\firmware\pic\rfid\project\main.c	1531;"	f	line:1531	signature:( uint8_t idx, uint8_t data )
+vscp_setNickname	C:\development\m2m\firmware\pic\rfid\project\main.c	1568;"	f	line:1568	signature:( uint8_t nickname )
+vscp_setPageSelect	C:\development\m2m\firmware\common\vscp.h	554;"	p	line:554	signature:( uint8_t idx, uint8_t data )
+vscp_setSegmentCRC	C:\development\m2m\firmware\common\vscp.h	536;"	p	line:536	signature:( uint8_t crc )
+vscp_setSegmentCRC	C:\development\m2m\firmware\pic\rfid\project\main.c	1586;"	f	line:1586	signature:( uint8_t crc )
+vscp_setUserID	C:\development\m2m\firmware\common\vscp.h	482;"	p	line:482	signature:( uint8_t idx, uint8_t data )
+vscp_setUserID	C:\development\m2m\firmware\pic\rfid\project\main.c	1509;"	f	line:1509	signature:( uint8_t idx, uint8_t data )
+vscp_statuscnt	C:\development\m2m\firmware\common\vscp.c	96;"	v	line:96
+vscp_timer	C:\development\m2m\firmware\common\vscp.c	88;"	v	line:88
+vscp_writeAppReg	C:\development\m2m\firmware\common\vscp.h	569;"	p	line:569	signature:( uint8_t reg, uint8_t value )
+vscp_writeNicknamePermanent	C:\development\m2m\firmware\common\vscp.h	526;"	p	line:526	signature:( uint8_t nickname )
+vscp_writeRegister	C:\development\m2m\firmware\common\vscp.c	639;"	f	line:639	signature:( uint8_t reg, uint8_t value )
+vscp_writeRegister	C:\development\m2m\firmware\common\vscp.h	382;"	p	line:382	signature:( uint8_t reg, uint8_t value )
+vscp_writeStdReg	C:\development\m2m\firmware\common\vscp.c	653;"	f	line:653	signature:( uint8_t reg, uint8_t value )
+vscp_writeStdReg	C:\development\m2m\firmware\common\vscp.h	390;"	p	line:390	signature:( uint8_t reg, uint8_t value )
+writeEEPROM	C:\development\m2m\firmware\pic\common\eeprom.c	22;"	f	line:22	signature:( uint16_t address, uint8_t data )
+writeEEPROM	C:\development\m2m\firmware\pic\common\eeprom.h	24;"	p	line:24	signature:( uint16_t address, uint8_t data )
+writeStringEEPROM	C:\development\m2m\firmware\pic\common\eeprom.c	67;"	f	line:67	signature:( uint16_t address, uint8_t string[] )
+writeStringEEPROM	C:\development\m2m\firmware\pic\common\eeprom.h	35;"	p	line:35	signature:( uint16_t address, uint8_t string[] )
+writeULongEEPROM	C:\development\m2m\firmware\pic\common\eeprom.c	51;"	f	line:51	signature:( uint16_t address, uint8_t data )
+writeULongEEPROM	C:\development\m2m\firmware\pic\common\eeprom.h	28;"	p	line:28	signature:( uint16_t address, uint8_t data )
+write_app_register	C:\development\m2m\firmware\pic\rfid\project\main.c	1281;"	f	line:1281	signature:( unsigned char reg, unsigned char val )
+write_app_register	C:\development\m2m\firmware\pic\rfid\project\main.h	136;"	p	line:136	signature:( unsigned char reg, unsigned char val )
+x	C:\development\m2m\firmware\pic\rfid\project\main.c	1117;"	l	line:1117
+x	C:\development\m2m\firmware\pic\rfid\project\main.c	1217;"	l	line:1217
+y	C:\development\m2m\firmware\pic\rfid\project\main.c	1117;"	l	line:1117

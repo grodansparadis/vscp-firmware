@@ -1,0 +1,20 @@
+*****************  version.txt file for STR91x software library ***************
+
+*  05/24/2006 : Version 1.1
+================================
+
+-CHANGING THE PATH OF THIS FILE.
+-Updating 91x_lib.c : to be inline with the Ethernet lib.
+-Updating 91x_map.h : to be inline with the Ethernet lib .
+
+
+*  05/18/2006 : Version 1.0
+================================
+
+  Created.
+
+
+
+********************(C) COPYRIGHT 2006 STMicroelectronics**********************
+
+

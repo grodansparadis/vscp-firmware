@@ -1,0 +1,40 @@
+********************
+Modtronix TCP/IP Stack
+********************
+The Modtronix TCP/IP Stack is a modified version of the original Micorchip TCP/IP Stack.
+The licence of the original code still applies, see license.txt file!
+
+********************
+V2.20 Modtronix TCP/IP Stack - 2005 May 10 (cvs tag pic_mxmctcpip_v220)
+********************
+- Fixed problem in MAC Receive buffer where large TCP and UDP packets that crossed MAC
+  Receive buffer boundry got corrupted.
+- Fixed minimum length check in Ethernet packet - caused CRC error
+- Added PIC configuration to main file - removed c18cfm.asm file
+- Added configuration to mac.c to disable INT0 output of RTL8019AS. When disabled,
+  PIC port pin RB0 is tri-state, and can be used by user.
+- Modified TCPProcess() to include localIP as third param. This was done to
+  allow this function to calculate checksum correctly.
+- Added UDPChecksum logic in UDPProcess()
+- Modified UDPProcess() and FindMatchingSocket() to include localIP as new parameter.
+  This corrects pseudo header checksum logic in UDPProcess().
+  It also corrects broadcast packet matching correct in FindMatchingSocket().
+- Moved some defines from dhcp.h and dhcp.c to projdefs.h
+- Moved some defines from ftp.h and ftp.c to projdefs.h
+- Moved some defines from http.h and http.c to projdefs.h
+- Moved some defines from ip.h and ip.c to projdefs.h
+- Moved some defines from snmp.h and snmp.c to projdefs.h
+- Moved some defines from tcp.h and tcp.c to projdefs.h
+
+********************
+V2.10 Modtronix TCP/IP Stack - 2005 March 01 (cvs tag pic_mxmctcpip_v210)
+********************
+- Cleaned up includes at top of each file. Each *.h file includes projdefs.h as first
+  include. Each *.c file includes it's *.h file as first include.
+
+********************
+V2.00 Modtronix TCP/IP Stack - 2005 Jan 19 (cvs tag pic_mxmctcpip_v200)
+********************
+- Made major changes to the original stack. All project specific defines have been moved
+  from stack files to the projdefs.h file
+- Changed the callback funcitions HTTPGetVar() and HTTPExecGetCmd() in http module.

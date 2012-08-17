@@ -1,0 +1,1255 @@
+###############################################################################
+#                                                                             #
+# IAR ARM ANSI C/C++ Compiler V5.12.0.50667/W32         18/Apr/2008  14:00:26 #
+# Copyright 1999-2007 IAR Systems. All rights reserved.                       #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Program\IAR Systems\Embedded Workbench                #
+#                    5.0\ARM\examples\ST\STR75x\STR75xLibrary\library\src\75x #
+#                    _uart.c                                                  #
+#    Command line =  "D:\Program\IAR Systems\Embedded Workbench               #
+#                    5.0\ARM\examples\ST\STR75x\STR75xLibrary\library\src\75x #
+#                    _uart.c" -lC D:\development\gediminas\CAN4USB\project\RE #
+#                    LEASE\List\ -lA D:\development\gediminas\CAN4USB\project #
+#                    \RELEASE\List\ -o D:\development\gediminas\CAN4USB\proje #
+#                    ct\RELEASE\Obj\ --no_cse --no_unroll --no_inline         #
+#                    --no_code_motion --no_tbaa --no_clustering               #
+#                    --no_scheduling --debug --endian little --cpu            #
+#                    ARM7TDMI-S -e --fpu None --dlib_config "D:\Program\IAR   #
+#                    Systems\Embedded Workbench 5.0\ARM\INC\DLib_Config_Norma #
+#                    l.h" -I D:\development\gediminas\CAN4USB\project\ -I     #
+#                    D:\development\gediminas\CAN4USB\project\app\ -I         #
+#                    D:\development\gediminas\CAN4USB\project\board\ -I       #
+#                    D:\development\gediminas\CAN4USB\project\module\ -I      #
+#                    D:\development\gediminas\CAN4USB\project\STR75xLibrary\l #
+#                    ibrary\inc\ -I j:\common\ -I "D:\Program\IAR             #
+#                    Systems\Embedded Workbench 5.0\ARM\INC\" --interwork     #
+#                    --cpu_mode thumb -On                                     #
+#    List file    =  D:\development\gediminas\CAN4USB\project\RELEASE\List\75 #
+#                    x_uart.lst                                               #
+#    Object file  =  D:\development\gediminas\CAN4USB\project\RELEASE\Obj\75x #
+#                    _uart.o                                                  #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Program\IAR Systems\Embedded Workbench 5.0\ARM\examples\ST\STR75x\STR75xLibrary\library\src\75x_uart.c
+      1          /******************** (C) COPYRIGHT 2006 STMicroelectronics ********************
+      2          * File Name          : 75x_uart.c
+      3          * Author             : MCD Application Team
+      4          * Date First Issued  : 03/10/2006
+      5          * Description        : This file provides all the UART software functions.
+      6          ********************************************************************************
+      7          * History:
+      8          * 07/17/2006 : V1.0
+      9          * 03/10/2006 : V0.1
+     10          ********************************************************************************
+     11          * THE PRESENT SOFTWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+     12          * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
+     13          * AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY DIRECT,
+     14          * INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE
+     15          * CONTENT OF SUCH SOFTWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING
+     16          * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+     17          *******************************************************************************/
+     18          
+     19          /* Includes ------------------------------------------------------------------*/
+     20          #include "75x_uart.h"
+     21          #include "75x_mrcc.h"
+     22          
+     23          /* Private typedef -----------------------------------------------------------*/
+     24          /* Private define ------------------------------------------------------------*/
+     25          /* UART LIN Mask */
+     26          #define UART_LIN_Disable_Mask           0xFEFF /* LIN Disable Mask */
+     27          #define UART_LIN_Enable_Mask            0x0100 /* LIN Enable Mask */
+     28          
+     29          /* UART Mask */
+     30          #define UART_Enable_Mask                0x0001 /* UART Enable Mask */
+     31          #define UART_Disable_Mask               0xFFFE /* UART Disable Mask */
+     32          
+     33          /* UART LoopBack */
+     34          #define UART_LoopBack_Disable_Mask      0xFF7F/* LoopBack Disable Mask */
+     35          #define UART_LoopBack_Enable_Mask       0x0080/* LoopBack Enable Mask */
+     36          
+     37          #define UART_WordLength_Mask            0xFF9F  /* UART Word Length Mask */
+     38          #define UART_Parity_Mask                0xFF79  /* UART Parity Mask */
+     39          #define UART_HardwareFlowControl_Mask   0x3FFF  /* UART Hardware Flow Control Mask */
+     40          #define UART_TxRxFIFOLevel_Mask         0xFFC0  /* UART Tx Rx FIFO Level Mask */
+     41          #define UART_LINBreakLength_Mask        0xE1FF  /* UART LIN Break Length Mask */
+     42          #define UART_BreakChar_Mask             0x0001  /* UART Break Character send Mask */
+     43          #define UART_FLAG_Mask                  0x1F    /* UART Flag Mask */
+     44          #define UART_Mode_Mask                  0xFCFF  /* UART Mode Mask */
+     45          #define UART_RTSSET_Mask                0xF7FF  /* RTS signal is high */
+     46          #define UART_RTSRESET_Mask              0x0800  /* RTS signal is low */
+     47          
+     48          /* Private macro -------------------------------------------------------------*/
+     49          /* Private variables ---------------------------------------------------------*/
+     50          /* Private function prototypes -----------------------------------------------*/
+     51          /* Private functions ---------------------------------------------------------*/
+     52          
+     53          /*******************************************************************************
+     54          * Function Name  : UART_DeInit
+     55          * Description    : Deinitializes the UARTx peripheral registers to their default
+     56          *                  reset values.
+     57          * Input          : UARTx: where x can be 0,1 or 2 to select the UART peripheral.
+     58          * Output         : None
+     59          * Return         : None
+     60          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+     61          void UART_DeInit(UART_TypeDef* UARTx)
+     62          {
+   \                     UART_DeInit:
+   \   00000000   10B5               PUSH     {R4,LR}
+   \   00000002   0400               MOVS     R4,R0
+     63            /* Reset the UARTx registers values */
+     64            if(UARTx == UART0)
+   \   00000004   1548               LDR      R0,??UART_DeInit_0  ;; 0xffffd400
+   \   00000006   8442               CMP      R4,R0
+   \   00000008   0AD1               BNE      ??UART_DeInit_1
+     65            {
+     66              MRCC_PeripheralSWResetConfig(MRCC_Peripheral_UART0,ENABLE);
+   \   0000000A   0121               MOVS     R1,#+1
+   \   0000000C   8020               MOVS     R0,#+128
+   \   0000000E   4003               LSLS     R0,R0,#+13       ;; #+1048576
+   \   00000010   ........           BL       MRCC_PeripheralSWResetConfig
+     67              MRCC_PeripheralSWResetConfig(MRCC_Peripheral_UART0,DISABLE);
+   \   00000014   0021               MOVS     R1,#+0
+   \   00000016   8020               MOVS     R0,#+128
+   \   00000018   4003               LSLS     R0,R0,#+13       ;; #+1048576
+   \   0000001A   ........           BL       MRCC_PeripheralSWResetConfig
+   \   0000001E   1AE0               B        ??UART_DeInit_2
+     68            }
+     69            else if(UARTx == UART1)
+   \                     ??UART_DeInit_1:
+   \   00000020   0F48               LDR      R0,??UART_DeInit_0+0x4  ;; 0xffffd800
+   \   00000022   8442               CMP      R4,R0
+   \   00000024   0AD1               BNE      ??UART_DeInit_3
+     70            {
+     71              MRCC_PeripheralSWResetConfig(MRCC_Peripheral_UART1,ENABLE);
+   \   00000026   0121               MOVS     R1,#+1
+   \   00000028   8020               MOVS     R0,#+128
+   \   0000002A   8003               LSLS     R0,R0,#+14       ;; #+2097152
+   \   0000002C   ........           BL       MRCC_PeripheralSWResetConfig
+     72              MRCC_PeripheralSWResetConfig(MRCC_Peripheral_UART1,DISABLE);
+   \   00000030   0021               MOVS     R1,#+0
+   \   00000032   8020               MOVS     R0,#+128
+   \   00000034   8003               LSLS     R0,R0,#+14       ;; #+2097152
+   \   00000036   ........           BL       MRCC_PeripheralSWResetConfig
+   \   0000003A   0CE0               B        ??UART_DeInit_2
+     73            }
+     74            else if(UARTx == UART2)
+   \                     ??UART_DeInit_3:
+   \   0000003C   0948               LDR      R0,??UART_DeInit_0+0x8  ;; 0xffffdc00
+   \   0000003E   8442               CMP      R4,R0
+   \   00000040   09D1               BNE      ??UART_DeInit_2
+     75            {
+     76              MRCC_PeripheralSWResetConfig(MRCC_Peripheral_UART2,ENABLE);
+   \   00000042   0121               MOVS     R1,#+1
+   \   00000044   8020               MOVS     R0,#+128
+   \   00000046   C003               LSLS     R0,R0,#+15       ;; #+4194304
+   \   00000048   ........           BL       MRCC_PeripheralSWResetConfig
+     77              MRCC_PeripheralSWResetConfig(MRCC_Peripheral_UART2,DISABLE);
+   \   0000004C   0021               MOVS     R1,#+0
+   \   0000004E   8020               MOVS     R0,#+128
+   \   00000050   C003               LSLS     R0,R0,#+15       ;; #+4194304
+   \   00000052   ........           BL       MRCC_PeripheralSWResetConfig
+     78            }
+     79          }
+   \                     ??UART_DeInit_2:
+   \   00000056   10BC               POP      {R4}
+   \   00000058   01BC               POP      {R0}
+   \   0000005A   0047               BX       R0               ;; return
+   \                     ??UART_DeInit_0:
+   \   0000005C   00D4FFFF           DC32     0xffffd400
+   \   00000060   00D8FFFF           DC32     0xffffd800
+   \   00000064   00DCFFFF           DC32     0xffffdc00
+     80          
+     81          /*******************************************************************************
+     82          * Function Name  : UART_Init
+     83          * Description    : Initializes the UARTx peripheral according to the specified
+     84          *                  parameters in the UART_InitStruct .
+     85          * Input          : - UARTx: where x can be 0,1or 2 to select the UART peripheral.
+     86          *                  - UART_InitStruct: pointer to a UART_InitTypeDef structure
+     87          *                    that contains the configuration information for the
+     88          *                    specified UART peripheral.
+     89          * Output         : None
+     90          * Return         : None
+     91          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+     92          void UART_Init(UART_TypeDef* UARTx, UART_InitTypeDef* UART_InitStruct)
+     93          {
+   \                     UART_Init:
+   \   00000000   F0B5               PUSH     {R4-R7,LR}
+   \   00000002   87B0               SUB      SP,SP,#+28
+   \   00000004   0400               MOVS     R4,R0
+   \   00000006   0D00               MOVS     R5,R1
+     94          
+     95            u32 APBClock = 0;
+   \   00000008   0020               MOVS     R0,#+0
+   \   0000000A   0090               STR      R0,[SP, #+0]
+     96            u32 IntegerDivider = 0;
+   \   0000000C   0020               MOVS     R0,#+0
+   \   0000000E   0600               MOVS     R6,R0
+     97            u32 FractionalDivider = 0;
+   \   00000010   0020               MOVS     R0,#+0
+   \   00000012   0700               MOVS     R7,R0
+     98            MRCC_ClocksTypeDef  MRCC_ClocksStatus;
+     99               
+    100            /* Clear the WLEN bits */
+    101            UARTx->LCR &= UART_WordLength_Mask;
+   \   00000014   A08D               LDRH     R0,[R4, #+44]
+   \   00000016   3449               LDR      R1,??UART_Init_0  ;; 0xff9f
+   \   00000018   0140               ANDS     R1,R1,R0
+   \   0000001A   A185               STRH     R1,[R4, #+44]
+    102            /* Set the WLEN bits according to UART_WordLength value */
+    103            UARTx->LCR |= UART_InitStruct->UART_WordLength;
+   \   0000001C   A08D               LDRH     R0,[R4, #+44]
+   \   0000001E   2988               LDRH     R1,[R5, #+0]
+   \   00000020   0143               ORRS     R1,R1,R0
+   \   00000022   A185               STRH     R1,[R4, #+44]
+    104          
+    105            /* Choose Stop Bits */
+    106            if(UART_InitStruct->UART_StopBits == UART_StopBits_1)
+   \   00000024   6888               LDRH     R0,[R5, #+2]
+   \   00000026   ....               LDR      R1,??DataTable6  ;; 0xfff7
+   \   00000028   8842               CMP      R0,R1
+   \   0000002A   04D1               BNE      ??UART_Init_1
+    107            {
+    108              /* One Stop Bit */
+    109              UARTx->LCR &= UART_StopBits_1;
+   \   0000002C   A08D               LDRH     R0,[R4, #+44]
+   \   0000002E   ....               LDR      R1,??DataTable6  ;; 0xfff7
+   \   00000030   0140               ANDS     R1,R1,R0
+   \   00000032   A185               STRH     R1,[R4, #+44]
+   \   00000034   03E0               B        ??UART_Init_2
+    110            }
+    111            else
+    112            {
+    113              /* Two Stop Bits */
+    114              UARTx->LCR |= UART_StopBits_2;
+   \                     ??UART_Init_1:
+   \   00000036   A08D               LDRH     R0,[R4, #+44]
+   \   00000038   0821               MOVS     R1,#+8
+   \   0000003A   0143               ORRS     R1,R1,R0
+   \   0000003C   A185               STRH     R1,[R4, #+44]
+    115            }
+    116          
+    117            /* Clear SPS, EPS and PEN bits */
+    118            UARTx->LCR &= UART_Parity_Mask;
+   \                     ??UART_Init_2:
+   \   0000003E   A08D               LDRH     R0,[R4, #+44]
+   \   00000040   2A49               LDR      R1,??UART_Init_0+0x4  ;; 0xff79
+   \   00000042   0140               ANDS     R1,R1,R0
+   \   00000044   A185               STRH     R1,[R4, #+44]
+    119            /* Set PS, EPS and PEN bits according to UART_Parity value */
+    120            UARTx->LCR |= UART_InitStruct->UART_Parity;
+   \   00000046   A08D               LDRH     R0,[R4, #+44]
+   \   00000048   A988               LDRH     R1,[R5, #+4]
+   \   0000004A   0143               ORRS     R1,R1,R0
+   \   0000004C   A185               STRH     R1,[R4, #+44]
+    121          
+    122            /* Configure the BaudRate --------------------------------------------------*/
+    123            /* Get the APB frequency */
+    124            MRCC_GetClocksStatus(&MRCC_ClocksStatus);
+   \   0000004E   01A8               ADD      R0,SP,#+4
+   \   00000050   ........           BL       MRCC_GetClocksStatus
+    125            APBClock = MRCC_ClocksStatus.PCLK_Frequency;
+   \   00000054   0698               LDR      R0,[SP, #+24]
+   \   00000056   0090               STR      R0,[SP, #+0]
+    126            
+    127            /* Determine the integer part */
+    128            IntegerDivider = ((100) * (APBClock) / (16 * (UART_InitStruct->UART_BaudRate)));
+   \   00000058   0098               LDR      R0,[SP, #+0]
+   \   0000005A   6421               MOVS     R1,#+100
+   \   0000005C   4843               MULS     R0,R1,R0
+   \   0000005E   A968               LDR      R1,[R5, #+8]
+   \   00000060   1022               MOVS     R2,#+16
+   \   00000062   5143               MULS     R1,R2,R1
+   \   00000064   ........           BL       __aeabi_uidivmod
+   \   00000068   0600               MOVS     R6,R0
+    129            UARTx->IBRD = IntegerDivider / 100; 
+   \   0000006A   3000               MOVS     R0,R6
+   \   0000006C   6421               MOVS     R1,#+100
+   \   0000006E   ........           BL       __aeabi_uidivmod
+   \   00000072   A084               STRH     R0,[R4, #+36]
+    130          
+    131            /* Determine the fractional part */
+    132            FractionalDivider = IntegerDivider - (100 * (UARTx->IBRD));
+   \   00000074   A08C               LDRH     R0,[R4, #+36]
+   \   00000076   6421               MOVS     R1,#+100
+   \   00000078   4843               MULS     R0,R1,R0
+   \   0000007A   301A               SUBS     R0,R6,R0
+   \   0000007C   0700               MOVS     R7,R0
+    133            UARTx->FBRD = ((((FractionalDivider * 64) + 50) / 100));
+   \   0000007E   4020               MOVS     R0,#+64
+   \   00000080   7843               MULS     R0,R7,R0
+   \   00000082   3230               ADDS     R0,R0,#+50
+   \   00000084   6421               MOVS     R1,#+100
+   \   00000086   ........           BL       __aeabi_uidivmod
+   \   0000008A   2085               STRH     R0,[R4, #+40]
+    134            
+    135            /* Choose the Hardware Flow Control */
+    136            /* Clear RTSEn and CTSEn bits */
+    137            UARTx->CR &=  UART_HardwareFlowControl_Mask;
+   \   0000008C   208E               LDRH     R0,[R4, #+48]
+   \   0000008E   8004               LSLS     R0,R0,#+18       ;; ZeroExtS R0,R0,#+18,#+18
+   \   00000090   800C               LSRS     R0,R0,#+18
+   \   00000092   2086               STRH     R0,[R4, #+48]
+    138            /* Set RTSEn and CTSEn bits according to UART_HardwareFlowControl value */
+    139            UARTx->CR |= UART_InitStruct->UART_HardwareFlowControl;
+   \   00000094   208E               LDRH     R0,[R4, #+48]
+   \   00000096   A989               LDRH     R1,[R5, #+12]
+   \   00000098   0143               ORRS     R1,R1,R0
+   \   0000009A   2186               STRH     R1,[R4, #+48]
+    140          
+    141            /* Configure the UART mode */
+    142            /* Clear TXE and RXE bits */
+    143            UARTx->CR &= UART_Mode_Mask;
+   \   0000009C   208E               LDRH     R0,[R4, #+48]
+   \   0000009E   1449               LDR      R1,??UART_Init_0+0x8  ;; 0xfcff
+   \   000000A0   0140               ANDS     R1,R1,R0
+   \   000000A2   2186               STRH     R1,[R4, #+48]
+    144            /* Set TXE and RXE bits according to UART_Mode value */
+    145            UARTx->CR |= UART_InitStruct->UART_Mode;
+   \   000000A4   208E               LDRH     R0,[R4, #+48]
+   \   000000A6   E989               LDRH     R1,[R5, #+14]
+   \   000000A8   0143               ORRS     R1,R1,R0
+   \   000000AA   2186               STRH     R1,[R4, #+48]
+    146          
+    147            /* Enable or disable the FIFOs */
+    148            /* Set the FIFOs Levels */
+    149            if(UART_InitStruct->UART_FIFO == UART_FIFO_Enable)
+   \   000000AC   288A               LDRH     R0,[R5, #+16]
+   \   000000AE   1028               CMP      R0,#+16
+   \   000000B0   11D1               BNE      ??UART_Init_3
+    150            {
+    151              /* Enable the FIFOs */
+    152              UARTx->LCR |= UART_FIFO_Enable;
+   \   000000B2   A08D               LDRH     R0,[R4, #+44]
+   \   000000B4   1021               MOVS     R1,#+16
+   \   000000B6   0143               ORRS     R1,R1,R0
+   \   000000B8   A185               STRH     R1,[R4, #+44]
+    153              
+    154              /* Clear TXIFLSEL and RXIFLSEL bits */
+    155              UARTx->IFLS &=  UART_TxRxFIFOLevel_Mask;
+   \   000000BA   A08E               LDRH     R0,[R4, #+52]
+   \   000000BC   0D49               LDR      R1,??UART_Init_0+0xC  ;; 0xffc0
+   \   000000BE   0140               ANDS     R1,R1,R0
+   \   000000C0   A186               STRH     R1,[R4, #+52]
+    156              
+    157              /* Set RXIFLSEL bits according to UART_RxFIFOLevel value */
+    158              UARTx->IFLS |= (UART_InitStruct->UART_RxFIFOLevel << 3);
+   \   000000C2   A08E               LDRH     R0,[R4, #+52]
+   \   000000C4   E97C               LDRB     R1,[R5, #+19]
+   \   000000C6   C900               LSLS     R1,R1,#+3
+   \   000000C8   0143               ORRS     R1,R1,R0
+   \   000000CA   A186               STRH     R1,[R4, #+52]
+    159              
+    160              /* Set TXIFLSEL bits according to UART_TxFIFOLevel value */
+    161              UARTx->IFLS |= UART_InitStruct->UART_TxFIFOLevel;
+   \   000000CC   A08E               LDRH     R0,[R4, #+52]
+   \   000000CE   A97C               LDRB     R1,[R5, #+18]
+   \   000000D0   0143               ORRS     R1,R1,R0
+   \   000000D2   A186               STRH     R1,[R4, #+52]
+   \   000000D4   03E0               B        ??UART_Init_4
+    162            }
+    163            else
+    164            {
+    165              /* Disable the FIFOs */
+    166              UARTx->LCR &= UART_FIFO_Disable;
+   \                     ??UART_Init_3:
+   \   000000D6   A08D               LDRH     R0,[R4, #+44]
+   \   000000D8   0749               LDR      R1,??UART_Init_0+0x10  ;; 0xffef
+   \   000000DA   0140               ANDS     R1,R1,R0
+   \   000000DC   A185               STRH     R1,[R4, #+44]
+    167            }
+    168          }
+   \                     ??UART_Init_4:
+   \   000000DE   07B0               ADD      SP,SP,#+28
+   \   000000E0   F0BC               POP      {R4-R7}
+   \   000000E2   01BC               POP      {R0}
+   \   000000E4   0047               BX       R0               ;; return
+   \   000000E6   C046               Nop      
+   \                     ??UART_Init_0:
+   \   000000E8   9FFF0000           DC32     0xff9f
+   \   000000EC   79FF0000           DC32     0xff79
+   \   000000F0   FFFC0000           DC32     0xfcff
+   \   000000F4   C0FF0000           DC32     0xffc0
+   \   000000F8   EFFF0000           DC32     0xffef
+    169          
+    170          /*******************************************************************************
+    171          * Function Name  : UART_StructInit
+    172          * Description    : Fills each UART_InitStruct member with its default value.
+    173          * Input          : UART_InitStruct: pointer to a UART_InitTypeDef structure which
+    174          *                  will be initialized.
+    175          * Output         : None
+    176          * Return         : None
+    177          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    178          void UART_StructInit(UART_InitTypeDef* UART_InitStruct)
+    179          {
+    180            /* UART_InitStruct members default value */
+    181            UART_InitStruct->UART_WordLength = UART_WordLength_8D;
+   \                     UART_StructInit:
+   \   00000000   6021               MOVS     R1,#+96
+   \   00000002   0180               STRH     R1,[R0, #+0]
+    182            UART_InitStruct->UART_StopBits = UART_StopBits_1;
+   \   00000004   ....               LDR      R1,??DataTable6  ;; 0xfff7
+   \   00000006   4180               STRH     R1,[R0, #+2]
+    183            UART_InitStruct->UART_Parity = UART_Parity_Odd ;
+   \   00000008   0221               MOVS     R1,#+2
+   \   0000000A   8180               STRH     R1,[R0, #+4]
+    184            UART_InitStruct->UART_BaudRate = 9600;
+   \   0000000C   9621               MOVS     R1,#+150
+   \   0000000E   8901               LSLS     R1,R1,#+6        ;; #+9600
+   \   00000010   8160               STR      R1,[R0, #+8]
+    185            UART_InitStruct->UART_HardwareFlowControl = UART_HardwareFlowControl_None;
+   \   00000012   0021               MOVS     R1,#+0
+   \   00000014   8181               STRH     R1,[R0, #+12]
+    186            UART_InitStruct->UART_Mode = UART_Mode_Tx_Rx;
+   \   00000016   C021               MOVS     R1,#+192
+   \   00000018   8900               LSLS     R1,R1,#+2        ;; #+768
+   \   0000001A   C181               STRH     R1,[R0, #+14]
+    187            UART_InitStruct->UART_FIFO = UART_FIFO_Enable;
+   \   0000001C   1021               MOVS     R1,#+16
+   \   0000001E   0182               STRH     R1,[R0, #+16]
+    188            UART_InitStruct->UART_TxFIFOLevel = UART_FIFOLevel_1_2;
+   \   00000020   0221               MOVS     R1,#+2
+   \   00000022   8174               STRB     R1,[R0, #+18]
+    189            UART_InitStruct->UART_RxFIFOLevel = UART_FIFOLevel_1_2;
+   \   00000024   0221               MOVS     R1,#+2
+   \   00000026   C174               STRB     R1,[R0, #+19]
+    190          }
+   \   00000028   7047               BX       LR               ;; return
+    191          
+    192          /*******************************************************************************
+    193          * Function Name  : UART_Cmd
+    194          * Description    : Enables or disables the specified UART peripheral.
+    195          * Input          : - UARTx: where x can be 0,1 or 2 to select the UART peripheral
+    196          *                  - NewState: new state of the UARTx peripheral.
+    197          *                    This parameter can be: ENABLE or DISABLE.
+    198          * Output         : None
+    199          * Return         : None
+    200          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    201          void UART_Cmd(UART_TypeDef* UARTx, FunctionalState NewState)
+    202          {
+   \                     UART_Cmd:
+   \   00000000   01B5               PUSH     {R0,LR}
+    203            if (NewState == ENABLE)
+   \   00000002   0906               LSLS     R1,R1,#+24       ;; ZeroExtS R1,R1,#+24,#+24
+   \   00000004   090E               LSRS     R1,R1,#+24
+   \   00000006   0129               CMP      R1,#+1
+   \   00000008   04D1               BNE      ??UART_Cmd_0
+    204            {
+    205              /* Enable the selected UART by setting the UARTEN bit in the CR register */
+    206              UARTx->CR |= UART_Enable_Mask;
+   \   0000000A   028E               LDRH     R2,[R0, #+48]
+   \   0000000C   0123               MOVS     R3,#+1
+   \   0000000E   1343               ORRS     R3,R3,R2
+   \   00000010   0386               STRH     R3,[R0, #+48]
+   \   00000012   03E0               B        ??UART_Cmd_1
+    207            }
+    208            else
+    209            {
+    210              /* Disable the selected UART by clearing the UARTEN bit in the CR register */
+    211              UARTx->CR &= UART_Disable_Mask;
+   \                     ??UART_Cmd_0:
+   \   00000014   028E               LDRH     R2,[R0, #+48]
+   \   00000016   ....               LDR      R3,??DataTable21  ;; 0xfffe
+   \   00000018   1340               ANDS     R3,R3,R2
+   \   0000001A   0386               STRH     R3,[R0, #+48]
+    212            }
+    213          }
+   \                     ??UART_Cmd_1:
+   \   0000001C   08BC               POP      {R3}
+   \   0000001E   01BC               POP      {R0}
+   \   00000020   0047               BX       R0               ;; return
+    214          
+    215          /*******************************************************************************
+    216          * Function Name  : UART_ITConfig
+    217          * Description    : Enables or disables the specified UART interrupts.
+    218          * Input          : - UARTx: where x can be 0,1 or 2 to select the UART peripheral
+    219          *                  - UART_IT: specifies the UART interrupts sources to be 
+    220          *                    enabled or disabled. This parameter can be any combination 
+    221          *                    of the following values:                   
+    222          *                       - UART_IT_OverrunError: Overrun Error interrupt
+    223          *                       - UART_IT_BreakError: Break Error interrupt
+    224          *                       - UART_IT_ParityError: Parity Error interrupt
+    225          *                       - UART_IT_FrameError: Frame Error interrupt
+    226          *                       - UART_IT_ReceiveTimeOut: Receive Time Out interrupt
+    227          *                       - UART_IT_Transmit: Transmit interrupt
+    228          *                       - UART_IT_Receive: Receive interrupt
+    229          *                       - UART_IT_CTS: CTS interrupt 
+    230          *                  - NewState: new state of the UARTx peripheral.
+    231          *                  This parameter can be: ENABLE or DISABLE.
+    232          * Output         : None
+    233          * Return         : None
+    234          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    235          void UART_ITConfig(UART_TypeDef* UARTx, u16 UART_IT, FunctionalState NewState)
+    236          {
+   \                     UART_ITConfig:
+   \   00000000   01B5               PUSH     {R0,LR}
+    237            if(NewState == ENABLE)
+   \   00000002   1206               LSLS     R2,R2,#+24       ;; ZeroExtS R2,R2,#+24,#+24
+   \   00000004   120E               LSRS     R2,R2,#+24
+   \   00000006   012A               CMP      R2,#+1
+   \   00000008   03D1               BNE      ??UART_ITConfig_0
+    238            {
+    239              /* Enables the selected interrupts */
+    240              UARTx->IMSC |= UART_IT;
+   \   0000000A   038F               LDRH     R3,[R0, #+56]
+   \   0000000C   0B43               ORRS     R3,R3,R1
+   \   0000000E   0387               STRH     R3,[R0, #+56]
+   \   00000010   02E0               B        ??UART_ITConfig_1
+    241            }
+    242            else
+    243            {
+    244              /* Disables the selected interrupts */
+    245              UARTx->IMSC &= ~UART_IT;
+   \                     ??UART_ITConfig_0:
+   \   00000012   038F               LDRH     R3,[R0, #+56]
+   \   00000014   8B43               BICS     R3,R3,R1
+   \   00000016   0387               STRH     R3,[R0, #+56]
+    246            }
+    247          }
+   \                     ??UART_ITConfig_1:
+   \   00000018   08BC               POP      {R3}
+   \   0000001A   01BC               POP      {R0}
+   \   0000001C   0047               BX       R0               ;; return
+    248          
+    249          /*******************************************************************************
+    250          * Function Name  : UART_DMAConfig
+    251          * Description    : Configures the UART0 DMA interface.
+    252          * Input          : - UART0_DMAtransfer : specifies the configuration of DMA request.
+    253          *                    This parameter can be:
+    254          *                         - UART0_DMATransfer_Single: Single DMA transfer
+    255          *                         - UART0_DMATransfer_Burst: Burst DMA transfer
+    256          *                  - UART0_DMAOnError: specifies the DMA on error request.
+    257          *                    This parameter can be:
+    258          *                         - UART0_DMAOnError_Enable: DMA receive request enabled
+    259          *                           when the UART error interrupt is asserted.
+    260          *                         - UART0_DMAOnError_Disable: DMA receive request disabled
+    261          *                           when the UART error interrupt is asserted.
+    262          * Output         : None
+    263          * Return         : None
+    264          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    265          void UART_DMAConfig(u16 UART0_DMATransfer, u16 UART0_DMAOnError)
+    266          {
+   \                     UART_DMAConfig:
+   \   00000000   01B5               PUSH     {R0,LR}
+    267            if(UART0_DMATransfer == UART0_DMATransfer_Single)
+   \   00000002   ....               LDR      R2,??DataTable6  ;; 0xfff7
+   \   00000004   0004               LSLS     R0,R0,#+16       ;; ZeroExtS R0,R0,#+16,#+16
+   \   00000006   000C               LSRS     R0,R0,#+16
+   \   00000008   9042               CMP      R0,R2
+   \   0000000A   06D1               BNE      ??UART_DMAConfig_0
+    268            {
+    269              /* Configure the DMA request from the UART0 as single transfer */
+    270              UART0->DMACR &= UART0_DMATransfer_Single;
+   \   0000000C   ....               LDR      R2,??DataTable22  ;; 0xffffd448
+   \   0000000E   1288               LDRH     R2,[R2, #+0]
+   \   00000010   ....               LDR      R3,??DataTable6  ;; 0xfff7
+   \   00000012   1340               ANDS     R3,R3,R2
+   \   00000014   ....               LDR      R2,??DataTable22  ;; 0xffffd448
+   \   00000016   1380               STRH     R3,[R2, #+0]
+   \   00000018   05E0               B        ??UART_DMAConfig_1
+    271            }
+    272            else
+    273            {
+    274              UART0->DMACR |= UART0_DMATransfer_Burst;
+   \                     ??UART_DMAConfig_0:
+   \   0000001A   ....               LDR      R2,??DataTable22  ;; 0xffffd448
+   \   0000001C   1288               LDRH     R2,[R2, #+0]
+   \   0000001E   0823               MOVS     R3,#+8
+   \   00000020   1343               ORRS     R3,R3,R2
+   \   00000022   ....               LDR      R2,??DataTable22  ;; 0xffffd448
+   \   00000024   1380               STRH     R3,[R2, #+0]
+    275            }
+    276            
+    277            if(UART0_DMAOnError == UART0_DMAOnError_Enable)
+   \                     ??UART_DMAConfig_1:
+   \   00000026   0A4A               LDR      R2,??UART_DMAConfig_2  ;; 0xfffb
+   \   00000028   0904               LSLS     R1,R1,#+16       ;; ZeroExtS R1,R1,#+16,#+16
+   \   0000002A   090C               LSRS     R1,R1,#+16
+   \   0000002C   9142               CMP      R1,R2
+   \   0000002E   06D1               BNE      ??UART_DMAConfig_3
+    278            {
+    279              UART0->DMACR &= UART0_DMAOnError_Enable;
+   \   00000030   ....               LDR      R2,??DataTable22  ;; 0xffffd448
+   \   00000032   1288               LDRH     R2,[R2, #+0]
+   \   00000034   064B               LDR      R3,??UART_DMAConfig_2  ;; 0xfffb
+   \   00000036   1340               ANDS     R3,R3,R2
+   \   00000038   ....               LDR      R2,??DataTable22  ;; 0xffffd448
+   \   0000003A   1380               STRH     R3,[R2, #+0]
+   \   0000003C   05E0               B        ??UART_DMAConfig_4
+    280            }
+    281            else
+    282            {
+    283              UART0->DMACR |= UART0_DMAOnError_Disable;
+   \                     ??UART_DMAConfig_3:
+   \   0000003E   ....               LDR      R2,??DataTable22  ;; 0xffffd448
+   \   00000040   1288               LDRH     R2,[R2, #+0]
+   \   00000042   0423               MOVS     R3,#+4
+   \   00000044   1343               ORRS     R3,R3,R2
+   \   00000046   ....               LDR      R2,??DataTable22  ;; 0xffffd448
+   \   00000048   1380               STRH     R3,[R2, #+0]
+    284            }
+    285          }
+   \                     ??UART_DMAConfig_4:
+   \   0000004A   08BC               POP      {R3}
+   \   0000004C   01BC               POP      {R0}
+   \   0000004E   0047               BX       R0               ;; return
+   \                     ??UART_DMAConfig_2:
+   \   00000050   FBFF0000           DC32     0xfffb
+    286          
+    287          /*******************************************************************************
+    288          * Function Name  : UART_DMACmd
+    289          * Description    : Enables or disables the UART0’s DMA interface.
+    290          * Input          : - UART0_DMAReq: specifies the DMA request.
+    291          *                    This parameter can be:
+    292          *                     - UART0_DMAReq_Tx: Transmit DMA request
+    293          *                     - UART0_DMAReq_Rx: Receive DMA request
+    294          *                  - NewState: new state of the UART0’s DMA request.
+    295          *                    This parameter can be: ENABLE or DISABLE.
+    296          * Output         : None
+    297          * Return         : None
+    298          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    299          void UART_DMACmd(u16 UART0_DMAReq, FunctionalState NewState)
+    300          {
+   \                     UART_DMACmd:
+   \   00000000   01B5               PUSH     {R0,LR}
+    301            if(UART0_DMAReq == UART0_DMAReq_Tx)
+   \   00000002   0004               LSLS     R0,R0,#+16       ;; ZeroExtS R0,R0,#+16,#+16
+   \   00000004   000C               LSRS     R0,R0,#+16
+   \   00000006   0228               CMP      R0,#+2
+   \   00000008   11D1               BNE      ??UART_DMACmd_0
+    302            {
+    303              if(NewState == ENABLE)
+   \   0000000A   0906               LSLS     R1,R1,#+24       ;; ZeroExtS R1,R1,#+24,#+24
+   \   0000000C   090E               LSRS     R1,R1,#+24
+   \   0000000E   0129               CMP      R1,#+1
+   \   00000010   06D1               BNE      ??UART_DMACmd_1
+    304              {
+    305                UART0->DMACR |=  UART0_DMAReq_Tx;
+   \   00000012   ....               LDR      R2,??DataTable22  ;; 0xffffd448
+   \   00000014   1288               LDRH     R2,[R2, #+0]
+   \   00000016   0223               MOVS     R3,#+2
+   \   00000018   1343               ORRS     R3,R3,R2
+   \   0000001A   ....               LDR      R2,??DataTable22  ;; 0xffffd448
+   \   0000001C   1380               STRH     R3,[R2, #+0]
+   \   0000001E   17E0               B        ??UART_DMACmd_2
+    306              }
+    307              else
+    308              {
+    309                UART0->DMACR &= ~UART0_DMAReq_Tx;
+   \                     ??UART_DMACmd_1:
+   \   00000020   ....               LDR      R2,??DataTable22  ;; 0xffffd448
+   \   00000022   1288               LDRH     R2,[R2, #+0]
+   \   00000024   0C4B               LDR      R3,??UART_DMACmd_3  ;; 0xfffd
+   \   00000026   1340               ANDS     R3,R3,R2
+   \   00000028   ....               LDR      R2,??DataTable22  ;; 0xffffd448
+   \   0000002A   1380               STRH     R3,[R2, #+0]
+   \   0000002C   10E0               B        ??UART_DMACmd_2
+    310              }
+    311            }
+    312            else
+    313            {
+    314              if(NewState == ENABLE)
+   \                     ??UART_DMACmd_0:
+   \   0000002E   0906               LSLS     R1,R1,#+24       ;; ZeroExtS R1,R1,#+24,#+24
+   \   00000030   090E               LSRS     R1,R1,#+24
+   \   00000032   0129               CMP      R1,#+1
+   \   00000034   06D1               BNE      ??UART_DMACmd_4
+    315              {
+    316                UART0->DMACR |=  UART0_DMAReq_Rx;
+   \   00000036   ....               LDR      R2,??DataTable22  ;; 0xffffd448
+   \   00000038   1288               LDRH     R2,[R2, #+0]
+   \   0000003A   0123               MOVS     R3,#+1
+   \   0000003C   1343               ORRS     R3,R3,R2
+   \   0000003E   ....               LDR      R2,??DataTable22  ;; 0xffffd448
+   \   00000040   1380               STRH     R3,[R2, #+0]
+   \   00000042   05E0               B        ??UART_DMACmd_2
+    317              }
+    318              else
+    319              {
+    320                UART0->DMACR &= ~UART0_DMAReq_Rx;
+   \                     ??UART_DMACmd_4:
+   \   00000044   ....               LDR      R2,??DataTable22  ;; 0xffffd448
+   \   00000046   1288               LDRH     R2,[R2, #+0]
+   \   00000048   ....               LDR      R3,??DataTable21  ;; 0xfffe
+   \   0000004A   1340               ANDS     R3,R3,R2
+   \   0000004C   ....               LDR      R2,??DataTable22  ;; 0xffffd448
+   \   0000004E   1380               STRH     R3,[R2, #+0]
+    321              }
+    322            }
+    323          }
+   \                     ??UART_DMACmd_2:
+   \   00000050   08BC               POP      {R3}
+   \   00000052   01BC               POP      {R0}
+   \   00000054   0047               BX       R0               ;; return
+   \   00000056   C046               Nop      
+   \                     ??UART_DMACmd_3:
+   \   00000058   FDFF0000           DC32     0xfffd
+    324          
+    325          /*******************************************************************************
+    326          * Function Name  : UART_LoopBackConfig
+    327          * Description    : Enables or disables LoopBack mode in UARTx.
+    328          * Input          : - UARTx: where x can be 0,1 or 2 to select the UART peripheral
+    329          *                  - NewState: new state of the UARTx’s LoopBack mode.
+    330          *                    This parameter can be: ENABLE or DISABLE.
+    331          * Output         : None
+    332          * Return         : None
+    333          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    334          void UART_LoopBackConfig(UART_TypeDef* UARTx, FunctionalState NewState)
+    335          {
+   \                     UART_LoopBackConfig:
+   \   00000000   01B5               PUSH     {R0,LR}
+    336            if (NewState == ENABLE)
+   \   00000002   0906               LSLS     R1,R1,#+24       ;; ZeroExtS R1,R1,#+24,#+24
+   \   00000004   090E               LSRS     R1,R1,#+24
+   \   00000006   0129               CMP      R1,#+1
+   \   00000008   04D1               BNE      ??UART_LoopBackConfig_0
+    337            {
+    338              /* Enable the LoopBack mode of the specified UART */
+    339              UARTx->CR |= UART_LoopBack_Enable_Mask;
+   \   0000000A   028E               LDRH     R2,[R0, #+48]
+   \   0000000C   8023               MOVS     R3,#+128
+   \   0000000E   1343               ORRS     R3,R3,R2
+   \   00000010   0386               STRH     R3,[R0, #+48]
+   \   00000012   03E0               B        ??UART_LoopBackConfig_1
+    340            }
+    341            else
+    342            {
+    343              /* Disable the LoopBack mode of the specified UART */
+    344              UARTx->CR &= UART_LoopBack_Disable_Mask;
+   \                     ??UART_LoopBackConfig_0:
+   \   00000014   028E               LDRH     R2,[R0, #+48]
+   \   00000016   034B               LDR      R3,??UART_LoopBackConfig_2  ;; 0xff7f
+   \   00000018   1340               ANDS     R3,R3,R2
+   \   0000001A   0386               STRH     R3,[R0, #+48]
+    345            }
+    346          }
+   \                     ??UART_LoopBackConfig_1:
+   \   0000001C   08BC               POP      {R3}
+   \   0000001E   01BC               POP      {R0}
+   \   00000020   0047               BX       R0               ;; return
+   \   00000022   C046               Nop      
+   \                     ??UART_LoopBackConfig_2:
+   \   00000024   7FFF0000           DC32     0xff7f
+    347          
+    348          /*******************************************************************************
+    349          * Function Name  : UART_LINConfig
+    350          * Description    : Sets the LIN break length.
+    351          * Input          : - UARTx: where x can be 0,1 or 2 to select the UART peripheral.
+    352          *                  - UART_LINBreakLength: Break length value.
+    353          *                    This parameter can be:
+    354          *                         - UART_LINBreakLength_10: 10 low bits
+    355          *                         - UART_LINBreakLength_11: 11 low bits
+    356          *                         - UART_LINBreakLength_12: 12 low bits
+    357          *                         - UART_LINBreakLength_13: 13 low bits
+    358          *                         - UART_LINBreakLength_14: 14 low bits
+    359          *                         - UART_LINBreakLength_15: 15 low bits
+    360          *                         - UART_LINBreakLength_16: 16 low bits
+    361          *                         - UART_LINBreakLength_17: 17 low bits
+    362          *                         - UART_LINBreakLength_18: 18 low bits
+    363          *                         - UART_LINBreakLength_19: 19 low bits
+    364          *                         - UART_LINBreakLength_20: 20 low bits
+    365          * Output         : None
+    366          * Return         : None
+    367          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    368          void UART_LINConfig(UART_TypeDef* UARTx, u16 UART_LINBreakLength)
+    369          {
+    370            /* Clear LBKLEN bits */
+    371            UARTx->LCR &= UART_LINBreakLength_Mask;
+   \                     UART_LINConfig:
+   \   00000000   828D               LDRH     R2,[R0, #+44]
+   \   00000002   034B               LDR      R3,??UART_LINConfig_0  ;; 0xe1ff
+   \   00000004   1340               ANDS     R3,R3,R2
+   \   00000006   8385               STRH     R3,[R0, #+44]
+    372          
+    373            /* Set LBKLEN bits according to UART_LINBreakLength value */
+    374            UARTx->LCR |= UART_LINBreakLength;
+   \   00000008   828D               LDRH     R2,[R0, #+44]
+   \   0000000A   0A43               ORRS     R2,R2,R1
+   \   0000000C   8285               STRH     R2,[R0, #+44]
+    375          }
+   \   0000000E   7047               BX       LR               ;; return
+   \                     ??UART_LINConfig_0:
+   \   00000010   FFE10000           DC32     0xe1ff
+    376          
+    377          /*******************************************************************************
+    378          * Function Name  : UART_LINCmd
+    379          * Description    : Enables or disables LIN master mode in UARTx.
+    380          * Input          : - UARTx: where x can be 0,1 or 2 to select the UART peripheral
+    381          *                  - NewState: new state of the UARTx’s LIN interface. 
+    382          *                    This parameter can be: ENABLE or DISABLE.
+    383          * Output         : None
+    384          * Return         : None
+    385          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    386          void UART_LINCmd(UART_TypeDef* UARTx, FunctionalState NewState)
+    387          {
+   \                     UART_LINCmd:
+   \   00000000   01B5               PUSH     {R0,LR}
+    388            if(NewState == ENABLE)
+   \   00000002   0906               LSLS     R1,R1,#+24       ;; ZeroExtS R1,R1,#+24,#+24
+   \   00000004   090E               LSRS     R1,R1,#+24
+   \   00000006   0129               CMP      R1,#+1
+   \   00000008   05D1               BNE      ??UART_LINCmd_0
+    389            {
+    390              /* Enable the LIN mode of the specified UART */
+    391              UARTx->LCR |= UART_LIN_Enable_Mask;
+   \   0000000A   828D               LDRH     R2,[R0, #+44]
+   \   0000000C   8023               MOVS     R3,#+128
+   \   0000000E   5B00               LSLS     R3,R3,#+1        ;; #+256
+   \   00000010   1343               ORRS     R3,R3,R2
+   \   00000012   8385               STRH     R3,[R0, #+44]
+   \   00000014   03E0               B        ??UART_LINCmd_1
+    392            }
+    393            else
+    394            {
+    395              /* Disable the LIN mode of the specified UART */
+    396              UARTx->LCR &= UART_LIN_Disable_Mask;
+   \                     ??UART_LINCmd_0:
+   \   00000016   828D               LDRH     R2,[R0, #+44]
+   \   00000018   024B               LDR      R3,??UART_LINCmd_2  ;; 0xfeff
+   \   0000001A   1340               ANDS     R3,R3,R2
+   \   0000001C   8385               STRH     R3,[R0, #+44]
+    397            }
+    398          }
+   \                     ??UART_LINCmd_1:
+   \   0000001E   08BC               POP      {R3}
+   \   00000020   01BC               POP      {R0}
+   \   00000022   0047               BX       R0               ;; return
+   \                     ??UART_LINCmd_2:
+   \   00000024   FFFE0000           DC32     0xfeff
+    399          
+    400          /*******************************************************************************
+    401          * Function Name  : UART_SendData
+    402          * Description    : Transmits a signle Byte of data through the UARTx peripheral.
+    403          * Input          : - UARTx: where x can be 0,1 or 2 to select the UART peripheral.
+    404          *                  - Data: the byte to transmit
+    405          * Output         : None
+    406          * Return         : None
+    407          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    408          void UART_SendData(UART_TypeDef* UARTx, u8 Data)
+    409          {
+    410            /* Transmit one byte */
+    411            UARTx->DR = Data;
+   \                     UART_SendData:
+   \   00000000   0906               LSLS     R1,R1,#+24       ;; ZeroExtS R1,R1,#+24,#+24
+   \   00000002   090E               LSRS     R1,R1,#+24
+   \   00000004   0180               STRH     R1,[R0, #+0]
+    412          }
+   \   00000006   7047               BX       LR               ;; return
+    413          
+    414          /*******************************************************************************
+    415          * Function Name  : UART_ReceiveData
+    416          * Description    : Returns the most recent received Byte by the UARTx peripheral.
+    417          * Input          : UARTx: where x can be 0,1 or 2 to select the UART peripheral.
+    418          * Output         : None
+    419          * Return         : The received data
+    420          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    421          u8 UART_ReceiveData(UART_TypeDef* UARTx)
+    422          {
+    423            /* Receive one byte */
+    424            return ((u8)UARTx->DR);
+   \                     UART_ReceiveData:
+   \   00000000   0088               LDRH     R0,[R0, #+0]
+   \   00000002   0006               LSLS     R0,R0,#+24       ;; ZeroExtS R0,R0,#+24,#+24
+   \   00000004   000E               LSRS     R0,R0,#+24
+   \   00000006   7047               BX       LR               ;; return
+    425          }
+    426          
+    427          /*******************************************************************************
+    428          * Function Name  : UART_SendBreak
+    429          * Description    : Transmits break characters.
+    430          * Input          : UARTx: where x can be 0,1 or 2 to select the UART peripheral.
+    431          * Output         : None
+    432          * Return         : None
+    433          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    434          void UART_SendBreak(UART_TypeDef* UARTx)
+    435          {
+    436            /* Send break characters */
+    437            UARTx->BKR |= UART_BreakChar_Mask;
+   \                     UART_SendBreak:
+   \   00000000   818B               LDRH     R1,[R0, #+28]
+   \   00000002   0122               MOVS     R2,#+1
+   \   00000004   0A43               ORRS     R2,R2,R1
+   \   00000006   8283               STRH     R2,[R0, #+28]
+    438          }
+   \   00000008   7047               BX       LR               ;; return
+    439          
+    440          /*******************************************************************************
+    441          * Function Name  : UART_RTSConfig
+    442          * Description    : Sets or Resets the RTS signal
+    443          * Input          : - UARTx: where x can be 0,1 or 2 to select the UART peripheral.
+    444          *                  - RTSState: new state of the RTS signal.
+    445          *                    This parameter can be: RTSSET or RTSRESET
+    446          * Output         : None
+    447          * Return         : None
+    448          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    449          void UART_RTSConfig(UART_TypeDef* UARTx, UART_RTSTypeDef RTSState)
+    450          {
+   \                     UART_RTSConfig:
+   \   00000000   01B5               PUSH     {R0,LR}
+    451            if(RTSState == RTSRESET)
+   \   00000002   0906               LSLS     R1,R1,#+24       ;; ZeroExtS R1,R1,#+24,#+24
+   \   00000004   090E               LSRS     R1,R1,#+24
+   \   00000006   0129               CMP      R1,#+1
+   \   00000008   05D1               BNE      ??UART_RTSConfig_0
+    452            {
+    453              UARTx->CR |= UART_RTSRESET_Mask;
+   \   0000000A   028E               LDRH     R2,[R0, #+48]
+   \   0000000C   8023               MOVS     R3,#+128
+   \   0000000E   1B01               LSLS     R3,R3,#+4        ;; #+2048
+   \   00000010   1343               ORRS     R3,R3,R2
+   \   00000012   0386               STRH     R3,[R0, #+48]
+   \   00000014   07E0               B        ??UART_RTSConfig_1
+    454            }
+    455            else if(RTSState == RTSSET)
+   \                     ??UART_RTSConfig_0:
+   \   00000016   0906               LSLS     R1,R1,#+24       ;; ZeroExtS R1,R1,#+24,#+24
+   \   00000018   090E               LSRS     R1,R1,#+24
+   \   0000001A   0229               CMP      R1,#+2
+   \   0000001C   03D1               BNE      ??UART_RTSConfig_1
+    456            {
+    457              UARTx->CR &= UART_RTSSET_Mask;
+   \   0000001E   028E               LDRH     R2,[R0, #+48]
+   \   00000020   024B               LDR      R3,??UART_RTSConfig_2  ;; 0xf7ff
+   \   00000022   1340               ANDS     R3,R3,R2
+   \   00000024   0386               STRH     R3,[R0, #+48]
+    458            }
+    459          }
+   \                     ??UART_RTSConfig_1:
+   \   00000026   08BC               POP      {R3}
+   \   00000028   01BC               POP      {R0}
+   \   0000002A   0047               BX       R0               ;; return
+   \                     ??UART_RTSConfig_2:
+   \   0000002C   FFF70000           DC32     0xf7ff
+    460          
+    461          /*******************************************************************************
+    462          * Function Name  : UART_GetFlagStatus
+    463          * Description    : Checks whether the specified UART flag is set or not.
+    464          * Input          : - UARTx: where x can be 0,1 or 2 to select the UART peripheral
+    465          *                  - UART_FLAG: specifies the flag to check.
+    466          *                    This parameter can be one of the following values:
+    467          *                     - UART_FLAG_OverrunError: Overrun error flag
+    468          *                     - UART_FLAG_Break: break error flag
+    469          *                     - UART_FLAG_ParityError: parity error flag
+    470          *                     - UART_FLAG_FrameError: frame error flag
+    471          *                     - UART_FLAG_TxFIFOEmpty: Transmit FIFO Empty flag
+    472          *                     - UART_FLAG_RxFIFOFull: Receive FIFO Full flag
+    473          *                     - UART_FLAG_TxFIFOFull: Transmit FIFO Full flag
+    474          *                     - UART_FLAG_RxFIFOEmpty: Receive FIFO Empty flag
+    475          *                     - UART_FLAG_Busy: Busy flag
+    476          *                     - UART_FLAG_CTS: CTS flag
+    477          *                     - UART_RawIT_OverrunError: Overrun Error interrupt flag
+    478          *                     - UART_RawIT_BreakError: Break Error interrupt flag
+    479          *                     - UART_RawIT_ParityError: Parity Error interrupt flag
+    480          *                     - UART_RawIT_FrameError: Frame Error interrupt flag
+    481          *                     - UART_RawIT_ReceiveTimeOut: ReceiveTimeOut interrupt flag
+    482          *                     - UART_RawIT_Transmit: Transmit interrupt flag
+    483          *                     - UART_RawIT_Receive: Receive interrupt flag
+    484          *                     - UART_RawIT_CTS: CTS interrupt flag
+    485          * Output         : None
+    486          * Return         : The new state of UART_FLAG (SET or RESET).
+    487          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    488          FlagStatus UART_GetFlagStatus(UART_TypeDef* UARTx, u16 UART_FLAG)
+    489          {
+   \                     UART_GetFlagStatus:
+   \   00000000   31B5               PUSH     {R0,R4,R5,LR}
+   \   00000002   0200               MOVS     R2,R0
+    490            u32 UARTReg = 0, FlagPos = 0;
+   \   00000004   0020               MOVS     R0,#+0
+   \   00000006   0300               MOVS     R3,R0
+   \   00000008   0020               MOVS     R0,#+0
+   \   0000000A   0400               MOVS     R4,R0
+    491            u32 StatusReg = 0;
+   \   0000000C   0020               MOVS     R0,#+0
+   \   0000000E   0500               MOVS     R5,R0
+    492          
+    493            /* Get the UART register index */
+    494            UARTReg = UART_FLAG >> 5;
+   \   00000010   0800               MOVS     R0,R1
+   \   00000012   0004               LSLS     R0,R0,#+16       ;; ZeroExtS R0,R0,#+16,#+16
+   \   00000014   000C               LSRS     R0,R0,#+16
+   \   00000016   4009               LSRS     R0,R0,#+5
+   \   00000018   0004               LSLS     R0,R0,#+16       ;; ZeroExtS R0,R0,#+16,#+16
+   \   0000001A   000C               LSRS     R0,R0,#+16
+   \   0000001C   0300               MOVS     R3,R0
+    495          
+    496            /* Get the flag position */
+    497            FlagPos = UART_FLAG & UART_FLAG_Mask;
+   \   0000001E   0904               LSLS     R1,R1,#+16       ;; ZeroExtS R1,R1,#+16,#+16
+   \   00000020   090C               LSRS     R1,R1,#+16
+   \   00000022   C806               LSLS     R0,R1,#+27       ;; ZeroExtS R0,R1,#+27,#+27
+   \   00000024   C00E               LSRS     R0,R0,#+27
+   \   00000026   0400               MOVS     R4,R0
+    498          
+    499            if(UARTReg == 1) /* The flag to check is in RSR register */
+   \   00000028   012B               CMP      R3,#+1
+   \   0000002A   02D1               BNE      ??UART_GetFlagStatus_0
+    500            {
+    501              StatusReg = UARTx->RSR;
+   \   0000002C   9088               LDRH     R0,[R2, #+4]
+   \   0000002E   0500               MOVS     R5,R0
+   \   00000030   08E0               B        ??UART_GetFlagStatus_1
+    502            }
+    503            else if (UARTReg == 2) /* The flag to check is in FR register */
+   \                     ??UART_GetFlagStatus_0:
+   \   00000032   022B               CMP      R3,#+2
+   \   00000034   02D1               BNE      ??UART_GetFlagStatus_2
+    504            {
+    505              StatusReg = UARTx->FR;
+   \   00000036   108B               LDRH     R0,[R2, #+24]
+   \   00000038   0500               MOVS     R5,R0
+   \   0000003A   03E0               B        ??UART_GetFlagStatus_1
+    506            }
+    507            else if(UARTReg == 3) /* The flag to check is in RIS register */
+   \                     ??UART_GetFlagStatus_2:
+   \   0000003C   032B               CMP      R3,#+3
+   \   0000003E   01D1               BNE      ??UART_GetFlagStatus_1
+    508            {
+    509              StatusReg = UARTx->RIS;
+   \   00000040   908F               LDRH     R0,[R2, #+60]
+   \   00000042   0500               MOVS     R5,R0
+    510            }
+    511          
+    512            if((StatusReg & (1 << FlagPos))!= RESET)
+   \                     ??UART_GetFlagStatus_1:
+   \   00000044   0120               MOVS     R0,#+1
+   \   00000046   A040               LSLS     R0,R0,R4
+   \   00000048   2840               ANDS     R0,R0,R5
+   \   0000004A   401E               SUBS     R0,R0,#+1
+   \   0000004C   8041               SBCS     R0,R0,R0
+   \   0000004E   C043               MVNS     R0,R0
+   \   00000050   C00F               LSRS     R0,R0,#+31
+   \   00000052   0006               LSLS     R0,R0,#+24       ;; ZeroExtS R0,R0,#+24,#+24
+   \   00000054   000E               LSRS     R0,R0,#+24
+    513            {
+    514              return SET;
+    515            }
+    516            else
+    517            {
+    518              return RESET;
+   \   00000056   38BC               POP      {R3-R5}
+   \   00000058   02BC               POP      {R1}
+   \   0000005A   0847               BX       R1               ;; return
+    519            }
+    520          }
+    521          
+    522          /*******************************************************************************
+    523          * Function Name  : UART_ClearFlag
+    524          * Description    : Clears the UARTx’s pending flags.
+    525          * Input          : - UARTx: where x can be 0,1or 2 to select the UART peripheral.
+    526          *                  - UART_FLAG: specifies the flag to clear.
+    527          *                    This parameter can be one of the following values:
+    528          *                       - UART_FLAG_OverrunError: Overrun error flag
+    529          *                       - UART_FLAG_Break: break error flag
+    530          *                       - UART_FLAG_ParityError: parity error flag
+    531          *                       - UART_FLAG_FrameError: frame error flag
+    532          * Output         : None
+    533          * Return         : None
+    534          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    535          void UART_ClearFlag(UART_TypeDef* UARTx, u16 UART_FLAG)
+    536          {
+   \                     UART_ClearFlag:
+   \   00000000   11B4               PUSH     {R0,R4}
+    537            u8 FlagPos = 0;
+   \   00000002   0023               MOVS     R3,#+0
+   \   00000004   1A00               MOVS     R2,R3
+    538          
+    539            /* Get the flag position */
+    540            FlagPos = UART_FLAG & UART_FLAG_Mask;
+   \   00000006   0B00               MOVS     R3,R1
+   \   00000008   DB06               LSLS     R3,R3,#+27       ;; ZeroExtS R3,R3,#+27,#+27
+   \   0000000A   DB0E               LSRS     R3,R3,#+27
+   \   0000000C   1A00               MOVS     R2,R3
+    541          
+    542            /* Clear the sepecified flag */
+    543            UARTx->RSR &= ~(1 << FlagPos);
+   \   0000000E   8388               LDRH     R3,[R0, #+4]
+   \   00000010   0124               MOVS     R4,#+1
+   \   00000012   9440               LSLS     R4,R4,R2
+   \   00000014   A343               BICS     R3,R3,R4
+   \   00000016   8380               STRH     R3,[R0, #+4]
+    544          }
+   \   00000018   18BC               POP      {R3,R4}
+   \   0000001A   7047               BX       LR               ;; return
+    545          
+    546          /*******************************************************************************
+    547          * Function Name  : UART_GetITStatus
+    548          * Description    : Checks whether the specified UART interrupt has occurred or not.
+    549          * Input          : - UARTx: where x can be 0,1or 2 to select the UART peripheral.
+    550          *                  - UART_IT: specifies the interrupt source to check.
+    551          *                    This parameter can be one of the following values:
+    552          *                       - UART_IT_OverrunError: Overrun Error interrupt 
+    553          *                       - UART_IT_BreakError: Break Error interrupt 
+    554          *                       - UART_IT_ParityError: Parity Error interrupt 
+    555          *                       - UART_IT_FrameError: Frame Error interrupt 
+    556          *                       - UART_IT_ReceiveTimeOut: Receive Time Out interrupt 
+    557          *                       - UART_IT_Transmit: Transmit interrupt 
+    558          *                       - UART_IT_Receive: Receive interrupt 
+    559          *                       - UART_IT_CTS: CTS interrupt 
+    560          * Output         : None
+    561          * Return         : The new state of UART_IT (SET or RESET).
+    562          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    563          ITStatus UART_GetITStatus(UART_TypeDef* UARTx, u16 UART_IT)
+    564          {
+   \                     UART_GetITStatus:
+   \   00000000   0200               MOVS     R2,R0
+    565            if((UARTx->MIS & UART_IT) != RESET)
+   \   00000002   4020               MOVS     R0,#+64
+   \   00000004   135A               LDRH     R3,[R2, R0]
+   \   00000006   0B40               ANDS     R3,R3,R1
+   \   00000008   1800               MOVS     R0,R3
+   \   0000000A   0004               LSLS     R0,R0,#+16       ;; ZeroExtS R0,R0,#+16,#+16
+   \   0000000C   000C               LSRS     R0,R0,#+16
+   \   0000000E   401E               SUBS     R0,R0,#+1
+   \   00000010   8041               SBCS     R0,R0,R0
+   \   00000012   C043               MVNS     R0,R0
+   \   00000014   C00F               LSRS     R0,R0,#+31
+   \   00000016   0006               LSLS     R0,R0,#+24       ;; ZeroExtS R0,R0,#+24,#+24
+   \   00000018   000E               LSRS     R0,R0,#+24
+    566            {
+    567              return SET;
+    568            }
+    569            else
+    570            {
+    571              return RESET;
+   \   0000001A   7047               BX       LR               ;; return
+    572            }
+    573          }
+    574          
+    575          /*******************************************************************************
+    576          * Function Name  : UART_ClearITPendingBit
+    577          * Description    : Clears the UARTx’s interrupt pending bits.
+    578          * Input          : - UARTx: where x can be 0,1or 2 to select the UART peripheral.
+    579          *                  - UART_IT: specifies the interrupt pending bit to clear.
+    580          *                    More than one interrupt can be cleared using the “|” operator.
+    581          *                    This parameter can be:
+    582          *                       - UART_IT_OverrunError: Overrun Error interrupt
+    583          *                       - UART_IT_BreakError: Break Error interrupt
+    584          *                       - UART_IT_ParityError: Parity Error interrupt
+    585          *                       - UART_IT_FrameError: Frame Error interrupt
+    586          *                       - UART_IT_ReceiveTimeOut: Receive Time Out interrupt
+    587          *                       - UART_IT_Transmit: Transmit interrupt
+    588          *                       - UART_IT_Receive: Receive interrupt
+    589          *                       - UART_IT_CTS: CTS interrupt
+    590          * Output         : None
+    591          * Return         : None
+    592          *******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    593          void UART_ClearITPendingBit(UART_TypeDef* UARTx, u16 UART_IT)
+    594          {
+    595            /* Clear the specified interrupt */
+    596            UARTx->ICR = UART_IT;
+   \                     UART_ClearITPendingBit:
+   \   00000000   4422               MOVS     R2,#+68
+   \   00000002   8152               STRH     R1,[R0, R2]
+    597          }
+   \   00000004   7047               BX       LR               ;; return
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable6:
+   \   00000000   F7FF0000           DC32     0xfff7
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable21:
+   \   00000000   FEFF0000           DC32     0xfffe
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable22:
+   \   00000000   48D4FFFF           DC32     0xffffd448
+    598          
+    599          /******************* (C) COPYRIGHT 2006 STMicroelectronics *****END OF FILE****/
+
+   Maximum stack usage in bytes:
+
+     Function               .cstack
+     --------               -------
+     UART_ClearFlag              8
+     UART_ClearITPendingBit      0
+     UART_Cmd                    8
+     UART_DMACmd                 8
+     UART_DMAConfig              8
+     UART_DeInit                 8
+     UART_GetFlagStatus         16
+     UART_GetITStatus            0
+     UART_ITConfig               8
+     UART_Init                  48
+     UART_LINCmd                 8
+     UART_LINConfig              0
+     UART_LoopBackConfig         8
+     UART_RTSConfig              8
+     UART_ReceiveData            0
+     UART_SendBreak              0
+     UART_SendData               0
+     UART_StructInit             0
+
+
+   Section sizes:
+
+     Function/Label         Bytes
+     --------------         -----
+     UART_DeInit             104
+     UART_Init               252
+     UART_StructInit          42
+     UART_Cmd                 34
+     UART_ITConfig            30
+     UART_DMAConfig           84
+     UART_DMACmd              92
+     UART_LoopBackConfig      40
+     UART_LINConfig           20
+     UART_LINCmd              40
+     UART_SendData             8
+     UART_ReceiveData          8
+     UART_SendBreak           10
+     UART_RTSConfig           48
+     UART_GetFlagStatus       92
+     UART_ClearFlag           28
+     UART_GetITStatus         28
+     UART_ClearITPendingBit    6
+     ??DataTable6              4
+     ??DataTable21             4
+     ??DataTable22             4
+
+ 
+ 978 bytes in section .text
+ 
+ 978 bytes of CODE memory
+
+Errors: none
+Warnings: none

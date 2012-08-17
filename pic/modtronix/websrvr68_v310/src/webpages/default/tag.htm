@@ -1,0 +1,47 @@
+<html>
+<head>
+<link href="mx.css" rel="stylesheet" type="text/css">
+<title>Tags</title>
+</head>
+
+<body>
+<p><div class=pgHdr>Tags</div>
+
+<p><a name=port></a><div class=pgSec>The following <b>Port Tags</b> are implemented:</div>
+The variable groups <b>a</b> to <b>j</b> can be used to display the value of any input pin
+or port on the PIC. The lower 3 bits of the 8 bit variable value is used to specify the
+desired bit of the given port (port is given by variable group). The upper 5 bits are used
+to specify how the ports value should be displayed. The following variable groups are defined:
+<table class=compactTable cellpadding=2 cellspacing=0 border=1>
+<tr width="100%"><td align="center"><i>Variable Group</i></td><td align="center"><i>Description</i></td></tr>
+<tr><td>a</td><td>PIC Port A </td></tr>
+<tr><td>b</td><td>PIC Port B </td></tr>
+<tr><td>c</td><td>PIC Port C </td></tr>
+<tr><td>d</td><td>PIC Port D </td></tr>
+<tr><td>e</td><td>PIC Port E </td></tr>
+<tr><td>f</td><td>PIC Port F </td></tr>
+<tr><td>g</td><td>PIC Port G </td></tr>
+<tr><td>h</td><td>Reserved for furture use </td></tr>
+<tr><td>j</td><td>Reserved for furture use </td></tr>
+</table>
+<p>The following variable values(in hex) are defined:
+<table class=compactTable cellspacing=0 cellpadding=2 border=1>
+<tr width="100%"><td align=center><i>Variable Value</i></td><td align=center><i>String returned by HTTP Server - displayed on web page</i></td></tr>
+<tr><td><code>00 - 07</code></td><td>'1' or '0' returned depending on PORT state</td></tr>
+<tr><td><code>10 - 17</code></td><td>"on" or "off" returned depending on PORT state</td></tr>
+<tr><td><code>20 - 27</code></td><td>"&lt;!--" returned if port is configured as input</td></tr>
+<tr><td><code>28 - 2f</code></td><td>"--&gt;" returned if port is configured as input</td></tr>
+<tr><td><code>30 - 37</code></td><td>"&lt;!--" returned if port is configured as output</td></tr>
+<tr><td><code>38 - 3f</code></td><td>"--&gt;" returned if port is configured as output</td></tr>
+<tr><td><code>40 - 47</code></td><td>"checked" returned if port is configured as output</td></tr>
+<tr><td><code>48 - 4f</code></td><td>"checked" returned if port is configured as input</td></tr>
+<tr><td><code>50 - 57</code></td><td>"0" returned if port is configured as output. "1" returned if port is configured as input.</td></tr>
+</table>
+<p>For variable values where bit 3 is set (values from x8 to xf):
+<br>x8=port bit 0, x9=port bit 1, xa=port bit 2, xb=port bit 3
+<br>xc=port bit 4, xd=port bit 5, xe=port bit 6, xf=port bit 8
+<br>For example, variable value 48 will return "checked" if port <b>bit 0</b> is configured as an input
+
+
+</body>
+</html>

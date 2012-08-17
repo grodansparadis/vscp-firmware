@@ -1,0 +1,94 @@
+/*********************************************************************
+ *
+ *            Ethernet ENC28J60 Driver Configuration File
+ *
+ *********************************************************************/
+
+#ifndef _ETHERNET_DEFINE_FILE
+#define _ETHERNET_DEFINE_FILE
+
+// peripheral library include, may be needed if the user is defining 
+// their own I/O lines and SPI configuration
+#include <plib.h>
+#include <freertos.h>
+#include <lwipopts.h>
+
+// The code has been created to allow for communication to the 
+// ENC28J60 by either SPI 1 or SPI 2.  The user needs to define 
+// which SPI port that will use.
+// SPI 1
+#define ETHERNET_USE_SPI_1
+// SPI 2
+//#define ETHERNET_USE_SPI_2
+
+// SPI Open Config setting (see spi.h)
+#define ETHERNET_SPI_OPEN_CFG_1		( PRI_PRESCAL_4_1 | SEC_PRESCAL_8_1 | MASTER_ENABLE_ON | SPI_CKE_ON | SPI_SMP_ON | SPI_MODE8_ON  )
+#define ETHERNET_SPI_OPEN_CFG_2		( SPI_ENABLE )
+
+// SPI baud rate.  Make sure that the baud rate is within ENC28J60 spec. (recommended < 20MHz)) and SPI.
+#define ETHERNET_IP_SPI_BRG      	( 10 )
+
+// The device is configured with a default IP and MAC address.
+// If the project uses a DHCP client, than the IP address will
+// be assigned by the DCHP server.  
+#define DEFAULT_IP_ADDR				"192.168.1.201"
+#define DEFAULT_IP_MASK				"255.255.255.0"
+#define DEFAULT_IP_GATEWAY			"192.168.1.255"
+#define DEFAULT_MAC_ADDR			"00-04-a3-00-00-02"
+
+
+// The clock frequency that your device is running at.  Please
+// refer to the configuration bit settings to figure the frequency out
+//#define CLOCK_FREQ					80000000
+
+
+// For a B1 errata for the ENC28J60, you will need to provide 
+// a transmitt collision timeout.  It is recommmended that it be
+// somewhere between .5 and .20 times the TCICKS_PER_SECOND.
+//  For more informaiton about this errata please refer to the
+// ENC28J60 errata documentation
+#define TX_COLLSION_TIMEOUT			((uint16_t)(configTICK_RATE_HZ * .15))
+
+
+// Chip Select (Pin 5)
+
+// Direction
+#define mSetupEthernetCSDirection()     {   mPORTESetBits( BIT_2 ); mPORTESetPinsDigitalOut( BIT_2 );  }
+
+// CS on, active low
+#define mSetEthernetCSOn()              {   taskENTER_CRITICAL();  mPORTEClearBits( BIT_2 ); }
+
+// CS off, active low
+#define mSetEthernetCSOff()             {   mPORTESetBits( BIT_2 );  taskEXIT_CRITICAL(); }
+
+
+
+// Reset (Pin 6)
+// Direction
+#define mSetupEthernetResetDirection()  {   mPORTESetBits( BIT_3 ); mPORTESetPinsDigitalOut( BIT_3 );  }
+
+// Reset on, active low
+#define mSetEthernetResetOn()           {   mPORTEClearBits( BIT_3 ); }
+
+// Reset off, active low
+#define mSetEthernetResetOff()          {   mPORTESetBits( BIT_3 );   }
+
+
+
+
+// Set up the direction for Wake on LAN
+#define mSetupEthernetWOLDirection()    {   mPORTBSetPinsDigitalIn( BIT_15 );  }
+
+
+
+
+// INT (pin 28)
+
+// Set up the direction for ethernet interrupt
+#define mSetupEthernetINTDirection()    {   mPORTASetPinsDigitalIn( BIT_14 );  }
+
+// Not used, but required for code
+#define mSetSPILatch()          {   mPORTBSetPinsDigitalOut(BIT_10 | BIT_11); mPORTBSetBits(BIT_10 | BIT_11);   }
+
+
+#endif

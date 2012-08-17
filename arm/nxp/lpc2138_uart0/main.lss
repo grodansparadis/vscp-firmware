@@ -1,0 +1,688 @@
+
+main.elf:     file format elf32-littlearm
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0000049c  00000000  00000000  00008000  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  40000000  0000049c  00010000  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          00000004  40000000  40000000  00010000  2**0
+                  ALLOC
+  3 .stack        00000400  40000100  40000100  00010000  2**0
+                  ALLOC
+  4 .comment      00000024  00000000  00000000  00010000  2**0
+                  CONTENTS, READONLY
+  5 .debug_aranges 00000060  00000000  00000000  00010028  2**3
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_pubnames 000000be  00000000  00000000  00010088  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_info   000002da  00000000  00000000  00010146  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_abbrev 000001a7  00000000  00000000  00010420  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_line   0000014c  00000000  00000000  000105c7  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_frame  000000f0  00000000  00000000  00010714  2**2
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_str    00000120  00000000  00000000  00010804  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_loc    0000008b  00000000  00000000  00010924  2**0
+                  CONTENTS, READONLY, DEBUGGING
+Disassembly of section .text:
+
+00000000 <_boot>:
+
+// Runtime Interrupt Vectors
+// -------------------------
+Vectors:
+        b     _start                    // reset - _start
+   0:	ea000012 	b	50 <_mainCRTStartup>
+        ldr   pc,_undf                  // undefined - _undf
+   4:	e59ff014 	ldr	pc, [pc, #20]	; 20 <_undf>
+        ldr   pc,_swi                   // SWI - _swi
+   8:	e59ff014 	ldr	pc, [pc, #20]	; 24 <_swi>
+        ldr   pc,_pabt                  // program abort - _pabt
+   c:	e59ff014 	ldr	pc, [pc, #20]	; 28 <_pabt>
+        ldr   pc,_dabt                  // data abort - _dabt
+  10:	e59ff014 	ldr	pc, [pc, #20]	; 2c <_dabt>
+        nop                             // reserved
+  14:	e1a00000 	nop			(mov r0,r0)
+        ldr   pc,[pc,#-0xFF0]           // IRQ - read the VIC
+  18:	e51ffff0 	ldr	pc, [pc, #-4080]	; fffff030 <_end+0xbfffeb30>
+        ldr   pc,_fiq                   // FIQ - _fiq
+  1c:	e59ff010 	ldr	pc, [pc, #16]	; 34 <_fiq>
+
+00000020 <_undf>:
+  20:	00000038 	andeq	r0, r0, r8, lsr r0
+
+00000024 <_swi>:
+  24:	0000003c 	andeq	r0, r0, ip, lsr r0
+
+00000028 <_pabt>:
+  28:	00000040 	andeq	r0, r0, r0, asr #32
+
+0000002c <_dabt>:
+  2c:	00000044 	andeq	r0, r0, r4, asr #32
+
+00000030 <_irq>:
+  30:	00000048 	andeq	r0, r0, r8, asr #32
+
+00000034 <_fiq>:
+  34:	0000004c 	andeq	r0, r0, ip, asr #32
+
+00000038 <__undf>:
+
+#if 0
+// Use this group for production
+_undf:  .word _reset                    // undefined - _reset
+_swi:   .word _reset                    // SWI - _reset
+_pabt:  .word _reset                    // program abort - _reset
+_dabt:  .word _reset                    // data abort - _reset
+_irq:   .word _reset                    // IRQ - _reset
+_fiq:   .word _reset                    // FIQ - _reset
+
+#else
+// Use this group for development
+_undf:  .word __undf                    // undefined
+_swi:   .word __swi                     // SWI
+_pabt:  .word __pabt                    // program abort
+_dabt:  .word __dabt                    // data abort
+_irq:   .word __irq                     // IRQ
+_fiq:   .word __fiq                     // FIQ
+
+__undf: b     .                         // undefined
+  38:	eafffffe 	b	38 <__undf>
+
+0000003c <__swi>:
+__swi:  b     .                         // SWI
+  3c:	eafffffe 	b	3c <__swi>
+
+00000040 <__pabt>:
+__pabt: b     .                         // program abort
+  40:	eafffffe 	b	40 <F_BIT>
+
+00000044 <__dabt>:
+__dabt: b     .                         // data abort
+  44:	eafffffe 	b	44 <__dabt>
+
+00000048 <__irq>:
+__irq:  b     .                         // IRQ
+  48:	eafffffe 	b	48 <__irq>
+
+0000004c <__fiq>:
+__fiq:  b     .                         // FIQ
+  4c:	eafffffe 	b	4c <__fiq>
+
+00000050 <_mainCRTStartup>:
+#endif
+        .size _boot, . - _boot
+        .endfunc
+
+
+// Setup the operating mode & stack.
+// ---------------------------------
+        .global _start, start, _mainCRTStartup
+        .func   _start
+
+_start:
+start:
+_mainCRTStartup:
+
+// Initialize Interrupt System
+// - Set stack location for each mode
+// - Leave in System Mode with Interrupts Disabled
+// -----------------------------------------------
+        ldr   r0,=_stack
+  50:	e59f0098 	ldr	r0, [pc, #152]	; f0 <.text+0xf0>
+        msr   CPSR_c,#MODE_UND|I_BIT|F_BIT // Undefined Instruction Mode
+  54:	e321f0db 	msr	CPSR_c, #219	; 0xdb
+        mov   sp,r0
+  58:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#UND_STACK_SIZE
+  5c:	e2400004 	sub	r0, r0, #4	; 0x4
+        msr   CPSR_c,#MODE_ABT|I_BIT|F_BIT // Abort Mode
+  60:	e321f0d7 	msr	CPSR_c, #215	; 0xd7
+        mov   sp,r0
+  64:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#ABT_STACK_SIZE
+  68:	e2400004 	sub	r0, r0, #4	; 0x4
+        msr   CPSR_c,#MODE_FIQ|I_BIT|F_BIT // FIQ Mode
+  6c:	e321f0d1 	msr	CPSR_c, #209	; 0xd1
+        mov   sp,r0
+  70:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#FIQ_STACK_SIZE
+  74:	e2400004 	sub	r0, r0, #4	; 0x4
+        msr   CPSR_c,#MODE_IRQ|I_BIT|F_BIT // IRQ Mode
+  78:	e321f0d2 	msr	CPSR_c, #210	; 0xd2
+        mov   sp,r0
+  7c:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#IRQ_STACK_SIZE
+  80:	e2400080 	sub	r0, r0, #128	; 0x80
+        msr   CPSR_c,#MODE_SVC|I_BIT|F_BIT // Supervisor Mode
+  84:	e321f0d3 	msr	CPSR_c, #211	; 0xd3
+        mov   sp,r0
+  88:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#SVC_STACK_SIZE
+  8c:	e2400004 	sub	r0, r0, #4	; 0x4
+        msr   CPSR_c,#MODE_SYS|I_BIT|F_BIT // System Mode
+  90:	e321f0df 	msr	CPSR_c, #223	; 0xdf
+        mov   sp,r0
+  94:	e1a0d000 	mov	sp, r0
+
+// Copy initialized data to its execution address in RAM
+// -----------------------------------------------------
+#ifdef ROM_RUN
+        ldr   r1,=_etext                // -> ROM data start
+  98:	e59f1054 	ldr	r1, [pc, #84]	; f4 <.text+0xf4>
+        ldr   r2,=_data                 // -> data start
+  9c:	e59f2054 	ldr	r2, [pc, #84]	; f8 <.text+0xf8>
+        ldr   r3,=_edata                // -> end of data
+  a0:	e59f3054 	ldr	r3, [pc, #84]	; fc <.text+0xfc>
+1:      cmp   r2,r3                     // check if data to move
+  a4:	e1520003 	cmp	r2, r3
+        ldrlo r0,[r1],#4                // copy it
+  a8:	34910004 	ldrcc	r0, [r1], #4
+        strlo r0,[r2],#4
+  ac:	34820004 	strcc	r0, [r2], #4
+        blo   1b                        // loop until done
+  b0:	3afffffb 	bcc	a4 <IRQ_STACK_SIZE+0x24>
+#endif
+// Clear .bss
+// ----------
+        mov   r0,#0                     // get a zero
+  b4:	e3a00000 	mov	r0, #0	; 0x0
+        ldr   r1,=__bss_start           // -> bss start
+  b8:	e59f1040 	ldr	r1, [pc, #64]	; 100 <.text+0x100>
+        ldr   r2,=__bss_end__           // -> bss end
+  bc:	e59f2040 	ldr	r2, [pc, #64]	; 104 <.text+0x104>
+2:      cmp   r1,r2                     // check if data to clear
+  c0:	e1510002 	cmp	r1, r2
+        strlo r0,[r1],#4                // clear 4 bytes
+  c4:	34810004 	strcc	r0, [r1], #4
+        blo   2b                        // loop until done
+  c8:	3afffffc 	bcc	c0 <IRQ_STACK_SIZE+0x40>
+
+// Call main program: main(0)
+// --------------------------
+        mov   r0,#0                     // no arguments (argc = 0)
+  cc:	e3a00000 	mov	r0, #0	; 0x0
+        mov   r1,r0
+  d0:	e1a01000 	mov	r1, r0
+        mov   r2,r0
+  d4:	e1a02000 	mov	r2, r0
+        mov   fp,r0                     // null frame pointer
+  d8:	e1a0b000 	mov	fp, r0
+        mov   r7,r0                     // null frame pointer for thumb
+  dc:	e1a07000 	mov	r7, r0
+        ldr   r10,=main
+  e0:	e59fa020 	ldr	sl, [pc, #32]	; 108 <.text+0x108>
+        mov   lr,pc
+  e4:	e1a0e00f 	mov	lr, pc
+        bx    r10                       // enter main()
+  e8:	e12fff1a 	bx	sl
+
+000000ec <_reset>:
+
+        .size   _start, . - _start
+        .endfunc
+
+        .global _reset, reset, exit, abort
+        .func   _reset
+_reset:
+reset:
+exit:
+abort:
+#if 0
+// Disable interrupts, then force a hardware reset by driving P23 low
+// -------------------------------------------------------------------
+        mrs   r0,cpsr                   // get PSR
+        orr   r0,r0,#I_BIT|F_BIT        // disable IRQ and FIQ
+        msr   cpsr,r0                   // set up status register
+
+        ldr   r1,=(PS_BASE)             // PS Base Address
+        ldr   r0,=(PS_PIO)              // PIO Module
+        str   r0,[r1,#PS_PCER_OFF]      // enable its clock
+        ldr   r1,=(PIO_BASE)            // PIO Base Address
+        ldr   r0,=(1<<23)               // P23
+        str   r0,[r1,#PIO_PER_OFF]      // make sure pin is contolled by PIO
+        str   r0,[r1,#PIO_CODR_OFF]     // set the pin low
+        str   r0,[r1,#PIO_OER_OFF]      // make it an output
+#endif
+        b     .                         // loop until reset
+  ec:	eafffffe 	b	ec <_reset>
+  f0:	40000500 	andmi	r0, r0, r0, lsl #10
+  f4:	0000049c 	muleq	r0, ip, r4
+  f8:	40000000 	andmi	r0, r0, r0
+  fc:	40000000 	andmi	r0, r0, r0
+ 100:	40000000 	andmi	r0, r0, r0
+ 104:	40000004 	andmi	r0, r0, r4
+ 108:	00000248 	andeq	r0, r0, r8, asr #4
+
+0000010c <wdtISR>:
+//
+
+void wdtISR( void )
+{
+	ISR_ENTRY();
+ 10c:	e24ee004 	sub	lr, lr, #4	; 0x4
+ 110:	e92d5fff 	stmdb	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
+ 114:	e14f1000 	mrs	r1, SPSR
+ 118:	e92d0002 	stmdb	sp!, {r1}
+/*	
+	if ( !( IOPIN1 & PIO1_FAN_BIT ) ) {
+		IOSET1 = PIO1_FAN_BIT;
+	}
+	else {
+		IOCLR1 = PIO1_FAN_BIT;
+	}
+	
+	IOSET1 = PIO1_EHEATER_ELEMENTB_BIT;
+*/	
+	//WDMOD &= ~BIT(WDTOF);
+	VICVectAddr = 0x00000000;	// Clear interrupt in 
+ 11c:	e59f3014 	ldr	r3, [pc, #20]	; 138 <.text+0x138>
+ 120:	e3a02000 	mov	r2, #0	; 0x0
+ 124:	e5832000 	str	r2, [r3]
+
+	ISR_EXIT();					// recover registers and return
+ 128:	e8bd0002 	ldmia	sp!, {r1}
+ 12c:	e161f001 	msr	SPSR_c, r1
+ 130:	e8fd9fff 	ldmia	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, pc}^
+}
+ 134:	e12fff1e 	bx	lr
+ 138:	fffff030 	swinv	0x00fff030
+
+0000013c <systemInit>:
+
+void systemInit(void)
+{
+	// --- enable and connect the PLL (Phase Locked Loop) ---
+	// a. set multiplier and divider
+	PLLCFG = MSEL | (1<<PSEL1) | (0<<PSEL0);
+ 13c:	e59f3084 	ldr	r3, [pc, #132]	; 1c8 <.text+0x1c8>
+ 140:	e3a02044 	mov	r2, #68	; 0x44
+ 144:	e5c32000 	strb	r2, [r3]
+	// b. enable PLL
+	PLLCON = (1<<PLLE);
+	// c. feed sequence
+	PLLFEED = PLL_FEED1;
+ 148:	e59f107c 	ldr	r1, [pc, #124]	; 1cc <.text+0x1cc>
+ 14c:	e2433004 	sub	r3, r3, #4	; 0x4
+ 150:	e3a02001 	mov	r2, #1	; 0x1
+ 154:	e5c32000 	strb	r2, [r3]
+ 158:	e3e03055 	mvn	r3, #85	; 0x55
+ 15c:	e5c13000 	strb	r3, [r1]
+	PLLFEED = PLL_FEED2;
+ 160:	e28330ab 	add	r3, r3, #171	; 0xab
+ 164:	e5c13000 	strb	r3, [r1]
+	
+	// d. wait for PLL lock (PLOCK bit is set if locked)
+	while ( !( PLLSTAT & (1<<PLOCK) ) );
+ 168:	e59f3060 	ldr	r3, [pc, #96]	; 1d0 <.text+0x1d0>
+ 16c:	e1d330b0 	ldrh	r3, [r3]
+ 170:	e3130b01 	tst	r3, #1024	; 0x400
+ 174:	0afffffb 	beq	168 <systemInit+0x2c>
+	
+	// e. connect (and enable) PLL
+	PLLCON = (1<<PLLE) | (1<<PLLC);
+ 178:	e59f3054 	ldr	r3, [pc, #84]	; 1d4 <.text+0x1d4>
+	
+	// f. feed sequence
+	PLLFEED = PLL_FEED1;
+ 17c:	e59f2048 	ldr	r2, [pc, #72]	; 1cc <.text+0x1cc>
+ 180:	e3a01003 	mov	r1, #3	; 0x3
+ 184:	e5c31000 	strb	r1, [r3]
+ 188:	e3e03055 	mvn	r3, #85	; 0x55
+ 18c:	e5c23000 	strb	r3, [r2]
+	PLLFEED = PLL_FEED2;
+	
+	// --- setup and enable the MAM (Memory Accelerator Module) ---
+	// a. start change by turning of the MAM (redundant)
+	MAMCR = 0;	
+ 190:	e59f0040 	ldr	r0, [pc, #64]	; 1d8 <.text+0x1d8>
+ 194:	e28330ab 	add	r3, r3, #171	; 0xab
+ 198:	e5c23000 	strb	r3, [r2]
+ 19c:	e3a03000 	mov	r3, #0	; 0x0
+ 1a0:	e5c03000 	strb	r3, [r0]
+	// b. set MAM-Fetch cycle to 3 cclk as recommended for >40MHz
+	MAMTIM = MAM_FETCH;
+ 1a4:	e59f3030 	ldr	r3, [pc, #48]	; 1dc <.text+0x1dc>
+ 1a8:	e5c31000 	strb	r1, [r3]
+	// c. enable MAM 
+	MAMCR = MAM_MODE;
+ 1ac:	e3a03002 	mov	r3, #2	; 0x2
+ 1b0:	e5c03000 	strb	r3, [r0]
+	
+	// --- set VPB speed ---
+	VPBDIV = VPBDIV_VAL;
+ 1b4:	e59f3024 	ldr	r3, [pc, #36]	; 1e0 <.text+0x1e0>
+ 1b8:	e3a0c001 	mov	ip, #1	; 0x1
+ 1bc:	e443c0c0 	strb	ip, [r3], #-192
+	
+	// --- map INT-vector ---
+	#if defined(RAM_RUN)
+	  MEMMAP = MEMMAP_USER_RAM_MODE;
+	#elif defined(ROM_RUN)
+	  MEMMAP = MEMMAP_USER_FLASH_MODE;
+ 1c0:	e5c3c000 	strb	ip, [r3]
+	#else
+	#error RUN_MODE not defined!
+	#endif
+}
+ 1c4:	e12fff1e 	bx	lr
+ 1c8:	e01fc084 	ands	ip, pc, r4, lsl #1
+ 1cc:	e01fc08c 	ands	ip, pc, ip, lsl #1
+ 1d0:	e01fc088 	ands	ip, pc, r8, lsl #1
+ 1d4:	e01fc080 	ands	ip, pc, r0, lsl #1
+ 1d8:	e01fc000 	ands	ip, pc, r0
+ 1dc:	e01fc004 	ands	ip, pc, r4
+ 1e0:	e01fc100 	ands	ip, pc, r0, lsl #2
+
+000001e4 <gpioInit>:
+
+void gpioInit(void)
+{
+	IODIR1 |= (1<<LEDPIN);		// define LED-Pin as output
+ 1e4:	e59f2018 	ldr	r2, [pc, #24]	; 204 <.text+0x204>
+ 1e8:	e5923000 	ldr	r3, [r2]
+ 1ec:	e3833801 	orr	r3, r3, #65536	; 0x10000
+ 1f0:	e5823000 	str	r3, [r2]
+	IOCLR1  = (1<<LEDPIN);		// set Bit = LED off (active high)
+ 1f4:	e59f300c 	ldr	r3, [pc, #12]	; 208 <.text+0x208>
+ 1f8:	e3a02801 	mov	r2, #65536	; 0x10000
+ 1fc:	e5832000 	str	r2, [r3]
+}
+ 200:	e12fff1e 	bx	lr
+ 204:	e0028018 	and	r8, r2, r8, lsl r0
+ 208:	e002801c 	and	r8, r2, ip, lsl r0
+
+0000020c <ledToggle>:
+
+void ledToggle(void)
+{
+	static unsigned char state=0;
+	
+	state = !state;
+ 20c:	e59f2028 	ldr	r2, [pc, #40]	; 23c <.text+0x23c>
+ 210:	e5d23000 	ldrb	r3, [r2]
+ 214:	e2733001 	rsbs	r3, r3, #1	; 0x1
+ 218:	33a03000 	movcc	r3, #0	; 0x0
+	if (state) IOSET1 = (1<<LEDPIN);	// set Bit = LED on
+ 21c:	e3530000 	cmp	r3, #0	; 0x0
+ 220:	e5c23000 	strb	r3, [r2]
+ 224:	159f3014 	ldrne	r3, [pc, #20]	; 240 <.text+0x240>
+	else IOCLR1 = (1<<LEDPIN);			// set Bit = LED off (active low)
+ 228:	059f3014 	ldreq	r3, [pc, #20]	; 244 <.text+0x244>
+ 22c:	13a02801 	movne	r2, #65536	; 0x10000
+ 230:	03a02801 	moveq	r2, #65536	; 0x10000
+ 234:	e5832000 	str	r2, [r3]
+ 238:	e12fff1e 	bx	lr
+ 23c:	40000000 	andmi	r0, r0, r0
+ 240:	e0028014 	and	r8, r2, r4, lsl r0
+ 244:	e002801c 	and	r8, r2, ip, lsl r0
+
+00000248 <main>:
+}
+
+int main(void)
+{
+ 248:	e92d4010 	stmdb	sp!, {r4, lr}
+	int ch;
+	
+	systemInit();
+ 24c:	ebffffba 	bl	13c <systemInit>
+ 250:	e59fc09c 	ldr	ip, [pc, #156]	; 2f4 <.text+0x2f4>
+ 254:	e59c3000 	ldr	r3, [ip]
+ 258:	e3833801 	orr	r3, r3, #65536	; 0x10000
+ 25c:	e58c3000 	str	r3, [ip]
+ 260:	e59f3090 	ldr	r3, [pc, #144]	; 2f8 <.text+0x2f8>
+ 264:	e3a0c801 	mov	ip, #65536	; 0x10000
+ 268:	e583c000 	str	ip, [r3]
+	gpioInit();
+	
+	// initialize the watchdog timer	
+/*	VICIntSelect &= ~VIC_BIT (VIC_WDT );	// WDT selected as IRQ
+	VICIntEnable = VIC_BIT( VIC_WDT );   	// WDT interrupt enabled
+	VICVectCntl8 = VIC_ENABLE | VIC_WDT;
+	VICVectAddr8 = (uint32_t)wdtISR;    	// address of the ISR
+*/  
+	WDTC = 150000000;						// One second = 15000000
+ 26c:	e59fc088 	ldr	ip, [pc, #136]	; 2fc <.text+0x2fc>
+ 270:	e3a0324e 	mov	r3, #-536870908	; 0xe0000004
+ 274:	e583c000 	str	ip, [r3]
+	WDTV = 0;
+ 278:	e3a0c000 	mov	ip, #0	; 0x0
+ 27c:	e2833008 	add	r3, r3, #8	; 0x8
+ 280:	e583c000 	str	ip, [r3]
+	WDMOD = 3;  				// Activate watchdog
+ 284:	e3a0e003 	mov	lr, #3	; 0x3
+ 288:	e3a0320e 	mov	r3, #-536870912	; 0xe0000000
+ 28c:	e5c3e000 	strb	lr, [r3]
+	WDFEED = 0xAA; WDFEED = 0x55;
+ 290:	e3a0428e 	mov	r4, #-536870904	; 0xe0000008
+ 294:	e3e03055 	mvn	r3, #85	; 0x55
+ 298:	e5c43000 	strb	r3, [r4]
+ 29c:	e28330ab 	add	r3, r3, #171	; 0xab
+	
+	uart0Init( UART_BAUD( BAUD ), UART_8N1, UART_FIFO_8 ); // setup the UART
+ 2a0:	e1a0100e 	mov	r1, lr
+ 2a4:	e3a02081 	mov	r2, #129	; 0x81
+ 2a8:	e5c43000 	strb	r3, [r4]
+ 2ac:	e3a00041 	mov	r0, #65	; 0x41
+ 2b0:	eb000016 	bl	310 <uart0Init>
+	
+	uart0Putch('M');
+ 2b4:	e3a0004d 	mov	r0, #77	; 0x4d
+ 2b8:	eb000035 	bl	394 <uart0Putch>
+	
+	uart0Puts("\r\nHello from WinARM!\r\n");
+ 2bc:	e59f003c 	ldr	r0, [pc, #60]	; 300 <.text+0x300>
+ 2c0:	eb00003d 	bl	3bc <uart0Puts>
+	uart0Puts("Demo based on code from R O Software\r\n");
+ 2c4:	e59f0038 	ldr	r0, [pc, #56]	; 304 <.text+0x304>
+ 2c8:	eb00003b 	bl	3bc <uart0Puts>
+	
+	ledToggle();
+ 2cc:	ebffffce 	bl	20c <ledToggle>
+	
+	while( 1 ) {
+	
+		if ( ( ch = uart0Getch() ) >= 0 ) {
+ 2d0:	eb000053 	bl	424 <uart0Getch>
+ 2d4:	e2504000 	subs	r4, r0, #0	; 0x0
+			uart0Puts("You pressed : ");
+ 2d8:	e59f0028 	ldr	r0, [pc, #40]	; 308 <.text+0x308>
+ 2dc:	bafffffb 	blt	2d0 <main+0x88>
+ 2e0:	eb000035 	bl	3bc <uart0Puts>
+			uart0Putch(ch);
+ 2e4:	e1a00004 	mov	r0, r4
+ 2e8:	eb000029 	bl	394 <uart0Putch>
+			uart0Puts("\r\n");
+ 2ec:	e59f0018 	ldr	r0, [pc, #24]	; 30c <.text+0x30c>
+ 2f0:	eafffff4 	b	2c8 <main+0x80>
+ 2f4:	e0028018 	and	r8, r2, r8, lsl r0
+ 2f8:	e002801c 	and	r8, r2, ip, lsl r0
+ 2fc:	08f0d180 	ldmeqia	r0!, {r7, r8, ip, lr, pc}^
+ 300:	0000044c 	andeq	r0, r0, ip, asr #8
+ 304:	00000464 	andeq	r0, r0, r4, ror #8
+ 308:	0000048c 	andeq	r0, r0, ip, lsl #9
+ 30c:	00000460 	andeq	r0, r0, r0, ror #8
+
+00000310 <uart0Init>:
+ *    fmode - see typical fmodes (uart.h)
+ *    NOTE: uart0Init(UART_BAUD(9600), UART_8N1, UART_FIFO_8); 
+ */
+void uart0Init(uint16_t baud, uint8_t mode, uint8_t fmode)
+{
+ 310:	e92d40f0 	stmdb	sp!, {r4, r5, r6, r7, lr}
+  // setup Pin Function Select Register (Pin Connect Block) 
+  // make sure old values of Bits 0-4 are masked out and
+  // set them according to UART0-Pin-Selection
+  PINSEL0 = ( PINSEL0 & ~UART0_PINMASK) | UART0_PINSEL;
+ 314:	e59f4060 	ldr	r4, [pc, #96]	; 37c <.text+0x37c>
+ 318:	e5943000 	ldr	r3, [r4]
+ 31c:	e3c3300f 	bic	r3, r3, #15	; 0xf
+ 320:	e3833005 	orr	r3, r3, #5	; 0x5
+ 324:	e5843000 	str	r3, [r4]
+
+  U0IER = 0x00;             // disable all interrupts
+ 328:	e59f6050 	ldr	r6, [pc, #80]	; 380 <.text+0x380>
+  U0IIR = 0x00;             // clear interrupt ID register
+ 32c:	e59f7050 	ldr	r7, [pc, #80]	; 384 <.text+0x384>
+  U0LSR = 0x00;             // clear line status register
+ 330:	e59f3050 	ldr	r3, [pc, #80]	; 388 <.text+0x388>
+ 334:	e3a0c000 	mov	ip, #0	; 0x0
+
+  // set the baudrate - DLAB must be set to access DLL/DLM
+  U0LCR = (1<<UART0_LCR_DLAB); // set divisor latches (DLAB)
+ 338:	e59f504c 	ldr	r5, [pc, #76]	; 38c <.text+0x38c>
+ 33c:	e5c6c000 	strb	ip, [r6]
+ 340:	e5c7c000 	strb	ip, [r7]
+ 344:	e5c3c000 	strb	ip, [r3]
+ 348:	e3e0307f 	mvn	r3, #127	; 0x7f
+ 34c:	e5c53000 	strb	r3, [r5]
+  U0DLL = (uint8_t)baud;         // set for baud low byte
+  U0DLM = (uint8_t)(baud >> 8);  // set for baud high byte
+ 350:	e1a0e420 	mov	lr, r0, lsr #8
+ 354:	e59f3034 	ldr	r3, [pc, #52]	; 390 <.text+0x390>
+ 358:	e20220ff 	and	r2, r2, #255	; 0xff
+ 35c:	e20ee0ff 	and	lr, lr, #255	; 0xff
+  
+  // set the number of characters and other
+  // user specified operating parameters
+  // Databits, Parity, Stopbits - Settings in Line Control Register
+  U0LCR = (mode & ~(1<<UART0_LCR_DLAB)); // clear DLAB "on-the-fly"
+ 360:	e201107f 	and	r1, r1, #127	; 0x7f
+ 364:	e20000ff 	and	r0, r0, #255	; 0xff
+ 368:	e5c30000 	strb	r0, [r3]
+ 36c:	e5c6e000 	strb	lr, [r6]
+ 370:	e5c51000 	strb	r1, [r5]
+  // setup FIFO Control Register (fifo-enabled + xx trig) 
+  U0FCR = fmode;
+ 374:	e5c72000 	strb	r2, [r7]
+}
+ 378:	e8bd80f0 	ldmia	sp!, {r4, r5, r6, r7, pc}
+ 37c:	e002c000 	and	ip, r2, r0
+ 380:	e000c004 	and	ip, r0, r4
+ 384:	e000c008 	and	ip, r0, r8
+ 388:	e000c014 	and	ip, r0, r4, lsl r0
+ 38c:	e000c00c 	and	ip, r0, ip
+ 390:	e000c000 	and	ip, r0, r0
+
+00000394 <uart0Putch>:
+
+int uart0Putch(int ch)
+{
+  while (!(U0LSR & ULSR_THRE))          // wait for TX buffer to empty
+ 394:	e59f3018 	ldr	r3, [pc, #24]	; 3b4 <.text+0x3b4>
+ 398:	e5d33000 	ldrb	r3, [r3]
+ 39c:	e3130020 	tst	r3, #32	; 0x20
+ 3a0:	0afffffb 	beq	394 <uart0Putch>
+    continue;                           // also either WDOG() or swap()
+
+  U0THR = (uint8_t)ch;  // put char to Transmit Holding Register
+ 3a4:	e59f300c 	ldr	r3, [pc, #12]	; 3b8 <.text+0x3b8>
+ 3a8:	e20000ff 	and	r0, r0, #255	; 0xff
+ 3ac:	e5c30000 	strb	r0, [r3]
+  return (uint8_t)ch;      // return char ("stdio-compatible"?)
+}
+ 3b0:	e12fff1e 	bx	lr
+ 3b4:	e000c014 	and	ip, r0, r4, lsl r0
+ 3b8:	e000c000 	and	ip, r0, r0
+
+000003bc <uart0Puts>:
+
+const char *uart0Puts(const char *string)
+{
+ 3bc:	e92d4010 	stmdb	sp!, {r4, lr}
+ 3c0:	e1a04000 	mov	r4, r0
+ 3c4:	ea000003 	b	3d8 <uart0Puts+0x1c>
+	char ch;
+	
+	while ((ch = *string)) {
+		if (uart0Putch(ch)<0) break;
+ 3c8:	ebfffff1 	bl	394 <uart0Putch>
+ 3cc:	e3500000 	cmp	r0, #0	; 0x0
+ 3d0:	ba000003 	blt	3e4 <uart0Puts+0x28>
+		string++;
+ 3d4:	e2844001 	add	r4, r4, #1	; 0x1
+ 3d8:	e5d43000 	ldrb	r3, [r4]
+ 3dc:	e2530000 	subs	r0, r3, #0	; 0x0
+ 3e0:	1afffff8 	bne	3c8 <uart0Puts+0xc>
+	}
+	
+	return string;
+}
+ 3e4:	e1a00004 	mov	r0, r4
+ 3e8:	e8bd8010 	ldmia	sp!, {r4, pc}
+
+000003ec <uart0TxEmpty>:
+
+int uart0TxEmpty(void)
+{
+  return (U0LSR & (ULSR_THRE | ULSR_TEMT)) == (ULSR_THRE | ULSR_TEMT);
+ 3ec:	e59f3014 	ldr	r3, [pc, #20]	; 408 <.text+0x408>
+ 3f0:	e5d30000 	ldrb	r0, [r3]
+ 3f4:	e2000060 	and	r0, r0, #96	; 0x60
+}
+ 3f8:	e3500060 	cmp	r0, #96	; 0x60
+ 3fc:	13a00000 	movne	r0, #0	; 0x0
+ 400:	03a00001 	moveq	r0, #1	; 0x1
+ 404:	e12fff1e 	bx	lr
+ 408:	e000c014 	and	ip, r0, r4, lsl r0
+
+0000040c <uart0TxFlush>:
+
+void uart0TxFlush(void)
+{
+  U0FCR |= UFCR_TX_FIFO_RESET;          // clear the TX fifo
+ 40c:	e59f200c 	ldr	r2, [pc, #12]	; 420 <.text+0x420>
+ 410:	e5d23000 	ldrb	r3, [r2]
+ 414:	e3833004 	orr	r3, r3, #4	; 0x4
+ 418:	e5c23000 	strb	r3, [r2]
+}
+ 41c:	e12fff1e 	bx	lr
+ 420:	e000c008 	and	ip, r0, r8
+
+00000424 <uart0Getch>:
+
+
+/* Returns: character on success, -1 if no character is available */
+int uart0Getch(void)
+{
+  if (U0LSR & ULSR_RDR)                 // check if character is available
+ 424:	e59f3018 	ldr	r3, [pc, #24]	; 444 <.text+0x444>
+ 428:	e5d33000 	ldrb	r3, [r3]
+ 42c:	e3130001 	tst	r3, #1	; 0x1
+    return U0RBR;                       // return character
+ 430:	159f3010 	ldrne	r3, [pc, #16]	; 448 <.text+0x448>
+ 434:	15d33000 	ldrneb	r3, [r3]
+ 438:	e3e00000 	mvn	r0, #0	; 0x0
+ 43c:	120300ff 	andne	r0, r3, #255	; 0xff
+
+  return -1;
+}
+ 440:	e12fff1e 	bx	lr
+ 444:	e000c014 	and	ip, r0, r4, lsl r0
+ 448:	e000c000 	and	ip, r0, r0
+ 44c:	65480a0d 	strvsb	r0, [r8, #-2573]
+ 450:	206f6c6c 	rsbcs	r6, pc, ip, ror #24
+ 454:	6d6f7266 	sfmvs	f7, 2, [pc, #-408]!
+ 458:	6e695720 	cdpvs	7, 6, cr5, cr9, cr0, {1}
+ 45c:	214d5241 	cmpcs	sp, r1, asr #4
+ 460:	00000a0d 	andeq	r0, r0, sp, lsl #20
+ 464:	6f6d6544 	swivs	0x006d6544
+ 468:	73616220 	cmnvc	r1, #2	; 0x2
+ 46c:	6f206465 	swivs	0x00206465
+ 470:	6f63206e 	swivs	0x0063206e
+ 474:	66206564 	strvst	r6, [r0], -r4, ror #10
+ 478:	206d6f72 	rsbcs	r6, sp, r2, ror pc
+ 47c:	204f2052 	subcs	r2, pc, r2, asr r0
+ 480:	74666f53 	strvcbt	r6, [r6], #-3923
+ 484:	65726177 	ldrvsb	r6, [r2, #-375]!
+ 488:	00000a0d 	andeq	r0, r0, sp, lsl #20
+ 48c:	20756f59 	rsbcss	r6, r5, r9, asr pc
+ 490:	73657270 	cmnvc	r5, #7	; 0x7
+ 494:	20646573 	rsbcs	r6, r4, r3, ror r5
+ 498:	0000203a 	andeq	r2, r0, sl, lsr r0

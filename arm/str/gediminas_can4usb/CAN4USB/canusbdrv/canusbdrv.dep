@@ -1,0 +1,28 @@
+# Microsoft Developer Studio Generated Dependency File, included by canusbdrv.mak
+
+.\canusb.c : \
+	"..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	"..\common\dllist.h"\
+	"..\common\lawicel_can.h"\
+	".\canusb.h"\
+	".\StdAfx.h"\
+	"c:\ftdi\dxx\ftd2xx.h"\
+	
+
+.\canusbdrv.cpp : \
+	"..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	"..\common\dllist.h"\
+	"..\common\lawicel_can.h"\
+	".\canusb.h"\
+	".\StdAfx.h"\
+	"c:\ftdi\dxx\ftd2xx.h"\
+	
+
+..\common\dllist.c : \
+	"..\common\dllist.h"\
+	
+
+.\StdAfx.cpp : \
+	"..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\StdAfx.h"\
+	

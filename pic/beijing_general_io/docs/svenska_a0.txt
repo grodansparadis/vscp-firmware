@@ -1,0 +1,24 @@
+Bejing A0 är en generell I/O enhet med fem 5V kanaler som kan användas var för sig som ingång eller utgång. Enheten finns i två varianter. En som kan
+fästas på DIN skena och en variant som kan skruvas på vägg.
+
+Bejing A0 är en CAN4VSCP modul och följer VSCP standarden. Det betyder att den kan arbeta självständigt eller tillsammans med en server och att
+alla programvaror och kodbibliotek som finns i VSCP projektet direkt fungerar tillsammans med den. Som alla CAN4VSCP moduler så strömförsörjs enheten
+över bussen med en 9-30V strömkälla.  
+
+Bejing A0 ansluts till bussen med en RJ45 kontakt. Lämpligen använder man CAT-5 eller bättre partvinnad kabel. Strömförsörjningen sker också genom
+denna kabel så det finns inget behov för en separat strömkälla. Maximala kabellängden ligger på runt 500 meter med dropkabellängder på max 24 meter.
+Som för all CAN4VSCP moduler används 125 kbps som kommunikationshastighet.
+
+Alla VSCP enheter innehåller information om sin egen konfiguration, inställningar, manual, drivare, version, tillverkare etc. Man behöver bara
+fråga modulen om den information man är intresserad av. När VSCP enheter startas upp har dom alltid en förprogrammerad standardfunktionalitet.
+
+Alla kanaler kan ställas individuellt som ingång eller utgång. On/Off/start/stop event kan får när en ingång ändrar tillstånd. Utgångar kan konfigureras
+för att automatiskt lägga ut en puls med en fast frekvens.
+
+Bejing enheterna har en decision matrix (beslutsmatris) inbyggd som gör att man enkelt kan programmera autonom funktionalitet. I matrisen kan man
+programmera vad som händer när ett valfritt event kommer in till enheten. Detta kan vara att slå på/av/pulsa en eller flera utgångar eller sända ut status för
+ingångar/utgångar. Genom beslutsmatrisen så kan man enkelt skapa autonoma system där man skapar sammansatta funktioner utan att en värddator behövs.
+Kombinerar man till exempel en Paris enhet med Bejing A0 så kan man mycket enkelt skapa ett system där tryckknappar kopplade till Bejing A0 slår av och på
+lampor motorer eller annat utan att blanda in en värddator annat än när man konfigurerar systemet.
+
+Se produktsidan för fullständig information.

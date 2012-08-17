@@ -1,0 +1,19 @@
+********************
+Modtronix TCP/IP Stack
+********************
+The Modtronix TCP/IP Stack is a modified version of the original Micorchip TCP/IP Stack.
+The licence of the original code still applies, see license.txt file!
+
+********************
+V2.10 Modtronix TCP/IP Stack - 2005 March 01 (cvs tag pic_mxmctcpip_v210)
+********************
+- Cleaned up includes at top of each file. Each *.h file includes projdefs.h as first
+  include. Each *.c file includes it's *.h file as first include.
+
+
+********************
+V2.00 Modtronix TCP/IP Stack - 2005 Jan 19 (cvs tag pic_mxmctcpip_v200)
+********************
+- Made major changes to the original stack. All project specific defines have been moved
+  from stack files to the projdefs.h file
+- Changed the callback funcitions HTTPGetVar() and HTTPExecGetCmd() in http module.

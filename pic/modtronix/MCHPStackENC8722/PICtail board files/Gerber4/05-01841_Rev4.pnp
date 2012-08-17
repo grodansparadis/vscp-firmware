@@ -1,0 +1,42 @@
+P-CAD Pick and Place Locations                       05-01841_Rev4.pcb
+
+======================================================================
+
+Report Origin = (0.0, 0.0)
+Units used = mil
+RefDes          PatternName     Type            Value           Layer           LocationX  LocationY  Rotation
+--------------- --------------- --------------- --------------- --------------- ---------- ---------- --------
+
+C1              CAP0603         CAP0603         0.1uF           Top                 7291.5     6087.5    180.0
+C2              CAP0603         CAP0603         .1uF            Top                 7900.0     5654.0    270.0
+C3              CAP0603         CAP0603         .01uF           Top                 8262.5     5641.5    270.0
+C4              CAP0603         CAP0603         0.1uF           Top                 8162.5     5508.5     90.0
+C5              CAP0603         CAP0603         18pf            Top                 7900.0     5408.5     90.0
+C6              CAP0603         CAP0603         0.1uF           Top                 7962.5     5358.5     90.0
+C7              CAP0603         CAP0603         0.1uF           Top                 8025.0     5358.5     90.0
+C8              CAP0603         CAP0603         0.1uF           Top                 7583.5     5300.0      0.0
+C9              CAP0603         CAP0603         0.1uF           Top                 7308.0     5041.5     90.0
+C11             CAP0603         CAP0603         0.1uF           Top                 6929.0     4975.0    180.0
+C13             CAP0603         CAP0603         0.1uF           Top                 8025.0     4916.5    270.0
+C14             CAP0603         CAP0603         0.1uF           Top                 8100.0     4916.5    270.0
+C17             CAP0603         CAP0603         18pf            Top                 7875.0     4754.0    270.0
+C18             CAP0603         CAP0603         0.1uF           Top                 7750.0     4746.0     90.0
+C19             CAP0603         CAP0603         0.1uF           Top                 8021.0     4437.5      0.0
+CR1             BRECT-W02M      BRRECT-WO2M     Value           Top                 8275.0     4537.5      0.0
+D1              LED-0805        LED-0805        Value           Top                 7470.0     5175.0      0.0
+L1              IND_1210        INDUCTOR-1210SM {Value}         Top                 7812.5     5640.0    270.0
+R1              RES0603         RES0603         100K            Top                 7350.0     6333.5     90.0
+R2              RES0603         RES0603         180             Top                 7450.0     5841.5    270.0
+R3              RES0603         RES0603         49.9            Top                 7962.5     5646.0     90.0
+R4              RES0603         RES0603         49.9            Top                 8029.5     5646.0     90.0
+R5              RES0603         RES0603         49.9            Top                 8137.5     5646.0     90.0
+R6              RES0603         RES0603         49.9            Top                 8200.0     5646.0     90.0
+R7              RES0603         RES0603         180             Top                 8325.0     5646.0     90.0
+R8              RES0603         RES0603         2.7K, 1%        Top                 8225.0     5504.0    270.0
+R9              RES0603         RES0603         100K            Top                 8375.0     5241.5    270.0
+R10             RES0603         RES0603         220             Top                 7616.5     5175.0    180.0
+R11             RES0603         RES0603         NL              Top                 8287.5     5504.0    270.0
+U1              SO8_150         25C040_SOIC     25LC256         Top                 7200.0     6267.5    270.0
+U3              QFN28           ENC28J60_QFN28  ENC28J60 QFN    Top                 8162.2     5176.7      0.0
+X2              FIDUCIAL        FIDUCIAL        Value           Top                 7425.0     6712.5      0.0
+X3              FIDUCIAL        FIDUCIAL        Value           Top                 5975.0     4000.0      0.0

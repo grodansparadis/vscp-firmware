@@ -1,0 +1,123 @@
+***  Installation Started 12/29/2008 19:31  ***
+Title: MiWi v1.0 Installation
+Source: C:\DOCUME~1\AKEHED~1\LOKALA~1\Temp\7zOAE.tmp\MiWi v1_0j.EXE | 11-18-2008 | 19:25:46 | 5084091
+Made Dir: C:\Microchip Solutions\MiWi
+Made Dir: C:\Microchip Solutions\MiWi\MiWi End Device
+Made Dir: C:\Microchip Solutions\MiWi\MiWi End Device\Pic16
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\Pic16\SymbolTime.inc | 01-10-2007 | 14:07:08 | | 2379 | 4cfdd80a
+File Overwrite: C:\Microchip Solutions\Microchip\Common\Console.c | 11-18-2008 | 17:37:00 | | 11385 | a2c84ca5
+Backup Copy: C:\Microchip Solutions\BACKUP\Console.c
+File Overwrite: C:\Microchip Solutions\Microchip\Include\Compiler.h | 11-18-2008 | 17:42:18 | | 4867 | c294bfd5
+Backup Copy: C:\Microchip Solutions\BACKUP\Compiler.001
+File Overwrite: C:\Microchip Solutions\Microchip\Include\GenericTypeDefs.h | 11-18-2008 | 17:42:32 | | 4986 | 5cbd5b7b
+Backup Copy: C:\Microchip Solutions\BACKUP\GenericTypeDefs.001
+File Overwrite: C:\Microchip Solutions\Microchip\Include\Common\Console.h | 11-18-2008 | 17:37:34 | | 4559 | f417fa72
+Backup Copy: C:\Microchip Solutions\BACKUP\Console.h
+Made Dir: C:\Microchip Solutions\Microchip\Include\MiWi
+File Copy: C:\Microchip Solutions\Microchip\Include\MiWi\MiWi.h | 11-18-2008 | 17:41:24 | | 13773 | de1efa92
+File Copy: C:\Microchip Solutions\Microchip\Include\MiWi\MRF24J40.h | 11-18-2008 | 17:41:40 | | 8026 | 58732245
+File Copy: C:\Microchip Solutions\Microchip\Include\MiWi\MSPI.h | 11-18-2008 | 17:41:50 | | 2549 | 3469034c
+File Copy: C:\Microchip Solutions\Microchip\Include\MiWi\SymbolTime.h | 11-18-2008 | 17:42:00 | | 7849 | 28545eb4
+Made Dir: C:\Microchip Solutions\Microchip\MiWi
+File Copy: C:\Microchip Solutions\Microchip\MiWi\MiWi.c | 11-18-2008 | 18:13:52 | | 213574 | 8a3baf8d
+File Copy: C:\Microchip Solutions\Microchip\MiWi\MSPI.c | 11-18-2008 | 17:43:02 | | 5213 | 6bab2891
+File Copy: C:\Microchip Solutions\Microchip\MiWi\SymbolTime.c | 11-18-2008 | 18:03:24 | | 6799 | 7fcbeac2
+Made Dir: C:\Microchip Solutions\Microchip\MiWi\Documentation
+Made Dir: C:\Microchip Solutions\Microchip\MiWi\Documentation\Getting Started - Loading a precompiled demo_files
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\Getting Started - Loading a precompiled demo_files\filelist.xml | 09-16-2008 | 08:47:20 | | 506 | 492a0923
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\Getting Started - Loading a precompiled demo_files\image001.png | 09-16-2008 | 08:47:20 | | 49913 | c783ca0f
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\Getting Started - Loading a precompiled demo_files\image002.jpg | 09-16-2008 | 08:47:20 | | 10651 | be55e16f
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\Getting Started - Loading a precompiled demo_files\image005.png | 09-16-2008 | 08:47:20 | | 87376 | e4ffd0d9
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\Getting Started - Loading a precompiled demo_files\image006.jpg | 09-16-2008 | 08:47:20 | | 35593 | 9049f3fc
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\Getting Started - Loading a precompiled demo_files\image007.png | 09-16-2008 | 08:47:20 | | 55924 | 617d2f28
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\Getting Started - Loading a precompiled demo_files\image008.jpg | 09-16-2008 | 08:47:20 | | 13108 | 90b9c9a3
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\Getting Started - Loading a precompiled demo_files\image009.png | 09-16-2008 | 08:47:20 | | 62290 | af2990d1
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\Getting Started - Loading a precompiled demo_files\image010.jpg | 09-16-2008 | 08:47:20 | | 14329 | a5b35c53
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\Getting Started - Loading a precompiled demo_files\image011.png | 09-16-2008 | 08:47:20 | | 48311 | 2e8f8aaa
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\Getting Started - Loading a precompiled demo_files\image012.jpg | 09-16-2008 | 08:47:20 | | 11520 | 9882753a
+Made Dir: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\filelist.xml | 10-01-2008 | 16:36:26 | | 1175 | 361d1e78
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image002.png | 09-16-2008 | 16:01:18 | | 398005 | 552cf484
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image003.jpg | 09-16-2008 | 16:01:18 | | 55947 | dea2e74f
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image004.png | 09-16-2008 | 16:01:18 | | 402095 | a335b0a7
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image005.jpg | 09-16-2008 | 16:01:18 | | 69122 | b1030158
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image006.png | 09-16-2008 | 16:01:18 | | 323164 | a3378256
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image007.jpg | 09-16-2008 | 16:01:18 | | 56261 | 3c29a705
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image008.jpg | 09-16-2008 | 16:01:18 | | 107750 | 43d3ef57
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image009.jpg | 09-16-2008 | 16:01:20 | | 62028 | e7038be5
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image010.png | 09-16-2008 | 16:01:20 | | 7908 | af37eb4
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image011.jpg | 09-16-2008 | 16:01:20 | | 20741 | 87d75aed
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image012.png | 09-16-2008 | 16:01:20 | | 18725 | 1f7edc34
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image013.gif | 10-01-2008 | 16:36:24 | | 2267 | 222db4ba
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image014.png | 09-16-2008 | 16:01:20 | | 30170 | 96720ec1
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image015.jpg | 09-16-2008 | 16:01:20 | | 69498 | ad38f3f9
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image016.png | 09-16-2008 | 16:01:20 | | 20557 | a43dfb7e
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image017.jpg | 09-16-2008 | 16:01:20 | | 61716 | fa0146e9
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image020.png | 09-16-2008 | 16:01:20 | | 23729 | 5aa8287a
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image021.jpg | 09-16-2008 | 16:01:20 | | 73964 | 472838de
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image022.png | 09-16-2008 | 16:01:20 | | 35162 | 5938943c
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image023.jpg | 09-16-2008 | 16:01:20 | | 85193 | e6dacace
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image024.png | 09-16-2008 | 16:01:20 | | 21540 | 8480b6c0
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image025.jpg | 09-16-2008 | 16:01:20 | | 64791 | 5568f276
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image026.png | 09-16-2008 | 16:01:20 | | 32904 | 4f05f62b
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image027.jpg | 09-16-2008 | 16:01:20 | | 85947 | d8dc67b8
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image031.png | 09-19-2008 | 15:13:32 | | 18044 | eed4661b
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image032.jpg | 09-19-2008 | 15:13:32 | | 15912 | 2e13febf
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image033.png | 09-19-2008 | 15:13:32 | | 9509 | 73ef9ecc
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image034.jpg | 09-19-2008 | 15:13:32 | | 19995 | 687eec22
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image035.jpg | 09-19-2008 | 15:31:26 | | 52117 | 91272f56
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image036.png | 09-19-2008 | 15:31:28 | | 71450 | db52469d
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started_files\image037.jpg | 09-19-2008 | 15:31:28 | | 168047 | e8155f6d
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\Getting Started - Loading a precompiled demo.html | 09-16-2008 | 08:47:20 | | 22177 | a5711291
+File Copy: C:\Microchip Solutions\Microchip\MiWi\Documentation\MiWi Getting Started.html | 10-01-2008 | 16:36:26 | | 84994 | c6c28f8f
+File Copy: C:\Microchip Solutions\MiWi\How to use VDI MiWi library.pdf | 04-10-2008 | 11:30:16 | | 162708 | d60e0040
+File Copy: C:\Microchip Solutions\MiWi\MiWi Application Note.pdf | 08-23-2007 | 11:18:02 | | 649697 | 7ab6ee9
+File Copy: C:\Microchip Solutions\MiWi\MiWi Getting Started.html | 09-30-2008 | 16:58:40 | | 3189 | ceadabf
+File Copy: C:\Microchip Solutions\MiWi\MiWi License _v2 FINAL 092908_.pdf | 11-18-2008 | 16:33:58 | | 34673 | 6bd6331b
+File Copy: C:\Microchip Solutions\MiWi\ZENA v3.0.exe | 09-25-2008 | 16:39:42 | 3.0.0.0 | 3213312 | f6471ff8
+Made Dir: C:\Microchip Solutions\MiWi\MiWi Coordinator
+File Copy: C:\Microchip Solutions\MiWi\MiWi Coordinator\MiWi - Coordinator - PIC32MX - C32.hex | 10-01-2008 | 16:06:06 | | 79705 | 28f954be
+File Copy: C:\Microchip Solutions\MiWi\MiWi Coordinator\18f4620.lkr | 01-10-2007 | 14:07:06 | | 1807 | 4d969ac7
+File Copy: C:\Microchip Solutions\MiWi\MiWi Coordinator\MiWi - Coordinator - dsPIC33+PIC24 - C30.mcp | 10-07-2008 | 18:55:50 | | 2384 | 939fbb86
+File Copy: C:\Microchip Solutions\MiWi\MiWi Coordinator\MiWi - Coordinator - PIC18 - C18.mcp | 10-01-2008 | 16:14:46 | | 2296 | 7c8357b9
+File Copy: C:\Microchip Solutions\MiWi\MiWi Coordinator\MiWi - Coordinator - PIC32MX - C32.mcp | 10-01-2008 | 16:06:04 | | 2331 | e28c2940
+File Copy: C:\Microchip Solutions\MiWi\MiWi Coordinator\ConfigFuses.c | 11-18-2008 | 18:03:40 | | 4219 | f2822ce8
+File Copy: C:\Microchip Solutions\MiWi\MiWi Coordinator\main.c | 11-18-2008 | 18:13:38 | | 24017 | dfdaec62
+File Copy: C:\Microchip Solutions\MiWi\MiWi Coordinator\HardwareProfile.h | 11-18-2008 | 18:05:12 | | 2276 | 5ac6ae12
+File Copy: C:\Microchip Solutions\MiWi\MiWi Coordinator\MiWiDefs.h | 11-18-2008 | 18:05:28 | | 7483 | b6aba108
+File Copy: C:\Microchip Solutions\MiWi\MiWi Coordinator\SystemProfile.h | 11-18-2008 | 18:05:40 | | 2284 | d4145143
+File Copy: C:\Microchip Solutions\MiWi\MiWi Coordinator\p24FJ128GA010.gld | 01-10-2007 | 14:07:06 | | 54308 | 31de503d
+File Copy: C:\Microchip Solutions\MiWi\MiWi Coordinator\p33FJ256GP710.gld | 01-10-2007 | 14:07:06 | | 70540 | c2a030c7
+File Copy: C:\Microchip Solutions\MiWi\MiWi Coordinator\MiWi - Coordinator - dsPIC33+PIC24 - C30.hex | 10-01-2008 | 16:06:40 | | 56990 | 401eedd2
+File Copy: C:\Microchip Solutions\MiWi\MiWi Coordinator\MiWi - Coordinator - PIC18 - C18.hex | 10-01-2008 | 16:08:36 | | 40293 | d3046038
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\MiWi - End Device - dsPIC33+PIC24 - C30.hex | 10-01-2008 | 16:00:14 | | 41481 | cf359fa0
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\MiWi - End Device - PIC18 - C18.hex | 10-01-2008 | 16:05:38 | | 29615 | 6c61b52e
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\MiWi - End Device - PIC32MX - C32.hex | 10-01-2008 | 16:01:18 | | 88432 | b3df254b
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\18f4620.lkr | 01-10-2007 | 14:07:08 | | 1963 | b439df21
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\MiWi - End Device - dsPIC33+PIC24 - C30.mcp | 10-07-2008 | 18:57:12 | | 2335 | 10931441
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\MiWi - End Device - PIC18 - C18.mcp | 10-01-2008 | 16:16:10 | | 2331 | 4af8b86e
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\MiWi - End Device - PIC32MX - C32.mcp | 10-01-2008 | 16:01:14 | | 2335 | ebf5e275
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\ConfigFuses.c | 11-18-2008 | 18:08:32 | | 3929 | 46e6c6a8
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\main.c | 11-18-2008 | 18:13:16 | | 32723 | 635a3ba4
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\HardwareProfile.h
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\MiWiDefs.h | 11-18-2008 | 18:14:26 | | 7559 | 183fcba5
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\SystemProfile.h | 11-18-2008 | 18:14:34 | | 1856 | f430853
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\p24FJ128GA010.gld | 01-10-2007 | 14:07:08 | | 54308 | 31de503d
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\p33FJ256GP710.gld | 01-10-2007 | 14:07:08 | | 70540 | c2a030c7
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\Pic16\MiWi - End Device - PIC16 - MPASM.mcp | 10-01-2008 | 08:54:26 | | 1556 | aa7fd510
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\Pic16\16f877a.lkr | 01-10-2007 | 14:07:08 | | 1840 | d1adb94b
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\Pic16\16f877ai.lkr | 01-10-2007 | 14:07:08 | | 2029 | 3129d86d
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\Pic16\Console.asm | 01-10-2007 | 14:07:08 | | 6592 | fd2e354c
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\Pic16\Console.inc | 01-10-2007 | 14:07:08 | | 2153 | 1a4128b9
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\Pic16\Main.asm | 01-10-2007 | 14:07:08 | | 25297 | e328b2f6
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\Pic16\MiWi.asm | 01-10-2007 | 14:07:08 | | 88476 | 36b47373
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\Pic16\MiWi.inc | 01-10-2007 | 14:07:08 | | 20846 | 82e426c0
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\Pic16\MiWiDefs.inc | 01-10-2007 | 14:07:08 | | 4462 | 8bef0967
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\Pic16\MRF24J40.asm | 01-10-2007 | 14:07:08 | | 276 | fa8355aa
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\Pic16\MRF24J40.inc | 01-10-2007 | 14:07:08 | | 13917 | e8332471
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\Pic16\P16f877a.inc | 01-10-2007 | 14:07:08 | | 16613 | df5ef8f0
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\Pic16\ReadMe.txt | 01-10-2007 | 14:07:08 | | 1934 | b20999fb
+File Copy: C:\Microchip Solutions\MiWi\MiWi End Device\Pic16\SymbolTime.asm | 01-10-2007 | 14:07:08 | | 4095 | 6a9747a0
+File Tree: C:\MICROC~1\Microchip\MiWi\
+File Tree: C:\MICROC~1\MiWi Coordinator\
+File Tree: C:\MICROC~1\MiWi End Device\

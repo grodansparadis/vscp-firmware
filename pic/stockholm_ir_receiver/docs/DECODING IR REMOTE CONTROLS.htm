@@ -1,0 +1,328 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0063)http://www.ee.washington.edu/circuit_archive/text/ir_decode.txt -->
+<HTML><HEAD><TITLE>DECODING IR REMOTE CONTROLS</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<META content="MSHTML 6.00.2800.1106" name=GENERATOR></HEAD>
+<BODY>
+<H2>DECODING IR REMOTE CONTROLS</H2>
+<H3>by Juergen Putzger</H3>The origin of this posting was the question what to 
+do with an old TV. I suggested to use the infrared remote control as an input 
+keyboard for a microcontroller board and mentioned a piece of code I had written 
+for the 8052 microcontroller. I was asked by some people to share my information 
+about remote controls, so here it is: 
+<P>There are at least two international standards which are used by remote 
+controls to encode the commands, the RC5 and RECS 80 code. The RECS 80 code uses 
+pulse length modulation. Each bit to be transmitted is encoded by a high level 
+of the duration T followed by a low level of duration 2T representing a logical 
+'0' or 3T representing a logical '1'. <PRE>
+  T 2T T 3T  T 2T
+  _    _     _ 
+ | |  | |   | |
+_| |__| |___| |__
+  0    1     0
+
+</PRE>Notice that a '1' takes more time to be transmitted than a '0'. The RC 5 
+code instead has a uniform duration of all bits. A transition in the middle of 
+the time interval assigned to each bit encodes the logical value. A '0' is 
+encoded by a high to low transition and a '1' by a low to high transition. 
+Therefore we need additional transitions at the beginning of each bit to set the 
+proper start level if a series of equal bits is sent. We don't need this 
+additional transition if the next bit has a different value. This is also called 
+a 'biphase' code. <PRE>
+|1.Bit|2.Bit|3.Bit|4.Bit|             
+ __    __       __    __
+   |  |  |     |  |  |  
+   |__|  |_____|  |__|  
+   0     0     1     1
+</PRE>Instead of being fed direct into the IR emitter, most remote controls 
+modulate a 20-30 kHz carrier with this signal. A logic one is represented by a 
+burst of oscillations. <PRE>
+______/\/\/\/\_______/\/\/\/\________
+  0      1       0       1      0
+
+</PRE>The reason is, that you can use a filter tuned to the carrier frequency to 
+distinguish the signal from noise in the ambient light. Fluorescent lamps are 
+the main source of such noise. Photodiodes behind an optical filter which 
+transmits infrared light but blocks visible light are used as detectors. The 
+signal from the photodiode is fed through a filter tuned to the carrier fequency 
+and then amplified. The amplified signal is demodulated just like the carrier is 
+demodulated in any AM radio receiver. <PRE>
+     +
+     |
+    _|_  photodiode
+    /_\                 demodulator
+     |      |\                             
+    _|_ ____| \_____| |__ __|\|___ ____            L and C form a 
+   |   |    | /     | |  |  |/|   |    signal      circuit resonant
+   |   /    |/          _|_       |    out         to the carrier
+  ===  \    amplifier   /_\      ===
+   |C  / L               |        |
+   |___|_________________|________|____    
+   
+
+</PRE>It can be a lot of pain to design a sensitive receiver that does'nt start 
+to oscillate. It is also necessary to have some automatic gain control to avoid 
+overload of the amplifier at close distance to the emitter. It is easier to use 
+some integrated circuit that does all of the job. The best i have ever seen (and 
+used) is the SFH505A manufactured by SIEMENS (no, I don't work for this 
+company). It looks like one of this three legged voltage regulators and uses a 
+single 5V supply. It incorporates an optical filter, the photodiode, a filter 
+tuned to about 30 kHz , the amplifier with automatic gain control and the 
+demodulator. 
+<P>If you don't know which code your remote control is transmitting you can 
+identify it by viewing the output of your receiver with an oscilloscope. The 
+RECS 80 code uses high pulses of uniform length while the low pulses differ in 
+length. If there are high and low pulses of two different lengths it might be 
+RC5 code. Note that your receiver may invert the levels. 
+<P>How are commands like volume control or channel selction encoded? In the case 
+of the RC5 code there is an international standard. Every command is encoded by 
+14 bits. The first two bits S are startbits to allow the receiver to adjust the 
+automatic gain control and to synchronize. Next a bit T follows, that toggles 
+with every new keystroke. Next is the address A of the device which shall 
+respond to the command. At last the command itself follows. <PRE>
+  | S | S | T | A4 | A3 | A2 | A1 | A0 | C5 | C4 | C3 | C2 | C1 | C0 |
+
+</PRE>Some important addresses and commands: <PRE>
+Address:          Device:          Command:           
+  0               TV1              0...9    Numbers 0...9 (channel 
+select)
+  1               TV2              12       Standby 
+  5               VCR1             16       Master Volume + 
+  6               VCR2             17       Master Volume - 
+ 17               Tuner            18       Brightness +
+ 18               Audio Tape       19       Brightness -
+ 20               CD Player        50       Fast rewind
+                                   52       Fast run forward
+                                   53       Play 
+                                   54       Stop
+                                   55       Recording
+
+
+</PRE>There are integrated decoder circuits which have inputs to select the 
+device address and parallel outputs activated by the commands. Since this is 
+comp. robotics the devices you wish to control will have a microcontroller on 
+board which can do all the decoding. Here is an input routine I have written for 
+the 8052 microcontroller family to receive RC5 codes. My cousin has written a 
+similar routine for the RECS80 code which i will try to make available also. 
+Perhaps we can start a collection of such routines and archive them somewhere. 
+<P>
+<HR>
+<PRE>;  ---------==========----------==========---------=========---------
+;         Interrupt Driven Receiving Routine for RC5 code
+; written by Juergen Putzger (juergen.putzger@physik.uni-regensburg.de)
+;  ---------==========----------==========---------=========---------
+
+$MOD52
+
+INPUT   EQU     P3.2    ; Port3,Bit2 is used as input. The demodulated 
+signal 
+                        ; with active low level is connected to this pin 
+    
+LF      EQU     0AH     ; Linefeed     
+CR      EQU     0DH     ; Carriage return
+SPC     EQU     20H     ; Space
+RB0     EQU     000H    ; Select Register Bank 0
+RB1     EQU     008H    ; Select Register Bank 1  ...poke to PSW to use
+
+
+
+        DSEG            ; This is internal data memory
+        ORG     20H     ; Bit adressable memory
+
+FLAGS:  DS      1      
+CONTROL BIT     FLAGS.0  ; toggles with every new keystroke
+NEW     BIT     FLAGS.1  ; Bit set when a new command has been received 
+
+COMMAND: DS     1       ; Received command byte
+SUBAD:  DS      1       ; Device subaddress 
+BUFFER: DS      30      ; Buffer to store length of transmitted pulses
+STACK:  DS      1       ; Stack begins here               
+
+
+
+
+        CSEG            ; Code begins here
+
+;---------==========----------==========---------=========---------
+;              PROCESSOR INTERRUPT AND RESET VECTORS
+;---------==========----------==========---------=========---------
+
+         ORG     00H    ; Reset
+         JMP     MAIN
+        
+         ORG     0003H  ; External Interrupt0
+         JMP     RECEIVE
+         
+
+
+;  ---------==========----------==========---------=========---------
+;                            Output routines
+;        Don岐 forget to set up the serial port and Baud rate !    
+        
+;  ---------==========----------==========---------=========---------
+
+N_OUT:  ADD     A,#30H  ;Convert BCD number to ASCII
+C_OUT:  JNB     TI,$    ;Wait until transmission completed.
+        CLR     TI      ;Clear interrupt flag.
+        MOV     SBUF,A  ;Write out character to serial port.
+        RET
+
+
+BIN2BCD:                ;Convert 8 bit value in Acc to 3 digit BCD 
+        MOV     B,#100          
+        DIV     AB      
+        CALL    N_OUT
+        XCH     A,B
+        MOV     B,#10
+        DIV     AB
+        CALL    N_OUT
+        XCH     A,B
+        CALL    N_OUT
+        RET
+
+
+
+;  ---------==========----------==========---------=========---------
+;  Interrupt routine is entered by the first high to low transition
+;  at Port3-Bit2. Stores the length of all pulses occuring at this
+;  pin in buffer. Analyzes the timing of the startbits to calculate
+;  a threshold between short and long pulses. This routine is 
+;  independent of CPU speed. The device address and command are 
+;  extracted from the bit stream. Two flags are set upon exit,
+;  the control bit which toggles with every new keystroke and the 
+;  NEW bit indicating that a new command has been received.    
+;  ---------==========----------==========---------=========---------
+
+RECEIVE:
+         PUSH   PSW           ; save current registerset
+         MOV    PSW,#RB1
+         PUSH   ACC
+         MOV    R0,#BUFFER
+REC:     MOV    A,#0
+REC0:    INC    A             ; Measure duration of low-level  
+         NOP
+         NOP                  ; Delay 
+         NOP                 
+         NOP
+         JZ     TIMEOUT       ; End of transmission if duration exeeds 
+256 counts
+         JNB    INPUT,REC0 
+         MOV    @R0,A
+         INC    R0
+         MOV    A,#0          
+REC1:    INC    A             ; Measure duration of high-level
+         NOP
+         NOP                  ; Delay
+         NOP
+         NOP
+         JZ     TIMEOUT       ; End of transmission
+         JB     INPUT,REC1
+         MOV    @R0,A
+         INC    R0
+         JMP    REC    
+TIMEOUT:  
+         MOV    A,BUFFER      ; calculate threshold between short and 
+long pulses 
+         INC    R0            ; length of first low-pulse
+         ADD    A,BUFFER+1    ; plus length of first high-pulse 
+         CLR    C
+         RRC    A             ; divided by two
+         MOV    R1,A
+         CLR    C
+         RRC    A             ; plus half of the time
+         ADD    A,R1
+         MOV    R5,A          ; yields threshold
+         MOV    R0,#BUFFER
+         MOV    R1,#1         ; initial value  
+         MOV    R2,#13        ; Number of bits to decode
+DECODE:  MOV    A,@R0
+         INC    R0
+         CLR    C
+         SUBB   A,R5          ; compare length with threshold
+         MOV    A,#0
+         CPL    C             ; short=1
+         RLC    A
+         JNZ    NOSKIP
+         INC    R0            ; if short skip over next pulse
+NOSKIP:  XRL    A,R1          ; new bit is calculated by XOR with 
+previous bit
+         MOV    R1,A          ; Store new bit
+         RRC    A
+         MOV    A,R3          ; Store new Bit in R3/R4 by rotating 
+         RLC    A
+         MOV    R3,A
+         MOV    A,R4
+         RLC    A
+         MOV    R4,A
+         DJNZ   R2,DECODE
+         MOV    A,R3          
+         ANL    A,#00111111B  ; extract command from R3
+         MOV    COMMAND,A
+         MOV    A,R3            
+         RLC    A             ; do some rotating to extract       
+         XCH    A,R4
+         RLC    A             ;device address 
+         XCH    A,R4
+         RLC    A       
+         XCH    A,R4    
+         RLC    A   
+         CLR    CONTROL
+         JNB    ACC.5,TZ      ; Check control bit
+         SETB   CONTROL         
+TZ:      ANL    A,#00011111B  ; mask device address
+         MOV    SUBAD,A
+         POP    ACC           ; Restore old registerset
+         POP    PSW
+         SETB   NEW           ; Set flag to indicate the new command
+         RETI 
+
+
+;  ---------==========----------==========---------=========---------
+;  Main routine. Program execution starts here. Don't forget to add
+;  code to initialize the serial port and Baud rate if your monitor
+;  program doesn't do that for you. The Main loop waits until a command
+;  has been received. Then the control bit, subaddress and command byte 
+;  are printed separated by spaces. Leading zeroes are not suppressed.
+;  When a standby command (12) has been received, the main loop is 
+;  terminated and the program returns to the monitor. 
+;  ---------==========----------==========---------=========---------
+
+
+MAIN:    MOV    TCON,#00H     ; MAKE SURE TIMERS ARE SHUT DOWN.
+         MOV    PSW,#RB0      ; Select register bank 0
+         MOV    SP,STACK
+         SETB   EX0           ; Enable external Interrupt0
+         CLR    IT0           ; triggered by a high to low transition  
+         SETB   EA   
+         CLR    NEW
+LOOP:    JNB    NEW,LOOP      ; Wait until a command has been received
+         MOV    A,#CR
+         CALL   C_OUT         ; Ouput carriage return and linefeed
+         MOV    A,#LF
+         CALL   C_OUT
+         MOV    A,FLAGS
+         ANL    A,#00000001B
+         CALL   BIN2BCD       ; Output control Bit  
+         MOV    A,#SPC
+         CALL   C_OUT
+         MOV    A,SUBAD
+         CALL   BIN2BCD       ; Output subaddress
+         MOV    A,#SPC
+         CALL   C_OUT
+         MOV    A,COMMAND
+         CALL   BIN2BCD       ; Output command
+         MOV    A,COMMAND
+         CLR    C
+         SUBB   A,#0CH        ; compare for standby command
+         CLR    NEW
+         JNZ    LOOP          ; go on receiving
+         CLR    EX0           ; stop receiving
+         CLR    EA            ; and 
+         JMP    8000H         ; return to monitor which has its entry
+                              ; point at 8000H
+        
+         END    
+        
+
+<HR>
+</PRE></BODY></HTML>

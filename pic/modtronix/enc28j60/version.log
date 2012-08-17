@@ -1,0 +1,162 @@
+********
+Microchip TCP/IP Beta Stack Version Log:
+********
+
+
+********
+v0.9.2:       11/30/04
+********
+
+Additions:
+1. SetLEDConfig() and GetLEDConfig() macros have been added which can be called from 
+any file that includes MAC.h.
+2. SetCLKOUT() and GetCLKOUT() functions have been added to ENC28J60.c which are useful 
+for changing the CLKOUT prescaler from within the main application file.
+
+Improvements:
+1. Renamed files/edited files so that the HI-TECH compiler won't raise many messages 
+stating that include files were spelled wrong.
+2. Minor comment changes and tests in the ENC28J60.c file have been changed to be more 
+robust and allow compatibility with future ENC28J60 silicon revisions which fix some 
+known errata.
+
+Known Problems:
+1. Sometimes when the FTP sever is used, an attempt to put a file is unsuccessful.  The 
+   problem seems to caused when an HTTP request to GET a file is made at the wrong time.
+2. MACSetPMFilter(), MACDisablePMFilter(), and MACCopyRxToTx() have not been tested 
+   and possibly do not work.
+3. The stack may behave incorrectly if compiled using the Hitech compiler with a high 
+   optimizations setting.
+4. Serial numbers >32K will be displayed as a negative value when C18 is used and the
+   board is placed in configuration mode (RB5 button is depressed on power up).
+5. SNMP, TFTPc modules have not been tested with this version.
+6. It seems as if IP Gleaning may not get disabled when, through the RS232 configuration 
+   application, DHCP and IP Gleaning are disabled.
+7. The IP address being outputted out the RS232 port and through the Announce module 
+   does not happen when the IP address is configured using IP Gleaning.
+
+
+
+********
+v0.9.1:       10/8/04
+********
+
+Additions:
+1. announce.c and announce.h have been added.  When added, STACK_USE_ANNOUNCE must be 
+   defined.  This module will broadcast a UDP message to port 30303 containing the local
+   MAC address whenever the local IP address changes.  This addition is intended to 
+   eliminate the need for an RS232 connection if board reconfiguration is not needed.
+   To retrieve the UDP message on your computer, use the new MCHPDetect.exe program 
+   included in the project folder.
+
+Improvements:
+1. Minor reordering/change to MACInit start up sequence.
+
+Fixes:
+1. MACPowerDown() and MACPowerUp() revised to match data sheet.
+
+
+Known Problems:
+1. Sometimes when the FTP sever is used, an attempt to put a file is unsuccessful.  The 
+   problem seems to caused when an HTTP request to GET a file is made at the wrong time.
+2. Multiple TX buffer support is not fully inplemented in the MAC layer, ENC28J60.c.  
+   Stack behavior when TCP_NO_WAIT_FOR_ACK is defined may be unexpected.
+3. MACSetPMFilter(), MACDisablePMFilter(), and MACCopyRxToTx() have not been tested 
+   and very possibly do not work.
+4. The stack may behave incorrectly if compiled using the Hitech compiler with a high 
+   optimizations setting.
+5. Serial numbers >32K will be displayed as a negative value when C18 is used and the
+   board is placed in configuration mode (RB5 button is depressed on power up).
+6. SNMP, TFTPc modules have not been tested with this version.
+7. It seems as if IP Gleaning may not get disabled when, through the RS232 configuration 
+   application, DHCP and IP Gleaning are disabled.
+8. The IP address being outputted out the RS232 port and through the Announce module 
+   does not happen when the IP address is configured using IP Gleaning.
+9. Sometimes on intial power up, the demo application does not function.  It may obtain
+   an IP address from a DHCP server, but then give it up immediately thereafter.  
+   Resetting the board solves the problem.
+
+
+********
+v0.9:       10/1/04
+********
+All changes are relative to the MCHPStackv2.20.04.01 released TCP/IP stack revision.
+
+Additions:
+1. ENC28J60.c and ENC28J60.h MAC layer driver for the Microchip ENC28J60 Ethernet 
+   controller chip.  This driver incorporates several new functions which can be called 
+   from any layer above the MAC.  The functions are:
+    MACSetDuplex()
+    MACPowerDown()
+    MACPowerUp()
+    MACSetPMFilter()
+    MACDisablePMFilter()
+    CalcIPBufferChecksum()
+    MACCalcRxChecksum()
+    MACCalcTxChecksum()
+    MACCopyRxToTx()
+
+   Additionally, the ENC28J60.c file incroporates TestMemory() which can do a power on
+   self test of numerous hardware functions.  To use TestMemory() define 
+   MAC_POWER_ON_TEST in StackTsk.h.  For this beta stack intended for beta silicon, it 
+   is defined by default.
+
+2. spieeprom.c was added to support SPI EEPROM chips for MPFS storage.  ENC28J60.c and 
+   spieeprom.c may both be included and they will share the SPI.
+3. The IP address, whenever it changes, is outputted out the RS232 serial port in human
+   readable form.  Any terminal program, such as HyperTerminal can be used to read it.
+   This allows the IP address to be easily determined when DHCP is used.  The serial 
+   port defaults to 19200 baud when CLOCK_FREQ in Compiler.h is properly defined.
+4. Added support for the ENC28J60's DMA module which calculates checksums directly in 
+   its hardware buffer.  The IP, ICMP, TCP, and UDP layers have been updated to use the 
+   DMA if 'MCHP_MAC' is defined in StackTsk.c.  Because of a silicon flaw, MCHP_MAC is
+   not defined by default.  Performance of certain transfers may be improved when 
+   MCHP_MAC is defined at the cost of having an occasional packet which has a wrong 
+   checksum calculated.
+
+
+Improvements:
+1. Moved MAX_ICMP_DATA_LEN from StackTsk.c to ICMP.h file for easier maintenance.
+2. Corrected STACK_USE_SIIP typo in dhcp.c file - Thanks to Gisle J.B.
+3. Implemented UDP checksum logic in UDPProcess() in UDP.c file.
+4. Renamed CalcTCPChecksum() in tcp.c file to CalcIPBufferChecksum().
+5. Moved CalcIPBufferChecksum() to helpers.c to reuse it for UDP checksum calculation.
+6. Modified UDPProcess() in UDP.c and TCPProcess() in TCP.c to include localIP as
+   third new parameter. This makes pseudo header checksum calculation correct in 
+   both functions. StackTsk.h, UDP.h and TCP.h files were also modified to reflect
+   these changes.
+7. Modified TCP.C file to include compile-time check of STACK_USE_TCP define
+   If it is not defined, an error will be displayed.
+8. Removed an unnecessary call to MACDiscardRx() when an IP packet is received but 
+   fails version, options length, or header checksum tests.
+9. Slightly altered MPFSOpen() filename comparison code.  Functional operation should 
+   be unaffected, but performance may be slightly improved.
+10.Changed LCD code to be compile time removable by undefining USE_LCD.
+   
+
+    
+Fixes:
+1. Fixed StackTsk.c file so that if static IP address is used and LINK is removed
+   node IP address is not cleared.
+2. Invalid ICMP echo replies are no longer generated for echo requests with a data 
+   length of 33 (one more than the configured maximum).
+3. Changed MAX_OPTIONS_LEN from 20 to 40.  The maximum IP options length is now in 
+   agreement with the IP RFC.
+4. Changed IPSetRxBuffer() from a macro to a function.  The function takes into account 
+   any options which may be present in the header of received IP packets.  Previously,
+   possible options were not taken into account when calculating the offset.
+
+
+Known Problems:
+1. Sometimes when the FTP sever is used, an attempt to put a file is unsuccessful.  The 
+   problem seems to caused when an HTTP request to GET a file is made at the wrong time.
+2. Multiple TX buffer support is not fully inplemented in the MAC layer, ENC28J60.c.  
+   Stack behavior when TCP_NO_WAIT_FOR_ACK is defined may be unexpected.
+3. MACPowerDown(), MACPowerUp(), MACSetPMFilter(), MACDisablePMFilter(), and 
+   MACCopyRxToTx() have not been tested and may not work.
+4. The stack may behave incorrectly if compiled using the Hitech compiler with a high 
+   optimizations setting.
+5. Serial numbers >32K will be displayed as a negative value when C18 is used and the
+   board is placed in configuration mode (RB5 button is depressed on power up).
+6. SNMP module is not tested with this version 
+   

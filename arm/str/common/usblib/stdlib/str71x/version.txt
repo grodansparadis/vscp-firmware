@@ -1,0 +1,275 @@
+*****************  version.txt file for STR71x software library ***************
+
+* 13/01/2006 : V3.1
+====================
+
+PCU
+* Function modification:
+Add a basy bit state verification bifore writing in PWRCR register
+* Correct Enumerations:
+ - PCU_VR enumeration : the PCU_LPR value is wrong (should be : 0x0010 not 0x0020)
+ - Add new on going programi,g bit decalaration : #define PCU_BUSY_Mask   0x4000
+
+RCCU
+* Function modification:
+- RCCU_PLL1Config : Setting of the RCCU_FREEN in the RCCU_PLL1CR register
+according to the PLL1 input clock.
+- RCCU_FrequencyValue : Correction of the multiplication factor 28 to 24.
+
+I2C
+* Function modification:
+- I2C_GetStatus : I2C control and status register are read in local variables
+before function return.
+- I2C_BufferSend() : deleted
+- I2C_BufferReceive() : deleted
+- I2C_StringSend() : deleted
+- Prototypes of the deleted routines are suppressed in i2c.h
+
+FLASH
+* Function modification:
+- FLASH_PermanantDebugPrConfig : unused variable removed.
+- FLASH_PermanantDebugPrConfig : becomes FLASH_PermanentDebugPrConfig
+- FLASH_FlagStatus             : initialize FlagStatus TmpResult = RESET
+- Improve commentaries
+
+* Constant modification:
+- flashwriteoperation enumeration in flash.h is deleted
+- FLASH_BER_Mask in flash.h is deleted
+- FLASH_MER_Mask in flash.h is deleted
+- FLASH_BSYA1_Mask in flash.h is deleted
+- FLASH_BSYA2_Mask in flash.h is deleted
+- FLASH_INTP_Mask in flash.h is deleted
+
+WDG
+* Function modification
+- FindFactors() : replace unsigned int by u16 and unsigned long by u32
+- WDG_PeriodValueConfig(): replace unsigned int by u16 and unsigned long by u32
+- Improve commentaries
+
+TIM
+* Function modification
+- TIM_OPModeConfig(): Replace TIM_OMP_Mask by TIM_OPM_Mask
+- Improve commentaries
+
+*constant modification
+- TIM_OMP_Mask in TIM.h is replaced by TIM_OPM_Mask 
+
+RTC
+* Function modification
+- RTC_Delay()  		: deleted
+- RTC_CounterConfig()	: delete the RTC_WaitForLastTask() after the RTC_EnterCfgMode()
+- RTC_PrescalerConfig()	: delete the RTC_WaitForLastTask() after the RTC_EnterCfgMode()
+			  delete the RTC_WaitForLastTask() after the RTC_ExitCfgMode()
+- RTC_AlarmConfig()	: delete the RTC_WaitForLastTask() after the RTC_EnterCfgMode()
+			: delete the RTC_WaitForLastTask() after the RTC_ExitCfgMode()
+- RTC_FlagClear()	: delete the RTC_WaitForLastTask() after the RTC_EnterCfgMode()
+			: delete the RTC_WaitForLastTask() after the RTC_ExitCfgMode()
+- RTC_ITClear()		: add the RTC_WaitForLastTask() after the instruction  RTC->CRL &= ~Xrtcit;
+			: delete the RTC_WaitForLastTask() after the RTC_ExitCfgMode()
+			: prototype changed in the rtc.h file 
+* Constant modification
+- RTC_NONE 	: deleted 
+- RTC_GI_Index	: deleted
+- RTC_OWI_Index : deleted
+- RTC_AI_Index  : deleted
+
+ADC
+* Function modification
+- ADC12_Init()		: The ADC CPR reset value is updated ( 0x05 and not 0x01)
+
+UART
+* Function modification
+- UART_Init()		: Add the initialization of TOR and GTR regsiters
+- UART_9BitsByteSend    : use a mask to send the a 9-bit data;
+- UART_ByteReceive() 	: Initialize the wStatus to 0 
+- UART_9BitByteReceive(): Initialize the wStatus to 0
+- UART_DataReceive()	: Initialize the wStatus to 0
+- UART_9BitDataReceive(): Initialize the wStatus to 0
+- UART_StringReceive()	: Initialize the wStatus to 0
+
+*Constant modification
+- UART_NO_PARITY	: Initialized to 0x0000
+- DUMMY 		: deleted 
+- UART_FIFOEnableBit 	: deleted
+- UART_RxEnableBit   	: deleted 
+- UART_RunBit		: deleted
+- UART_LoopBackBit   	: deleted
+- UART_ParityOddBit  	: deleted
+- UART_05StopBits     	: deleted
+- UART_1StopBit       	: deleted
+- UART_15StopBits     	: deleted
+- UART_2StopBits      	: deleted
+- UART_8BitsData       	: deleted
+- UART_7BitsData       	: deleted
+- UART_9BitsData       	: deleted
+- UART_8BitsDataWakeUp 	: deleted
+
+ 
+
+Examples update:
+---------------
+
+* Examples Code modification:
+
+ - I2C : EEPROM_Send() : new routine
+         EEPROM_Receive() : new routine
+         EEPROM_WaitForlastTask() : replaced by EEPROM_WaitForLastTask()
+         SendResult: deleted
+         RecResult : deleted
+
+ - Flash: - FLASH_WordRead() routine is used to read back the written value 
+          - display the read value on the debugger output window.
+          
+ 
+ 
+ - Tim  : PWMO : in the TIM_PWMOModeConfig() routine, the full period 
+                 parameter is 0x7FFF and not 0xFFFF.
+          OCMP : TIM3 is initiliazed twice so delete one of the two initialization routines. 
+          OPM  : TIM3 is initiliazed twice so delete one of the two initialization routines.
+          music: TIM1 is initiliazed twice so delete one of the two initialization routines.
+- UART	: Remove the UARTStatus variable from the uart interrupt handling in the UART 
+	  interrupt example
+
+- ADC	: ADC polling example changed
+
+
+* 24/05/2005 : V3.0
+====================
+
+71xLibraryD.lib and 71xLibraryR.lib regenerated using the new library files.
+
+I2C
+* Function modification:
+- I2C_FlagStatus bug fix when in INDIRECT access mode
+- inline u32 I2C_GetStatus(I2C_TypeDef *I2Cx) retuns a 32bit value
+* New Enumerations
+- I2C_Flags enumaration : the I2C_ACK value is wrong (should be : 0x10000)
+                          New   I2C_STOP  = 0x08000 & I2C_START = 0x20000
+FLASH
+* Function modification:
+- The header of the FLASH_SectorErase() functions updated in the header file.
+- FLASH_WritePrConfig : The temporary vaiable removed
+
+Examples update:
+---------------
+
+All the readme files of the STR71x software library examples are restructed
+and updated in order to contains enough of information wich can help the user
+to understand correctly and easily the example objective. 
+
+* Examples Code modification:
+
+ - Adc12:  adc_int   : code Clean.
+                   
+           polling   : change the "ADC12_Calib()" function.
+                       add an infinite loop to have a continuously conversion.
+                       Add some code comment.
+
+ - Bspi :  Code Clean.
+           Change the  "TrFifoDepth" length to 9. 
+
+ - Emi  :  Code Clean.
+
+ - Gpio :  Code Clean and all the code use the STR71x software library function .
+
+ - Pcu  :  Add some comment to the source code lines.
+
+ - Rtc  :  Code Clean.
+
+ - Uart :  interrupt :Code Clean.
+           polling :Code Clean.
+ 
+ - Xti  :  Code Clean.
+
+ - Apb  :  Code Clean.
+
+ - Can  :  Unchenged
+ 
+ - Flash:  Code Clean.
+
+ - I2c  :  i2c read  : New example
+           i2c write : New example
+ 
+ - Rccu :  remove some unused code line.
+ 
+ - Tim  :  Music     : Change the music Note.
+                     : Add the possibility to stop music.
+           OCMP      : Code Clean.
+           OPM       : Code Clean.
+           PWMI      : New example.
+           PWMO      : Code clean.
+ - wdg  :  use GPIO0 instead of GPIO2.
+           increase counter  value to 0xFFFFF. 
+           Calculate the Refresh_Time limit.
+
+* 22/12/2004 : V2.0
+====================
+
+STR71xDL7 renamed to 71xLibraryD
+STR71xnDL renamed to 71xLibraryR.lib
+newDL & newnDL renamed to debug.prj & release.prj
+
+RTC
+* Function modification:
+- RTC_SetTime & RTC_SetAlarmTime fnctions are deleted (see the RTC application
+note AN 1780)
+
+XTI
+* Function modification:
+- XTI_LineModeConfig
+
+ADC
+* Function modification:
+- ADC12_PrescalerConfig
+- ADC12_ConversionValue: Clear the ADC pending flag
+
+I2C
+* Function modification:
+-I2C_SpeedConfig
+
+PCU
+* Function modification:
+-PCU_LPMEnter: Assembly lines removed
+
+
+TIM
+* Function modification:
+- TIM_OCMPModeConfig
+- New function: TIM_CounterValue. This function return the counter value of the
+                                  selected timer
+
+FLASH
+* Function modification:
+- FLASH_BlockWrite: deleted
+- FLASH_BlockRead: deleted
+- FLASH_WaitForLastTask: Modified
+- FLASH_DWordWrite: Modified
+- FLASH_SectorErase: Modified
+- FLASH_Suspend: Mofifid
+- FLASH_Resume: Modified
+- FLASH_WritePrConfig: Modified
+- FLASH_DebugPrConfig: renamed to FLASH_PermanantDebugPrConfig
+- FLASH_ProtectionLevel: Modified
+- FLASH_WaitForLastTask: Modified
+* Constant modification:
+- flashflags enumeration in the flash.h file is cerrected
+
+RCCU
+* New Enumerations
+- PLL1 Multiplication factors and PLL2 Multiplication factors
+* Function modification:
+- RCCU_PLL1Config
+- RCCU_PLL2Config
+- #define RCCU_Main_Osc 16000000 definition moved to 71x_conf.h file
+
+
+* 31/07/2003 : V1.0
+====================
+
+  Created.
+
+
+
+********************(C) COPYRIGHT 2003 STMicroelectronics**********************
+
+

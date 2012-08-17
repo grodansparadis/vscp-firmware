@@ -1,0 +1,20 @@
+1-Wire sensor 1: 16 36 57 42 0 0 0 141   	Furnace water temperature
+
+
+
+
+
+
+1-wire sensor 2: 16 247 105 64 0 8 0 120   	Transport B temperature
+
+
+
+
+
+1-wire sensor 3: 16 219 106 75 0 8 0 105	Furnace Return temperature
+
+
+
+
+
+1-wire sensor 4:  16 238 102 64 0 8 0 218	Hot Water temperature

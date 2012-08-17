@@ -1,0 +1,5 @@
+Existing TAGS on this project:
+
+r1.0: Original release for inclusion in the BoostC compiler
+r1.1: Added clock and timer lib
+r1.2: Added shift register, nokia 3310 lcd interface, nrf2401 2.4 GHz transceiver lib. Updated serial, EEPROM and OneWire lib.

@@ -1,0 +1,24 @@
+[Settings]
+Active Compiler=BoostC
+Target=PIC16F876A
+[Files]
+File0=adc_test.h
+Count=6
+File1=adc.h
+File2=adc_test.c
+File3=adc.c
+File4=serial.h
+File5=serial.c
+[Bookmarks]
+Count=0
+[Breakpoints]
+Count=0
+[Debugger]
+DebugFromMain=1
+[Plugins]
+Bcd=506F727442000100000001000000
+Button=00706F727462000000000000000000
+Button Block=706F72746200000000000000000000000000
+Led=706F72746200000000000000000000000000
+Led Block=706F727462000000000000000000
+Speed Tester=6B094201040000004E6F6E65

@@ -1,0 +1,5 @@
+/** \defgroup timer128 timer128: Timer Function Library for the ATmega128
+
+This library provides functions for use with the timers internal to the AVR ATmega128.  Functions include initialization, set prescaler, calibrated pause function (in milliseconds), attaching and detaching of user functions to interrupts, overflow counters, and PWM.
+
+*/

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$\LedBlink.ewp</path>
+  </project>
+  <batchBuild>
+    <batchDefinition>
+      <name>All</name>
+      <member>
+        <project>LedBlink</project>
+        <configuration>Debug Rev A</configuration>
+      </member>
+      <member>
+        <project>LedBlink</project>
+        <configuration>Debug Rev B</configuration>
+      </member>
+    </batchDefinition>
+  </batchBuild>
+</workspace>
+
+

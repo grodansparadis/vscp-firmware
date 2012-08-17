@@ -1,0 +1,5 @@
+/** \defgroup sta013 sta013: STMicroelectronics STA013 MP3 Player Driver
+
+This library interfaces to the I2C control port of the STA013 MP3 decoder chip.  All functions necessary for setup and and control of the decoder chip are included.  Supported functions include decoder initialize, decoder start, stop, pause, and resume, get bitrate and sample rate, set volume and tone controls.  NOTE: the actual MP3 music data must be transmitted through a separate interface using SPI.  The SPI function library is suitable for this.
+
+*/

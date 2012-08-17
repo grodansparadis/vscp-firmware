@@ -1,0 +1,452 @@
+/********************************************************************
+ * FileName:		httpEx.c
+ * Dependencies:
+ * Processor:		PIC24FJ128
+ * Hardware:		N/A
+ * Assembler:		N/A
+ * Linker:		N/A
+ * Company:		Microchip Technology, Inc.
+ *
+ * Software License Agreement:
+ * The software supplied herewith by Microchip Technology Incorporated
+ * (the “Company”) for its PICmicro® Microcontroller is intended and
+ * supplied to you, the Company’s customer, for use solely and
+ * exclusively on Microchip PICmicro Microcontroller products. The
+ * software is owned by the Company and/or its supplier, and is
+ * protected under applicable copyright laws. All rights are reserved.
+ * Any use in violation of the foregoing restrictions may subject the
+ * user to criminal sanctions under applicable laws, as well as to
+ * civil liability for the breach of the terms and conditions of this
+ * license.
+ *
+ * THIS SOFTWARE IS PROVIDED IN AN “AS IS” CONDITION. NO WARRANTIES,
+ * WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
+ * TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
+ * IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
+ * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+ *
+ *********************************************************************
+ * File Description:
+ *
+ * HTTP Server Appilcation
+ *
+ * Change History:
+ * Name         Date            Changes
+ * S Justice    01/09/06        Initial Version
+ ********************************************************************/
+
+#include <string.h>
+#include "HTTP Server\http.h"
+#include "httpEx.h"
+#include "ports.h"
+
+#define HTTPExampleLed1Toggle()     (mPORTAOutputConfig(IOPORT_BIT_4), mPORTAToggleBits(IOPORT_BIT_4))
+#define HTTPLed1On()                mPORTAReadLatchBit(IOPORT_BIT_4)
+
+#define HTTPExampleLed2Toggle()     (mPORTAOutputConfig(IOPORT_BIT_5), mPORTAToggleBits(IOPORT_BIT_5))
+#define HTTPLed2On()                mPORTAReadLatchBit(IOPORT_BIT_5)
+
+const HTTP_EX_FILENAME athenticateFiles[] =
+{
+    {   "authent.htm"   }
+};
+#define HTTP_EX_AUTHENT_SIZE    (sizeof(athenticateFiles) / sizeof(HTTP_EX_FILENAME))
+
+const HTTP_EX_FILENAME actionFile[] =
+{
+    {   "lcdwrite.cgi"  },
+    {   "ex16led.cgi"   }
+};
+#define HTTP_EX_POST_SIZE        (sizeof(actionFile) / sizeof(HTTP_EX_FILENAME))
+
+const HTTP_EX_FILENAME  lcdwriteVar[] =
+{
+    {   "line1"     },
+    {   "line2"     }
+};
+#define HTTP_EX_POST_LCD_WRITE_SIZE (sizeof(lcdwriteVar) / sizeof(HTTP_EX_FILENAME))
+
+const HTTP_EX_FILENAME  ledVar[] =
+{
+    {   "LED1"     },
+    {   "LED2"     }
+};
+#define HTTP_EX_POST_LED_SIZE (sizeof(ledVar) / sizeof(HTTP_EX_FILENAME))
+
+HTTP_EX_FILENAME    lcdLine[2] =
+{
+    {   "Test code 1"   },
+    {   "Test code 2"   }
+};
+
+PRIVATE DWORD _HitCount = 0;
+
+/*********************************************************************
+ * Function:        void HTTPExecCmd(BYTE **arg, BYTE num_arg)
+ *
+ * PreCondition:
+ *
+ * Input:           **arg - a pointer to an array of ASCII params
+ *                  num_arg - number of params in the array
+ *
+ * Output:          none
+ *
+ * Side Effects:
+ *
+ * Overview:        This function passes params that it has received via
+ *                  http GET method
+ *
+ * Note:
+ ********************************************************************/
+void HTTPExecCmd(BYTE **arg, BYTE num_arg)
+{
+    BYTE    param;
+
+    num_arg--;
+    param = 1;
+
+    while((num_arg) && (num_arg != 1))
+    {
+        num_arg -= 2;
+
+        if(num_arg)
+            HTTPSendVar(arg[0], arg[param], arg[param + 1], TRUE);
+        else
+            HTTPSendVar(arg[0], arg[param], arg[param + 1], FALSE);
+
+        param += 2;
+    }
+
+    if(num_arg)
+        HTTPSendVar(arg[0], arg[param], NULL, FALSE);
+
+}
+/*********************************************************************
+ * Function:        WORD HTTPGetVar(BYTE var, WORD ref, BYTE *data)
+ *
+ * PreCondition:
+ *
+ * Input:           var - escape char
+ *                  ref - index of data
+ *                  data - byte of file
+ *
+ * Output:          new ref
+ *
+ * Side Effects:
+ *
+ * Overview:        This function passes the escape character and the param
+ *                  that is read from the file
+ *
+ * Note:
+ ********************************************************************/
+WORD HTTPGetVar(BYTE var, WORD ref, BYTE *data)
+{
+    switch(var)
+    {
+        case 0:
+            *data = lcdLine[0].filename[ref];
+
+            ref++;
+
+            if(lcdLine[0].filename[ref] == '\0')
+                ref = HTTP_GET_FILE_EOF_VAR;
+            break;
+
+        case 1:
+            *data = lcdLine[1].filename[ref];
+
+            ref++;
+
+            if(lcdLine[1].filename[ref] == '\0')
+                ref = HTTP_GET_FILE_EOF_VAR;
+            break;
+
+        case 2:
+            #ifndef _BORLAND_BUILD
+            if(HTTPLed1On())
+            {
+                *data = 'n';
+                ref = HTTP_GET_FILE_EOF_VAR;
+            }else
+            {
+                *data = 'f';
+
+                if(ref)
+                    ref = HTTP_GET_FILE_EOF_VAR;
+                else
+                    ref++;
+            }
+            #else
+            *data = 'n';
+            ref = HTTP_GET_FILE_EOF_VAR;
+            #endif
+            break;
+
+        case 3:
+            #ifndef _BORLAND_BUILD
+            if(HTTPLed2On())
+            {
+                *data = 'n';
+                ref = HTTP_GET_FILE_EOF_VAR;
+            }else
+            {
+                *data = 'f';
+
+                if(ref)
+                    ref = HTTP_GET_FILE_EOF_VAR;
+                else
+                    ref++;
+            }
+            #else
+            *data = 'n';
+            ref = HTTP_GET_FILE_EOF_VAR;
+            #endif
+            break;
+
+        case 4:
+            if(!ref)
+                _HitCount++;
+
+            *data = _GetNumberChar(_HitCount, 9 - ref);
+            
+            ref++;
+
+            if(ref > 9)
+                return HTTP_GET_FILE_EOF_VAR;
+
+            break;
+        default:
+            return HTTP_GET_FILE_EOF_VAR;
+    }
+
+    return ref;
+}
+/*********************************************************************
+ * Function:        void HTTPPutVar(BYTE *filename, BYTE *var, BYTE *value, BOOL end)
+ *
+ * PreCondition:
+ *
+ * Input:
+ *
+ * Output:
+ *
+ * Side Effects:
+ *
+ * Overview:
+ *
+ * Note:
+ ********************************************************************/
+HTTP_STATUS_CODES HTTPSendVar(BYTE *filename, BYTE *var, BYTE *value, BOOL end)
+{
+    BYTE    i;
+    BYTE    k;
+
+    for(i = 0; i < HTTP_EX_POST_SIZE; i++)
+    {
+        if(!strcmp(filename, actionFile[i].filename))
+            break;
+    }
+
+    if(i >= HTTP_EX_POST_SIZE)
+        return HTTP_STATUS_NOT_FOUND;
+
+    switch(i)
+    {
+        case 0:
+            for(k = 0; k < HTTP_EX_POST_LCD_WRITE_SIZE; k++)
+            {
+                if(!strcmp(var, lcdwriteVar[k].filename))
+                    break;
+            }
+
+            if(k >= HTTP_EX_POST_LCD_WRITE_SIZE)
+                return HTTP_STATUS_NOT_IMPLEMENTED;
+
+            strcpy(lcdLine[k].filename, value);
+
+            #ifndef _BORLAND_BUILD
+            {
+				BYTE size;
+
+				size =  (BYTE)strlen(lcdLine[k].filename);
+
+				if(size < 16)
+				{
+					BYTE 	j;
+					BYTE	*ptr;
+
+					ptr = lcdLine[k].filename;
+
+					for(j = size; j < 16; j++)
+						ptr[j] = ' ';
+
+					ptr[j] = '\0';
+				}
+
+            	//***MyLcdWriteLine(k + 1, lcdLine[k].filename);
+			}
+            #endif
+            break;
+
+        case 1:
+            for(k = 0; k < HTTP_EX_POST_LED_SIZE; k++)
+            {
+                if(!strcmp(var, ledVar[k].filename))
+                    break;
+            }
+
+            if(k >= HTTP_EX_POST_LED_SIZE)
+                return HTTP_STATUS_NOT_IMPLEMENTED;
+
+            #ifndef _BORLAND_BUILD
+
+            if(k)
+                HTTPExampleLed1Toggle();
+            else
+                HTTPExampleLed2Toggle();
+
+            #endif
+            break;
+    }
+    return HTTP_STATUS_OK;
+}
+/*********************************************************************
+ * Function:        BOOL HTTPAuthorizationRequired(BYTE *filename)
+ *
+ * PreCondition:
+ *
+ * Input:
+ *
+ * Output:
+ *
+ * Side Effects:
+ *
+ * Overview:
+ *
+ * Note:
+ ********************************************************************/
+BOOL HTTPAuthorizationRequired(BYTE *filename)
+{
+	BYTE    idx;
+
+    for(idx = 0; idx < HTTP_EX_AUTHENT_SIZE; idx++)
+    {
+        if(!strcmp(filename, athenticateFiles[idx].filename))
+            return TRUE;
+    }
+
+    return FALSE;
+}
+/*********************************************************************
+ * Function:        BOOL HTTPPUTSendFile(BYTE *filename)
+ *
+ * PreCondition:
+ *
+ * Input:
+ *
+ * Output:
+ *
+ * Side Effects:
+ *
+ * Overview:
+ *
+ * Note:
+ ********************************************************************/
+BOOL HTTPPUTSendFile(BYTE *filename, HTTP_STATUS_CODES status)
+{
+    if(status == HTTP_STATUS_CREATED)
+		strcpy(filename, "put_ok.cgi");
+	else if(status == HTTP_STATUS_INTERNAL_SERVER_ERR)
+		strcpy(filename, "put_err.htm");
+	else
+		return FALSE;
+		
+    return TRUE;
+}
+/*********************************************************************
+ * Function:        BOOL HTTPChkAuthorization(BYTE *type, BYTE *text)
+ *
+ * PreCondition:
+ *
+ * Input:
+ *
+ * Output:
+ *
+ * Side Effects:
+ *
+ * Overview:
+ *
+ * Note:
+ ********************************************************************/
+BOOL HTTPChkAuthorization(BYTE *type, BYTE *text)
+{
+    type = strupr(type);
+
+    if(strcmp(type, "BASIC"))
+        return FALSE;
+
+    if(strcmp(text, "YWRtaW46cGFzc3dvcmQ="))
+        return FALSE;
+
+    return TRUE;
+}
+/*********************************************************************
+ * Function:        BOOL HTTPPUTUpload(BYTE *filename)
+ *
+ * PreCondition:
+ *
+ * Input:
+ *
+ * Output:
+ *
+ * Side Effects:
+ *
+ * Overview:        Check the file to upload to see if it is allowed
+ *
+ * Note:
+ ********************************************************************/
+BOOL HTTPPUTUpload(BYTE *filename)
+{
+    while(*filename != '.' || *filename != '\0')
+		filename++;
+
+	if(*filename == '\0')
+		return FALSE;
+
+	if(!strcmp(filename, ".txt"))
+		return FALSE;
+
+	return TRUE;
+}
+/*********************************************************************
+ * Function:        BOOL HTTPPUTUpload(BYTE *filename)
+ *
+ * PreCondition:
+ *
+ * Input:
+ *
+ * Output:
+ *
+ * Side Effects:
+ *
+ * Overview:        Check the file to upload to see if it is allowed
+ *
+ * Note:
+ ********************************************************************/
+BYTE _GetNumberChar(DWORD number, BYTE position)
+{
+    DWORD character;
+
+    character = number;
+
+    while(position)
+    {
+        character /= 10;
+        position--;
+    }
+
+    character %= 10;
+
+    return (BYTE)(character | 0x30);
+}

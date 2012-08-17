@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>MCC18 compatible Delays library for fedC and wizC</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<BODY>
+<PRE>
+<H1><B>MCC18 compatible Delays library</B></H1>
+<H1><B>      for fedC and wizC</B></H1>
+<H2>NAME</H2>
+     <B>MCC18 compatible Delays - Burn CPU-cycles</B>
+
+<H2>SYNOPSIS</H2>
+     <B>#include</B> <B>&lt;delays.h&gt;</B>
+
+     <B>void Delay1TCY( void );</B>
+     <B>void Delay10TCYx( unsigned char unit );</B>
+     <B>void Delay100TCYx( unsigned char unit );</B>
+     <B>void Delay1KTCYx( unsigned char unit );</B>
+     <B>void Delay10KTCYx( unsigned char unit );</B>
+
+<H2>DESCRIPTION</H2>
+     <B>Delay1TCY()</B> delays execution for one instruction cycle. It is implemented
+     as a macro.
+
+     <B>Delay10TCYx()</B> delays execution for multiples of 10 instruction cycles that
+     is specified in <B>unit</B>. A value of 1 to 255 provides 10 to 2550 Tcy delay.
+     A value of 0 will provide a delay of 2560 Tcy.
+    
+     <B>Delay100TCYx()</B> delays execution for multiples of 100 instruction cycles that
+     is specified in <B>unit</B>. A value of 1 to 255 provides 100 to 25,500 Tcy delay.
+     A value of 0 will provide a delay of 25,600 Tcy.
+
+     <B>Delay1KTCYx()</B> delays execution for multiples of 1,000 instruction cycles that
+     is specified in <B>unit</B>. A value of 1 to 255 provides 1,000 to 255,000 Tcy delay.
+     A value of 0 will provide a delay of 256,000 Tcy.
+
+     <B>Delay10KTCYx()</B> delays execution for multiples of 10,000 instruction cycles that
+     is specified in <B>unit</B>. A value of 1 to 255 provides 10,000 to 2,550,000 Tcy delay.
+     A value of 0 will provide a delay of 2,560,000 Tcy.
+
+<H2>RETURN VALUE</H2>
+     The macro's and functions in this library do not return a value.
+
+<H2>EXAMPLE</H2>
+     #include &lt;delays.h&gt;
+
+     Delay100TCYx(12);     // Delay 100 * 12 = 1200 cycles
+
+<H2>NOTES</H2>
+     The library only supports MCU's of the PIC18 family. An error is flagged when
+     the library is used with non-PIC18 MCU's.
+
+     When QuickCall is disabled, <B>Delay10TCYx()</B> is less accurate. Because,
+     for PIC18, QuickCall is very likely to be enabled, this should not matter much.
+     A warning is given when <B>Delay10TCYx()</B> is used while QuickCall is disabled.
+
+     Including <B>delays.h</B> automatically includes the standard FED delays library
+     as well.
+
+<H2>CONFIGURATION</H2>
+     No configuration is required.
+
+<H2>FILES</H2>
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\Delays.h
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\LibDelays\Delays.c
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\LibDelays\Delays16.c
+
+<H2>LICENSE</H2>
+     This software is based on the API of the delays library created by Microchip for
+     their MCC18 C-compiler. The "Microchip MCC18 compatible delays library for fedC
+     and wizC" software is released to the public domain but all rights by Microchip
+     must be respected. The software comes without warranty and/or guarantees of any
+     kind.
+
+     Copyright (c) 2005, HMCS, Marcel van Lieshout
+
+               <a href=http://www.hmcs.nl target="_blank"><img src=HMCservices.jpg border="0"></a>
+</PRE>
+</BODY></HTML>

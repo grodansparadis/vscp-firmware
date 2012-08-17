@@ -1,0 +1,47 @@
+;This file is used by the Modtronix Web Page Uploading program. It contains
+;a list of all files that should be uploaded to the web server.
+
+reserved_block = 64
+
+fsys_id = 1
+
+outfile = ..\default.img
+
+file = tag.htm /c
+file = lcd2s.htm /c
+file = xbus.htm /c
+file = exp1.cgi
+file = xbucfg.cgi
+file = xiocfg.cgi
+file = xpcfg.cgi
+file = intro.htm /c
+file = iocfg65.js /c
+file = xxdbcfg.cgi
+file = xscfg.cgi
+file = xacfg.cgi
+file = cmdcfg65.js /c
+file = index.htm /c
+file = ioval.cgi
+file = contact.htm /c
+file = xbuses.cgi
+file = bscfg65.js /c
+file = pwmval.cgi
+file = xuser.cgi
+file = in_a2.cgi
+file = lib01.js /c
+file = xwcfg.cgi
+file = bucfg65.js /c
+file = mx.css /c
+file = cmd.htm /c
+file = webcfg65.js /c
+file = xccfg.cgi
+file = xncfg.cgi
+file = pwmcfg65.js /c
+file = xcfg.htm /c
+file = syscfg65.js /c
+file = xdbcfg65.js /c
+file = _xdb.cgi
+file = aval.cgi
+file = buscfg65.js /c
+file = xbscfg.cgi
+file = netcfg01.js /c

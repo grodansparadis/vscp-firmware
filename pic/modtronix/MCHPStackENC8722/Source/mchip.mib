@@ -1,0 +1,167 @@
+-- PICDEM.net control MIB.
+--
+-- Author                   Date        Comment
+-- ==================================================================
+-- Nilesh Rajbharti         5/21/03     Initial
+--
+
+Microchip DEFINITIONS ::= BEGIN
+
+IMPORTS
+   enterprises, IpAddress, Gauge, TimeTicks     FROM RFC1155-SMI
+   DisplayString                                FROM RFC1213-MIB
+   OBJECT-TYPE                                  FROM RFC-1212
+   TRAP-TYPE                                    FROM RFC-1215;
+
+microchip                           OBJECT IDENTIFIER ::=  { enterprises 17095 }
+
+product                            OBJECT IDENTIFIER ::=  { microchip 1 }
+setup                               OBJECT IDENTIFIER ::=  { microchip 2 }
+control                             OBJECT IDENTIFIER ::=  { microchip 3 }
+
+   ON-OFF          ::=   INTEGER { ON(1), OFF(0) }
+
+
+name    OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Name of product. e.g. PICDEM.net etc."
+   ::= { product 1 }
+   
+
+version    OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Version string. e.g. 1.0"
+   ::= { product 2 }
+   
+date    OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Date of version"
+   ::= { product 3 }
+   
+ledD5 OBJECT-TYPE
+    SYNTAX INTEGER { ON(0), OFF(1) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION 
+        "D5 LED connected LATA2"
+    ::= { control 1 }
+    
+ledD6 OBJECT-TYPE
+    SYNTAX INTEGER { ON(0), OFF(1) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "D6 LED connected to LATA3"
+    ::= { control 2 }
+
+pushButton    OBJECT-TYPE
+   SYNTAX INTEGER { OPEN(1), CLOSED(0) }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "8-bit A/D value"
+   ::= { control 3 }
+
+
+analogPot0    OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "10-bit A/D value"
+   ::= { control 4 }
+   
+analogPot1    OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "10-bit A/D value"
+   ::= { control 5 }
+   
+   
+lcdDisplay  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Second line of LCD on PICDEM.net board"
+    ::= { control 6 }        
+
+
+traps OBJECT-TYPE
+    SYNTAX SEQUENCE OF TrapEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Trap table"
+    ::= { setup 1 }        
+    
+trapEntry OBJECT-TYPE
+    SYNTAX TrapEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Single trap entry containing trap receiver info."
+    INDEX { trapReceiverNumber }
+     ::= { traps 1 }
+     
+trapEntry ::=
+    SEQUENCE {
+        trapReceiverNumber
+            INTEGER,
+        trapEnabled
+            INTEGER,
+        trapReceiverIPAddress
+            IpAddress,
+        trapCommunity
+            DisplayString
+    }            
+    
+trapReceiverNumber  OBJECT-TYPE
+    SYNTAX INTEGER (0.. 4)
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Index of trap receiver"
+    ::= { trapEntry 1 }
+    
+trapEnabled OBJECT-TYPE
+    SYNTAX INTEGER { Yes(1), No(0) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Indicates if this trap entry is enabled or not."
+    ::= { trapEntry 2 }
+
+
+trapReceiverIPAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Trap receiver IP address"
+    ::= { trapEntry 3 }
+
+trapCommunity OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..7))
+    ACCESS  read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Trap community to be used by agent to send trap"
+    ::= { trapEntry 4 }
+
+
+
+
+
+END   

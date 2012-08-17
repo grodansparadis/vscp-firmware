@@ -1,0 +1,7 @@
+/** \defgroup a2d a2d: Analog-to-Digital Converter Functions
+
+    This library provides an easy interface to the analog-to-digital converter
+	 available on many AVR processors.
+	 
+	 Updated to support the ATmega128.
+*/

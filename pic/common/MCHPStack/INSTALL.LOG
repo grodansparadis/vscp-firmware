@@ -1,0 +1,145 @@
+***  Installation Started 03/17/2005 22:17  ***
+Title: Microchip TCP/IP Stack v2.20.04.01 Source Installation
+Source: D:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\7zO4CEF.tmp\MCHPStackv2.20.04.01.exe | 09-24-2003 | 09:52:12 | 1329398
+Made Dir: D:\dev\firmware\pic\common\MCHPStack
+File Copy: D:\dev\firmware\pic\common\MCHPStack\UNWISE.EXE | 06-25-1999 | 10:55:30 | | 149504 | 30fdd633
+RegDB Key: Software\Microsoft\Windows\CurrentVersion\Uninstall\Microchip TCP/IP Stack v2.20.04.01 Source
+RegDB Val: Microchip TCP/IP Stack v2.20.04.01 Source
+RegDB Name: DisplayName
+RegDB Root: 2
+RegDB Old: Microchip TCP/IP Stack v2.20.04.01 Source
+RegDB Key: Software\Microsoft\Windows\CurrentVersion\Uninstall\Microchip TCP/IP Stack v2.20.04.01 Source
+RegDB Val: D:\dev\firmware\pic\common\MCHPST~1\UNWISE.EXE D:\dev\firmware\pic\common\MCHPST~1\INSTALL.LOG
+RegDB Name: UninstallString
+RegDB Root: 2
+RegDB Old: D:\dev\MCHPST~1\UNWISE.EXE D:\dev\MCHPST~1\INSTALL.LOG
+Made Dir: D:\dev\firmware\pic\common\MCHPStack\Source
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\TFTPcDemo.c | 08-16-2003 | 14:19:38 | | 34475 | 2e85b18b
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\TFTPc.h | 08-12-2003 | 09:57:30 | | 16043 | 6d1384e8
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\TFTPc.c | 08-15-2003 | 13:27:10 | | 30897 | 554b15c6
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\MpTFTPcDemo.mcw | 09-24-2003 | 09:40:48 | | 24576 | faecb5bf
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\MpTFTPcDemo.mcp | 09-24-2003 | 09:40:44 | | 1171 | 67397fa1
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\MpTFTPcDemo.map | 09-24-2003 | 09:40:36 | | 142499 | 66fc7c16
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\MpTFTPcDemo.cof | 09-24-2003 | 09:40:36 | | 264383 | ce0908a0
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\HtTFTPcDemo.mcw | 09-24-2003 | 09:39:00 | | 23040 | d053a4b4
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\HtTFTPcDemo.mcp | 09-24-2003 | 09:38:50 | | 1043 | a131ebf3
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\HtTFTPcDemo.hex | 08-12-2003 | 10:41:28 | | 58771 | a20c381a
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\HtTFTPcDemo.cof | 09-24-2003 | 09:38:48 | | 206111 | e3c9335b
+File Copy: D:\dev\firmware\pic\common\MCHPStack\picdemnet10100.pdf | 06-24-2003 | 14:20:30 | | 190048 | aac4a30f
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\xlcd.c | 09-19-2002 | 14:26:14 | | 18479 | 8d5a6521
+Made Dir: D:\dev\firmware\pic\common\MCHPStack\Source\SmallWebPages
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\SmallWebPages\Status.CGI | 09-19-2002 | 14:26:14 | | 302 | 2ded45d
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\xlcd.h | 09-19-2002 | 14:26:14 | | 6350 | 56ef4d1f
+Made Dir: D:\dev\firmware\pic\common\MCHPStack\Source\WebPages
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\WebPages\Status.htm | 09-19-2002 | 14:26:14 | | 2141 | a87c6e8c
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\WebPages\Status.CGI | 09-19-2002 | 14:26:14 | | 485 | c7cd0faa
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\WebPages\snmp.bib | 06-05-2003 | 15:55:12 | | 302 | cc8404a6
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\WebPages\Mchp.gif | 09-19-2002 | 14:26:14 | | 2413 | 36373519
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\WebPages\Index.htm | 09-19-2002 | 14:26:14 | | 475 | 4bacbf96
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\WebPages\Home.htm | 09-19-2002 | 14:26:14 | | 1294 | 73cd24b3
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\WebPages\Header.htm | 05-23-2003 | 14:12:22 | | 1314 | 1ec0a469
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\WebPages\Footprnt.htm | 05-27-2003 | 14:40:50 | | 4211 | 3574548
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\WebPages\Features.htm | 05-23-2003 | 14:21:24 | | 1709 | 9637ac20
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\WebPages\Commands.cgi | 09-19-2002 | 14:26:14 | | 330 | e4b1e088
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\WebPages\Arch.htm | 09-19-2002 | 14:26:14 | | 459 | 5c3adca4
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\SmallWebPages\Commands.CGI | 09-19-2002 | 14:26:14 | | 319 | aa2a10e2
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\SmallWebPages\Index.htm | 09-19-2002 | 14:26:14 | | 391 | 2301d14c
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\SmallWebPages\Main.htm | 09-19-2002 | 14:26:14 | | 974 | a999f5b1
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\18c452.lkr | 09-19-2002 | 14:26:12 | | 997 | c93c8acb
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\18f452.lkr | 09-19-2002 | 14:26:12 | | 1044 | 4eca6075
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\18f8720.lkr | 08-22-2002 | 13:53:50 | | 1570 | 50cbc3ba
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\arp.c | 09-19-2002 | 14:26:12 | | 8046 | cc68808b
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\arp.h | 09-19-2002 | 14:26:12 | | 3802 | e9c5a5c2
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\ARPTsk.c | 08-11-2003 | 10:09:36 | | 6418 | b6a0327a
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\ARPTsk.h | 09-19-2002 | 14:26:12 | | 4117 | a3bee005
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\C18Cfg.asm | 03-21-2003 | 12:31:08 | | 3080 | 867542ef
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\CleanUp.bat | 05-28-2003 | 11:43:24 | | 833 | b82aad7
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Compiler.h | 06-24-2003 | 11:24:56 | | 9546 | 908d298a
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\delay.c | 09-19-2002 | 14:26:12 | | 2222 | 933e22b8
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\delay.h | 09-19-2002 | 14:26:12 | | 3910 | 181d26f4
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\DemoSNMPAgent.c | 08-16-2003 | 14:18:28 | | 35610 | 21f4b7f1
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\DemoSNMPAgent.hex | 09-24-2003 | 09:37:40 | | 56007 | a5f02a6e
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\DemoSNMPAgent.map | 09-24-2003 | 09:37:40 | | 226425 | 82da2a93
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\DemoSNMPAgent.mcp | 09-24-2003 | 09:37:48 | | 1276 | f4ad700b
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\DemoSNMPAgent.mcw | 09-24-2003 | 09:37:54 | | 29696 | a2c12c20
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\dhcp.c | 09-05-2003 | 09:56:24 | | 24069 | 1a37a69c
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\DHCP.h | 08-15-2003 | 11:25:06 | | 5908 | dc8062ae
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Empty.scp | 09-19-2002 | 14:26:12 | | 271 | cebf1ce7
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\ftp.c | 05-28-2003 | 10:54:08 | | 15913 | 809b3f96
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\ftp.h | 09-19-2002 | 14:26:12 | | 4124 | 28b88548
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Helpers.c | 06-23-2003 | 16:53:28 | | 3777 | 12f8b17d
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Helpers.h | 09-19-2002 | 14:26:12 | | 2019 | 4675faeb
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\htnicee.hex | 06-24-2003 | 13:43:34 | | 90692 | f3a8deb4
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Htnicee.map | 09-24-2003 | 09:38:08 | | 114202 | c3174df5
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\htnicee.mcp | 09-24-2003 | 09:38:12 | | 2168 | 7d6b704c
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\htnicee.mcw | 09-24-2003 | 09:38:16 | | 25088 | fa1ccae8
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\HtNICEE.pjt | 09-19-2002 | 14:26:12 | | 17319 | 6d03e2cf
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Htnicpg.hex | 09-19-2002 | 14:26:12 | | 76880 | 4fd89485
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Htnicpg.map | 09-19-2002 | 14:26:12 | | 75031 | feb39982
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\htnicpg.mcp | 09-24-2003 | 09:38:30 | | 1091 | 26efd3ea
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\htnicpg.mcw | 09-24-2003 | 09:38:34 | | 24576 | ded9b748
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\HtNICPG.pjt | 09-19-2002 | 14:26:12 | | 15290 | d73c7dcc
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Htslee.hex | 09-19-2002 | 14:26:12 | | 74716 | 5289d044
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Htslee.map | 09-19-2002 | 14:26:12 | | 57492 | a2a0437
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\HtSlEE.pjt | 09-19-2002 | 14:26:12 | | 15585 | a775932
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Htslpg.hex | 09-19-2002 | 14:26:12 | | 65725 | ee213aa4
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Htslpg.map | 09-19-2002 | 14:26:12 | | 41063 | f28bd599
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\HtSlPG.pjt | 09-19-2002 | 14:26:12 | | 14910 | e5c8c6ad
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\http.c | 05-23-2003 | 14:10:34 | | 22257 | 1f9f2bd8
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Http.h | 09-19-2002 | 14:26:12 | | 4027 | 5cd057c
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\icmp.c | 09-19-2002 | 14:26:12 | | 6887 | a848216
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\icmp.h | 09-19-2002 | 14:26:12 | | 4755 | feab91d8
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\ip.c | 09-19-2002 | 14:26:12 | | 9277 | 8a3811a8
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\ip.h | 09-19-2002 | 14:26:12 | | 7867 | 864a4eb8
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Mac.c | 08-15-2003 | 14:48:36 | | 16008 | e5235006
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Mac.h | 08-15-2003 | 11:17:44 | | 3146 | 3bee6a2
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\MasterDemo.c | 08-16-2003 | 14:19:12 | | 44752 | 8c8cf05d
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\mchip.mib | 05-23-2003 | 10:46:58 | | 3946 | e519aae0
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\mib.h | 06-03-2003 | 12:56:04 | | 1182 | 6f28ef2a
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\mib2bib.exe | 09-05-2003 | 09:40:14 | | 178176 | badfcf0d
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\mpfs.c | 05-28-2003 | 11:37:14 | | 13725 | f4c5b77b
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\MPFS.exe | 08-16-2003 | 14:35:48 | | 73216 | 782f709a
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\mpfs.h | 05-28-2003 | 11:11:56 | | 10962 | d88d98b8
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\MPFSimg.bin | 06-05-2003 | 15:55:46 | | 14728 | 175fb519
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\MPFSimg.c | 09-19-2002 | 14:26:12 | | 15029 | 2937cba7
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Mpnicee.hex | 09-24-2003 | 09:26:32 | | 62977 | 4f4f527b
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Mpnicee.map | 05-28-2003 | 11:25:32 | | 229094 | bd27f840
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\mpnicee.mcp | 09-24-2003 | 09:36:48 | | 3920 | 4e3d78e7
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\mpnicee.mcw | 09-24-2003 | 09:36:26 | | 29184 | f5a0ff46
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Mpnicee.pjt | 09-19-2002 | 14:26:12 | | 26229 | e4cc9e41
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\mpnicee_smsc.hex | 09-24-2003 | 09:39:32 | | 109679 | e6f03d
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\mpnicee_smsc.map | 09-24-2003 | 09:39:32 | | 268917 | 1f9016b
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\mpnicee_smsc.mcp | 09-24-2003 | 09:39:40 | | 1389 | 3a9bc356
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\mpnicee_smsc.mcw | 09-24-2003 | 09:39:54 | | 30208 | 442adf47
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Mpnicpg.hex | 09-24-2003 | 09:51:44 | | 89014 | a1b179ee
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Mpnicpg.map | 09-19-2002 | 14:26:14 | | 163755 | 96e899f8
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\mpnicpg.mcp | 09-24-2003 | 09:51:34 | | 1297 | 1f423e3a
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\mpnicpg.mcw | 09-24-2003 | 09:51:08 | | 25088 | 99604d28
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Mpnicpg.pjt | 09-19-2002 | 14:26:14 | | 25037 | 3989bccd
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Mpslee.hex | 09-19-2002 | 14:26:14 | | 84409 | df01f67a
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Mpslee.map | 09-19-2002 | 14:26:14 | | 260202 | 7ff5694e
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\MPSlEE.pjt | 09-19-2002 | 14:26:14 | | 21531 | fd39b2d4
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Mpslpg.hex | 09-19-2002 | 14:26:14 | | 83449 | 6f6d2a0a
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Mpslpg.map | 09-19-2002 | 14:26:14 | | 224938 | d1d610a9
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\MPSlPG.pjt | 09-19-2002 | 14:26:14 | | 21490 | 289d6b15
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\slip.c | 09-19-2002 | 14:26:14 | | 17535 | 727e5bab
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\SMSC91C111.c | 08-15-2003 | 15:22:52 | | 24026 | 3445f631
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\SNMP.c | 06-05-2003 | 11:03:10 | | 60624 | 21abac5c
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\SNMP.h | 06-05-2003 | 11:33:24 | | 16904 | c27e1cd9
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\snmp.mib | 06-05-2003 | 17:07:32 | | 5382 | e60117ad
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\StackTsk.c | 08-15-2003 | 14:40:10 | | 10996 | 3be40752
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\StackTsk.h | 08-15-2003 | 14:51:10 | | 17693 | 5d9a4369
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\tcp.c | 06-20-2003 | 11:21:40 | | 48930 | c8206a74
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Tcp.h | 09-19-2002 | 14:26:14 | | 12617 | 3ee66d6d
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Tick.c | 06-05-2003 | 10:56:08 | | 5098 | a70a460
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\Tick.h | 06-20-2003 | 11:55:22 | | 3748 | 294fd669
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\udp.c | 08-15-2003 | 14:07:26 | | 18322 | 937249cc
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\UDP.h | 08-15-2003 | 13:04:48 | | 11926 | dac362a2
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\version.log | 09-24-2003 | 09:44:20 | | 13580 | 3ea7e363
+File Copy: D:\dev\firmware\pic\common\MCHPStack\version.log | 09-24-2003 | 09:44:20 | | 13580 | 3ea7e363
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\websrvr.c | 09-05-2003 | 09:50:28 | | 34759 | 8452fa94
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\xeeprom.c | 09-19-2002 | 14:26:14 | | 16899 | 52113fdd
+File Copy: D:\dev\firmware\pic\common\MCHPStack\Source\xeeprom.h | 09-19-2002 | 14:26:14 | | 10738 | b2d4550d
+Shell Link: D:\Documents and Settings\Administrator\Start Menu\Programs\Microchip TCP/IP Stack\End User License Text Read Me.lnk
+Link Info: D:\dev\firmware\pic\common\MCHPST~1\End User License Text.txt |  |  | 0 | 1 | 0 | 
+User Rights: Admin

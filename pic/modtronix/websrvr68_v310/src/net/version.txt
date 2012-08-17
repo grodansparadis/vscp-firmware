@@ -1,0 +1,282 @@
+********************************************************************************
+Modtronix TCP/IP Stack
+********************************************************************************
+The Modtronix TCP/IP Stack is a modified version of the original Micorchip TCP/IP Stack.
+The licence of the original code still applies, see license.txt file!
+
+********************************************************************************
+V2.52 Modtronix TCP/IP Stack - 2009 September 8
+********************************************************************************
+- Fixed bug in SendFile() function in http.c - made getTagInfo variable static
+
+********************************************************************************
+V2.51 Modtronix TCP/IP Stack - 2008 October 13 (cvs tag pic_mxmctcpip_v251)
+********************************************************************************
+- Use configured default IP address if no DHCP server is available
+
+********************************************************************************
+V2.50 Modtronix TCP/IP Stack - 2008 July 10 (cvs tag pic_mxmctcpip_v250)
+********************************************************************************
+- Replaced DHCP module with new code from Microchip V4.50
+- Fixed bug in UDP command receiption where command was not correctly terminated
+- Made various other small changes
+
+********************************************************************************
+V2.48 Modtronix TCP/IP Stack - 2007 May 14 (cvs tag pic_mxmctcpip_v248)
+********************************************************************************
+- MAC changes to serial number from serial configuration menu is now stored in EEPROM.
+
+********************************************************************************
+V2.47 Modtronix TCP/IP Stack - 2007 February 22 (cvs tag pic_mxmctcpip_v247)
+********************************************************************************
+- Fixed bug in DHCP module were DHCP did not retry to get data if first attempt failed.
+- Added HTTP Header processing to HTTP Module
+- Added HTTP Basic Authentication
+- Modified RTL8019AS MAC Module to handle multiple TX Buffers
+- Added MACGetArrayChr() function to mac.c module.
+- Added TCPGetArrayChr() function to tcp.c module. This function is speeds up code
+  that needs to read an array from the TCP stream that is terminated by a given char.
+- Implemented multiple TX buffers for TCP. This means that multiple packets can
+  be send at the same time, which improves performance lots.
+- Added PWM commands and tags
+- Added "UDP Command" function
+- The following 3 bug fixes were submitted by Giorgio, thanks! For details, see:
+  http://forum.modtronix.com/index.php?topic=606.
+- Fixed checksum computation bug in CalcIPChecksum() function, thanks to Giorgio!
+- Fixed bug where lost/faulty outbound TCP packets not retransmitted after receiving
+  duplicate ACKs. Thanks to Giorgio!
+- Fixed bug where lost/faulty outbound TCP packets not retransmitted after receiving
+  data from remote node. Thanks to Giorgio!
+- Added fseePutByte() code given to us by OmarZ, see http://forum.modtronix.com/index.php?topic=242.0
+
+********************************************************************************
+V2.46 Modtronix TCP/IP Stack - 2006 October 9 (cvs tag pic_mxmctcpip_v246)
+********************************************************************************
+- Fixed bug in TCPInit() function that overwrote random data
+- Improved DHCP process
+- Integrated NetBIOS and DNS into Modtronix TCP/IP stack
+
+
+********************************************************************************
+V2.45Beta2 Modtronix TCP/IP Stack - 2006 September 25 (cvs tag pic_mxmctcpip_v245b2)
+********************************************************************************
+- Removed code that resends all TCP segments twice, and placed it in new
+  TCP_SEND_EACH_SEGMENT_TWICE #ifdef condition
+
+
+********************************************************************************
+V2.45Beta1 Modtronix TCP/IP Stack - 2006 September 6 (cvs tag pic_mxmctcpip_v245b1)
+********************************************************************************
+- Implemented code modification to TCP code from Microchip V3.75 and V3.60 TCP/IP stack:
+- Changes ported from Microchip V3.75:
+     - Added beta DNS client module (DNS.c).  DHCP was also updated to obtain a DNS 
+       server address.  Added AppConfig.PrimaryDNSServer IP address.  Added STACK_USE_DNS 
+       configuration macro.  To use the DNS client, call DNSResolve() with the server name, 
+       ex: DNSResolve("www.microchip.com"), and then periodically call DNSIsResolved() 
+       until it returns TRUE, ex: DNSIsResolved(&IPAddressDestination).  Only one DNS 
+       resolution can be in progress at a time.  Because the DNS client is a beta module, 
+       the API or code may change before being finalized.  No formal DNS API documentation 
+       is available yet.
+     - Added beta NetBIOS Name Service responder module (NBNS.c).  Added 
+       AppConfig.NetBIOSName string.  Added STACK_USE_NBNS configuration macro.  Added 
+       MY_DEFAULT_HOST_NAME macro in StackTsk.h.  Now, whenever a NetBIOS broadcast 
+       attempting to resolve AppConfig.NetBIOSName arrives, a response will be made.  
+       This form of name resolution only works on a single subnet.  Off the subnet, 
+       manual registration in a DNS server or other means will be needed to allow the 
+       local Host Name to be recognized and translated to an IP address.  The default 
+       NetBIOS name for the board is "MCHPBOARD".  To test the NetBIOS Name Service 
+       module, try entering http://MCHPBOARD/ into your web browser instead of the board's
+       IP address.
+     - Added Embedded Ethernet Device Discoverer PC project to aid in embedded product 
+       discovery when connected to a network and demonstrate how to write PC applications 
+       which can communicate with embedded devices.  The source code for this device is 
+       included.  It can be built using the Microsoft Visual C# 2005 Express Edition 
+       compiler.  At the time of stack release, this 3rd party PC development tool can be 
+       downloaded at no cost from http://msdn.microsoft.com/vstudio/express/.  If using 
+       only the Microchip Device Discoverer executable file without the Visual C# compiler, 
+       the .NET Framework 2.0 must be installed on the local PC.  The application setup 
+       utility should allow dynamic downloading of this component if the target machine 
+       does not already have it installed.
+    -  Updated Announce.c to listen and respond to discovery requests sent to UDP port 
+       30303 starting with the character 'D'.  To test this functionality, use the 
+       Embedded Ethernet Device Discoverer on a PC connected to the same subnet.
+    -  All stack modules that can be disabled (DHCP.c, FTP.c, etc) now will no longer 
+       emit a compiler error if you have it in the project without defining the 
+       appropriate macro (STACK_USE_DHCP, STACK_USE_FTP, etc).  It will simply generate 
+       no machine code when compiled and the stack will not use that module.  Make sure 
+       the proper macro is defined for each module that you wish to use.
+    -  Added SetRXHashTableEntry() to ENC28J60.c.  This function can be used to set the 
+       appropriate bit in the Hash Table registers to join a particular multicast group.
+    -  Added Realtek RTL8019AS Ethernet controller support to the stack.  MAC.c was 
+       renamed to RTL8019AS.c.  This Ethernet controller is not recommended for new 
+       designs.  RTL8019AS support was reintroduced to provide ongoing assistance to 
+       former Application designs implementing this chip.  For new applications, use the 
+       Microchip ENC28J60 or PIC18F97J60 family of microcontrollers.
+- Bug Fixes ported from Microchip V3.75:
+    -  Fixed a serious MAC TXBuffer leak in TCP.c.  Previously TCP.c would allocate a 
+       buffer for each socket in use, but under heavy traffic conditions (ex: user holds 
+       down F5 on web browser), the buffer handle might have been discarded before 
+       releasing the buffer.  As a result all TCP connections would have lost the ability 
+       to send any application data after the TXBuffer pool ran out.
+    -  In the TCP_SYN_SENT TCP state, ACKs may only be received (as opposed to SYN+ACK 
+       packets) if the remote node thinks the connection is already open.  A RST is now 
+       sent in response to an unexpected ACK, which may improve reconnection time when 
+       this (rare) condition occurs.
+    -  A bug was present in the UDP module where remote MAC addresses would be cached for 
+       each socket, even when UDPInit() or UDPClose() was called, or the microcontroller 
+       was reset.  As a result, responses to incoming packets could have been sent to the 
+       wrong MAC address.  UDP Sockets are now properly initialized/closed.
+- Changes ported from Microchip V3.60:
+    -  Changed IP Gleaning procedure.  Now, if DHCP is enabled, the DHCP module will 
+       continue to look for a new IP address/renew existing IP address if the IP address 
+       is configured using IP Gleaning.  Previously, the DHCP module would be disabled 
+       once a successful ICMP packet was received and used to configure the IP address.
+    -  Updated TCP state machine.  It now includes the TCP_FIN_WAIT_2 state.  Some other 
+       changes were made to handle errors more robustly.
+    -  FTP client hash printing has been added to the FTP server.  Now, whenever a chunk 
+       of data is successfully uploaded to the device, a '#' character will appear on the 
+       FTP client screen.  The numbers of bytes each '#' represents is variable.
+    -  Multiple TX buffer support has been implemented.  Most stack layers have been 
+       touched.  ENC28J60.c has the most extensive changes.  Each socket may use only one
+       TX buffer.
+    -  Implemented TCP retransmission support regardless of if TCP_NO_WAIT_FOR_ACK is 
+       defined or not.
+    -  TCP_NO_WAIT_FOR_ACK in StackTsk.h has been undefined by default.  This should 
+       increase default TCP connection robustness.  Packets sent from the stack to the 
+       remote node will now be detected and retransmitted if lost or corrupted.
+    -  All TCP packets are now retransmitted immediately after being initially transmitted 
+       when TCP_NO_WAIT_FOR_ACK is undefined.  This improves throughput greatly when 
+       communicating with systems which wait a long time before transmitting ACKs.  TCP/IP 
+       stacks, such as that used by Microsoft Windows, implement the TCP Delayed 
+       Acknowledgement algorithm, which is why this retransmission is necessary for high 
+       performance.  The double transmission feature can be disabled in the Microchip 
+       TCP/IP stack by defining "DEBUG" either in the TCP.c file or the project compiler 
+       macros section.  Using DEBUG mode can be useful when trying to look for errors 
+       using Ethreal [ http://www.ethereal/ ].
+    -  Lowered TCP_START_TIMEOUT_VAL from 60 seconds to 3 seconds.  60 seconds is an 
+       unreasonably long timeout for modern day network speeds.
+    -  Native support for the SLIP module has been dropped.
+- Fixes ported from Microchip V3.60:
+    -  DHCP client will now correctly use the first DHCP offer received when connected 
+       to a network running multiple DHCP servers.  Previously, the board would get no
+       IP address when attached to a network with multiple DHCP servers (unless the DHCP 
+       request was transmitted before a second DHCP offer was received -- a relatively 
+       rare event).  Additionally, DHCPLeaseTime does not get reset to 60 seconds or 
+       the value stored in the last DHCP packet received prior to receiving the ACK.
+    -  UDPProces() will now correctly process received UDP packets that have a 0x0000 
+       checksum field.  The UDP protocol specifies that 0x0000 means the checksum is 
+       disabled.  Packets with a 0x0000 checksum were previously thrown away unless the 
+       calculated checksum also happened to be 0x0000.
+    -  The TCPIsPutReady() function will now honor the remote node's TCP window size.  In 
+       other words, if the remote application pauses or cannot handle the incoming data 
+       rate, the TCP flow control feature will correctly function.  Previously, if the 
+       remote node ran out of incoming buffer memory, the TCP layer would still allow 
+       more data to be transmitted.  This would result in the loss or corruption of 
+       application data, with a potentially broken connection.  The change requires 2 more
+       bytes of RAM per TCP socket (TCB array).
+
+
+
+********************************************************************************
+V2.44Beta1 Modtronix TCP/IP Stack - 2006 May 4 (cvs tag pic_mxmctcpip_v244b1)
+********************************************************************************
+- Implemented code modification to TCP code from Microchip V3.02 TCP/IP stack
+
+
+
+********************************************************************************
+V2.43 Modtronix TCP/IP Stack - 2006 January 9 (cvs tag pic_mxmctcpip_v243)
+********************************************************************************
+- Added support for PIC18F6627 CPU
+- Implemented code required for second I2C module present on new PIC chips
+- Added defines for Port F to compiler.h
+
+
+
+********************************************************************************
+V2.42 Modtronix TCP/IP Stack - 2006 January 9 (cvs tag pic_mxmctcpip_v242)
+********************************************************************************
+- Added UDPGetArray() and UDPPutArray() functions to improve performance
+- Added TCPGetArray() and TCPPutArray() functions to improve performance
+- Increased performance of UDP and TCP send and receive
+- Added documentation and example projects for UDP, TCP, File System, Ticks...
+- Fixed bug with second TICK
+- Added memclr() function to helpers.c
+
+
+
+********************************************************************************
+V2.41 Modtronix TCP/IP Stack - 2005 December 23 (cvs tag pic_mxmctcpip_v241)
+********************************************************************************
+- Changed HTTP_INFO structure to allow implementation of more of the HTTP protocol
+- Added support for HTTP POST method
+
+
+
+********************************************************************************
+V2.40 Modtronix TCP/IP Stack - 2005 December 21 (cvs tag pic_mxmctcpip_v240)
+********************************************************************************
+- Fixed error that occurred when long resource name is received in HTTP header
+- Added support for Javascript ".js" files
+- Fixed bug in HTTP module that overwrote memory when filenames longer then 12
+  characters (8.3 format) were requested.
+- Added HTTP_PARSE_FILETYPE_HTML and HTTP_PARSE_FILETYPE_JS defines to HTTP module that can
+  be used to enable parsing (replace %nnn tags) of HTML and JavaScript files.
+- Added support for sending compressed Text, HTML and JavaScript HTTP files.
+- Added version information
+- All IP messages now sent have the DF (Don't Fragment) flag set!
+- File System has been completely redone. Now supports multiple File Systems
+- Modified FTP code to use new File System
+- Modified HTTP user authentication code
+- Added new defines to optimize code for size or speed
+- External EEPROM code completely redone. Put all I2C code in separate file.
+- Tick code redone. Added support for 16bit and 8bit tick counters. This optimizes code size and speed.
+
+
+
+********************************************************************************
+V2.30 Modtronix TCP/IP Stack - 2005 July 31 (cvs tag pic_mxmctcpip_v230)
+********************************************************************************
+- Optimized CalcIPChecksum() function - smaller and faster
+- Added option to use Access RAM in mac module to improve size and speed
+
+
+
+********************************************************************************
+V2.20 Modtronix TCP/IP Stack - 2005 May 10 (cvs tag pic_mxmctcpip_v220)
+********************************************************************************
+- Fixed problem in MAC Receive buffer where large TCP and UDP packets that crossed MAC
+  Receive buffer boundary got corrupted.
+- Fixed minimum length check in Ethernet packet - caused CRC error
+- Added PIC configuration to main file - removed c18cfm.asm file
+- Added configuration to mac.c to disable INT0 output of RTL8019AS. When disabled,
+  PIC port pin RB0 is tri-state, and can be used by user.
+- Modified TCPProcess() to include localIP as third param. This was done to
+  allow this function to calculate checksum correctly.
+- Added UDPChecksum logic in UDPProcess()
+- Modified UDPProcess() and FindMatchingSocket() to include localIP as new parameter.
+  This corrects pseudo header checksum logic in UDPProcess().
+  It also corrects broadcast packet matching correct in FindMatchingSocket().
+- Moved some defines from dhcp.h and dhcp.c to projdefs.h
+- Moved some defines from ftp.h and ftp.c to projdefs.h
+- Moved some defines from http.h and http.c to projdefs.h
+- Moved some defines from ip.h and ip.c to projdefs.h
+- Moved some defines from snmp.h and snmp.c to projdefs.h
+- Moved some defines from tcp.h and tcp.c to projdefs.h
+
+
+
+********************************************************************************
+V2.10 Modtronix TCP/IP Stack - 2005 March 01 (cvs tag pic_mxmctcpip_v210)
+********************************************************************************
+- Cleaned up includes at top of each file. Each *.h file includes projdefs.h as first
+  include. Each *.c file includes it's *.h file as first include.
+
+
+
+********************************************************************************
+V2.00 Modtronix TCP/IP Stack - 2005 Jan 19 (cvs tag pic_mxmctcpip_v200)
+********************************************************************************
+- Made major changes to the original stack. All project specific defines have been moved
+  from stack files to the projdefs.h file
+- Changed the callback functions HTTPGetVar() and HTTPExecGetCmd() in http module.

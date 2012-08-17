@@ -1,0 +1,154 @@
+﻿/*
+Style Sheet "webserver.css"
+by:  Dennis Lehman, HPMD Applications - Microchip
+
+*/
+	
+		body
+		{
+		font-family: arial;
+		color: #000000;
+		background: #FFFFFF;
+		font-size:10pt;
+		}
+		
+		span
+		{
+		font-family: Arial;
+		color: #000000;
+		background: #FFFFFF;
+		font-size: 10pt;
+		}
+		
+		span.title_small
+		{
+		font-family:arial;
+		font-style:normal;
+		color: #000000;
+		font-weight:bold;
+		font-size:0.9em;
+		}
+		
+		span.title_large
+		{
+		font-family:Arial;
+		color: #000000;
+		font-weight:bold;
+		font-size:1.2em;
+		}
+		
+		span.title_super
+		{
+		font-family:arial;
+		font-style:italic;
+		color: #ff0000;
+		font-weight:bold;
+		font-size:1.4em;
+		}
+				
+		p.text_small, span.text_small
+		{
+		font-size:8pt;
+		font-family:arial;
+		font-weight:normal;
+		color: #000000;
+	    }
+		
+		p.Heading0, li.Heading0, div.Heading0, span.Heading0
+		{
+		font-size:1.6em;
+		font-family:arial;
+		font-weight:bold;
+		}
+		
+		table
+		{
+		width:100%;
+		padding: 0px 0px 0px 0px;
+		font-size: 10pt;
+		border: solid 0px green;
+		}
+        
+        table.navigation
+        {
+        border: 3px;
+		background-image:url(ticellblue2.gif);
+		width:100%;
+		}
+		
+		table.features
+		{
+		width:96%;
+		margin-left:2%;
+		border-collapse:collapse;
+		}
+		
+		table.status
+		{
+		width:100%;
+		border-collapse:collapse;
+		border:solid 2px green;
+		font-size:11pt;
+		font-weight:bold;
+		}
+		table.description
+		{
+		    background-color:#f0f0f0;
+		    border:solid 0px blue;
+		    border-collapse:collapse;
+		    margin: 5px 0px 5px 0px;
+		}
+		td.description
+		{
+		    width:45%;
+		    vertical-align:top;
+		    padding:5px 5px 5px 5px;
+		    font-size:1.0em;
+		}
+		
+		tr.feature_stripes
+		{
+		    background-color:#d0d0d0;
+		    border: solid 1px #d0d0d0;
+		}	
+		
+		/* navigation bar styles */
+		.navbar
+		{
+		    text-align:center;
+		    font-size: 1.0em;
+		    font-family:arial;
+		    color:white;
+		    background-image:url(ticellblue2.gif);
+		    background-repeat:repeat-x;
+		    width:100%;
+		}
+		.navbar a
+		{
+		    color:blue;
+		    font-weight:bold;
+		}
+		.navbar a:hover
+		{
+		    color:white;
+		    font-weight:bold;
+		}
+		
+		/* picture styles */
+		img.picture_left
+		{
+		    width: auto;
+		    height: auto;
+		    border-width: 0px;
+		    vertical-align:top;
+		    float:left;
+		}
+		img.picture_right
+		{
+		    width: auto;
+		    height: auto;
+		    border-width: 0px;
+		    vertical-align:top;
+		    float:right;
+		}
+		

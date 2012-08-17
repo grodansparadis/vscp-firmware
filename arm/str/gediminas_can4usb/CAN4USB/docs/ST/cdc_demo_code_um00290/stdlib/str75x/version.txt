@@ -1,0 +1,19 @@
+/******************** (C) COPYRIGHT 2006 STMicroelectronics ********************
+* File Name          : version.txt
+* Author             : MCD Application Team
+* Date First Issued  : 03/10/2006
+* Description        : Version file for STR75x software library.
+********************************************************************************
+
+* 07/17/2006 : V1.0
+===================
+  Updated version
+
+
+* 03/10/2006 : V0.1
+===================
+  Created.
+
+******************* (C) COPYRIGHT 2006 STMicroelectronics *****END OF FILE****
+
+

@@ -1,0 +1,38 @@
+BODY {font-size:12px; font-family:Verdana,Arial,sans-serif;}
+TABLE {font-size:12px; font-family:Verdana,Arial,sans-serif;}
+UL {margin-top:4px; margin-bottom:4px;}
+
+.pgHdr {font-size:18px; color:#000080; white-space:nowrap; font-weight:bold;}
+.pgSec {font-size:16px; color:#000070; white-space:nowrap; font-weight:bold;}
+
+.mxlink {color: #0000FF; text-decoration: underline;}
+
+.ifrmBody {margin-bottom: 50px; padding: 3px;}
+
+/* Modtronix Boxes */
+.bBox {border:2px solid #999999; padding: 0px;}
+
+.bHdr {font-size:16px; background:#AAAAAA; white-space:nowrap; font-weight:bold;}
+
+.bSec {font-size:14px; background:#BBBBBB; padding-left:5; font-weight:bold;}
+
+.bSub {font-size:14px; background:#CCCCCC; padding-left:10; font-weight:bold;}
+
+.bDesc {background:#D0E0F0; padding-left:20;}
+
+.bLbl {background:#D0D0D0; white-space:nowrap; padding-left:20; padding-right:20;}
+
+.bCtr {background:#DDDDDD; padding-left:10; padding-right:20;}
+
+.bCel {background:#DDDDDD; }
+
+.bBot {background:#DDDDDD; padding-top: 20;}
+
+
+
+
+
+
+
+
+

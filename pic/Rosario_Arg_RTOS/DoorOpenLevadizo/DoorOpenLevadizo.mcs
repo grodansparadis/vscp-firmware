@@ -1,0 +1,240 @@
+[Header]
+MagicCookie={0b13fe8c-dfe0-40eb-8900-6712719559a7}
+Version=1.0
+[File000]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Obj\VSCP_app.o
+Folder=Intermediary
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={E56A1C86-9D32-4DF6-8C34-FE0388B1B644}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mcc18.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=-DRMT_DRV -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa- -On-
+TraceCmdString=
+DebugOptions=-D__DEBUG
+[File001]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Obj\Task3_Loop.o
+Folder=Intermediary
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={E56A1C86-9D32-4DF6-8C34-FE0388B1B644}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mcc18.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=-DRMT_DRV -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa- -On-
+TraceCmdString=
+DebugOptions=-D__DEBUG
+[File002]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Obj\Main_VSCP.o
+Folder=Intermediary
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={E56A1C86-9D32-4DF6-8C34-FE0388B1B644}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mcc18.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=-DRMT_DRV -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa- -On-
+TraceCmdString=
+DebugOptions=-D__DEBUG
+[File003]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Obj\Int_VSCP.o
+Folder=Intermediary
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={E56A1C86-9D32-4DF6-8C34-FE0388B1B644}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mcc18.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=-DRMT_DRV -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa- -On-
+TraceCmdString=
+DebugOptions=-D__DEBUG
+[File004]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Obj\Tasks_Desc.o
+Folder=Intermediary
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={E56A1C86-9D32-4DF6-8C34-FE0388B1B644}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mcc18.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=-DRMT_DRV -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa- -On-
+TraceCmdString=
+DebugOptions=-D__DEBUG
+[File005]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Obj\VSCP_Functions.o
+Folder=Intermediary
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={E56A1C86-9D32-4DF6-8C34-FE0388B1B644}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mcc18.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=-DRMT_DRV -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa- -On-
+TraceCmdString=
+DebugOptions=-D__DEBUG
+[File006]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Obj\eeprom.o
+Folder=Intermediary
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={E56A1C86-9D32-4DF6-8C34-FE0388B1B644}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mcc18.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=-DRMT_DRV -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa- -On-
+TraceCmdString=
+DebugOptions=-D__DEBUG
+[File007]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Obj\Task2_VSCP.o
+Folder=Intermediary
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={E56A1C86-9D32-4DF6-8C34-FE0388B1B644}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mcc18.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=-DRMT_DRV -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa- -On-
+TraceCmdString=
+DebugOptions=-D__DEBUG
+[File008]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Obj\Task0_InitAddress.o
+Folder=Intermediary
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={E56A1C86-9D32-4DF6-8C34-FE0388B1B644}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mcc18.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=-DRMT_DRV -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa- -On-
+TraceCmdString=
+DebugOptions=-D__DEBUG
+[File009]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Obj\VSCP_drv.o
+Folder=Intermediary
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={E56A1C86-9D32-4DF6-8C34-FE0388B1B644}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mcc18.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=-DRMT_DRV -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa- -On-
+TraceCmdString=
+DebugOptions=-D__DEBUG
+[File010]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Obj\RMT_drv.o
+Folder=Intermediary
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={E56A1C86-9D32-4DF6-8C34-FE0388B1B644}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mcc18.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=-DRMT_DRV -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa- -On-
+TraceCmdString=
+DebugOptions=-D__DEBUG
+[File011]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Obj\DM_Application.o
+Folder=Intermediary
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={E56A1C86-9D32-4DF6-8C34-FE0388B1B644}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mcc18.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=-DRMT_DRV -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa- -On-
+TraceCmdString=
+DebugOptions=-D__DEBUG
+[File012]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Obj\DoorOpenLevadizo.o
+Folder=Intermediary
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={E56A1C86-9D32-4DF6-8C34-FE0388B1B644}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mcc18.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=-DRMT_DRV -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa- -On-
+TraceCmdString=
+DebugOptions=-D__DEBUG
+[File013]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out\DoorOpenLevadizo.cof
+Folder=Output
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={96C98149-AA1B-4CF9-B967-FAE79CAB663C}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mplink.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=/m"$(BINDIR_)$(TARGETBASE).map" /o"$(BINDIR_)$(TARGETBASE).cof"
+TraceCmdString=
+DebugOptions=/z__MPLAB_DEBUG=1 /z__MPLAB_DEBUGGER_ICD2=1 /z__ICD2RAM=1
+[File014]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out\DoorOpenLevadizo.hex
+Folder=Output
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={96C98149-AA1B-4CF9-B967-FAE79CAB663C}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mplink.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=/m"$(BINDIR_)$(TARGETBASE).map" /o"$(BINDIR_)$(TARGETBASE).cof"
+TraceCmdString=
+DebugOptions=/z__MPLAB_DEBUG=1 /z__MPLAB_DEBUGGER_ICD2=1 /z__ICD2RAM=1
+[File015]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out\DoorOpenLevadizo.cod
+Folder=Output
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={96C98149-AA1B-4CF9-B967-FAE79CAB663C}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mplink.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=/m"$(BINDIR_)$(TARGETBASE).map" /o"$(BINDIR_)$(TARGETBASE).cof"
+TraceCmdString=
+DebugOptions=/z__MPLAB_DEBUG=1 /z__MPLAB_DEBUGGER_ICD2=1 /z__ICD2RAM=1
+[File016]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out\DoorOpenLevadizo.lst
+Folder=Output
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={96C98149-AA1B-4CF9-B967-FAE79CAB663C}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mplink.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=/m"$(BINDIR_)$(TARGETBASE).map" /o"$(BINDIR_)$(TARGETBASE).cof"
+TraceCmdString=
+DebugOptions=/z__MPLAB_DEBUG=1 /z__MPLAB_DEBUGGER_ICD2=1 /z__ICD2RAM=1
+[File017]
+Location=D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out\DoorOpenLevadizo.map
+Folder=Output
+DeviceName=PIC18F258
+LanguageToolSuiteID={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
+LanguageToolID={96C98149-AA1B-4CF9-B967-FAE79CAB663C}
+LanguageToolLocation=C:\Archivos de programa\Microchip\MCC18\bin\mplink.exe
+PPAD=$(BINDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Out||$(TMPDIR)|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\obj||$(AINDIR)||$(INCDIR)|C:\Archivos de Programa\Microchip\MCC18\h;D:\Marcelo\0_Working\VSCP\RTOS\Include;D:\Marcelo\0_Working\VSCP\VSCP_RTOS;D:\Marcelo\0_Working\VSCP\VSCP_Driver;D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo||$(LIBDIR)|C:\Archivos de Programa\Microchip\MCC18\lib;D:\Marcelo\0_Working\VSCP\RTOS\Lib||$(LKRDIR)||
+SOLK=<src>|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\VSCP_app.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\Task3_Loop.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Main_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Int_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Tasks_Desc.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\VSCP_Functions.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\eeprom.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task2_VSCP.c|D:\Marcelo\0_Working\VSCP\VSCP_RTOS\Task0_InitAddress.C|D:\Marcelo\0_Working\VSCP\VSCP_Driver\VSCP_drv.c|D:\Marcelo\0_Working\VSCP\VSCP_Driver\RMT_drv.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DM_Application.c|D:\Marcelo\0_Working\VSCP\DoorOpenLevadizo\DoorOpenLevadizo.c||<obj>||<lib>||<lkr>|D:\Marcelo\0_Working\VSCP\LKR\18f258ori.lkr||
+SuiteArgsString=
+ToolArgsString=/m"$(BINDIR_)$(TARGETBASE).map" /o"$(BINDIR_)$(TARGETBASE).cof"
+TraceCmdString=
+DebugOptions=/z__MPLAB_DEBUG=1 /z__MPLAB_DEBUGGER_ICD2=1 /z__ICD2RAM=1
+[TOOL_LOC_STAMPS]
+tool_loc{96C98149-AA1B-4CF9-B967-FAE79CAB663C}=C:\Archivos de programa\Microchip\MCC18\bin\mplink.exe
+tool_loc{E56A1C86-9D32-4DF6-8C34-FE0388B1B644}=C:\Archivos de programa\Microchip\MCC18\bin\mcc18.exe

@@ -1,0 +1,78 @@
+Documentation for module RiffFile.
+Version 1.1.
+
+Copyright (c) 1996 by Timothy J. Weber.
+
+Requires:
+	Standard Template Library stacks and vectors
+
+Change history:
+	tjw 19 Aug 96: started
+	tjw 01 Sep 96: finished initial version
+	tjw 13 Mar 97: fixed bug that left file handle open upon destruction.
+
+
+-------------------------------------------------------------------------------
+SUMMARY
+
+A platform-independent way to read a RIFF file (e.g., WAVE).
+
+
+-------------------------------------------------------------------------------
+EXTERNAL INTERFACE
+
+
+class RiffFile:
+
+	RiffFile(const char *name)
+		Constructor.  Opens the named file, and calls rewind(); if rewind()
+		returns false, it sets the file pointer to null.
+		The file is closed when the instance is destroyed.
+
+	bool rewind()
+		Moves to the first chunk of the file.
+		Returns false if the file is not a RIFF file.
+
+	const char* formType() const
+		Returns the form type, or 0 if the file is not a RIFF file.
+
+	bool push(const char* chunkType = 0)
+		Descends from the current chunk to a subchunk with the specified type.
+		If the type is 0, descends into the next available chunk, starting at
+		the current file position.
+		Assumes chunkType is four characters long.
+		Leaves the get and put pointers pointing to the beginning of the
+		chunk's contents.
+		Returns false if the specified chunk type can't be found.
+
+	bool pop()
+		Pops up to the containing chunk, and positions after the end of of the
+		current subchunk.  If the current chunk is a top-level chunk, returns
+		false.
+
+	long chunkSize() const
+		Returns the size of the current chunk, or 0 if there is none.
+
+	const char* chunkName() const
+		Returns the name of the current chunk, or 0 if there is none.
+
+	const char* subType() const
+		Returns the subtype of the current chunk, or 0 if there is none.
+		(E.g.: a LIST chunk might have a subtype of INFO, or a top-level
+		RIFF chunk a subtype of WAVE.)
+
+	FILE* filep()
+		Returns a file pointer that can be used for reading.  May return 0.
+
+
+-------------------------------------------------------------------------------
+IMPLEMENTATION NOTES
+
+-------------------------------------------------------------------------------
+WISH LIST
+
+Should use Win32 Multimedia API calls if they're available, for complete
+compatibility with other programs on those platforms.
+
+Expand to handle RIFX transparently.
+

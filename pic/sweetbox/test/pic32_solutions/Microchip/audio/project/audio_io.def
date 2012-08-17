@@ -1,0 +1,96 @@
+/*********************************************************************
+ *
+ *            Audio IO Configuration File
+ *
+ *********************************************************************
+ * FileName:        audio_io.def
+ * Description: 	Configurations for the default audio IO opertaions
+ * Company:         Microchip Technology, Inc.
+ *
+ * Software License Agreement
+ *
+ * The software supplied herewith by Microchip Technology Incorporated
+ * (the “Company”) for its PICmicro® Microcontroller is intended and
+ * supplied to you, the Company’s customer, for use solely and
+ * exclusively on Microchip PICmicro Microcontroller products. The
+ * software is owned by the Company and/or its supplier, and is
+ * protected under applicable copyright laws. All rights are reserved.
+ * Any use in violation of the foregoing restrictions may subject the
+ * user to criminal sanctions under applicable laws, as well as to
+ * civil liability for the breach of the terms and conditions of this
+ * license.
+ *
+ * THIS SOFTWARE IS PROVIDED IN AN “AS IS” CONDITION. NO WARRANTIES,
+ * WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
+ * TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
+ * IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
+ * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+ *$Id: $
+ ************************************************************************/
+
+
+/************************ output (playback) defines ****************************************/
+
+#define	AUDIO_OUT_POS			// if the output DAC is unbalanced, 0 to Vmax.	
+
+/* select timer to be used by the OCMP */
+/* Note: should match the timer selected in the audio.def! */
+//#define TIMER2
+#define TIMER3
+
+
+/* select the Output compare */
+#define OUTCOMPARE1
+//#define OUTCOMPARE2
+//#define OUTCOMPARE3
+//#define OUTCOMPARE4
+//#define OUTCOMPARE5
+
+#define	AUDIO_MIN_RES_BITS	10	// at least this number of bits for PWM output
+
+
+
+/* select the audio amplifier */
+//#define	AUDIO_AMP
+
+#ifdef AUDIO_AMP
+	#define	AUDIO_PORT		IOPORT_D
+	#define	AUDIO_PORT_BIT		BIT_9
+	#define	AUDIO_PORT_POLARITY	0		// the active polarity
+#endif
+
+
+
+/************************ input (record) defines ****************************************/
+
+#define	AUDIO_IN_POS			// if the ADC input is unbalanced, 0 to VrefMax
+
+/* ADC settings */
+
+#define	ADC_VREF_SOURCE	ADC_VREF_AVDD_AVSS	// select the ADC references
+
+/* select the ADC operation mode: exclusive, scan or punctual */
+#define	ADC_EXCLUSIVE_MODE				// the audio IO  has exclusive control of the ADC
+
+//#define	ADC_EXT_MODE_SCAN			// the ADC is controlled externally in scan mode
+	//#define	ADC_SCAN_INDEX		2	// the ADC index to be used for reading the ADC record input
+	
+//#define	ADC_EXT_MODE_POINT			// ADC controlled externally, the record use a punctual read
+
+
+/* select the settings for ADC_EXCLUSIVE_MODE and ADC_EXT_MODE_POINT */
+#if defined(ADC_EXCLUSIVE_MODE) || defined(ADC_EXT_MODE_POINT)
+	#define		AUDIO_ADC_CHN		3			// input channel
+	#define		ADC_SAMPLE_TAD		2			// sample time: the number of Tad for sample states
+	#define		ADC_PB_TAD_DIV		7			// ADC clock: the number of PB divider to get Tad (i.e. ADCS)
+#endif
+
+/* select the ADC format for ADC_EXT_MODE_SCAN */
+#ifdef ADC_EXT_MODE_SCAN
+	#define	ADC_UNSIGNED_16
+#endif
+
+
+	
+

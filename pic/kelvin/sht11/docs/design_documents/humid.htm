@@ -1,0 +1,223 @@
+
+<HTML>
+<HEAD><TITLE>/techref/scenix/contest/humid/humid.asm</TITLE></HEAD>
+<BODY><A HREF='/techref/indexok.asp?38081.1907291667' onClick='return false;'><img src='/images/null.gif' ALIGN=LEFT HEIGHT=1 WIDTH=1 BORDER=0 ALT='please dont rip this site'></A>
+<PRE><A HREF=";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;">;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;</A>
+;; Sensirion SHT11 sensor interface                                  ;;
+;;                                                                   ;;
+;; Copyleft  (L) P Pemberton                                         ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; PIC setup and toplevel includes
+	LIST	R=DEC
+	INCLUDE	sxdefs.inc
+	INCLUDE	sxregs.inc
+	EXPAND				; Expand must be ON for ICD
+
+#DEFINE	BANK0	BCF	STATUS,	PA0
+#DEFINE	BANK1	BSF	STATUS,	PA0
+
+; SX18AB
+DEVICE	EQU	PINS18+OSC4MHZ+PAGES2+BANKS2
+RAMBase	EQU	07h		;Start of RAM
+
+SEROUT	MACRO	__byte
+	MOVLW	__byte
+;	CALL	SER_SEND
+	ENDM
+
+CHKWZ	MACRO	__outz, __outnz
+	IORLW	.0
+	MOVLW	__outz
+	BTFSS	STATUS,		Z
+	MOVLW	__outnz
+;	CALL	SER_SEND
+	ENDM
+
+; Pindefs
+#DEFINE	SHT_SDA	PORTB,	7
+#DEFINE	SHT_SCL	PORTB,	6
+
+; Variables
+	CBLOCK	RAMBase
+		TEMPERATURE:2
+		HUMIDITY:2
+		CHKSUM
+		CHAHI, CHALO
+	ENDC
+
+; Reset vector
+	ORG	0
+	GOTO	START
+; Interrupt vector
+	ORG	4
+	GOTO	START
+
+; Start of code
+	ORG	5
+
+START:
+;	CALL	SER_SETUP		; Set up the serial port
+
+	CALL	SHT_BUSINIT		; Init the SHT bus
+	MOVLW	.5			; Read Humidity
+	CALL	SHT_SEND
+	CALL	SHT_WAITACK		; Wait for an ACK
+	CHKWZ	&quot;A&quot;,&quot;!&quot;
+
+	CALL	SHT_WAIT		; Wait for the data
+	CHKWZ	&quot;W&quot;,&quot;!&quot;
+
+	CALL	SHT_RECEIVE		; Get byte 1
+	MOVWF	HUMIDITY+0		; Store it
+	CALL	SHT_ACK			; Wait for an ACK
+
+	CALL	SHT_RECEIVE		; Get byte 2
+	MOVWF	HUMIDITY+1		; Store it
+	CALL	SHT_ACK			; Wait for an ACK
+
+	CALL	SHT_RECEIVE
+	MOVWF	CHKSUM
+	CALL	SHT_NACK
+
+	MOVF	HUMIDITY+0,	W	; Send humidity to host
+	CALL	HEXOUT
+	MOVF	HUMIDITY+1,	W
+	CALL	HEXOUT
+	MOVF	CHKSUM,		W
+	CALL	HEXOUT
+
+	SEROUT	&quot; &quot;
+
+	GOTO	$			; Crash!
+
+;; Subroutines
+
+HEXOUT:
+	MOVWF	CHALO
+	SWAPF	CHALO,		W
+	ANDLW	0x0F
+	MOVWF	CHAHI
+	MOVLW	0x0F
+	ANDWF	CHALO
+
+	MOVF	CHAHI,		W
+	CALL	HEXTAB
+;	CALL	SER_SEND
+
+	MOVF	CHALO,		W
+	CALL	HEXTAB
+;	CALL	SER_SEND
+	RETURN
+
+HEXTAB:
+	ADDWF	PC,	F
+	DT &quot;0123456789ABCDEF&quot;
+
+;; Final post-code includes
+#DEFINE	SER_BAUD .19200
+
+	INCLUDE	&quot;sht11.inc&quot;
+	
+	END
+
+</PRE>
+<FORM ACTION='/techref/postsearch.asp' METHOD=POST><HR><SMALL>file: /techref/scenix/contest/humid/humid.asm, updated: 8/20/02 6:57:32 PM, <A HREF="/techref/member.asp?actid=">you</A> (<A HREF="/techref/member//index.htm"></A>) own this page.
+</SMALL><DIV NAME="upperright" ID="upperright" 
+	onMouseOver="this.style.backgroundColor='#FFFF00';this.style.borderStyle='outset';" 
+	onMouseOut="this.style.backgroundColor='#FFFFFF';this.style.borderStyle='ridge';" 
+	style="position:absolute;top:0;right:0;width:200;text-align:right;text-justify:right;color:gray;background-color:#FFFFFF;border-width:2px;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=75);"><SMALL><SUP>
+<A style="color:#AF4040;text-decoration:none;" TITLE="Go to the top page" HREF="/techref/index.htm">TOP</A> 
+<A style="color:#AF4040;text-decoration:none;" TITLE="Monthly Change Log for this folder" HREF="new200404.txt">NEW</A>
+
+<A style="color:#AF4040;text-decoration:none;" TITLE="More pages like this." HREF="/techref/postsearch.asp?from=%2Ftechref%2Fscenix%2Fcontest%2Fhumid%2Fhumid%2Easm">
+MORE</A> 
+<A style="color:#AF4040;text-decoration:none;" TITLE="I'm willing to pay for help, please refer me to a qualified consultant" HREF="mailto:webmaster@massmind?subject=I%20need%20someone%20to%20help%20me%20with%3A%20">
+HELP</A>
+<A style="color:#AF4040;text-decoration:none;" TITLE="Advanced search" HREF="/techref/postsearch.asp">
+FIND:</A>&nbsp;<BR>
+<INPUT style="background-color:transparent;padding:0px;border-width:1px;font-size:small;border-style:solid;border-color:#AF0000" TITLE="Free text search" TYPE="TEXT" ID="search" NAME="SearchString" SIZE="20" MAXLENGTH="100" VALUE="Search" onClick="this.value='';">
+<INPUT NAME="FreeText" TYPE="HIDDEN" VALUE="ON"> 
+</SUP></SMALL></DIV>
+
+<DIV NAME="upperleft" ID="upperleft" 
+	onMouseOver="this.style.backgroundColor='#FFFF00';this.style.borderStyle='outset';" 
+	onMouseOut="this.style.backgroundColor='transparent';this.style.borderStyle='none';" 
+	style="position:absolute;top:0;left:0;color:gray;background-color:transparent;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=75);"><SMALL>
+<A HREF="/techref/indexok.asp?top"> </A>
+<SUP>80.65.200.74:<A style="color:#AF4040" HREF="/techref/login/default.asp?req=403%3Bhttp%3A%2F%2Ftechref%2Emassmind%2Eorg%2Ftechref%2Fubicom%2Fcontest%2Fhumid%2Fhumid%2Easm">LOG IN</A></SUP></SMALL></DIV><DIV ALIGN=CENTER VALIGN=TOP style="position:absolute;top:0;left:25%;width:25%"><SMALL><SUP><FONT COLOR=#FF0000><B><A TITLE='Why does RIP/GRAB/SPIDERing lead to ads and sponsors? Click here.' HREF='/dontripthissite.htm' style='color:red'>PLEASE DON'T RIP!</A></B></FONT></SUP>
+</SMALL></DIV>
+<script LANGUAGE="JavaScript">
+<!--- Hide script from old browsers.
+var old = 1;
+var to;
+
+function scrollHold() {
+var pos=1;
+	if (to) clearTimeout(to);
+	if (window.innerHeight) {
+		pos = window.pageYOffset;
+		}
+	else if (document.documentElement && document.documentElement.scrollTop) {
+		pos = document.documentElement.scrollTop;
+		}
+	else if (document.body) {
+		pos = document.body.scrollTop;
+		}
+	if (pos < 0) pos = 1;
+	else pos += 1;
+	if (pos != old) {
+		upperright.style.top = pos;
+		upperleft.style.top = pos;
+		}
+	old = pos;
+	if (window.onscroll==null) {to=setTimeout('scrollHold()',100);}
+}
+
+window.onscroll = scrollHold;
+scrollHold();
+
+// End the hiding here. -->
+</script>
+</FORM>
+<HR><DIV STYLE='eznav'><TABLE ALIGN=RIGHT WIDTH='30%'><TR><TD>&nbsp;</TD><TD>These pages are served without commercial sponsorship. (No popup ads, etc...).Bandwidth abuse increases hosting cost forcing sponsorship or shutdown. This server aggressively defends against automated copying for any reason including offline viewing, duplication, etc... Please respect this requirement and <FONT FACE='Comic Sans MS' COLOR='#FF0000'>DO NOT RIP THIS SITE</FONT>.<A HREF='/dontripthissite.htm'>Questions?</A></TD></TR></TABLE>Did you find what you needed? <UL>
+<LI><I>&quot;Not quite. <A HREF="/techref/postsearch.asp?from=%2Ftechref%2Fscenix%2Fcontest%2Fhumid%2Fhumid%2Easm">
+ Look for more pages like this one.&quot;</A></I>
+<LI><FORM ACTION="/techref/postsearch.asp#result" METHOD=POST>
+ <I>&quot;No. I'm looking for: 
+<INPUT TYPE="TEXT" NAME="SearchString" SIZE="40" MAXLENGTH="100" VALUE="">
+<INPUT NAME="FreeText" TYPE="HIDDEN" VALUE="on"> 
+<INPUT NAME="from" TYPE="HIDDEN" VALUE="/techref/scenix/contest/humid/humid.asm">
+<INPUT TYPE="SUBMIT" NAME="Action" VALUE="Fetch">&quot;</I>
+<LI><A HREF="/techref/postsearch.asp">
+<I>&quot;No. Take me to the search page.&quot;</I></A>
+<LI><A HREF="/techref/index.htm">
+<I>&quot;No. Take me to the top so I can drill down by catagory&quot;</I></A>
+<LI><A HREF="mailto:webmaster@massmind?subject=I%20need%20someone%20to%20help%20me%20with%3A%20">
+<I>&quot;No. I'm willing to pay for help, please refer me to a qualified consultant&quot;</I></A>
+
+</UL>
+</DIV>
+
+
+<HR>
+<TABLE WIDTH=30% BGCOLOR=#F0F0F0 ALIGN=LEFT><TR><TD>&nbsp;</TD><TD>
+<CENTER>
+<BIG>Welcome to the <A HREF="/techref/idea/websites.htm">MASSMind!</A></BIG>
+</CENTER>
+<A HREF="/techref/default.asp">MassMind.org</A> members can 
+<A HREF="/techref/login/default.asp?req=403%3Bhttp%3A%2F%2Ftechref%2Emassmind%2Eorg%2Ftechref%2Fubicom%2Fcontest%2Fhumid%2Fhumid%2Easm">LOGIN</A> to add public or private comments, links and we will even host pages(!). 
+Membership cost: $ZERO! Just fill out the <A HREF="/techref/private.asp?req=403%3Bhttp%3A%2F%2Ftechref%2Emassmind%2Eorg%2Ftechref%2Fubicom%2Fcontest%2Fhumid%2Fhumid%2Easm">form</A>.
+<A TITLE="Pigmies placed on the shoulders of giants see more than the giants themselves">Pigmai gigantum humeris impositi plusquam ipsi gigantes vident</A>
+
+</TD></TR></TABLE>
+<TABLE WIDTH=30% BGCOLOR=#F0F0F0 ALIGN=RIGHT><TR><TD>&nbsp;</TD><TD>
+<CENTER>
+<BIG><B>Quick, <U>Easy</U> <I>and</I> <FONT FACE="Comic Sans MS" COLOR="#408040">CHEAP</FONT>! <A HREF="/techref/io/serial/RCL1.htm" target="_top">RCL-1 RS232 Level Converter in a DB9 backshell</A> only $15.00 </B></BIG>
+<BR>Ashley Roll has put together a really nice little unit here. Leave off the MAX232 and keep these handy for the few times you need true RS232!
+</CENTER>
+
+</TABLE>
+</TD></TR></TABLE>
+</BODY>
+</HTML>

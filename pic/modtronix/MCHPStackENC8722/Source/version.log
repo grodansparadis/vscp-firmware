@@ -1,0 +1,392 @@
+********
+Microchip TCP/IP Stack Version Log:
+********
+
+Note: Please send bug-report/bug-fixes/new module addition to tech.support@microchip.com
+
+
+********
+v3.00.00:       16 Jan 2006
+********
+Changes:
+1. The stack now targets the PICDEM HPC Explorer demo board (PIC18F8722 MCU) with an 
+   attached Ethernet PICtail Daughter Board (with the Microchip ENC28J60 Ethernet 
+   controller).
+2. IP Gleaning is no longer enabled (STACK_USE_IP_GLEANING is not defined) by any of 
+   the default project files.
+3. The IP address, whenever it changes, is outputted out the RS232 serial port in 
+   human readable form.  Any terminal program, such as HyperTerminal can be used to 
+   read it.  This allows the IP address to be easily determined when DHCP is used.  
+   The serial port defaults to 19200 baud when CLOCK_FREQ in Compiler.h is properly 
+   defined.
+
+
+Additions:
+1. Microchip ENC28J60 Ethernet controller support.  Support is included through the 
+   ENC28J60.c and ENC28J60.h files.  Various other files were modified to take 
+   advantage of ENC28J60 specific features, like the hardware DMA/IP checksum engine.  
+   This new MAC driver incorporates several new functions which can be called from any 
+   layer above the MAC.  The functions are:
+      MACSetDuplex()
+      MACPowerDown()
+      MACPowerUp()
+      MACSetPMFilter()
+      MACDisablePMFilter()
+      CalcIPBufferChecksum()
+      MACCalcRxChecksum()
+      MACCalcTxChecksum()
+      MACCopyRxToTx()
+   See the ENC28J60.c file comments for function descriptions.  The ENC28J60.c file 
+   also incroporates TestMemory() which can do a power on self test of various hardware 
+   functions.  TestMemory() is included and used when MAC_POWER_ON_TEST is defined in 
+   StackTsk.h.  It is undefined by default.  Defining it will require some program 
+   memory.
+2. Announce module.  Announce.c and announce.h have been added.  When included in the 
+   project, STACK_USE_ANNOUNCE must be defined.  This module will broadcast a UDP 
+   message to port 30303 containing the local MAC address whenever the local IP 
+   address changes.  This addition is intended to facilitate device discovery on DHCP 
+   enabled networks and eliminate the need for an RS232 connection if board 
+   reconfiguration is not needed. To retrieve the UDP message on your computer, use 
+   the new MCHPDetect.exe program included in the \MCHPDetect subfolder.
+3. The spieeprom.c file was added to support SPI EEPROM chips for MPFS storage.  
+   ENC28J60.c and spieeprom.c may both be included and they will share the same SPI 
+   module.
+
+
+Improvements:
+1. Renamed files/edited files so that the HI-TECH compiler won't raise messages stating 
+   that include files were spelled wrong.
+2. Moved MAX_ICMP_DATA_LEN from StackTsk.c to ICMP.h file for easier maintenance.
+3. Corrected STACK_USE_SIIP typo in dhcp.c file - Thanks to Gisle J.B.
+4. Implemented UDP checksum logic in UDPProcess() in UDP.c file.
+5. Renamed CalcTCPChecksum() in tcp.c file to CalcIPBufferChecksum().
+6. Moved CalcIPBufferChecksum() to helpers.c to reuse it for UDP checksum calculation.
+7. Modified UDPProcess() in UDP.c and TCPProcess() in TCP.c to include localIP as third 
+   new parameter. This makes pseudo header checksum calculation correct in both 
+   functions. StackTsk.h, UDP.h and TCP.h files were also modified to reflect these 
+   changes.
+8. Modified TCP.C file to include compile-time check of STACK_USE_TCP define.  If it is 
+   not defined, an error will be displayed.
+9. Removed an unnecessary call to MACDiscardRx() when an IP packet is received but 
+   fails version, options length, or header checksum tests.
+10. Changed LCD code to be compile time removable by undefining USE_LCD.
+
+
+Fixes:
+1. IPHeaderLen in IP.c is initialized properly now when IPGetHeader() is called.
+2. Under some circumstances, HandleTCPSeg() would acknowlege, but throw valid received 
+   TCP packets away, resulting in loss of application data.  An invalid comparison in 
+   HandleTCPSeg() has been fixed to prevent this situation from occuring.
+        *** Thanks go to Richard Shelquist for identifying this problem.
+3. Fixed StackTsk.c file so that if a static IP address is used and the LINK is 
+   removed, the node IP address is not cleared.
+4. Invalid ICMP echo replies are no longer generated for echo requests with a data 
+   length of 33 (one more than the configured maximum).
+5. Changed MAX_OPTIONS_LEN from 20 to 40.  The maximum IP options length is now in 
+   agreement with the IP RFC.
+6. Changed IPSetRxBuffer() from a macro to a function.  The function takes into 
+   account any options which may be present in the header of received IP packets.  
+   Previously, possible options were not taken into account when calculating the 
+   offset.
+
+
+Known Problems:
+1. Testing on the PICDEM.net demo board with the Realtek RTL8019AS Ethernet controller 
+   has not been done.  Moving to the HPC Explorer demo board has resulted in pinout 
+   and other hardware changes.
+2. Sometimes when the FTP sever is used, an attempt to put a file is unsuccessful.  
+   The problem may be caused when an HTTP request to GET a file is made at the wrong 
+   time.
+3. MACSetPMFilter(), MACDisablePMFilter(), and MACCopyRxToTx() have not been tested and 
+   possibly do not work.
+4. SNMP, TFTPc, LCD, SLIP modules have not been tested with this version.
+5. The stack may behave incorrectly if compiled using the Hitech compiler with a high 
+   optimizations setting.
+6. Serial numbers >32K will be displayed on the serial port as a negative value when 
+   C18 is used and the board is placed in configuration mode (RB0 button is depressed 
+   on power up).
+7. IP Gleaning may not get disabled when, through the RS232 configuration application, 
+   DHCP and IP Gleaning are disabled.
+8. The IP address being outputted out the RS232 port and through the Announce module 
+   does not happen when the IP address is configured using IP Gleaning.
+9. Multiple TX buffer support is not fully inplemented in the MAC layer, ENC28J60.c.  
+   Stack behavior when TCP_NO_WAIT_FOR_ACK is defined may be unexpected.
+
+
+
+********
+v2.20.04.01:   9/24/03
+********
+1. Recreated MPLAB projects to avoid problems when source is not at \MCHPStack location.
+
+
+********
+v2.20.04:   9/5/03
+********
+Fixes:
+1. Modified DHCPReset() in DHCP.c to not reset DHCP state machine if it was previously 
+   disabled using DHCPDisable().  This would make sure that if DHCP module was enabled
+   and application had run-time disabled DHCP and network cable is disconnected, 
+   stack will not clear its IP address.
+
+2. Rebuilt mib2bib.exe file with static library options.  This fixes problem where
+   one tries to execute this exe, an error occurs about missing DLLs. 
+   
+
+********
+v2.20.03:   
+********
+Improvements:
+1. When DHCP is enabled, LINK is monitored and IP address is reset on disconnect.
+   New IP configuration is obtained on LINK reconnect. - For RealTek only.
+   Modified DHCP.c to add DHCPReset()
+   Modified MAC.c to add MACIsLinked()
+   Modified StackTsk.h to add BYTE_VAL def.
+   
+Changes:
+1. Modified SMSC91c111.c to add empty MACIsLinked() - will be populated in next rev.
+   
+Bug Fixes:
+1. Corrected DHCP logic to accept first DHCP offer instead of second response.
+2. Corrected DHCP logic to check for chaddr in DHCP offer and accept one that
+   matches with local MAC address.  This will fix problem where if multiple
+   nodes were on bus and all requested DHCP address, all would accept response
+   from one server instead of verifying who was intended node.
+3. Fixed UDPClose() in UDP.c to use INVALID_UDP_PORT instead of INVALID_UDP_SOCKET
+   because of which a closed socket would not be scanned correctly.
+4. Modified UDP.h to use long contsant designators for INVALID_UDP_OPRT 
+   to explicitly state that it is a long.   
+
+
+
+********
+v2.20.02:   
+********
+Beta version containing TFTP client module.
+
+Addition:
+1. TFTP Client module - See TFTPc.* and TFTPcDemo.c for more information.
+   See MpTFTPcDemo and HtTFTPcDemo projects for build information.
+
+Bug Fix:
+1. UDPIsGetReady() was modified to overcome compiler rule where only 8-bit value was
+   used to evaluate non-zero condition.
+2. ARPResolve() in ARPTsk was fixed to clear Cache.IPAddr value.
+
+********
+v2.20.01:   
+********
+Bug fix:
+1. Fixed SMSC91C111.c where MACInit() would hand if ethernet link is not detected.
+
+
+********
+v2.20:   
+********
+Bug Fixes:
+1. General  - Removed most of harmless warnings.
+2. C18Cfg.asm - Fixed "include" instead of "define".
+3. DHCP.c   -   Increased DHCP_TIMEOUT_VAL to 2 seconds.
+                Fixed problem where UDP active socket was not set before calling UDP functions
+                in SM_DHCP_BROADCAST state.
+4. MAC.c    -   Fixed MACIsTxReady() where under heavy traffic it would always return FALSE.                
+                This fixes bug where all high level applications would stop transmitting.
+5. TCP.c    -   Enabled portion of code that performs timeout logic even if TCP_NO_WAIT_ACK
+                is defined.  This fixes bug where occasionally, tcp applications such as 
+                HTTP server would stop working after few hours.
+6. UDP.c    -   Fixed UDPGet() where it would return FALSE on last good byte.
+                Fixed UDPProcess() where it was calculating incorrect length.
+                
+                Added bFirstRead flag with UDP sockets similar to TCP sockets
+                so that whenever first UDP byte is read, MAC read pointer will be
+                reset to begining of correct packet.
+                This change fixes problem where if one transmits a packet while
+                UDP packet is pending in a socket, next get to pending UDP socket would
+                return wrong data. (This is apparent only when there is heavy network traffic)
+                
+Known Issues:
+1. HiTech v8.20 PL4 with all optimization enabled may not work properly.
+2. C18 "Static" and "Auto" mode may not be used - there are too many local variables to fit
+    in standard stack of 256 bytes.  One may modify linker script file to avoid this limitation.
+
+                
+
+Improvements:
+1. Modified TICK def. in Tick.h to unsigned long to support 32-bit wide SNMP tick.
+2. Added SNMP Module (SNMP.c)
+3. Added Two new demo projects - DemoSNMPApp and HtDemoSNMPApp.
+4. Created MPLAB 6.X projects for different demo configurations.
+5. MAC.c    -   Added MACGetTxOffset().
+6. MPFS.c   -   Added MPFSSeek(), MPFSTell().
+7. MPFSImg.*-   Rebuilt to reflect v2.20, footprint changes etc.
+8. StackTsk.h-  Enhanced WORD_VAL, DWORD_VAL defs.
+                Added STACK_USE_SNMP and related compile-time checks.
+9. UDP.h    -   Added UDPSetTx and UDPSetRx macros.
+                Moved UDP_SOCKET_INFO structure to header file.
+10. WebSrvr.c-   Modifed MCHPStack version message and added DATE info to BoardSetup
+                menu.
+11. Added support for SMSC LAN91C111 10/100 Non-PCI ethernet controller 
+            Use "SMSC91C111.C" instead of MAC.c.  
+            "mpnicee_smsc" is a sample project that uses PIC18F8720 and SMSC NIC.
+            "MasterDemo.c" is a main source file for above project that includes
+            all modules - must use device with more than 32KB of memory.
+            
+
+
+
+********
+v2.11:   
+********
+Bug Fixes:
+1. Fixed dhcp.c to make it work with new C18 startup code.
+
+Improvements:
+1. Modified websrvr.c DownloadMPFS() to make use of compiler allocated XMODEM data block
+   rather than use fixed address block starting at 0x400.
+
+
+********
+v2.10:   7/9/02
+********
+Bug Fixes:
+1. Fixed HTTP Server bug where a form submission with empty parameter value would not 
+   parse correctly.
+
+
+
+********
+v2.0:   5/22/02
+********
+
+********
+New Modules:
+********
+1. Added UDP, DHCP, FTP and IP Gleaning
+2. Added PICDEM.net LCD support
+3. Added board setup through RS-232.
+
+********
+Improvements:
+********
+1. Optimized serial EEPROM access routines in terms of speed and size
+    (Replaced ee256.* files with eeprom*.h)
+2. Improved board setup through RS-232.
+
+********
+Known Issues:
+********
+1. LCD may not display properly on MCLR only.
+   Workaround: 1. Debug XLCDInit() routine in "xlcdlh" 
+               2. Always do POR reset.
+
+2. SLIP connection is not very robust.
+   Workaround: None at this time.
+
+3. Hi-Tech Compiler: 
+                1. Aggressive optimization breaks the functionality.
+                   Workaround: Apply optimization listed in each source file comment header.
+                2. In order to use V8.12, you will need to remove "FTP Server" from Ht*.pjt.
+                   You will also need to disable all optimizations.
+
+4. C18 Compler: 1. Static model does not compile.
+                   Workaround: None at this time.
+                2. Overlay model breaks the functionality.
+                   Workaround: None at this time.
+                3. All modules does not fit in 32KB memory.
+                   Workaround: 1. None at this time.
+                               2. Sample project disables some modules.
+
+
+********
+New Files:
+********
+============================================================================================================================
+    File        Purpose
+============================================================================================================================
+1. delay.*      Provides CLOCK_FREQ depenent delay routines.
+2. dhcp.*       DHCP client support
+3. ftp.*        FTP server
+4. udp.*        UDP socket support
+5. xeeprom.*    Improved ee256.* and renamed.
+6. xlcd.*       External LCD support.
+7. version.log  To track changes and history.
+
+    
+********
+Changes:
+********
+============================================================================================================================
+    File        Change                                                                  To-do for v1.0 stack applications
+============================================================================================================================
+1. arptsk.c     1. Fixed STACK_CLIENT_MODE compile errors.                              None
+                2. Modifed ARPIsResolved() to support IP Gleaning                       None
+
+2. c18cfg.asm   1. Added PIC18F452 configuration                                        None
+                2. Fixed "include" errors.                                              None
+
+3. compiler.h   1. Included "stdlib.h" in both C18 and Hi-Tech compilers.               None
+                2. Moved CLOCK_FREQ from "stacktsk.h" to this file.                     None
+                3. Added PORTA defs.                                                    None
+
+4. htnicee.pjt  1. Removed "ee256.c".                                                   None
+                2. Added "udp.c", "dhcp.c", "ftp.c", "xlcd.c", "xeeprom.c" files        Add these files if needed.
+
+5. htnicpg.pjt  None
+
+6. htslee.pjt   1. Removed "ee256.c".                                                   None
+                2. Added "ftp.c", "xlcd.c", "xeeprom.c" files                           None
+
+7. http.c       1. Included compile-time verification that HTTP module is included.     None
+                2. Put HTTP message strings into one array "HTTPMessages".              None
+                3. Modified to return "Service Unavailable" message if MPFS is being    None
+                   remotely programmed.
+                4. Modified SendFile() to make use of sequential EEPROM read.           None
+
+8. ip.c         1. Added one more paramter to IPGetHeader() to support IP Gleaning      Custom apps using IP needs to be
+                                                                                        modified.
+
+9. mac.c        1. Replaced fixed delay routines with CLOCK_FREQ dependent              None
+                   routines
+
+10. mpfs.c      1. Replaced ee256.h with xeeprom.h.                                     None
+                2. Added MPFSFormat(), MPFSPut() etc. routines                          None
+                3. Added sequential read and page write operations                      Custom apps using MPFS directly
+                                                                                        needs to be modified.
+                4. Defined MPFS_WRITE_PAGE_SIZE for MPFSPut operations.                 Apps using different EEPROM page size
+                                                                                        needs to be modified.
+                
+11. mpnicee.pjt 1. Removed "ee256.c"                                                    None
+                2. Added "xcld.c", "xeeprom.c" files                                    None
+
+12. stacktsk.c  1. Replaced ee256.h with xeeprom.h                                      None
+                2. Added IP Gleaning and DHCP support.                                  None
+            
+13. stacktsk.h  1. Moved CLOCK_FREQ to compiler.h                                       None
+                2. Added STACK_USE_DHCP, STACK_USE_FTP_SERVER etc. options              None
+                3. Added compile-time enable/disable of modules based on selection
+                   of higher level modules.                                             None
+                4. Modified MY_DEFAULT_MAC_BYTE? to use Microchip OUI id.               None
+                5. Added compiler-time check to confirm available TCP sockets           None
+                6. Added MSB and LSB macros.                                            None
+                7. Added SerialNumber etc. to AppConfig structure                       None
+                8. Commented module selection defines: They are defined by cmopiler     None
+                   command-line options.
+                   Real application should define them here in this file.
+
+14. tcp.c       1. Moved TCP_STATE and TCP_INFO to .h file.                             None
+                2. Fixed TCPIsConnected()                                               None
+                3. Fixed TCPDisconnect()                                                None
+                4. Modified TransmitTCP() to set receive window of one segment          None
+                5. Modified TransmitTCP() to use max segment size equal to
+                   predefined value.                                                    None
+                6. Improved TCP State machine                                           None
+
+15. tick.c      1. Modified TICK type to 16-bit.                                        None
+                2. Made use of TICK_PRESCALE_VALUE                                      None
+                3. Added code to blink PICDEM.net "System LED"                          Remove if not required.
+
+16. websrvr.c   1. Added LCD support                                                    N/A
+                2. Made TickUpdate() on Timer0 interrupt                                N/A
+                3. Added code to save/restore board configuration                       N/A
+                4. Added board setup via RS-232.                                        N/A
+                5. Added call to FTP modules                                            If needed, add this.

@@ -1,0 +1,7 @@
+TODO's
+
+- The serial IRQ buffers does not have overflow control.
+- Handle Commands to set mode etc.
+- Hardware filters.
+- Baudrates
+- Identify this device as a CAN4VSCP node

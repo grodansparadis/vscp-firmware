@@ -1,0 +1,107 @@
+/*********************************************************************
+ *
+ *            TCP/IP Stack Configuration File
+ *
+ *********************************************************************
+ * FileName:        eTCP.def
+ * Description: 	Configurations for eTCP Stack
+ * Company:         Microchip Technology, Inc.
+ *
+ * Software License Agreement
+ *
+ * The software supplied herewith by Microchip Technology Incorporated
+ * (the “Company”) for its PICmicro® Microcontroller is intended and
+ * supplied to you, the Company’s customer, for use solely and
+ * exclusively on Microchip PICmicro Microcontroller products. The
+ * software is owned by the Company and/or its supplier, and is
+ * protected under applicable copyright laws. All rights are reserved.
+ * Any use in violation of the foregoing restrictions may subject the
+ * user to criminal sanctions under applicable laws, as well as to
+ * civil liability for the breach of the terms and conditions of this
+ * license.
+ *
+ * THIS SOFTWARE IS PROVIDED IN AN “AS IS” CONDITION. NO WARRANTIES,
+ * WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
+ * TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
+ * IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
+ * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+ *
+ * $Id: eTCP.def,v 1.6 2006/10/24 16:39:07 C12923 Exp $
+ *
+*/
+
+
+
+//#define API_00833_SUPPORT		//Enable this def only if you want legacy api support in addition to BSD sockets
+
+#ifndef DAYTONA
+#define __PIC24_ES_A0__			//enable this def is you are using A0 or A1 pic24 silicon
+#endif
+
+#define TCP_USE_SPI_1
+//#define TCP_USE_SPI_2
+
+
+#define DEFAULT_IP_ADDR			"10.10.33.203"
+#define DEFAULT_IP_GATEWAY		"10.10.33.203"
+
+#define DEFAULT_IP_MASK			"255.255.255.0"
+
+#define DEFAULT_MAC_ADDR		"00-04-a3-00-00-01"
+
+#define CLOCK_FREQ				30000000	// 30 MHz
+
+#define MAX_SOCKET				16
+
+#define TICKS_PER_SECOND        100
+
+#define TX_COLLSION_TIMEOUT		((WORD)(TICKS_PER_SECOND * .15))
+
+#define TCP_DEFAULT_TX_BFR_SZ	1024
+
+#define NAGGLES_TX_BFR_TIMEOUT	(TICKS_PER_SECOND * 0.2)
+
+#define ARP_TIMEOUT_TICKS 		(TICKS_PER_SECOND * 3)
+
+#define MAX_RETRY_COUNTS		1
+#define TCP_RETRY_TIMEOUT_VAL   (TICKS_PER_SECOND * 5)
+
+// Buffer n packets, then start blocking send
+#define MAX_TCP_TX_PKT_BFR		2
+
+#define TCP_WAIT_SOCKET_DEL		(TICKS_PER_SECOND * 7)
+
+// Process upto n Rx packets on every StackMgrProcess() call
+#define STACK_MGR_RX_PKT_CNT	4	//8 bit
+
+#undef ENABLE_HEAP_PKT_ALLOCATION
+#define MAX_HEAP_PKTS			20
+
+// Static memory for packets
+#define MGR_BLOCK_SIZE			64
+#define MGR_MAX_BLOCKS			100
+
+// SPI Open Config setting (see spi.h)
+#define SPI_OPEN_CFG_1		(PRI_PRESCAL_4_1 | SEC_PRESCAL_8_1 | MASTER_ENABLE_ON | SPI_CKE_ON | SPI_SMP_ON)
+#define SPI_OPEN_CFG_2		(SPI_ENABLE)
+
+#define TCP_IP_SPI_BRG      (0)
+
+
+// provide a msec wait macro
+#ifndef SleepMS
+#include "mstimer.h"
+#define SleepMS(msec)               MSTimerWait(msec)
+#endif
+
+// ENC28J60 O/I defines
+#define mSetUpCSDirection()     {   mPORTDSetPinsDigitalOut(BIT_14);  }
+#define mSetCSOn()              {   mPORTDClearBits(BIT_14); }
+#define mSetCSOff()             {   mPORTDSetBits(BIT_14);   }
+#define mSetUpResetDirection()  {   mPORTDSetPinsDigitalOut(BIT_15);  }
+#define mSetResetOn()           {   mPORTDClearBits(BIT_15); }
+#define mSetResetOff()          {   mPORTDSetBits(BIT_15);   }
+#define mSetUpWOLDirection()    {   mPORTESetPinsDigitalIn(BIT_8);  }
+#define mSetUpINTDirection()    {   mPORTESetPinsDigitalIn(BIT_9);  }
+#define mSetSPILatch()          {   mPORTBSetPinsDigitalOut(BIT_12 | BIT_13); mPORTBSetBits(BIT_12 | BIT_13);    }

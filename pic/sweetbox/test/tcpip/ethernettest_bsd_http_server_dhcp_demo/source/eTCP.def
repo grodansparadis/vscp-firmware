@@ -1,0 +1,169 @@
+/*********************************************************************
+ *
+ *            TCP/IP Stack Configuration File
+ *
+ *********************************************************************
+ * FileName:        eTCP.def
+ * Description: 	Configurations for eTCP Stack
+ * Company:         Microchip Technology, Inc.
+ *
+ * Software License Agreement
+ *
+ * The software supplied herewith by Microchip Technology Incorporated
+ * (the “Company”) for its PICmicro® Microcontroller is intended and
+ * supplied to you, the Company’s customer, for use solely and
+ * exclusively on Microchip PICmicro Microcontroller products. The
+ * software is owned by the Company and/or its supplier, and is
+ * protected under applicable copyright laws. All rights are reserved.
+ * Any use in violation of the foregoing restrictions may subject the
+ * user to criminal sanctions under applicable laws, as well as to
+ * civil liability for the breach of the terms and conditions of this
+ * license.
+ *
+ * THIS SOFTWARE IS PROVIDED IN AN “AS IS” CONDITION. NO WARRANTIES,
+ * WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
+ * TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
+ * IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
+ * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+ *
+ * $Id: eTCP.def,v 1.6 2006/10/24 16:39:07 C12923 Exp $
+ *
+*/
+
+#ifndef _TCP_IP_DEFINE_FILE
+#define _TCP_IP_DEFINE_FILE
+
+// peripheral library include, may be needed if the user is defining 
+// their own I/O lines and SPI configuration
+#include <plib.h>
+
+
+// The code has been created to allow for communication to the 
+// ENC28J60 by either SPI 1 or SPI 2.  The user needs to define 
+// which SPI port that will use.
+// SPI 1
+#define TCP_USE_SPI_1
+// SPI 2
+//#define TCP_USE_SPI_2
+
+// SPI Open Config setting (see spi.h)
+#define SPI_OPEN_CFG_1		(PRI_PRESCAL_4_1 | SEC_PRESCAL_8_1 | MASTER_ENABLE_ON | SPI_CKE_ON | SPI_SMP_ON)
+#define SPI_OPEN_CFG_2		(SPI_ENABLE)
+
+// SPI baud rate.  Make sure that the baud rate is within ENC28J60 spec. (recommended < 20MHz)) and SPI.
+#define TCP_IP_SPI_BRG      (10)
+
+// The device is configured with a default IP and MAC address.
+// If the project uses a DHCP client, than the IP address will
+// be assigned by the DCHP server.  
+#define DEFAULT_IP_ADDR			"192.168.1.201"
+#define DEFAULT_IP_GATEWAY		"192.168.1.255"
+#define DEFAULT_IP_MASK			"255.255.255.0"
+#define DEFAULT_MAC_ADDR		"00-04-a3-00-00-02"
+
+
+// The clock frequency that your device is running at.  Please
+// refer to the configuration bit settings to figure the frequency out
+#define CLOCK_FREQ				80000000	// 80 MHz
+
+// The maximun number of sockets that you may have active at one time.
+//  If you are using any other middleware (HTTP, DHCP), you will need to 
+// make sure that you can accomidate the worst case senerio.
+#define MAX_SOCKET				12
+
+// The number of ticks per second.  This is used to define timeouts
+// and must be defined before them.
+#define TICKS_PER_SECOND        100
+
+// For a B1 errata for the ENC28J60, you will need to provide 
+// a transmitt collision timeout.  It is recommmended that it be
+// somewhere between .5 and .20 times the TCICKS_PER_SECOND.
+//  For more informaiton about this errata please refer to the
+// ENC28J60 errata documentation
+#define TX_COLLSION_TIMEOUT		((WORD)(TICKS_PER_SECOND * .15))
+
+// This is the transmit buffer size for out going TCP/IP packets
+#define TCP_DEFAULT_TX_BFR_SZ	256
+
+// This is the naggles algorthym timeout.  Please refer to
+// TCP/IP documentation for more informaiton on the naggles
+// algorthym
+#define NAGGLES_TX_BFR_TIMEOUT	(TICKS_PER_SECOND * 0.2)
+
+// This is the ARP timeout.
+#define ARP_TIMEOUT_TICKS 		(TICKS_PER_SECOND * 3)
+
+//  This is the number of retries and timeout assocaited with
+// transmitted TCP packets.
+#define MAX_RETRY_COUNTS		1
+#define TCP_RETRY_TIMEOUT_VAL   (TICKS_PER_SECOND * 5)
+
+// Buffer n packets, then start blocking send
+#define MAX_TCP_TX_PKT_BFR		2
+
+// The delay for the wait on a socket.
+#define TCP_WAIT_SOCKET_DEL		(TICKS_PER_SECOND * 7)
+
+// Process upto n Rx packets on every StackMgrProcess() call
+#define STACK_MGR_RX_PKT_CNT	8	//8 bit
+
+// The user may use static or dymanic memory to store transmit and receive 
+// TCP/IP packets.
+// For dymanic memory, define ENABLE_HEAP_PKT_ALLOCATION and the number of 
+// active allocations (MAX_HEAP_PKTS).  Please be sure to define a heap size in 
+// the build options in MPLAB
+#undef ENABLE_HEAP_PKT_ALLOCATION
+#define MAX_HEAP_PKTS			20
+
+// Static memory uses blocks to store the packets.  You should define in the 
+// block size (MGR_BLOCK_SIZE) as the same size of the expected minium packet and 
+// the minimum number of blocks (MGR_MAX_BLOCKS) to be around the max packet size.
+#define MGR_BLOCK_SIZE			64
+#define MGR_MAX_BLOCKS			64
+
+// provide a msec wait macro
+#ifndef SleepMS
+#include "mstimer.h"
+#define SleepMS(msec)               MSTimerWait(msec)
+#endif
+
+// If the user is running the project on the Explorer 16, they will not 
+// have to define any I/O lines that the ENC38J60 will be using.  If you are
+// using this code on your own board, you may define your I/O here
+
+
+
+#define _SWEETBOX
+
+// Defining our own I/O lines
+#ifndef _SWEETBOX
+// Chip Select (Pin 5)
+// Direction
+#define mSetUpCSDirection()     {   mPORTESetPinsDigitalOut(BIT_2);  }
+// CS on, active low
+#define mSetCSOn()              {   mPORTEClearBits(BIT_2); }
+// CS off, active low
+#define mSetCSOff()             {   mPORTESetBits(BIT_2);   }
+
+// Reset (Pin 6)
+// Direction
+#define mSetUpResetDirection()  {   mPORTESetPinsDigitalOut(BIT_3);  }
+// Reset on, active low
+#define mSetResetOn()           {   mPORTEClearBits(BIT_3); }
+// Reset off, active low
+#define mSetResetOff()          {   mPORTESetBits(BIT_3);   }
+
+// Not used
+#define mSetUpWOLDirection()    {   mPORTBSetPinsDigitalIn(BIT_15);  }
+
+// INT (pin 28)
+// set up the direction, not used
+#define mSetUpINTDirection()    {   mPORTASetPinsDigitalIn(BIT_14);  }
+
+// Not used, but required for code
+#define mSetSPILatch()          {   /*mPORTBSetPinsDigitalOut(BIT_10 | BIT_11); mPORTBSetBits(BIT_10 | BIT_11); */   }
+
+#endif
+
+#endif

@@ -1,0 +1,133 @@
+#==========================================================================
+# this section uses the environment variable VSCP_HOME as base for all
+# vscp related files. If you dont have a seperate VSCP_FIRMWARE path in
+# use then simply dont set this variable, it becomes default :)
+#==========================================================================
+ifndef VSCP_HOME
+   $(error > You must set environment variable VSCP_HOME in your system or shell)
+endif
+ifndef VSCP_FIRMWARE
+   $(info > VSCP_FIRMWARE was unset, forcing it to be set to $(VSCP_HOME)\firmware)
+   export VSCP_FIRMWARE=$(VSCP_HOME)\firmware
+endif
+# $(info > VSCP Paths set to $(VSCP_HOME) and $(VSCP_FIRMWARE) respectivly)
+
+
+PRG = AAmini
+
+
+OBJ = AAmini.o
+OBJ += $(VSCP_FIRMWARE)/avr/common/can_at90can128.o
+OBJ += $(VSCP_FIRMWARE)/avr/common/uart.o
+OBJ += $(VSCP_FIRMWARE)/common/vscp_firmware.c
+
+
+MCU_TARGET	= at90can128
+#MCU_TARGET	= at90can32
+
+OPTIMIZE	= -Os
+
+
+EXTRAINCDIRS   = $(VSCP_FIRMWARE)/common
+EXTRAINCDIRS  += $(VSCP_FIRMWARE)/avr/common
+EXTRAINCDIRS  += $(VSCP_HOME)/src/common
+EXTRAINCDIRS  += $(VSCP_HOME)/src/vscp/common
+EXTRAINCDIRS  += $(VSCP_FIRMWARE)/avr/AAboot
+EXTRAINCDIRS  += .
+
+
+# defs
+# ====
+# 'FOSC' is oscillator frequency in K
+# Define 'USE_UART0' for uart0 'USE_UART1' for uart1
+# 'BAUDRATE' for the configred baudrate
+//DEFS			=
+DEFS           = -DFOSC=16000 -DUSE_UART0 -DBAUDRATE=38400 -DBOARD=aamini
+#DEFS           = -DFOSC=14300 -DUSE_UART0 -DBAUDRATE=38400
+
+LIBS            =
+
+
+	
+# You should not have to change anything below here.
+
+CC             = avr-gcc
+
+# Override is only needed by avr-lib build system.
+
+override CFLAGS        = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS) $(patsubst %,-I %,$(EXTRAINCDIRS))
+override LDFLAGS       = -Wl,-Map,$(PRG).map
+
+OBJCOPY        = avr-objcopy
+OBJDUMP        = avr-objdump
+
+all: $(PRG).elf lst text eeprom
+
+$(PRG).elf: $(OBJ)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
+	avr-size -C --mcu=$(MCU_TARGET) $(PRG).elf 
+clean:
+	rm -rf *.o ../common/*.o $(PRG).elf *.eps *.png *.pdf *.bak
+	rm -rf *.lst *.map $(EXTRA_CLEAN_FILES)
+
+lst:  $(PRG).lst
+
+%.lst: %.elf
+	$(OBJDUMP) -h -S $< > $@
+	
+# Display size of file. 
+HEXSIZE = $(SIZE) --target=$(FORMAT) $(TARGET).hex 
+ELFSIZE = $(SIZE) --mcu=$(MCU) --format=avr $(TARGET).elf 
+
+# Rules for building the .text rom images
+
+text: hex bin srec
+
+hex:  $(PRG).hex
+bin:  $(PRG).bin
+srec: $(PRG).srec
+
+%.hex: %.elf
+	$(OBJCOPY) -j .text -j .data -O ihex $< $@
+
+%.srec: %.elf
+	$(OBJCOPY) -j .text -j .data -O srec $< $@
+
+%.bin: %.elf
+	$(OBJCOPY) -j .text -j .data -O binary $< $@
+
+# Rules for building the .eeprom rom images
+
+eeprom: ehex ebin esrec
+
+ehex:  $(PRG)_eeprom.hex
+ebin:  $(PRG)_eeprom.bin
+esrec: $(PRG)_eeprom.srec
+
+%_eeprom.hex: %.elf
+	$(OBJCOPY) -j .eeprom --change-section-lma .eeprom=0 -O ihex $< $@
+
+%_eeprom.srec: %.elf
+	$(OBJCOPY) -j .eeprom --change-section-lma .eeprom=0 -O srec $< $@
+
+%_eeprom.bin: %.elf
+	$(OBJCOPY) -j .eeprom --change-section-lma .eeprom=0 -O binary $< $@
+
+
+# Every thing below here is used by avr-libc's build system and can be ignored
+# by the casual user.
+
+JPEGFILES               = largedemo-setup.jpg largedemo-wiring.jpg \
+                          largedemo-wiring2.jpg
+
+JPEG2PNM           = jpegtopnm
+PNM2EPS            = pnmtops
+JPEGRESOLUTION     = 180
+EXTRA_CLEAN_FILES  = *.hex *.bin *.srec *.eps
+
+dox: ${JPEGFILES:.jpg=.eps}
+
+%.eps: %.jpg
+	$(JPEG2PNM) $< |\
+	$(PNM2EPS) -noturn -dpi $(JPEGRESOLUTION) -equalpixels \
+	> $@

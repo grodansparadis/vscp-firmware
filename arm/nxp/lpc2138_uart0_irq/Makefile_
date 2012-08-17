@@ -1,0 +1,191 @@
+#******************************************************************************
+#
+#  $RCSfile: Makefile_,v $
+#  $Revision: 1.1 $
+#
+#  This is the Makefile for an LPC project using gcc.
+#  Copyright 2004, R O SoftWare
+#  No guarantees, warrantees, or promises, implied or otherwise.
+#  May be used for hobby or commercial purposes provided copyright
+#  notice remains intact.
+# 
+#******************************************************************************
+
+# name of output program
+NAME      = uartTest
+CPU       = arm7tdmi
+RUN_MODE  = RAM_RUN                     # one of RAM_RUN or ROM_RUN
+VERSION   = 0000
+
+
+# check for a local environmental include file
+!if exist(.environ)
+!include .environ
+!else
+# put default environmental variables (ROOTDIR,PATH,...) here
+ROOTDIR  = D:/Cygwin/gnutools
+!endif
+
+PATH     = $(ROOTDIR)\bin;$(PATH)
+
+INCLUDES = -I ./
+
+!if "$(RUN_MODE)" == "RAM_RUN"
+SCRIPT   = RAM
+!elseif "$(RUN_MODE)" == "ROM_RUN"
+SCRIPT   = ROM
+!else
+!ERROR RUN_MODE not defined.
+!endif
+
+#THUMB    = -mthumb
+#THUMB_IW = -mthumb-interwork
+RUN_DEF  = -D$(RUN_MODE)
+
+OPTFLAGS = -mcpu=$(CPU) -ggdb $(THUMB_IW)
+WARNINGS = -Wall -Wcast-align -Wcast-qual -Wimplicit -Wmissing-declarations \
+           -Wmissing-prototypes -Wnested-externs -Wpointer-arith -Wswitch \
+           -Wredundant-decls -Wreturn-type -Wshadow -Wstrict-prototypes -Wunused
+CCFLAGS  = $(OPTFLAGS) $(INCLUDES) $(WARNINGS) $(RUN_DEF) -O2 -DVERSION=0x$(VERSION)
+ASFLAGS  = $(OPTFLAGS) $(INCLUDES) -D_GNU_ASSEMBLER_ -x assembler-with-cpp $(RUN_DEF) \
+           -Wa,-gstabs
+LDFLAGS  = $(OPTFLAGS) -nostartfiles -Wl,-Map=$*.map,--cref
+
+########################################################################################
+
+CC       = arm-elf-gcc
+LD       = arm-elf-ld
+AR       = arm-elf-ar
+AS       = arm-elf-gcc
+GASP     = arm-elf-gasp
+NM       = arm-elf-nm
+OBJCOPY  = arm-elf-objcopy
+RANLIB   = arm-elf-ranlib
+READELF  = arm-elf-readelf
+STRIP    = arm-elf-strip
+SIZE     = arm-elf-size
+CP       = copy /Y
+RM       = del /Q
+ARCHIVE  = zip
+MV       = move /Y
+
+########################################################################################
+
+.SUFFIXES :
+.SUFFIXES : .o .c .s .S .elf .bin .hex .asm .s19
+
+.c.o:
+  @$(CC) $(THUMB) $(CCFLAGS) $< -c -o $@
+         
+.c.asm:  
+  @$(CC) $(THUMB) $(CCFLAGS) $< -S -o $@
+         
+.S.o:    
+  @$(CC) $(ASFLAGS) $< -c -o $@
+
+.s.o:    
+  @$(CC) $(ASFLAGS) $< -c -o $@
+
+.elf.bin:
+  @$(OBJCOPY) $*.elf -O binary $*.bin
+
+.elf.hex:
+  @$(OBJCOPY) $*.elf -O ihex $*.hex
+
+# "mark" the S0 record of the .S19 file with the value of $(VERSION)
+.elf.s19:
+  @$(OBJCOPY) $*.elf -O srec $(NAME)$(VERSION).s19
+  @$(MV) $(NAME)$(VERSION).s19 $*.s19
+
+########################################################################################
+# source and object files
+ASRCS = crt0.S
+
+CSRCS = main.c sysTime.c uart.c uartISR.c armVIC.c
+
+OBJS = $(ASRCS:.S=.o) $(CSRCS:.c=.o)
+
+########################################################################################
+# The following MUST precede all: 
+# 'nmake zip=<file_name>' creates a <file_name>.zip archive.
+!ifdef ZIP
+ZIPFILE = $(ZIP)
+do_zip: zip
+!else
+ZIPFILE = sMPR$(VERSION)
+!endif
+
+########################################################################################
+
+all: $(NAME).hex
+
+# 'nmake release' rebuilds everything then creates a ZIP file using the
+# current value of $(VERSION) as its name.
+release: clobber depend all zip
+
+$(NAME).elf: $(OBJS) Makefile $(SCRIPT).ld
+  @$(CC) $(OBJS) $(THUMB) $(LDFLAGS) -T $(SCRIPT).ld -o $@
+  @$(STRIP) -SXR .comment -o $(NAME).es $(NAME).elf
+  @$(NM) $(NAME).es >$(NAME).syA
+  @$(NM) -n $(NAME).es >$(NAME).sy1
+  @echo MODE: $(RUN_MODE)
+  @$(SIZE) -Ax $(NAME).es
+  @$(RM) $(NAME).es
+
+scratch: clobber all
+
+clobber: clean
+  -@$(RM) *.s19     >NUL 2>&1
+  -@$(RM) *.hex     >NUL 2>&1
+  -@$(RM) *.bin     >NUL 2>&1
+  -@$(RM) *.map     >NUL 2>&1
+  -@$(RM) *.syA     >NUL 2>&1
+  -@$(RM) *.sy1     >NUL 2>&1
+  -@$(RM)  .depend  >NUL 2>&1
+
+clean:
+  -@$(RM) /S *.o    >NUL 2>&1
+  -@$(RM) *.elf     >NUL 2>&1
+  -@$(RM) *.lst     >NUL 2>&1
+  -@$(RM) *.asm     >NUL 2>&1
+  -@$(RM) *.bin     >NUL 2>&1
+  -@$(RM) *.hex     >NUL 2>&1
+  -@$(RM) *.bak     >NUL 2>&1
+
+zip:
+!if exist(zips)
+  @$(ARCHIVE) $(ZIPFILE).zip $(ASRCS) $(CSRCS) *.h Makefile *.ld README.txt
+  @$(MV) $(ZIPFILE).zip zips
+!endif
+
+############################################################################
+# special C language dependencies
+# the following C files MUST be compiled in ARM mode (with interworking)
+#flash.o:
+#  @$(CC) $(CCFLAGS) $*.c -c -o $@
+
+uartISR.o:
+  @$(CC) $(CCFLAGS) $*.c -c -o $@
+
+armVIC.o:
+  @$(CC) $(CCFLAGS) $*.c -c -o $@
+
+############################################################################
+# assembly language dependencies
+
+
+############################################################################
+# dependency file support
+# version.c gets the value of $(VERSION) from Makefile
+host.c: MakeFile
+
+depend: clobber .depend
+
+.depend:
+  @$(CC) -MM $(CCFLAGS) $(CSRCS) >  .depend
+  @$(CC) -MM $(ASFLAGS) $(ASRCS) >> .depend
+#  @makedepend -o.o -S -Y -- $(CCFLAGS) -- $(CSRCS) -f- > .depend
+
+!if exist(.depend)
+!include .depend
+!endif

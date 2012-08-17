@@ -1,0 +1,42 @@
+[Project ID]
+Signature=UE Proj: v.1
+[Project Information]
+Compilable=1
+Use Relative Directory=1
+Relative to Project File=1
+Using VCS=1
+Save Account=0
+VCS Default Module={267DF24D-24E7-44c4-AECA-68854531502F}
+Include Sub Directories=1
+Project Tagfile=
+Project Wordfile=
+Filter=
+Create Tagfile=0
+CTags Legacy Support=0
+[Files]
+0=VSCP_app.c
+1=DM_Application.c
+2=DoorOpenLevadizo.c
+3=Task3_Loop.c
+4=Registers.h
+5=Application.h
+[VCS Module List]
+{267DF24D-24E7-44c4-AECA-68854531502F}=
+[uemakeXp]
+ReleaseMode=0
+[Debug Settings]
+Program Arguments=
+Symbol Paths=
+Working Directory=
+Selected Debugger=0
+Source Paths=
+[{267DF24D-24E7-44c4-AECA-68854531502F}]
+Module Id={267DF24D-24E7-44c4-AECA-68854531502F}
+Module Type=SVN
+Module Path=D:\Marcelo\0_Working\VSCP
+Module Enabled=true
+Account Id={7B499868-644C-44bf-A0FD-5F038DE0D48F}
+Account Type=
+Account Name="svn:special "
+VCS Module Path=
+VCS Specific Settings=

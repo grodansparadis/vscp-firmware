@@ -1,0 +1,13 @@
+#
+# Copyright ARM Limited 1998-2000. All rights reserved.
+#
+#------------------------------------------------------------
+# This set of makefile definitions describe the build
+# environment for the zlib Library
+#------------------------------------------------------------
+# Where is uHAL (relative to ./Build)
+UHAL_BASE = ../../uHAL
+# Build Specifics
+UHAL_PROCESSOR_ARCHITECTURE = 4
+
+

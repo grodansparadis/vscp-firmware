@@ -1,0 +1,12 @@
+/** \defgroup ds1631 ds1631: Dallas DS1631 Temperature Sensor Driver
+
+	This library provides high-level functions for accessing the Dallas
+	Semiconductor DS1631 I2C Temperature Sensor.
+
+	The basic specs of the DS1631 are:
+	- operating temperature range -55 to +125 degrees C
+	- high accuracy of +/-0.5C over 0 to +70 degrees C
+	- 8 to 12-bit signed output
+	- thermostat functionality
+
+*/

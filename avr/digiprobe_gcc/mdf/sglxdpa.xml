@@ -1,0 +1,135 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+
+<vscp>
+<module>
+	<name>digiprobe</name>
+ 	<model>alpha</model>
+	<version>1.0.0</version>
+
+	<description lang="en">This is a high resolution photocurrent probe with temperature compensation</description>
+	<infourl>http://datenheim.de</infourl>
+	<changed>2010-09-23</changed>
+	<buffersize>8</buffersize>
+
+	<manufacturer>	
+		<name>datenheim</name>
+		  <address>
+				<street>Lennestr. 74</street>
+				<city>Potsdam</city>
+				<postcode>14471</postcode>
+				<country>Germany</country>
+			</address>
+			<telephone>									
+				<number>+49 179 2513025</number>
+				<description lang="en" >Main Reception</description>
+			</telephone>
+		<email>
+			<address>dev@datenheim.de</address>
+			<description>Support email</description>
+		</email>
+		<web>
+			<address>datenheim.de</address>
+			<description>Main web site</description>
+		</web>					
+	</manufacturer>  
+	
+	
+	<boot>
+		<algorithm>0</algorithm>
+		<blocksize>256</blocksize>  <!-- Pages are 128 words long -->
+		<blockcount>96</blockcount> <!-- total 128 pages, bootloader has 32, remaining 96 -->
+	</boot>
+	
+	
+	<registers>        
+
+      <reg page="0" offset="0" >
+            <name lang="en">Current Offset byte 0</name>
+            <description lang="en">part of the current offset</description>
+            <access>rw</access>
+        </reg>        
+
+        <reg page="0" offset="1" >
+            <name lang="en">Current Offset byte 1</name>
+            <description lang="en">part of the current offset</description>
+            <access>rw</access>
+        </reg>        
+
+        <reg page="0" offset="2" >
+            <name lang="en">Current Offset byte 2</name>
+            <description lang="en">part of the current offset</description>
+            <access>rw</access>
+        </reg>        
+
+        <reg page="0" offset="3" >
+            <name lang="en">Current Offset byte 3</name>
+            <description lang="en">part of the current offset</description>
+            <access>rw</access>
+        </reg>        
+
+        <reg page="0" offset="4" >
+            <name lang="en">Current Factor byte 0</name>
+            <description lang="en">part of the current calibration factor</description>
+            <access>rw</access>
+        </reg>        
+
+        <reg page="0" offset="5" >
+            <name lang="en">Current Factor byte 1</name>
+            <description lang="en">part of the current calibration factor</description>
+            <access>rw</access>
+        </reg>        
+
+        <reg page="0" offset="6" >
+            <name lang="en">Current Factor byte 2</name>
+            <description lang="en">part of the current calibration factor</description>
+            <access>rw</access>
+        </reg>        
+
+        <reg page="0" offset="7" >
+            <name lang="en">Current Factor byte 3</name>
+            <description lang="en">part of the current calibration factor</description>
+            <access>rw</access>
+        </reg>        
+
+	</registers>
+	
+	<events>
+
+		<event class="0x0A" type="0x05" >
+			<name lang="en">Photo current</name> 					
+			<description lang="en">
+				High resolution photo current measurement data
+			</description> 	
+			<priority>4</priority>
+				<data offset="1" >						
+					<name lang="en">photo current</name>
+					<description lang="en">
+					Photo current in ampere, single precision float
+					</description>      	
+				</data>
+				<data offset="5" >						
+					<name lang="en">ADC error indicator</name>
+					<description lang="en">
+					reflects errors during A-D conversion, zero = OK
+					</description>      	
+				</data>
+		</event>
+
+		<event class="0x0A" type="0x06" >
+			<name lang="en">Probe temperature</name> 					
+			<description lang="en">
+				Temperature inside probe housing
+			</description> 	
+			<priority>4</priority>
+				<data offset="1" >						
+					<name lang="en">actual temperature</name>
+					<description lang="en">
+					Internal probe temperature in Kelvin, single precision float
+					</description>      	
+				</data>
+		</event>
+	
+	</events>
+
+</module>	
+</vscp>	

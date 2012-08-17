@@ -1,0 +1,30 @@
+To do:
+  [ ] ./FreeRTOS/portable/GCC/ARM7_LPC2000/port.c uses local defines for timer control
+  [ ] Some modules (USB) still have local #defines for hardware (protocol engine)
+  [ ] Finish rest of syscalls.c functions (fstat ())
+  [ ] Fix SPI code to be thread safe
+  [ ] Fix I2C using polled mode for EEPROM
+  [ ] Add firmware update from file system
+  [ ] Add keyboard code from project-X (leave inactive)
+
+Done:
+  [X] Add PWM demo to channel 5
+  [X] Upgrade FreeRTOS to 4.7.2 (or higher)
+  [X] Add fixes for usbmass
+  [X] Move file commands to 'file' submenu
+  [X] Add LCD code from project-X (leave inactive)
+  [X] Add 'const' keyword to commandList_t vars
+  [X] Add prompt from user submitted code
+  [X] Add sound demo from user submitted code
+  [X] Add -Wno-strict-aliasing to FreeRTOS/Makefile
+  [X] Add -Wno-cast-align to FreeRTOS/Makefile
+  [X] Add -Wno-cast-align to usbmass/Makefile
+  [X] Update boot.s comments from Mortimer/boot.s
+  [X] Remove dead files from i2c directory
+  [X] Update tags target in Makefile
+  [X] Update lpc210x.h from Mortimer
+  [X] Update Makefiles from Mortimer
+  [X] Update usbmass/mmc/fatfs code from Mortimer
+  [X] Interrupt vectors in RAM example
+  [X] Update WinARM Makefile
+  [X] Add data abort demo

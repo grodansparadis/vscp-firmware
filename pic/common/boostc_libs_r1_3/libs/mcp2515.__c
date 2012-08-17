@@ -1,0 +1,26 @@
+[Settings]
+Active Compiler=BoostC
+Target=PIC16F876A
+[Debugger]
+DebugFromMain=1
+[Files]
+File0=serial.h
+Count=8
+File1=mcp2515.h
+File2=mcp2515_test.c
+File3=mcp2515_test.h
+File4=serial.c
+File5=mcp2515.c
+File6=spi.c
+File7=spi.h
+[Bookmarks]
+Count=0
+[Breakpoints]
+Count=0
+[Plugins]
+Bcd=506F727442000100000001000000
+Button=00706F727462000000000000000000
+Button Block=706F72746200000000000000000000000000
+Led=706F72746200000000000000000000000000
+Led Block=706F727462000000000000000000
+Speed Tester=6B094201040000004E6F6E65

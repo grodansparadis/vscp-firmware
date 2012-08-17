@@ -1,0 +1,501 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<title>PIC-based APRS Weather Station - Part 3</title>
+<!-- Banner goes after here -->
+<!-- Banner goes before here -->
+</head>
+
+<body bgcolor="#FFFFFF" link="#0000FF" vlink="#0000FF" alink="#FF0000">
+
+<TABLE COLS=1 WIDTH="100%" HEIGHT="87" BGCOLOR="#FFFFCC"> 
+<TR>
+<TD align="center" height="83" bordercolor="#000000" style="border-style: solid; border-width: 1">
+  <p style="word-spacing: 0; margin-top: 0; margin-bottom: 0"><b><i><font color="#FF0000" size="+3" face="Comic Sans MS"><img border="0" src="../DQH%20Logo2-cropped.gif" width="124" height="84" align="center">&nbsp;&nbsp;&nbsp;&nbsp;
+  PIC-based APRS Weather Station&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></i></b></p>
+</TD>
+</TR>
+</TABLE>
+
+
+<table border="0" cellpadding="4" cellspacing="3" width="100%" bgcolor="#FFFFCC">
+  <tr>
+    <td align="center" valign="top" width="25%" bgcolor="#00FFFF" style="border-style: solid; border-width: 1">
+      <hr>
+      <p style="word-spacing: 0; line-height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 6"><font face="Arial" size="2" color="#FF0000"><b>PIC
+      APRS&nbsp;<br>
+      Weather Station</b></font></p>
+      <p style="word-spacing: 0; line-height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 6"><font face="Arial" size="2" color="#FF0000"><b>~
+      Part 3 Files ~</b></font></p>
+      <p style="word-spacing: 0; line-height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 6">&nbsp;</p>
+      <p style="word-spacing: 0; line-height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 6"><a href="pic-wx%20schematic%20(pt%203).gif"><b><font face="Arial" size="1">Schematic</font></b></a></p>
+      <p style="word-spacing: 0; line-height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 6">&nbsp;</p>
+      <p style="word-spacing: 0; line-height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 6"><b><font face="Arial" size="1"><a href="part3.asm">Source
+      Code</a></font></b></p>
+      <p style="word-spacing: 0; line-height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 6">&nbsp;</p>
+      <p style="word-spacing: 0; line-height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 6"><b><font face="Arial" size="1"><a href="picwxcode-3.zip">All
+      Software Files</a><br>
+      (Zip contains files for hex, list, err, cod and asm.)</font></b></p>
+      <p style="word-spacing: 0; line-height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 6"><b><font face="Arial" size="1"><br>
+      <a href="setup.exe">PIC-WX Windows program</a></font></b></p>
+      <hr>
+      <p style="word-spacing: 0; line-height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 6"><b><font face="Arial" size="1"><a href="../index.html">Back
+      to&nbsp;<br>
+      Digital Homebrewing Home Page</a></font></b></p>
+    </td>
+    <td valign="top" width="95%" bgcolor="#FFFF99" style="border-style: solid; border-width: 1">
+      <hr color="#FF0000">
+      <p align="center" style="margin-top: 0"><strong><font size="4" face="Tahoma">Part
+      3 - Temperature &amp; Humidity</font></strong></p>
+
+      <p class="MsoNormal">Hi gang! Finally, after laying the groundwork in the
+      first two episodes of the PIC WX saga, it’s time to get down to the
+      business of actually measuring weather data! We’re going to start by
+      adding a sensor for temperature and relative humidity. The sensor I’ve
+      chosen is the SHT11 from Sensirion (<a href="http://www.sensirion.com)/">www.sensirion.com)</a>.
+      The SHT11 is a digital device that, when queried, returns an unsigned
+      16-bit number that must be converted into the actual value for temperature
+      or humidity by using simple formulas given in the SHT11 data sheet. It
+      requires no calibration and is reasonably accurate (for temperature,
+      better than <span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-family: Symbol; mso-ascii-font-family: Times New Roman; mso-hansi-font-family: Times New Roman">±</span>3.6
+      <span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-family: Symbol; mso-ascii-font-family: Times New Roman; mso-hansi-font-family: Times New Roman">°</span>F
+      between –40 and 100 <span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-family: Symbol; mso-ascii-font-family: Times New Roman; mso-hansi-font-family: Times New Roman">°</span>F,
+      and <span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-family: Symbol; mso-ascii-font-family: Times New Roman; mso-hansi-font-family: Times New Roman">±</span>3.5%
+      for relative humidity). Purchasing information is found on Sensirion’s
+      web site—it’s around $20, but you can also request a free sample (mine
+      arrived within a week of my request).</p>
+      <span style="font-family: Times New Roman; mso-fareast-font-family: Times New Roman; mso-ansi-language: EN-US; mso-fareast-language: EN-US; mso-bidi-language: AR-SA"><font size="3">The
+      SHT11 sensor is pretty small—only 0.3” by 0.2”, basically in a
+      surface-mount package. The pin spacing on the package is 0.05”. Because
+      of this, I fabricated a small PC board on which to mount it so that it
+      would be easier to handle. Figure 1 shows the PC board before and after
+      the SHT11 was mounted. I included pads for 0.1” header pins to make it
+      easier to connect the board to the rest of the circuit.<span style="mso-spacerun: yes; font-family: Times New Roman; mso-fareast-font-family: Times New Roman; mso-ansi-language: EN-US; mso-fareast-language: EN-US; mso-bidi-language: AR-SA">&nbsp;
+      </span>I made several extra PC boards for the SHT11, so contact me if
+      you’re following along and need one.</font></span>
+      <p align="center"><span style="font-size:10.0pt;font-family:&quot;Times New Roman&quot;;
+mso-fareast-font-family:&quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA"><!--[if gte vml 1]><v:shapetype id="_x0000_t75"
+ coordsize="21600,21600" o:spt="75" o:preferrelative="t" path="m@4@5l@4@11@9@11@9@5xe"
+ filled="f" stroked="f">
+ <v:stroke joinstyle="miter"/>
+ <v:formulas>
+  <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+  <v:f eqn="sum @0 1 0"/>
+  <v:f eqn="sum 0 0 @1"/>
+  <v:f eqn="prod @2 1 2"/>
+  <v:f eqn="prod @3 21600 pixelWidth"/>
+  <v:f eqn="prod @3 21600 pixelHeight"/>
+  <v:f eqn="sum @0 0 1"/>
+  <v:f eqn="prod @6 1 2"/>
+  <v:f eqn="prod @7 21600 pixelWidth"/>
+  <v:f eqn="sum @8 21600 0"/>
+  <v:f eqn="prod @7 21600 pixelHeight"/>
+  <v:f eqn="sum @10 21600 0"/>
+ </v:formulas>
+ <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+ <o:lock v:ext="edit" aspectratio="t"/>
+</v:shapetype><v:shape id="_x0000_i1025" type="#_x0000_t75" style='width:328.5pt;
+ height:194.25pt' o:bordertopcolor="this" o:borderleftcolor="this"
+ o:borderbottomcolor="this" o:borderrightcolor="this">
+ <v:imagedata src="file:///C:/DOCUME~1/gheron/LOCALS~1/Temp/msoclip1/01/clip_image001.jpg"
+  o:title="fig1-opt"/>
+ <w:bordertop type="single" width="4"/>
+ <w:borderleft type="single" width="4"/>
+ <w:borderbottom type="single" width="4"/>
+ <w:borderright type="single" width="4"/>
+</v:shape><![endif]-->
+      <img src="pic-wx1.jpg" v:shapes="_x0000_i1025" width="440" height="261"></span></p>
+      <p class="MsoNormal" align="center" style="text-align:center"><b style="mso-bidi-font-weight:
+normal">Figure 1. The carrier board for the SHT11 sensor.<o:p>
+      </o:p>
+      </b></p>
+      <p class="MsoNormal">The data sheet for the SHT11 cautions that care must
+      be taken when soldering the sensor. Contact time must be limited to 5
+      seconds with an iron at 350 <span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-family: Symbol; mso-ascii-font-family: Times New Roman; mso-hansi-font-family: Times New Roman">°</span>C.
+      In addition, the sensor should be stored for at least 24 hours at a
+      relative humidity of 75% or higher after soldering to allow it to recover
+      (since it’s always dry here in Colorado, I stored mine in a small
+      container with a wet sponge).</p>
+      <p class="MsoNormal">Although the SHT11 has eight pins, only pins 1
+      through 4 are actually used:</p>
+      <div align="center">
+        <table border="1" cellspacing="0" cellpadding="0" style="border-collapse:collapse;
+ mso-table-layout-alt:fixed;border:none;mso-border-alt:solid black 1.5pt;
+ mso-padding-alt:0in 5.4pt 0in 5.4pt">
+          <tr>
+            <td width="39" valign="top" style="width:29.15pt;border:solid black 1.5pt;
+  border-right:solid black .75pt;padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid"><b style="mso-bidi-font-weight:
+  normal">Pin<o:p>
+              </o:p>
+              </b></p>
+            </td>
+            <td width="58" valign="top" style="width:43.6pt;border-top:solid black 1.5pt;
+  border-left:none;border-bottom:solid black 1.5pt;border-right:solid black .75pt;
+  mso-border-left-alt:solid black .75pt;padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid"><b style="mso-bidi-font-weight:
+  normal">Name<o:p>
+              </o:p>
+              </b></p>
+            </td>
+            <td width="153" valign="top" style="width:114.65pt;border:solid black 1.5pt;
+  border-left:none;mso-border-left-alt:solid black .75pt;padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid"><b style="mso-bidi-font-weight:
+  normal">Connection<o:p>
+              </o:p>
+              </b></p>
+            </td>
+          </tr>
+          <tr>
+            <td width="39" valign="top" style="width:29.15pt;border-top:none;border-left:
+  solid black 1.5pt;border-bottom:solid black .75pt;border-right:solid black .75pt;
+  mso-border-top-alt:solid black 1.5pt;padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid">1<o:p>
+              </o:p>
+              </p>
+            </td>
+            <td width="58" valign="top" style="width:43.6pt;border-top:none;border-left:none;
+  border-bottom:solid black .75pt;border-right:solid black .75pt;mso-border-top-alt:
+  solid black 1.5pt;mso-border-left-alt:solid black .75pt;padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid">GND<o:p>
+              </o:p>
+              </p>
+            </td>
+            <td width="153" valign="top" style="width:114.65pt;border-top:none;border-left:
+  none;border-bottom:solid black .75pt;border-right:solid black 1.5pt;
+  mso-border-top-alt:solid black 1.5pt;mso-border-left-alt:solid black .75pt;
+  padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid">Ground<o:p>
+              </o:p>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td width="39" valign="top" style="width:29.15pt;border-top:none;border-left:
+  solid black 1.5pt;border-bottom:solid black .75pt;border-right:solid black .75pt;
+  mso-border-top-alt:solid black .75pt;padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid">2<o:p>
+              </o:p>
+              </p>
+            </td>
+            <td width="58" valign="top" style="width:43.6pt;border-top:none;border-left:none;
+  border-bottom:solid black .75pt;border-right:solid black .75pt;mso-border-top-alt:
+  solid black .75pt;mso-border-left-alt:solid black .75pt;padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid">DATA<o:p>
+              </o:p>
+              </p>
+            </td>
+            <td width="153" valign="top" style="width:114.65pt;border-top:none;border-left:
+  none;border-bottom:solid black .75pt;border-right:solid black 1.5pt;
+  mso-border-top-alt:solid black .75pt;mso-border-left-alt:solid black .75pt;
+  padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid">Serial data
+              bi-directional<o:p>
+              </o:p>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td width="39" valign="top" style="width:29.15pt;border-top:none;border-left:
+  solid black 1.5pt;border-bottom:solid black .75pt;border-right:solid black .75pt;
+  mso-border-top-alt:solid black .75pt;padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid">3<o:p>
+              </o:p>
+              </p>
+            </td>
+            <td width="58" valign="top" style="width:43.6pt;border-top:none;border-left:none;
+  border-bottom:solid black .75pt;border-right:solid black .75pt;mso-border-top-alt:
+  solid black .75pt;mso-border-left-alt:solid black .75pt;padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid">SCK<o:p>
+              </o:p>
+              </p>
+            </td>
+            <td width="153" valign="top" style="width:114.65pt;border-top:none;border-left:
+  none;border-bottom:solid black .75pt;border-right:solid black 1.5pt;
+  mso-border-top-alt:solid black .75pt;mso-border-left-alt:solid black .75pt;
+  padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid">Serial clock
+              input<o:p>
+              </o:p>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td width="39" valign="top" style="width:29.15pt;border-top:none;border-left:
+  solid black 1.5pt;border-bottom:solid black .75pt;border-right:solid black .75pt;
+  mso-border-top-alt:solid black .75pt;padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid">4<o:p>
+              </o:p>
+              </p>
+            </td>
+            <td width="58" valign="top" style="width:43.6pt;border-top:none;border-left:none;
+  border-bottom:solid black .75pt;border-right:solid black .75pt;mso-border-top-alt:
+  solid black .75pt;mso-border-left-alt:solid black .75pt;padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid">VDD<o:p>
+              </o:p>
+              </p>
+            </td>
+            <td width="153" valign="top" style="width:114.65pt;border-top:none;border-left:
+  none;border-bottom:solid black .75pt;border-right:solid black 1.5pt;
+  mso-border-top-alt:solid black .75pt;mso-border-left-alt:solid black .75pt;
+  padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid">Supply 2.4 –
+              5.5V<o:p>
+              </o:p>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td width="39" valign="top" style="width:29.15pt;border-top:none;border-left:
+  solid black 1.5pt;border-bottom:solid black 1.5pt;border-right:solid black .75pt;
+  mso-border-top-alt:solid black .75pt;padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid">5-8<o:p>
+              </o:p>
+              </p>
+            </td>
+            <td width="58" valign="top" style="width:43.6pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.5pt;border-right:solid black .75pt;mso-border-top-alt:
+  solid black .75pt;mso-border-left-alt:solid black .75pt;padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid">nc<o:p>
+              </o:p>
+              </p>
+            </td>
+            <td width="153" valign="top" style="width:114.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.5pt;border-right:solid black 1.5pt;
+  mso-border-top-alt:solid black .75pt;mso-border-left-alt:solid black .75pt;
+  padding:0in 5.4pt 0in 5.4pt">
+              <p class="MsoNormal" style="page-break-after:avoid">Do not connect<o:p>
+              </o:p>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <p class="MsoNormal">You probably figured out for yourself that pins 2 and
+      3 must be connected to the PIC chip so that the PIC chip can communicate
+      with the SHT11. The PIC and SHT11 communicate using <i style="mso-bidi-font-style:normal">synchronous</i>
+      serial communications—synchronous because they share a clock line (SCK)
+      to indicate when each bit can be written/read. The PIC chip controls the
+      SCK line, while the PIC and the SHT11 take turns controlling the DATA
+      line.</p>
+      <p class="MsoNormal">The PIC uses the SCK line to signal when each bit can
+      be written or read. Although it’s called a clock line, it doesn’t need
+      to have a fixed frequency. When the clock line goes high, a bit can be
+      read from the DATA line. When the clock line goes low, a bit can be
+      written to the DATA line. In other words, the device currently sending the
+      data should set the value of the DATA line whenever the clock line goes
+      low, and the device reading the data should get the value of the DATA line
+      whenever the clock line goes high. The PIC chip controls this line at all
+      times. There is no danger of the PIC chip changing the clock line at too
+      high of a frequency for the SHT11—the maximum clock frequency for the
+      SHT11 is 10 MHz, while the PIC can change it at a maximum frequency of
+      only 1 MHz (determined by its own clock rate of 4 MHz).</p>
+      <p class="MsoNormal" style="text-indent:.5in">The SHT11 datasheet covers
+      the operation of the sensor in great detail. In a nutshell, here is the
+      sequence of events for obtaining a reading from the sensor:</p>
+      <p class="MsoNormal">&nbsp;1)<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </span>The PIC chip sends a “transmission start” sequence. While SCK
+      is high, the DATA line is taken low. While the DATA line is low, the SCK
+      line is taken low and then high again, and then the DATA line is taken
+      high. This signals the SHT11 that a command will be sent to it.</p>
+      <p class="MsoNormal">&nbsp;2)<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </span>The PIC chip sends an 8-bit command. “00000011” is sent if
+      temperature is desired, or “00000101” is sent for humidity.</p>
+      <p class="MsoNormal">&nbsp;3)<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </span>The SHT11 acknowledges receipt of the command by pulling the DATA
+      line low for one clock cycle, and then releasing the DATA line (which goes
+      high).</p>
+      <p class="MsoNormal">&nbsp;4)<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </span>After it has completed its measurement (which can take up to 210
+      ms), the SHT11 again pulls the DATA line low to indicate that it’s ready
+      to send data back to the PIC. The data is returned as three bytes (high
+      byte, low byte, checksum). After receiving each byte, the PIC must
+      acknowledge by pulling the DATA line low for one clock cycle.</p>
+      <p class="MsoNormal" style="tab-stops:.5in">Figure 2 shows the schematic
+      diagram for the entire circuit. It differs from the schematic for the
+      previous installment only by the addition of the SHT11 sensor. Note that
+      the DATA line for the sensor has a pull-up resistor connected to it. The
+      SHT11 datasheet indicates that the pull-up resistor is necessary.</p>
+      <p align="center"><span style="font-size:10.0pt;font-family:&quot;Times New Roman&quot;;
+mso-fareast-font-family:&quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA"><!--[if gte vml 1]><v:shapetype id="_x0000_t75"
+ coordsize="21600,21600" o:spt="75" o:preferrelative="t" path="m@4@5l@4@11@9@11@9@5xe"
+ filled="f" stroked="f">
+ <v:stroke joinstyle="miter"/>
+ <v:formulas>
+  <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+  <v:f eqn="sum @0 1 0"/>
+  <v:f eqn="sum 0 0 @1"/>
+  <v:f eqn="prod @2 1 2"/>
+  <v:f eqn="prod @3 21600 pixelWidth"/>
+  <v:f eqn="prod @3 21600 pixelHeight"/>
+  <v:f eqn="sum @0 0 1"/>
+  <v:f eqn="prod @6 1 2"/>
+  <v:f eqn="prod @7 21600 pixelWidth"/>
+  <v:f eqn="sum @8 21600 0"/>
+  <v:f eqn="prod @7 21600 pixelHeight"/>
+  <v:f eqn="sum @10 21600 0"/>
+ </v:formulas>
+ <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+ <o:lock v:ext="edit" aspectratio="t"/>
+</v:shapetype><v:shape id="_x0000_i1025" type="#_x0000_t75" style='width:503.25pt;
+ height:307.5pt'>
+ <v:imagedata src="file:///C:/DOCUME~1/gheron/LOCALS~1/Temp/msoclip1/01/clip_image001.png"
+  o:title="fig2"/>
+</v:shape><![endif]-->
+      <img src="pic-wx2.jpg" v:shapes="_x0000_i1025" width="758" height="464"></span></p>
+      <p class="MsoNormal" align="center" style="text-align:center;tab-stops:.5in"><b style="mso-bidi-font-weight:normal">Figure
+      2: PICWX schematic for part 3<br>
+      </b><i><font size="2"><a href="pic-wx3.gif"><b style="mso-bidi-font-weight:normal">(Click
+      here for full-size GIF file</b><b style="mso-bidi-font-weight: normal">)</b></a></font></i><b style="mso-bidi-font-weight:normal"><o:p>
+      </o:p>
+      </b></p>
+      <p class="MsoNormal" style="tab-stops:.5in">&nbsp;<o:p>
+      </o:p>
+      The operation of the circuit is quite simple. The PIC accepts the ‘t’
+      command to initiate a temperature measurement and the ‘h’ command to
+      initiate a humidity measurement. In either case, the PIC returns a five
+      digit number (as an ASCII string) followed by a carriage return and line
+      feed. Once you’ve built the circuit (don’t forget to reprogram the PIC),
+      connect it to the serial port on your computer and start up Hyperterminal
+      (or your favorite communications program). Configure your communications
+      program for 9600 baud, 8 bits, 1 stop bit, no parity, and no flow control.
+      Then, type a ‘v’. The PIC should transmit a version string back to the
+      PC (“WxPIC v0.3b (c) 2002 by NK0E”). If so, try typing ‘t’. The
+      PIC should get a temperature measurement from the SHT11 and transmit a
+      five-digit number back to the PC. Also try typing ‘h’. Again, the PIC
+      should get a humidity measurement from the SHT11 and return a five-digit
+      number.</p>
+      <p class="MsoNormal" style="tab-stops:.5in"><span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </span>To convert the five-digit numbers to temperature and humidity, use
+      the following formulas (also given in the SHT11 datasheet):</p>
+      <p class="MsoNormal" style="tab-stops:.5in" align="center">&nbsp;<span style="mso-text-raise:-3.0pt"><!--[if gte vml 1]><v:shapetype id="_x0000_t75"
+ coordsize="21600,21600" o:spt="75" o:preferrelative="t" path="m@4@5l@4@11@9@11@9@5xe"
+ filled="f" stroked="f">
+ <v:stroke joinstyle="miter"/>
+ <v:formulas>
+  <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+  <v:f eqn="sum @0 1 0"/>
+  <v:f eqn="sum 0 0 @1"/>
+  <v:f eqn="prod @2 1 2"/>
+  <v:f eqn="prod @3 21600 pixelWidth"/>
+  <v:f eqn="prod @3 21600 pixelHeight"/>
+  <v:f eqn="sum @0 0 1"/>
+  <v:f eqn="prod @6 1 2"/>
+  <v:f eqn="prod @7 21600 pixelWidth"/>
+  <v:f eqn="sum @8 21600 0"/>
+  <v:f eqn="prod @7 21600 pixelHeight"/>
+  <v:f eqn="sum @10 21600 0"/>
+ </v:formulas>
+ <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+ <o:lock v:ext="edit" aspectratio="t"/>
+</v:shapetype><v:shape id="_x0000_i1025" type="#_x0000_t75" style='width:84pt;
+ height:14.25pt' o:ole="" fillcolor="window">
+ <v:imagedata src="file:///C:/DOCUME~1/gheron/LOCALS~1/Temp/msoclip1/01/clip_image001.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+      <img src="pic-wx4.gif" v:shapes="_x0000_i1025" width="213" height="21"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1025"
+  DrawAspect="Content" ObjectID="_1104869783">
+ </o:OLEObject>
+</xml><![endif]-->
+      </p>
+      <p class="MsoNormal" align="center" style="text-align:center;tab-stops:.5in"><span style="mso-text-raise:-3.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1026"
+ type="#_x0000_t75" style='width:159.75pt;height:15.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="file:///C:/DOCUME~1/gheron/LOCALS~1/Temp/msoclip1/01/clip_image003.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+      <img src="pic-wx4.gif" v:shapes="_x0000_i1026" width="213" height="21"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1026"
+  DrawAspect="Content" ObjectID="_1104869785">
+ </o:OLEObject>
+</xml><![endif]-->
+      </p>
+      <p class="MsoNormal" style="tab-stops:.5in">&nbsp;In those formulas,
+      temperature <i style="mso-bidi-font-style:normal">T</i> is given in
+      degrees F, and humidity <i style="mso-bidi-font-style:normal">H</i> is the
+      percent relative humidity. <i style="mso-bidi-font-style:normal">N</i> is
+      the number returned by the PIC chip.</p>
+      <p class="MsoNormal" style="tab-stops:.5in">If you examine the PIC code,
+      you’ll see that the ‘t’ and ‘h’ commands reuse the same code
+      that communicates with the SHT11. I wrote several subroutines, to send the
+      command to the SHT11, get a byte from the SHT11, and acknowledge bytes
+      received from the SHT11. I also reused the code from last time that
+      converts a two-byte binary integer to an ASCII string and sends the ASCII
+      string back to the PC.</p>
+      <p class="MsoNormal" style="tab-stops:.5in">Finally, I wrote a simple
+      Windows program (using Microsoft Visual C++) that periodically queries the
+      PICWX for temperature and humidity and displays it on the screen. A screen
+      shot is shown in Figure 3. When you first run it, click the Settings
+      button to tell it the serial port to which the PIC WX circuit is
+      connected, and also to set the measurement intervals. When you start the
+      PIC WX program, it places a small thermometer icon in your system tray. If
+      you hover your mouse pointer over that icon, a small box will pop up that
+      shows the current measurements. If you minimize the PIC WX program, it
+      disappears completely except for the icon in the system tray. Double-click
+      the icon to make the PIC WX program reappear. You can download the PIC WX
+      Windows program <a href="setup.exe"><b>here</b></a>.</p>
+      <p align="center"><span style="font-size:10.0pt;font-family:&quot;Times New Roman&quot;;
+mso-fareast-font-family:&quot;Times New Roman&quot;;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA"><!--[if gte vml 1]><v:shapetype id="_x0000_t75"
+ coordsize="21600,21600" o:spt="75" o:preferrelative="t" path="m@4@5l@4@11@9@11@9@5xe"
+ filled="f" stroked="f">
+ <v:stroke joinstyle="miter"/>
+ <v:formulas>
+  <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+  <v:f eqn="sum @0 1 0"/>
+  <v:f eqn="sum 0 0 @1"/>
+  <v:f eqn="prod @2 1 2"/>
+  <v:f eqn="prod @3 21600 pixelWidth"/>
+  <v:f eqn="prod @3 21600 pixelHeight"/>
+  <v:f eqn="sum @0 0 1"/>
+  <v:f eqn="prod @6 1 2"/>
+  <v:f eqn="prod @7 21600 pixelWidth"/>
+  <v:f eqn="sum @8 21600 0"/>
+  <v:f eqn="prod @7 21600 pixelHeight"/>
+  <v:f eqn="sum @10 21600 0"/>
+ </v:formulas>
+ <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+ <o:lock v:ext="edit" aspectratio="t"/>
+</v:shapetype><v:shape id="_x0000_i1025" type="#_x0000_t75" style='width:6in;
+ height:187.5pt'>
+ <v:imagedata src="file:///C:/DOCUME~1/gheron/LOCALS~1/Temp/msoclip1/01/clip_image001.jpg"
+  o:title="fig3"/>
+</v:shape><![endif]-->
+      <img src="pic-wx5.jpg" v:shapes="_x0000_i1025" width="576" height="250"></span></p>
+      <p class="MsoNormal" align="center" style="text-align:center;tab-stops:.5in"><b style="mso-bidi-font-weight:normal">Figure
+      3: The PIC WX Windows program for reading the PIC weather station.<o:p>
+      </o:p>
+      </b></p>
+      <p class="MsoNormal" style="tab-stops:.5in">That wraps up this installment
+      of the PIC WX project. Next time we’ll add a sensor for wind speed.
+      That’ll probably be a bit more complicated than the SHT11 sensor!</p>
+      <p class="MsoNormal" style="tab-stops:.5in"><span style="mso-bidi-font-size: 12.0pt"><font size="3">&nbsp;</font></span><i><span style="mso-bidi-font-size: 9.0pt"><font size="3"><b>73,
+      Dave NK0E<o:p>
+      </o:p>
+      </b></font></span></i></p>
+      <p class="MsoNormal"><i><font size="3"><span style="mso-bidi-font-size: 12.0pt"><b><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;
+      </span>email: <a href="mailto:ekdave@earthlink.net">ekdave@earthlink.net</a></b></span><span style="mso-bidi-font-size: 9.0pt"><o:p>
+      </o:p>
+      </span></font></i></p>
+      <p class="MsoNormal"><i><span style="mso-bidi-font-size:9.0pt;font-family:&quot;Courier New&quot;">
+      </o:p>
+      </span></i></p>
+      <div style="width: 777; height: 19; border-left-style: none; border-left-width: medium; border-right-style: none; border-right-width: medium; border-top-style: none; border-top-width: medium; border-bottom: 2.25pt double windowtext; padding-left: 0in; padding-right: 0in; padding-top: 0in; padding-bottom: 1.0pt">
+      </div>
+      <hr>
+      <p align="center"><b><i><font face="Arial" size="2">Page last modified:&nbsp;
+      January 22, 2003<br>
+      </font><font face="Arial" size="1"><br>
+      Copyright 2002 G. Heron, N2APB&nbsp; <a href="mailto:n2apb@amsat.org">n2apb@amsat.org</a>
+      </font></i></b></p>
+    <p><font color="#0000FF"
+    size="4" face="Comic Sans MS"> </font></td>
+  </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,206 @@
+/*********************************************************************
+ *                                                                    
+ * Software License Agreement                                         
+ *                                                                    
+ * Copyright © 2007-2008 Microchip Technology Inc.  All rights reserved.
+ *
+ * Microchip licenses to you the right to use, modify, copy and distribute 
+ * Software only when embedded on a Microchip microcontroller or digital 
+ * signal controller and used with a Microchip radio frequency transceiver, 
+ * which are integrated into your product or third party product (pursuant 
+ * to the terms in the accompanying license agreement).  
+ *
+ * You should refer to the license agreement accompanying this Software for 
+ * additional information regarding your rights and obligations.
+ *
+ * SOFTWARE AND DOCUMENTATION ARE PROVIDED “AS IS” WITHOUT WARRANTY OF ANY 
+ * KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION, ANY 
+ * WARRANTY OF MERCHANTABILITY, TITLE, NON-INFRINGEMENT AND FITNESS FOR A 
+ * PARTICULAR PURPOSE. IN NO EVENT SHALL MICROCHIP OR ITS LICENSORS BE 
+ * LIABLE OR OBLIGATED UNDER CONTRACT, NEGLIGENCE, STRICT LIABILITY, 
+ * CONTRIBUTION, BREACH OF WARRANTY, OR OTHER LEGAL EQUITABLE THEORY ANY 
+ * DIRECT OR INDIRECT DAMAGES OR EXPENSES INCLUDING BUT NOT LIMITED TO 
+ * ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE OR CONSEQUENTIAL DAMAGES, 
+ * LOST PROFITS OR LOST DATA, COST OF PROCUREMENT OF SUBSTITUTE GOODS, 
+ * TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT 
+ * NOT LIMITED TO ANY DEFENSE THEREOF), OR OTHER SIMILAR COSTS.             
+ *                                                                    
+ *********************************************************************/
+
+
+//#define ENABLE_TABLE_DUMP
+
+#define ENABLE_CONSOLE
+
+#ifndef _MIWI_DEFS_H_
+#define _MIWI_DEFS_H_
+
+// Pin definitions
+
+// ** CS
+// Direction
+#define mSetupMiWiCSDirection()     {   mPORTESetBits( BIT_5 ); mPORTESetPinsDigitalOut( BIT_5 );  }
+
+// CS on, active low
+#define mSetMiWiCSOn()              {   taskENTER_CRITICAL(); mPORTEClearBits( BIT_5 ); }
+
+// CS off, active low
+#define mSetMiWiCSOff()             {   mPORTESetBits( BIT_5 );  taskEXIT_CRITICAL(); }
+
+
+// ** Reset
+// Direction
+#define mSetupMiWiResetDirection()  {   mPORTESetBits( BIT_6 ); mPORTESetPinsDigitalOut( BIT_6 );  }
+
+// Reset on, active low
+#define mSetMiWiResetOn()           {   mPORTEClearBits( BIT_6 ); }
+
+// Reset off, active low
+#define mSetMiWiResetOff()          {   mPORTESetBits( BIT_6 );   }
+
+
+// ** WAKE
+
+// Direction
+#define mSetupMiWiWAKEDirection()  {   mPORTBSetBits( BIT_4 ); mPORTBSetPinsDigitalOut( BIT_4 );  }
+
+// Reset on, active low
+#define mSetMiWiWAKEOn()           {   mPORTBClearBits( BIT_4 ); }
+
+// Reset off, active low
+#define mSetMiWiWAKEOff()          {   mPORTBSetBits( BIT_4 );   }
+
+
+// ** INT
+
+// Set up the direction for MiWi interrupt
+#define mSetupMiWiINTDirection()    {   mPORTESetPinsDigitalIn( BIT_9 );  }
+
+
+// SPI 1
+#define MIWI_USE_SPI_1
+// SPI 2
+//#define MIWI_USE_SPI_2
+
+
+//#define CLOCK_FREQ 8000000
+#define TMRL TMR2	// used to get a "random" number
+
+// Transceiver Configuration
+#define RFIF IFS0bits.INT1IF
+#define RFIE IEC0bits.INT1IE
+
+// Sweetbox port defines
+#define RF_INT_PIN PORTEbits.RE9
+
+// debug output
+#define ConsolePutROMString( a )
+
+#define SUPPORT_CLUSTER_SOCKETS
+#define SUPPORT_P2P_SOCKETS
+#define SUPPORT_EUI_ADDRESS_SEARCH
+
+// MAC Address
+#define EUI_7 0x00
+#define EUI_6 0x04
+#define EUI_5 0xA3
+#define EUI_4 0x12
+#define EUI_3 0x34
+#define EUI_2 0x56
+#define EUI_1 0x78
+#define EUI_0 0x93
+
+
+#define BAUD_RATE 19200
+
+// Device Information
+#define I_AM_FFD
+//#define I_AM_RFD
+#define DEVICE_TYPE 1       // FFD
+#define I_AM_COORDINATOR_CAPABLE
+#define ALTERNATE_PAN_COORDINATOR 1
+#define RX_ON_WHEN_IDLE 1
+#define POWER_SOURCE 1      // Not Mains
+#define SECURITY_CAPABLE 0
+#define ALLOCATE_ADDRESS 1
+#define CAP_INFO ( (((uint8_t)ALLOCATE_ADDRESS)<<7) | (((uint8_t)SECURITY_CAPABLE)<<6) | (((uint8_t)RX_ON_WHEN_IDLE)<<3) | (((uint8_t)POWER_SOURCE)<<2) | (((uint8_t)DEVICE_TYPE)<<1) | ALTERNATE_PAN_COORDINATOR ) // 0x8B
+
+
+#define PA_LEVEL 0x00  // -0.00 dBm
+#define FREQUENCY_BAND 2400
+#define ALLOWED_CHANNELS CHANNEL_25
+#define AVAILABLE_CHANNELS_SIZE 1
+#define RSSI_SAMPLES_PER_CHANNEL 5  //0-255
+
+// Message Buffers
+#define TX_BUFFER_SIZE 127
+#define RX_BUFFER_SIZE 127
+
+// Timeouts
+#define NETWORK_DISCOVERY_TIMEOUT 0x00007A12
+#define OPEN_CLUSTER_SOCKET_TIMEOUT 0x0002DC6C
+#define RFD_DATA_WAIT 0x00003FFF
+
+// Indirect Buffer Management
+#define INDIRECT_BUFFER_SIZE 127
+#define INDIRECT_BUFFER_TIMEOUT 0x0005B8D8
+
+// Additional NWK/MAC Constants
+#define NETWORK_TABLE_SIZE 10
+#define MAX_HOPS 4
+
+//#define SUPPORT_SECURITY
+#define SECURITY_KEY_00 0x00
+#define SECURITY_KEY_01 0x01
+#define SECURITY_KEY_02 0x02
+#define SECURITY_KEY_03 0x03
+#define SECURITY_KEY_04 0x04
+#define SECURITY_KEY_05 0x05
+#define SECURITY_KEY_06 0x06
+#define SECURITY_KEY_07 0x07
+#define SECURITY_KEY_08 0x08
+#define SECURITY_KEY_09 0x09
+#define SECURITY_KEY_10 0x0a
+#define SECURITY_KEY_11 0x0b
+#define SECURITY_KEY_12 0x0c
+#define SECURITY_KEY_13 0x0d
+#define SECURITY_KEY_14 0x0e
+#define SECURITY_KEY_15 0x0f
+#define KEY_SEQUENCE_NUMBER 0x00
+#define SECURITY_LEVEL 0x04
+
+// Constants Validation
+
+// ZENA(TM) will automatically range check the entered values.  These range
+// checks are included here in cases the application developer manually
+// adjusts the values.
+
+#if (RX_BUFFER_SIZE > 127)
+    #error RX BUFFER SIZE too large. Must be <= 127.
+#endif
+
+#if (TX_BUFFER_SIZE > 127)
+    #error TX BUFFER SIZE too large. Must be <= 127.
+#endif
+
+#if (RX_BUFFER_SIZE < 25)
+    #error RX BUFFER SIZE too small. Must be >= 25.
+#endif
+
+#if (TX_BUFFER_SIZE < 25)
+    #error TX BUFFER SIZE too small. Must be >= 25.
+#endif
+
+#if (NETWORK_TABLE_SIZE == 0)
+    #error NETWORK TABLE SIZE too small.
+#endif
+
+#if (NETWORK_TABLE_SIZE > 0xFE)
+    #error NETWORK TABLE SIZE too large.  Must be < 0xFF.
+#endif
+
+#if (INDIRECT_BUFFER_SIZE > 0xFE)
+    #error INDIRECT BUFFER SIZE too large.  Must be < 0xFF.
+#endif
+
+#endif

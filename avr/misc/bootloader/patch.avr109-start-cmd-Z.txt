@@ -1,0 +1,39 @@
+----------------------------------------------------------------------
+Patch name: patch.start-cmd-Z
+Author: Bryce Denney (bryce@tlw.com)
+Date: Wed Jun 12 18:39:21 EDT 2002
+
+Detailed description:
+As written, there's no way to start the application after you've entered the
+boot loader.  The only way is to power down, move a jumper or something
+to change the value on PD4, and power up again.  This is ridiculous.
+
+Add a 'Z' command which jumps to application code.
+
+Patch was created with:
+  diff -u
+Apply patch to:
+  avr109.zip source code
+Instructions:
+  Type "patch < THIS_PATCH_FILE".
+----------------------------------------------------------------------
+Index: main.c
+===================================================================
+RCS file: /usr/src/CVSROOT/designs/avr109/main.c,v
+retrieving revision 1.1.4.3
+diff -u -b -r1.1.4.3 main.c
+--- main.c	2002/03/04 08:41:51	1.1.4.3
++++ main.c	2002/06/12 18:24:38
+@@ -309,6 +309,12 @@
+           sendchar(sig_byte1);
+         }       
+ 
++        else if (val=='Z')                      // Start application
++        {
++          sendchar('\r');
++          funcptr();                        // Jump to Reset vector 0x0000 in Application Section
++        }
++
+         else if(val!=0x1b)                  // if not esc
+         {
+           sendchar('?');

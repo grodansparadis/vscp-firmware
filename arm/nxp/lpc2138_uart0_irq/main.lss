@@ -1,0 +1,2042 @@
+
+main.elf:     file format elf32-littlearm
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000f90  00000000  00000000  00008000  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  40000000  00000f90  00010000  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          000000f8  40000000  40000000  00010000  2**2
+                  ALLOC
+  3 .stack        00000400  40000100  40000100  00010000  2**0
+                  ALLOC
+  4 .comment      0000006c  00000000  00000000  00010000  2**0
+                  CONTENTS, READONLY
+  5 .debug_aranges 000000e0  00000000  00000000  00010070  2**3
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_pubnames 000001dd  00000000  00000000  00010150  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_info   00000b87  00000000  00000000  0001032d  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_abbrev 0000057b  00000000  00000000  00010eb4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_line   000003ed  00000000  00000000  0001142f  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_frame  00000294  00000000  00000000  0001181c  2**2
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_str    0000035f  00000000  00000000  00011ab0  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_loc    000003b0  00000000  00000000  00011e0f  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 13 .debug_ranges 00000040  00000000  00000000  000121bf  2**0
+                  CONTENTS, READONLY, DEBUGGING
+Disassembly of section .text:
+
+00000000 <_boot>:
+
+// Runtime Interrupt Vectors
+// -------------------------
+Vectors:
+        b     _start                    // reset - _start
+   0:	ea000012 	b	50 <_mainCRTStartup>
+        ldr   pc,_undf                  // undefined - _undf
+   4:	e59ff014 	ldr	pc, [pc, #20]	; 20 <_undf>
+        ldr   pc,_swi                   // SWI - _swi
+   8:	e59ff014 	ldr	pc, [pc, #20]	; 24 <_swi>
+        ldr   pc,_pabt                  // program abort - _pabt
+   c:	e59ff014 	ldr	pc, [pc, #20]	; 28 <_pabt>
+        ldr   pc,_dabt                  // data abort - _dabt
+  10:	e59ff014 	ldr	pc, [pc, #20]	; 2c <_dabt>
+        nop                             // reserved
+  14:	e1a00000 	nop			(mov r0,r0)
+        ldr   pc,[pc,#-0xFF0]           // IRQ - read the VIC
+  18:	e51ffff0 	ldr	pc, [pc, #-4080]	; fffff030 <_end+0xbfffeb30>
+        ldr   pc,_fiq                   // FIQ - _fiq
+  1c:	e59ff010 	ldr	pc, [pc, #16]	; 34 <_fiq>
+
+00000020 <_undf>:
+  20:	00000038 	andeq	r0, r0, r8, lsr r0
+
+00000024 <_swi>:
+  24:	0000003c 	andeq	r0, r0, ip, lsr r0
+
+00000028 <_pabt>:
+  28:	00000040 	andeq	r0, r0, r0, asr #32
+
+0000002c <_dabt>:
+  2c:	00000044 	andeq	r0, r0, r4, asr #32
+
+00000030 <_irq>:
+  30:	00000048 	andeq	r0, r0, r8, asr #32
+
+00000034 <_fiq>:
+  34:	0000004c 	andeq	r0, r0, ip, asr #32
+
+00000038 <__undf>:
+
+#if 0
+// Use this group for production
+_undf:  .word _reset                    // undefined - _reset
+_swi:   .word _reset                    // SWI - _reset
+_pabt:  .word _reset                    // program abort - _reset
+_dabt:  .word _reset                    // data abort - _reset
+_irq:   .word _reset                    // IRQ - _reset
+_fiq:   .word _reset                    // FIQ - _reset
+
+#else
+// Use this group for development
+_undf:  .word __undf                    // undefined
+_swi:   .word __swi                     // SWI
+_pabt:  .word __pabt                    // program abort
+_dabt:  .word __dabt                    // data abort
+_irq:   .word __irq                     // IRQ
+_fiq:   .word __fiq                     // FIQ
+
+__undf: b     .                         // undefined
+  38:	eafffffe 	b	38 <__undf>
+
+0000003c <__swi>:
+__swi:  b     .                         // SWI
+  3c:	eafffffe 	b	3c <__swi>
+
+00000040 <__pabt>:
+__pabt: b     .                         // program abort
+  40:	eafffffe 	b	40 <F_BIT>
+
+00000044 <__dabt>:
+__dabt: b     .                         // data abort
+  44:	eafffffe 	b	44 <__dabt>
+
+00000048 <__irq>:
+__irq:  b     .                         // IRQ
+  48:	eafffffe 	b	48 <__irq>
+
+0000004c <__fiq>:
+__fiq:  b     .                         // FIQ
+  4c:	eafffffe 	b	4c <__fiq>
+
+00000050 <_mainCRTStartup>:
+#endif
+        .size _boot, . - _boot
+        .endfunc
+
+
+// Setup the operating mode & stack.
+// ---------------------------------
+        .global _start, start, _mainCRTStartup
+        .func   _start
+
+_start:
+start:
+_mainCRTStartup:
+
+// Initialize Interrupt System
+// - Set stack location for each mode
+// - Leave in System Mode with Interrupts Disabled
+// -----------------------------------------------
+        ldr   r0,=_stack
+  50:	e59f0098 	ldr	r0, [pc, #152]	; f0 <.text+0xf0>
+        msr   CPSR_c,#MODE_UND|I_BIT|F_BIT // Undefined Instruction Mode
+  54:	e321f0db 	msr	CPSR_c, #219	; 0xdb
+        mov   sp,r0
+  58:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#UND_STACK_SIZE
+  5c:	e2400004 	sub	r0, r0, #4	; 0x4
+        msr   CPSR_c,#MODE_ABT|I_BIT|F_BIT // Abort Mode
+  60:	e321f0d7 	msr	CPSR_c, #215	; 0xd7
+        mov   sp,r0
+  64:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#ABT_STACK_SIZE
+  68:	e2400004 	sub	r0, r0, #4	; 0x4
+        msr   CPSR_c,#MODE_FIQ|I_BIT|F_BIT // FIQ Mode
+  6c:	e321f0d1 	msr	CPSR_c, #209	; 0xd1
+        mov   sp,r0
+  70:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#FIQ_STACK_SIZE
+  74:	e2400004 	sub	r0, r0, #4	; 0x4
+        msr   CPSR_c,#MODE_IRQ|I_BIT|F_BIT // IRQ Mode
+  78:	e321f0d2 	msr	CPSR_c, #210	; 0xd2
+        mov   sp,r0
+  7c:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#IRQ_STACK_SIZE
+  80:	e2400080 	sub	r0, r0, #128	; 0x80
+        msr   CPSR_c,#MODE_SVC|I_BIT|F_BIT // Supervisor Mode
+  84:	e321f0d3 	msr	CPSR_c, #211	; 0xd3
+        mov   sp,r0
+  88:	e1a0d000 	mov	sp, r0
+        sub   r0,r0,#SVC_STACK_SIZE
+  8c:	e2400004 	sub	r0, r0, #4	; 0x4
+        msr   CPSR_c,#MODE_SYS|I_BIT|F_BIT // System Mode
+  90:	e321f0df 	msr	CPSR_c, #223	; 0xdf
+        mov   sp,r0
+  94:	e1a0d000 	mov	sp, r0
+
+// Copy initialized data to its execution address in RAM
+// -----------------------------------------------------
+#ifdef ROM_RUN
+        ldr   r1,=_etext                // -> ROM data start
+  98:	e59f1054 	ldr	r1, [pc, #84]	; f4 <.text+0xf4>
+        ldr   r2,=_data                 // -> data start
+  9c:	e59f2054 	ldr	r2, [pc, #84]	; f8 <.text+0xf8>
+        ldr   r3,=_edata                // -> end of data
+  a0:	e59f3054 	ldr	r3, [pc, #84]	; fc <.text+0xfc>
+1:      cmp   r2,r3                     // check if data to move
+  a4:	e1520003 	cmp	r2, r3
+        ldrlo r0,[r1],#4                // copy it
+  a8:	34910004 	ldrcc	r0, [r1], #4
+        strlo r0,[r2],#4
+  ac:	34820004 	strcc	r0, [r2], #4
+        blo   1b                        // loop until done
+  b0:	3afffffb 	bcc	a4 <IRQ_STACK_SIZE+0x24>
+#endif
+// Clear .bss
+// ----------
+        mov   r0,#0                     // get a zero
+  b4:	e3a00000 	mov	r0, #0	; 0x0
+        ldr   r1,=__bss_start           // -> bss start
+  b8:	e59f1040 	ldr	r1, [pc, #64]	; 100 <.text+0x100>
+        ldr   r2,=__bss_end__           // -> bss end
+  bc:	e59f2040 	ldr	r2, [pc, #64]	; 104 <.text+0x104>
+2:      cmp   r1,r2                     // check if data to clear
+  c0:	e1510002 	cmp	r1, r2
+        strlo r0,[r1],#4                // clear 4 bytes
+  c4:	34810004 	strcc	r0, [r1], #4
+        blo   2b                        // loop until done
+  c8:	3afffffc 	bcc	c0 <IRQ_STACK_SIZE+0x40>
+
+// Call main program: main(0)
+// --------------------------
+        mov   r0,#0                     // no arguments (argc = 0)
+  cc:	e3a00000 	mov	r0, #0	; 0x0
+        mov   r1,r0
+  d0:	e1a01000 	mov	r1, r0
+        mov   r2,r0
+  d4:	e1a02000 	mov	r2, r0
+        mov   fp,r0                     // null frame pointer
+  d8:	e1a0b000 	mov	fp, r0
+        mov   r7,r0                     // null frame pointer for thumb
+  dc:	e1a07000 	mov	r7, r0
+        ldr   r10,=main
+  e0:	e59fa020 	ldr	sl, [pc, #32]	; 108 <.text+0x108>
+        mov   lr,pc
+  e4:	e1a0e00f 	mov	lr, pc
+        bx    r10                       // enter main()
+  e8:	e12fff1a 	bx	sl
+
+000000ec <_reset>:
+
+        .size   _start, . - _start
+        .endfunc
+
+        .global _reset, reset, exit, abort
+        .func   _reset
+_reset:
+reset:
+exit:
+abort:
+#if 0
+// Disable interrupts, then force a hardware reset by driving P23 low
+// -------------------------------------------------------------------
+        mrs   r0,cpsr                   // get PSR
+        orr   r0,r0,#I_BIT|F_BIT        // disable IRQ and FIQ
+        msr   cpsr,r0                   // set up status register
+
+        ldr   r1,=(PS_BASE)             // PS Base Address
+        ldr   r0,=(PS_PIO)              // PIO Module
+        str   r0,[r1,#PS_PCER_OFF]      // enable its clock
+        ldr   r1,=(PIO_BASE)            // PIO Base Address
+        ldr   r0,=(1<<23)               // P23
+        str   r0,[r1,#PIO_PER_OFF]      // make sure pin is contolled by PIO
+        str   r0,[r1,#PIO_CODR_OFF]     // set the pin low
+        str   r0,[r1,#PIO_OER_OFF]      // make it an output
+#endif
+        b     .                         // loop until reset
+  ec:	eafffffe 	b	ec <_reset>
+  f0:	40000500 	andmi	r0, r0, r0, lsl #10
+  f4:	00000f90 	muleq	r0, r0, pc
+  f8:	40000000 	andmi	r0, r0, r0
+  fc:	40000000 	andmi	r0, r0, r0
+ 100:	40000000 	andmi	r0, r0, r0
+ 104:	400000f8 	strmid	r0, [r0], -r8
+ 108:	00000188 	andeq	r0, r0, r8, lsl #3
+
+0000010c <button_state>:
+ *
+ *****************************************************************************/
+#define KEY_DEBOUNCE FIFTY_MS
+static int button_state(void)
+{
+ 10c:	e92d40f0 	stmdb	sp!, {r4, r5, r6, r7, lr}
+	static uint32_t lastchangetime;
+	static boolean  laststate=FALSE;
+	boolean actstate;
+	
+	actstate = (IOPIN1 & PIO0_BTN_STATE0_BIT) ? FALSE : TRUE; // TRUE if pressed (active low)
+ 110:	e59f3060 	ldr	r3, [pc, #96]	; 178 <.text+0x178>
+ 114:	e5933000 	ldr	r3, [r3]
+	
+	if (laststate != actstate) {
+ 118:	e59f705c 	ldr	r7, [pc, #92]	; 17c <.text+0x17c>
+ 11c:	e1a03723 	mov	r3, r3, lsr #14
+ 120:	e2033001 	and	r3, r3, #1	; 0x1
+ 124:	e5975000 	ldr	r5, [r7]
+ 128:	e2234001 	eor	r4, r3, #1	; 0x1
+ 12c:	e1550004 	cmp	r5, r4
+ 130:	e59f6048 	ldr	r6, [pc, #72]	; 180 <.text+0x180>
+ 134:	0a000004 	beq	14c <button_state+0x40>
+		lastchangetime = getSysTICs();
+ 138:	eb0000bc 	bl	430 <getSysTICs>
+		laststate = actstate;
+ 13c:	e3e03000 	mvn	r3, #0	; 0x0
+ 140:	e5860000 	str	r0, [r6]
+ 144:	e5874000 	str	r4, [r7]
+ 148:	ea000008 	b	170 <button_state+0x64>
+	}
+	else {
+		if (getElapsedSysTICs(lastchangetime) > KEY_DEBOUNCE) {
+ 14c:	e5960000 	ldr	r0, [r6]
+ 150:	eb0000c4 	bl	468 <getElapsedSysTICs>
+ 154:	e59f3028 	ldr	r3, [pc, #40]	; 184 <.text+0x184>
+ 158:	e1500003 	cmp	r0, r3
+ 15c:	e3e03000 	mvn	r3, #0	; 0x0
+ 160:	9a000002 	bls	170 <button_state+0x64>
+			if (actstate) return 1;
+ 164:	e3550000 	cmp	r5, #0	; 0x0
+ 168:	13a03001 	movne	r3, #1	; 0x1
+ 16c:	03a03000 	moveq	r3, #0	; 0x0
+			else return 0;
+		}
+	}
+	return -1; // changed or bouncing
+}
+ 170:	e1a00003 	mov	r0, r3
+ 174:	e8bd80f0 	ldmia	sp!, {r4, r5, r6, r7, pc}
+ 178:	e0028010 	and	r8, r2, r0, lsl r0
+ 17c:	40000000 	andmi	r0, r0, r0
+ 180:	40000004 	andmi	r0, r0, r4
+ 184:	0007a120 	andeq	sl, r7, r0, lsr #2
+
+00000188 <main>:
+ 188:	e59f320c 	ldr	r3, [pc, #524]	; 39c <.text+0x39c>
+ 18c:	e3a02024 	mov	r2, #36	; 0x24
+
+/******************************************************************************
+ *
+ * Function Name: main()
+ *
+ * Description:
+ *    This function is the program entry point.  After initializing the
+ *    system, it sends a greeting out UART0 then enters an endless loop
+ *    echoing chracters on the UART and blinking an LED every half
+ *    second.
+ *
+ * Calling Sequence: 
+ *    void
+ *
+ * Returns:
+ *    void
+ *
+ *****************************************************************************/
+int main(void)
+{
+ 190:	e92d41f0 	stmdb	sp!, {r4, r5, r6, r7, r8, lr}
+ 194:	e59f1204 	ldr	r1, [pc, #516]	; 3a0 <.text+0x3a0>
+ 198:	e5c32000 	strb	r2, [r3]
+ 19c:	e3a02001 	mov	r2, #1	; 0x1
+ 1a0:	e2433004 	sub	r3, r3, #4	; 0x4
+ 1a4:	e5c32000 	strb	r2, [r3]
+ 1a8:	e3e03055 	mvn	r3, #85	; 0x55
+ 1ac:	e5c13000 	strb	r3, [r1]
+ 1b0:	e28330ab 	add	r3, r3, #171	; 0xab
+ 1b4:	e5c13000 	strb	r3, [r1]
+ 1b8:	e59f21e4 	ldr	r2, [pc, #484]	; 3a4 <.text+0x3a4>
+ 1bc:	e59f31e4 	ldr	r3, [pc, #484]	; 3a8 <.text+0x3a8>
+ 1c0:	e5832000 	str	r2, [r3]
+ 1c4:	e3a0200c 	mov	r2, #12	; 0xc
+ 1c8:	e2433008 	sub	r3, r3, #8	; 0x8
+ 1cc:	e5832000 	str	r2, [r3]
+ 1d0:	e59f21d4 	ldr	r2, [pc, #468]	; 3ac <.text+0x3ac>
+ 1d4:	e2833004 	add	r3, r3, #4	; 0x4
+ 1d8:	e5832000 	str	r2, [r3]
+ 1dc:	e59f31cc 	ldr	r3, [pc, #460]	; 3b0 <.text+0x3b0>
+ 1e0:	e1d330b0 	ldrh	r3, [r3]
+ 1e4:	e3130b01 	tst	r3, #1024	; 0x400
+ 1e8:	0afffffb 	beq	1dc <main+0x54>
+ 1ec:	e59f31c0 	ldr	r3, [pc, #448]	; 3b4 <.text+0x3b4>
+ 1f0:	e3a04003 	mov	r4, #3	; 0x3
+ 1f4:	e59f21a4 	ldr	r2, [pc, #420]	; 3a0 <.text+0x3a0>
+ 1f8:	e5c34000 	strb	r4, [r3]
+ 1fc:	e3e05055 	mvn	r5, #85	; 0x55
+ 200:	e3a06055 	mov	r6, #85	; 0x55
+ 204:	e243307c 	sub	r3, r3, #124	; 0x7c
+ 208:	e5c25000 	strb	r5, [r2]
+ 20c:	e3a01002 	mov	r1, #2	; 0x2
+ 210:	e5c26000 	strb	r6, [r2]
+ 214:	e4434004 	strb	r4, [r3], #-4
+ 218:	e4c31100 	strb	r1, [r3], #256
+ 21c:	e5c31000 	strb	r1, [r3]
+ 220:	e3a08001 	mov	r8, #1	; 0x1
+ 224:	e24330c0 	sub	r3, r3, #192	; 0xc0
+ 228:	e5c38000 	strb	r8, [r3]
+ 22c:	e59f3184 	ldr	r3, [pc, #388]	; 3b8 <.text+0x3b8>
+ 230:	e3e02000 	mvn	r2, #0	; 0x0
+ 234:	e5832000 	str	r2, [r3]
+ 238:	e3a07000 	mov	r7, #0	; 0x0
+ 23c:	e59f2178 	ldr	r2, [pc, #376]	; 3bc <.text+0x3bc>
+ 240:	e2433008 	sub	r3, r3, #8	; 0x8
+ 244:	e4837028 	str	r7, [r3], #40
+ 248:	e5832000 	str	r2, [r3]
+ 24c:	eb000066 	bl	3ec <initSysTime>
+ 250:	e1a01004 	mov	r1, r4
+ 254:	e3a02081 	mov	r2, #129	; 0x81
+ 258:	e3a00021 	mov	r0, #33	; 0x21
+ 25c:	eb0000a5 	bl	4f8 <uart0Init>
+ 260:	eb0001f7 	bl	a44 <i2cInit>
+ 264:	e59f2154 	ldr	r2, [pc, #340]	; 3c0 <.text+0x3c0>
+ 268:	e3a0324e 	mov	r3, #-536870908	; 0xe0000004
+ 26c:	e4832008 	str	r2, [r3], #8
+ 270:	e3a0128e 	mov	r1, #-536870904	; 0xe0000008
+ 274:	e5837000 	str	r7, [r3]
+ 278:	e3a0320e 	mov	r3, #-536870912	; 0xe0000000
+ 27c:	e5c34000 	strb	r4, [r3]
+ 280:	e5c15000 	strb	r5, [r1]
+ 284:	e5c16000 	strb	r6, [r1]
+	unsigned _cpsr;
+	uint32_t startTime;
+	boolean lock=FALSE;
+  
+	sysInit();
+#if defined(UART0_TX_INT_MODE) || defined(UART0_RX_INT_MODE)
+	enableIRQ();
+ 288:	eb0001de 	bl	a08 <enableIRQ>
+#endif
+	startTime = getSysTICs();
+ 28c:	eb000067 	bl	430 <getSysTICs>
+ 290:	e1a05000 	mov	r5, r0
+  
+	uart0Puts("\r\nHello World!\r\n");
+ 294:	e59f0128 	ldr	r0, [pc, #296]	; 3c4 <.text+0x3c4>
+ 298:	eb000118 	bl	700 <uart0Puts>
+	uart0Puts("(a WinARM Demo-Application based on code from R O Software)\r\n\r\n");
+ 29c:	e59f0124 	ldr	r0, [pc, #292]	; 3c8 <.text+0x3c8>
+ 2a0:	eb000116 	bl	700 <uart0Puts>
+
+	if ( -1 == readEEPROM( 0 ) ) {
+ 2a4:	e1a00007 	mov	r0, r7
+ 2a8:	eb000264 	bl	c40 <readEEPROM>
+ 2ac:	e1a00800 	mov	r0, r0, lsl #16
+ 2b0:	e3700801 	cmn	r0, #65536	; 0x10000
+		uart0Puts("EEPROM ERROR1\r\n");
+ 2b4:	059f0110 	ldreq	r0, [pc, #272]	; 3cc <.text+0x3cc>
+ 2b8:	0b000110 	bleq	700 <uart0Puts>
+	}
+	if ( -1 == readEEPROM( 1 ) ) {
+ 2bc:	e1a00008 	mov	r0, r8
+ 2c0:	eb00025e 	bl	c40 <readEEPROM>
+ 2c4:	e1a00800 	mov	r0, r0, lsl #16
+ 2c8:	e3700801 	cmn	r0, #65536	; 0x10000
+		uart0Puts("EEPROM ERROR2\r\n");
+ 2cc:	059f00fc 	ldreq	r0, [pc, #252]	; 3d0 <.text+0x3d0>
+ 2d0:	0b00010a 	bleq	700 <uart0Puts>
+ 2d4:	e1a06007 	mov	r6, r7
+	}
+	
+	for (;;) {
+	
+		do {
+			int ch;
+
+			if ( (ch = uart0Getch() ) >= 0 ) {
+ 2d8:	eb000149 	bl	804 <uart0Getch>
+ 2dc:	e2504000 	subs	r4, r0, #0	; 0x0
+				uart0Puts("the <");
+ 2e0:	e59f00ec 	ldr	r0, [pc, #236]	; 3d4 <.text+0x3d4>
+ 2e4:	ba000004 	blt	2fc <main+0x174>
+ 2e8:	eb000104 	bl	700 <uart0Puts>
+				uart0Putch(ch);
+ 2ec:	e1a00004 	mov	r0, r4
+ 2f0:	eb0000c5 	bl	60c <uart0Putch>
+				uart0Puts("> key has been pressed\r\n");
+ 2f4:	e59f00dc 	ldr	r0, [pc, #220]	; 3d8 <.text+0x3d8>
+ 2f8:	eb000100 	bl	700 <uart0Puts>
+			}
+	
+			// send button-pressed string only once if hit
+			if ( button_state() == 0) lock=FALSE; // release lock if button is released
+ 2fc:	ebffff82 	bl	10c <button_state>
+ 300:	e3500000 	cmp	r0, #0	; 0x0
+ 304:	03a06000 	moveq	r6, #0	; 0x0
+			if ( ( button_state() == 1 ) && !lock ) {
+ 308:	ebffff7f 	bl	10c <button_state>
+ 30c:	e3500001 	cmp	r0, #1	; 0x1
+ 310:	e1a04000 	mov	r4, r0
+ 314:	1a000004 	bne	32c <main+0x1a4>
+ 318:	e3560000 	cmp	r6, #0	; 0x0
+				uart0Puts("\r\nButton Pressed!\r\n");
+ 31c:	e59f00b8 	ldr	r0, [pc, #184]	; 3dc <.text+0x3dc>
+ 320:	1a000001 	bne	32c <main+0x1a4>
+ 324:	eb0000f5 	bl	700 <uart0Puts>
+ 328:	e1a06004 	mov	r6, r4
+				lock=TRUE;
+			}
+		} 
+		while ( getElapsedSysTICs(startTime) < HALF_SEC );
+ 32c:	e1a00005 	mov	r0, r5
+ 330:	eb00004c 	bl	468 <getElapsedSysTICs>
+ 334:	e59f30a4 	ldr	r3, [pc, #164]	; 3e0 <.text+0x3e0>
+ 338:	e1500003 	cmp	r0, r3
+ 33c:	9affffe5 	bls	2d8 <main+0x150>
+
+		if ( IOPIN1 & PIO0_LCD_RS_BIT ) {
+ 340:	e59f309c 	ldr	r3, [pc, #156]	; 3e4 <.text+0x3e4>
+ 344:	e5933000 	ldr	r3, [r3]
+ 348:	e3130b01 	tst	r3, #1024	; 0x400
+			IOCLR1 = PIO0_LCD_RS_BIT;
+ 34c:	159f3054 	ldrne	r3, [pc, #84]	; 3a8 <.text+0x3a8>
+		}
+		else {
+			IOSET1 = PIO0_LCD_RS_BIT; 
+ 350:	059f3090 	ldreq	r3, [pc, #144]	; 3e8 <.text+0x3e8>
+ 354:	13a02b01 	movne	r2, #1024	; 0x400
+ 358:	03a02b01 	moveq	r2, #1024	; 0x400
+ 35c:	e5832000 	str	r2, [r3]
+		}
+		
+		readEEPROM( 1 );
+ 360:	e3a00001 	mov	r0, #1	; 0x1
+ 364:	eb000235 	bl	c40 <readEEPROM>
+		readEEPROM( 1000 );
+ 368:	e3a00ffa 	mov	r0, #1000	; 0x3e8
+ 36c:	eb000233 	bl	c40 <readEEPROM>
+
+		startTime += HALF_SEC;
+		_cpsr = disableIRQ();
+ 370:	eb000199 	bl	9dc <disableIRQ>
+		WDFEED = 0xAA; WDFEED = 0x55;
+ 374:	e3a0328e 	mov	r3, #-536870904	; 0xe0000008
+ 378:	e3e02055 	mvn	r2, #85	; 0x55
+ 37c:	e5c32000 	strb	r2, [r3]
+ 380:	e2855713 	add	r5, r5, #4980736	; 0x4c0000
+ 384:	e28220ab 	add	r2, r2, #171	; 0xab
+ 388:	e2855c4b 	add	r5, r5, #19200	; 0x4b00
+ 38c:	e5c32000 	strb	r2, [r3]
+ 390:	e2855040 	add	r5, r5, #64	; 0x40
+		restoreIRQ( _cpsr );
+ 394:	eb000194 	bl	9ec <restoreIRQ>
+ 398:	eaffffce 	b	2d8 <main+0x150>
+ 39c:	e01fc084 	ands	ip, pc, r4, lsl #1
+ 3a0:	e01fc08c 	ands	ip, pc, ip, lsl #1
+ 3a4:	e1803cf0 	strd	r3, [r0, r0]
+ 3a8:	e002801c 	and	r8, r2, ip, lsl r0
+ 3ac:	000034fc 	streqd	r3, [r0], -ip
+ 3b0:	e01fc088 	ands	ip, pc, r8, lsl #1
+ 3b4:	e01fc080 	ands	ip, pc, r0, lsl #1
+ 3b8:	fffff014 	swinv	0x00fff014
+ 3bc:	000000ec 	andeq	r0, r0, ip, ror #1
+ 3c0:	03938700 	orreqs	r8, r3, #0	; 0x0
+ 3c4:	00000ee4 	andeq	r0, r0, r4, ror #29
+ 3c8:	00000ef8 	streqd	r0, [r0], -r8
+ 3cc:	00000f38 	andeq	r0, r0, r8, lsr pc
+ 3d0:	00000f48 	andeq	r0, r0, r8, asr #30
+ 3d4:	00000f58 	andeq	r0, r0, r8, asr pc
+ 3d8:	00000f60 	andeq	r0, r0, r0, ror #30
+ 3dc:	00000f7c 	andeq	r0, r0, ip, ror pc
+ 3e0:	004c4b3f 	subeq	r4, ip, pc, lsr fp
+ 3e4:	e0028010 	and	r8, r2, r0, lsl r0
+ 3e8:	e0028014 	and	r8, r2, r4, lsl r0
+
+000003ec <initSysTime>:
+  T0MCR = 0;                            // disable match registers
+  T0CCR = 0;                            // disable compare registers
+  T0EMR = 0;                            // disable external match register
+  T0TCR = TCR_ENABLE;                   // enable timer 0
+  sysTICs = 0;
+ 3ec:	e59f3030 	ldr	r3, [pc, #48]	; 424 <.text+0x424>
+ 3f0:	e3a02000 	mov	r2, #0	; 0x0
+ 3f4:	e5832000 	str	r2, [r3]
+ 3f8:	e59f0028 	ldr	r0, [pc, #40]	; 428 <.text+0x428>
+ 3fc:	e59f3028 	ldr	r3, [pc, #40]	; 42c <.text+0x42c>
+ 400:	e3a01002 	mov	r1, #2	; 0x2
+ 404:	e5801000 	str	r1, [r0]
+ 408:	e4831008 	str	r1, [r3], #8
+ 40c:	e4832014 	str	r2, [r3], #20
+ 410:	e4832014 	str	r2, [r3], #20
+ 414:	e5832000 	str	r2, [r3]
+ 418:	e3a03001 	mov	r3, #1	; 0x1
+ 41c:	e5803000 	str	r3, [r0]
+}
+ 420:	e12fff1e 	bx	lr
+ 424:	4000000c 	andmi	r0, r0, ip
+ 428:	e0004004 	and	r4, r0, r4
+ 42c:	e000400c 	and	r4, r0, ip
+
+00000430 <getSysTICs>:
+
+/******************************************************************************
+ *
+ * Function Name: getSysTICs()
+ *
+ * Description:
+ *    This function returns the current syetem time in TICs.
+ *
+ * Calling Sequence: 
+ *    void
+ *
+ * Returns:
+ *    The current time in TICs as represented by sysTICs
+ *
+ *****************************************************************************/
+uint32_t getSysTICs(void)
+{
+  uint32_t now = T0TC;
+
+  sysTICs += (uint32_t)(now - lastT0TC);
+ 430:	e59f1024 	ldr	r1, [pc, #36]	; 45c <.text+0x45c>
+ 434:	e59f3024 	ldr	r3, [pc, #36]	; 460 <.text+0x460>
+ 438:	e59fc024 	ldr	ip, [pc, #36]	; 464 <.text+0x464>
+ 43c:	e5932000 	ldr	r2, [r3]
+ 440:	e5913000 	ldr	r3, [r1]
+ 444:	e59c0000 	ldr	r0, [ip]
+ 448:	e0633002 	rsb	r3, r3, r2
+ 44c:	e0800003 	add	r0, r0, r3
+  lastT0TC = now;
+ 450:	e5812000 	str	r2, [r1]
+ 454:	e58c0000 	str	r0, [ip]
+  return sysTICs;
+}
+ 458:	e12fff1e 	bx	lr
+ 45c:	40000008 	andmi	r0, r0, r8
+ 460:	e0004008 	and	r4, r0, r8
+ 464:	4000000c 	andmi	r0, r0, ip
+
+00000468 <getElapsedSysTICs>:
+
+
+/******************************************************************************
+ *
+ * Function Name: getElapsedSysTICs()
+ *
+ * Description:
+ *    This function then returns the difference in TICs between the
+ *    given starting time and the current system time.
+ *
+ * Calling Sequence: 
+ *    The starting time.
+ *
+ * Returns:
+ *    The time difference.
+ *
+ *****************************************************************************/
+uint32_t getElapsedSysTICs(uint32_t startTime)
+{
+ 468:	e52de004 	str	lr, [sp, #-4]!
+ 46c:	e59fc028 	ldr	ip, [pc, #40]	; 49c <.text+0x49c>
+ 470:	e59f3028 	ldr	r3, [pc, #40]	; 4a0 <.text+0x4a0>
+ 474:	e59fe028 	ldr	lr, [pc, #40]	; 4a4 <.text+0x4a4>
+ 478:	e5931000 	ldr	r1, [r3]
+ 47c:	e59c3000 	ldr	r3, [ip]
+ 480:	e59e2000 	ldr	r2, [lr]
+ 484:	e0633001 	rsb	r3, r3, r1
+ 488:	e0822003 	add	r2, r2, r3
+  return getSysTICs() - startTime;
+}
+ 48c:	e0600002 	rsb	r0, r0, r2
+ 490:	e58c1000 	str	r1, [ip]
+ 494:	e58e2000 	str	r2, [lr]
+ 498:	e49df004 	ldr	pc, [sp], #4
+ 49c:	40000008 	andmi	r0, r0, r8
+ 4a0:	e0004008 	and	r4, r0, r8
+ 4a4:	4000000c 	andmi	r0, r0, ip
+
+000004a8 <pause>:
+
+
+/******************************************************************************
+ *
+ * Function Name: pause()
+ *
+ * Description:
+ *    This function does not return until the specified 'duration' in
+ *    TICs has elapsed.
+ *
+ * Calling Sequence: 
+ *    duration - length of time in TICs to wait before returning
+ *
+ * Returns:
+ *    void
+ *
+ *****************************************************************************/
+void pause(uint32_t duration)
+{
+ 4a8:	e92d4030 	stmdb	sp!, {r4, r5, lr}
+ 4ac:	e59fc038 	ldr	ip, [pc, #56]	; 4ec <.text+0x4ec>
+ 4b0:	e59f3038 	ldr	r3, [pc, #56]	; 4f0 <.text+0x4f0>
+ 4b4:	e59fe038 	ldr	lr, [pc, #56]	; 4f4 <.text+0x4f4>
+ 4b8:	e5931000 	ldr	r1, [r3]
+ 4bc:	e59c3000 	ldr	r3, [ip]
+ 4c0:	e59e2000 	ldr	r2, [lr]
+ 4c4:	e0633001 	rsb	r3, r3, r1
+ 4c8:	e0825003 	add	r5, r2, r3
+ 4cc:	e58c1000 	str	r1, [ip]
+ 4d0:	e58e5000 	str	r5, [lr]
+ 4d4:	e1a04000 	mov	r4, r0
+  uint32_t startTime = getSysTICs();
+
+  while (getElapsedSysTICs(startTime) < duration)
+ 4d8:	e1a00005 	mov	r0, r5
+ 4dc:	ebffffe1 	bl	468 <getElapsedSysTICs>
+ 4e0:	e1500004 	cmp	r0, r4
+ 4e4:	3afffffb 	bcc	4d8 <pause+0x30>
+    WDOG();
+}
+ 4e8:	e8bd8030 	ldmia	sp!, {r4, r5, pc}
+ 4ec:	40000008 	andmi	r0, r0, r8
+ 4f0:	e0004008 	and	r4, r0, r8
+ 4f4:	4000000c 	andmi	r0, r0, ip
+
+000004f8 <uart0Init>:
+ * NOTE: uart0Init(UART_BAUD(9600), UART_8N1, UART_FIFO_8);
+ *
+ *****************************************************************************/
+void uart0Init(uint16_t baud, uint8_t mode, uint8_t fmode)
+{
+ 4f8:	e92d40f0 	stmdb	sp!, {r4, r5, r6, r7, lr}
+  // set port pins for UART0
+  PINSEL0 = ( PINSEL0 & ~U0_PINMASK ) | U0_PINSEL;
+ 4fc:	e59fc0cc 	ldr	ip, [pc, #204]	; 5d0 <.text+0x5d0>
+ 500:	e59c3000 	ldr	r3, [ip]
+
+  U0IER = 0x00;                         // disable all interrupts
+ 504:	e59f60c8 	ldr	r6, [pc, #200]	; 5d4 <.text+0x5d4>
+ 508:	e3c3300f 	bic	r3, r3, #15	; 0xf
+ 50c:	e3a0e000 	mov	lr, #0	; 0x0
+ 510:	e3833005 	orr	r3, r3, #5	; 0x5
+ 514:	e58c3000 	str	r3, [ip]
+  U0IIR;                                // clear interrupt ID
+ 518:	e59f70b8 	ldr	r7, [pc, #184]	; 5d8 <.text+0x5d8>
+ 51c:	e5c6e000 	strb	lr, [r6]
+  U0RBR;                                // clear receive register
+ 520:	e59f40b4 	ldr	r4, [pc, #180]	; 5dc <.text+0x5dc>
+ 524:	e5d73000 	ldrb	r3, [r7]
+ 528:	e1a00800 	mov	r0, r0, lsl #16
+ 52c:	e5d43000 	ldrb	r3, [r4]
+  U0LSR;                                // clear line status register
+ 530:	e59f30a8 	ldr	r3, [pc, #168]	; 5e0 <.text+0x5e0>
+
+  // set the baudrate
+  U0LCR = ULCR_DLAB_ENABLE;             // select divisor latches 
+ 534:	e59f50a8 	ldr	r5, [pc, #168]	; 5e4 <.text+0x5e4>
+ 538:	e1a0c820 	mov	ip, r0, lsr #16
+ 53c:	e5d33000 	ldrb	r3, [r3]
+ 540:	e20220ff 	and	r2, r2, #255	; 0xff
+ 544:	e3e0307f 	mvn	r3, #127	; 0x7f
+  U0DLL = (uint8_t)baud;                // set for baud low byte
+ 548:	e20cc0ff 	and	ip, ip, #255	; 0xff
+  U0DLM = (uint8_t)(baud >> 8);         // set for baud high byte
+ 54c:	e1a00c20 	mov	r0, r0, lsr #24
+
+  // set the number of characters and other
+  // user specified operating parameters
+  U0LCR = (mode & ~ULCR_DLAB_ENABLE);
+ 550:	e201107f 	and	r1, r1, #127	; 0x7f
+ 554:	e5c53000 	strb	r3, [r5]
+ 558:	e5c4c000 	strb	ip, [r4]
+ 55c:	e5c60000 	strb	r0, [r6]
+ 560:	e5c51000 	strb	r1, [r5]
+  U0FCR = fmode;
+ 564:	e5c72000 	strb	r2, [r7]
+
+#if defined(UART0_TX_INT_MODE) || defined(UART0_RX_INT_MODE)
+  // initialize the interrupt vector
+  VICIntSelect &= ~VIC_BIT(VIC_UART0);  // UART0 selected as IRQ
+ 568:	e59f2078 	ldr	r2, [pc, #120]	; 5e8 <.text+0x5e8>
+ 56c:	e5923000 	ldr	r3, [r2]
+ 570:	e3c33040 	bic	r3, r3, #64	; 0x40
+ 574:	e5823000 	str	r3, [r2]
+  VICIntEnable = VIC_BIT(VIC_UART0);    // UART0 interrupt enabled
+  VICVectCntl0 = VIC_ENABLE | VIC_UART0;
+  VICVectAddr0 = (uint32_t)uart0ISR;    // address of the ISR
+
+#ifdef UART0_TX_INT_MODE
+  // initialize the transmit data queue
+  uart0_tx_extract_idx = uart0_tx_insert_idx = 0;
+  uart0_tx_running = 0;
+#endif
+
+#ifdef UART0_RX_INT_MODE
+  // initialize the receive data queue
+  uart0_rx_extract_idx = uart0_rx_insert_idx = 0;
+ 578:	e59f306c 	ldr	r3, [pc, #108]	; 5ec <.text+0x5ec>
+ 57c:	e1c3e0b0 	strh	lr, [r3]
+ 580:	e59f3068 	ldr	r3, [pc, #104]	; 5f0 <.text+0x5f0>
+ 584:	e3a02040 	mov	r2, #64	; 0x40
+ 588:	e5832000 	str	r2, [r3]
+ 58c:	e3a02026 	mov	r2, #38	; 0x26
+ 590:	e2833e1f 	add	r3, r3, #496	; 0x1f0
+ 594:	e5832000 	str	r2, [r3]
+ 598:	e59f3054 	ldr	r3, [pc, #84]	; 5f4 <.text+0x5f4>
+ 59c:	e59f2054 	ldr	r2, [pc, #84]	; 5f8 <.text+0x5f8>
+ 5a0:	e5832000 	str	r2, [r3]
+
+  // enable receiver interrupts
+  U0IER = UIER_ERBFI;
+ 5a4:	e3a03001 	mov	r3, #1	; 0x1
+ 5a8:	e5c63000 	strb	r3, [r6]
+ 5ac:	e59f3048 	ldr	r3, [pc, #72]	; 5fc <.text+0x5fc>
+ 5b0:	e1c3e0b0 	strh	lr, [r3]
+ 5b4:	e59f3044 	ldr	r3, [pc, #68]	; 600 <.text+0x600>
+ 5b8:	e1c3e0b0 	strh	lr, [r3]
+ 5bc:	e59f3040 	ldr	r3, [pc, #64]	; 604 <.text+0x604>
+ 5c0:	e583e000 	str	lr, [r3]
+ 5c4:	e59f303c 	ldr	r3, [pc, #60]	; 608 <.text+0x608>
+ 5c8:	e1c3e0b0 	strh	lr, [r3]
+#endif
+#endif
+}
+ 5cc:	e8bd80f0 	ldmia	sp!, {r4, r5, r6, r7, pc}
+ 5d0:	e002c000 	and	ip, r2, r0
+ 5d4:	e000c004 	and	ip, r0, r4
+ 5d8:	e000c008 	and	ip, r0, r8
+ 5dc:	e000c000 	and	ip, r0, r0
+ 5e0:	e000c014 	and	ip, r0, r4, lsl r0
+ 5e4:	e000c00c 	and	ip, r0, ip
+ 5e8:	fffff00c 	swinv	0x00fff00c
+ 5ec:	400000e0 	andmi	r0, r0, r0, ror #1
+ 5f0:	fffff010 	swinv	0x00fff010
+ 5f4:	fffff100 	swinv	0x00fff100
+ 5f8:	00000844 	andeq	r0, r0, r4, asr #16
+ 5fc:	40000094 	mulmi	r0, r4, r0
+ 600:	40000098 	mulmi	r0, r8, r0
+ 604:	4000009c 	mulmi	r0, ip, r0
+ 608:	40000096 	mulmi	r0, r6, r0
+
+0000060c <uart0Putch>:
+
+/******************************************************************************
+ *
+ * Function Name: uart0Putch()
+ *
+ * Description:  
+ *    This function puts a character into the UART output queue for
+ *    transmission.
+ *
+ * Calling Sequence: 
+ *    character to be transmitted
+ *
+ * Returns:
+ *    ch on success, -1 on error (queue full)
+ *
+ *****************************************************************************/
+int uart0Putch(int ch)
+{
+ 60c:	e92d4070 	stmdb	sp!, {r4, r5, r6, lr}
+#ifdef UART0_TX_INT_MODE
+  uint16_t temp;
+  unsigned cpsr;
+
+  temp = (uart0_tx_insert_idx + 1) % UART0_TX_BUFFER_SIZE;
+ 610:	e59f6098 	ldr	r6, [pc, #152]	; 6b0 <.text+0x6b0>
+ 614:	e1d630b0 	ldrh	r3, [r6]
+ 618:	e59f2094 	ldr	r2, [pc, #148]	; 6b4 <.text+0x6b4>
+ 61c:	e2833001 	add	r3, r3, #1	; 0x1
+ 620:	e0032002 	and	r2, r3, r2
+
+  if (temp == uart0_tx_extract_idx)
+ 624:	e59f308c 	ldr	r3, [pc, #140]	; 6b8 <.text+0x6b8>
+ 628:	e1a02802 	mov	r2, r2, lsl #16
+ 62c:	e1d330b0 	ldrh	r3, [r3]
+ 630:	e1a05822 	mov	r5, r2, lsr #16
+ 634:	e1530005 	cmp	r3, r5
+ 638:	e1a04000 	mov	r4, r0
+ 63c:	e3e03000 	mvn	r3, #0	; 0x0
+ 640:	0a000018 	beq	6a8 <uart0Putch+0x9c>
+    return -1;                          // no room
+
+  cpsr = disableIRQ();                  // disable global interrupts
+ 644:	eb0000e4 	bl	9dc <disableIRQ>
+  U0IER &= ~UIER_ETBEI;                 // disable TX interrupts
+ 648:	e59f306c 	ldr	r3, [pc, #108]	; 6bc <.text+0x6bc>
+ 64c:	e5d32000 	ldrb	r2, [r3]
+ 650:	e20220fd 	and	r2, r2, #253	; 0xfd
+ 654:	e5c32000 	strb	r2, [r3]
+  restoreIRQ(cpsr);                     // restore global interrupts
+ 658:	eb0000e3 	bl	9ec <restoreIRQ>
+
+  // check if in process of sending data
+  if (uart0_tx_running)
+ 65c:	e59f105c 	ldr	r1, [pc, #92]	; 6c0 <.text+0x6c0>
+ 660:	e5913000 	ldr	r3, [r1]
+ 664:	e3530000 	cmp	r3, #0	; 0x0
+    {
+    // add to queue
+    uart0_tx_buffer[uart0_tx_insert_idx] = (uint8_t)ch;
+    uart0_tx_insert_idx = temp;
+    }
+  else
+    {
+    // set running flag and write to output register
+    uart0_tx_running = 1;
+ 668:	03a03001 	moveq	r3, #1	; 0x1
+    U0THR = (uint8_t)ch;
+ 66c:	e20420ff 	and	r2, r4, #255	; 0xff
+ 670:	05813000 	streq	r3, [r1]
+ 674:	11d620b0 	ldrneh	r2, [r6]
+ 678:	159f3044 	ldrne	r3, [pc, #68]	; 6c4 <.text+0x6c4>
+ 67c:	059f3044 	ldreq	r3, [pc, #68]	; 6c8 <.text+0x6c8>
+ 680:	17c34002 	strneb	r4, [r3, r2]
+ 684:	05c32000 	streqb	r2, [r3]
+ 688:	11c650b0 	strneh	r5, [r6]
+    }
+
+  cpsr = disableIRQ();                  // disable global interrupts
+ 68c:	eb0000d2 	bl	9dc <disableIRQ>
+  U0IER |= UIER_ETBEI;                  // enable TX interrupts
+ 690:	e59f2024 	ldr	r2, [pc, #36]	; 6bc <.text+0x6bc>
+ 694:	e5d23000 	ldrb	r3, [r2]
+ 698:	e3833002 	orr	r3, r3, #2	; 0x2
+ 69c:	e5c23000 	strb	r3, [r2]
+  restoreIRQ(cpsr);                     // restore global interrupts
+ 6a0:	eb0000d1 	bl	9ec <restoreIRQ>
+#else
+  while (!(U0LSR & ULSR_THRE))          // wait for TX buffer to empty
+    continue;                           // also either WDOG() or swap()
+
+  U0THR = (uint8_t)ch;
+#endif
+  return (uint8_t)ch;
+ 6a4:	e20430ff 	and	r3, r4, #255	; 0xff
+}
+ 6a8:	e1a00003 	mov	r0, r3
+ 6ac:	e8bd8070 	ldmia	sp!, {r4, r5, r6, pc}
+ 6b0:	40000094 	mulmi	r0, r4, r0
+ 6b4:	8000007f 	andhi	r0, r0, pc, ror r0
+ 6b8:	40000098 	mulmi	r0, r8, r0
+ 6bc:	e000c004 	and	ip, r0, r4
+ 6c0:	4000009c 	mulmi	r0, ip, r0
+ 6c4:	40000014 	andmi	r0, r0, r4, lsl r0
+ 6c8:	e000c000 	and	ip, r0, r0
+
+000006cc <uart0Space>:
+
+/******************************************************************************
+ *
+ * Function Name: uart0Space()
+ *
+ * Description:  
+ *    This function gets the available space in the transmit queue
+ *
+ * Calling Sequence: 
+ *    void
+ *
+ * Returns:
+ *    available space in the transmit queue
+ *
+ *****************************************************************************/
+uint16_t uart0Space(void)
+{
+#ifdef UART0_TX_INT_MODE
+  int space;
+
+  if ((space = (uart0_tx_extract_idx - uart0_tx_insert_idx)) <= 0)
+ 6cc:	e59f3024 	ldr	r3, [pc, #36]	; 6f8 <.text+0x6f8>
+ 6d0:	e1d320b0 	ldrh	r2, [r3]
+ 6d4:	e59f3020 	ldr	r3, [pc, #32]	; 6fc <.text+0x6fc>
+ 6d8:	e1d330b0 	ldrh	r3, [r3]
+ 6dc:	e0630002 	rsb	r0, r3, r2
+ 6e0:	e3500000 	cmp	r0, #0	; 0x0
+    space += UART0_TX_BUFFER_SIZE;
+ 6e4:	d2800080 	addle	r0, r0, #128	; 0x80
+ 6e8:	e2400001 	sub	r0, r0, #1	; 0x1
+ 6ec:	e1a00800 	mov	r0, r0, lsl #16
+
+  return (uint16_t)(space - 1);
+#else
+  return USHRT_MAX;
+#endif
+}
+ 6f0:	e1a00820 	mov	r0, r0, lsr #16
+ 6f4:	e12fff1e 	bx	lr
+ 6f8:	40000098 	mulmi	r0, r8, r0
+ 6fc:	40000094 	mulmi	r0, r4, r0
+
+00000700 <uart0Puts>:
+
+/******************************************************************************
+ *
+ * Function Name: uart0Puts()
+ *
+ * Description:  
+ *    This function writes a NULL terminated 'string' to the UART output
+ *    queue, returning a pointer to the next character to be written.
+ *
+ * Calling Sequence: 
+ *    address of the string
+ *
+ * Returns:
+ *    a pointer to the next character to be written
+ *    (\0 if full string is written)
+ *
+ *****************************************************************************/
+const char *uart0Puts(const char *string)
+{
+ 700:	e92d4010 	stmdb	sp!, {r4, lr}
+ 704:	e1a04000 	mov	r4, r0
+ 708:	ea000000 	b	710 <uart0Puts+0x10>
+  register char ch;
+
+  while ((ch = *string) && (uart0Putch(ch) >= 0))
+    string++;
+ 70c:	e2844001 	add	r4, r4, #1	; 0x1
+ 710:	e5d43000 	ldrb	r3, [r4]
+ 714:	e2530000 	subs	r0, r3, #0	; 0x0
+ 718:	0a000002 	beq	728 <uart0Puts+0x28>
+ 71c:	ebffffba 	bl	60c <uart0Putch>
+ 720:	e3500000 	cmp	r0, #0	; 0x0
+ 724:	aafffff8 	bge	70c <uart0Puts+0xc>
+
+  return string;
+}
+ 728:	e1a00004 	mov	r0, r4
+ 72c:	e8bd8010 	ldmia	sp!, {r4, pc}
+
+00000730 <uart0Write>:
+
+/******************************************************************************
+ *
+ * Function Name: uart0Write()
+ *
+ * Description:  
+ *    This function writes 'count' characters from 'buffer' to the UART
+ *    output queue.
+ *
+ * Calling Sequence: 
+ *    
+ *
+ * Returns:
+ *    0 on success, -1 if insufficient room, -2 on error
+ *    NOTE: if insufficient room, no characters are written.
+ *
+ *****************************************************************************/
+int uart0Write(const char *buffer, uint16_t count)
+{
+ 730:	e92d4070 	stmdb	sp!, {r4, r5, r6, lr}
+ 734:	e1a01801 	mov	r1, r1, lsl #16
+ 738:	e1a06821 	mov	r6, r1, lsr #16
+ 73c:	e1a05000 	mov	r5, r0
+#ifdef UART0_TX_INT_MODE
+  if (count > uart0Space())
+ 740:	ebffffe1 	bl	6cc <uart0Space>
+ 744:	e1560000 	cmp	r6, r0
+ 748:	83e00000 	mvnhi	r0, #0	; 0x0
+ 74c:	88bd8070 	ldmhiia	sp!, {r4, r5, r6, pc}
+ 750:	ea000001 	b	75c <uart0Write+0x2c>
+    return -1;
+#endif
+  while (count && (uart0Putch(*buffer++) >= 0))
+ 754:	e3a00000 	mov	r0, #0	; 0x0
+ 758:	e8bd8070 	ldmia	sp!, {r4, r5, r6, pc}
+ 75c:	e1a04006 	mov	r4, r6
+ 760:	ea000002 	b	770 <uart0Write+0x40>
+    count--;
+ 764:	e2443001 	sub	r3, r4, #1	; 0x1
+ 768:	e1a03803 	mov	r3, r3, lsl #16
+ 76c:	e1a04823 	mov	r4, r3, lsr #16
+ 770:	e3540000 	cmp	r4, #0	; 0x0
+ 774:	0afffff6 	beq	754 <uart0Write+0x24>
+ 778:	e4d50001 	ldrb	r0, [r5], #1
+ 77c:	ebffffa2 	bl	60c <uart0Putch>
+ 780:	e3500000 	cmp	r0, #0	; 0x0
+ 784:	aafffff6 	bge	764 <uart0Write+0x34>
+ 788:	e3e00001 	mvn	r0, #1	; 0x1
+
+  return (count ? -2 : 0);
+}
+ 78c:	e8bd8070 	ldmia	sp!, {r4, r5, r6, pc}
+
+00000790 <uart0TxEmpty>:
+
+/******************************************************************************
+ *
+ * Function Name: uart0TxEmpty()
+ *
+ * Description:
+ *    This function returns the status of the UART transmit data
+ *    registers.
+ *
+ * Calling Sequence: 
+ *    void
+ *
+ * Returns:
+ *    FALSE - either the tx holding or shift register is not empty
+ *   !FALSE - if both the tx holding & shift registers are empty
+ *
+ *****************************************************************************/
+int uart0TxEmpty(void)
+{
+  return (U0LSR & (ULSR_THRE | ULSR_TEMT)) == (ULSR_THRE | ULSR_TEMT);
+ 790:	e59f3014 	ldr	r3, [pc, #20]	; 7ac <.text+0x7ac>
+ 794:	e5d30000 	ldrb	r0, [r3]
+ 798:	e2000060 	and	r0, r0, #96	; 0x60
+}
+ 79c:	e3500060 	cmp	r0, #96	; 0x60
+ 7a0:	13a00000 	movne	r0, #0	; 0x0
+ 7a4:	03a00001 	moveq	r0, #1	; 0x1
+ 7a8:	e12fff1e 	bx	lr
+ 7ac:	e000c014 	and	ip, r0, r4, lsl r0
+
+000007b0 <uart0TxFlush>:
+
+/******************************************************************************
+ *
+ * Function Name: uart0TxFlush()
+ *
+ * Description:  
+ *    This function removes all characters from the UART transmit queue
+ *    (without transmitting them).
+ *
+ * Calling Sequence: 
+ *    void
+ *
+ * Returns:
+ *    void
+ *
+ *****************************************************************************/
+void uart0TxFlush(void)
+{
+ 7b0:	e52de004 	str	lr, [sp, #-4]!
+#ifdef UART0_TX_INT_MODE
+  unsigned cpsr;
+
+  U0FCR |= UFCR_TX_FIFO_RESET;          // clear the TX fifo
+ 7b4:	e59f2038 	ldr	r2, [pc, #56]	; 7f4 <.text+0x7f4>
+ 7b8:	e5d23000 	ldrb	r3, [r2]
+ 7bc:	e3833004 	orr	r3, r3, #4	; 0x4
+ 7c0:	e5c23000 	strb	r3, [r2]
+
+  // "Empty" the transmit buffer.
+  cpsr = disableIRQ();                  // disable global interrupts
+ 7c4:	eb000084 	bl	9dc <disableIRQ>
+  U0IER &= ~UIER_ETBEI;                 // disable TX interrupts
+ 7c8:	e59f2028 	ldr	r2, [pc, #40]	; 7f8 <.text+0x7f8>
+ 7cc:	e5d23000 	ldrb	r3, [r2]
+ 7d0:	e20330fd 	and	r3, r3, #253	; 0xfd
+ 7d4:	e5c23000 	strb	r3, [r2]
+  restoreIRQ(cpsr);                     // restore global interrupts
+ 7d8:	eb000083 	bl	9ec <restoreIRQ>
+  uart0_tx_insert_idx = uart0_tx_extract_idx = 0;
+ 7dc:	e59f3018 	ldr	r3, [pc, #24]	; 7fc <.text+0x7fc>
+ 7e0:	e3a02000 	mov	r2, #0	; 0x0
+ 7e4:	e1c320b0 	strh	r2, [r3]
+ 7e8:	e59f3010 	ldr	r3, [pc, #16]	; 800 <.text+0x800>
+ 7ec:	e1c320b0 	strh	r2, [r3]
+#else
+  U0FCR |= UFCR_TX_FIFO_RESET;          // clear the TX fifo
+#endif
+}
+ 7f0:	e49df004 	ldr	pc, [sp], #4
+ 7f4:	e000c008 	and	ip, r0, r8
+ 7f8:	e000c004 	and	ip, r0, r4
+ 7fc:	40000094 	mulmi	r0, r4, r0
+ 800:	40000098 	mulmi	r0, r8, r0
+
+00000804 <uart0Getch>:
+
+/******************************************************************************
+ *
+ * Function Name: uart0Getch()
+ *
+ * Description:  
+ *    This function gets a character from the UART receive queue
+ *
+ * Calling Sequence: 
+ *    void
+ *
+ * Returns:
+ *    character on success, -1 if no character is available
+ *
+ *****************************************************************************/
+int uart0Getch(void)
+{
+#ifdef UART0_RX_INT_MODE
+  uint8_t ch;
+
+  if (uart0_rx_insert_idx == uart0_rx_extract_idx) // check if character is available
+ 804:	e59fc02c 	ldr	ip, [pc, #44]	; 838 <.text+0x838>
+ 808:	e59f302c 	ldr	r3, [pc, #44]	; 83c <.text+0x83c>
+ 80c:	e1dc10b0 	ldrh	r1, [ip]
+ 810:	e1d320b0 	ldrh	r2, [r3]
+    return -1;
+
+  ch = uart0_rx_buffer[uart0_rx_extract_idx++]; // get character, bump pointer
+ 814:	e2813001 	add	r3, r1, #1	; 0x1
+  uart0_rx_extract_idx %= UART0_RX_BUFFER_SIZE; // limit the pointer
+ 818:	e203303f 	and	r3, r3, #63	; 0x3f
+ 81c:	e1520001 	cmp	r2, r1
+ 820:	11cc30b0 	strneh	r3, [ip]
+ 824:	159f3014 	ldrne	r3, [pc, #20]	; 840 <.text+0x840>
+ 828:	17d33001 	ldrneb	r3, [r3, r1]
+ 82c:	e3e00000 	mvn	r0, #0	; 0x0
+  return ch;
+ 830:	11a00003 	movne	r0, r3
+#else
+  if (U0LSR & ULSR_RDR)                 // check if character is available
+    return U0RBR;                       // return character
+
+  return -1;
+#endif
+}
+ 834:	e12fff1e 	bx	lr
+ 838:	400000e0 	andmi	r0, r0, r0, ror #1
+ 83c:	40000096 	mulmi	r0, r6, r0
+ 840:	400000a0 	andmi	r0, r0, r0, lsr #1
+
+00000844 <uart0ISR>:
+{
+  uint8_t iid;
+
+  // perform proper ISR entry so thumb-interwork works properly
+  ISR_ENTRY();
+ 844:	e24ee004 	sub	lr, lr, #4	; 0x4
+ 848:	e92d5fff 	stmdb	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
+ 84c:	e14f1000 	mrs	r1, SPSR
+ 850:	e92d0002 	stmdb	sp!, {r1}
+
+  // loop until not more interrupt sources
+  while (((iid = U0IIR) & UIIR_NO_INT) == 0)
+    {
+    // identify & process the highest priority interrupt
+    switch (iid & UIIR_ID_MASK)
+      {
+      case UIIR_RLS_INT:                // Receive Line Status
+        U0LSR;                          // read LSR to clear
+        break;
+
+#ifdef UART0_RX_INT_MODE
+      case UIIR_CTI_INT:                // Character Timeout Indicator
+      case UIIR_RDA_INT:                // Receive Data Available
+        do
+          {
+          uint16_t temp;
+
+          // calc next insert index & store character
+          temp = (uart0_rx_insert_idx + 1) % UART0_RX_BUFFER_SIZE;
+          uart0_rx_buffer[uart0_rx_insert_idx] = U0RBR;
+
+          // check for more room in queue
+          if (temp != uart0_rx_extract_idx)
+ 854:	e59f3144 	ldr	r3, [pc, #324]	; 9a0 <.text+0x9a0>
+ 858:	e1d350b0 	ldrh	r5, [r3]
+            uart0_rx_insert_idx = temp; // update insert index
+          }
+        while (U0LSR & ULSR_RDR);
+
+        break;
+#endif
+
+#ifdef UART0_TX_INT_MODE
+      case UIIR_THRE_INT:               // Transmit Holding Register Empty
+        while (U0LSR & ULSR_THRE)
+          {
+          // check if more data to send
+          if (uart0_tx_insert_idx != uart0_tx_extract_idx)
+ 85c:	e59f3140 	ldr	r3, [pc, #320]	; 9a4 <.text+0x9a4>
+ 860:	e1d340b0 	ldrh	r4, [r3]
+ 864:	e59f313c 	ldr	r3, [pc, #316]	; 9a8 <.text+0x9a8>
+ 868:	e593e000 	ldr	lr, [r3]
+ 86c:	e59f3138 	ldr	r3, [pc, #312]	; 9ac <.text+0x9ac>
+ 870:	e1d300b0 	ldrh	r0, [r3]
+ 874:	e59f3134 	ldr	r3, [pc, #308]	; 9b0 <.text+0x9b0>
+ 878:	e1d3c0b0 	ldrh	ip, [r3]
+ 87c:	ea000037 	b	960 <.text+0x960>
+ 880:	e202300e 	and	r3, r2, #14	; 0xe
+ 884:	e2433002 	sub	r3, r3, #2	; 0x2
+ 888:	e353000a 	cmp	r3, #10	; 0xa
+ 88c:	979ff103 	ldrls	pc, [pc, r3, lsl #2]
+ 890:	ea00002e 	b	950 <.text+0x950>
+ 894:	00000930 	andeq	r0, r0, r0, lsr r9
+ 898:	00000950 	andeq	r0, r0, r0, asr r9
+ 89c:	000008c8 	andeq	r0, r0, r8, asr #17
+ 8a0:	00000950 	andeq	r0, r0, r0, asr r9
+ 8a4:	000008c0 	andeq	r0, r0, r0, asr #17
+ 8a8:	00000950 	andeq	r0, r0, r0, asr r9
+ 8ac:	00000950 	andeq	r0, r0, r0, asr r9
+ 8b0:	00000950 	andeq	r0, r0, r0, asr r9
+ 8b4:	00000950 	andeq	r0, r0, r0, asr r9
+ 8b8:	00000950 	andeq	r0, r0, r0, asr r9
+ 8bc:	000008c8 	andeq	r0, r0, r8, asr #17
+ 8c0:	e59f30ec 	ldr	r3, [pc, #236]	; 9b4 <.text+0x9b4>
+ 8c4:	ea000024 	b	95c <.text+0x95c>
+ 8c8:	e28c3001 	add	r3, ip, #1	; 0x1
+ 8cc:	e21311fe 	ands	r1, r3, #-2147483585	; 0x8000003f
+ 8d0:	e59f30e0 	ldr	r3, [pc, #224]	; 9b8 <.text+0x9b8>
+ 8d4:	42411001 	submi	r1, r1, #1	; 0x1
+ 8d8:	41e01d01 	mvnmi	r1, r1, lsl #26
+ 8dc:	e5d32000 	ldrb	r2, [r3]
+ 8e0:	e59f30d4 	ldr	r3, [pc, #212]	; 9bc <.text+0x9bc>
+ 8e4:	41e01d21 	mvnmi	r1, r1, lsr #26
+ 8e8:	e7c3200c 	strb	r2, [r3, ip]
+ 8ec:	42811001 	addmi	r1, r1, #1	; 0x1
+ 8f0:	e59f20bc 	ldr	r2, [pc, #188]	; 9b4 <.text+0x9b4>
+ 8f4:	e1a03801 	mov	r3, r1, lsl #16
+ 8f8:	e1a03823 	mov	r3, r3, lsr #16
+ 8fc:	e5d22000 	ldrb	r2, [r2]
+ 900:	e1530005 	cmp	r3, r5
+ 904:	11a0c003 	movne	ip, r3
+ 908:	e3120001 	tst	r2, #1	; 0x1
+ 90c:	0a000013 	beq	960 <.text+0x960>
+ 910:	eaffffec 	b	8c8 <.text+0x8c8>
+ 914:	e1540000 	cmp	r4, r0
+ 918:	0a00000a 	beq	948 <.text+0x948>
+            {
+            U0THR = uart0_tx_buffer[uart0_tx_extract_idx++];
+ 91c:	e59f309c 	ldr	r3, [pc, #156]	; 9c0 <.text+0x9c0>
+ 920:	e7d32000 	ldrb	r2, [r3, r0]
+ 924:	e59f308c 	ldr	r3, [pc, #140]	; 9b8 <.text+0x9b8>
+ 928:	e5c32000 	strb	r2, [r3]
+            uart0_tx_extract_idx %= UART0_TX_BUFFER_SIZE;
+ 92c:	e201007f 	and	r0, r1, #127	; 0x7f
+ 930:	e59f307c 	ldr	r3, [pc, #124]	; 9b4 <.text+0x9b4>
+ 934:	e5d33000 	ldrb	r3, [r3]
+ 938:	e3130020 	tst	r3, #32	; 0x20
+ 93c:	e2801001 	add	r1, r0, #1	; 0x1
+ 940:	1afffff3 	bne	914 <.text+0x914>
+ 944:	ea000005 	b	960 <.text+0x960>
+ 948:	e3a0e000 	mov	lr, #0	; 0x0
+ 94c:	ea000003 	b	960 <.text+0x960>
+            }
+          else
+            {
+            // no
+            uart0_tx_running = 0;       // clear running flag
+            break;
+            }
+          }
+
+        break;
+#endif // UART0_TX_INT_MODE
+
+      default:                          // Unknown
+        U0LSR;
+ 950:	e59f305c 	ldr	r3, [pc, #92]	; 9b4 <.text+0x9b4>
+ 954:	e5d33000 	ldrb	r3, [r3]
+        U0RBR;
+ 958:	e59f3058 	ldr	r3, [pc, #88]	; 9b8 <.text+0x9b8>
+ 95c:	e5d33000 	ldrb	r3, [r3]
+ 960:	e59f305c 	ldr	r3, [pc, #92]	; 9c4 <.text+0x9c4>
+ 964:	e5d32000 	ldrb	r2, [r3]
+ 968:	e2223001 	eor	r3, r2, #1	; 0x1
+ 96c:	e2131001 	ands	r1, r3, #1	; 0x1
+ 970:	1affffc2 	bne	880 <uart0ISR+0x3c>
+ 974:	e59f302c 	ldr	r3, [pc, #44]	; 9a8 <.text+0x9a8>
+ 978:	e583e000 	str	lr, [r3]
+ 97c:	e59f3028 	ldr	r3, [pc, #40]	; 9ac <.text+0x9ac>
+ 980:	e1c300b0 	strh	r0, [r3]
+ 984:	e59f3024 	ldr	r3, [pc, #36]	; 9b0 <.text+0x9b0>
+ 988:	e1c3c0b0 	strh	ip, [r3]
+        break;
+      }
+    }
+
+  VICVectAddr = 0x00000000;             // clear this interrupt from the VIC
+ 98c:	e59f3034 	ldr	r3, [pc, #52]	; 9c8 <.text+0x9c8>
+ 990:	e5831000 	str	r1, [r3]
+  ISR_EXIT();                           // recover registers and return
+ 994:	e8bd0002 	ldmia	sp!, {r1}
+ 998:	e161f001 	msr	SPSR_c, r1
+ 99c:	e8fd9fff 	ldmia	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, pc}^
+ 9a0:	400000e0 	andmi	r0, r0, r0, ror #1
+ 9a4:	40000094 	mulmi	r0, r4, r0
+ 9a8:	4000009c 	mulmi	r0, ip, r0
+ 9ac:	40000098 	mulmi	r0, r8, r0
+ 9b0:	40000096 	mulmi	r0, r6, r0
+ 9b4:	e000c014 	and	ip, r0, r4, lsl r0
+ 9b8:	e000c000 	and	ip, r0, r0
+ 9bc:	400000a0 	andmi	r0, r0, r0, lsr #1
+ 9c0:	40000014 	andmi	r0, r0, r4, lsl r0
+ 9c4:	e000c008 	and	ip, r0, r8
+ 9c8:	fffff030 	swinv	0x00fff030
+
+000009cc <enableFIQ>:
+
+static inline unsigned __get_cpsr(void)
+{
+  unsigned long retval;
+  asm volatile (" mrs  %0, cpsr" : "=r" (retval) : /* no inputs */  );
+ 9cc:	e10f0000 	mrs	r0, CPSR
+  return retval;
+}
+
+static inline void __set_cpsr(unsigned val)
+{
+  asm volatile (" msr  cpsr, %0" : /* no outputs */ : "r" (val)  );
+ 9d0:	e3c03040 	bic	r3, r0, #64	; 0x40
+ 9d4:	e129f003 	msr	CPSR_fc, r3
+}
+
+unsigned disableIRQ(void)
+{
+  unsigned _cpsr;
+
+  _cpsr = __get_cpsr();
+  __set_cpsr(_cpsr | IRQ_MASK);
+  return _cpsr;
+}
+
+unsigned restoreIRQ(unsigned oldCPSR)
+{
+  unsigned _cpsr;
+
+  _cpsr = __get_cpsr();
+  __set_cpsr((_cpsr & ~IRQ_MASK) | (oldCPSR & IRQ_MASK));
+  return _cpsr;
+}
+
+unsigned enableIRQ(void)
+{
+  unsigned _cpsr;
+
+  _cpsr = __get_cpsr();
+  __set_cpsr(_cpsr & ~IRQ_MASK);
+  return _cpsr;
+}
+
+unsigned disableFIQ(void)
+{
+  unsigned _cpsr;
+
+  _cpsr = __get_cpsr();
+  __set_cpsr(_cpsr | FIQ_MASK);
+  return _cpsr;
+}
+
+unsigned restoreFIQ(unsigned oldCPSR)
+{
+  unsigned _cpsr;
+
+  _cpsr = __get_cpsr();
+  __set_cpsr((_cpsr & ~FIQ_MASK) | (oldCPSR & FIQ_MASK));
+  return _cpsr;
+}
+
+unsigned enableFIQ(void)
+{
+  unsigned _cpsr;
+
+  _cpsr = __get_cpsr();
+  __set_cpsr(_cpsr & ~FIQ_MASK);
+  return _cpsr;
+}
+ 9d8:	e12fff1e 	bx	lr
+
+000009dc <disableIRQ>:
+ 9dc:	e10f0000 	mrs	r0, CPSR
+ 9e0:	e3803080 	orr	r3, r0, #128	; 0x80
+ 9e4:	e129f003 	msr	CPSR_fc, r3
+ 9e8:	e12fff1e 	bx	lr
+
+000009ec <restoreIRQ>:
+ 9ec:	e10f2000 	mrs	r2, CPSR
+ 9f0:	e2000080 	and	r0, r0, #128	; 0x80
+ 9f4:	e3c23080 	bic	r3, r2, #128	; 0x80
+ 9f8:	e1833000 	orr	r3, r3, r0
+ 9fc:	e129f003 	msr	CPSR_fc, r3
+ a00:	e1a00002 	mov	r0, r2
+ a04:	e12fff1e 	bx	lr
+
+00000a08 <enableIRQ>:
+ a08:	e10f0000 	mrs	r0, CPSR
+ a0c:	e3c03080 	bic	r3, r0, #128	; 0x80
+ a10:	e129f003 	msr	CPSR_fc, r3
+ a14:	e12fff1e 	bx	lr
+
+00000a18 <disableFIQ>:
+ a18:	e10f0000 	mrs	r0, CPSR
+ a1c:	e3803040 	orr	r3, r0, #64	; 0x40
+ a20:	e129f003 	msr	CPSR_fc, r3
+ a24:	e12fff1e 	bx	lr
+
+00000a28 <restoreFIQ>:
+ a28:	e10f2000 	mrs	r2, CPSR
+ a2c:	e2000040 	and	r0, r0, #64	; 0x40
+ a30:	e3c23040 	bic	r3, r2, #64	; 0x40
+ a34:	e1833000 	orr	r3, r3, r0
+ a38:	e129f003 	msr	CPSR_fc, r3
+ a3c:	e1a00002 	mov	r0, r2
+ a40:	e12fff1e 	bx	lr
+
+00000a44 <i2cInit>:
+//
+
+void i2cInit( void )
+{
+	bI2c_lock = FALSE;						// Initilise the lock flag
+ a44:	e59f3060 	ldr	r3, [pc, #96]	; aac <.text+0xaac>
+ a48:	e3a02000 	mov	r2, #0	; 0x0
+ a4c:	e5832000 	str	r2, [r3]
+
+	//PINSEL0  |= 0x30c00000; 				// Activate I2C 1
+	PINSEL0 = ( PINSEL0 & ~0xF0 ) | 0x50; 	// Activate I2C 0
+ a50:	e59f2058 	ldr	r2, [pc, #88]	; ab0 <.text+0xab0>
+ a54:	e5923000 	ldr	r3, [r2]
+ a58:	e3c330f0 	bic	r3, r3, #240	; 0xf0
+ a5c:	e3833050 	orr	r3, r3, #80	; 0x50
+ a60:	e5823000 	str	r3, [r2]
+	
+	// initialize the interrupt vector
+	VICIntSelect &= ~VIC_BIT (VIC_I2C0 );	// I2C selected as IRQ
+ a64:	e59f2048 	ldr	r2, [pc, #72]	; ab4 <.text+0xab4>
+ a68:	e5923000 	ldr	r3, [r2]
+ a6c:	e3c33c02 	bic	r3, r3, #512	; 0x200
+ a70:	e5823000 	str	r3, [r2]
+	VICVectCntl5 = VIC_ENABLE | VIC_I2C0;
+ a74:	e59f303c 	ldr	r3, [pc, #60]	; ab8 <.text+0xab8>
+ a78:	e3a02029 	mov	r2, #41	; 0x29
+ a7c:	e5832000 	str	r2, [r3]
+	VICVectAddr5 = (uint32_t)I2CISR;    	// address of the ISR
+ a80:	e59f2034 	ldr	r2, [pc, #52]	; abc <.text+0xabc>
+ a84:	e2433c01 	sub	r3, r3, #256	; 0x100
+ a88:	e4032104 	str	r2, [r3], #-260
+	VICIntEnable = VIC_BIT( VIC_I2C0 );    	// I2C interrupt enabled
+ a8c:	e3a02c02 	mov	r2, #512	; 0x200
+ a90:	e5832000 	str	r2, [r3]
+	
+	I20SCLH = 75;	// Set bit rate 60.0000hz / (SCLH + SCLL ) = 60.0000/(75+75) = 400.0Khz
+ a94:	e59f3024 	ldr	r3, [pc, #36]	; ac0 <.text+0xac0>
+ a98:	e3a0104b 	mov	r1, #75	; 0x4b
+ a9c:	e1c310b0 	strh	r1, [r3]
+	I20SCLL = 75;
+ aa0:	e2833004 	add	r3, r3, #4	; 0x4
+ aa4:	e1c310b0 	strh	r1, [r3]
+}
+ aa8:	e12fff1e 	bx	lr
+ aac:	400000e8 	andmi	r0, r0, r8, ror #1
+ ab0:	e002c000 	and	ip, r2, r0
+ ab4:	fffff00c 	swinv	0x00fff00c
+ ab8:	fffff214 	swinv	0x00fff214
+ abc:	00000cf0 	streqd	r0, [r0], -r0
+ ac0:	e001c010 	and	ip, r1, r0, lsl r0
+
+00000ac4 <I2CTransferByte>:
+
+///////////////////////////////////////////////////////////////////////////////
+// writeEEPROM
+//
+// return: True on success.
+
+boolean writeEEPROM( uint16_t addr, uint8_t data )
+{
+	boolean rv;
+	
+	rv = I2CTransferByte( EEPROM_ADDR, addr, 1, (unsigned char *)&data );
+	pause( TEN_MS );	// HACK!!! TODO Remove
+	
+	return rv;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// readEEPROM
+//
+// Return: -1 on failure, data on success.
+
+int16_t readEEPROM( uint16_t addr )
+{
+	unsigned _cpsr;
+	uint32_t start;
+	
+	// Write address
+	if ( !I2CTransferByte( EEPROM_ADDR, addr, 0, NULL ) ) {
+		return -1;	
+	}
+	
+	//  Read content of address
+	if ( !I2CTransferByte( EEPROM_ADDR + 1, addr, 1, NULL ) ) {	
+		return -1;
+	}
+	
+	// Wait until data is available
+	start = getSysTICs();
+	while ( bI2c_lock ) {			// Wait for interrupt to signal end of I2C activity
+		if ( getElapsedSysTICs( start ) > HUNDRED_MS ) { 
+			return -1;
+		}
+		_cpsr = disableIRQ();
+		WDFEED = 0xAA; WDFEED = 0x55;
+		restoreIRQ( _cpsr );
+	}
+	
+	return I2CData[ 0 ];
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// I2CTransferByte
+//
+
+boolean I2CTransferByte( unsigned char I2CAddr,
+							unsigned short memAddr,
+							unsigned char count,
+							unsigned char *pData )
+{
+ ac4:	e92d45f0 	stmdb	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ ac8:	e1a01801 	mov	r1, r1, lsl #16
+	unsigned _cpsr;
+	unsigned char i;
+	uint32_t start;
+
+	// CAN only hadle MAX_I2C_DATA + sizeof( addr )
+	if ( I2CAddr & 1 ) {
+ acc:	e2106001 	ands	r6, r0, #1	; 0x1
+ ad0:	e1a0a003 	mov	sl, r3
+ ad4:	e1a07821 	mov	r7, r1, lsr #16
+ ad8:	e20240ff 	and	r4, r2, #255	; 0xff
+ adc:	e20080ff 	and	r8, r0, #255	; 0xff
+ ae0:	0a000001 	beq	aec <I2CTransferByte+0x28>
+		if ( count > MAX_I2C_DATA ) return FALSE;
+ ae4:	e3540008 	cmp	r4, #8	; 0x8
+ ae8:	ea000000 	b	af0 <I2CTransferByte+0x2c>
+	}
+	else {
+		if ( count > ( MAX_I2C_DATA - 2 ) ) return FALSE;
+ aec:	e3540006 	cmp	r4, #6	; 0x6
+ af0:	8a000038 	bhi	bd8 <I2CTransferByte+0x114>
+	}
+	
+	// Wait until last I2C operation has finished.
+	start = getSysTICs();
+ af4:	ebfffe4d 	bl	430 <getSysTICs>
+ af8:	e1a05000 	mov	r5, r0
+ afc:	ea00000a 	b	b2c <I2CTransferByte+0x68>
+	while ( bI2c_lock ) {			// Wait for interrupt to signal end of I2C activity
+		if ( getElapsedSysTICs( start ) > HUNDRED_MS ) {
+ b00:	ebfffe58 	bl	468 <getElapsedSysTICs>
+ b04:	e59f30d4 	ldr	r3, [pc, #212]	; be0 <.text+0xbe0>
+ b08:	e1500003 	cmp	r0, r3
+ b0c:	8a000031 	bhi	bd8 <I2CTransferByte+0x114>
+			return FALSE;
+		}
+		_cpsr = disableIRQ();
+ b10:	ebffffb1 	bl	9dc <disableIRQ>
+		WDFEED = 0xAA; WDFEED = 0x55;
+ b14:	e3a0328e 	mov	r3, #-536870904	; 0xe0000008
+ b18:	e3e02055 	mvn	r2, #85	; 0x55
+ b1c:	e5c32000 	strb	r2, [r3]
+ b20:	e28220ab 	add	r2, r2, #171	; 0xab
+ b24:	e5c32000 	strb	r2, [r3]
+		restoreIRQ( _cpsr );
+ b28:	ebffffaf 	bl	9ec <restoreIRQ>
+ b2c:	e59f20b0 	ldr	r2, [pc, #176]	; be4 <.text+0xbe4>
+ b30:	e5923000 	ldr	r3, [r2]
+ b34:	e3530000 	cmp	r3, #0	; 0x0
+ b38:	e1a00005 	mov	r0, r5
+ b3c:	1affffef 	bne	b00 <I2CTransferByte+0x3c>
+	}
+	
+	bI2c_lock = TRUE;                  		// Set I2C bus as active
+ b40:	e2833001 	add	r3, r3, #1	; 0x1
+ b44:	e5823000 	str	r3, [r2]
+	I2CAddress = I2CAddr;					// Sava I2C address
+ b48:	e59f3098 	ldr	r3, [pc, #152]	; be8 <.text+0xbe8>
+
+	// If write operation the address should also be sent
+	if ( I2CAddr & 1 ) {
+ b4c:	e3560000 	cmp	r6, #0	; 0x0
+ b50:	e5c38000 	strb	r8, [r3]
+ b54:	e59fc090 	ldr	ip, [pc, #144]	; bec <.text+0xbec>
+	
+		// Read
+		I2Counter = count;
+		pI2CData = pData;					// Point at user buffer
+ b58:	159f3090 	ldrne	r3, [pc, #144]	; bf0 <.text+0xbf0>
+ b5c:	15cc4000 	strneb	r4, [ip]
+ b60:	1583a000 	strne	sl, [r3]
+ b64:	1a000011 	bne	bb0 <I2CTransferByte+0xec>
+		
+	}
+	else {
+	
+		// Write
+		I2Counter = count + 2;				// Add address length to count
+		I2CData[ 0 ] = ( memAddr >> 8 );	// MSB of memeory address
+ b68:	e59f3084 	ldr	r3, [pc, #132]	; bf4 <.text+0xbf4>
+ b6c:	e2842002 	add	r2, r4, #2	; 0x2
+ b70:	e1a01427 	mov	r1, r7, lsr #8
+		I2CData[ 1 ] = memAddr & 0xff;		// LSB of address
+ b74:	e1a00006 	mov	r0, r6
+ b78:	e5cc2000 	strb	r2, [ip]
+ b7c:	e5c37001 	strb	r7, [r3, #1]
+ b80:	e5c31000 	strb	r1, [r3]
+ b84:	ea000001 	b	b90 <I2CTransferByte+0xcc>
+		
+		for ( i=0; i<count; i++ ) {
+			I2CData[ i + 2 ] = pData[ i ];
+ b88:	e7da3003 	ldrb	r3, [sl, r3]
+ b8c:	e5c23002 	strb	r3, [r2, #2]
+ b90:	e20030ff 	and	r3, r0, #255	; 0xff
+ b94:	e59f1058 	ldr	r1, [pc, #88]	; bf4 <.text+0xbf4>
+ b98:	e1530004 	cmp	r3, r4
+ b9c:	e2800001 	add	r0, r0, #1	; 0x1
+ ba0:	e0832001 	add	r2, r3, r1
+ ba4:	3afffff7 	bcc	b88 <I2CTransferByte+0xc4>
+		}
+		
+		pI2CData = I2CData;		// Point at internal buffer
+ ba8:	e59f3040 	ldr	r3, [pc, #64]	; bf0 <.text+0xbf0>
+ bac:	e5831000 	str	r1, [r3]
+
+	}
+	
+	I20CONCLR 	= 0x000000FF;	// Clear all I2C settings
+ bb0:	e59f3040 	ldr	r3, [pc, #64]	; bf8 <.text+0xbf8>
+	I20CONSET 	= 0x00000040; 	// Enable the I2C interface
+ bb4:	e59f1040 	ldr	r1, [pc, #64]	; bfc <.text+0xbfc>
+ bb8:	e3e02000 	mvn	r2, #0	; 0x0
+ bbc:	e5c32000 	strb	r2, [r3]
+ bc0:	e3a03040 	mov	r3, #64	; 0x40
+ bc4:	e5c13000 	strb	r3, [r1]
+	I20CONSET 	= 0x00000020; 	// Start condition
+ bc8:	e3a00001 	mov	r0, #1	; 0x1
+ bcc:	e3a03020 	mov	r3, #32	; 0x20
+ bd0:	e5c13000 	strb	r3, [r1]
+ bd4:	e8bd85f0 	ldmia	sp!, {r4, r5, r6, r7, r8, sl, pc}
+			
+	return TRUE;
+ bd8:	e3a00000 	mov	r0, #0	; 0x0
+}
+ bdc:	e8bd85f0 	ldmia	sp!, {r4, r5, r6, r7, r8, sl, pc}
+ be0:	000f4240 	andeq	r4, pc, r0, asr #4
+ be4:	400000e8 	andmi	r0, r0, r8, ror #1
+ be8:	400000e5 	andmi	r0, r0, r5, ror #1
+ bec:	400000e4 	andmi	r0, r0, r4, ror #1
+ bf0:	400000ec 	andmi	r0, r0, ip, ror #1
+ bf4:	400000f0 	strmid	r0, [r0], -r0
+ bf8:	e001c018 	and	ip, r1, r8, lsl r0
+ bfc:	e001c000 	and	ip, r1, r0
+
+00000c00 <writeEEPROM>:
+ c00:	e92d4010 	stmdb	sp!, {r4, lr}
+ c04:	e1a00800 	mov	r0, r0, lsl #16
+ c08:	e24dd004 	sub	sp, sp, #4	; 0x4
+ c0c:	e5cd1000 	strb	r1, [sp]
+ c10:	e3a02001 	mov	r2, #1	; 0x1
+ c14:	e1a01820 	mov	r1, r0, lsr #16
+ c18:	e1a0300d 	mov	r3, sp
+ c1c:	e3a000a8 	mov	r0, #168	; 0xa8
+ c20:	ebffffa7 	bl	ac4 <I2CTransferByte>
+ c24:	e1a04000 	mov	r4, r0
+ c28:	e59f000c 	ldr	r0, [pc, #12]	; c3c <.text+0xc3c>
+ c2c:	ebfffe1d 	bl	4a8 <pause>
+ c30:	e1a00004 	mov	r0, r4
+ c34:	e28dd004 	add	sp, sp, #4	; 0x4
+ c38:	e8bd8010 	ldmia	sp!, {r4, pc}
+ c3c:	000186a0 	andeq	r8, r1, r0, lsr #13
+
+00000c40 <readEEPROM>:
+ c40:	e1a00800 	mov	r0, r0, lsl #16
+ c44:	e92d4010 	stmdb	sp!, {r4, lr}
+ c48:	e3a02000 	mov	r2, #0	; 0x0
+ c4c:	e1a04820 	mov	r4, r0, lsr #16
+ c50:	e1a01004 	mov	r1, r4
+ c54:	e3a000a8 	mov	r0, #168	; 0xa8
+ c58:	e1a03002 	mov	r3, r2
+ c5c:	ebffff98 	bl	ac4 <I2CTransferByte>
+ c60:	e3500000 	cmp	r0, #0	; 0x0
+ c64:	0a00001c 	beq	cdc <readEEPROM+0x9c>
+ c68:	e1a01004 	mov	r1, r4
+ c6c:	e3a000a9 	mov	r0, #169	; 0xa9
+ c70:	e3a02001 	mov	r2, #1	; 0x1
+ c74:	e3a03000 	mov	r3, #0	; 0x0
+ c78:	ebffff91 	bl	ac4 <I2CTransferByte>
+ c7c:	e3500000 	cmp	r0, #0	; 0x0
+ c80:	0a000015 	beq	cdc <readEEPROM+0x9c>
+ c84:	ebfffde9 	bl	430 <getSysTICs>
+ c88:	e1a04000 	mov	r4, r0
+ c8c:	ea00000a 	b	cbc <readEEPROM+0x7c>
+ c90:	ebfffdf4 	bl	468 <getElapsedSysTICs>
+ c94:	e59f3048 	ldr	r3, [pc, #72]	; ce4 <.text+0xce4>
+ c98:	e1500003 	cmp	r0, r3
+ c9c:	8a00000e 	bhi	cdc <readEEPROM+0x9c>
+ ca0:	ebffff4d 	bl	9dc <disableIRQ>
+ ca4:	e3a0328e 	mov	r3, #-536870904	; 0xe0000008
+ ca8:	e3e02055 	mvn	r2, #85	; 0x55
+ cac:	e5c32000 	strb	r2, [r3]
+ cb0:	e28220ab 	add	r2, r2, #171	; 0xab
+ cb4:	e5c32000 	strb	r2, [r3]
+ cb8:	ebffff4b 	bl	9ec <restoreIRQ>
+ cbc:	e59f3024 	ldr	r3, [pc, #36]	; ce8 <.text+0xce8>
+ cc0:	e5933000 	ldr	r3, [r3]
+ cc4:	e3530000 	cmp	r3, #0	; 0x0
+ cc8:	e1a00004 	mov	r0, r4
+ ccc:	1affffef 	bne	c90 <readEEPROM+0x50>
+ cd0:	e59f3014 	ldr	r3, [pc, #20]	; cec <.text+0xcec>
+ cd4:	e5d30000 	ldrb	r0, [r3]
+ cd8:	e8bd8010 	ldmia	sp!, {r4, pc}
+ cdc:	e3e00000 	mvn	r0, #0	; 0x0
+ ce0:	e8bd8010 	ldmia	sp!, {r4, pc}
+ ce4:	000f4240 	andeq	r4, pc, r0, asr #4
+ ce8:	400000e8 	andmi	r0, r0, r8, ror #1
+ cec:	400000f0 	strmid	r0, [r0], -r0
+
+00000cf0 <I2CISR>:
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// I2CISR
+//
+
+void I2CISR( void )					// I2C interrupt routine
+{
+	// perform proper ISR entry so thumb-interwork works properly
+	ISR_ENTRY();
+ cf0:	e24ee004 	sub	lr, lr, #4	; 0x4
+ cf4:	e92d5fff 	stmdb	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
+ cf8:	e14f1000 	mrs	r1, SPSR
+ cfc:	e92d0002 	stmdb	sp!, {r1}
+	
+	switch ( I20STAT ) {				// Read result code and switch to next action
+ d00:	e59f31b4 	ldr	r3, [pc, #436]	; ebc <.text+0xebc>
+ d04:	e5d33000 	ldrb	r3, [r3]
+ d08:	e20310ff 	and	r1, r3, #255	; 0xff
+ d0c:	e3510028 	cmp	r1, #40	; 0x28
+ d10:	0a000035 	beq	dec <I2CISR+0xfc>
+ d14:	8a00000d 	bhi	d50 <I2CISR+0x60>
+ d18:	e3510010 	cmp	r1, #16	; 0x10
+ d1c:	0a000024 	beq	db4 <I2CISR+0xc4>
+ d20:	8a000005 	bhi	d3c <I2CISR+0x4c>
+ d24:	e3510000 	cmp	r1, #0	; 0x0
+	
+		// Start and Send byte conditions
+		case 0x00:						// Bus errror
+			I20CONSET = 0x10;			// STOP 
+ d28:	03a03010 	moveq	r3, #16	; 0x10
+ d2c:	0a000036 	beq	e0c <I2CISR+0x11c>
+ d30:	e3510008 	cmp	r1, #8	; 0x8
+ d34:	1a000056 	bne	e94 <I2CISR+0x1a4>
+ d38:	ea000013 	b	d8c <I2CISR+0x9c>
+ d3c:	e3510018 	cmp	r1, #24	; 0x18
+ d40:	0a000022 	beq	dd0 <I2CISR+0xe0>
+ d44:	e3510020 	cmp	r1, #32	; 0x20
+ d48:	1a000051 	bne	e94 <I2CISR+0x1a4>
+ d4c:	ea00003a 	b	e3c <I2CISR+0x14c>
+ d50:	e3510040 	cmp	r1, #64	; 0x40
+ d54:	0a00003c 	beq	e4c <I2CISR+0x15c>
+ d58:	8a000004 	bhi	d70 <I2CISR+0x80>
+ d5c:	e3510030 	cmp	r1, #48	; 0x30
+ d60:	0a000035 	beq	e3c <I2CISR+0x14c>
+ d64:	e3510038 	cmp	r1, #56	; 0x38
+ d68:	1a000049 	bne	e94 <I2CISR+0x1a4>
+ d6c:	ea000034 	b	e44 <I2CISR+0x154>
+ d70:	e3510050 	cmp	r1, #80	; 0x50
+ d74:	0a00003c 	beq	e6c <I2CISR+0x17c>
+ d78:	e3510058 	cmp	r1, #88	; 0x58
+ d7c:	0a00003a 	beq	e6c <I2CISR+0x17c>
+ d80:	e3510048 	cmp	r1, #72	; 0x48
+ d84:	1a000042 	bne	e94 <I2CISR+0x1a4>
+ d88:	ea000033 	b	e5c <I2CISR+0x16c>
+			bI2c_lock = FALSE;
+			break;
+		
+		case 0x08:						// Start bit sent
+			I20DAT = I2CAddress; 		// Send address and write bit
+ d8c:	e59f312c 	ldr	r3, [pc, #300]	; ec0 <.text+0xec0>
+ d90:	e5d32000 	ldrb	r2, [r3]
+ d94:	e59f3128 	ldr	r3, [pc, #296]	; ec4 <.text+0xec4>
+ d98:	e5c32000 	strb	r2, [r3]
+			I20CONCLR = 0x20;			// Clear start flag
+ d9c:	e3a02020 	mov	r2, #32	; 0x20
+ da0:	e2833010 	add	r3, r3, #16	; 0x10
+ da4:	e5c32000 	strb	r2, [r3]
+			I20CONSET = 0x04;			// Set ACK bit
+ da8:	e3a02004 	mov	r2, #4	; 0x4
+ dac:	e2433018 	sub	r3, r3, #24	; 0x18
+ db0:	ea000027 	b	e54 <I2CISR+0x164>
+			break;
+
+		case 0x10:
+			I20DAT = I2CAddress; 		// Send address and write bit
+ db4:	e59f3104 	ldr	r3, [pc, #260]	; ec0 <.text+0xec0>
+ db8:	e5d32000 	ldrb	r2, [r3]
+ dbc:	e59f3100 	ldr	r3, [pc, #256]	; ec4 <.text+0xec4>
+ dc0:	e5c32000 	strb	r2, [r3]
+			I20CONSET = 0x04;			// Set ACK bit
+ dc4:	e3a02004 	mov	r2, #4	; 0x4
+ dc8:	e2433008 	sub	r3, r3, #8	; 0x8
+ dcc:	ea000020 	b	e54 <I2CISR+0x164>
+			break;
+
+		case 0x18:						// Start Data
+			I20DAT = *pI2CData++;		// Write data to tx register
+ dd0:	e59f00f0 	ldr	r0, [pc, #240]	; ec8 <.text+0xec8>
+ dd4:	e5903000 	ldr	r3, [r0]
+ dd8:	e59f20e4 	ldr	r2, [pc, #228]	; ec4 <.text+0xec4>
+ ddc:	e4d31001 	ldrb	r1, [r3], #1
+ de0:	e5c21000 	strb	r1, [r2]
+ de4:	e5803000 	str	r3, [r0]
+ de8:	ea000029 	b	e94 <I2CISR+0x1a4>
+			break;
+			
+		case 0x20:						// Slave address+W, Not ACK
+			I20CONSET = 0x14;			// Set STOP and ACK bits
+			bI2c_lock = FALSE;
+			break;
+		
+		case 0x28:						// Data sent, ACK
+			I2Counter--;
+ dec:	e59f20d8 	ldr	r2, [pc, #216]	; ecc <.text+0xecc>
+ df0:	e5d23000 	ldrb	r3, [r2]
+ df4:	e2433001 	sub	r3, r3, #1	; 0x1
+ df8:	e20310ff 	and	r1, r3, #255	; 0xff
+			if ( 0 == I2Counter ) {	
+ dfc:	e3510000 	cmp	r1, #0	; 0x0
+ e00:	e5c21000 	strb	r1, [r2]
+ e04:	1a000005 	bne	e20 <I2CISR+0x130>
+				I20CONSET = 0x14;		// Set STOP
+ e08:	e3a03014 	mov	r3, #20	; 0x14
+ e0c:	e59f20bc 	ldr	r2, [pc, #188]	; ed0 <.text+0xed0>
+ e10:	e5c23000 	strb	r3, [r2]
+				bI2c_lock = FALSE;
+ e14:	e59f30b8 	ldr	r3, [pc, #184]	; ed4 <.text+0xed4>
+ e18:	e5831000 	str	r1, [r3]
+ e1c:	ea00001c 	b	e94 <I2CISR+0x1a4>
+			}
+			else {
+				I20DAT = *pI2CData++;	// Write data to tx register
+ e20:	e59f00a0 	ldr	r0, [pc, #160]	; ec8 <.text+0xec8>
+ e24:	e5903000 	ldr	r3, [r0]
+ e28:	e59f2094 	ldr	r2, [pc, #148]	; ec4 <.text+0xec4>
+ e2c:	e4d31001 	ldrb	r1, [r3], #1
+ e30:	e5c21000 	strb	r1, [r2]
+ e34:	e5803000 	str	r3, [r0]
+ e38:	ea000003 	b	e4c <I2CISR+0x15c>
+				I20CONSET = 0x04;		// Set AA bit
+			}
+			break;
+
+		case 0x30:						// Data sent, NOT Ack
+			I20CONSET = 0x14;			// Set STOP and ACK bits
+ e3c:	e3a02014 	mov	r2, #20	; 0x14
+ e40:	ea000006 	b	e60 <I2CISR+0x170>
+			bI2c_lock = FALSE;
+			break;
+
+		case 0x38:						// Arbitration lost
+			I20CONSET = 0x24;			// Set STAT and ACK bits
+ e44:	e3a02024 	mov	r2, #36	; 0x24
+ e48:	ea000000 	b	e50 <I2CISR+0x160>
+			break;
+			
+		// * * * Receive byte conditions
+		case 0x40:						// Slave Address + R, ACK
+			I20CONSET = 0x04;			// Enable ACK for data byte
+ e4c:	e3a02004 	mov	r2, #4	; 0x4
+ e50:	e59f3078 	ldr	r3, [pc, #120]	; ed0 <.text+0xed0>
+ e54:	e5c32000 	strb	r2, [r3]
+ e58:	ea00000d 	b	e94 <I2CISR+0x1a4>
+			break;
+
+		case 0x48:						// Slave Address +R, Not Ack
+			I20CONSET = 0x10;			// Set STOP and ACK bits
+ e5c:	e3a02010 	mov	r2, #16	; 0x10
+ e60:	e59f3068 	ldr	r3, [pc, #104]	; ed0 <.text+0xed0>
+ e64:	e5c32000 	strb	r2, [r3]
+ e68:	ea000006 	b	e88 <I2CISR+0x198>
+			bI2c_lock = FALSE;
+			break;
+
+		case 0x50:						// Data Received, ACK 
+			I2CData[ 0 ] = I20DAT;
+			I20CONSET = 0x10;			// Set STOP bit
+			bI2c_lock = FALSE;
+			break;
+
+		case 0x58:						// Data Received, Not Ack
+			I2CData[ 0 ] = I20DAT;
+ e6c:	e59f3050 	ldr	r3, [pc, #80]	; ec4 <.text+0xec4>
+			I20CONSET = 0x10;			// Set STOP bit
+ e70:	e3a02010 	mov	r2, #16	; 0x10
+ e74:	e5d31000 	ldrb	r1, [r3]
+ e78:	e2433008 	sub	r3, r3, #8	; 0x8
+ e7c:	e5c32000 	strb	r2, [r3]
+ e80:	e59f3050 	ldr	r3, [pc, #80]	; ed8 <.text+0xed8>
+ e84:	e5c31000 	strb	r1, [r3]
+			bI2c_lock = FALSE;
+ e88:	e59f3044 	ldr	r3, [pc, #68]	; ed4 <.text+0xed4>
+ e8c:	e3a02000 	mov	r2, #0	; 0x0
+ e90:	e5832000 	str	r2, [r3]
+			break;
+
+		default:
+			break;
+
+	}
+
+	I20CONCLR = 0x08;					// Clear I2C interrupt flag
+ e94:	e59f3040 	ldr	r3, [pc, #64]	; edc <.text+0xedc>
+ e98:	e3a02008 	mov	r2, #8	; 0x8
+ e9c:	e5c32000 	strb	r2, [r3]
+	VICVectAddr = 0x00000000;			// Clear interrupt in 
+ ea0:	e59f3038 	ldr	r3, [pc, #56]	; ee0 <.text+0xee0>
+ ea4:	e3a02000 	mov	r2, #0	; 0x0
+ ea8:	e5832000 	str	r2, [r3]
+
+	ISR_EXIT();                         // recover registers and return
+ eac:	e8bd0002 	ldmia	sp!, {r1}
+ eb0:	e161f001 	msr	SPSR_c, r1
+ eb4:	e8fd9fff 	ldmia	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, pc}^
+}
+ eb8:	e12fff1e 	bx	lr
+ ebc:	e001c004 	and	ip, r1, r4
+ ec0:	400000e5 	andmi	r0, r0, r5, ror #1
+ ec4:	e001c008 	and	ip, r1, r8
+ ec8:	400000ec 	andmi	r0, r0, ip, ror #1
+ ecc:	400000e4 	andmi	r0, r0, r4, ror #1
+ ed0:	e001c000 	and	ip, r1, r0
+ ed4:	400000e8 	andmi	r0, r0, r8, ror #1
+ ed8:	400000f0 	strmid	r0, [r0], -r0
+ edc:	e001c018 	and	ip, r1, r8, lsl r0
+ ee0:	fffff030 	swinv	0x00fff030
+ ee4:	65480a0d 	strvsb	r0, [r8, #-2573]
+ ee8:	206f6c6c 	rsbcs	r6, pc, ip, ror #24
+ eec:	6c726f57 	ldcvsl	15, cr6, [r2], #-348
+ ef0:	0a0d2164 	beq	349488 <_etext+0x3484f8>
+ ef4:	00000000 	andeq	r0, r0, r0
+ ef8:	57206128 	strpl	r6, [r0, -r8, lsr #2]!
+ efc:	52416e69 	subpl	r6, r1, #1680	; 0x690
+ f00:	6544204d 	strvsb	r2, [r4, #-77]
+ f04:	412d6f6d 	teqmi	sp, sp, ror #30
+ f08:	696c7070 	stmvsdb	ip!, {r4, r5, r6, ip, sp, lr}^
+ f0c:	69746163 	ldmvsdb	r4!, {r0, r1, r5, r6, r8, sp, lr}^
+ f10:	62206e6f 	eorvs	r6, r0, #1776	; 0x6f0
+ f14:	64657361 	strvsbt	r7, [r5], #-865
+ f18:	206e6f20 	rsbcs	r6, lr, r0, lsr #30
+ f1c:	65646f63 	strvsb	r6, [r4, #-3939]!
+ f20:	6f726620 	swivs	0x00726620
+ f24:	2052206d 	subcss	r2, r2, sp, rrx
+ f28:	6f53204f 	swivs	0x0053204f
+ f2c:	61777466 	cmnvs	r7, r6, ror #8
+ f30:	0d296572 	cfstr32eq	mvfx6, [r9, #-456]!
+ f34:	000a0d0a 	andeq	r0, sl, sl, lsl #26
+ f38:	52504545 	subpls	r4, r0, #289406976	; 0x11400000
+ f3c:	45204d4f 	strmi	r4, [r0, #-3407]!
+ f40:	524f5252 	subpl	r5, pc, #536870917	; 0x20000005
+ f44:	000a0d31 	andeq	r0, sl, r1, lsr sp
+ f48:	52504545 	subpls	r4, r0, #289406976	; 0x11400000
+ f4c:	45204d4f 	strmi	r4, [r0, #-3407]!
+ f50:	524f5252 	subpl	r5, pc, #536870917	; 0x20000005
+ f54:	000a0d32 	andeq	r0, sl, r2, lsr sp
+ f58:	20656874 	rsbcs	r6, r5, r4, ror r8
+ f5c:	0000003c 	andeq	r0, r0, ip, lsr r0
+ f60:	656b203e 	strvsb	r2, [fp, #-62]!
+ f64:	61682079 	smivs	33289
+ f68:	65622073 	strvsb	r2, [r2, #-115]!
+ f6c:	70206e65 	eorvc	r6, r0, r5, ror #28
+ f70:	73736572 	cmnvc	r3, #478150656	; 0x1c800000
+ f74:	0a0d6465 	beq	35a110 <_etext+0x359180>
+ f78:	00000000 	andeq	r0, r0, r0
+ f7c:	75420a0d 	strvcb	r0, [r2, #-2573]
+ f80:	6e6f7474 	mcrvs	4, 3, r7, cr15, cr4, {3}
+ f84:	65725020 	ldrvsb	r5, [r2, #-32]!
+ f88:	64657373 	strvsbt	r7, [r5], #-883
+ f8c:	000a0d21 	andeq	r0, sl, r1, lsr #26

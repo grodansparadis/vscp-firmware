@@ -1,0 +1,5 @@
+/** \defgroup vt100 vt100: VT100 Terminal Function Library
+
+This library provides functions for sending VT100 escape codes to control a connected VT100 or ANSI terminal.  Commonly useful functions include setting the cursor position, clearing the screen, setting the text attributes (bold, inverse, blink, etc), and setting the text color.  This library will slowly be expanded to include support for codes as needed and may eventually receive VT100 escape codes too.
+
+*/

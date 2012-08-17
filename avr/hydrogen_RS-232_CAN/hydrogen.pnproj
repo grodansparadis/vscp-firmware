@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<Project name="hydrogen">
+<File path="uart.h" />
+<File path="async.h" />
+<File path="can.h" />
+<File path="hydrogen.c" />
+<File path="hydrogen.h" />
+<File path="sja1000.c" />
+<File path="sja1000.h" />
+<File path="uart.c" />
+<File path="makefile" />
+</Project>

@@ -1,0 +1,23 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE project PUBLIC "-//audacityproject-1.3.0//DTD//EN" "http://audacity.sourceforge.net/xml/audacityproject-1.3.0.dtd" >
+<project xmlns="http://audacity.sourceforge.net/xml/" projname="test_data" version="1.3.0" audacityversion="1.3.5" sel0="0.0000000000" sel1="28.1526250000" vpos="0" h="15.9869387755" zoom="86.1328125000" rate="44100">
+	<tags>
+		<tag name="id3v2" value="1"/>
+	</tags>
+	<wavetrack name="smoke_original_signed_16bit_stereo 1" channel="2" linked="0" offset="0.00000000" rate="8000" gain="1" pan="0">
+		<waveclip offset="0.00000000">
+			<sequence maxsamples="262144" sampleformat="131073" numsamples="225221">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000560.au" len="6992" min="-0.323883" max="0.265411" rms="0.023001"/>
+				</waveblock>
+				<waveblock start="6992">
+					<simpleblockfile filename="e0000daf.au" len="142664" min="-0.816864" max="0.591034" rms="0.079394"/>
+				</waveblock>
+				<waveblock start="149656">
+					<simpleblockfile filename="e00001e5.au" len="75565" min="-0.775848" max="0.789856" rms="0.108513"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+</project>

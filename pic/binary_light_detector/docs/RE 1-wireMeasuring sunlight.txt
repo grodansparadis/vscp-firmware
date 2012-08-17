@@ -1,0 +1,116 @@
+Från: 1-wire-software-development-admin@dalsemi.com för Kelly Smith
+[bebop1@earthlink.net]
+Skickat: den 3 maj 2004 22:41
+Till: 1-wire-software-development@dalsemi.com; IGLHAUT@profimail.de
+Ämne: RE: [1-wire]Measuring sunlight
+
+Dear Stephan - Dan Awtrey (a Staff Engineer, Dallas Semiconductor), wrote
+this in the article, May 2001 - 1-Wire Addressable Digital Instruments (see
+Dan's comments below).
+
+This should also work:  http://www.photonicdetectors.com/pdf/pdbv113.pdf
+
+Here is Dan Awtrey's article:
+
+Ref: http://www.sensorsmag.com/articles/0501/34/main.shtml
+
+"An interesting variation of a solar radiation sensor can be constructed
+using a standard LED in reverse bias mode. An LED is selected that generates
+acceptable photocurrent levels when exposed to the sun at high noon on a
+clear day. The resistor is sized to develop 250 mV maximum using the
+formula:
+
+Rsens = E/I
+
+where:
+
+E = 0.25 V
+I = maximum photocurrent generated
+
+
+One example is the EFA5364X from Stanley (Irvine, CA). This is a
+super-bright orange AlGaInP LED with a peak response at 609 nm and a narrow
+(15°) spectral field of view. A 4.7 k sense resistor provides acceptable
+outdoor performance, which may be increased to 100 k if the circuit is to be
+used with indoor lighting. LEDs made from other compounds will have their
+peak response in a different portion of the spectrum, which can prove useful
+in certain installations."
+
+In the same article from Dan, you can use a solar cell... BUT (cymbal crash
+goes here!):
+
+Let me also suggest, that the DS2450 1-WireTM Quad A/D Converter (4 ADC
+Channels), is a good choice also, in that you can "look" East, West", and
+"Staight-Up", for sunrise, sunset, and high-noon sensing, with a silcon
+solar cell.
+
+Ref:  http://pdfserv.maxim-ic.com/en/ds/DS2450.pdf
+
+I use this, from Radio Shack:
+
+Ref:  http://www.radioshack.com/search.asp?find=solar+cell&site=search&SRC=1
+
+I use catalog number:  277-1201
+
+Ref:
+http://www.radioshack.com/product.asp?catalog%5Fname=CTLG&product%5Fid=277-1
+201
+
+Its small, has a plastic case (put some water-proofing "goop" around the
+edge of the platic lens to keep the rain out!), and is very sensitive.
+
+This one, is $12.99...
+
+http://www.radioshack.com/product.asp?catalog%5Fname=CTLG&product%5Fid=980-0
+878
+
+You might want to keep an eye on what Systronix is doing, for their LCX
+(Java Control Systems)product line at:
+
+http://jcx.systronix.com/
+
+I have a "preview" JCX product running on a DalSemi "TINI-type" product
+(actually a Systronix TStik), that uses the DS2450 ADC, that allows for
+monitoring light levels over the WWW.
+
+The target market for the JCX products are intended for the JStik, at:
+
+http://jstik.systronix.com/specs.htm
+
+Anyway, "Let there be LIGHT!"  I hope this helps.
+
+Best regards, Kelly Smith
+
+
+-----Original Message-----
+From: 1-wire-software-development-admin@dalsemi.com
+[mailto:1-wire-software-development-admin@dalsemi.com]On Behalf Of
+IGLHAUT@profimail.de
+Sent: Thursday, April 29, 2004 1:08 PM
+To: 1-wire-software-development@dalsemi.com.IGLHAUT@profimail.de
+Subject: [1-wire]Measuring sunlight
+
+
+Hello,
+
+I want to measure sunlight with a 1-wire based approach. The circuit with to
+OP-954 should do it. But I  can't find a distributor for the OP-954 in
+Germany. Has anybody a circuit containing an other photodiode?
+
+Regards,
+
+Stephan
+
+
+_______________________________________________
+1-wire-software-development mailing list
+1-wire-software-development@dalsemi.com
+To UNSUBSCRIBE, edit your profile, or visit the list archives, go to:
+http://lists.dalsemi.com/mailman/listinfo/1-wire-software-development
+
+
+_______________________________________________
+1-wire-software-development mailing list
+1-wire-software-development@dalsemi.com
+To UNSUBSCRIBE, edit your profile, or visit the list archives, go to:
+http://lists.dalsemi.com/mailman/listinfo/1-wire-software-development
