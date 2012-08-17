@@ -1,6 +1,0 @@
-/** \defgroup encoder encoder: Quadrature Encoder Driver
-
-This library provides an interface to standard quadrature encoders (used for sensing shaft rotational position and speed). The library uses external interrupts to sense and keep track of the encoder's movements. The library is extendable with the maximum number of encoders equal to the total number of external interrupts available on the target AVR processor.
-\note Library tested to work but processor compatibility is still being worked out
-
-*/

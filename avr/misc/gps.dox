@@ -1,7 +1,0 @@
-/** \defgroup gps gps: GPS Positioning and Navigation Function Library
-
-(in development)
-
-This library provides a generic way to store and process information received from a GPS receiver.  Currently the library only stores the most recent set of GPS data (position, velocity, time) from a GPS receiver.  Future revisions will include navigation functions like calculate heading/distance to a waypoint.  The processing of incoming serial data packets from GPS hardware is not done in this library.  The libraries tsip.c and nmea.c do the packet processing for Trimble Standard Interface Protocol and NMEA-0813 repectively, and store the results in this library.
-
-*/

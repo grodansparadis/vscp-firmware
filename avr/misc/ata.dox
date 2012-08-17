@@ -1,7 +1,0 @@
-/** \defgroup ata ata: IDE/ATA Interface Driver
-
-(for IDE/ATA hard disks and CF Cards)
-
-This library provides an interface from AVR processors to IDE/ATA hard disks.  The library supports automatic drive identification and sector-level reading and writing.  Some minimal address decoding hardware is required to use this interface.  A schematic of the interface is coming.  Future revisions may include a direct hardware-less option.
-
-*/

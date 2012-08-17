@@ -1,5 +1,0 @@
-/** \defgroup spi spi: SPI (Serial Peripheral Interface) Function Library
-
-Provides basic byte and word transmitting and receiving via the AVR SPI interface.  Due to the nature of SPI, every SPI communication operation is both a transmit and simultaneous receive.   Currently, only MASTER mode is supported.
-
-*/

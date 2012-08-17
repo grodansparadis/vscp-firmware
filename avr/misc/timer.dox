@@ -1,5 +1,0 @@
-/** \defgroup timer timer: Timer Function Library
-
-This library provides functions for use with the timers internal to the AVR processors.  Functions include initialization, set prescaler, calibrated pause function (in milliseconds), attaching and detaching of user functions to interrupts, overflow counters, PWM. Arbitrary frequency generation has been moved to the Pulse Library.
-
-*/

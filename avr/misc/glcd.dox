@@ -1,7 +1,0 @@
-/** \defgroup glcd glcd: Graphic LCD API (application programmer's interface)
-
-This library (or API) allows you to draw dots, lines, boxes, circles, and text on most monochrome graphic LCDs.  An easily expandable font file (5x7-pixel characters) is provided for all basic ASCII characters (0x20-0x7F hex, 32-127 decimal).  An expandable graphic font file is provided for defining specialty characters or custom icons.  Because this library is designed to work with many different kinds of LCDs, it needs a graphic LCD driver such as ks0108.c to enable it to talk to the LCD.
-
-\note For full text output functionality, you may wish to use the rprintf functions along with this driver.
-
-*/

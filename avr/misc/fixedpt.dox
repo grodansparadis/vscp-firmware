@@ -1,7 +1,0 @@
-/** \defgroup fixedpt fixedpt: Fixed-Point Math Function Library
-
-This library provides basic fixed-point math operations implemented in C. Fixed-point math is a system by which integer variables can represent fractional values with a fixed precision "behind" the decimal point. Fixed-point math is much faster to execute than floating-point math, and should be used when a limited amount of fractional precision is sufficient (such as 4ths, or 10ths, or 128ths).
-
-\note Library functional but not currently complete
-
-*/

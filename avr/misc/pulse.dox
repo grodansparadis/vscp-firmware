@@ -1,5 +1,0 @@
-/** \defgroup pulse pulse: Pulse Function Library
-
-This library provides functions for generating pulses of arbitrary frequency and number.  Common uses include stepper motor speed control, tone generation, communications, etc.  This library requires the timer.c or timer128.c function library.
-
-*/

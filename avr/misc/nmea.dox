@@ -1,5 +1,0 @@
-/** \defgroup nmea nmea: NMEA Packet Interface for GPS Receivers
-
-This library parses and decodes the standard NMEA data stream from a GPS and stores the position, velocity, and time solutions in the gps.c library.
-
-*/

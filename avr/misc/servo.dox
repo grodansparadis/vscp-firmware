@@ -1,5 +1,0 @@
-/** \defgroup servo servo: Interrupt-driven RC Servo Function Library
-
-A basic interrupt-driven function library that supports the continuous driving of up to eight RC hobby servos.  The servos may be driven off any combination of I/O ports and pins.  Works best at higher clock speeds 6-8MHz.
-
-*/

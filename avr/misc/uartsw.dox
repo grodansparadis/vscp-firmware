@@ -1,5 +1,0 @@
-/** \defgroup uartsw uartsw: Software Interrupt-driven UART Function Library
-
-This library provides an additional half-duplex serial port to most AVR processors.
-
-*/

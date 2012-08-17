@@ -1,5 +1,0 @@
-/** \defgroup stxetx stxetx: STX/ETX Packet Protocol Function Library
-
-This library provides functions needed to transmit and receive STX/ETX packets over any interface which can send and receive bytes.  STX/ETX is a simple packet protocol for serial data streams and offers packetization, type tagging, and checksum protection for user data.  Common uses of STX/ETX might include radio communications were it can improve data reliability over lossy channels.  STX/ETX may also be used effectively anywhere multiple access to the communication medium is required.  The packets can be made to contain destination addresses or routing information as well as data.
-
-*/

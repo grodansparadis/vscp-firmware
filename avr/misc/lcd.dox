@@ -1,9 +1,0 @@
-/** \defgroup lcd lcd: Character LCD Driver for HD44780/SED1278-based displays
-
-This display driver provides an interface to the most common type of character LCD, those based on the HD44780 or SED1278 controller chip (about 90% use one of these chips).  The display driver can interface to the display through the CPU memory bus, or directly via I/O port pins.  When using the direct I/O port mode, no additional interface hardware is needed except for a contrast potentiometer.  Supported functions include initialization, clearing, scrolling, cursor positioning, text writing, and loading of custom characters or icons (up to 8).  Although these displays are simple, clever use of the custom characters can allow you to create animations or simple graphics.  A "progress bar" function is included in the driver.
-
-The driver now supports both 8-bit and 4-bit interface modes.
-
-\note For full text output functionality, you may wish to use the rprintf functions along with this driver
-
-*/
