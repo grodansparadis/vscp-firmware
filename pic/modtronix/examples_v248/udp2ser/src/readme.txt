@@ -1,1 +1,0 @@
-This example show how to sent and receive UDP messages using the Modtronix TCP/IP stack
