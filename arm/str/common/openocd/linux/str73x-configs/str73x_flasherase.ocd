@@ -1,6 +1,0 @@
-wait_halt
-mww 0x40000000 0x00000200
-flash protect 0 0 7 off
-flash erase 0 0 7
-reset
-shutdown
