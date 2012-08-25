@@ -1224,10 +1224,7 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
 		writeEEPROM( VSCP_EEPROM_END + reg, val );
 		rv = readEEPROM( VSCP_EEPROM_END + reg );
 	}
-	
-	// Send response
-	vscp_sendEvent();	
-	
+		
 	// Sned information Event 
 	// if enabled in the registers
 	if ( bInfoEvent ) {
