@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>RCA CAN Library: can_t Strukturreferenz</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- Erzeugt von Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="index.html"><span>Hauptseite</span></a></li>
+      <li><a href="modules.html"><span>Module</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Datenstrukturen</span></a></li>
+      <li><a href="files.html"><span>Dateien</span></a></li>
+    </ul>
+  </div>
+  <div class="tabs">
+    <ul>
+      <li><a href="annotated.html"><span>Datenstrukturen</span></a></li>
+      <li><a href="functions.html"><span>Datenstruktur-Elemente</span></a></li>
+    </ul>
+  </div>
+</div>
+<div class="contents">
+<h1>can_t Strukturreferenz<br/>
+<small>
+[<a class="el" href="group__can__interface.html">Universelles CAN Interface</a>]</small>
+</h1><!-- doxytag: class="can_t" -->
+<p>Datenstruktur zum Aufnehmen von CAN Nachrichten.  
+<a href="#_details">Mehr ...</a></p>
+
+<p><code>#include &lt;<a class="el" href="can_8h_source.html">can.h</a>&gt;</code></p>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2"><h2>Datenfelder</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a70770164cbfc6d3890fd2a391dd7ff78"></a><!-- doxytag: member="can_t::id" ref="a70770164cbfc6d3890fd2a391dd7ff78" args="" -->
+uint32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcan__t.html#a70770164cbfc6d3890fd2a391dd7ff78">id</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">ID der Nachricht (11 oder 29 Bit). <br/></td></tr>
+<tr><td class="memItemLeft" ><a class="anchor" id="a5c1f523300e41b097189798777cef273"></a><!-- doxytag: member="can_t::flags" ref="a5c1f523300e41b097189798777cef273" args="" -->
+struct {</td></tr>
+<tr><td class="memItemLeft" >&nbsp;&nbsp;&nbsp;int&nbsp;&nbsp;&nbsp;<a class="el" href="structcan__t.html#a14d5a9d3bff411d041f125e150459b46">rtr</a>: 1</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Remote-Transmit-Request-Frame? <br/></td></tr>
+<tr><td class="memItemLeft" >&nbsp;&nbsp;&nbsp;int&nbsp;&nbsp;&nbsp;<a class="el" href="structcan__t.html#a370e328099a3100137a9abf498f6b7e9">extended</a>: 1</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">extended ID? <br/></td></tr>
+<tr><td class="memItemLeft" valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><b>flags</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a844e44350689150ce88efc94e94107eb"></a><!-- doxytag: member="can_t::length" ref="a844e44350689150ce88efc94e94107eb" args="" -->
+uint8_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcan__t.html#a844e44350689150ce88efc94e94107eb">length</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Anzahl der Datenbytes. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac48d13931d629e37a6b5bdf0a4ec6dcd"></a><!-- doxytag: member="can_t::data" ref="ac48d13931d629e37a6b5bdf0a4ec6dcd" args="[8]" -->
+uint8_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcan__t.html#ac48d13931d629e37a6b5bdf0a4ec6dcd">data</a> [8]</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Die Daten der CAN Nachricht. <br/></td></tr>
+</table>
+<hr/><a name="_details"></a><h2>Ausführliche Beschreibung</h2>
+<p>Datenstruktur zum Aufnehmen von CAN Nachrichten. </p>
+
+<p>Definiert in Zeile <a class="el" href="can_8h_source.html#l00169">169</a> der Datei <a class="el" href="can_8h_source.html">can.h</a>.</p>
+<hr/>Die Dokumentation für diese Struktur wurde erzeugt aufgrund der Datei:<ul>
+<li><a class="el" href="can_8h_source.html">can.h</a></li>
+</ul>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Erzeugt am Thu Aug 19 22:03:52 2010 für RCA CAN Library von&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

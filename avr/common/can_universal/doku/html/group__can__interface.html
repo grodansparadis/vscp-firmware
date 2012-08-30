@@ -1,0 +1,480 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>RCA CAN Library: Universelles CAN Interface</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- Erzeugt von Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="index.html"><span>Hauptseite</span></a></li>
+      <li><a href="modules.html"><span>Module</span></a></li>
+      <li><a href="annotated.html"><span>Datenstrukturen</span></a></li>
+      <li><a href="files.html"><span>Dateien</span></a></li>
+    </ul>
+  </div>
+</div>
+<div class="contents">
+<h1>Universelles CAN Interface</h1>
+<p>allgemeines CAN Interface für AT90CAN32/64/128, MCP2515 und SJA1000  
+<a href="#_details">Mehr ...</a></p>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2"><h2>Datenstrukturen</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcan__t.html">can_t</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Datenstruktur zum Aufnehmen von CAN Nachrichten.  <a href="structcan__t.html#_details">Mehr ...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcan__filter__t.html">can_filter_t</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Datenstruktur zur Aufnahme von CAN-Filtern.  <a href="structcan__filter__t.html#_details">Mehr ...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcan__error__register__t.html">can_error_register_t</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Inhalt der Fehler-Register.  <a href="structcan__error__register__t.html#_details">Mehr ...</a><br/></td></tr>
+<tr><td colspan="2"><h2>Makrodefinitionen</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga0c107bf106e5097ee208985008c9c112"></a><!-- doxytag: member="can_interface::CAN_ALL_FILTER" ref="ga0c107bf106e5097ee208985008c9c112" args="" -->
+#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__interface.html#ga0c107bf106e5097ee208985008c9c112">CAN_ALL_FILTER</a>&nbsp;&nbsp;&nbsp;0xff</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Symbol um auf alle Filter zuzugreifen. <br/></td></tr>
+<tr><td colspan="2"><h2>Aufzählungen</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__interface.html#ga1085b545b19ee92abad774ad27eec8d7">can_bitrate_t</a> { <br/>
+&nbsp;&nbsp;<b>BITRATE_10_KBPS</b> =  0, 
+<b>BITRATE_20_KBPS</b> =  1, 
+<b>BITRATE_50_KBPS</b> =  2, 
+<b>BITRATE_100_KBPS</b> =  3, 
+<br/>
+&nbsp;&nbsp;<b>BITRATE_125_KBPS</b> =  4, 
+<b>BITRATE_250_KBPS</b> =  5, 
+<b>BITRATE_500_KBPS</b> =  6, 
+<b>BITRATE_1_MBPS</b> =  7
+<br/>
+ }</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><p>Bitraten fuer den CAN-Bus. </p>
+<br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__interface.html#gad6f5bfd4c152b830a94c2066e9c81710">can_mode_t</a> { <a class="el" href="group__can__interface.html#ggad6f5bfd4c152b830a94c2066e9c81710a581130e49bf3be40cabb563b0fee8fc4">LISTEN_ONLY_MODE</a>, 
+<a class="el" href="group__can__interface.html#ggad6f5bfd4c152b830a94c2066e9c81710a187b2d7634d602c4f41d4a92b02c4b8f">LOOPBACK_MODE</a>, 
+<a class="el" href="group__can__interface.html#ggad6f5bfd4c152b830a94c2066e9c81710a83feb61d42f8db9f494019fcea2c0148">NORMAL_MODE</a>, 
+<b>SLEEP_MODE</b>
+ }</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><p>Modus des CAN Interfaces. </p>
+ <a href="group__can__interface.html#gad6f5bfd4c152b830a94c2066e9c81710">Mehr ...</a><br/></td></tr>
+<tr><td colspan="2"><h2>Funktionen</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__interface.html#gabd1f48e60b6607452b92d08cca69e882">can_init</a> (<a class="el" href="group__can__interface.html#ga1085b545b19ee92abad774ad27eec8d7">can_bitrate_t</a> bitrate)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Initialisierung des CAN Interfaces.  <a href="#gabd1f48e60b6607452b92d08cca69e882"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga12a1ee4cf18d154f9c05be090ae8d7ef"></a><!-- doxytag: member="can_interface::can_sleep" ref="ga12a1ee4cf18d154f9c05be090ae8d7ef" args="(void)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>can_sleep</b> (void)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__interface.html#gaf6ee58a439c848efb779306f0d84f87d">can_set_filter</a> (uint8_t number, const <a class="el" href="structcan__filter__t.html">can_filter_t</a> *filter)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Setzen eines Filters.  <a href="#gaf6ee58a439c848efb779306f0d84f87d"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__interface.html#ga481f4fb1ea636415efc618e4e7f40989">can_disable_filter</a> (uint8_t number)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Filter deaktivieren.  <a href="#ga481f4fb1ea636415efc618e4e7f40989"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__interface.html#ga1a525dac710bc2650bb2d9939f287923">can_static_filter</a> (const prog_uint8_t *filter_array)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Setzt die Werte für alle Filter.  <a href="#ga1a525dac710bc2650bb2d9939f287923"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">uint8_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__interface.html#ga16d0640bef61ef76d8bd4c6274c6cdaa">can_get_filter</a> (uint8_t number, <a class="el" href="structcan__filter__t.html">can_filter_t</a> *filter)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Filterdaten auslesen.  <a href="#ga16d0640bef61ef76d8bd4c6274c6cdaa"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__interface.html#gaea4af1845c4128b901e6b5190f154f02">can_check_message</a> (void)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Ueberpruefen ob neue CAN Nachrichten vorhanden sind.  <a href="#gaea4af1845c4128b901e6b5190f154f02"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__interface.html#ga645382c1488d16b75b6721a476ac0836">can_check_free_buffer</a> (void)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Ueberprueft ob ein Puffer zum Versenden einer Nachricht frei ist.  <a href="#ga645382c1488d16b75b6721a476ac0836"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">uint8_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__interface.html#gae3f7b241d087aaa78feb98452ae320d5">can_send_message</a> (const <a class="el" href="structcan__t.html">can_t</a> *msg)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Verschickt eine Nachricht über den CAN Bus.  <a href="#gae3f7b241d087aaa78feb98452ae320d5"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">uint8_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__interface.html#ga93c3e6ad5e58dc208cd1ccce45f4fe97">can_get_message</a> (<a class="el" href="structcan__t.html">can_t</a> *msg)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Liest eine Nachricht aus den Empfangspuffern des CAN Controllers.  <a href="#ga93c3e6ad5e58dc208cd1ccce45f4fe97"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gab163a825c6dc771bfd910dd1566c6709"></a><!-- doxytag: member="can_interface::can_read_error_register" ref="gab163a825c6dc771bfd910dd1566c6709" args="(void)" -->
+<a class="el" href="structcan__error__register__t.html">can_error_register_t</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__interface.html#gab163a825c6dc771bfd910dd1566c6709">can_read_error_register</a> (void)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Liest den Inhalt der Fehler-Register. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__interface.html#ga789249cd7bf03abf1112e66dc31c6a6b">can_check_bus_off</a> (void)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Überprüft ob der CAN Controller im Bus-Off-Status.  <a href="#ga789249cd7bf03abf1112e66dc31c6a6b"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__interface.html#ga9dd5adf15a4a0421c45840443e720ee3">can_reset_bus_off</a> (void)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Setzt einen Bus-Off Status zurück und schaltet den CAN Controller wieder aktiv.  <a href="#ga9dd5adf15a4a0421c45840443e720ee3"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__interface.html#ga08711a36cb70dc71c761ed01f7cbf8c8">can_set_mode</a> (<a class="el" href="group__can__interface.html#gad6f5bfd4c152b830a94c2066e9c81710">can_mode_t</a> mode)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Setzt den Operations-Modus.  <a href="#ga08711a36cb70dc71c761ed01f7cbf8c8"></a><br/></td></tr>
+</table>
+<hr/><a name="_details"></a><h2>Ausführliche Beschreibung</h2>
+<p>allgemeines CAN Interface für AT90CAN32/64/128, MCP2515 und SJA1000 </p>
+<dl class="author"><dt><b>Autor:</b></dt><dd>Fabian Greif &lt;<a href="mailto:fabian.greif@rwth-aachen.de">fabian.greif@rwth-aachen.de</a>&gt; </dd>
+<dd>
+Roboterclub Aachen e.V. (<a href="http://www.roboterclub.rwth-aachen.de">http://www.roboterclub.rwth-aachen.de</a>)</dd></dl>
+<p>can_sleep() and can_wakeup() functions by Frédéric Lamorce.</p>
+<dl class="version"><dt><b>Version:</b></dt><dd></dd></dl>
+<dl class="rcs"><dt><b>Id</b></dt><dd><a class="el" href="can_8h.html" title="Header-Datei für das allgemeine CAN Interface.">can.h</a> 8086 2009-07-14 14:08:25Z fabian </dd></dl>
+<hr/><h2>Dokumentation der Aufzählungstypen</h2>
+<a class="anchor" id="gad6f5bfd4c152b830a94c2066e9c81710"></a><!-- doxytag: member="can.h::can_mode_t" ref="gad6f5bfd4c152b830a94c2066e9c81710" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group__can__interface.html#gad6f5bfd4c152b830a94c2066e9c81710">can_mode_t</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Modus des CAN Interfaces. </p>
+<dl><dt><b>Aufzählungswerte: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" id="ggad6f5bfd4c152b830a94c2066e9c81710a581130e49bf3be40cabb563b0fee8fc4"></a><!-- doxytag: member="LISTEN_ONLY_MODE" ref="ggad6f5bfd4c152b830a94c2066e9c81710a581130e49bf3be40cabb563b0fee8fc4" args="" -->LISTEN_ONLY_MODE</em>&nbsp;</td><td>
+<p>der CAN Contoller empfängt nur und verhält sich völlig passiv </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="ggad6f5bfd4c152b830a94c2066e9c81710a187b2d7634d602c4f41d4a92b02c4b8f"></a><!-- doxytag: member="LOOPBACK_MODE" ref="ggad6f5bfd4c152b830a94c2066e9c81710a187b2d7634d602c4f41d4a92b02c4b8f" args="" -->LOOPBACK_MODE</em>&nbsp;</td><td>
+<p>alle Nachrichten direkt auf die Empfangsregister umleiten ohne sie zu senden </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="ggad6f5bfd4c152b830a94c2066e9c81710a83feb61d42f8db9f494019fcea2c0148"></a><!-- doxytag: member="NORMAL_MODE" ref="ggad6f5bfd4c152b830a94c2066e9c81710a83feb61d42f8db9f494019fcea2c0148" args="" -->NORMAL_MODE</em>&nbsp;</td><td>
+<p>normaler Modus, CAN Controller ist aktiv </p>
+</td></tr>
+</table>
+</dd>
+</dl>
+
+<p>Definiert in Zeile <a class="el" href="can_8h_source.html#l00259">259</a> der Datei <a class="el" href="can_8h_source.html">can.h</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Dokumentation der Funktionen</h2>
+<a class="anchor" id="ga789249cd7bf03abf1112e66dc31c6a6b"></a><!-- doxytag: member="can.h::can_check_bus_off" ref="ga789249cd7bf03abf1112e66dc31c6a6b" args="(void)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool can_check_bus_off </td>
+          <td>(</td>
+          <td class="paramtype">void&nbsp;</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Überprüft ob der CAN Controller im Bus-Off-Status. </p>
+<dl class="return"><dt><b>Rückgabe:</b></dt><dd>true wenn der Bus-Off-Status aktiv ist, false ansonsten</dd></dl>
+<dl class="warning"><dt><b>Warnung:</b></dt><dd>aktuell nur auf dem SJA1000 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga645382c1488d16b75b6721a476ac0836"></a><!-- doxytag: member="can.h::can_check_free_buffer" ref="ga645382c1488d16b75b6721a476ac0836" args="(void)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool can_check_free_buffer </td>
+          <td>(</td>
+          <td class="paramtype">void&nbsp;</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Ueberprueft ob ein Puffer zum Versenden einer Nachricht frei ist. </p>
+<dl class="return"><dt><b>Rückgabe:</b></dt><dd>true falls ein Sende-Puffer frei ist, false ansonsten. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gaea4af1845c4128b901e6b5190f154f02"></a><!-- doxytag: member="can.h::can_check_message" ref="gaea4af1845c4128b901e6b5190f154f02" args="(void)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool can_check_message </td>
+          <td>(</td>
+          <td class="paramtype">void&nbsp;</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Ueberpruefen ob neue CAN Nachrichten vorhanden sind. </p>
+<dl class="return"><dt><b>Rückgabe:</b></dt><dd>true falls neue Nachrichten verfuegbar sind, false ansonsten. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga481f4fb1ea636415efc618e4e7f40989"></a><!-- doxytag: member="can.h::can_disable_filter" ref="ga481f4fb1ea636415efc618e4e7f40989" args="(uint8_t number)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool can_disable_filter </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&nbsp;</td>
+          <td class="paramname"> <em>number</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Filter deaktivieren. </p>
+<dl><dt><b>Parameter:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>number</em>&nbsp;</td><td>Nummer des Filters der deaktiviert werden soll, 0xff deaktiviert alle Filter. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Rückgabe:</b></dt><dd>false falls ein Fehler auftrat, true ansonsten</dd></dl>
+<dl class="warning"><dt><b>Warnung:</b></dt><dd>Wird nur vom AT90CAN32/64/128 unterstuetzt. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga16d0640bef61ef76d8bd4c6274c6cdaa"></a><!-- doxytag: member="can.h::can_get_filter" ref="ga16d0640bef61ef76d8bd4c6274c6cdaa" args="(uint8_t number, can_filter_t *filter)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t can_get_filter </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&nbsp;</td>
+          <td class="paramname"> <em>number</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structcan__filter__t.html">can_filter_t</a> *&nbsp;</td>
+          <td class="paramname"> <em>filter</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Filterdaten auslesen. </p>
+<dl><dt><b>Parameter:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>number</em>&nbsp;</td><td>Nummer des Filters dessen Daten man haben moechte </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>*filter</em>&nbsp;</td><td>Pointer in den die Filterstruktur geschrieben wird</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Rückgabe:</b></dt><dd><b>0</b> falls ein Fehler auftrat, \ <b>1</b> falls der Filter korrekt gelesen werden konnte, \ <b>2</b> falls der Filter im Moment nicht verwendet wird (nur AT90CAN), \ <b>0xff</b> falls gerade keine Aussage moeglich ist (nur AT90CAN).</dd></dl>
+<dl class="warning"><dt><b>Warnung:</b></dt><dd>Da der SJA1000 nicht feststellen kann ob der ausgelesene Filter nun zwei 11-Bit Filter oder ein 29-Bit Filter ist werden nicht die Filter sondern die Registerinhalte direkt zurück gegeben. Der Programmierer muss dann selbst entscheiden was er mit den Werten macht. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga93c3e6ad5e58dc208cd1ccce45f4fe97"></a><!-- doxytag: member="can.h::can_get_message" ref="ga93c3e6ad5e58dc208cd1ccce45f4fe97" args="(can_t *msg)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t can_get_message </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structcan__t.html">can_t</a> *&nbsp;</td>
+          <td class="paramname"> <em>msg</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Liest eine Nachricht aus den Empfangspuffern des CAN Controllers. </p>
+<dl><dt><b>Parameter:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>msg</em>&nbsp;</td><td>Pointer auf die Nachricht die gelesen werden soll. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Rückgabe:</b></dt><dd>FALSE falls die Nachricht nicht ausgelesen konnte, ansonsten Filtercode welcher die Nachricht akzeptiert hat. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gabd1f48e60b6607452b92d08cca69e882"></a><!-- doxytag: member="can.h::can_init" ref="gabd1f48e60b6607452b92d08cca69e882" args="(can_bitrate_t bitrate)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool can_init </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__can__interface.html#ga1085b545b19ee92abad774ad27eec8d7">can_bitrate_t</a>&nbsp;</td>
+          <td class="paramname"> <em>bitrate</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Initialisierung des CAN Interfaces. </p>
+<dl><dt><b>Parameter:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>bitrate</em>&nbsp;</td><td>Gewuenschte Geschwindigkeit des CAN Interfaces</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Rückgabe:</b></dt><dd>false falls das CAN Interface nicht initialisiert werden konnte, true ansonsten. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga9dd5adf15a4a0421c45840443e720ee3"></a><!-- doxytag: member="can.h::can_reset_bus_off" ref="ga9dd5adf15a4a0421c45840443e720ee3" args="(void)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void can_reset_bus_off </td>
+          <td>(</td>
+          <td class="paramtype">void&nbsp;</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Setzt einen Bus-Off Status zurück und schaltet den CAN Controller wieder aktiv. </p>
+<dl class="warning"><dt><b>Warnung:</b></dt><dd>aktuell nur auf dem SJA1000 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gae3f7b241d087aaa78feb98452ae320d5"></a><!-- doxytag: member="can.h::can_send_message" ref="gae3f7b241d087aaa78feb98452ae320d5" args="(const can_t *msg)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t can_send_message </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structcan__t.html">can_t</a> *&nbsp;</td>
+          <td class="paramname"> <em>msg</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Verschickt eine Nachricht über den CAN Bus. </p>
+<dl><dt><b>Parameter:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>msg</em>&nbsp;</td><td>Nachricht die verschickt werden soll </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Rückgabe:</b></dt><dd>FALSE falls die Nachricht nicht verschickt werden konnte, <br/>
+ ansonsten der Code des Puffes in den die Nachricht gespeichert wurde </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gaf6ee58a439c848efb779306f0d84f87d"></a><!-- doxytag: member="can.h::can_set_filter" ref="gaf6ee58a439c848efb779306f0d84f87d" args="(uint8_t number, const can_filter_t *filter)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool can_set_filter </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&nbsp;</td>
+          <td class="paramname"> <em>number</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structcan__filter__t.html">can_filter_t</a> *&nbsp;</td>
+          <td class="paramname"> <em>filter</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Setzen eines Filters. </p>
+<p>Für einen MCP2515 sollte die Funktion <a class="el" href="group__can__interface.html#ga1a525dac710bc2650bb2d9939f287923" title="Setzt die Werte für alle Filter.">can_static_filter()</a> bevorzugt werden.</p>
+<dl><dt><b>Parameter:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>number</em>&nbsp;</td><td>Position des Filters </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>filter</em>&nbsp;</td><td>zu setzender Filter</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Rückgabe:</b></dt><dd>false falls ein Fehler auftrat, true ansonsten </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga08711a36cb70dc71c761ed01f7cbf8c8"></a><!-- doxytag: member="can.h::can_set_mode" ref="ga08711a36cb70dc71c761ed01f7cbf8c8" args="(can_mode_t mode)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void can_set_mode </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__can__interface.html#gad6f5bfd4c152b830a94c2066e9c81710">can_mode_t</a>&nbsp;</td>
+          <td class="paramname"> <em>mode</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Setzt den Operations-Modus. </p>
+<dl><dt><b>Parameter:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>mode</em>&nbsp;</td><td>Gewünschter Modus des CAN Controllers </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga1a525dac710bc2650bb2d9939f287923"></a><!-- doxytag: member="can.h::can_static_filter" ref="ga1a525dac710bc2650bb2d9939f287923" args="(const prog_uint8_t *filter_array)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void can_static_filter </td>
+          <td>(</td>
+          <td class="paramtype">const prog_uint8_t *&nbsp;</td>
+          <td class="paramname"> <em>filter_array</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Setzt die Werte für alle Filter. </p>
+<div class="fragment"><pre class="fragment"> <span class="comment">// Filter und Masken-Tabelle anlegen</span>
+ prog_char can_filter[] = {
+    MCP2515_FILTER_EXTENDED(0), <span class="comment">// Filter 0</span>
+    MCP2515_FILTER_EXTENDED(0), <span class="comment">// Filter 1</span>
+    
+    MCP2515_FILTER_EXTENDED(0), <span class="comment">// Filter 2</span>
+    MCP2515_FILTER_EXTENDED(0), <span class="comment">// Filter 3</span>
+    MCP2515_FILTER_EXTENDED(0), <span class="comment">// Filter 4</span>
+    MCP2515_FILTER_EXTENDED(0), <span class="comment">// Filter 5</span>
+    
+    MCP2515_FILTER_EXTENDED(0), <span class="comment">// Maske 0</span>
+    MCP2515_FILTER_EXTENDED(0), <span class="comment">// Maske 1</span>
+ };
+ 
+ ...
+
+ <span class="comment">// Filter und Masken-Tabelle laden</span>
+ <a class="code" href="group__can__interface.html#ga1a525dac710bc2650bb2d9939f287923" title="Setzt die Werte für alle Filter.">can_static_filter</a>(can_filter);
+</pre></div><dl><dt><b>Parameter:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>*filter_array</em>&nbsp;</td><td>Array im Flash des AVRs mit den Initialisierungs- werten für die Filter des MCP2515</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="see"><dt><b>Siehe auch:</b></dt><dd>MCP2515_FILTER_EXTENDED() </dd>
+<dd>
+MCP2515_FILTER() </dd></dl>
+<dl class="warning"><dt><b>Warnung:</b></dt><dd>Wird nur vom MCP2515 unterstuetzt. </dd></dl>
+
+</div>
+</div>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Erzeugt am Thu Aug 19 22:03:52 2010 für RCA CAN Library von&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>

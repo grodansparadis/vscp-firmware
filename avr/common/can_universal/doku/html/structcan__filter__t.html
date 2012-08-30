@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>RCA CAN Library: can_filter_t Strukturreferenz</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<!-- Erzeugt von Doxygen 1.6.3 -->
+<div class="navigation" id="top">
+  <div class="tabs">
+    <ul>
+      <li><a href="index.html"><span>Hauptseite</span></a></li>
+      <li><a href="modules.html"><span>Module</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Datenstrukturen</span></a></li>
+      <li><a href="files.html"><span>Dateien</span></a></li>
+    </ul>
+  </div>
+  <div class="tabs">
+    <ul>
+      <li><a href="annotated.html"><span>Datenstrukturen</span></a></li>
+      <li><a href="functions.html"><span>Datenstruktur-Elemente</span></a></li>
+    </ul>
+  </div>
+</div>
+<div class="contents">
+<h1>can_filter_t Strukturreferenz<br/>
+<small>
+[<a class="el" href="group__can__interface.html">Universelles CAN Interface</a>]</small>
+</h1><!-- doxytag: class="can_filter_t" -->
+<p>Datenstruktur zur Aufnahme von CAN-Filtern.  
+<a href="#_details">Mehr ...</a></p>
+
+<p><code>#include &lt;<a class="el" href="can_8h_source.html">can.h</a>&gt;</code></p>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2"><h2>Datenfelder</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0f5355216c1c65447bb70fbc08842407"></a><!-- doxytag: member="can_filter_t::id" ref="a0f5355216c1c65447bb70fbc08842407" args="" -->
+uint32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcan__filter__t.html#a0f5355216c1c65447bb70fbc08842407">id</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">ID der Nachricht (11 oder 29 Bit). <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ada668967e1f3cd95d5227b5c7a8c2716"></a><!-- doxytag: member="can_filter_t::mask" ref="ada668967e1f3cd95d5227b5c7a8c2716" args="" -->
+uint32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcan__filter__t.html#ada668967e1f3cd95d5227b5c7a8c2716">mask</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Maske. <br/></td></tr>
+<tr><td class="memItemLeft" ><a class="anchor" id="ad26bf41e341c731da4ed74448c48b8df"></a><!-- doxytag: member="can_filter_t::flags" ref="ad26bf41e341c731da4ed74448c48b8df" args="" -->
+struct {</td></tr>
+<tr><td class="memItemLeft" >&nbsp;&nbsp;&nbsp;uint8_t&nbsp;&nbsp;&nbsp;<a class="el" href="structcan__filter__t.html#a9abf718d97c55ea00e0d05efe1f1ce49">rtr</a>: 2</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Remote Request Frame. <br/></td></tr>
+<tr><td class="memItemLeft" >&nbsp;&nbsp;&nbsp;uint8_t&nbsp;&nbsp;&nbsp;<a class="el" href="structcan__filter__t.html#ac47839420cf365d464a1cebbdf00ae87">extended</a>: 2</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">extended ID <br/></td></tr>
+<tr><td class="memItemLeft" valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><b>flags</b></td></tr>
+</table>
+<hr/><a name="_details"></a><h2>Ausführliche Beschreibung</h2>
+<p>Datenstruktur zur Aufnahme von CAN-Filtern. </p>
+<div class="fragment"><pre class="fragment">  <a class="code" href="structcan__filter__t.html#a9abf718d97c55ea00e0d05efe1f1ce49" title="Remote Request Frame.">rtr</a> | Funtion
+ -----|------
+  00  | alle Nachrichten unabhaengig vom RTR-Bit
+  01  | ungültig
+  10  | empfange nur nicht RTR-Nachrichten
+  11  | empfange nur Nachrichten mit gesetzem RTR-Bit
+</pre></div><p><b>ACHTUNG:</b> Funktioniert nur mit dem AT90CAN, beim MCP2515 wird der Parameter ignoriert.</p>
+<div class="fragment"><pre class="fragment">  ext | Funtion
+ -----|------
+  00  | alle Nachrichten
+  01  | ungueltig
+  10  | empfange nur Standard-Nachrichten
+  11  | empfange nur Extended-Nachrichten
+</pre></div><dl class="warning"><dt><b>Warnung:</b></dt><dd>Filter sind beim SJA1000 nur begrenzt nutzbar, man sollte ihn nur in Systemen mit entweder Standard- oder Extended-Frames einsetzten, aber nicht beidem zusammen. </dd></dl>
+
+<p>Definiert in Zeile <a class="el" href="can_8h_source.html#l00225">225</a> der Datei <a class="el" href="can_8h_source.html">can.h</a>.</p>
+<hr/>Die Dokumentation für diese Struktur wurde erzeugt aufgrund der Datei:<ul>
+<li><a class="el" href="can_8h_source.html">can.h</a></li>
+</ul>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Erzeugt am Thu Aug 19 22:03:52 2010 für RCA CAN Library von&nbsp;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
+</body>
+</html>
