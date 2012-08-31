@@ -1,0 +1,103 @@
+#######################################
+# Syntax Coloring Map For Ethernet
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+MCP2515	KEYWORD1
+CANMSG	KEYWORD1
+vscp_nickname	KEYWORD1
+vscp_errorcnt	KEYWORD1
+vscp_alarmstatus	KEYWORD1
+vscp_node_state	KEYWORD1
+vscp_node_substate	KEYWORD1
+vscp_initledfunc	KEYWORD1
+vscp_imsg	KEYWORD1
+vscp_omsg	KEYWORD1
+vscp_timer	KEYWORD1
+vscp_probe_address	KEYWORD1
+vscp_initbtncnt	KEYWORD1
+vscp_statuscnt	KEYWORD1
+vscp_page_select	KEYWORD1
+vscp_second	KEYWORD1
+vscp_minute	KEYWORD1
+vscp_hour	KEYWORD1
+vscp_deviceURL	KEYWORD1
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+Init	KEYWORD2
+Reset	KEYWORD2
+Read	KEYWORD2
+ReadBuffer	KEYWORD2
+Write	KEYWORD2
+LoadBuffer	KEYWORD2
+SendBuffer	KEYWORD2
+Status	KEYWORD2
+RXStatus	KEYWORD2
+BitModify	KEYWORD2
+SendMessage	KEYWORD2
+GetMessage	KEYWORD2
+isFreeTxBuffer	KEYWORD2
+Interrupt	KEYWORD2
+Mode	KEYWORD2
+_init	KEYWORD2
+_CS	KEYWORD2
+_INT	KEYWORD2
+vscp_init	KEYWORD2
+vscp_error	KEYWORD2
+vscp_handleProbeState	KEYWORD2
+vscp_handlePeActiveState	KEYWORD2
+vscp_handleProtocolEvent	KEYWORD2
+vscp_goActiveState	KEYWORD2
+vscp_sendHeartBeat	KEYWORD2
+vscp_handleHeartbeat	KEYWORD2
+vscp_handleSetNickname	KEYWORD2
+vscp_handleDropNickname	KEYWORD2
+vscp_newNodeOnline	KEYWORD2
+vscp_readRegister	KEYWORD2
+vscp_readStdReg	KEYWORD2
+vscp_writeRegister	KEYWORD2
+vscp_writeStdReg	KEYWORD2
+vscp_doOneSecondWork	KEYWORD2
+vscp_check_pstorage	KEYWORD2
+vscp_sendEvent	KEYWORD2
+vscp_getEvent	KEYWORD2
+getVSCPFrame	KEYWORD2
+sendVSCPFrame	KEYWORD2
+vscp_getMajorVersion	KEYWORD2
+vscp_getMinorVersion	KEYWORD2
+vscp_getSubMinorVersion	KEYWORD2
+vscp_getGUID	KEYWORD2
+vscp_setGUID	KEYWORD2
+vscp_getUserID	KEYWORD2
+vscp_setUserID	KEYWORD2
+vscp_getManufacturerId	KEYWORD2
+vscp_setManufacturerId	KEYWORD2
+vscp_getBootLoaderAlgorithm	KEYWORD2
+vscp_getBufferSize	KEYWORD2
+vscp_getRegisterPagesUsed	KEYWORD2
+vscp_getMDF_URL	KEYWORD2
+vscp_readNicknamePermanent	KEYWORD2
+vscp_writeNicknamePermanent	KEYWORD2
+vscp_getSegmentCRC	KEYWORD2
+vscp_setSegmentCRC	KEYWORD2
+vscp_setControlByte	KEYWORD2
+vscp_getControlByte	KEYWORD2
+vscp_getPageSelect	KEYWORD2
+vscp_setPageSelect	KEYWORD2
+vscp_readAppReg	KEYWORD2
+vscp_writeAppReg	KEYWORD2
+vscp_getMatrixInfo	KEYWORD2
+vscp_getEmbeddedMdfInfo	KEYWORD2
+vscp_goBootloaderMode	KEYWORD2
+vscp_getZone	KEYWORD2
+vscp_getSubzone	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
