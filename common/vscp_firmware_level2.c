@@ -177,6 +177,10 @@ int8_t vscp_sendEvent( PVSCPEVENT pEvent )
 
 int8_t vscp_getEvent( vscpEvent *pEvent )
 {
+#if defined(VSCP_USE_RAW_ETHERNET)
+	return vscp_getRawPacket( pEvent );
+#endif
+
 #if defined(VSCP_USE_UDP) && defined(VSCP_USE_TCP)		
 	if ( vscp_function_flags & VSCP_FUNCTION_USE_TCP ) {
 		return vscp_getTCPEvent( pevent );

@@ -16,3 +16,4 @@
 /avr/Bootloader_AVR/Device_boot_Loader/Build_avr_vscp/firmware/avr/AAboot/*.srec
 *.d
 *.cof
+/pic/modtronix/websrvr68_v310_rawEthernet/rawEthernet.X/*.err

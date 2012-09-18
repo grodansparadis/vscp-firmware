@@ -62,22 +62,22 @@
 //  	VSCP Constants
 // ******************************************************************************
 
-#define VSCP_MAJOR_VERSION					1
-#define VSCP_MINOR_VERSION					5
+#define VSCP_MAJOR_VERSION				1
+#define VSCP_MINOR_VERSION				5
 
 #define	VSCP_LEVEL2_UDP_PORT				9598	
 #define	VSCP_LEVEL2_TCP_PORT				9598	 
 
-#define VSCP_SIZE_GUID						16 		// # GUID bytes
-#define VSCP_SIZE_DEVURL					32  	// # of device URL bytes
+#define VSCP_SIZE_GUID					16 	// # GUID bytes
+#define VSCP_SIZE_DEVURL				32  	// # of device URL bytes
 
 #define LIMITED_DEVICE_DATASIZE				32      // This is the max size used for
-                                                    // a limited data Level II unit.
-                                                    // VSCP_LEVEL2_LIMITED_DEVICE should
-                                                    // be define in vscp_projdefs.h for
-                                                    // it to be used
+                                                                // a limited data Level II unit.
+                                                                // VSCP_LEVEL2_LIMITED_DEVICE should
+                                                                // be define in vscp_projdefs.h for
+                                                                // it to be used
 
-#define VSCP_BOOT_FLAG						0xff	// Boot flag is stored in persistent storage
+#define VSCP_BOOT_FLAG					0xff	// Boot flag is stored in persistent storage
 													// and if it is there the bootloader will be 
 													// activated. 
 // Bootloaders
@@ -87,14 +87,14 @@
 #define VSCP_BOOTLOADER_NONE				0xff
 
 // State machine states 
-#define VSCP_STATE_STARTUP					0x00	// Cold/warm reset
-#define VSCP_STATE_INIT						0x01	// Assigning nickname
+#define VSCP_STATE_STARTUP				0x00	// Cold/warm reset
+#define VSCP_STATE_INIT					0x01	// Assigning nickname
 #define VSCP_STATE_PREACTIVE				0x02	// Waiting for host initialixation
-#define VSCP_STATE_ACTIVE					0x03	// The normal state
-#define VSCP_STATE_ERROR					0x04	// error state. Big problems.
+#define VSCP_STATE_ACTIVE				0x03	// The normal state
+#define VSCP_STATE_ERROR				0x04	// error state. Big problems.
 
 // State machine sub states 
-#define VSCP_SUBSTATE_NONE					0x00	// No state
+#define VSCP_SUBSTATE_NONE				0x00	// No state
 
 
 // VSCP message
@@ -104,12 +104,12 @@ typedef struct _vscpEvent {
 // CRC should be calculated from
 // here to end + datablock
 	uint8_t head;		  	    	// bit 765 prioriy, Priority 0-7 where 0 is highest.
-									// bit 4 = hardcoded, true for a hardcoded device.
-									// bit 3 = Dont calculate CRC, false for CRC usage.
+						// bit 4 = hardcoded, true for a hardcoded device.
+						// bit 3 = Dont calculate CRC, false for CRC usage.
 	uint16_t  vscp_class;			// VSCP class
-	uint16_t  vscp_type;				// VSCP type
+	uint16_t  vscp_type;			// VSCP type
 	uint8_t   GUID[ 16 ];			// Node address MSB -> LSB
-	uint16_t  sizeData;				// Number of valid data bytes	
+	uint16_t  sizeData;			// Number of valid data bytes	
 	
 	// Pointer to data. Normally Max 487 (512- 25) bytes
 	// but can be restrictedto 8 bytes. This means that
@@ -139,7 +139,8 @@ typedef vscpEvent *PVSCPEVENT;
 #define VSCP_PRIORITY_7				0xE0
 
 #define VSCP_PRIORITY_HIGH			0x00
-#define VSCP_PRIORITY_MEDIUM		0x80
+#define VSCP_PRIORITY_MEDIUM                    0x80
+#define VSCP_PRIORITY_NORMAL                    0x80
 #define VSCP_PRIORITY_LOW			0xE0
 
 #define VSCP_MASK_PRIORITY			0xE0
@@ -343,6 +344,7 @@ int8_t vscp_getTCPEvent( vscpEvent *pEvent );
 
 #ifdef VSCP_USE_RAW_ETHERNET
 int8_t vscp_sendRawPacket( vscpEvent *pevent );
+int8_t vscp_getRawPacket( vscpEvent *pEvent );
 #endif
 
 uint8_t vscp_readAppReg( uint32_t reg );

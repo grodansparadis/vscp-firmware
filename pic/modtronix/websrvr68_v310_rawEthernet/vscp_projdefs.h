@@ -77,7 +77,7 @@
 
 // Uncomment the following to reduce memory usage
 // Only 32 bytes will used for data instead of 512-25
-//#define VSCP_LEVEL2_LIMITED_DEVICE	
+#define VSCP_LEVEL2_LIMITED_DEVICE	
 
 // A Decision Matrix row for VSCP Level II is 14 bytes plus action parameters.
 // The define below set the size for the action parameters.

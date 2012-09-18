@@ -55,7 +55,7 @@
 #include "xeeprom.h"
 
 #include "vscp_firmware_level2.h"
-#include "vscp_class.h"      // Must use batch script i VSCP root
+#include "vscp_class.h"      
 #include "vscp_type.h"
 
 #include "crc.h"
@@ -73,8 +73,6 @@ extern uint8_t AdcValues[ ADC_CHANNELS ];
 #elif defined( APP_USE_ADC10 )
 extern uint16_t AdcValues[ ADC_CHANNELS ];
 #endif
-
-
 
 // Prototypes
 
@@ -131,65 +129,65 @@ vscpEvent outEvent;	// Used for outgoing events
 
 void feedVSCP( vscpEvent *pEvent )
 {
-	int i;
+    int i;
 	
-	if ( ( VSCP_CLASS1_PROTOCOL == pEvent->vscp_class ) || 
-			( VSCP_CLASS2_LEVEL1_PROTOCOL == pEvent->vscp_class )  ) {
+    if ( ( VSCP_CLASS1_PROTOCOL == pEvent->vscp_class ) ||
+        ( VSCP_CLASS2_LEVEL1_PROTOCOL == pEvent->vscp_class )  ) {
 			
-			// Handle Read register
-			if ( VSCP_TYPE_PROTOCOL_READ_REGISTER == pEvent->vscp_type ) {
+        // Handle Read register
+	if ( VSCP_TYPE_PROTOCOL_READ_REGISTER == pEvent->vscp_type ) {
 				
-				// Must be addressed to us
-				for ( i=0; i<16; i++ ) {
-					if ( vscp_getGUID( i ) != pEvent->data[ i ] ) return;
-				}
+            // Must be addressed to us
+            for ( i=0; i<16; i++ ) {
+                if ( vscp_getGUID( i ) != pEvent->data[ i ] ) return;
+            }
 				
-				vscp_readRegister( pEvent, &outEvent );
+            vscp_readRegister( pEvent, &outEvent );
 				
-			}
+	}
 			
-			// Handle write register
-			else if ( VSCP_TYPE_PROTOCOL_WRITE_REGISTER == pEvent->vscp_type ) {
+	// Handle write register
+	else if ( VSCP_TYPE_PROTOCOL_WRITE_REGISTER == pEvent->vscp_type ) {
 				
-				// Must be addressed to us
-				for ( i=0; i<16; i++ ) {
-					if ( vscp_getGUID( i ) != pEvent->data[ i ] ) return;
-				}
+            // Must be addressed to us
+            for ( i=0; i<16; i++ ) {
+                if ( vscp_getGUID( i ) != pEvent->data[ i ] ) return;
+            }
 				
-				vscp_writeRegister( pEvent, &outEvent );
+            vscp_writeRegister( pEvent, &outEvent );
 					
-			}		
+	}		
 			
-			// Get decision matrix info
-			else if ( VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO == pEvent->vscp_type ) {
+	// Get decision matrix info
+	else if ( VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO == pEvent->vscp_type ) {
 				
-				outEvent.head = ( VSCP_PRIORITY_MEDIUM << 5 );
-				outEvent.sizeData = 23;
-				outEvent.vscp_class = VSCP_CLASS1_PROTOCOL;
-				outEvent.vscp_type = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
-				// GUID is filled in by the send routine automatically
+            outEvent.head = VSCP_PRIORITY_NORMAL;
+            outEvent.sizeData = 23;
+            outEvent.vscp_class = VSCP_CLASS1_PROTOCOL;
+            outEvent.vscp_type = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
+            // GUID is filled in by the send routine automatically
 				
-				outEvent.data[ 16 ] = 16;	// 16 rows in matrix
-				outEvent.data[ 17 ] = 16;	// Matrix offset
-				outEvent.data[ 18 ] = 0; 	// Page stat
-				outEvent.data[ 19 ] = 0;
-				outEvent.data[ 20 ] = 0;	// Page end
-				outEvent.data[ 21 ] = 0;
-				outEvent.data[ 22 ] = 0;	// Size of row for Level II
+            outEvent.data[ 16 ] = 16;	// 16 rows in matrix
+            outEvent.data[ 17 ] = 16;	// Matrix offset
+            outEvent.data[ 18 ] = 0; 	// Page stat
+            outEvent.data[ 19 ] = 0;
+            outEvent.data[ 20 ] = 0;	// Page end
+            outEvent.data[ 21 ] = 0;
+            outEvent.data[ 22 ] = 0;	// Size of row for Level II
 				
-				vscp_sendEvent( &outEvent );
-				return;
+            vscp_sendEvent( &outEvent );
+            return;
 				
-			}
+	}
 			
-			// Handle Get Decision Matrix Info
-			else if ( VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO == pEvent->vscp_type ) {
+	// Handle Get Decision Matrix Info
+	else if ( VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO == pEvent->vscp_type ) {
 				
-				// Must be addressed to us
-				for ( i=0; i<16; i++ ) {
-					if ( vscp_getGUID( i ) != pEvent->data[ i ] ) return;
-				}		
-			}
+            // Must be addressed to us
+            for ( i=0; i<16; i++ ) {
+                if ( vscp_getGUID( i ) != pEvent->data[ i ] ) return;
+            }
+	}
 			
 			
 #if defined(VSCP_ENABLE_BOOTLOADER)			
@@ -210,7 +208,7 @@ void feedVSCP( vscpEvent *pEvent )
 				// Bootloader algorithm must be VSCP 
 				if ( 0 != pEvent->data[ 16 ] ) {
  	
-					outEvent.head = ( VSCP_PRIORITY_HIGH << 5 );
+					outEvent.head = VSCP_PRIORITY_HIGH;
 					outEvent.sizeData = 1;
 					outEvent.vscp_class = VSCP_CLASS1_PROTOCOL;
 					outEvent.vscp_type = VSCP_TYPE_PROTOCOL_NACK_BOOT_LOADER;
@@ -229,7 +227,7 @@ void feedVSCP( vscpEvent *pEvent )
 					XEEWrite( 0xff );
 				}
 				
- 				outEvent.head = ( VSCP_PRIORITY_HIGH << 5 );
+ 				outEvent.head = VSCP_PRIORITY_HIGH;
 				outEvent.sizeData = 24;
 				outEvent.vscp_class = VSCP_CLASS1_PROTOCOL;
 				outEvent.vscp_type = VSCP_TYPE_PROTOCOL_ACK_BOOT_LOADER;
@@ -292,7 +290,7 @@ void feedVSCP( vscpEvent *pEvent )
 			// Bootloader: Data block
 			else if ( bBootLoadMode && VSCP_TYPE_PROTOCOL_BLOCK_DATA == pEvent->vscp_type ) {
 				
-				outEvent.head = ( VSCP_PRIORITY_MEDIUM << 5 );
+				outEvent.head = VSCP_PRIORITY_NORMAL);
 				outEvent.sizeData = 22;
 				outEvent.vscp_class = VSCP_CLASS1_PROTOCOL;
 				
@@ -305,7 +303,7 @@ void feedVSCP( vscpEvent *pEvent )
 				}
 				
 				outEvent.sizeData = 6;
-				outEvent.head = ( VSCP_PRIORITY_HIGH << 5 );
+				outEvent.head = VSCP_PRIORITY_HIGH;
 				outEvent.vscp_class = VSCP_CLASS1_PROTOCOL;
 				outEvent.vscp_type = VSCP_TYPE_PROTOCOL_BLOCK_DATA_ACK;
 				
@@ -325,7 +323,7 @@ void feedVSCP( vscpEvent *pEvent )
 			
 				//  Does nothing here - we just ACK
 				outEvent.sizeData = 4;
-				outEvent.head = ( VSCP_PRIORITY_HIGH << 5 );
+				outEvent.head = VSCP_PRIORITY_HIGH;
 				outEvent.vscp_class = VSCP_CLASS1_PROTOCOL;
 				outEvent.vscp_type = VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA_ACK;
 				
@@ -348,49 +346,49 @@ void feedVSCP( vscpEvent *pEvent )
 	    	
 	    } // CLASS1.PROTOCOL
 			
-		else if ( ( VSCP_CLASS1_ALARM == pEvent->vscp_class ) || 
-				( VSCP_CLASS2_LEVEL1_ALARM == pEvent->vscp_class )  ) {
+	else if ( ( VSCP_CLASS1_ALARM == pEvent->vscp_class ) || 
+                    ( VSCP_CLASS2_LEVEL1_ALARM == pEvent->vscp_class )  ) {
 			
-		}
- 		else if ( ( VSCP_CLASS1_MEASUREMENT == pEvent->vscp_class ) || 
-				( VSCP_CLASS2_LEVEL1_MEASUREMENT == pEvent->vscp_class )  ) {
+	}
+ 	else if ( ( VSCP_CLASS1_MEASUREMENT == pEvent->vscp_class ) || 
+			( VSCP_CLASS2_LEVEL1_MEASUREMENT == pEvent->vscp_class )  ) {
 		
-		}
-		else if ( ( VSCP_CLASS1_INFORMATION == pEvent->vscp_class ) || 
-				( VSCP_CLASS2_LEVEL1_INFORMATION == pEvent->vscp_class )  ) {
+	}
+	else if ( ( VSCP_CLASS1_INFORMATION == pEvent->vscp_class ) || 
+			( VSCP_CLASS2_LEVEL1_INFORMATION == pEvent->vscp_class )  ) {
 			
-		}
-		else if ( ( VSCP_CLASS1_CONTROL == pEvent->vscp_class ) || 
-				( VSCP_CLASS2_LEVEL1_CONTROL == pEvent->vscp_class )  ) {
+	}
+	else if ( ( VSCP_CLASS1_CONTROL == pEvent->vscp_class ) || 
+                    ( VSCP_CLASS2_LEVEL1_CONTROL == pEvent->vscp_class )  ) {
 					
+	}
+	else if ( VSCP_CLASS2_PROTOCOL == pEvent->vscp_class )  {
+			
+            if ( VSCP2_TYPE_PROTOCOL_READ_REGISTER == pEvent->vscp_type ) {
+				
+                // Must be addressed to us
+		for ( i=0; i<16; i++ ) {
+                    if ( vscp_getGUID( i ) != pEvent->data[ 8 + i ] ) return;
 		}
-		else if ( VSCP_CLASS2_PROTOCOL == pEvent->vscp_class )  {
+				
+		vscp_readRegister( pEvent, &outEvent );
+				
+            }
+            else if ( VSCP2_TYPE_PROTOCOL_WRITE_REGISTER == pEvent->vscp_type ) {
+				
+                // Must be addressed to us
+		for ( i=0; i<16; i++ ) {
+                    if ( vscp_getGUID( i ) != pEvent->data[ 8 + i ] ) return;
+		}
+				
+		vscp_writeRegister( pEvent, &outEvent );
+            }
 			
-			if ( VSCP2_TYPE_PROTOCOL_READ_REGISTER == pEvent->vscp_type ) {
-				
-				// Must be addressed to us
-				for ( i=0; i<16; i++ ) {
-					if ( vscp_getGUID( i ) != pEvent->data[ 8 + i ] ) return;
-				}
-				
-				vscp_readRegister( pEvent, &outEvent );
-				
-			}
-			else if ( VSCP2_TYPE_PROTOCOL_WRITE_REGISTER == pEvent->vscp_type ) {
-				
-				// Must be addressed to us
-				for ( i=0; i<16; i++ ) {
-					if ( vscp_getGUID( i ) != pEvent->data[ 8 + i ] ) return;
-				}
-				
-				vscp_writeRegister( pEvent, &outEvent );
-			}	
-			
-		} // CLASS2.PROTOCOL
+	} // CLASS2.PROTOCOL
 		
 		
-		// Feed Event into decision matrix
-		vscp_feedDM( pEvent );
+	// Feed Event into decision matrix
+	vscp_feedDM( pEvent );
 		
 }
 
@@ -402,7 +400,7 @@ void feedVSCP( vscpEvent *pEvent )
 // Routine must be called from time to time.
 //
  
-void periodicVSCPWork( )
+void periodicVSCPWork( void )
 {
 	// Check if we should send periodic output events
 	if ( TickGetDiff8bitSec( lastPeriodicOutputEvent ) > appcfgGetc(APPCFG_VSCP_EEPROM_REG_EVENT_INTERVAL) ) {		
@@ -473,14 +471,18 @@ void sendHeartBeat(void )
 	uint8_t i;
 	
 	// Send heartbeat
-	outEvent.head = ( VSCP_PRIORITY_MEDIUM << 5 );
+	outEvent.head = VSCP_PRIORITY_NORMAL;
 	outEvent.sizeData = 3;
-	outEvent.vscp_class = VSCP_CLASS1_INFORMATION;
+	outEvent.vscp_class = VSCP_CLASS2_LEVEL1_INFORMATION;
 	outEvent.vscp_type = VSCP_TYPE_INFORMATION_NODE_HEARTBEAT;
 	// GUID is filled in by send routine
-	outEvent.data[0] = 0; // No meaning
-	outEvent.data[1] = appcfgGetc( APPCFG_VSCP_EEPROM_REG_MODULE_ZONE ); 				// Zone
-	outEvent.data[2] = ( appcfgGetc( APPCFG_VSCP_EEPROM_REG_MODULE_SUBZONE ) & 0xe0 ); 	// SubZone
+	outEvent.data[ 0 ] = 0; // No meaning
+        // Zone
+	outEvent.data[ 1 ] =
+                appcfgGetc( APPCFG_VSCP_EEPROM_REG_MODULE_ZONE );
+	// SubZone
+        outEvent.data[ 2 ] =
+                ( appcfgGetc( APPCFG_VSCP_EEPROM_REG_MODULE_SUBZONE ) & 0xe0 );
 	
 	vscp_sendEvent( &outEvent );
 }
@@ -493,9 +495,9 @@ void sendHeartBeat(void )
 
 void sendPeriodicOutputEvents( void )
 {	
-	outEvent.head = ( VSCP_PRIORITY_MEDIUM << 5 );
+	outEvent.head = VSCP_PRIORITY_NORMAL;
 	outEvent.sizeData = 2;
-	outEvent.vscp_class = VSCP_CLASS1_DATA;
+	outEvent.vscp_class = VSCP_CLASS2_LEVEL1_DATA;
 	outEvent.vscp_type = VSCP_TYPE_DATA_IO;
 	
 	// GUID is filled in by send routine
@@ -512,9 +514,9 @@ void sendPeriodicOutputEvents( void )
 
 void sendPeriodicInputEvents( void )
 {
-	outEvent.head = ( VSCP_PRIORITY_MEDIUM << 5 );
+	outEvent.head = VSCP_PRIORITY_NORMAL;
 	outEvent.sizeData = 2;
-	outEvent.vscp_class = VSCP_CLASS1_DATA;
+	outEvent.vscp_class = VSCP_CLASS2_LEVEL1_DATA;
 	outEvent.vscp_type = VSCP_TYPE_DATA_IO;
 	// GUID is filled in by send routine
 	outEvent.data[0] = 0x02; // Byte format
@@ -532,31 +534,31 @@ void sendPeriodicADEvents( uint8_t ch )
 {
 	switch ( ch ) {
 	
-		case 0:
-			ch =5;
-			break;
+	case 0:
+            ch =5;
+            break;
 			
-		case 1:
-			ch =6;
-			break;
+	case 1:
+            ch =6;
+            break;
 			
-		case 2:
-			ch =7;
-			break;
+	case 2:
+            ch =7;
+            break;
 			
-		case 3:
-			ch =8;
-			break;
+	case 3:
+            ch =8;
+            break;
 			
-		default:
-			ch = 5;
-			break;			
+	default:
+            ch = 5;
+            break;
 	
 	}
 		
-	outEvent.head = ( VSCP_PRIORITY_MEDIUM << 5 );
+	outEvent.head = VSCP_PRIORITY_NORMAL;
 	outEvent.sizeData = 3;
-	outEvent.vscp_class = VSCP_CLASS1_DATA;
+	outEvent.vscp_class = VSCP_CLASS2_LEVEL1_DATA;
 	outEvent.vscp_type = VSCP_TYPE_DATA_AD;
 	
 	// GUID is filled in by send routine

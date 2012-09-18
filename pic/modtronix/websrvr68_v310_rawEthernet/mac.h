@@ -232,6 +232,11 @@ For details on configuring this module, see @ref mac_conf section of mac.h file.
 #define MAC_GETARR_RETMASK      (0xF0ul)
 
 
+#define ETHER_IP        (0x00ul)
+#define ETHER_ARP       (0x06ul)
+#define ETHER_VSCP	(0x7eul)
+
+
 /** Structure for storing Ethernet address */
 typedef struct _MAC_ADDR
 {

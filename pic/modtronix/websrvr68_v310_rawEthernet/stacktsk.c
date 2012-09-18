@@ -116,6 +116,7 @@ void StackInit(void)
  
 void StackTask(void)
 {
+    /*
     static WORD dataCount;
         
     union
@@ -164,15 +165,15 @@ void StackTask(void)
         	{
         		BYTE buf[ 21 ];
         		BYTE b;
-        		/*BYTE type;
-        		MAC_ADDR remote;
-        		MACGetHeader( &remote, &type );
-        		b = remote.v[ 0 ];
-        		b = remote.v[ 1 ];
-        		b = remote.v[ 2 ];
-        		b = remote.v[ 3 ];
-        		b = remote.v[ 4 ];
-        		b = remote.v[ 5 ];*/
+        		//BYTE type;
+        		//MAC_ADDR remote;
+        		//MACGetHeader( &remote, &type );
+        		//b = remote.v[ 0 ];
+        		//b = remote.v[ 1 ];
+        		//b = remote.v[ 2 ];
+        		//b = remote.v[ 3 ];
+        		//b = remote.v[ 4 ];
+        		//b = remote.v[ 5 ];
         		
         		MACGetArray( buf, sizeof( buf ) );
         		b = buf[ 0 ];
@@ -194,7 +195,7 @@ void StackTask(void)
 
 
     //debugPutGenRomStr(2, (ROM char*)"MACTask");     //@mxd:2:%s
-
+*/
     //Perform routine MAC tasks
     MACTask();
 }

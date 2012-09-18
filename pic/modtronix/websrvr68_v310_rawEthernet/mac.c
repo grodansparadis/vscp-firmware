@@ -224,11 +224,6 @@ typedef struct _IEEE_HEADER
 } IEEE_HEADER;
 
 
-#define ETHER_IP        (0x00ul)
-#define ETHER_ARP       (0x06ul)
-#define ETHER_VSCP		(0x7eul)
-
-
 typedef struct _DATA_BUFFER
 {
     BYTE Index; //Page of this buffer in NIC's SRAM
@@ -330,7 +325,7 @@ void NICPut(BYTE reg, BYTE val);
 BYTE NICGet(BYTE reg);
 void NICSetAddr(WORD_VAL addr);
 
-void    MACInit(void)
+void MACInit(void)
 {
     BYTE i;
 
@@ -1288,7 +1283,7 @@ BOOL MACGetHeader(MAC_ADDR *remote, BYTE* type)
                 *type = header.Type.v[0];
                 
             if ( (header.Type.v[1] == 0x25) && (header.Type.v[0] == ETHER_VSCP )  ) {
-	        	*type = header.Type.v[0];
+	        *type = header.Type.v[0];
 	        }
 
             MACCurrRxbuf = NICReadPtr;   //Set MACCurrRxbuf with page address of current RX Buffer

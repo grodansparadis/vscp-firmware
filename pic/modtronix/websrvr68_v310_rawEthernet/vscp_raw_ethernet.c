@@ -3,7 +3,7 @@
  * 	VSCP (Very Simple Control Protocol) 
  * 	http://www.vscp.org
  *
- * Copyright (C) 2011 Ake Hedman, eurosource
+ * Copyright (C) 2011-2012 Ake Hedman, Grodans Paradis AB
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -33,11 +33,14 @@
 #include "projdefs.h"
 #include "checkcfg.h" 
 #include "mac.h"
+#include "tick.h"
 #include "inttypes.h"
 #include "vscp_class.h"      
 #include "vscp_type.h"
 #include "vscp_firmware_level2.h"
 #include "vscp_raw_ethernet.h"
+
+extern MAC_ADDR broadcastTargetMACAddr;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // vscp_sendRawPacket
@@ -45,7 +48,134 @@
 
 int8_t vscp_sendRawPacket( vscpEvent *pevent )
 {
-	return -1;
+    uint8_t i;
+    BUFFER MyTxBuffer;
+    BYTE buf[ 60 ];
+    MAC_ADDR TargetMACAddr;
+    TICK tick = TickGet();
+    
+    MyTxBuffer = MACGetTxBuffer( TRUE );
+
+    if ( !MACIsTxReady( FALSE ) ) return FALSE;
+
+    // Nill it
+    memset( buf, 0, sizeof( buf ) );
+
+    // Do not respond if there is no room
+    if ( MyTxBuffer == INVALID_BUFFER ) {
+        return FALSE;
+    }
+
+    MACSetTxBuffer( MyTxBuffer, 0 );
+
+    // Destination address - Always MAC broadcast address
+    TargetMACAddr.v[ 0 ] = 0xff;
+    TargetMACAddr.v[ 1 ] = 0xff;
+    TargetMACAddr.v[ 2 ] = 0xff;
+    TargetMACAddr.v[ 3 ] = 0xff;
+    TargetMACAddr.v[ 4 ] = 0xff;
+    TargetMACAddr.v[ 5 ] = 0xff;
+
+    // Prepare the VSCP payload
+
+    // Version
+    buf[ 0 ] = 0x00;
+
+    // VSCP head
+    buf[ 1 ] = ( pevent->head >> 24 ) & 0xff;
+    buf[ 2 ] = ( pevent->head >> 16 ) & 0xff;
+    buf[ 3 ] = ( pevent->head >> 8 ) & 0xff;
+    buf[ 4 ] = pevent->head & 0xff;
+
+    // VSCP sub source address
+    buf[ 5 ] = 0xaa;
+    buf[ 6 ] = 0x55;
+
+    // Timestamp
+    buf[ 7 ] = tick >> 24;
+    buf[ 8 ] = tick >> 16;
+    buf[ 9 ] = tick >> 8;
+    buf[ 10 ] = tick & 0xff;
+
+    // OBID
+    buf[ 11 ] = 0x00;
+    buf[ 12 ] = 0x00;
+    buf[ 13 ] = 0x00;
+    buf[ 14 ] = 0x00;
+
+    // VSCP class
+    buf[ 15 ] = ( pevent->vscp_class >> 8 ) & 0xff;
+    buf[ 16 ] = pevent->vscp_class & 0xff;
+
+    // VSCP type
+    buf[ 17 ] = ( pevent->vscp_type >> 8 ) & 0xff;
+    buf[ 18 ] = pevent->vscp_type & 0xff;
+
+    // DataSize
+    buf[ 19 ] = ( pevent->sizeData >> 8 ) & 0xff;
+    buf[ 20 ] = pevent->sizeData & 0xff;
+
+    for ( i = 0; i<pevent->sizeData; i++ ) {
+        buf[ 21 + i ] = pevent->data[ i ];
+    }
+
+    // Write the Ethernet Header to the MAC's TX buffer. The last parameter
+    // (dataLen) is the length of the data to follow.
+    MACPutHeader( &broadcastTargetMACAddr, MAC_VSCP, 6 + 6 + 2 + 21 + pevent->sizeData );
+    MACPutArray( buf, sizeof( buf ) );
+    MACFlush();
+
+
+    return TRUE;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// vscp_getRawPacket
+//
+
+int8_t vscp_getRawPacket( vscpEvent *pevent )
+{
+    uint8_t buf[ 21 ];
+    MAC_ADDR remoteMAC;
+    uint8_t type;
+
+    // Check for incoming data
+    if ( !MACGetHeader( &remoteMAC, &type) ) {
+        return FALSE;
+    }
+
+    // Ignore non VSCP frames
+    if ( ETHER_VSCP != type ) {
+        MACDiscardRx();
+        return FALSE;
+    }
+
+    // Read the VSCP package header
+    // version, head, subaddr, timestamp, obid, class, type, datasize
+    MACGetArray( buf, 21 );
+
+    // Only version 0
+    if ( 0x00 != buf[0] ) {
+        MACDiscardRx();
+        return FALSE;
+    }
+/*
+    pevent->head =
+
+    pevent->GUID =
+
+    pevent->vscp_class =
+
+    pevent->vscp_type =
+
+    pevent->sizeData = 
+*/
+    // Fetch head
+    //MACGet();
+
+    MACDiscardRx();
+
+     return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +194,7 @@ BOOL SendTestVSCPPacket( void )
     // Nill it
     memset( buf, 0, sizeof( buf ) );
     
-    // Do not respond if there is no room to generate the ARP reply
+    // Do not respond if there is no room 
     if ( MyTxBuffer == INVALID_BUFFER ) {
         return FALSE;
     }    
@@ -107,20 +237,20 @@ BOOL SendTestVSCPPacket( void )
     buf[ 14 ] = 0x00;
     
     // VSCP class
-    buf[ 15 ] = 0x02;	// Class=512 (0x200) - Control
-    buf[ 16 ] = 0x00; 
+    buf[ 15 ] = 0x02;	// Class=512 (0x214) - Information
+    buf[ 16 ] = 0x14;
     
     // VSCP type 
-    buf[ 17 ] = 0x00;	// Type = 2 (0x02) New node on line / Probe.
-    buf[ 18 ] = 0x02;
+    buf[ 17 ] = 0x00;	// Type = 9 (0x09) Node heartbeat.
+    buf[ 18 ] = 0x09;
     
     // DataSize
     buf[ 19 ] = 0x00;	// Size for data part
     buf[ 20 ] = 0x00;
     
-    // Write the Ethernet Header to the MAC's TX buffer. The last parameter (dataLen) is the length
-    // of the data to follow.
-    MACPutHeader( &TargetMACAddr, MAC_VSCP, 21 );
+    // Write the Ethernet Header to the MAC's TX buffer. The last parameter 
+    // (dataLen) is the length of the data to follow.
+    MACPutHeader( &TargetMACAddr, MAC_VSCP, 21  );
     MACPutArray( buf, sizeof( buf ) );
     MACFlush();
 

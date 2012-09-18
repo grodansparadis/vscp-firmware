@@ -1,54 +1,23 @@
 /*********************************************************************
 *
-*       Modtronix Example Web Server Application using Microchip TCP/IP Stack
+*               VSCP Modtronix raw ethernet sample
 *
 *********************************************************************
-* FileName:        WebSrvr.c
-* Dependencies:    string.H
-*                  usart.h
-*                  stacktsk.h
-*                  Tick.h
-*                  http.h
-*                  MPFS.h
+* FileName:        main.c
+*
 * Processor:       PIC18
-* Complier:        MCC18 v1.00.50 or higher
-*                  HITECH PICC-18 V8.35PL3 or higher
-* Company:         Microchip Technology, Inc.
+* Complier:        MPLABX with C18 v1.00.50 or higher
+*                  
+* Company:         Grodans Paradis AN.
 *
-* Software License Agreement
-*
-* The software supplied herewith by Microchip Technology Incorporated
-* (the Company) for its PICmicro® Microcontroller is intended and
-* supplied to you, the Company’s customer, for use solely and
-* exclusively on Microchip PICmicro Microcontroller products. The
-* software is owned by the Company and/or its supplier, and is
-* protected under applicable copyright laws. All rights are reserved.
-* Any use in violation of the foregoing restrictions may subject the
-* user to criminal sanctions under applicable laws, as well as to
-* civil liability for the breach of the terms and conditions of this
-* license.
-*
-* THIS SOFTWARE IS PROVIDED IN AN AS IS CONDITION. NO WARRANTIES,
-* WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED
-* TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. THE COMPANY SHALL NOT,
-* IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
-* CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
-*
-*
-* HiTech PICC18 Compiler Options excluding device selection:
-*                  -FAKELOCAL -G -O -Zg -E -C
+* VSCP Sample
+* Copyright (C) 2011-2012 Ake Hedman, Grodans Paradis AB
 *
 **********************************************************************
 * File History
 *
-* 2004--2-15, David Hosken (DH):
-*  - Original (Rev. 1.0)
-* 2009-05-29, David Hosken (DH):
-*  - Added code for watchdog timer, and alive counters
-*  - Fixed bug initializing CPU ports. This bug could have caused very short
-*    micro-second spikes on IO ports at start up. Sequence of calling appcfgCpuIO()
-*    and appcfgCpuIOValues() functions were fixed.
+* 2012-09-18 - Checking and claning.
+* 2011 - AKHE Intial History
 *********************************************************************/
  
 /*
@@ -75,7 +44,12 @@
 #include "serint.h"
 #include "i2c.h"
 
+#include "inttypes.h"
+#include "vscp_class.h"     
+#include "vscp_type.h"
+#include "vscp_firmware_level2.h"
 #include "vscp_raw_ethernet.h"
+#include "vscpmain.h"
 
 extern APP_CONFIG AppConfig;  // from appcfg.c
 
@@ -93,9 +67,11 @@ extern uint16_t AdcValues[ ADC_CHANNELS ];
 
 /////////////////////////////////////////////////
 // Global variables used for alive counters.
-BYTE aliveCntrMain; //Alive counter must be reset each couple of ms to prevent board reset. Set to 0xff to disable.
+BYTE aliveCntrMain; //Alive counter must be reset each couple of ms to prevent
+                    // board reset. Set to 0xff to disable.
 BOOL aliveCntrDec;
 
+MAC_ADDR broadcastTargetMACAddr;
 
 /////////////////////////////////////////////////
 // Version number
@@ -109,11 +85,6 @@ extern uint16_t vscp_page_select;		// Current register page
 
 static void InitializeBoard(void);
 static void ProcessIO(void);
-
-
-
-
-
 
 /////////////////////////////////////////////////
 //High Interrupt ISR
@@ -192,12 +163,14 @@ void fastUserProcess(void)
     T1CON_RD16 = 0; //Enable reading TMR1L and TMR1H individually
 
     //Decrement all alive counters every 26.2144ms x 2 = 52.42ms.
-    //Timer1 is a free running timer that is incremented every 800ns. Bit 7 of TMR1H is toggled every 3.2512ms.
+    //Timer1 is a free running timer that is incremented every 800ns. Bit 7
+    // of TMR1H is toggled every 3.2512ms.
     if (TMR1H & 0x80) {
         if (aliveCntrDec) {
             aliveCntrDec = 0;
 
-            //Decrement all alive counters. If alive counter is 0xff, it is disabled
+            //Decrement all alive counters. If alive counter is 0xff, it is
+            // disabled
             if ((aliveCntrMain!=0xff) && (aliveCntrMain!=0)) aliveCntrMain--;
         }
     }
@@ -217,10 +190,20 @@ void fastUserProcess(void)
  */
 void main(void)
 {
-    static TICK8 t = 0;
+    vscpEvent vscpevent;
 
+    static TICK tickHeartBeat = 0xffffffff;
     static BYTE testLED;
+   
     testLED = 1;
+
+    // Destination address - Always MAC broadcast address
+    broadcastTargetMACAddr.v[ 0 ] = 0xff;
+    broadcastTargetMACAddr.v[ 1 ] = 0xff;
+    broadcastTargetMACAddr.v[ 2 ] = 0xff;
+    broadcastTargetMACAddr.v[ 3 ] = 0xff;
+    broadcastTargetMACAddr.v[ 4 ] = 0xff;
+    broadcastTargetMACAddr.v[ 5 ] = 0xff;
 
     //Set SWDTEN bit, this will enable the watch dog timer
     WDTCON_SWDTEN = 1;
@@ -231,7 +214,7 @@ void main(void)
 
     //Initialize all stack related components. Following steps must
     //be performed for all applications using PICmicro TCP/IP Stack.
-    TickInit();    
+    TickInit();
 
     //Initialize serial ports early, because they could be required for debugging
     if (appcfgGetc(APPCFG_USART1_CFG & APPCFG_USART_ENABLE)) {
@@ -258,7 +241,7 @@ void main(void)
     appcfgADC();            //Configure ADC unit
     appcfgPWM();            //Configure PWM Channels
 
-    StackInit();
+    MACInit();
 
     #if (DEBUG_MAIN >= LOG_DEBUG)
         debugPutMsg(1); //@mxd:1:Starting main loop
@@ -277,14 +260,30 @@ void main(void)
      * down into smaller pieces so that other tasks can have CPU time.
      */
     while ( 1 ) {
-        aliveCntrMain = 38;     //Reset if not services in 52.42ms x 38 = 2 seconds
-        
-        //Configure RB6 as output, and blink it every 500ms
-        if ( TickGetDiff8bit(t) >= ((TICK8)TICKS_PER_SECOND / (TICK8)2) ) {
-	    	
-	    	SendTestVSCPPacket();
+
+        //aliveCntrMain = 38;     //Reset if not services in 52.42ms x 38 = 2 seconds
+        aliveCntrMain = 0xff;
+        CLRWDT();
+
+        // Check for event
+        if ( vscp_getRawPacket( &vscpevent ) ) {
+            feedVSCP();
+        }
+
+        // Send heartbeat every 30 seconds
+        if ( TickGetDiff( tickHeartBeat ) >= ( TICKS_PER_SECOND * 30 ) ) {
+
+            //vscpevent.head = VSCP_PRIORITY_NORMAL;
+            //vscpevent.vscp_class = VSCP_CLASS2_LEVEL1_INFORMATION;
+            //vscpevent.vscp_type = VSCP_TYPE_INFORMATION_NODE_HEARTBEAT;
+            //vscpevent.sizeData = 3;
+            //vscpevent.data[ 0 ] = 0;
+            //vscpevent.data[ 1 ] = 0; // Zone
+            //vscpevent.data[ 2 ] = 0; // subzone
+            //vscp_sendRawPacket( &vscpevent );
+            //SendTestVSCPPacket();
 	            
-          	t = TickGet8bit();
+            tickHeartBeat = TickGet();
 /*                
           	//If B6 is configured as input, change to output
             if (appcfgGetc(APPCFG_TRISB) & 0x40) {
@@ -301,15 +300,18 @@ void main(void)
 */           	
       	}
 
-        //This task performs normal stack task including checking for incoming packet,
-        //type of packet and calling appropriate stack entity to process it.
+        // Do MAC work
         StackTask();
+        //MACTask();;
 
         //I2C Task
         i2cTask();
 
-        //Add your application speicifc tasks here.
+        //Add your application specific tasks here.
         ProcessIO();
+
+        // Do VSCP periodic tasks
+        periodicVSCPWork();
 
     }
 }
