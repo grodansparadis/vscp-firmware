@@ -21,7 +21,7 @@
 //#include <util/delay.h>
 
 #define CRC16
-#include "crc.h"
+#include "./../../../src/common/crc.h"
 
 // ========================================================================================================================================================
 uint8_t vscp_nickname; ///< Assigned node nickname

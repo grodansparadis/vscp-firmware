@@ -3,7 +3,7 @@
 # vscp related files. If you dont have a seperate VSCP_FIRMWARE path in
 # use then simply dont set this variable, it becomes default :)
 #==========================================================================
-VSCP_HOME = ./../../..
+#VSCP_HOME = ./../../..
 ifndef VSCP_HOME
    $(error > You must set environment variable VSCP_HOME in your system or shell)
 endif
@@ -23,7 +23,7 @@ OBJ = AAboot.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/can_at90can128.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/uart.o
 #OBJ += $(VSCP_FIRMWARE)/common/vscp_firmware.c
-OBJ += crc.c
+OBJ += $(VSCP_HOME)/src/common/crc.c
 
 
 
