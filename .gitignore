@@ -10,3 +10,9 @@
 *.lai
 *.la
 *.a
+/avr/Bootloader_AVR/Device_boot_Loader/Build_avr_vscp/firmware/avr/AAboot/*.bin
+/avr/Bootloader_AVR/Device_boot_Loader/Build_avr_vscp/firmware/avr/AAboot/*.elf
+/avr/Bootloader_AVR/Device_boot_Loader/Build_avr_vscp/firmware/avr/AAboot/*.lst
+/avr/Bootloader_AVR/Device_boot_Loader/Build_avr_vscp/firmware/avr/AAboot/*.srec
+*.d
+*.cof
