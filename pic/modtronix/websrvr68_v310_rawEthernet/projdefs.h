@@ -165,10 +165,11 @@ extern void fastUserProcess(void);
 /*******************************************************
 ----------------- Mac Configuration --------------------
 ********************************************************/
-//When STACK_USE_FAST_NIC is defined, a bit longer, but faster code is used.
+// When STACK_USE_FAST_NIC is defined, a bit longer, but faster code is used.
 #define STACK_USE_FAST_NIC
 
-//When defined, the code will be compiled for optimal speed. If not defined, code is defined for smallest size.
+// When defined, the code will be compiled for optimal speed. If not defined,
+// code is defined for smallest size.
 #define MAC_SPEED_OPTIMIZE
 
 //STACK_DISABLES_INTS can be defined if interrupts are to be disabled during the

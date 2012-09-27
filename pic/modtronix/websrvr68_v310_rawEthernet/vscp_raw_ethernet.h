@@ -30,7 +30,5 @@ typedef struct _NODE_INFO
 
 BOOL SendTestVSCPPacket( void );
 
-int8_t vscp_sendRawPacket( vscpEvent *pevent );
-int8_t vscp_getRawPacket( vscpEvent *pEvent );
 
 #endif

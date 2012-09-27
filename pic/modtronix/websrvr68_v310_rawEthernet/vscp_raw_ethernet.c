@@ -42,11 +42,17 @@
 
 extern MAC_ADDR broadcastTargetMACAddr;
 
+// Important Note!
+// For some reason it has been impossible to use a pointer
+// to an ebent as an argument here. I have never been able
+// to find out why.  Therfore the global event is used.
+extern vscpEvent wrkEvent;
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 // vscp_sendRawPacket
 //
 
-int8_t vscp_sendRawPacket( vscpEvent *pevent )
+int8_t vscp_sendRawPacket( void )
 {
     uint8_t i;
     BUFFER MyTxBuffer;
@@ -82,10 +88,10 @@ int8_t vscp_sendRawPacket( vscpEvent *pevent )
     buf[ 0 ] = 0x00;
 
     // VSCP head
-    buf[ 1 ] = ( pevent->head >> 24 ) & 0xff;
-    buf[ 2 ] = ( pevent->head >> 16 ) & 0xff;
-    buf[ 3 ] = ( pevent->head >> 8 ) & 0xff;
-    buf[ 4 ] = pevent->head & 0xff;
+    buf[ 1 ] = ( wrkEvent.head >> 24 ) & 0xff;
+    buf[ 2 ] = ( wrkEvent.head >> 16 ) & 0xff;
+    buf[ 3 ] = ( wrkEvent.head >> 8 ) & 0xff;
+    buf[ 4 ] = wrkEvent.head & 0xff;
 
     // VSCP sub source address
     buf[ 5 ] = 0xaa;
@@ -104,24 +110,24 @@ int8_t vscp_sendRawPacket( vscpEvent *pevent )
     buf[ 14 ] = 0x00;
 
     // VSCP class
-    buf[ 15 ] = ( pevent->vscp_class >> 8 ) & 0xff;
-    buf[ 16 ] = pevent->vscp_class & 0xff;
+    buf[ 15 ] = ( wrkEvent.vscp_class >> 8 ) & 0xff;
+    buf[ 16 ] = wrkEvent.vscp_class & 0xff;
 
     // VSCP type
-    buf[ 17 ] = ( pevent->vscp_type >> 8 ) & 0xff;
-    buf[ 18 ] = pevent->vscp_type & 0xff;
+    buf[ 17 ] = ( wrkEvent.vscp_type >> 8 ) & 0xff;
+    buf[ 18 ] = wrkEvent.vscp_type & 0xff;
 
     // DataSize
-    buf[ 19 ] = ( pevent->sizeData >> 8 ) & 0xff;
-    buf[ 20 ] = pevent->sizeData & 0xff;
+    buf[ 19 ] = ( wrkEvent.sizeData >> 8 ) & 0xff;
+    buf[ 20 ] = wrkEvent.sizeData & 0xff;
 
-    for ( i = 0; i<pevent->sizeData; i++ ) {
-        buf[ 21 + i ] = pevent->data[ i ];
+    for ( i = 0; i<wrkEvent.sizeData; i++ ) {
+        buf[ 21 + i ] = wrkEvent.data[ i ];
     }
 
     // Write the Ethernet Header to the MAC's TX buffer. The last parameter
     // (dataLen) is the length of the data to follow.
-    MACPutHeader( &broadcastTargetMACAddr, MAC_VSCP, 6 + 6 + 2 + 21 + pevent->sizeData );
+    MACPutHeader( &broadcastTargetMACAddr, MAC_VSCP, 6 + 6 + 2 + 21 + wrkEvent.sizeData );
     MACPutArray( buf, sizeof( buf ) );
     MACFlush();
 
@@ -133,8 +139,9 @@ int8_t vscp_sendRawPacket( vscpEvent *pevent )
 // vscp_getRawPacket
 //
 
-int8_t vscp_getRawPacket( vscpEvent *pevent )
+int8_t vscp_getRawPacket( void  )
 {
+    uint8_t i;
     uint8_t buf[ 21 ];
     MAC_ADDR remoteMAC;
     uint8_t type;
@@ -154,28 +161,47 @@ int8_t vscp_getRawPacket( vscpEvent *pevent )
     // version, head, subaddr, timestamp, obid, class, type, datasize
     MACGetArray( buf, 21 );
 
-    // Only version 0
-    if ( 0x00 != buf[0] ) {
+    // Only version 0 is accepted here
+    if ( 0x00 != buf[ 0 ] ) {
         MACDiscardRx();
         return FALSE;
     }
-/*
-    pevent->head =
 
-    pevent->GUID =
+    // Head
+    wrkEvent.head = buf[ 4 ];
+    
+    // sender GUID
+    memcpy( (void *)wrkEvent.GUID, (void *)buf, 16 );
+    
+    // Fill in remote MAC
+    for ( i=0; i<6; i++ ) {
+        wrkEvent.GUID[ 7 + i ] = remoteMAC.v[ i ];
+    }
 
-    pevent->vscp_class =
+    // Timestamp 7,8,9,10
+    // obdi in 11,12,13,14
 
-    pevent->vscp_type =
+    // Class
+    wrkEvent.vscp_class = ( ( (uint16_t)buf[ 15 ] ) << 8 ) + buf[ 16 ];
 
-    pevent->sizeData = 
-*/
-    // Fetch head
-    //MACGet();
+    // Type
+    wrkEvent.vscp_type =  ( ( (uint16_t)buf[ 17 ] ) << 8 ) + buf[ 18 ];
 
+    // Size
+    wrkEvent.sizeData =   ( ( (uint16_t)buf[ 19 ] ) << 8 ) + buf[ 20 ];
+
+    // Check that size is correct and adjust if not.
+    if ( wrkEvent.sizeData > LIMITED_DEVICE_DATASIZE ) {
+        wrkEvent.sizeData = LIMITED_DEVICE_DATASIZE;
+    }
+
+    // Copy in data
+    MACGetArray( wrkEvent.data, wrkEvent.sizeData );
+  
+    // Free buffer
     MACDiscardRx();
 
-     return TRUE;
+    return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////

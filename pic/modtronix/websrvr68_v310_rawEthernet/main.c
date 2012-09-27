@@ -80,6 +80,7 @@ MAC_ADDR broadcastTargetMACAddr;
 ///ROM char APP_VER_STR[] = "V0.1";
 
 // From vscp_2.c
+extern vscpEvent wrkEvent;
 extern uint8_t vscp_function_flags;
 extern uint16_t vscp_page_select;		// Current register page
 
@@ -190,8 +191,6 @@ void fastUserProcess(void)
  */
 void main(void)
 {
-    vscpEvent vscpevent;
-
     static TICK tickHeartBeat = 0xffffffff;
     static BYTE testLED;
    
@@ -266,7 +265,7 @@ void main(void)
         CLRWDT();
 
         // Check for event
-        if ( vscp_getRawPacket( &vscpevent ) ) {
+        if ( vscp_getRawPacket() ) {
             feedVSCP();
         }
 

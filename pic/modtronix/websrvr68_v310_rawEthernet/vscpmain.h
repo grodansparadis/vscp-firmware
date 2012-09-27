@@ -219,6 +219,10 @@
 #define VSCP_ACTION_ANALOG_SEND_STATUS_IO		14
 
 // Prototypes
+
+// Handle incoming VSCP events
+void feedVSCP( void );
+
 void vscp_main_task( void );
 
 // Send VSCP heartbeat to show we are alive
@@ -246,7 +250,10 @@ uint16_t getPWMValue( void );
 void setPWMValue( uint16_t value );
 
 // Do Action
-void doAction( uint16_t action, PVSCPEVENT pmsg );	
+void doAction( uint16_t action );
+
+// Do periodic VSCP work
+void periodicVSCPWork( void );
 
 #endif
 

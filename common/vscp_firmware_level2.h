@@ -185,7 +185,7 @@ typedef struct _vscp_DMatrixRow {
 #define VSCP_DM_CONTROL_MATCH_GUID		0x40000000
 #define VSCP_DM_CONTROL_MATCH_GUID		0x40000000
 #define VSCP_DM_CONTROL_MATCH_ZONE		0x00000010
-#define VSCP_DM_CONTROL_MATCH_SUBZONE	0x40000008
+#define VSCP_DM_CONTROL_MATCH_SUBZONE           0x40000008
 
 // VSCP LEVEL II UDP datagram offsets
 #define VSCP2_UDP_POS_HEAD			0
@@ -204,32 +204,32 @@ typedef struct _vscp_DMatrixRow {
 
 #define  VSCP_LEVEL2_COMMON_REGISTER_START	0xffffff80
 
-#define VSCP_REG_ALARMSTATUS				0xffffff80
-#define VSCP_REG_VSCP_MAJOR_VERSION			0xffffff81
-#define VSCP_REG_VSCP_MINOR_VERSION			0xffffff82
+#define VSCP_REG_ALARMSTATUS			0xffffff80
+#define VSCP_REG_VSCP_MAJOR_VERSION		0xffffff81
+#define VSCP_REG_VSCP_MINOR_VERSION		0xffffff82
 
-#define VSCP_REG_NODE_CONTROL				0xffffff83
+#define VSCP_REG_NODE_CONTROL			0xffffff83
 
-#define VSCP_REG_USERID0					0xffffff84
-#define VSCP_REG_USERID1					0xffffff85
-#define VSCP_REG_USERID2					0xffffff86
-#define VSCP_REG_USERID3					0xffffff87
-#define VSCP_REG_USERID4					0xffffff88
+#define VSCP_REG_USERID0			0xffffff84
+#define VSCP_REG_USERID1			0xffffff85
+#define VSCP_REG_USERID2			0xffffff86
+#define VSCP_REG_USERID3			0xffffff87
+#define VSCP_REG_USERID4			0xffffff88
 
-#define VSCP_REG_MANUFACTUR_ID0				0xffffff89
-#define VSCP_REG_MANUFACTUR_ID1				0xffffff8A
-#define VSCP_REG_MANUFACTUR_ID2				0xffffff8B
-#define VSCP_REG_MANUFACTUR_ID3				0xffffff8C
+#define VSCP_REG_MANUFACTUR_ID0			0xffffff89
+#define VSCP_REG_MANUFACTUR_ID1			0xffffff8A
+#define VSCP_REG_MANUFACTUR_ID2			0xffffff8B
+#define VSCP_REG_MANUFACTUR_ID3			0xffffff8C
 
-#define VSCP_REG_MANUFACTUR_SUBID0			0xffffff8D
-#define VSCP_REG_MANUFACTUR_SUBID1			0xffffff8E
-#define VSCP_REG_MANUFACTUR_SUBID2			0xffffff8F
-#define VSCP_REG_MANUFACTUR_SUBID3			0xffffff90
+#define VSCP_REG_MANUFACTUR_SUBID0		0xffffff8D
+#define VSCP_REG_MANUFACTUR_SUBID1		0xffffff8E
+#define VSCP_REG_MANUFACTUR_SUBID2		0xffffff8F
+#define VSCP_REG_MANUFACTUR_SUBID3		0xffffff90
 
-#define VSCP_REG_NICKNAME_ID				0xffffff91
+#define VSCP_REG_NICKNAME_ID			0xffffff91
 
-#define VSCP_REG_PAGE_SELECT_MSB			0xffffff92
-#define VSCP_REG_PAGE_SELECT_LSB			0xffffff93
+#define VSCP_REG_PAGE_SELECT_MSB		0xffffff92
+#define VSCP_REG_PAGE_SELECT_LSB		0xffffff93
 
 #define VSCP_REG_FIRMWARE_MAJOR_VERSION		0xffffff94
 #define VSCP_REG_FIRMWARE_MINOR_VERSION		0xffffff95
@@ -237,53 +237,53 @@ typedef struct _vscp_DMatrixRow {
 
 #define VSCP_REG_BOOT_LOADER_ALGORITHM		0xffffff97 
 
-#define VSCP_REG_BUFFER_SIZE				0xffffff98
+#define VSCP_REG_BUFFER_SIZE			0xffffff98
 
-#define VSCP_REG_GUID						0xffffffD0
-#define VSCP_REG_GUID0						0xffffffD0
-#define VSCP_REG_GUID1						0xffffffD1
-#define VSCP_REG_GUID2						0xffffffD2
-#define VSCP_REG_GUID3						0xffffffD3
-#define VSCP_REG_GUID4						0xffffffD4
-#define VSCP_REG_GUID5						0xffffffD5
-#define VSCP_REG_GUID6						0xffffffD6
-#define VSCP_REG_GUID7						0xffffffD7
-#define VSCP_REG_GUID8						0xffffffD8
-#define VSCP_REG_GUID9						0xffffffD9
-#define VSCP_REG_GUID10					    0xffffffDA
-#define VSCP_REG_GUID11					    0xffffffDB
-#define VSCP_REG_GUID12					    0xffffffDC
-#define VSCP_REG_GUID13					    0xffffffDD
-#define VSCP_REG_GUID14					    0xffffffDE
-#define VSCP_REG_GUID15					    0xffffffDF
+#define VSCP_REG_GUID				0xffffffD0
+#define VSCP_REG_GUID0				0xffffffD0
+#define VSCP_REG_GUID1				0xffffffD1
+#define VSCP_REG_GUID2				0xffffffD2
+#define VSCP_REG_GUID3				0xffffffD3
+#define VSCP_REG_GUID4				0xffffffD4
+#define VSCP_REG_GUID5				0xffffffD5
+#define VSCP_REG_GUID6				0xffffffD6
+#define VSCP_REG_GUID7				0xffffffD7
+#define VSCP_REG_GUID8				0xffffffD8
+#define VSCP_REG_GUID9				0xffffffD9
+#define VSCP_REG_GUID10                         0xffffffDA
+#define VSCP_REG_GUID11				0xffffffDB
+#define VSCP_REG_GUID12                         0xffffffDC
+#define VSCP_REG_GUID13                         0xffffffDD
+#define VSCP_REG_GUID14				0xffffffDE
+#define VSCP_REG_GUID15				0xffffffDF
 
-#define VSCP_REG_DEVICE_URL					0xffffffE0
+#define VSCP_REG_DEVICE_URL			0xffffffE0
 
 // VSCP function flags
-#define VSCP_FUNCTION_USE_TCP				0x01	// Use TCP or UDP
-#define VSCP_FUNCTION_AUTODISCOVER			0x02	// If TCP enabled serach server
+#define VSCP_FUNCTION_USE_TCP			0x01	// Use TCP or UDP
+#define VSCP_FUNCTION_AUTODISCOVER		0x02	// If TCP enabled serach server
 													// with UDP High End Discovery before 
 													// trying to connect
-#define VSCP_FUNCTION_FALLBACK				0x04	// If TCP is enabled fallback to UDP on
+#define VSCP_FUNCTION_FALLBACK			0x04	// If TCP is enabled fallback to UDP on
 													// failure.
 #define VSCP_FUNCTION_HARDCODED_IPADDR		0x08	// Use a hard TCP/IP address for the
 													// VSCP TCP server.
-#define VSCP_FUNCTION_PROBE_SENT			0x10  	// High end server probe sent
-#define VSCP_FUNCTION_RXOBJ_IN_USE			0x40  	// TCP has receibed a frame
-#define VSCP_FUNCTION_TXOBJ_IN_USE			0x80  	// Set to initiate TCP TX	
+#define VSCP_FUNCTION_PROBE_SENT		0x10  	// High end server probe sent
+#define VSCP_FUNCTION_RXOBJ_IN_USE		0x40  	// TCP has receibed a frame
+#define VSCP_FUNCTION_TXOBJ_IN_USE		0x80  	// Set to initiate TCP TX	
 
 // FAST mode frame types
-#define VSCP_FAST_FRAMETYPE_VSCP			0x00
-#define VSCP_FAST_FRAMETYPE_ERROR			0x01
-#define VSCP_FAST_FRAMETYPE_COMMAND			0x02
+#define VSCP_FAST_FRAMETYPE_VSCP		0x00
+#define VSCP_FAST_FRAMETYPE_ERROR		0x01
+#define VSCP_FAST_FRAMETYPE_COMMAND		0x02
 
 // FAST mode command codes
-#define VSCP_FAST_COMMAND_NOOP				0x00
-#define VSCP_FAST_COMMAND_READ				0x01
-#define VSCP_FAST_COMMAND_CLOSE				0x02
+#define VSCP_FAST_COMMAND_NOOP			0x00
+#define VSCP_FAST_COMMAND_READ			0x01
+#define VSCP_FAST_COMMAND_CLOSE			0x02
 
 // Define FAST error codes
-#define VSCP_FAST_ERROR_OK					0x00
+#define VSCP_FAST_ERROR_OK			0x00
 
 extern uint8_t vscp_alarmstatus;		
 extern uint8_t vscp_node_state;	
@@ -298,8 +298,8 @@ void sendHighEndServerProbe(void );
 #endif
 
 // Prototypes 
-void vscp_readRegister( vscpEvent *pEvent, vscpEvent *pOutEvent );
-void vscp_writeRegister( vscpEvent *pEvent, vscpEvent *pOutEvent );
+void vscp_readRegister( void );
+void vscp_writeRegister( void );
 uint8_t vscp_readStdReg( uint32_t reg );
 uint8_t vscp_writeStdReg( uint32_t reg, uint8_t data );
  
@@ -315,14 +315,14 @@ uint8_t vscp_getFirmwareMajorVersion( void );
 uint8_t vscp_getFirmwareMinorVersion( void );
 uint8_t vscp_getFirmwareSubMinorVersion( void );
 
-int8_t vscp_sendEvent( vscpEvent *pEvent );
-int8_t vscp_getEvent( vscpEvent *pEvent );
+int8_t vscp_sendEvent( void );
+int8_t vscp_getEvent( void );
 
 /// Init the VSCP functionality
 void vscp_init( void );
 
 // Fill in GUID information for our node  into event
-void fillGUID( vscpEvent *pEvent );
+void fillGUID( void );
 
 
 // ***********************************************************************
@@ -343,8 +343,8 @@ int8_t vscp_getTCPEvent( vscpEvent *pEvent );
 #endif
 
 #ifdef VSCP_USE_RAW_ETHERNET
-int8_t vscp_sendRawPacket( vscpEvent *pevent );
-int8_t vscp_getRawPacket( vscpEvent *pEvent );
+int8_t vscp_sendRawPacket( void );
+int8_t vscp_getRawPacket( void );
 #endif
 
 uint8_t vscp_readAppReg( uint32_t reg );
@@ -372,7 +372,7 @@ uint8_t vscp_getMDF_URL( uint8_t idx );
 uint8_t vscp_readAppReg( uint32_t idx );
 uint8_t vscp_writeAppReg( uint32_t idx, uint8_t data );
 
-void vscp_feedDM( vscpEvent *pEvent );
+void vscp_feedDM( void );
 
 // ============ END OF CALLBACKS ============
 

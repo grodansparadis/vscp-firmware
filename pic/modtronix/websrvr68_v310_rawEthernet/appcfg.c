@@ -104,6 +104,7 @@ void appcfgInit(void)
  * @return Returns the requested byte
  */
 BYTE appcfgGetc(WORD offset) {
+
     //Set address
     EEADR = (BYTE)offset;
     EEADRH = (BYTE)(offset >> 8);
@@ -832,156 +833,58 @@ void appcfgPWM(void)
 #endif
 ROM BYTE eeConfigArray[] = {
 
+    // Bootloader
+    0,
+
     //MyMACAddr
-    MY_MAC_BYTE1,       //Offset 4
+    MY_MAC_BYTE1,               //Offset 0
     MY_MAC_BYTE2,
     MY_MAC_BYTE3,
     MY_MAC_BYTE4,
     MY_MAC_BYTE5,
     MY_MAC_BYTE6,
 
-    //wait4bl - Delay how long we wait for the bootloader, value from 0-n. Time = 0.8sec x n
-    //Default value = 2.4
-    4,
-    //flashHasProgram - If 1, the FLASH has been programmed and contain a valid program.
-    1,
-    //Startup serial delay
-    40,                         //Offset 20 = 40 x 50ms = 2 seconds
     //System Flags
     //xxxx xxx1 = PLL Enabled
     //xxxx xx1x = Blink LED on B7
-    0x03,                       //Offset 21
-    //Network Flags
-    #if defined(DEMO_MODE)
-    //xxxx xxx0 = DHCP Disabled
-    0x00,                       //Offset 22
-    #else
-    //xxxx xxx1 = DHCP Enabled
-    0x01,                       //Offset 22
-    #endif
-    
+    0x03,
+
     //USART1_CFG.baud
     BAUD_57600,
     //USART1_CFG.cfg
     //xxxx xxx1 = Enabled
     0x01,
-    //USART2_CFG.baud
-    BAUD_57600,
-    //USART2_CFG.cfg
-    //xxxx xxx0 = Not Enabled by default
-    0,  //Not enabled by default
+
     //Port Direction Configuration - 7 bytes for port A, B, C, D, E, F and G. A 0 bit=output, 1 bit=input
-    0b11111111, //Port A - All inputs   - Offset 35
+    0b11111111, //Port A - All inputs
     0b11111111, //Port B - All inputs
     0b11111111, //Port C - All inputs
     0b11111111, //Port D - All inputs
     0b11111111, //Port E - All inputs
-    0b11111111, //Port F - All inputs   - Offset 40
+    0b11111111, //Port F - All inputs
     0b11111111, //Port G - All inputs
+
     //Port Default Values - 7 bytes for port A, B, C, D, E, F and G. Gived default values for output ports
     0b00000000, //Port A - All 0s
     0b00000000, //Port B - All 0s
     0b00000000, //Port C - All 0s
-    0b00000000, //Port D - All 0s       - Offset 45
+    0b00000000, //Port D - All 0s
     0b00000000, //Port E - All 0s
     0b00000000, //Port F - All 0s
-    0b00000000, //Port G - All 0s       - Offset 48
+    0b00000000, //Port G - All 0s       -
     
 
-        //APPCFG_ADCON1 - adcon1            - Offset 49
-        0x03,   //A0 - A5 and F0 - F6 = ADC, no digital inputs
-        //APPCFG_ADCON0_2 - adcon2          - Offset 50
-        0x2e,   // xxxx x110 - Fosc/64 clock = 1.6us @ 40MHz
-                // xx10 1xxx - 12 Tad = 12 x 1.6 = 19.2uS conversion time
-                // 0xxx xxxx - Left justified
+    //APPCFG_ADCON1 - adcon1
+    0x03,   //A0 - A5 and F0 - F6 = ADC, no digital inputs
+    //APPCFG_ADCON0_2 - adcon2
+    0x2e,   // xxxx x110 - Fosc/64 clock = 1.6us @ 40MHz
+    // xx10 1xxx - 12 Tad = 12 x 1.6 = 19.2uS conversion time
+    // 0xxx xxxx - Left justified
 
     //SerialNumber
-    0,                                  //Offset 51
-    0,
-    //Username - Is a null terminated string. Max 8 char + null termination char
-    'a',                                //Offset = 53
-    'd',                                //Offset = 54
-    'm',                                //Offset = 55
-    'i',                                //Offset = 56
-    'n',                                //Offset = 57
-    '\0',                               //Offset = 58
-    '\0',                               //Offset = 59
-    '\0',                               //Offset = 60
-    '\0',                               //Offset = 61
-    //Password - Is a null terminated string. Max 8 char + null termination char
-    'p',                                //Offset = 62
-    'w',                                //Offset = 63
-    '\0',                               //Offset = 64
-    '\0',                               //Offset = 65
-    '\0',                               //Offset = 66
-    '\0',                               //Offset = 67
-    '\0',                               //Offset = 68
-    '\0',                               //Offset = 69
-    '\0',                               //Offset = 70
+    0xAA,                                   
+    0x55,
 
-
-    //NetBIOS Name - Is a 16 character name, all in uppercase. All unused characters must be spaces! Must end with 0!
-    'M',                                // Offset = 71
-    'X',                                // Offset = 72
-    #if defined(DEMO_MODE)
-    'D',                                // Offset = 73
-    'E',                                // Offset = 74
-    'M',                                // Offset = 75
-    'O',                                // Offset = 76
-    ' ',                                // Offset = 77
-    #else
-    'B',                                // Offset = 73
-    'O',                                // Offset = 74
-    'A',                                // Offset = 75
-    'R',                                // Offset = 76
-    'D',                                // Offset = 77
-    #endif
-    ' ',                                // Offset = 78
-    ' ',                                // Offset = 79
-    ' ',                                // Offset = 80
-    ' ',                                // Offset = 81
-    ' ',                                // Offset = 82
-    ' ',                                // Offset = 83
-    ' ',                                // Offset = 84
-    ' ',                                // Offset = 85
-    0,                                  // Offset = 86
-    
-    //Command Flags
-    //xxxxxxx1 = UDP Commands Enabled
-    //xxxxxx0x = Authentication required for UDP Commands
-    0b00000001,                         // Offset = 98
-
-    // PWM Channel 1-8 Enable Register. 0=off, 1=on. All Off by default
-    0,                                  // Offset = 99
-    
-    // PWM Frequency for all channels.
-    //For 8 bit mode:  0 and 1=9.766kHz, 2=39.062kHz, 3=156.25kHz
-    //For 10 bit mode: 0=2.441kHz, 1=9.766kHz, 2 and 3=39.062kHz
-    2,                                  // Offset = 100
-    
-    //PWM Flags
-    //---- ---x = Configures for 8 or 10 bit PWM. 0=8 bit, 1=10 bit
-    1,                                  // Offset = 101
-
-    // PWM Channel 1 (C1) default value (10 bit value)
-    (BYTE)0,                            // Offset = 102
-    (BYTE)(0>>8),                       // Offset = 103
-
-    // PWM Channel 2 (C2) default value (10 bit value)
-    (BYTE)0,                            // Offset = 104
-    (BYTE)(0>>8),                       // Offset = 105
-
-    // PWM Channel 3 (G0) default value (10 bit value)
-    (BYTE)0,                            // Offset = 106
-    (BYTE)(0>>8),                       // Offset = 107
-
-    // PWM Channel 4 (G3) default value (10 bit value)
-    (BYTE)0,                            // Offset = 108
-    (BYTE)(0>>8),                       // Offset = 109
-
-    // PWM Channel 5 (G4) default value (10 bit value)
-    (BYTE)0,                            // Offset = 110
-    (BYTE)(0>>8),                       // Offset = 111
 
 };
 
