@@ -429,13 +429,13 @@ uint8_t vscp_writeStdReg(uint32_t reg, uint8_t data) {
     else if (VSCP_REG_PAGE_SELECT_MSB == reg) {
 
         // * * * Page select register MSB * * *
-        vscp_page_select = (vscp_page_select & 0xff00) | ((uint16_t) data << 8);
+        vscp_page_select = (vscp_page_select & 0x00ff) + ((uint16_t) data << 8);
         rv = (vscp_page_select >> 8) & 0xff;
     }
     else if (VSCP_REG_PAGE_SELECT_LSB == reg) {
 
         // * * * Page select register LSB * * *
-        vscp_page_select = (vscp_page_select & 0xff) | data;
+        vscp_page_select = (vscp_page_select & 0xff00) + data;
         rv = (vscp_page_select & 0xff);
     }
 
