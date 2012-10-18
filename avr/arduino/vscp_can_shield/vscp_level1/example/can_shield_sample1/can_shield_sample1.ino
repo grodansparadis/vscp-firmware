@@ -8,8 +8,9 @@
  *    http://www.skpang.co.uk/catalog/arduino-canbus-shield-with-usd-card-holder-p-706.html
  *    is used for this sample.
  *
- *  Copyright (C) 1995-2012 Ake Hedman, Grodans Paradis AB
- *                          <akhe@grodansparadis.com>
+ *  Copyright (C) 1995-2012 Ake Hedman, Grodans Paradis AB, http://www.auto.grodansparadis.com/products.html
+ *                          <akhe@grodansparadis.com>  
+ *  Part of the VSCP Project - http://www.vscp.org
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -60,7 +61,7 @@ MCP2515 mcp2515( CS_PIN, INT_PIN );
  
 // Set to non zero to get debug messages on the serial channel
 // The control of the serial channel will be disabled in debug mode.
-#define DEBUG
+#define DEBUG  1
 
 // Debound time in milliseconds for joystick
 #define DEBOUNCE_TIMER  100
@@ -69,7 +70,7 @@ MCP2515 mcp2515( CS_PIN, INT_PIN );
 
 #define FIRMWARE_MAJOR_VERSION                  0
 #define FIRMWARE_MINOR_VERSION		        0
-#define FIRMWARE_SUB_MINOR_VERSION	        1
+#define FIRMWARE_SUB_MINOR_VERSION	        2
 
 // Number of rows in decision matrix
 #define SIZE_OF_DM                              8
@@ -452,6 +453,7 @@ void loop()
         if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class  ) {
           // Handle protocol event
           vscp_handleProtocolEvent();
+          Serial.println(F("Protocol event"));
         }
           
         doDM(); // Handle decision matrix
@@ -609,7 +611,7 @@ void loop()
     }
  
 #ifdef DEBUG    
-    Serial.println( millis() );
+//    Serial.println( millis() );
 #endif    
             
   }
@@ -1003,7 +1005,6 @@ uint8_t vscp_getControlByte(void)
 
 void vscp_getEmbeddedMdfInfo(void)
 {
- 
     // No embedded DM so we respond with info about that
 
     vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
@@ -1065,6 +1066,11 @@ uint8_t vscp_readAppReg(uint8_t reg)
 {
     uint8_t rv;
 
+#ifdef DEBUG
+    Serial.print( "Read app. reg " );
+    Serial.println( reg, HEX );
+#endif    
+    
     rv = 0x00; // default read
     
     if ( REG_ZONE == reg ) {
@@ -1149,6 +1155,11 @@ uint8_t vscp_readAppReg(uint8_t reg)
 uint8_t vscp_writeAppReg(uint8_t reg, uint8_t val)
 {
     uint8_t rv = ~val;
+    
+#ifdef DEBUG    
+    Serial.print( "Write app. reg " );
+    Serial.println( reg, HEX );
+#endif    
     
     if ( REG_ZONE == reg ) {
       eeprom.write( EEPROM_ZONE, val );
@@ -1244,7 +1255,8 @@ uint8_t vscp_writeAppReg(uint8_t reg, uint8_t val)
       return  vscp_readAppReg( reg );
     }
      else if ( REG_CTRL_LEDS == reg ) {
-      if ( val & 1 ) {
+      
+       if ( val & 1 ) {
         // Trun on LED D7
         digitalWrite( 7, HIGH );  
       }
@@ -1252,6 +1264,7 @@ uint8_t vscp_writeAppReg(uint8_t reg, uint8_t val)
         // Trun on LED D7
         digitalWrite( 7, LOW );
       }
+      
       if ( val & 2 ) {
         // Trun on LED D8 
         digitalWrite( 8, HIGH );  
@@ -1260,13 +1273,17 @@ uint8_t vscp_writeAppReg(uint8_t reg, uint8_t val)
         // Trun off LED D8
         digitalWrite( 8, LOW );
       }
+      
       return  vscp_readAppReg( reg );
+      
     }  
     else if ( ( reg >= REG_DM_START ) && ( reg < 128 ) ) {
+      Serial.println( "Writing DM" );
       eeprom.write( EEPROM_DM_START + ( reg - REG_DM_START ), val );
       return  vscp_readAppReg( reg );
     }
     
+    Serial.println( "end" );
     return rv;
 }
 
@@ -1316,6 +1333,19 @@ int8_t getVSCPFrame(uint16_t *pvscpclass,
     *pvscptype = (id >> 8) & 0xff;
     *pvscpclass = (id >> 16) & 0x1ff;
     *pPriority = (uint16_t) (0x07 & (id >> 26));
+    
+#ifdef DEBUG        
+     Serial.print("Event received! Class=");
+     Serial.print( *pvscpclass, HEX );
+     Serial.print(" Type=");
+     Serial.print( *pvscptype, HEX );
+     if ( *pSize ) Serial.print(" Data=");
+     for ( int i=0; i<*pSize; i++ ) {
+       Serial.print( pData[i], HEX );
+       Serial.print(",");
+     }
+     Serial.println();
+#endif
 
     return TRUE;
 }
@@ -1366,9 +1396,7 @@ bool getCANFrame(uint32_t *pid, uint8_t *pdlc, uint8_t *pdata)
         *pid = canmsg.id;
         *pdlc = canmsg.dlc;
         memcpy( pdata, canmsg.data, canmsg.dlc ); 
-#ifdef DEBUG        
-        Serial.println("Event received!");
-#endif        
+        
         return true;
     }
     

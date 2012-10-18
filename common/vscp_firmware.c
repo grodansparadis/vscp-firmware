@@ -40,9 +40,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include "vscp_firmware.h"
-#include "../../src/vscp/common/vscp_class.h"	
-#include "../../src/vscp/common/vscp_type.h"	
-
+#include "vscp_class.h"      
+#include "vscp_type.h"
 
 #ifndef FALSE
 #define FALSE           0
@@ -1029,6 +1028,7 @@ void vscp_handleProtocolEvent(void)
                 }
                 break;
 
+
             case VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO:
 
                 if (vscp_nickname == vscp_imsg.data[ 0 ]) {
@@ -1044,42 +1044,72 @@ void vscp_handleProtocolEvent(void)
                 }
                 break;
 
+			#ifdef EMBEDDED_MDF
             case VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF:
 
                 vscp_getEmbeddedMdfInfo();
                 break;
+			#endif
 
             case VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_READ:
 
-                if (vscp_nickname == vscp_imsg.data[ 0 ]) {
-                    uint8_t i;
+                if (vscp_nickname == vscp_imsg.data[0]) {
                     uint16_t page_save;
-                    uint8_t page_msb = vscp_imsg.data[ 1 ];
-                    uint8_t page_lsb = vscp_imsg.data[ 2 ];
+                    uint8_t byte = 0;
+					uint8_t bytes = 1;
+					uint8_t bytes_this_time, cb;
+					
+					// if data byte 4 of the request is present probably more than 1 register should be
+					// read/written, therefore check lower 4 bits of the flags and decide
+					if ((vscp_imsg.flags & 0x0f) > 3) {
+						// 'number of registers was specified', thus take that value
+						bytes = vscp_imsg.data[4];
+						// if number of bytes was zero it makes no sense thus force to read 1 register
+						if (bytes == 0) bytes = 1; }
+					else { bytes = 1; }
 
                     // Save the current page
                     page_save = vscp_page_select;
 
-                    // Check for valid count
-                    if (vscp_imsg.data[ 3 ] > 6) vscp_imsg.data[ 3 ] = 6;
+					// Assign the requested page, this variable is used in the implementation
+					// specific function 'vscp_readAppReg()' and 'vscp_writeAppReg()' to actually
+					// switch pages there
+					vscp_page_select = ((vscp_imsg.data[1]<<8) | vscp_imsg.data[2]);
 
+					//construct response event
                     vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
-                    vscp_omsg.flags = VSCP_VALID_MSG + 3 + vscp_imsg.data[ 3 ];
                     vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
                     vscp_omsg.type = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
+					vscp_omsg.data[0] = 0; // index of event, this is the first
+					vscp_omsg.data[1] = vscp_imsg.data[1]; // mirror page msb
+					vscp_omsg.data[2] = vscp_imsg.data[2]; // mirror page lsb
 
-                    for (i = vscp_imsg.data[ 2 ];
-                            i < (vscp_imsg.data[ 2 ] + vscp_imsg.data[ 3 ]);
-                            i++) {
-                        vscp_omsg.data[ 3 + (i - vscp_imsg.data[ 2 ]) ] =
-                                vscp_readRegister(i);
-                    }
+					do {
+						// calculate bytes to transfer in this event
+						if ((bytes - byte) > 4) {
+							bytes_this_time = 4; }
+						else {
+							bytes_this_time = (bytes - byte); }
+
+						// define length of this event
+						vscp_omsg.flags = (VSCP_VALID_MSG + 4 + bytes_this_time);
+						vscp_omsg.data[3] = vscp_imsg.data[3] + byte; // first register in this event
+
+						// put up to four registers to data space
+						for (cb = 0; cb < bytes_this_time; cb++) {
+							vscp_omsg.data[ (4 + cb) ] = vscp_readRegister( (vscp_imsg.data[3] + byte + cb) ); }
+
+						// send the event
+						vscp_sendEvent();
+						// increment byte by bytes_this_time and the event number by one
+						byte = (byte + bytes_this_time);
+						// increment the index
+						vscp_omsg.data[0] +=1 ;
+						}
+					while (byte < bytes);
 
                     // Restore the saved page
                     vscp_page_select = page_save;
-
-                    // send the event
-                    vscp_sendEvent();
 
                 }
                 break;
@@ -1089,25 +1119,26 @@ void vscp_handleProtocolEvent(void)
                 if (vscp_nickname == vscp_imsg.data[ 0 ]) {
                     uint8_t i;
                     uint16_t page_save;
-                    uint8_t page_msb = vscp_imsg.data[ 1 ];
-                    uint8_t page_lsb = vscp_imsg.data[ 2 ];
 
                     // Save the current page
                     page_save = vscp_page_select;
 
+					// Assign the requested page
+					// specific function 'vscp_readAppReg()' and 'vscp_writeAppReg()' to actually
+					vscp_page_select = (vscp_imsg.data[1]<<8) | vscp_imsg.data[2];
+
                     vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
-                    vscp_omsg.flags = VSCP_VALID_MSG + 3 + vscp_imsg.data[ 3 ];
+                    vscp_omsg.flags = VSCP_VALID_MSG + 4 + ((vscp_imsg.flags & 0x0f) - 4);
                     vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
                     vscp_omsg.type = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
 
-                    for (i = vscp_imsg.data[ 2 ];
-                            i < (vscp_imsg.data[ 2 ] + vscp_imsg.data[ 3 ]);
+                    for ( i = vscp_imsg.data[ 3 ]; // register to write
+							// number of registers to write comes from byte length of write event
+							// reduced by four bytes
+                            i < (vscp_imsg.data[ 3 ] + ((vscp_imsg.flags & 0x0f) - 4));
                             i++) {
-                        vscp_omsg.data[ 3 +
-                                (i - vscp_imsg.data[ 2 ]) ] =
-                                vscp_writeRegister(i,
-                                vscp_imsg.data[ 4 +
-                                (i - vscp_imsg.data[ 2 ]) ]);
+							vscp_omsg.data[ 4 + (i - vscp_imsg.data[ 3 ]) ] =
+                                vscp_writeRegister(i, vscp_imsg.data[ 4 + (i - vscp_imsg.data[ 3 ]) ]);
                     }
 
                     // Restore the saved page
