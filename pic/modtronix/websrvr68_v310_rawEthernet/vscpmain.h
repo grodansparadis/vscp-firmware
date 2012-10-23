@@ -105,8 +105,8 @@
 #define VSCP_REG_ANALOG7_LSB				0x38
 #define VSCP_REG_ANALOG7_MSB				0x39
 
-#define VSCP_REG_PWM_MSB							0x42
-#define VSCP_REG_PWM_LSB							0x43
+#define VSCP_REG_PWM_MSB				0x42
+#define VSCP_REG_PWM_LSB				0x43
 
 #define VSCP_REG_SERIAL_BAUDRATE			0x44
 #define VSCP_REG_SERIAL_CONTROL				0x46
@@ -161,12 +161,12 @@
 
 // The following 15 register positions is used for the CAN
 // interface GUID.
-#define VSCP_REG_CAN_GUID							0x71
+#define VSCP_REG_CAN_GUID				0x71
 
 
 // Control register bits
-#define PWM_PERSISTENT_BIT							0x10
-#define ENABLE_INPUT_CHANGE							0x20
+#define PWM_PERSISTENT_BIT				0x10
+#define ENABLE_INPUT_CHANGE				0x20
 #define ENABLE_PERIODIC_OUTPUT_EVENTS			0x40
 #define ENABLE_PERIODIC_INPUT_EVENTS			0x80
 
@@ -181,28 +181,28 @@
 #define SERIAL_SPEED_DEFAULT				BAUD_57600				
 
 // CAN speed
-#define CAN_SPEED_10K								0
-#define CAN_SPEED_20K								1
-#define CAN_SPEED_50K								2
-#define CAN_SPEED_100K								3
-#define CAN_SPEED_125K								4
-#define CAN_SPEED_250K								5
-#define CAN_SPEED_500K								6
-#define CAN_SPEED_800K								7
-#define CAN_SPEED_1000K								8
+#define CAN_SPEED_10K					0
+#define CAN_SPEED_20K					1
+#define CAN_SPEED_50K					2
+#define CAN_SPEED_100K					3
+#define CAN_SPEED_125K					4
+#define CAN_SPEED_250K					5
+#define CAN_SPEED_500K					6
+#define CAN_SPEED_800K					7
+#define CAN_SPEED_1000K					8
 
-#define CAN_SPEED_DEFAULT							CAN_SPEED_500K
+#define CAN_SPEED_DEFAULT				CAN_SPEED_125K
 
 // CAN control register bits
-#define CAN_CRTL_OPEN_PORT							0x40
+#define CAN_CRTL_OPEN_PORT				0x40
 #define CAN_CRTL_PERSISTENT_OPEN_PORT			0x80
 
 // Base address for DM matrix in external EEPROM
-#define VSCP_DM_MATRIX_BASE							0x200   // base address in internal EEPROM
+#define VSCP_DM_MATRIX_BASE				0x200   // base address in internal EEPROM
 #define DM_ENTERIES									16		// Number of DM enteries
 
 // Action codes
-#define VSCP_ACTION_NOOP							0
+#define VSCP_ACTION_NOOP				0
 #define VSCP_ACTION_OUTPUTS_ACTIVATE			1
 #define VSCP_ACTION_OUTPUTS_DEACTIVATE			2
 #define VSCP_ACTION_SERIAL_SEND_ARGUMENT		3

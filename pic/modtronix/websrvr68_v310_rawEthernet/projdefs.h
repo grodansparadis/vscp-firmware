@@ -57,7 +57,8 @@
 #define NON_MCHP_MAC
 
 // TEST TEST
-//The DEMO Mode define is used to place the SBC65EC in demo mode. In this mode, some functions are disabled
+// The DEMO Mode define is used to place the SBC65EC in demo mode.
+// In this mode, some functions are disabled
 //#define DEMO_MODE   //release - Ensure this is commented out!
 
 //Include files
@@ -65,8 +66,9 @@
 #include "appcfg.h"
 
 /////////////////////////////////////////////////
-//Define fast user process. It can be an external function, or a Macro. When it is an external
-//function, an "extern ...." function prototype must also be defined
+// Define fast user process. It can be an external function, or a Macro.
+// When it is an external
+// function, an "extern ...." function prototype must also be defined
 extern void fastUserProcess(void);
 #define FAST_USER_PROCESS() fastUserProcess()
 

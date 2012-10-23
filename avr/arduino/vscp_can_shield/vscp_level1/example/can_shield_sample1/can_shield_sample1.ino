@@ -273,6 +273,7 @@ void setup()
   pinMode(LED_USER, OUTPUT);  
   pinMode(LED_STATUS, OUTPUT);   
  
+ /*
   int baudRate = mcp2515.Init( 125, 16 );
 #ifdef DEBUG   
   if ( baudRate > 0 ) {
@@ -283,7 +284,14 @@ void setup()
   else {
     Serial.println("MCP2515 Init Failed ...");
   }
-#endif  
+#endif
+*/
+
+  // http://www.kvaser.com/en/support/bit-timing-calculator.html
+  // T1=11, T2=5, BTQ=16, SP%=68.75, SJW=3, Bps=125, Err%=0,CNF1=0x83,CNF2=0xa4,CNF3=0x04
+  if ( !mcp2515.Init( 0x43, 0xA4, 0x04 ) ) {
+    Serial.println("MCP2515 Init Failed ...");
+  }
     
   // Check VSCP persistent storage and
   // restore if needed

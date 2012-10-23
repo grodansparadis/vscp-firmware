@@ -584,7 +584,7 @@ uint8_t vscp_getGUID( uint8_t idx )
 
 uint8_t vscp_getBootLoaderAlgorithm( void ) 
 {
-    return 0;
+    return VSCP_BOOTLOADER_NONE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
