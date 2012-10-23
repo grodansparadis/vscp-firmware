@@ -1,19 +1,21 @@
 /**
  * @brief           VSCP Level II common functionality
  * @file            vscp_firmware_level2.c
- * @author          Ake Hedman, eurosource, <a href="www.vscp.org">VSCP Project</a>
+ * @author          Ake Hedman, eurosource,
+ *                  <a href="www.vscp.org">VSCP Project</a>
  * @dependencies    -
  * @ingroup         mod_vscp
  *
  *
  * @section description Description
  **********************************
- * This module contains the code that implements the common VSCP level II functionality.
+ * This module contains the code that implements the common
+ * VSCP level II functionality.
  *
  *********************************************************************/
 
 
-/* ******************************************************************************
+/* *****************************************************************************
  * VSCP (Very Simple Control Protocol) 
  * http://www.vscp.org
  *
@@ -222,23 +224,20 @@ void vscp_readRegister( void )
 
         if ( ( reg + i) > VSCP_LEVEL2_COMMON_REGISTER_START ) {
             // Common register
-            wrkEvent.data[ 6 + i ] =
-                    vscp_readStdReg( reg -
-                        VSCP_LEVEL2_COMMON_REGISTER_START + 0x80 + i );
+            wrkEvent.data[ 4 + i ] =
+                    vscp_readStdReg( reg + i );
         } else {
             // User register
-            wrkEvent.data[ 6 + i ] = vscp_readAppReg( reg + i );
+            wrkEvent.data[ 4 + i ] = vscp_readAppReg( reg + i );
         }
 
     }
 
-    wrkEvent.sizeData = 6 + cnt;
+    wrkEvent.sizeData = 4 + cnt;
     wrkEvent.data[ 0 ] = reg >> 24;
     wrkEvent.data[ 1 ] = reg >> 16;
     wrkEvent.data[ 2 ] = reg >> 8;
     wrkEvent.data[ 3 ] = reg & 0xff;
-    wrkEvent.data[ 4 ] = cnt >> 8;
-    wrkEvent.data[ 5 ] = cnt & 0xff;
     wrkEvent.head = VSCP_PRIORITY_NORMAL;
     wrkEvent.vscp_class = VSCP_CLASS2_PROTOCOL;
     wrkEvent.vscp_type = VSCP2_TYPE_PROTOCOL_READ_WRITE_RESPONSE;
@@ -309,100 +308,106 @@ uint8_t vscp_readStdReg( uint32_t reg ) {
 
     uint8_t rv;
 
-    if (VSCP_REG_ALARMSTATUS == reg) {
+    if ( VSCP_REG_ALARMSTATUS == reg ) {
 
         // * * * Read alarm status register * * *
         rv = vscp_alarmstatus;
         vscp_alarmstatus = 0x00; // Reset alarm status
 
     }
-    else if (VSCP_REG_VSCP_MAJOR_VERSION == reg) {
+    else if ( VSCP_REG_VSCP_MAJOR_VERSION == reg ) {
 
         // * * * VSCP Protocol Major Version * * *
         rv = VSCP_MAJOR_VERSION;
 
     }
-    else if (VSCP_REG_VSCP_MINOR_VERSION == reg) {
+    else if ( VSCP_REG_VSCP_MINOR_VERSION == reg ) {
 
         // * * * VSCP Protocol Minor Version * * *
         rv = VSCP_MINOR_VERSION;
 
     }
-    else if (VSCP_REG_NODE_CONTROL == reg) {
+    else if ( VSCP_REG_NODE_CONTROL == reg ) {
 
         // * * * Reserved * * *
         rv = 0;
 
     }
-    else if (VSCP_REG_FIRMWARE_MAJOR_VERSION == reg) {
-
-        // * * * Get firmware Major version * * *
-        rv = vscp_getFirmwareMajorVersion();
-
-    }
-    else if (VSCP_REG_FIRMWARE_MINOR_VERSION == reg) {
-
-        // * * * Get firmware Minor version * * *
-        rv = vscp_getFirmwareMinorVersion();
-
-    }
-    else if (VSCP_REG_FIRMWARE_SUB_MINOR_VERSION == reg) {
-
-        // * * * Get firmware Sub Minor version * * *
-        rv = vscp_getFirmwareSubMinorVersion();
-
-    }
-    else if (reg < VSCP_REG_MANUFACTUR_ID0) {
+    else if ( ( reg >= VSCP_REG_USERID0 ) &&
+            ( reg < VSCP_REG_MANUFACTUR_ID0 ) )  {
 
         // * * * Read from persitant locations * * *
-        rv = vscp_getUserID(reg - VSCP_REG_USERID0);
+        rv = vscp_getUserID( reg - VSCP_REG_USERID0 );
 
     }
-    else if ((reg > VSCP_REG_USERID4) &&
-            (reg < VSCP_REG_NICKNAME_ID)) {
+    else if ( ( reg >= VSCP_REG_MANUFACTUR_ID0  ) &&
+            ( reg < VSCP_REG_NICKNAME_ID ) ) {
 
         // * * * Manufacturer ID information * * *
-        rv = vscp_getManufacturerId(reg - VSCP_REG_MANUFACTUR_ID0);
+        rv = vscp_getManufacturerId( reg - VSCP_REG_MANUFACTUR_ID0 );
 
     }
-    else if (VSCP_REG_NICKNAME_ID == reg) {
+    else if ( VSCP_REG_NICKNAME_ID == reg ) {
 
         // * * * nickname id * * *
         rv = 0xff; // Always undefined  for Level II
 
     }
-    else if (VSCP_REG_PAGE_SELECT_LSB == reg) {
-
-        // * * * Page select LSB * * *
-        rv = (vscp_page_select & 0xff);
-
-    }
-
-    else if (VSCP_REG_PAGE_SELECT_MSB == reg) {
+    else if ( VSCP_REG_PAGE_SELECT_MSB == reg ) {
 
         // * * * Page select MSB * * *
-        rv = (vscp_page_select >> 8) & 0xff;
+        rv = ( vscp_page_select >> 8 ) & 0xff;
 
     }
-    else if (VSCP_REG_BOOT_LOADER_ALGORITHM == reg) {
-        // * * * Boot loader algorithm * * *
-        rv = VSCP_BOOTLOADER_PIC1;
+    else if ( VSCP_REG_PAGE_SELECT_LSB == reg ) {
+
+        // * * * Page select LSB * * *
+        rv = ( vscp_page_select & 0xff );
+
     }
-    else if (VSCP_REG_BUFFER_SIZE == reg) {
+    else if ( VSCP_REG_FIRMWARE_MAJOR_VERSION == reg ) {
+
+        // * * * Get firmware Major version * * *
+        rv = vscp_getFirmwareMajorVersion();
+
+    }
+    else if ( VSCP_REG_FIRMWARE_MINOR_VERSION == reg ) {
+
+        // * * * Get firmware Minor version * * *
+        rv = vscp_getFirmwareMinorVersion();
+
+    }
+    else if ( VSCP_REG_FIRMWARE_SUB_MINOR_VERSION == reg ) {
+
+        // * * * Get firmware Sub Minor version * * *
+        rv = vscp_getFirmwareSubMinorVersion();
+
+    }
+    else if ( VSCP_REG_BOOT_LOADER_ALGORITHM == reg ) {
+
+        // * * * Boot loader algorithm * * *
+        rv = vscp_getBootLoaderAlgorithm();
+
+    }
+    else if ( VSCP_REG_BUFFER_SIZE == reg ) {
+
         // * * * Buffer size * * *
         rv = vscp_getBufferSize();
+
     }
-    else if ((reg > (VSCP_REG_GUID - 1)) &&
-            (reg < VSCP_REG_DEVICE_URL)) {
+
+    else if ( ( reg >= VSCP_REG_GUID ) &&
+            ( reg < VSCP_REG_DEVICE_URL  ) ) {
 
         // * * * GUID * * *
-        rv = vscp_getGUID(reg - VSCP_REG_GUID);
+        rv = vscp_getGUID( reg - VSCP_REG_GUID );
 
     }
-    else {
+
+    else if ( reg >= VSCP_REG_DEVICE_URL ) {
 
         // * * * The device URL * * *
-        rv = vscp_getMDF_URL(reg - VSCP_REG_DEVICE_URL);
+        rv = vscp_getMDF_URL( reg - VSCP_REG_DEVICE_URL );
 
     }
 

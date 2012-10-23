@@ -62,66 +62,67 @@
 //  	VSCP Constants
 // ******************************************************************************
 
-#define VSCP_MAJOR_VERSION				1
-#define VSCP_MINOR_VERSION				5
+#define VSCP_MAJOR_VERSION          1
+#define VSCP_MINOR_VERSION          5
 
-#define	VSCP_LEVEL2_UDP_PORT				9598	
-#define	VSCP_LEVEL2_TCP_PORT				9598	 
+#define	VSCP_LEVEL2_UDP_PORT        9598
+#define	VSCP_LEVEL2_TCP_PORT        9598
 
-#define VSCP_SIZE_GUID					16 	// # GUID bytes
-#define VSCP_SIZE_DEVURL				32  	// # of device URL bytes
+#define VSCP_SIZE_GUID              16      // # GUID bytes
+#define VSCP_SIZE_DEVURL            32      // # of device URL bytes
 
-#define LIMITED_DEVICE_DATASIZE				32      // This is the max size used for
-                                                                // a limited data Level II unit.
-                                                                // VSCP_LEVEL2_LIMITED_DEVICE should
-                                                                // be define in vscp_projdefs.h for
-                                                                // it to be used
+#define LIMITED_DEVICE_DATASIZE     128     // This is the max size used for
+                                            // a limited data Level II unit.
+                                            // VSCP_LEVEL2_LIMITED_DEVICE should
+                                            // be define in vscp_projdefs.h for
+                                            // it to be used
 
-#define VSCP_BOOT_FLAG					0xff	// Boot flag is stored in persistent storage
-													// and if it is there the bootloader will be 
-													// activated. 
+#define VSCP_BOOT_FLAG              0xff    // Boot flag is stored in persistent storage
+                                            // and if it is there the bootloader will be
+                                            // activated.
 // Bootloaders
-#define VSCP_BOOTLOADER_VSCP				0x00	// VSCP bootloader algorithm
-#define VSCP_BOOTLOADER_PIC1				0x01	// PIC
-#define VSCP_BOOTLOADER_LPC1				0x10	// NXP LPC algortithm
-#define VSCP_BOOTLOADER_NONE				0xff
+#define VSCP_BOOTLOADER_VSCP        0x00    // VSCP bootloader algorithm
+#define VSCP_BOOTLOADER_PIC1        0x01    // PIC
+#define VSCP_BOOTLOADER_LPC1        0x10    // NXP LPC algortithm
+#define VSCP_BOOTLOADER_NONE        0xff    // No bootloader
 
 // State machine states 
-#define VSCP_STATE_STARTUP				0x00	// Cold/warm reset
-#define VSCP_STATE_INIT					0x01	// Assigning nickname
-#define VSCP_STATE_PREACTIVE				0x02	// Waiting for host initialixation
-#define VSCP_STATE_ACTIVE				0x03	// The normal state
-#define VSCP_STATE_ERROR				0x04	// error state. Big problems.
+#define VSCP_STATE_STARTUP          0x00	// Cold/warm reset
+#define VSCP_STATE_INIT             0x01	// Assigning nickname
+#define VSCP_STATE_PREACTIVE        0x02	// Waiting for host initialixation
+#define VSCP_STATE_ACTIVE           0x03	// The normal state
+#define VSCP_STATE_ERROR            0x04	// error state. Big problems.
 
 // State machine sub states 
-#define VSCP_SUBSTATE_NONE				0x00	// No state
+#define VSCP_SUBSTATE_NONE          0x00	// No state
 
 
 // VSCP message
 
 // This structure is for VSCP Level II
-typedef struct _vscpEvent {								
+typedef struct _vscpEvent {
+
 // CRC should be calculated from
 // here to end + datablock
-	uint8_t head;		  	    	// bit 765 prioriy, Priority 0-7 where 0 is highest.
-						// bit 4 = hardcoded, true for a hardcoded device.
-						// bit 3 = Dont calculate CRC, false for CRC usage.
-	uint16_t  vscp_class;			// VSCP class
-	uint16_t  vscp_type;			// VSCP type
-	uint8_t   GUID[ 16 ];			// Node address MSB -> LSB
-	uint16_t  sizeData;			// Number of valid data bytes	
+    uint8_t head;           // bit 765 prioriy, Priority 0-7 where 0 is highest.
+                            // bit 4 = hardcoded, true for a hardcoded device.
+                            // bit 3 = Dont calculate CRC, false for CRC usage.
+    uint16_t  vscp_class;   // VSCP class
+    uint16_t  vscp_type;    // VSCP type
+    uint8_t   GUID[ 16 ];   // Node address MSB -> LSB
+    uint16_t  sizeData;     // Number of valid data bytes
 	
-	// Pointer to data. Normally Max 487 (512- 25) bytes
-	// but can be restrictedto 8 bytes. This means that
-	// that all Level II events will not be handled
-	// on a low-end Level II device.
+    // Pointer to data. Normally Max 487 (512- 25) bytes
+    // but can be restrictedto 8 bytes. This means that
+    // that all Level II events will not be handled
+    // on a low-end Level II device.
 #ifdef VSCP_LEVEL2_LIMITED_DEVICE	
-	uint8_t  data[ LIMITED_DEVICE_DATASIZE ];
+    uint8_t  data[ LIMITED_DEVICE_DATASIZE ];
 #else
-	uint8_t  data[ 512- 25 ];
+    uint8_t  data[ 512- 25 ];
 #endif
 
- 	uint16_t  crc;					// crc checksum
+ uint16_t  crc;             // crc checksum
 	
 } vscpEvent;
 
@@ -157,19 +158,19 @@ typedef vscpEvent *PVSCPEVENT;
 
 typedef struct _vscp_DMatrixRow {
 
-	uint32_t mask;				// Mask ( class + type )
-	uint32_t filter;			// Filter (class + type )
+    uint32_t mask;	// Mask ( class + type )
+    uint32_t filter;	// Filter (class + type )
 									
-	uint32_t control;			// Control word
-								//		Bit 31 - Enabled (if == 1).
-								//		Bit 30 -- Match GUID /beginnig of param field 0-15)
-								//		But 4  -- Match Zone.
-								//		Bit 3  -- Match Subzone.
+    uint32_t control;	// Control word
+			//  Bit 31 - Enabled (if == 1).
+			//  Bit 30 -- Match GUID /beginnig of param field 0-15)
+			//  But 4  -- Match Zone.
+			//  Bit 3  -- Match Subzone.
 	
-	uint16_t action;			// Action code
+    uint16_t action;	// Action code
 
-	uint8_t action_params[ VSCP_ACTION_PARAM_SIZE ];	// Action parameter
-	                                                    // Should be define in vscp_projdefs.h
+    uint8_t action_params[ VSCP_ACTION_PARAM_SIZE ];	// Action parameter
+                                                        // Should be define in vscp_projdefs.h
 	
 } vscp_DMatrixRow;
 
@@ -347,6 +348,8 @@ int8_t vscp_sendRawPacket( void );
 int8_t vscp_getRawPacket( void );
 #endif
 
+uint8_t vscp_getBootLoaderAlgorithm( void );
+
 uint8_t vscp_readAppReg( uint32_t reg );
 uint8_t vscp_writeAppReg( uint32_t reg, uint8_t data );
 
@@ -358,8 +361,6 @@ void vscp_setUserID( uint8_t idx, uint8_t data );
 
 uint8_t vscp_getManufacturerId( uint8_t idx );
 void vscp_setManufacturerId( uint8_t idx, uint8_t data );
-
-uint8_t vscp_getBootLoaderAlgorithm( void );
 
 uint8_t vscp_getBufferSize( void );
 
