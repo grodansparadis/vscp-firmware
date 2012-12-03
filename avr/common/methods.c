@@ -7,8 +7,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // sendVSCPFrame
 //
@@ -91,29 +89,23 @@ int8_t getVSCPFrame( uint16_t *pvscpclass,
 ///////////////////////////////////////////////////////////////////////////////
 // readEEPROM
 //
-//
 
 int readEEPROM( uint8_t addr )
 {
-    while ( EECR & ( 1 << EEWE ) );
-    EEAR = addr;
-    EECR |= ( 1 << EERE );
-    return EEDR;
+	// we now use the avrlib-eeprom functions
+	uint8_t test = eeprom_read_byte( &addr );
+	return test;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // writeEEPROM
 //
-//
 
 int writeEEPROM( uint8_t addr, uint8_t data )
 {
-    while ( EECR & ( 1 << EEWE ) );
-    EEAR = addr;
-    EEDR=data;
-    EECR |= ( 1 << EEMWE );
-    EECR |= ( 1 << EEWE );
-    return TRUE;
+	// we now use the avrlib-eeprom update functions, saves some write cycles
+	eeprom_update_byte(&addr, data);
+	return TRUE;
 }
 
 
@@ -389,7 +381,22 @@ void vscp_getMatrixInfo( char *pData )
     pData[ 4 ] = 0;
     pData[ 5 ] = 0;
     pData[ 6 ] = 0;
-    uart_puts("DM\n");
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// SendInformationEvent
+//
+void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId ) 
+{
+	vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
+	vscp_omsg.flags = VSCP_VALID_MSG + 3;
+	vscp_omsg.class = eventClass;
+	vscp_omsg.type = eventTypeId;
+
+	vscp_omsg.data[ 0 ] = idx;	// Register
+	vscp_omsg.data[ 1 ] = eeprom_read_byte(&STD_REG_ZONE);
+	vscp_omsg.data[ 2 ] = eeprom_read_byte(&STD_REG_SUBZONE);
+
+	vscp_sendEvent();	// Send data
+}
 
