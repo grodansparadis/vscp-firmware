@@ -196,7 +196,7 @@ typedef struct _vscp_DMatrixRow {
 #define VSCP2_UDP_POS_SIZE			21
 
 #define VSCP2_UDP_POS_DATA			23  // Holder for beginning of data
-#define VSCP2_UDP_POS_CRC			25	// dummy: actual is len - 2
+#define VSCP2_UDP_POS_CRC			25  // dummy: actual is len - 2
 
 
 // ******************************************************************************
@@ -263,12 +263,12 @@ typedef struct _vscp_DMatrixRow {
 // VSCP function flags
 #define VSCP_FUNCTION_USE_TCP			0x01	// Use TCP or UDP
 #define VSCP_FUNCTION_AUTODISCOVER		0x02	// If TCP enabled serach server
-													// with UDP High End Discovery before 
-													// trying to connect
+							// with UDP High End Discovery before 
+							// trying to connect
 #define VSCP_FUNCTION_FALLBACK			0x04	// If TCP is enabled fallback to UDP on
-													// failure.
+							// failure.
 #define VSCP_FUNCTION_HARDCODED_IPADDR		0x08	// Use a hard TCP/IP address for the
-													// VSCP TCP server.
+							// VSCP TCP server.
 #define VSCP_FUNCTION_PROBE_SENT		0x10  	// High end server probe sent
 #define VSCP_FUNCTION_RXOBJ_IN_USE		0x40  	// TCP has receibed a frame
 #define VSCP_FUNCTION_TXOBJ_IN_USE		0x80  	// Set to initiate TCP TX	
@@ -335,12 +335,14 @@ void fillGUID( void );
 int8_t vscp_udpinit( void );
 int8_t vscp_sendUDPEvent( vscpEvent *pEvent );
 int8_t vscp_getUDPEvent( vscpEvent *pEvent );
+uint8_t vscp_getIPsddress( uint8_t pos );
 #endif
 
 // TCP event functionality - Don't use directly
 #ifdef VSCP_USE_TCP
 int8_t vscp_sendTCPEvent( vscpEvent *pEvent );
 int8_t vscp_getTCPEvent( vscpEvent *pEvent );
+uint8_t vscp_getIPsddress( uint8_t pos );
 #endif
 
 #ifdef VSCP_USE_RAW_ETHERNET

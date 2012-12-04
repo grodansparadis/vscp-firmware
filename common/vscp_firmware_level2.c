@@ -2,7 +2,7 @@
  * @brief           VSCP Level II common functionality
  * @file            vscp_firmware_level2.c
  * @author          Ake Hedman, eurosource,
- *                  <a href="www.vscp.org">VSCP Project</a>
+ *                  www.vscp.org - VSCP Project
  * @dependencies    -
  * @ingroup         mod_vscp
  *
@@ -45,11 +45,6 @@
  *
  * ******************************************************************************
  */
-
-// $RCSfile: vscp_2.c,v $                                       
-// $Date: 2005/10/24 06:45:44 $                                  
-// $Author: akhe $                                              
-// $Revision: 1.2 $ 
 
 #include <vscp_compiler.h>
 #include <vscp_projdefs.h>
@@ -143,6 +138,7 @@ void vscp_init(void) {
 //
 
 int8_t vscp_sendEvent() {
+    
     // Fill in GUID
     fillGUID();
 
@@ -250,7 +246,8 @@ void vscp_readRegister( void )
 // vscp_writeRegister
 //
 
-void vscp_writeRegister( void ) {
+void vscp_writeRegister( void )
+{
     uint8_t saveData[ 4 ];
     uint32_t i;
     uint32_t idx = ((uint32_t) wrkEvent.data[ 0 ] << 24) +
@@ -304,7 +301,8 @@ void vscp_writeRegister( void ) {
 // vscp_readStdReg
 //
 
-uint8_t vscp_readStdReg( uint32_t reg ) {
+uint8_t vscp_readStdReg( uint32_t reg )
+{
 
     uint8_t rv;
 
@@ -420,7 +418,8 @@ uint8_t vscp_readStdReg( uint32_t reg ) {
 // vscp_writeStdReg
 //
 
-uint8_t vscp_writeStdReg(uint32_t reg, uint8_t data) {
+uint8_t vscp_writeStdReg(uint32_t reg, uint8_t data)
+{
     uint8_t rv = ~data;
 
     if ((reg > (VSCP_REG_VSCP_MINOR_VERSION + 1)) &&
@@ -489,17 +488,18 @@ uint8_t vscp_writeStdReg(uint32_t reg, uint8_t data) {
 
 #ifdef VSCP_DISCOVER_SERVER
 
-void sendHighEndServerProbe(void) {
+void sendHighEndServerProbe(void)
+{
     outEvent.head = (VSCP_PRIORITY_HIGH << 5);
     outEvent.sizeData = 5;
     outEvent.vscp_class = VSCP_CLASS1_PROTOCOL;
     outEvent.vscp_type = VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_PROBE;
     // GUID is filled in by send routine
     outEvent.data[0] = 0; // TCP interface
-    outEvent.data[1] = appcfgGetc(APPCFG_IP0);
-    outEvent.data[2] = appcfgGetc(APPCFG_IP1);
-    outEvent.data[3] = appcfgGetc(APPCFG_IP2);
-    outEvent.data[4] = appcfgGetc(APPCFG_IP3);
+    outEvent.data[1] = vscp_getIPsddress( 0 );
+    outEvent.data[2] = vscp_getIPsddress( 1 );
+    outEvent.data[3] = vscp_getIPsddress( 2 );
+    outEvent.data[4] = vscp_getIPsddress( 3 );
 
     vscp_sendEvent(&outEvent);
 }
@@ -511,7 +511,8 @@ void sendHighEndServerProbe(void) {
 // fillGUID
 //
 
-void fillGUID(void) {
+void fillGUID(void)
+{
     uint8_t i;
 
     for (i = 0; i < 16; i++) {

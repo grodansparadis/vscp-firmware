@@ -1,5 +1,5 @@
 MPLINK 4.42, Linker
-Linker Map File - Created Tue Oct 23 21:13:42 2012
+Linker Map File - Created Thu Oct 25 10:39:35 2012
 
                                  Section Info
                   Section       Type    Address   Location Size(Bytes)
@@ -98,7 +98,6 @@ Linker Map File - Created Tue Oct 23 21:13:42 2012
          .idata_xeeprom.o      idata   0x0001fa       data   0x000000
          .udata_xeeprom.o      udata   0x0001fa       data   0x000000
           .idata___init.o      idata   0x0001fa       data   0x000000
-          outeventSection      udata   0x0001fa       data   0x000000
 .idata_vscp_raw_ethernet.o      idata   0x0001fa       data   0x000000
 .udata_vscp_raw_ethernet.o      udata   0x0001fa       data   0x000000
              .idata_i2c.o      idata   0x0001fa       data   0x000000

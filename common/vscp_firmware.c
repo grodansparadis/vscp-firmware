@@ -40,7 +40,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "vscp_firmware.h"
-#include "vscp_class.h"      
+#include "vscp_class.h"
 #include "vscp_type.h"
 
 #ifndef FALSE
@@ -513,104 +513,104 @@ uint8_t vscp_readStdReg(uint8_t reg)
 {
     uint8_t rv = 0;
 
-    if (VSCP_REG_ALARMSTATUS == vscp_imsg.data[ 1 ]) {
+    if (VSCP_REG_ALARMSTATUS == reg) {
 
         // * * * Read alarm status register * * *
         rv = vscp_alarmstatus;
         vscp_alarmstatus = 0x00; // Reset alarm status
 
     }
-    else if (VSCP_REG_VSCP_MAJOR_VERSION == vscp_imsg.data[ 1 ]) {
+    else if (VSCP_REG_VSCP_MAJOR_VERSION == reg) {
 
         // * * * VSCP Protocol Major Version * * *
         rv = VSCP_MAJOR_VERSION;
 
     }
-    else if (VSCP_REG_VSCP_MINOR_VERSION == vscp_imsg.data[ 1 ]) {
+    else if (VSCP_REG_VSCP_MINOR_VERSION == reg) {
 
         // * * * VSCP Protocol Minor Version * * *
         rv = VSCP_MINOR_VERSION;
 
     }
-    else if (VSCP_REG_NODE_CONTROL == vscp_imsg.data[ 1 ]) {
+    else if (VSCP_REG_NODE_CONTROL == reg) {
 
         // * * * Reserved * * *
         rv = 0;
 
     }
-    else if (VSCP_REG_FIRMWARE_MAJOR_VERSION == vscp_imsg.data[ 1 ]) {
+    else if (VSCP_REG_FIRMWARE_MAJOR_VERSION == reg) {
 
         // * * * Get firmware Major version * * *
         rv = vscp_getMajorVersion();
 
     }
-    else if (VSCP_REG_FIRMWARE_MINOR_VERSION == vscp_imsg.data[ 1 ]) {
+    else if (VSCP_REG_FIRMWARE_MINOR_VERSION == reg) {
 
         // * * * Get firmware Minor version * * *
         rv = vscp_getMinorVersion();
 
     }
-    else if (VSCP_REG_FIRMWARE_SUB_MINOR_VERSION == vscp_imsg.data[ 1 ]) {
+    else if (VSCP_REG_FIRMWARE_SUB_MINOR_VERSION == reg) {
 
         // * * * Get firmware Sub Minor version * * *
         rv = vscp_getSubMinorVersion();
 
     }
-    else if (vscp_imsg.data[ 1 ] < VSCP_REG_MANUFACTUR_ID0) {
+    else if (reg < VSCP_REG_MANUFACTUR_ID0) {
 
         // * * * Read from persitant locations * * *
-        rv = vscp_getUserID(vscp_imsg.data[ 1 ] - VSCP_REG_USERID0);
+        rv = vscp_getUserID(reg - VSCP_REG_USERID0);
 
     }
-    else if ((vscp_imsg.data[ 1 ] > VSCP_REG_USERID4) &&
-            (vscp_imsg.data[ 1 ] < VSCP_REG_NICKNAME_ID)) {
+    else if ((reg > VSCP_REG_USERID4) &&
+            (reg < VSCP_REG_NICKNAME_ID)) {
 
         // * * * Manufacturer ID information * * *
-        rv = vscp_getManufacturerId(vscp_imsg.data[ 1 ] - VSCP_REG_MANUFACTUR_ID0);
+        rv = vscp_getManufacturerId(reg - VSCP_REG_MANUFACTUR_ID0);
 
     }
-    else if (VSCP_REG_NICKNAME_ID == vscp_imsg.data[ 1 ]) {
+    else if (VSCP_REG_NICKNAME_ID == reg) {
 
         // * * * nickname id * * *
         rv = vscp_nickname;
 
     }
-    else if (VSCP_REG_PAGE_SELECT_LSB == vscp_imsg.data[ 1 ]) {
+    else if (VSCP_REG_PAGE_SELECT_LSB == reg) {
 
         // * * * Page select LSB * * *
         rv = (vscp_page_select & 0xff);
 
     }
 
-    else if (VSCP_REG_PAGE_SELECT_MSB == vscp_imsg.data[ 1 ]) {
+    else if (VSCP_REG_PAGE_SELECT_MSB == reg) {
 
         // * * * Page select MSB * * *
         rv = (vscp_page_select >> 8) & 0xff;
 
     }
-    else if (VSCP_REG_BOOT_LOADER_ALGORITHM == vscp_imsg.data[ 1 ]) {
+    else if (VSCP_REG_BOOT_LOADER_ALGORITHM == reg) {
         // * * * Boot loader algorithm * * *
         rv = vscp_getBootLoaderAlgorithm();
     }
-    else if (VSCP_REG_BUFFER_SIZE == vscp_imsg.data[ 1 ]) {
+    else if (VSCP_REG_BUFFER_SIZE == reg) {
         // * * * Buffer size * * *
         rv = vscp_getBufferSize();
     }
-    else if (VSCP_REG_PAGES_USED == vscp_imsg.data[ 1 ]) {
+    else if (VSCP_REG_PAGES_USED == reg) {
         // * * * Register Pages Used * * *
         rv = vscp_getRegisterPagesUsed();
     }
-    else if ((vscp_imsg.data[ 1 ] > (VSCP_REG_GUID - 1)) &&
-            (vscp_imsg.data[ 1 ] < VSCP_REG_DEVICE_URL)) {
+    else if ((reg > (VSCP_REG_GUID - 1)) &&
+            (reg < VSCP_REG_DEVICE_URL)) {
 
         // * * * GUID * * *
-        rv = vscp_getGUID(vscp_imsg.data[ 1 ] - VSCP_REG_GUID);
+        rv = vscp_getGUID(reg - VSCP_REG_GUID);
 
     }
     else {
 
         // * * * The device URL * * *
-        rv = vscp_getMDF_URL(vscp_imsg.data[ 1 ] - VSCP_REG_DEVICE_URL);
+        rv = vscp_getMDF_URL(reg - VSCP_REG_DEVICE_URL);
 
     }
 
@@ -638,51 +638,51 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value)
 {
     uint8_t rv = ~value;
 
-    if ((vscp_imsg.data[ 1 ] > (VSCP_REG_VSCP_MINOR_VERSION + 1)) &&
-            (vscp_imsg.data[ 1 ] < VSCP_REG_MANUFACTUR_ID0)) {
+    if ((reg > (VSCP_REG_VSCP_MINOR_VERSION + 1)) &&
+            (reg < VSCP_REG_MANUFACTUR_ID0)) {
 
         // * * * User Client ID * * *
-        vscp_setUserID((vscp_imsg.data[ 1 ] - VSCP_REG_USERID0), vscp_imsg.data[ 2 ]);
-        rv = vscp_getUserID((vscp_imsg.data[ 1 ] - VSCP_REG_USERID0));
+        vscp_setUserID((reg - VSCP_REG_USERID0), value);
+        rv = vscp_getUserID((reg - VSCP_REG_USERID0));
 
     }
-    else if (VSCP_REG_PAGE_SELECT_MSB == vscp_imsg.data[ 1 ]) {
+    else if (VSCP_REG_PAGE_SELECT_MSB == reg) {
 
         // * * * Page select register MSB * * *
-        vscp_page_select = (vscp_page_select & 0xff00) | ((uint16_t) vscp_imsg.data[ 2 ] << 8);
+        vscp_page_select = (vscp_page_select & 0xff00) | ((uint16_t) value << 8);
         rv = (vscp_page_select >> 8) & 0xff;
     }
-    else if (VSCP_REG_PAGE_SELECT_LSB == vscp_imsg.data[ 1 ]) {
+    else if (VSCP_REG_PAGE_SELECT_LSB == reg) {
 
         // * * * Page select register LSB * * *
-        vscp_page_select = (vscp_page_select & 0xff) | vscp_imsg.data[ 2 ];
+        vscp_page_select = (vscp_page_select & 0xff) | value;
         rv = (vscp_page_select & 0xff);
     }
 
 #ifdef ENABLE_WRITE_2PROTECTED_LOCATIONS
 
         // Write manufacturer id configuration information
-    else if ((vscp_imsg.data[ 1 ] > VSCP_REG_USERID4) && (vscp_imsg.data[ 1 ] < VSCP_REG_NICKNAME_ID)) {
+    else if ((reg > VSCP_REG_USERID4) && (reg < VSCP_REG_NICKNAME_ID)) {
         // page select must be 0xffff for writes to be possible
         if ((0xff != ((vscp_page_select >> 8) & 0xff)) ||
                 (0xff != (vscp_page_select & 0xff))) {
             // return complement to indicate error
-            rv = ~vscp_imsg.data[ 2 ];
+            rv = ~value;
         } else {
             // Write
-            vscp_setManufacturerId(vscp_imsg.data[ 1 ] - VSCP_REG_MANUFACTUR_ID0, vscp_imsg.data[ 2 ]);
-            rv = vscp_getManufacturerId(vscp_imsg.data[ 1 ] - VSCP_REG_MANUFACTUR_ID0);
+            vscp_setManufacturerId(reg - VSCP_REG_MANUFACTUR_ID0, value);
+            rv = vscp_getManufacturerId(reg - VSCP_REG_MANUFACTUR_ID0);
         }
     }        // Write GUID configuration information
-    else if ((vscp_imsg.data[ 1 ] > (VSCP_REG_GUID - 1)) && (vscp_imsg.data[ 1 ] < VSCP_REG_DEVICE_URL)) {
+    else if ((reg > (VSCP_REG_GUID - 1)) && (reg < VSCP_REG_DEVICE_URL)) {
         // page must be 0xffff for writes to be possible
         if ((0xff != ((vscp_page_select >> 8) & 0xff)) ||
                 (0xff != (vscp_page_select & 0xff))) {
             // return complement to indicate error
-            rv = ~vscp_imsg.data[ 2 ];
+            rv = ~value;
         } else {
-            vscp_setGUID(vscp_imsg.data[ 1 ] - VSCP_REG_GUID, vscp_imsg.data[ 2 ]);
-            rv = vscp_getGUID(vscp_imsg.data[ 1 ] - VSCP_REG_GUID);
+            vscp_setGUID(reg - VSCP_REG_GUID, value);
+            rv = vscp_getGUID(reg - VSCP_REG_GUID);
         }
     }
 #endif
@@ -891,11 +891,11 @@ void vscp_handleProtocolEvent(void)
                     for (i = 0; i < len; i++) {
                         vscp_omsg.data[ (i % 7) + 1 ] = vscp_readRegister(offset + i);
 
-                        if (i % 7 == 6 || i == (len - 1)) {
+                        if ((i % 7) == 6 || i == (len - 1)) {
                             uint8_t bytes;
 
-                            if (i % 7 == 6) bytes = 7;
-                            else bytes = i % 7 + 1;
+                            if ((i % 7) == 6) bytes = 7;
+                            else bytes = (i % 7) + 1;
 
                             vscp_omsg.flags = VSCP_VALID_MSG + bytes + 1;
                             vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
@@ -1055,8 +1055,7 @@ void vscp_handleProtocolEvent(void)
 
                 if (vscp_nickname == vscp_imsg.data[0]) {
                     uint16_t page_save;
-                    uint8_t byte = 0;
-					uint8_t bytes = 1;
+                    uint8_t byte = 0, bytes = 0;
 					uint8_t bytes_this_time, cb;
 					
 					// if data byte 4 of the request is present probably more than 1 register should be
@@ -1086,13 +1085,13 @@ void vscp_handleProtocolEvent(void)
 
 					do {
 						// calculate bytes to transfer in this event
-						if ((bytes - byte) > 4) {
+						if ((bytes - byte) >= 4) {
 							bytes_this_time = 4; }
 						else {
 							bytes_this_time = (bytes - byte); }
 
 						// define length of this event
-						vscp_omsg.flags = (VSCP_VALID_MSG + 4 + bytes_this_time);
+						vscp_omsg.flags = VSCP_VALID_MSG + 4 + bytes_this_time;
 						vscp_omsg.data[3] = vscp_imsg.data[3] + byte; // first register in this event
 
 						// put up to four registers to data space
@@ -1102,7 +1101,7 @@ void vscp_handleProtocolEvent(void)
 						// send the event
 						vscp_sendEvent();
 						// increment byte by bytes_this_time and the event number by one
-						byte = (byte + bytes_this_time);
+						byte = byte + bytes_this_time;
 						// increment the index
 						vscp_omsg.data[0] +=1 ;
 						}

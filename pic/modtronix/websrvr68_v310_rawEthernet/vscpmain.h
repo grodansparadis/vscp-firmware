@@ -199,7 +199,7 @@
 
 // Base address for DM matrix in external EEPROM
 #define VSCP_DM_MATRIX_BASE				0x200   // base address in internal EEPROM
-#define DM_ENTERIES									16		// Number of DM enteries
+#define DM_ENTERIES					16	// Number of DM enteries
 
 // Action codes
 #define VSCP_ACTION_NOOP				0

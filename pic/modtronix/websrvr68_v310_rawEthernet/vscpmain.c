@@ -1,7 +1,7 @@
  /**
  * @brief           VSCP task for the rawEthernet reference project
  * @file            vscp_task.c
- * @author          Ake Hedman, eurosource, <a href="www.vscp.org">VSCP Project</a>
+ * @author          Ake Hedman, Grodans Paradis AB, www.vscp.org
  * @dependencies    -
  * @compiler        MPLAB C18 v2.10 or higher <br>
  *                  HITECH PICC-18 V8.35PL3 or higher
@@ -15,11 +15,11 @@
  *********************************************************************/
 
 
-/* ******************************************************************************
- * 	VSCP (Very Simple Control Protocol) 
- * 	http://www.vscp.org
+/* *****************************************************************************
+ * VSCP (Very Simple Control Protocol) 
+ * http://www.vscp.org
  *
- *  Copyright (C) 2011-2012 Ake Hedman, eurosource
+ * Copyright (C) 2011-2012 Ake Hedman, Grodans Paradis AB
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -60,9 +60,7 @@
 
 #include "crc.h"
 #include "eeprom.h"
-
 #include "version.h"
-
 #include "vscpmain.h"
 
 
@@ -98,17 +96,12 @@ const ROM char vscp_deviceURL[] = "www.eurosource.se/raweth_a.xml";
 
 // From vscp_2.c
 extern uint8_t vscp_function_flags;
-extern uint16_t vscp_page_select;		// Current register page
+extern uint16_t vscp_page_select;	// Current register page
 extern vscpEvent wrkEvent;
-
-#if defined(VSCP_ENABLE_BOOTLOADER)
-BOOL bBootLoadMode;				// TRUE if in bootloader mode
-uint8_t vscp_current_bootblock;			// Block that is loading
-#endif
 
 uint8_t pwmtemp[2];
 
-static uint8_t lastHeartBeat = 120;		// Set 120 as value to send heatbeat directly
+static uint8_t lastHeartBeat = 120;	// Set 120 as value to send heatbeat directly
 static uint8_t lastPeriodicOutputEvent = 0;
 static uint8_t lastPeriodicInputEvent = 0;
 static uint8_t lastPeriodicADEvent0 = 0;
@@ -117,7 +110,7 @@ static uint8_t lastPeriodicADEvent2 = 0;
 static uint8_t lastPeriodicADEvent3 = 0;
 
 // The outevent is so large that we need to put it in it's own memory bank.
-#pragma udata outeventSection
+//#pragma udata outeventSection
 
 ///////////////////////////////////////////////////////////////////////////////
 // feedVSCP
