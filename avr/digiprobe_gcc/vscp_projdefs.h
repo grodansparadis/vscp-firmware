@@ -55,9 +55,11 @@
 	#define DECISION_MATRIX_ELEMENTS			0
 
 	// Start register position for decision matrix
-	#if DECISION_MATRIX_ELEMENTS>0
-		#define STD_REG_DECISION_MATRIX		0x80-(DECISION_MATRIX_ELEMENTS * 8)
-	#endif
+	#define STD_REG_DECISION_MATRIX		0x80-(DECISION_MATRIX_ELEMENTS * 8)
 
+	// I want to use optional "drop nickname" features with reset and
+	// timeout. Comment it out or do not define this to stay with
+	// standard implementation
+	#define VSCP_SPECIAL_PLATFORM				1
 
 #endif

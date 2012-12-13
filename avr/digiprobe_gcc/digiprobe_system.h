@@ -12,7 +12,6 @@
 
 	// System clock in kHz
 	#define F_CPU	8000000	// CPU Clock in Hz
-	#define FOSC	8000	// CPU Clock in kHz
 
 	// SPI device selection enumerator
 	#define SPI_DEVICE_NONE		0		// disable all devices

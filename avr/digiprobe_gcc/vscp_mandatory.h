@@ -85,9 +85,7 @@
 
 	uint8_t vscp_getControlByte( void );
 
-	#if (DECISION_MATRIX_ELEMENTS > 0)
 	void vscp_getMatrixInfo( char *pData );
-	#endif
 
 	#if DECISION_MATRIX_ELEMENTS > 0
 	static void doDM( void );
