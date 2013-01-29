@@ -42,7 +42,6 @@
 #include "vscp_class.h"
 #include "vscp_type.h"
 #include "vscp_firmware.h"
-#include "vscp_special.h"
 
 #ifndef FALSE
 #define FALSE           0
@@ -425,14 +424,14 @@ void vscp_handleDropNickname(void)
 {
 	uint8_t bytes = vscp_imsg.flags & 0x0f;
 
-	#if VSCP_SPECIAL_PLATFORM > 0
+	#ifdef DROP_NICKNAME_EXTENDED_FEATURES
 	uint8_t brake = 0;
 	#endif
 	
     if ((bytes >= 1) && (vscp_nickname == vscp_imsg.data[ 0 ])) {
         // Yes, we are addressed
 
-	#if VSCP_SPECIAL_PLATFORM > 0
+	#ifdef DROP_NICKNAME_EXTENDED_FEATURES
 		// Optional Byte 1: 
 		// bit7 - go idle do not start, bit6 - reset persistent storage
 		// bit5 - reset device but keep nickname
@@ -448,7 +447,7 @@ void vscp_handleDropNickname(void)
 			// bit 5 set: reset device, keep nickname, disregard other option
 			// below this by using 'brake'
 			if ((vscp_imsg.data[1] & (1<<5)) && (brake == 0)) {
-				platform_reset();
+				vscp_hardreset();
 				brake = 1;}
 
 			// bit 7 set: go idle, e.g. stay in an endless loop until repower
@@ -466,14 +465,14 @@ void vscp_handleDropNickname(void)
 			vscp_nickname = VSCP_ADDRESS_FREE;
 			vscp_writeNicknamePermanent(VSCP_ADDRESS_FREE);
 			}
-	#if VSCP_SPECIAL_PLATFORM > 0
+	#ifdef DROP_NICKNAME_EXTENDED_FEATURES
 		// now check if timing was passed in byte 2
 		if (bytes > 2) {
 			// and waiting for options that made sense
 			if ( (vscp_imsg.data[1] == 0) || ( vscp_imsg.data[1] & (1<<6)) ||
 			( vscp_imsg.data[1] & (1<<5)) ) {
 				// wait platform independently
-				platform_wait_ms(vscp_imsg.data[1] * 1000);
+				vscp_wait_ms(vscp_imsg.data[1] * 1000);
 				}
 		}
 	#endif

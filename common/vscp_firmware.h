@@ -650,4 +650,9 @@ uint8_t vscp_getZone(void);
  */
 uint8_t vscp_getSubzone(void);
 
+#ifdef DROP_NICKNAME_EXTENDED_FEATURES
+	void vscp_hardreset(void);
+	void vscp_wait_ms(uint16_t ms);
+#endif
+
 #endif
