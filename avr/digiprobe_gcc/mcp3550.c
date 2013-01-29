@@ -7,7 +7,7 @@
  	MCP355X driver using portpins
 *******************************************************************************/
 
-#include "digiprobe.inc"
+#include "digiprobe_gcc.inc"
 
 #define byteof(A,byte) (*(uint8_t*)(&A + byte))
 

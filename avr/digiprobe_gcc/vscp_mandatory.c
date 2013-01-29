@@ -7,7 +7,7 @@
  	All mandatory functions for the vscp protocol class
 *******************************************************************************/
 
-#include "digiprobe.inc"
+#include "digiprobe_gcc.inc"
 
 //**************************************************************************
 // Extended features in "Drop nickname / Reset" Event, Class 0, Type 7

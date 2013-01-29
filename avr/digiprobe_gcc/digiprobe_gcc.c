@@ -7,7 +7,7 @@
  	Main application
 *******************************************************************************/
 
-#include "digiprobe.inc"
+#include "digiprobe_gcc.inc"
 
 //somewhat bad behaviour
 #include "digiprobe_memory.c"
