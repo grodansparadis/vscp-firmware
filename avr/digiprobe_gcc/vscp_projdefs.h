@@ -57,9 +57,10 @@
 	// Start register position for decision matrix
 	#define STD_REG_DECISION_MATRIX		0x80-(DECISION_MATRIX_ELEMENTS * 8)
 
-	// I want to use optional "drop nickname" features with reset and
-	// timeout. Comment it out or do not define this to stay with
-	// standard implementation
-	#define VSCP_SPECIAL_PLATFORM				1
+	//uncomment the following line to enable the extended features of
+	//drop nickname event. You must provide these functions:
+	//   void vscp_hardreset(void);
+	//   
+	#define DROP_NICKNAME_EXTENDED_FEATURES
 
 #endif

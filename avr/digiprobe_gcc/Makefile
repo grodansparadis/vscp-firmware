@@ -60,7 +60,6 @@ OBJ += avr_spi.c
 OBJ += mcp355xs.c
 
 OBJ += $(VSCP_FIRMWARE)/common/vscp_firmware.c
-OBJ += $(VSCP_FIRMWARE)/avr/common/special_avr.c
 OBJ += $(VSCP_FIRMWARE)/avr/common/can_at90can128.c
 
 #==========================================================================

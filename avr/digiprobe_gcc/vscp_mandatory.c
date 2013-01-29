@@ -9,6 +9,26 @@
 
 #include "digiprobe.inc"
 
+//**************************************************************************
+// Extended features in "Drop nickname / Reset" Event, Class 0, Type 7
+//**************************************************************************
+#ifdef DROP_NICKNAME_EXTENDED_FEATURES
+void vscp_hardreset(void)
+{
+cli();						// disable all interrupts
+wdt_enable (WDTO_15MS);		// enable watchdog with shortes timing
+while (1);					// wait until watchdog resets the processor
+}
+
+void vscp_wait_ms(uint16_t tins)
+{
+// do a blocking wait but leave interrupts untouched
+_delay_ms(tins);
+}
+#endif
+
+
+
 void vscp_protocol_class(void)
 {
 	switch ( vscp_node_state ) {
