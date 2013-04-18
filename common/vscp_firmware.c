@@ -464,6 +464,7 @@ void vscp_handleDropNickname(void)
 			// this is the regular behavior without using byte 1 options
 			vscp_nickname = VSCP_ADDRESS_FREE;
 			vscp_writeNicknamePermanent(VSCP_ADDRESS_FREE);
+	        vscp_init();
 			}
 	#ifdef DROP_NICKNAME_EXTENDED_FEATURES
 		// now check if timing was passed in byte 2
@@ -472,7 +473,7 @@ void vscp_handleDropNickname(void)
 			if ( (vscp_imsg.data[1] == 0) || ( vscp_imsg.data[1] & (1<<6)) ||
 			( vscp_imsg.data[1] & (1<<5)) ) {
 				// wait platform independently
-				vscp_wait_ms(vscp_imsg.data[1] * 1000);
+				vscp_wait_s(vscp_imsg.data[2]);
 				}
 		}
 	#endif

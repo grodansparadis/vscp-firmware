@@ -20,13 +20,18 @@ wdt_enable (WDTO_15MS);		// enable watchdog with shortes timing
 while (1);					// wait until watchdog resets the processor
 }
 
-void vscp_wait_ms(uint16_t tins)
+void vscp_wait_ms(uint16_t tmsec)
 {
-// do a blocking wait but leave interrupts untouched
-_delay_ms(tins);
+	_delay_ms(tmsec);
+}
+
+void vscp_wait_s(uint16_t tsec)
+{
+	for (uint32_t cnt = 0; cnt < (tsec*1000); cnt++) {
+		_delay_ms(1);
+	}
 }
 #endif
-
 
 
 void vscp_protocol_class(void)

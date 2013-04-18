@@ -15,7 +15,8 @@
 //**************************************************************************
 #ifdef DROP_NICKNAME_EXTENDED_FEATURES
 void vscp_hardreset(void);
-void vscp_wait_ms(uint16_t tins);
+void vscp_wait_ms(uint16_t tmsec);
+void vscp_wait_s(uint16_t tsec);
 #endif
 
 	void vscp_protocol_class(void);
