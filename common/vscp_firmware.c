@@ -649,13 +649,13 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value)
     else if (VSCP_REG_PAGE_SELECT_MSB == reg) {
 
         // * * * Page select register MSB * * *
-        vscp_page_select = (vscp_page_select & 0xff00) | ((uint16_t) value << 8);
+        vscp_page_select = (vscp_page_select & 0xff) | ((uint16_t) value << 8);
         rv = (vscp_page_select >> 8) & 0xff;
     }
     else if (VSCP_REG_PAGE_SELECT_LSB == reg) {
 
         // * * * Page select register LSB * * *
-        vscp_page_select = (vscp_page_select & 0xff) | value;
+        vscp_page_select = (vscp_page_select & 0xff00) | value;
         rv = (vscp_page_select & 0xff);
     }
 
