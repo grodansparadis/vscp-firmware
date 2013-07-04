@@ -18,10 +18,9 @@
  * 	VSCP (Very Simple Control Protocol) 
  * 	http://www.vscp.org
  *
- * 	Version 0.02 2008-11-15
- * 	akhe@eurosource.se
  *
- *  Copyright (C) 1995-2011 Ake Hedman, eurosource
+ *  Copyright (C) 1995-2013 Ake Hedman, 
+ *  Grodans Paradis AB, <akhe@grodansparadis.com>
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages

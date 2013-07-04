@@ -6,7 +6,7 @@
  * 	VSCP (Very Simple Control Protocol) 
  * 	http://www.vscp.org
  *
- *  Copyright (C) 1995-2012 Ake Hedman, 
+ *  Copyright (C) 1995-2013 Ake Hedman, 
  *  Grodans Paradis AB, <akhe@grodansparadis.com> 
  *
  * This software is provided 'as-is', without any express or implied
@@ -19,7 +19,7 @@
  *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
- *    in a product, an acknowledgment in the product documentation would be
+ *    in a product, an acknowledgement in the product documentation would be
  *    appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
  *    misrepresented as being the original software.
@@ -31,12 +31,6 @@
  * ******************************************************************************
  */
 
-
-//
-// $RCSfile: vscp.c,v $
-// $Revision: 1.6 $
-//
-
 #include <string.h>
 #include <stdlib.h>
 #include "vscp_firmware.h"
@@ -44,34 +38,34 @@
 #include "vscp_type.h"
 
 #ifndef FALSE
-#define FALSE           0
+#define FALSE  0
 #endif
 
 #ifndef TRUE
-#define TRUE            !FALSE
+#define TRUE   !FALSE
 #endif
 
 #ifndef ON
-#define ON              !FALSE
+#define ON     !FALSE
 #endif
 
 #ifndef OFF
-#define OFF             FALSE
+#define OFF    FALSE
 #endif 
 
 
 // Globals
 
 // VSCP Data
-uint8_t vscp_nickname; ///< Node nickname
+uint8_t vscp_nickname;      ///< Node nickname
 
-uint8_t vscp_errorcnt; // VSCP/CAN errors
-uint8_t vscp_alarmstatus; // VSCP Alarm Status
+uint8_t vscp_errorcnt;      // VSCP/CAN errors
+uint8_t vscp_alarmstatus;   // VSCP Alarm Status
 
-uint8_t vscp_node_state; // State machine state
+uint8_t vscp_node_state;    // State machine state
 uint8_t vscp_node_substate; // State machine substate
 
-uint8_t vscp_probe_cnt; // Number of timout probes
+uint8_t vscp_probe_cnt;     // Number of timout probes
 
 // Incoming event
 struct _imsg vscp_imsg;
@@ -80,7 +74,7 @@ struct _imsg vscp_imsg;
 struct _omsg vscp_omsg;
 
 uint8_t vscp_probe_address; // Address used during initialization
-uint8_t vscp_initledfunc; // Init LED functionality
+uint8_t vscp_initledfunc;   // Init LED functionality
 
 volatile uint16_t vscp_timer; // 1 ms timer counter
 //	Shold be externally updated.
@@ -734,32 +728,33 @@ void vscp_handleProtocolEvent(void)
 
                     if (vscp_imsg.data[ 1 ] < 0x80) {
 
+                        // Read application specific register
+                        vscp_omsg.data[ 1 ] = vscp_readAppReg(vscp_imsg.data[ 1 ]);
+
+                        // Register to read
+                        vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
+                        
                         vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
                         vscp_omsg.flags = VSCP_VALID_MSG + 2;
                         vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
                         vscp_omsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
 
-                        // Register to read
-                        vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
-
-                        // Read application specific register
-                        vscp_omsg.data[ 1 ] = vscp_readAppReg(vscp_imsg.data[ 1 ]);
-
                         // Send reply data
                         vscp_sendEvent();
                     } else {
-                        vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
-                        vscp_omsg.flags = VSCP_VALID_MSG + 2;
-                        vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-                        vscp_omsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-
-                        // Register to read
-                        vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
 
                         // Read VSCP register
                         vscp_omsg.data[ 1 ] =
                                 vscp_readStdReg(vscp_imsg.data[ 1 ]);
 
+                        // Register to read
+                        vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
+                        
+                        vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
+                        vscp_omsg.flags = VSCP_VALID_MSG + 2;
+                        vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
+                        vscp_omsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+                        
                         // Send event
                         vscp_sendEvent();
                     }
@@ -773,34 +768,36 @@ void vscp_handleProtocolEvent(void)
 
                     if (vscp_imsg.data[ 1 ] < 0x80) {
 
+                        // Write application specific register
+                        vscp_omsg.data[ 1 ] =
+                                vscp_writeAppReg(vscp_imsg.data[ 1 ], vscp_imsg.data[ 2 ]);
+                        
+                        // Register read
+                        vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
+
                         vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
                         vscp_omsg.flags = VSCP_VALID_MSG + 2;
                         vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
                         vscp_omsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+                        
+                        // Send reply
+                        vscp_sendEvent();
+                        
+                    } else {
 
+                        // Write VSCP register
+                        vscp_omsg.data[ 1 ] =
+                                vscp_writeStdReg(vscp_imsg.data[ 1 ], vscp_imsg.data[ 2 ]);
+                        
                         // Register read
                         vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
 
-                        // Write application specific register
-                        vscp_omsg.data[ 1 ] =
-                                vscp_writeAppReg(vscp_imsg.data[ 1 ], vscp_imsg.data[ 2 ]);
-
-                        // Send reply
-                        vscp_sendEvent();
-                    } else {
                         vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
                         vscp_omsg.flags = VSCP_VALID_MSG + 2;
                         vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
                         vscp_omsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
                         vscp_omsg.data[ 0 ] = vscp_nickname;
-
-                        // Register read
-                        vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
-
-                        // Write VSCP register
-                        vscp_omsg.data[ 1 ] =
-                                vscp_writeStdReg(vscp_imsg.data[ 1 ], vscp_imsg.data[ 2 ]);
-
+                        
                         // Write event
                         vscp_sendEvent();
                     }
@@ -940,15 +937,16 @@ void vscp_handleProtocolEvent(void)
 
                 if (vscp_nickname == vscp_imsg.data[ 0 ]) {
 
+                    vscp_omsg.data[ 1 ] = vscp_writeAppReg(
+                            vscp_imsg.data[ 1 ],
+                            vscp_readAppReg(vscp_imsg.data[ 1 ]) + 1);
+                    
+                    vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
+                    
                     vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
                     vscp_omsg.flags = VSCP_VALID_MSG + 2;
                     vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
                     vscp_omsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-
-                    vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
-                    vscp_omsg.data[ 1 ] = vscp_writeAppReg(
-                            vscp_imsg.data[ 1 ],
-                            vscp_readAppReg(vscp_imsg.data[ 1 ]) + 1);
 
                     // send the event
                     vscp_sendEvent();
@@ -959,15 +957,16 @@ void vscp_handleProtocolEvent(void)
 
                 if (vscp_nickname == vscp_imsg.data[ 0 ]) {
 
+                    vscp_omsg.data[ 1 ] = vscp_writeAppReg(
+                            vscp_imsg.data[ 1 ],
+                            vscp_readAppReg(vscp_imsg.data[ 1 ]) - 1);
+
+                    vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
+                    
                     vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
                     vscp_omsg.flags = VSCP_VALID_MSG + 2;
                     vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
                     vscp_omsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-
-                    vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
-                    vscp_omsg.data[ 1 ] = vscp_writeAppReg(
-                            vscp_imsg.data[ 1 ],
-                            vscp_readAppReg(vscp_imsg.data[ 1 ]) - 1);
 
                     // send the event
                     vscp_sendEvent();
@@ -1032,6 +1031,7 @@ void vscp_handleProtocolEvent(void)
             case VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO:
 
                 if (vscp_nickname == vscp_imsg.data[ 0 ]) {
+                    
                     vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
                     vscp_omsg.flags = VSCP_VALID_MSG + 7;
                     vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
@@ -1092,11 +1092,13 @@ void vscp_handleProtocolEvent(void)
 
 						// define length of this event
 						vscp_omsg.flags = VSCP_VALID_MSG + 4 + bytes_this_time;
-						vscp_omsg.data[3] = vscp_imsg.data[3] + byte; // first register in this event
+						vscp_omsg.data[3] = 
+                            vscp_imsg.data[3] + byte; // first register in this event
 
 						// put up to four registers to data space
 						for (cb = 0; cb < bytes_this_time; cb++) {
-							vscp_omsg.data[ (4 + cb) ] = vscp_readRegister( (vscp_imsg.data[3] + byte + cb) ); }
+							vscp_omsg.data[ (4 + cb) ] = 
+                                vscp_readRegister( (vscp_imsg.data[3] + byte + cb) ); }
 
 						// send the event
 						vscp_sendEvent();

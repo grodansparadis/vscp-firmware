@@ -8,7 +8,7 @@
  *
  * akhe@eurosource.se
  *
- * Copyright (C) 1995-2012 Ake Hedman,
+ * Copyright (C) 1995-2013 Ake Hedman,
  * Grodans Paradis AB, <akhe@grodansparadis.com>
  *
  * 080702 Cleaned up even more.
@@ -25,7 +25,7 @@
  *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
- *    in a product, an acknowledgment in the product documentation would be
+ *    in a product, an acknowledgement in the product documentation would be
  *    appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
  *    misrepresented as being the original software.
@@ -51,7 +51,7 @@ low end hardware device.
  Notes about defines
  -------------------
 
- Normaly make the following defines in the prjcfg.h file
+ Normally make the following defines in the prjcfg.h file
 
  ENABLE_WRITE_2PROTECTED_LOCATIONS
  =================================
@@ -73,17 +73,17 @@ low end hardware device.
 //  				VSCP Constants
 // ******************************************************************************
 
-#define VSCP_MAJOR_VERSION                     1    ///< VSCP Major version
-#define VSCP_MINOR_VERSION                     5    ///< VSCP Minor Version
+#define VSCP_MAJOR_VERSION				1    ///< VSCP Major version
+#define VSCP_MINOR_VERSION              5    ///< VSCP Minor Version
 
-#define VSCP_ADDRESS_MASTER                    0x00
-#define VSCP_ADDRESS_FREE                      0xff
+#define VSCP_ADDRESS_MASTER             0x00
+#define VSCP_ADDRESS_FREE               0xff
 
-#define VSCP_SIZE_GUID                         16   ///< # GUID bytes
-#define VSCP_SIZE_DEVURL                       32   ///< # of device URL bytes
-#define VSCP_SIZE_STD_DM_ROW                   8    ///< Size for level I decision matrix row
+#define VSCP_SIZE_GUID                  16   ///< # GUID bytes
+#define VSCP_SIZE_DEVURL                32   ///< # of device URL bytes
+#define VSCP_SIZE_STD_DM_ROW            8    ///< Size for level I decision matrix row
 
-#define VSCP_BOOT_FLAG                         0xff // Boot flag is stored in persistent storage
+#define VSCP_BOOT_FLAG                  0xff // Boot flag is stored in persistent storage
 // and if it is there the bootloader will be
 // activated.
 
@@ -99,52 +99,52 @@ low end hardware device.
 #define  VSCP_LEVEL1_COMMON_REGISTER_START      0x80
 
 // State machine states 
-#define VSCP_STATE_STARTUP                      0x00	// Cold/warm reset
-#define VSCP_STATE_INIT                         0x01	// Assigning nickname
-#define VSCP_STATE_PREACTIVE                    0x02	// Waiting for host initialixation
-#define VSCP_STATE_ACTIVE                       0x03	// The normal state
-#define VSCP_STATE_ERROR                        0x04	// error state. Big problems.
+#define VSCP_STATE_STARTUP              0x00	// Cold/warm reset
+#define VSCP_STATE_INIT                 0x01	// Assigning nickname
+#define VSCP_STATE_PREACTIVE            0x02	// Waiting for host initialixation
+#define VSCP_STATE_ACTIVE               0x03	// The normal state
+#define VSCP_STATE_ERROR                0x04	// error state. Big problems.
 
 // State machine sub states 
-#define VSCP_SUBSTATE_NONE                      0x00	// No state
-#define VSCP_SUBSTATE_INIT_PROBE_SENT           0x01	// probe sent
-#define VSCP_SUBSTATE_INIT_PROBE_ACK            0x02	// probe ACK received
+#define VSCP_SUBSTATE_NONE              0x00	// No state
+#define VSCP_SUBSTATE_INIT_PROBE_SENT   0x01	// probe sent
+#define VSCP_SUBSTATE_INIT_PROBE_ACK    0x02	// probe ACK received
 
 // Helper consts and 
-#define VSCP_VALID_MSG                          0x80	// Bit 7 set in flags
+#define VSCP_VALID_MSG                  0x80	// Bit 7 set in flags
 
-#define VSCP_PRIORITY7                          0x00
-#define VSCP_PRIORITY_HIGH                      0x00
-#define VSCP_PRIORITY6                          0x01
-#define VSCP_PRIORITY5                          0x02
-#define VSCP_PRIORITY4                          0x03
-#define VSCP_PRIORITY_MEDIUM                    0x03
-#define VSCP_PRIORITY_NORMAL                    0x03
-#define VSCP_PRIORITY3                          0x04
-#define VSCP_PRIORITY2                          0x05
-#define VSCP_PRIORITY1                          0x06
-#define VSCP_PRIORITY0                          0x07
-#define VSCP_PRIORITY_LOW                       0x07
+#define VSCP_PRIORITY7                  0x00
+#define VSCP_PRIORITY_HIGH              0x00
+#define VSCP_PRIORITY6                  0x01
+#define VSCP_PRIORITY5                  0x02
+#define VSCP_PRIORITY4                  0x03
+#define VSCP_PRIORITY_MEDIUM            0x03
+#define VSCP_PRIORITY_NORMAL            0x03
+#define VSCP_PRIORITY3                  0x04
+#define VSCP_PRIORITY2                  0x05
+#define VSCP_PRIORITY1                  0x06
+#define VSCP_PRIORITY0                  0x07
+#define VSCP_PRIORITY_LOW               0x07
 
 
-#define VSCP_PROBE_TIMEOUT                      1000    // ms - one second
-#define VSCP_PROBE_TIMEOUT_COUNT                3       // Max # probe timeouts allowed
+#define VSCP_PROBE_TIMEOUT              1000    // ms - one second
+#define VSCP_PROBE_TIMEOUT_COUNT        3       // Max # probe timeouts allowed
 
 // ******************************************************************************
 //  			VSCP Register - Logical positions
 // ******************************************************************************
 
-#define VSCP_REG_ALARMSTATUS                    0x80
-#define VSCP_REG_VSCP_MAJOR_VERSION             0x81
+#define VSCP_REG_ALARMSTATUS            0x80
+#define VSCP_REG_VSCP_MAJOR_VERSION     0x81
 #define VSCP_REG_VSCP_MINOR_VERSION		0x82
 
-#define VSCP_REG_NODE_CONTROL                   0x83
+#define VSCP_REG_NODE_CONTROL           0x83
 
-#define VSCP_REG_USERID0                        0x84
-#define VSCP_REG_USERID1                        0x85
-#define VSCP_REG_USERID2                        0x86
-#define VSCP_REG_USERID3                        0x87
-#define VSCP_REG_USERID4			0x88
+#define VSCP_REG_USERID0                0x84
+#define VSCP_REG_USERID1                0x85
+#define VSCP_REG_USERID2                0x86
+#define VSCP_REG_USERID3                0x87
+#define VSCP_REG_USERID4				0x88
 
 #define VSCP_REG_MANUFACTUR_ID0			0x89
 #define VSCP_REG_MANUFACTUR_ID1			0x8A
@@ -158,24 +158,24 @@ low end hardware device.
 
 #define VSCP_REG_NICKNAME_ID			0x91
 
-#define VSCP_REG_PAGE_SELECT_MSB                0x92
-#define VSCP_REG_PAGE_SELECT_LSB                0x93
+#define VSCP_REG_PAGE_SELECT_MSB        0x92
+#define VSCP_REG_PAGE_SELECT_LSB        0x93
 
 #define VSCP_REG_FIRMWARE_MAJOR_VERSION		0x94
 #define VSCP_REG_FIRMWARE_MINOR_VERSION		0x95
 #define VSCP_REG_FIRMWARE_SUB_MINOR_VERSION	0x96
 
-#define VSCP_REG_BOOT_LOADER_ALGORITHM		0x97
-#define VSCP_REG_BUFFER_SIZE                    0x98
-#define VSCP_REG_PAGES_USED			0x99
+#define VSCP_REG_BOOT_LOADER_ALGORITHM  0x97
+#define VSCP_REG_BUFFER_SIZE            0x98
+#define VSCP_REG_PAGES_USED			    0x99
 
-#define VSCP_REG_GUID                           0xD0
-#define VSCP_REG_DEVICE_URL                     0xE0
+#define VSCP_REG_GUID                   0xD0
+#define VSCP_REG_DEVICE_URL             0xE0
 
 // INIT LED function codes
-#define VSCP_LED_OFF		            	0x00
-#define VSCP_LED_ON                             0x01
-#define VSCP_LED_BLINK1                         0x02
+#define VSCP_LED_OFF		            0x00
+#define VSCP_LED_ON                     0x01
+#define VSCP_LED_BLINK1                 0x02
 
 /*!
         \struct _imsg
