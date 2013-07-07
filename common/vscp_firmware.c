@@ -796,7 +796,6 @@ void vscp_handleProtocolEvent(void)
                         vscp_omsg.flags = VSCP_VALID_MSG + 2;
                         vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
                         vscp_omsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-                        vscp_omsg.data[ 0 ] = vscp_nickname;
                         
                         // Write event
                         vscp_sendEvent();
