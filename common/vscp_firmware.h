@@ -73,7 +73,7 @@ low end hardware device.
 //  				VSCP Constants
 // ******************************************************************************
 
-#define VSCP_MAJOR_VERSION				1    ///< VSCP Major version
+#define VSCP_MAJOR_VERSION		1    ///< VSCP Major version
 #define VSCP_MINOR_VERSION              5    ///< VSCP Minor Version
 
 #define VSCP_ADDRESS_MASTER             0x00
@@ -88,13 +88,13 @@ low end hardware device.
 // activated.
 
 // Bootloaders
-#define VSCP_BOOTLOADER_VSCP			0x00	// VSCP bootloader algorithm
+#define VSCP_BOOTLOADER_VSCP		0x00	// VSCP bootloader algorithm
 #define VSCP_BOOTLOADER_PIC1            0x01	// PIC algorithm 0
-#define VSCP_BOOTLOADER_AVR1			0x10	// AVR algorithm 0
-#define VSCP_BOOTLOADER_LPC1			0x20	// NXP/Philips LPC algorithm 0
-#define VSCP_BOOTLOADER_NXP1			0x20
-#define VSCP_BOOTLOADER_ST			    0x30	// ST STR algorithm 0
-#define VSCP_BOOTLOADER_NONE			0xff
+#define VSCP_BOOTLOADER_AVR1		0x10	// AVR algorithm 0
+#define VSCP_BOOTLOADER_LPC1		0x20	// NXP/Philips LPC algorithm 0
+#define VSCP_BOOTLOADER_NXP1		0x20
+#define VSCP_BOOTLOADER_ST              0x30	// ST STR algorithm 0
+#define VSCP_BOOTLOADER_NONE		0xff
 
 #define  VSCP_LEVEL1_COMMON_REGISTER_START      0x80
 
@@ -136,7 +136,7 @@ low end hardware device.
 
 #define VSCP_REG_ALARMSTATUS            0x80
 #define VSCP_REG_VSCP_MAJOR_VERSION     0x81
-#define VSCP_REG_VSCP_MINOR_VERSION		0x82
+#define VSCP_REG_VSCP_MINOR_VERSION	0x82
 
 #define VSCP_REG_NODE_CONTROL           0x83
 
@@ -144,19 +144,19 @@ low end hardware device.
 #define VSCP_REG_USERID1                0x85
 #define VSCP_REG_USERID2                0x86
 #define VSCP_REG_USERID3                0x87
-#define VSCP_REG_USERID4				0x88
+#define VSCP_REG_USERID4		0x88
 
-#define VSCP_REG_MANUFACTUR_ID0			0x89
-#define VSCP_REG_MANUFACTUR_ID1			0x8A
-#define VSCP_REG_MANUFACTUR_ID2			0x8B
-#define VSCP_REG_MANUFACTUR_ID3			0x8C
+#define VSCP_REG_MANUFACTUR_ID0		0x89
+#define VSCP_REG_MANUFACTUR_ID1		0x8A
+#define VSCP_REG_MANUFACTUR_ID2		0x8B
+#define VSCP_REG_MANUFACTUR_ID3		0x8C
 
-#define VSCP_REG_MANUFACTUR_SUBID0		0x8D
-#define VSCP_REG_MANUFACTUR_SUBID1		0x8E
-#define VSCP_REG_MANUFACTUR_SUBID2		0x8F
-#define VSCP_REG_MANUFACTUR_SUBID3		0x90
+#define VSCP_REG_MANUFACTUR_SUBID0	0x8D
+#define VSCP_REG_MANUFACTUR_SUBID1	0x8E
+#define VSCP_REG_MANUFACTUR_SUBID2	0x8F
+#define VSCP_REG_MANUFACTUR_SUBID3	0x90
 
-#define VSCP_REG_NICKNAME_ID			0x91
+#define VSCP_REG_NICKNAME_ID		0x91
 
 #define VSCP_REG_PAGE_SELECT_MSB        0x92
 #define VSCP_REG_PAGE_SELECT_LSB        0x93
@@ -167,13 +167,21 @@ low end hardware device.
 
 #define VSCP_REG_BOOT_LOADER_ALGORITHM  0x97
 #define VSCP_REG_BUFFER_SIZE            0x98
-#define VSCP_REG_PAGES_USED			    0x99
+#define VSCP_REG_PAGES_USED             0x99
+
+// 32-bit
+#define VSCP_REG_STANDARD_DEVICE_FAMILY_CODE	0x9A
+
+// 32-bit
+#define VSCP_REG_STANDARD_DEVICE_TYPE_CODE	0x9E
+
+#define VSCP_REG_DEFAULT_CONFIG_RESTORE	0xA2
 
 #define VSCP_REG_GUID                   0xD0
 #define VSCP_REG_DEVICE_URL             0xE0
 
 // INIT LED function codes
-#define VSCP_LED_OFF		            0x00
+#define VSCP_LED_OFF		        0x00
 #define VSCP_LED_ON                     0x01
 #define VSCP_LED_BLINK1                 0x02
 
@@ -254,12 +262,12 @@ struct _omsg {
 #define VSCP_DM_POS_FLAGS			      	1
 #define VSCP_DM_POS_CLASSMASK		   		2
 #define VSCP_DM_POS_CLASSFILTER		  		3
-#define VSCP_DM_POS_TYPEMASK		    	4
+#define VSCP_DM_POS_TYPEMASK                            4
 #define VSCP_DM_POS_TYPEFILTER		  		5
 #define VSCP_DM_POS_ACTION			    	6
 #define VSCP_DM_POS_ACTIONPARAM		  		7
 
-#define VSCP_DM_FLAG_ENABLED		    	0x80
+#define VSCP_DM_FLAG_ENABLED                            0x80
 #define VSCP_DM_FLAG_CHECK_OADDR	  		0x40
 #define VSCP_DM_FLAG_HARDCODED		  		0x20
 #define VSCP_DM_FLAG_CHECK_ZONE		  		0x10
@@ -649,5 +657,25 @@ uint8_t vscp_getZone(void);
     
  */
 uint8_t vscp_getSubzone(void);
+
+/*!
+		Get device family code
+		return zero for not known.
+*/
+uint32_t vscp_getFamilyCode(void);
+
+/*!
+		Get device family type
+		return zero for not known.
+*/
+uint32_t vscp_getFamilyType(void);
+
+/*!
+        Restore defaults
+        If 0x55/0xaa is written to register location
+		162 within one second defaults should be loaded
+    	by the device.
+ */
+void vscp_restoreDefaults(void);
 
 #endif

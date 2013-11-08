@@ -87,6 +87,9 @@ volatile uint8_t vscp_initbtncnt; // init button counter
 volatile uint8_t vscp_statuscnt; // status LED counter
 //	increase externally bye one every millisecond
 
+volatile uint16_t vscp_configtimer; // configuration timer
+//	increase externally bye one every millisecond
+
 // page selector
 uint16_t vscp_page_select;
 
@@ -143,6 +146,7 @@ void vscp_init(void)
 
     // Initialize time keeping
     vscp_timer = 0;
+	vscp_configtimer = 0;
     vscp_second = 0;
     vscp_minute = 0;
     vscp_hour = 0;
@@ -680,7 +684,36 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value)
         }
     }
 #endif
+	else if ( ( reg >= VSCP_REG_STANDARD_DEVICE_FAMILY_CODE ) &&
+		 		( reg < VSCP_REG_STANDARD_DEVICE_TYPE_CODE ) ) {
 
+		uint32_t code = vscp_getFamilyCode();
+		uint8_t idx = reg - VSCP_REG_STANDARD_DEVICE_FAMILY_CODE;
+		rv = code >> (((3-idx)*8) & 0xff);	
+	}
+	else if ( ( reg >= VSCP_REG_STANDARD_DEVICE_TYPE_CODE ) &&
+		 		( reg < VSCP_REG_DEFAULT_CONFIG_RESTORE ) ) {
+
+		uint32_t code = vscp_getFamilyType();
+		uint8_t idx = reg - VSCP_REG_STANDARD_DEVICE_TYPE_CODE;
+		rv = code >> (((3-idx)*8) & 0xff);
+	}
+	else if ( VSCP_REG_DEFAULT_CONFIG_RESTORE == reg ) {
+		if ( 0x55 == value ) {
+			vscp_configtimer = 0;
+			rv = 0x55;
+		}
+		else if ( 0xaa == value ) {
+			if ( vscp_configtimer < 1000 ) {
+				vscp_restoreDefaults();
+				rv = 0xaa;	
+			}
+			else {
+				rv = 0;	// false		
+			}
+		}
+			
+	}
     else {
         // return complement to indicate error
         rv = ~value;
