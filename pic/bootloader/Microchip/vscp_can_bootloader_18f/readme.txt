@@ -10,4 +10,4 @@ If byte 0 in EEPROM is not oxFF on startup a normal boot of the relocated code w
 
 
 Ake Hedman
-akhe@eurosource.se
+akhe@grodansparadis.com
