@@ -55,9 +55,8 @@
 	#define DECISION_MATRIX_ELEMENTS			0
 
 	// Start register position for decision matrix
-	#if DECISION_MATRIX_ELEMENTS>0
+	#ifdef DECISION_MATRIX_ELEMENTS
 		#define STD_REG_DECISION_MATRIX		0x80-(DECISION_MATRIX_ELEMENTS * 8)
 	#endif
-
 
 #endif

@@ -85,9 +85,7 @@
 
 	uint8_t vscp_getControlByte( void );
 
-	#if (DECISION_MATRIX_ELEMENTS > 0)
 	void vscp_getMatrixInfo( char *pData );
-	#endif
 
 	#if DECISION_MATRIX_ELEMENTS > 0
 	static void doDM( void );
@@ -100,5 +98,11 @@
 	///////////////////////////////////////////////////////////////////////////////
 
 	void init_app_eeprom( void );
+	
+	uint32_t vscp_getFamilyCode(void);
+	
+	uint32_t vscp_getFamilyType(void);
+	
+	void vscp_restoreDefaults(void);
 
 #endif
