@@ -501,7 +501,6 @@ uint8_t vscp_getControlByte( void )
 // Send Decsion Matrix Information
 //
 
-#if (DECISION_MATRIX_ELEMENTS > 0)
 void vscp_getMatrixInfo( char *pData )
 {
     pData[ 0 ] = DECISION_MATRIX_ELEMENTS;
@@ -512,7 +511,6 @@ void vscp_getMatrixInfo( char *pData )
     pData[ 5 ] = 0;
     pData[ 6 ] = 0;
 }
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Do decision Matrix handling
@@ -538,6 +536,21 @@ void vscp_getEmbeddedMdfInfo( void )
 	// TODO
 }
 #endif
+
+uint32_t vscp_getFamilyCode(void)
+{
+	return 0;
+}
+
+uint32_t vscp_getFamilyType(void)
+{
+	return 0;
+}
+
+void vscp_restoreDefaults(void)
+{
+// to do
+}
 
 /*	-------------------------------------------------------------------
 	Initialize complete EEPROM, has no parameters
