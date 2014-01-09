@@ -90,7 +90,7 @@ srec: $(PRG).srec
 #extracting size of sections
 size: ${TARGET}
 	@echo
-	@avr-size -C --mcu=${MCU_TARGET} ${TARGET}
+	@avr-size ${TARGET}
 
 
 # Rules for building the .eeprom rom images
