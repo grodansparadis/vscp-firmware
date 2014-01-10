@@ -2,6 +2,8 @@
 *.slo
 *.lo
 *.o
+*.sym
+*.map
 
 # Compiled Dynamic libraries
 *.so
@@ -10,10 +12,12 @@
 *.lai
 *.la
 *.a
-/avr/Bootloader_AVR/Device_boot_Loader/Build_avr_vscp/firmware/avr/AAboot/*.bin
-/avr/Bootloader_AVR/Device_boot_Loader/Build_avr_vscp/firmware/avr/AAboot/*.elf
-/avr/Bootloader_AVR/Device_boot_Loader/Build_avr_vscp/firmware/avr/AAboot/*.lst
-/avr/Bootloader_AVR/Device_boot_Loader/Build_avr_vscp/firmware/avr/AAboot/*.srec
+*.lst
+*.srec
 *.d
 *.cof
-/pic/modtronix/websrvr68_v310_rawEthernet/rawEthernet.X/*.err
+*.err
+
+#other filetypes to ignore
+*.lnk
+Thumbs.db
