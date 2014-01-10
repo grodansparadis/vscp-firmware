@@ -82,7 +82,7 @@ OPTIMIZE        = -Os
 # 'FOSC' is oscillator frequency in K
 # Define 'USE_UART0' for uart0 'USE_UART1' for uart1
 # 'BAUDRATE' for the configred baudrate
-DEFS = -DFOSC=8000 -DF_CPU=8000000 -DUSE_UART1 -DBAUDRATE=9600 
+DEFS = -DF_CPU=8000000 -DUSE_UART1 -DBAUDRATE=9600 
 LIBS =
 
 

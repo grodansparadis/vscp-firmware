@@ -7,7 +7,7 @@
  	generic AVR ADC functions
 *******************************************************************************/
 
-#include "digiprobe.inc"
+#include "digiprobe_gcc.inc"
 
 /******************************************************************************
 	Set reference and prescaler and enable ADC

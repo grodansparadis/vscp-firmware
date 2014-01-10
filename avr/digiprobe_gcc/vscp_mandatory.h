@@ -10,6 +10,15 @@
 #ifndef _VSCP_MANDATORY_H_
 #define _VSCP_MANDATORY_H_
 
+//**************************************************************************
+// Extended features in "Drop nickname / Reset" Event, Class 0, Type 7
+//**************************************************************************
+#ifdef DROP_NICKNAME_EXTENDED_FEATURES
+void vscp_hardreset(void);
+void vscp_wait_ms(uint16_t tmsec);
+void vscp_wait_s(uint16_t tsec);
+#endif
+
 	void vscp_protocol_class(void);
 
 	int readEEPROM( uint8_t addr );

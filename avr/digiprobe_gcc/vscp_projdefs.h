@@ -59,4 +59,10 @@
 		#define STD_REG_DECISION_MATRIX		0x80-(DECISION_MATRIX_ELEMENTS * 8)
 	#endif
 
+	//uncomment the following line to enable the extended features of
+	//drop nickname event. You must provide these functions:
+	//   void vscp_hardreset(void);
+	//   
+	#define DROP_NICKNAME_EXTENDED_FEATURES
+
 #endif

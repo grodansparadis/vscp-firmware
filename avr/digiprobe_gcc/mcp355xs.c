@@ -9,7 +9,7 @@
 	spi_chip_select() contained in digiprobe_system.c
 *******************************************************************************/
 
-#include "digiprobe.inc"
+#include "digiprobe_gcc.inc"
 
 //------------------------------------------------------------------------------
 // Chip initialisieren

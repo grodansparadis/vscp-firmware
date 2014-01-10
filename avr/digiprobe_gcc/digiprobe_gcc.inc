@@ -16,6 +16,7 @@
 #include <util/delay.h>
 #include <stdbool.h>
 #include <avr/power.h>
+#include <avr/wdt.h>
 
 // default common vscp includes (from vscp source tree)
 #include <vscp_type.h>

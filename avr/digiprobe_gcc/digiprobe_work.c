@@ -7,7 +7,7 @@
  	Application specific worker tasks
 *******************************************************************************/
 
-#include "digiprobe.inc"
+#include "digiprobe_gcc.inc"
 
 void do_work(void)
 {

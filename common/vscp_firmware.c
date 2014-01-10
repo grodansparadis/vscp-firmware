@@ -33,9 +33,9 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "vscp_firmware.h"
 #include "vscp_class.h"
 #include "vscp_type.h"
+#include "vscp_firmware.h"
 
 #ifndef FALSE
 #define FALSE  0
@@ -420,14 +420,61 @@ void vscp_handleSetNickname(void)
 
 void vscp_handleDropNickname(void)
 {
-    if ((1 == (vscp_imsg.flags & 0x0f)) &&
-            (vscp_nickname == vscp_imsg.data[ 0 ])) {
+	uint8_t bytes = vscp_imsg.flags & 0x0f;
 
+	#ifdef DROP_NICKNAME_EXTENDED_FEATURES
+	uint8_t brake = 0;
+	#endif
+	
+    if ((bytes >= 1) && (vscp_nickname == vscp_imsg.data[ 0 ])) {
         // Yes, we are addressed
-        vscp_nickname = VSCP_ADDRESS_FREE;
-        vscp_writeNicknamePermanent(VSCP_ADDRESS_FREE);
-        vscp_init();
 
+	#ifdef DROP_NICKNAME_EXTENDED_FEATURES
+		// Optional Byte 1: 
+		// bit7 - go idle do not start, bit6 - reset persistent storage
+		// bit5 - reset device but keep nickname
+		// bit5 and bit 7 are concurrent, here I give bit 5 higher priority
+		// Optional byte 2: time in seconds before restarting (makes only sense
+		// with either none of the bits or only bit 5 of byte1 set.
+		if (bytes >= 2) {  // byte 1 does exist
+			// bit 6 set: reset persistent storage, continue to check other
+			// options in byte 1
+			if (vscp_imsg.data[1] & (1<<6)) {
+				// reset persistant storage here
+				}
+			// bit 5 set: reset device, keep nickname, disregard other option
+			// below this by using 'brake'
+			if ((vscp_imsg.data[1] & (1<<5)) && (brake == 0)) {
+				vscp_hardreset();
+				brake = 1;}
+
+			// bit 7 set: go idle, e.g. stay in an endless loop until repower
+			if ((vscp_imsg.data[1] & (1<<7)) && (brake == 0)) { 
+				vscp_nickname = VSCP_ADDRESS_FREE;
+				vscp_writeNicknamePermanent(VSCP_ADDRESS_FREE);
+				for (;;) {}; // wait forever
+				}
+			}
+	#endif
+		// none of the options from byte 1 have been used or byte 1 itself
+		// has not been transmitted at all
+		if ((bytes == 1) || ((bytes > 1) && (vscp_imsg.data[1] == 0))) {
+			// this is the regular behavior without using byte 1 options
+			vscp_nickname = VSCP_ADDRESS_FREE;
+			vscp_writeNicknamePermanent(VSCP_ADDRESS_FREE);
+	        vscp_init();
+			}
+	#ifdef DROP_NICKNAME_EXTENDED_FEATURES
+		// now check if timing was passed in byte 2
+		if (bytes > 2) {
+			// and waiting for options that made sense
+			if ( (vscp_imsg.data[1] == 0) || ( vscp_imsg.data[1] & (1<<6)) ||
+			( vscp_imsg.data[1] & (1<<5)) ) {
+				// wait platform independently
+				vscp_wait_s(vscp_imsg.data[2]);
+				}
+		}
+	#endif
     }
 }
 

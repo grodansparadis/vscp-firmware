@@ -7,7 +7,7 @@
  	hardware specific settings and functions
 *******************************************************************************/
 
-#include "digiprobe.inc"
+#include "digiprobe_gcc.inc"
 /*
 #include <inttypes.h>
 #include <avr/io.h>

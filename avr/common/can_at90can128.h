@@ -46,9 +46,28 @@
 #ifndef	__CAN_AT90CAN1238__H
 #define	__CAN_AT90CAN1238__H
 
+#ifdef F_CPU
+#ifndef FOSC
+#define FOSC (F_CPU / 1000)
+#endif
+#endif
+
+#ifdef FOSC
+#ifndef F_CPU
+#define F_CPU (FOSC * 1000)
+#endif
+#endif
+
+#ifdef FOSC
+#ifdef F_CPU
+#if F_CPU != (FOSC * 1000)
+#error F_CPU and FOSC defines do not match
+#endif
+#endif
+#endif
 
 #ifndef FOSC
-#error You must define FOSC in your makefile
+#error You must define FOSC in kHz or F_CPU in Hz (or both) in your makefile
 
 // 8MHz clock
 // 

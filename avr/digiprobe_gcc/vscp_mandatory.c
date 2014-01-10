@@ -7,7 +7,32 @@
  	All mandatory functions for the vscp protocol class
 *******************************************************************************/
 
-#include "digiprobe.inc"
+#include "digiprobe_gcc.inc"
+
+//**************************************************************************
+// Extended features in "Drop nickname / Reset" Event, Class 0, Type 7
+//**************************************************************************
+#ifdef DROP_NICKNAME_EXTENDED_FEATURES
+void vscp_hardreset(void)
+{
+cli();						// disable all interrupts
+wdt_enable (WDTO_15MS);		// enable watchdog with shortes timing
+while (1);					// wait until watchdog resets the processor
+}
+
+void vscp_wait_ms(uint16_t tmsec)
+{
+	_delay_ms(tmsec);
+}
+
+void vscp_wait_s(uint16_t tsec)
+{
+	for (uint32_t cnt = 0; cnt < (tsec*1000); cnt++) {
+		_delay_ms(1);
+	}
+}
+#endif
+
 
 void vscp_protocol_class(void)
 {

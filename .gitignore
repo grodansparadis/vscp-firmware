@@ -21,3 +21,4 @@
 #other filetypes to ignore
 *.lnk
 Thumbs.db
+*.pnps

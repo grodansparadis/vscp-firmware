@@ -41,7 +41,7 @@
 #define VSCP_FIRMWARE_H
 
 
-/*! 
+/*!
         \file vscp_firmware.h
         \brief VSCP firmware stack
 
@@ -173,9 +173,9 @@ low end hardware device.
 #define VSCP_REG_STANDARD_DEVICE_FAMILY_CODE	0x9A
 
 // 32-bit
-#define VSCP_REG_STANDARD_DEVICE_TYPE_CODE	0x9E
+#define VSCP_REG_STANDARD_DEVICE_TYPE_CODE		0x9E
 
-#define VSCP_REG_DEFAULT_CONFIG_RESTORE	0xA2
+#define VSCP_REG_DEFAULT_CONFIG_RESTORE			0xA2
 
 #define VSCP_REG_GUID                   0xD0
 #define VSCP_REG_DEVICE_URL             0xE0
@@ -671,11 +671,17 @@ uint32_t vscp_getFamilyCode(void);
 uint32_t vscp_getFamilyType(void);
 
 /*!
-        Restore defaults
-        If 0x55/0xaa is written to register location
+		Restore defaults
+		If 0x55/0xaa is written to register location
 		162 within one second defaults should be loaded
-    	by the device.
+		by the device.
  */
 void vscp_restoreDefaults(void);
+
+#ifdef DROP_NICKNAME_EXTENDED_FEATURES
+	void vscp_hardreset(void);
+	void vscp_wait_ms(uint16_t ms);
+	void vscp_wait_s(uint16_t ms);
+#endif
 
 #endif
