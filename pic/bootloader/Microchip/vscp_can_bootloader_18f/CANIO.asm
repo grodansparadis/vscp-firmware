@@ -152,7 +152,7 @@
 ;* 
 ;*****************************************************************************/
 ;
-; Changes copyright (c) 2004-2010 Ake Hedman, eurosource
+; Changes copyright (c) 2004-2014 Ake Hedman, Grodans Paradis AB
 ;
 ; - Watchdog timer updated during wait for CAN message.
 ; - Symbolic init of mode control bits.
