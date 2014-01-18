@@ -135,6 +135,5 @@ ehex:  $(TARGET)_eeprom.eep
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 sizes:
-	@avr-size --format=avr --totals --mcu=$(MCU_TARGET) -C $(TARGET).elf
-
+	@avr-size --format=avr --totals --mcu=$(MCU_TARGET) $(TARGET).elf
 #	@avr-nm --size-sort --print-size $(TARGET).elf

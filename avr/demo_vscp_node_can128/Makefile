@@ -56,7 +56,7 @@ override LDFLAGS       = -Wl,-Map,$(PRG).map
 OBJCOPY        = avr-objcopy
 OBJDUMP        = avr-objdump
 
-all: $(PRG).elf lst text eeprom size
+all: $(PRG).elf lst text eeprom sizes
 
 $(PRG).elf: $(OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
@@ -87,10 +87,11 @@ srec: $(PRG).srec
 %.bin: %.elf
 	$(OBJCOPY) -j .text -j .data -O binary $< $@
 
-#extracting size of sections
-size: ${TARGET}
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+sizes:
 	@echo
-	@avr-size ${TARGET}
+	@avr-size --format=avr --totals --mcu=$(MCU_TARGET) $(TARGET)
+#	@avr-nm --size-sort --print-size $(TARGET)
 
 
 # Rules for building the .eeprom rom images

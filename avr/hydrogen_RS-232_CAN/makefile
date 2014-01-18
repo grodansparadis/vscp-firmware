@@ -19,7 +19,7 @@ override LDFLAGS       = -Wl,-Map,$(PRG).map
 OBJCOPY        = avr-objcopy
 OBJDUMP        = avr-objdump
 
-all: $(PRG).elf lst text eeprom srec
+all: $(PRG).elf lst text eeprom srec sizes
 
 $(PRG).elf: $(OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
@@ -88,3 +88,6 @@ pdf: $(PRG).pdf
 %.png: %.fig
 	$(FIG2DEV) -L png $< $@
 
+sizes:
+	@avr-size --format=avr --mcu=$(MCU_TARGET) $(PRG).elf
+	#@avr-nm --size-sort --print-size $(PRG).elf
