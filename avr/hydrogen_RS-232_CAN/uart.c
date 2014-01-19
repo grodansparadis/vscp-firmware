@@ -440,7 +440,8 @@ int16_t uart0Getch(void)
  *    void
  *
  *****************************************************************************/
-SIGNAL( SIG_UART0_RECV )
+//SIGNAL( SIG_UART0_RECV )
+ISR( USART_RXC_vect )
 {
   uint16_t temp;
 
@@ -476,7 +477,8 @@ SIGNAL( SIG_UART0_RECV )
  *    void
  *
  *****************************************************************************/
-SIGNAL( SIG_UART0_DATA )
+//SIGNAL( SIG_UART0_DATA )
+ISR ( USART_UDRE_vect )
 {
   if ( uart0_tx_insert_idx != uart0_tx_extract_idx ) {
     outp( uart0_tx_buffer[ uart0_tx_extract_idx++ ], UDR0 );

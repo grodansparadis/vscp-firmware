@@ -22,3 +22,7 @@
 *.lnk
 Thumbs.db
 *.pnps
+*.~
+*~
+
+

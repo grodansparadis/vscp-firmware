@@ -648,7 +648,8 @@ u16 getTXMsgCnt( void )
 // signal handler for external interrupt int0 
 //
 
-SIGNAL( SIG_INTERRUPT0 )     
+//SIGNAL( SIG_INTERRUPT0 )     
+ISR( INT0_vect )
 {
   u8 irq_register;
 

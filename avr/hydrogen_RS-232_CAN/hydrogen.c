@@ -26,8 +26,8 @@
 
 #include <stdlib.h>
 #include <avr/pgmspace.h>
-#include <avr/iom161.h>
 #include <avr/io.h>
+#include <avr/iom161.h>
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
 #include <compat/deprecated.h>
@@ -174,7 +174,8 @@ void initHardware( void )
 // TIMER0 overflow
 //
 
-SIGNAL( SIG_OVERFLOW0 )
+//SIGNAL( SIG_OVERFLOW0 )
+ISR (TIMER0_OVF_vect)
 {
   ustime += 256;
 }

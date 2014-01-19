@@ -11,14 +11,13 @@
 # vscp related files. If you dont have a seperate VSCP_FIRMWARE path in 
 # use then simply dont set this variable, it becomes default :)
 #==========================================================================
-ifndef VSCP_HOME
-   $(error > You must set environment variable VSCP_HOME in your system or shell)
+ifndef VSCP_SOFTWARE
+   $(error > You must set environment variable VSCP_SOFTWARE in your system or shell)
 endif
 ifndef VSCP_FIRMWARE
-   $(info > VSCP_FIRMWARE was unset, forcing it to $(VSCP_HOME)\firmware)
-   export VSCP_FIRMWARE=$(VSCP_HOME)\firmware
+   $(error > You must set environment variable VSCP_SOFTWARE in your system or shell)
 endif
-$(info > VSCP Paths set to $(VSCP_HOME) and $(VSCP_FIRMWARE) respectivly)
+$(info > VSCP Paths set to $(VSCP_SOFTWARE) and $(VSCP_FIRMWARE) respectivly)
 
 #--------------------------------------------------------------------------
 # This subsection is only needed if you use multiple WinAVR versions
@@ -40,8 +39,8 @@ ifdef WINAVR_HOME
 endif
 #--------------------------------------------------------------------------
 EXTRAINCDIRS +=  .
-EXTRAINCDIRS += $(VSCP_HOME)/src/common
-EXTRAINCDIRS += $(VSCP_HOME)/src/vscp/common
+EXTRAINCDIRS += $(VSCP_SOFTWARE)/src/common
+EXTRAINCDIRS += $(VSCP_SOFTWARE)/src/vscp/common
 EXTRAINCDIRS += $(VSCP_FIRMWARE)/common
 EXTRAINCDIRS += $(VSCP_FIRMWARE)/avr/common
 #--------------------------------------------------------------------------

@@ -7,6 +7,8 @@
  	Meta include file
 *******************************************************************************/
 
+#include "vscp_compiler.h"
+
 // avr default includes
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
@@ -26,7 +28,6 @@
 
 // project specific vscp includes from project directory
 #include "vscp_projdefs.h"
-#include "vscp_compiler.h"
 #include "can_at90can128.h"
 
 //hardware related includes

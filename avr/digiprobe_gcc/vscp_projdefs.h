@@ -22,18 +22,18 @@
 
 	// The GUID can be stored in FLASH (recommended) or EEPROM
 	// comment the next line out to have GUID in EEPROM
-	#define GUID_IN_FLASH
 	// this is the default GUID used for this node
+	//#define GUID_IN_FLASH
 	#define MY_GUID			0xDE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x03, 0x02, 0x01
 
 	// The Manufacturer ID can stored in FLASH (recommended) or EEPROM
 	// comment the next line out to have Manufacturer ID in EEPROM
-	#define MANUFACTID_IN_FLASH
+	//#define MANUFACTID_IN_FLASH
 	#define MY_MANUFACTID	0x22, 0x23, 0x24, 0x25, 0x26, 0x26, 0x27, 0x28
 
 	// The MDF URL can be stored in FLASH (recommended) or EEPROM
 	// comment the next line out to have MDF URL stored in EEPROM
-	#define MDF_URL_IN_FLASH
+	//#define MDF_URL_IN_FLASH
 	#define MY_MDF_URL		"datenheim.de/vscp/sglxdpa.xml"
 
 	// Remove comment if there is an embedded MDF
