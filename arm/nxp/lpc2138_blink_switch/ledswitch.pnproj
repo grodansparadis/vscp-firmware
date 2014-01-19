@@ -1,1 +1,0 @@
-<Project name="ledswitch"><File path="Makefile"></File><File path="ledswitch.c"></File><File path="readme.txt"></File><File path="build\crt0.S"></File><File path="build\LPC2138-ROM.ld"></File><File path="build\LPC2138-RAM.ld"></File></Project>
