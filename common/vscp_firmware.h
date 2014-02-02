@@ -8,7 +8,7 @@
  *
  * akhe@eurosource.se
  *
- * Copyright (C) 1995-2013 Ake Hedman,
+ * Copyright (C) 1995-2014 Ake Hedman,
  * Grodans Paradis AB, <akhe@grodansparadis.com>
  *
  * 080702 Cleaned up even more.
@@ -45,7 +45,7 @@
         \file vscp_firmware.h
         \brief VSCP firmware stack
 
-This file contains the firmware neded to implement VSCP in a 
+This file contains the firmware needed to implement VSCP in a 
 low end hardware device.
 
  Notes about defines
@@ -74,26 +74,26 @@ low end hardware device.
 // ******************************************************************************
 
 #define VSCP_MAJOR_VERSION		1    ///< VSCP Major version
-#define VSCP_MINOR_VERSION              5    ///< VSCP Minor Version
+#define VSCP_MINOR_VERSION      5    ///< VSCP Minor Version
 
-#define VSCP_ADDRESS_MASTER             0x00
-#define VSCP_ADDRESS_FREE               0xff
+#define VSCP_ADDRESS_MASTER     0x00
+#define VSCP_ADDRESS_FREE       0xff
 
-#define VSCP_SIZE_GUID                  16   ///< # GUID bytes
-#define VSCP_SIZE_DEVURL                32   ///< # of device URL bytes
-#define VSCP_SIZE_STD_DM_ROW            8    ///< Size for level I decision matrix row
+#define VSCP_SIZE_GUID          16   ///< # GUID bytes
+#define VSCP_SIZE_DEVURL        32   ///< # of device URL bytes
+#define VSCP_SIZE_STD_DM_ROW    8    ///< Size for level I decision matrix row
 
-#define VSCP_BOOT_FLAG                  0xff // Boot flag is stored in persistent storage
+#define VSCP_BOOT_FLAG          0xff // Boot flag is stored in persistent storage
 // and if it is there the bootloader will be
 // activated.
 
 // Bootloaders
 #define VSCP_BOOTLOADER_VSCP		0x00	// VSCP bootloader algorithm
-#define VSCP_BOOTLOADER_PIC1            0x01	// PIC algorithm 0
+#define VSCP_BOOTLOADER_PIC1        0x01	// PIC algorithm 0
 #define VSCP_BOOTLOADER_AVR1		0x10	// AVR algorithm 0
 #define VSCP_BOOTLOADER_LPC1		0x20	// NXP/Philips LPC algorithm 0
 #define VSCP_BOOTLOADER_NXP1		0x20
-#define VSCP_BOOTLOADER_ST              0x30	// ST STR algorithm 0
+#define VSCP_BOOTLOADER_ST          0x30	// ST STR algorithm 0
 #define VSCP_BOOTLOADER_NONE		0xff
 
 #define  VSCP_LEVEL1_COMMON_REGISTER_START      0x80
@@ -144,19 +144,19 @@ low end hardware device.
 #define VSCP_REG_USERID1                0x85
 #define VSCP_REG_USERID2                0x86
 #define VSCP_REG_USERID3                0x87
-#define VSCP_REG_USERID4		0x88
+#define VSCP_REG_USERID4				0x88
 
-#define VSCP_REG_MANUFACTUR_ID0		0x89
-#define VSCP_REG_MANUFACTUR_ID1		0x8A
-#define VSCP_REG_MANUFACTUR_ID2		0x8B
-#define VSCP_REG_MANUFACTUR_ID3		0x8C
+#define VSCP_REG_MANUFACTUR_ID0			0x89
+#define VSCP_REG_MANUFACTUR_ID1			0x8A
+#define VSCP_REG_MANUFACTUR_ID2			0x8B
+#define VSCP_REG_MANUFACTUR_ID3			0x8C
 
-#define VSCP_REG_MANUFACTUR_SUBID0	0x8D
-#define VSCP_REG_MANUFACTUR_SUBID1	0x8E
-#define VSCP_REG_MANUFACTUR_SUBID2	0x8F
-#define VSCP_REG_MANUFACTUR_SUBID3	0x90
+#define VSCP_REG_MANUFACTUR_SUBID0		0x8D
+#define VSCP_REG_MANUFACTUR_SUBID1		0x8E
+#define VSCP_REG_MANUFACTUR_SUBID2		0x8F
+#define VSCP_REG_MANUFACTUR_SUBID3		0x90
 
-#define VSCP_REG_NICKNAME_ID		0x91
+#define VSCP_REG_NICKNAME_ID			0x91
 
 #define VSCP_REG_PAGE_SELECT_MSB        0x92
 #define VSCP_REG_PAGE_SELECT_LSB        0x93
@@ -181,7 +181,7 @@ low end hardware device.
 #define VSCP_REG_DEVICE_URL             0xE0
 
 // INIT LED function codes
-#define VSCP_LED_OFF		        0x00
+#define VSCP_LED_OFF		        	0x00
 #define VSCP_LED_ON                     0x01
 #define VSCP_LED_BLINK1                 0x02
 
