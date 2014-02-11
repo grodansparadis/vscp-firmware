@@ -6,7 +6,7 @@
  * 	VSCP (Very Simple Control Protocol) 
  * 	http://www.vscp.org
  *
- *  Copyright (C) 1995-2013 Ake Hedman, 
+ *  Copyright (C) 1995-2014 Ake Hedman, 
  *  Grodans Paradis AB, <akhe@grodansparadis.com> 
  *
  * This software is provided 'as-is', without any express or implied
@@ -383,19 +383,24 @@ void vscp_sendHeartBeat(uint8_t zone, uint8_t subzone)
 
 void vscp_handleHeartbeat(void)
 {
-    if ((5 == (vscp_imsg.flags & 0x0f)) &&
-            (vscp_getSegmentCRC() != vscp_imsg.data[ 0 ])) {
+	if ( !vscp_getSegmentCRC() ) {
+		if ( ( 5 == (vscp_imsg.flags & 0x0f ) ) &&
+				(vscp_getSegmentCRC() != vscp_imsg.data[ 0 ])) {
 
-        // Stored CRC are different than received
-        // We must be on a different segment
-        vscp_setSegmentCRC(vscp_imsg.data[ 0 ]);
+			// Stored CRC are different than received
+			// We must be on a different segment
+			vscp_setSegmentCRC(vscp_imsg.data[ 0 ]);
 
-        // Introduce ourself in the proper way and start from the beginning
-        vscp_nickname = VSCP_ADDRESS_FREE;
-        vscp_writeNicknamePermanent(VSCP_ADDRESS_FREE);
-        vscp_node_state = VSCP_STATE_INIT;
-
-    }
+			// Introduce ourself in the proper way and start from the beginning
+			vscp_nickname = VSCP_ADDRESS_FREE;
+			vscp_writeNicknamePermanent(VSCP_ADDRESS_FREE);
+			vscp_node_state = VSCP_STATE_INIT;
+		}
+	}
+	else {
+		// First heartbeat seen by this node
+		vscp_setSegmentCRC(vscp_imsg.data[ 0 ]);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
