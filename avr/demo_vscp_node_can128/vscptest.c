@@ -300,10 +300,10 @@ int main( void )
 #else
 
     PORTA   = 0xff;     // Activate pull-ups
-    DDRA = 0x00;	    // Port A all inputs
+    DDRA 	= 0x00;	    // Port A all inputs
 	
-    DDRB = 0xFF;	    // Port B all outputs 
-    PORTB = 0xFF;	    // all LEDS off
+    DDRB 	= 0xFF;	    // Port B all outputs 
+    PORTB 	= 0xFF;	    // all LEDS off
     
 #endif
 

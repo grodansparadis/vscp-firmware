@@ -22,3 +22,5 @@
 *.lnk
 Thumbs.db
 *.pnps
+/avr/demo_vscp_node_can128/*.elf
+/avr/demo_vscp_node_can128/*.bin

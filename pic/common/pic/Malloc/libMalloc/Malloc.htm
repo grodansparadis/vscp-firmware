@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>Malloc library for fedC and wizC</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<BODY>
+<PRE>
+<H1><B>Malloc library for fedC and wizC</B></H1>
+<H2>NAME</H2>
+     <B>Malloc - Dynamic memory allocation</B>
+
+<H2>SYNOPSIS</H2>
+     <B>#include</B> <B>&lt;malloc.h&gt;</B>
+
+     <B>void *malloc(malloc_t size);</B>
+     <B>void *calloc(malloc_t count, malloc_t size);</B>
+     <B>void *realloc(void *ptr, malloc_t newsize);</B>
+
+     <B>void free(void *ptr);</B>
+
+     <B>malloc_t malloc_size(void *ptr);</B>
+     <B>malloc_t malloc_good_size(malloc_t size);</B>
+
+<H2>DESCRIPTION</H2>
+     <B>malloc()</B> allocates <B>size</B> bytes and returns a pointer to the allocated
+     memory. The memory is not initialized.
+
+     <B>calloc()</B> allocates memory for an array of <B>count</B> elements of size <B>size</B> each
+     and returns a pointer to the allocated memory. The memory is initialized
+     to all zeroes.
+
+     <B>realloc()</B> changes the size of the memory block pointed to by <B>ptr</B> to
+     size <B>newsize</B>. The contents will be unchanged to the minimum of the old and
+     new sizes. Newly allocated memory will be uninitialized. If <B>ptr</B> is NULL,
+     the call is equivalent to malloc(size). if <B>newsize</B> is equal to zero,
+     the call is equivalent to free(ptr). Unless <B>ptr</B> is NULL, it must have
+     been returned by an earlier call to malloc(), calloc() or realloc().
+
+     <B>free()</B> frees the memory space pointed to by <B>ptr</B>, which must have been
+     returned by a previous call to malloc(), calloc() or realloc(). Otherwise,
+     or if free(ptr) has  already been called before, undefined behaviour occurs.
+     If <B>ptr</B> is NULL, no operation is performed.
+
+     <B>malloc_size()</B> returns the actual size (including slack) of the memory block
+     pointed to by <B>ptr</B>.
+
+     <B>malloc_good_size()</B> rounds up <B>size</B> to a value that can be allocated without
+     adding any slack or padding and returns this adjusted <B>size</B>. If <B>size</B> is
+     larger than the maximum allowed segmentsize, this maximum is returned.
+
+<H2>RETURN VALUE</H2>
+     <B>malloc()</B> and <B>calloc()</B> return a pointer to the allocated  memory, which is
+     suitably aligned for any kind of variable, or NULL if the request fails.
+
+     <b>realloc()</B> returns a pointer to the newly allocated memory, which is suitably
+     aligned for any kind of variable and may be different from <B>ptr</B>, or NULL if
+     the request fails. If <B>size</B> was equal to 0, the memory block pointed to by <B>ptr</B>
+     is freed and NULL is returned. If realloc() fails the original block is left
+     untouched: It is neither freed nor moved.
+
+     <B>free()</B> returns no value.
+
+     <B>malloc_size()</B> and <B>malloc_good_size()</B> return sizes that are described in the
+     description above.
+
+<H2>EXAMPLE</H2>
+     #include &lt;malloc.h&gt;
+
+     int *ptr;
+
+     if((ptr = (int *) malloc(sizeof(int))) == NULL) {
+        ErrorRoutine();
+     } else {
+        *ptr = 25;
+        free(ptr);
+     }
+
+<H2>NOTES</H2>
+     Crashes in <B>malloc()</B>, <B>calloc()</B>, <B>realloc()</B> or <B>free()</B> are almost always related
+     to heap corruption, such as overflowing an allocated chunk or freeing the same
+     pointer twice.
+
+     <B>realloc()</B> and <B>free()</B> will behave strangely if called with an invalid pointer.
+
+<H2>CONFIGURATION</H2>
+     The library is configurable by modifying/creating a configurationfile. See
+     'FILES' below for the exact location of the default file. By copying this file
+     into your fedC or wizC projectdirectory, you can set options for a specific
+     project. The following options are available.
+
+     <B>Memory model</B>: The library supports two memorymodels. When you <B>#define MALLOC_SMALL</B>,
+     a memory- and cpu-efficient model is used. Each allocation will only use a single
+     byte RAM-overhead and all arithmetic is done using unsigned char's. The only
+     limitation is that allocations are limited to 127 bytes. Requesting larger chunks
+     will return NULL. With <B>#define MALLOC_LARGE</B> you select the full model. Two bytes
+     of overhead are used for each allocation and all arithmetic is done using unsigned
+     integers. There is no limit on the size of an allocation-request.
+
+     <B>Heapsize</B>: The library uses a private heap from which allocation-requests are served.
+     <B>#define MALLOC_HEAP_SIZE size</B> sets the amount of memory the library will use to
+     <B>size</B> bytes.
+
+     <B>Memory release</B>: When <B>#define MALLOC_SCRIBBLE</B> is configured, all memory will be
+     overwritten with a 01010101 bitpattern before it is freed. This is usefull during
+     debugging or when creating secure applications.
+
+     <B>Debug</B>: Additional informational messages can be generated during compilation of the
+     library. Use <B>#define MALLOC_DEBUG</B> to activate this feature.
+
+<H2>FILES</H2>
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\Malloc.h
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\MallocConfig.h
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\LibMalloc\Malloc.c
+
+<H2>LICENSE</H2>
+     This software is released to the public domain and comes without	warranty
+     and/or guarantees of any kind. You have the right to use, copy, modify and/or
+     (re-)distribute the software as long as the reference to the author is 
+     maintained in the software (in it's original or in a modified form).
+
+     Copyright (c) 2005, HMCS, Marcel van Lieshout
+
+               <a href=http://www.hmcs.nl target="_blank"><img src=HMCservices.jpg border="0"></a>
+</PRE>
+</BODY></HTML>

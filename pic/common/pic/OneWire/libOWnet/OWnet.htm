@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>OneWire library for fedC and wizC</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<BODY>
+<PRE>
+<H1><B>OneWire library for fedC and wizC</B></H1>
+<H2>NAME</H2>
+     <B>OneWire - 1-Wire and iButton library</B>
+
+<H2>SYNOPSIS</H2>
+     <B>#include</B> <B>&lt;OWnet.h&gt;</B>
+
+     <B>BYTE owFirst(BYTE portnum, BYTE do_reset, BYTE alarm_only);</B>
+     <B>BYTE owNext(BYTE portnum, BYTE do_reset, BYTE alarm_only);</B>
+     <B>void owSerialNum(BYTE portnum, BYTE *serialnum_buf, BYTE do_read);</B>
+     <B>void owFamilySearchSetup(BYTE portnum, BYTE search_family);</B>
+     <B>void owSkipFamily(BYTE portnum);</B>
+     <B>BYTE owAccess(BYTE portnum);</B>
+     <B>BYTE owVerify(BYTE portnum, BYTE alarm_only);</B>
+     <B>BYTE owOverdriveAccess(BYTE portnum);</B>
+     <B>BYTE owAcquire(BYTE portnum, BYTE *port_zstr);</B>
+     <B>void owRelease(BYTE portnum);</B>
+     <B>void owSetCurrentPort(BYTE portnum);</B>
+     <B>BYTE owTouchReset(BYTE portnum);</B>
+     <B>BYTE owTouchBit(BYTE portnum, BYTE sendbit);</B>
+     <B>BYTE owTouchByte(BYTE portnum, BYTE sendbyte);</B>
+     <B>BYTE owWriteByte(BYTE portnum, BYTE sendbyte);</B>
+     <B>BYTE owReadByte(BYTE portnum);</B>
+     <B>BYTE owSpeed(BYTE portnum, BYTE new_speed);</B>
+     <B>BYTE owLevel(BYTE portnum, BYTE new_level);</B>
+     <B>BYTE owProgramPulse(BYTE portnum);</B>
+     <B>BYTE owWriteBytePower(BYTE portnum, BYTE sendbyte);</B>
+     <B>BYTE owReadBytePower(BYTE portnum);</B>
+     <B>BYTE owHasPowerDelivery(BYTE portnum);</B>
+     <B>BYTE owHasProgramPulse(BYTE portnum);</B>
+     <B>BYTE owHasOverDrive(BYTE portnum);</B>
+     <B>BYTE owReadBitPower(BYTE portnum, BYTE applyPowerResponse);</B>
+     <B>BYTE owBlock(BYTE portnum, BYTE do_reset, BYTE *tran_buf, BYTE tran_len);</B>
+     <B>BYTE owReadPacketStd(BYTE portnum, BYTE do_access, int start_page, BYTE *read_buf);</B>
+     <B>BYTE owWritePacketStd(BYTE portnum, int start_page, BYTE *write_buf,
+                              BYTE write_len, BYTE is_eprom, BYTE crc_type);</B>
+     <B>BYTE owProgramByte(BYTE portnum, BYTE write_byte, int addr, BYTE write_cmd,
+                           BYTE crc_type, BYTE do_access);</B>
+     <B>void setcrc16(BYTE portnum, WORD reset);</B>
+     <B>WORD docrc16(BYTE portnum, WORD cdata);</B>
+     <B>void setcrc8(BYTE portnum, BYTE reset);</B>
+     <B>BYTE docrc8(BYTE portnum, BYTE x);</B>
+
+<H2>DESCRIPTION</H2>
+     1-Wire&reg devices lower system cost and simplify design with an interface protocol that
+     supplies control, signaling, and power over a single-wire connection. A variety of
+     identification, sensor, control, and memory functions are available in traditional
+     IC packages, ultra-small CSPs, and stainless-steel-clad iButtons&reg. 
+
+     The 1-Wire® Public Domain Kit (PDK) is a software development kit (SDK) containing a
+     1-Wire API written entirely in C. The API is designed to be portable across multiple
+     PC operating systems, handheld operating systems, and microcontroller platforms.
+
+<H2>EXAMPLE</H2>
+     Several ready-to-run applications are provided in the Demo directory in the library
+     distribution zipfile.
+     For more examples, visit <a href=http://www.maxim-ic.com/products/ibutton/software/1wire/wirekit.cfm target="_blank">the Maxim website</a>.
+
+<H2>NOTES</H2>
+     Two versions of the library are provided: A SingleBus and a MultiBus library. The SingleBus
+     library is fully optimised to handle only a single OneWire network. The MultiBus library
+     is designed to handle up to eight independant OneWire networks.
+	 
+     When only a single network is configured (see 'configuration' for details), the parameter
+     'portnum', present in several libraryfunctions, is ignored and optimised out. To make it
+     easier to change the application to MultiBus at a later time, we suggest you set this
+     parameter to 0.
+	 
+     In the standard PDK, several globals are accessed using portnum as an index
+     (eg. SerialNum[portnum]). As a result of optimising the PDK for wizC/fedC, this has
+     been changed. Instead of SerialNum[portnum], use owNetCurrent.SerialNum.
+	 
+     Pins that will be used for OneWire networks and have an analog function attached to
+     them <B>must</B> be set to digital mode before calling owAquire().
+	 
+<H2>CONFIGURATION</H2>
+     The library is configurable by modifying/creating a configurationfile. See
+     'FILES' below for the exact location of the example file. By copying this file
+     into your fedC or wizC projectdirectory, you can set options for a specific
+     project. The following options are available.
+
+     For every OneWire network, a set  of definitons is provided in the configuration
+     file. Please study the demo applications as to how to define the Sense/Drive/
+     Dynamic PullUp/Strong PullUp/Program Pulse pins. Depending on your definitions,
+     library code is in- or excluded from compilation in an effort to create the
+     smallest possible solution that meets the application's needs.
+	 
+     <B>CRC Algorithms</B>: The CRC calculation routines come in two flavours: One uses
+     a lookup table, the other calculates the CRC. The choice is yours: the lookuptable
+     version is fast but uses more ROM, the calculator takes less ROM space but more
+     cycles to complete. Algorithm Selection (or not) is done through the macro
+     <B>OWCRC_USELOOKUP</B>.
+
+<H2>FILES</H2>
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\OWnet.h
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\OWnetConfig.h
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\LibOWnet\MultiBus\OWcrc.c
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\LibOWnet\MultiBus\OWlnk.c
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\LibOWnet\MultiBus\OWnet.c
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\LibOWnet\MultiBus\OWses.c
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\LibOWnet\MultiBus\OWtran.c
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\LibOWnet\SingleBus\OWcrc.c
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\LibOWnet\SingleBus\OWlnk.c
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\LibOWnet\SingleBus\OWnet.c
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\LibOWnet\SingleBus\OWses.c
+     &lt;FEDinstallpath&gt;\Libs\LibsUser\LibOWnet\SingleBus\OWtran.c
+
+<H2>LICENSE</H2>
+     This software is released to the public domain and comes without warranty
+     and/or guarantees of any kind. You have the right to use, copy, modify and/or
+     (re-)distribute the software as long as the reference to the author(s) is 
+     maintained in the software (in it's original or in a modified form).
+
+     Copyright (C) 2006, HMCS, Marcel van Lieshout
+     Copyright (C) 1999-2004, Dallas Semiconductor Corporation 
+
+
+               <a href=http://www.hmcs.nl target="_blank"><img src=HMCservices.jpg border="0"></a>
+</PRE>
+</BODY></HTML>
