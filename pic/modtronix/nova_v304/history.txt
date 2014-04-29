@@ -4,4 +4,4 @@ Nova History
 Started: 2007-06-04
 
 
-2007-06-04 AKHE: Heartbeat did not send correct subzone. Fized.
+2007-06-04 AKHE: Heartbeat did not send correct subzone. Fixed.
