@@ -8,13 +8,13 @@
 *******************************************************************************/
 
 #ifdef GUID_IN_FLASH
-	uint8_t STD_REG_GUID[16] PROGMEM = { MY_GUID };
+	const uint8_t STD_REG_GUID[16] = { MY_GUID };
 #else
 	uint8_t STD_REG_GUID[16] EEMEM = { MY_GUID };
 #endif
 
 #ifdef MDF_URL_IN_FLASH
-	uint8_t STD_REG_MDF_URL[] PROGMEM = MY_MDF_URL;
+	const uint8_t STD_REG_MDF_URL[] = MY_MDF_URL;
 #else
 	uint8_t STD_REG_MDF_URL[] EEMEM = MY_MDF_URL;
 #endif
@@ -23,7 +23,7 @@
 // offset 0-3 Manufacturer device id 0-3
 // offset 4-7 Manufacturer subdevice id 0-3
 #ifdef MANUFACTID_IN_FLASH
-	uint8_t STD_REG_MANUFACTID[8] PROGMEM = { MY_MANUFACTID };
+	const uint8_t STD_REG_MANUFACTID[8] = { MY_MANUFACTID };
 #else
 	uint8_t STD_REG_MANUFACTID[8] EEMEM = { MY_MANUFACTID };
 #endif

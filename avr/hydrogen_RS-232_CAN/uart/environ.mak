@@ -1,1 +1,0 @@
-ROOTDIR  = d:\micro\avrgcc

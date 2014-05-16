@@ -10,7 +10,7 @@
 #include "digiprobe_gcc.inc"
 
 //somewhat bad behaviour
-#include "digiprobe_memory.c"
+//#include "digiprobe_memory.c"
 
 int32_t sens_current_raw=0;
 int16_t sens_temp_raw=0;

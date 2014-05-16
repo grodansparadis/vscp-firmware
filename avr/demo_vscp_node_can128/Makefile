@@ -1,17 +1,45 @@
+#******************************************************************************
+# 	makefile
+#******************************************************************************
+
 #==========================================================================
 # this section uses the environment variable VSCP_HOME as base for all
-# vscp related files. If you dont have a seperate VSCP_FIRMWARE path in
+# vscp related files. If you dont have a seperate VSCP_FIRMWARE path in 
 # use then simply dont set this variable, it becomes default :)
 #==========================================================================
-ifndef VSCP_HOME
-   $(error > You must set environment variable VSCP_HOME in your system or shell)
+ifndef VSCP_SOFTWARE
+   $(error > You must set environment variable VSCP_SOFTWARE in your system or shell)
 endif
 ifndef VSCP_FIRMWARE
-   $(info > VSCP_FIRMWARE was unset, forcing it to be set to $(VSCP_HOME)\firmware)
-   export VSCP_FIRMWARE=$(VSCP_HOME)\firmware
+   $(error > You must set environment variable VSCP_SOFTWARE in your system or shell)
 endif
-# $(info > VSCP Paths set to $(VSCP_HOME) and $(VSCP_FIRMWARE) respectivly)
+$(info > VSCP Paths set to $(VSCP_SOFTWARE) and $(VSCP_FIRMWARE) respectivly)
 
+#--------------------------------------------------------------------------
+# This subsection is only needed if you use multiple WinAVR versions
+# in that case simply define WINAVR_HOME variable to selected version
+ifndef WINAVR_HOME
+   $(info > You can define the WINAVR_HOME environment variable in case)
+   $(info > there are more WinAVR versions installed)
+endif
+#--------------------------------------------------------------------------
+
+#==========================================================================
+# here most often only the last line has to be adjusted to match platform
+#==========================================================================
+#--------------------------------------------------------------------------
+#This subsection is only needed if you use multiple WinAVR versions
+ifdef WINAVR_HOME
+  EXTRAINCDIRS += $(WINAVR_HOME)/avr/include
+#  EXTRAINCDIRS += $(WINAVR_HOME)/avr/include/avr
+endif
+#--------------------------------------------------------------------------
+EXTRAINCDIRS +=  .
+EXTRAINCDIRS += $(VSCP_SOFTWARE)/src/common
+EXTRAINCDIRS += $(VSCP_SOFTWARE)/src/vscp/common
+EXTRAINCDIRS += $(VSCP_FIRMWARE)/common
+EXTRAINCDIRS += $(VSCP_FIRMWARE)/avr/common
+#--------------------------------------------------------------------------
 
 PRG = demo_vscp_node_can128
 
@@ -30,8 +58,8 @@ OPTIMIZE	= -Os
 
 EXTRAINCDIRS   = $(VSCP_FIRMWARE)/common
 EXTRAINCDIRS  += $(VSCP_FIRMWARE)/avr/common
-EXTRAINCDIRS  += $(VSCP_HOME)/src/common
-EXTRAINCDIRS  += $(VSCP_HOME)/src/vscp/common
+EXTRAINCDIRS  += $(VSCP_SOFTWARE)/src/common
+EXTRAINCDIRS  += $(VSCP_SOFTWARE)/src/vscp/common
 EXTRAINCDIRS  += .
 
 

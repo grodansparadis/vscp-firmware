@@ -19,10 +19,10 @@
 	// I want to use floating points
 	//#define DIGIPROBE_USE_FLOAT
 
-
-
 	uint8_t STD_REG_GUID[16];
 	uint8_t STD_REG_MANUFACTID[8];
+	uint8_t STD_REG_MDF_URL[32];
+
 	uint8_t STD_REG_MDF_URL[32];
 
 	uint8_t STD_REG_NICKNAME;
