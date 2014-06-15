@@ -1,7 +1,7 @@
 vscp_firmware
 =============
 
-vscp firmware contains examples for different hardware architectures how to
+VSCP firmware contains examples for different hardware architectures how to
 implement the Very Simple Control Protocol (VSCP, http://www.vscp.org).
 
 Files are organized under hardware architecture with common file folders on
