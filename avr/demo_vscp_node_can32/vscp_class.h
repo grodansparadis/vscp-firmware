@@ -1,0 +1,1 @@
+../../../vscp_software/src/vscp/common/vscp_class.h
