@@ -432,6 +432,7 @@ int main( void )
 static void init_app_eeprom( void )
 {
   uint8_t pos;
+  uint8_t i;
   
   writeEEPROM( REG_ZONE + VSCP_EEPROM_END, 0 );
   writeEEPROM( REG_SUBZONE + VSCP_EEPROM_END, 0 );
@@ -444,11 +445,22 @@ static void init_app_eeprom( void )
   writeEEPROM( REG_SWITCH6_SUBZONE + VSCP_EEPROM_END, 0 );
   writeEEPROM( REG_SWITCH7_SUBZONE + VSCP_EEPROM_END, 0 );
   writeEEPROM( REG_LED_CONTROL + VSCP_EEPROM_END, 0 );
-  
-  // Decision matrix storage
-  for ( pos = REG_DM_START; pos < ( REG_DM_START + DESCION_MATRIX_ELEMENTS * 8 ); pos++ ) {
-    writeEEPROM( pos + VSCP_EEPROM_END, 0 );
+
+  // Decision matrix flags storage
+
+  for ( i=0; i<DESCION_MATRIX_ELEMENTS; i++ ) {
+  writeEEPROM( VSCP_EEPROM_END + REG_DM_START + 
+                                    1 + ( VSCP_SIZE_STD_DM_ROW * i ), 0b11000000);
+  writeEEPROM( VSCP_EEPROM_END + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_CLASSFILTER, 0x14 );
+  writeEEPROM( VSCP_EEPROM_END + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_CLASSMASK, 0xff );
+  writeEEPROM( VSCP_EEPROM_END + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_TYPEFILTER, 0x03 );
+  writeEEPROM( VSCP_EEPROM_END + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_TYPEMASK, 0xff );
   }
+
+  // Decision matrix storage
+//  for ( pos = REG_DM_START; pos < ( REG_DM_START + DESCION_MATRIX_ELEMENTS * 8 ); pos++ ) {
+//    writeEEPROM( pos + VSCP_EEPROM_END, 0 );
+//  }
 }
 
 
@@ -1096,11 +1108,15 @@ uart_puts("doDM");
 
         // Get DM flags for this row
 
-        dmflags = 0b11111011;
+        dmflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 
+                                    1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
 
-//        dmflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 
-//                                    1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
 
+        char buf[30];
+        sprintf(buf, "dmflags: %03x", dmflags );
+        uart_puts(buf);
+                sprintf(buf, "vscp_imsg.data[ 0 ]: %03x", vscp_imsg.data[ 0 ] );
+                uart_puts(buf);
 
     uart_puts( "Debug: doDM check rows");
 
@@ -1135,19 +1151,35 @@ uart_puts("doDM");
                                                     REG_DM_START + 
                                                     ( VSCP_SIZE_STD_DM_ROW * i ) + 
                                                     VSCP_DM_POS_CLASSFILTER  );
+
+            sprintf(buf, "class_filter: %03x", class_filter ^ vscp_imsg.class );
+            uart_puts(buf);
+
             class_mask = ( ( dmflags & VSCP_DM_FLAG_CLASS_MASK ) << 8 ) + 
                                     readEEPROM( VSCP_EEPROM_END + 
                                                     REG_DM_START + 
                                                     ( VSCP_SIZE_STD_DM_ROW * i ) +
                                                     VSCP_DM_POS_CLASSMASK  );
+
+            sprintf(buf, "class_mask: %03x", class_mask );
+            uart_puts(buf);
+
             type_filter = readEEPROM( VSCP_EEPROM_END + 
                                     REG_DM_START + 
                                         ( VSCP_SIZE_STD_DM_ROW * i ) + 
                                         VSCP_DM_POS_TYPEFILTER );
+
+            sprintf(buf, "type_filter: %03x", type_filter );
+            uart_puts(buf);
+
             type_mask = readEEPROM( VSCP_EEPROM_END + 
                                         REG_DM_START + 
                                         ( VSCP_SIZE_STD_DM_ROW * i ) + 
                                         VSCP_DM_POS_TYPEMASK  );
+
+            sprintf(buf, "type_mask: %03x", type_mask );
+            uart_puts(buf);
+
 
 
             if ( !( ( class_filter ^ vscp_imsg.class ) & class_mask ) &&
@@ -1155,9 +1187,6 @@ uart_puts("doDM");
 
                 uart_puts( "Class and type filter OK");
 
-        char buf[30];
-        sprintf(buf, "switch: %03x", readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTION  ) );
-        uart_puts(buf);
                 // OK Trigger this action
                 switch ( readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTION  ) ) {
 
