@@ -278,8 +278,11 @@ int main( void )
     PORTA   = 0xff;     // Activate pull-ups
     DDRA = 0x00;	    // Port A all inputs
 	
-    DDRB = 0xFF;	    // Port B all outputs 
-    PORTB = 0xFF;	    // all LEDS off
+    DDRB = 0xFF;      // Port B all outputs 
+    PORTB = 0xFF;     // all LEDS off
+
+    DDRC = 0xFF;      // Port B all outputs 
+    PORTC = 0x00;     // all LEDS off
     
     PORTE   = 0x00;     // LED on
     DDRE    = 0x92;     // LED2 output, LED1 output, TX output
@@ -450,13 +453,15 @@ static void init_app_eeprom( void )
 
   for ( i=0; i<DESCION_MATRIX_ELEMENTS; i++ ) {
   writeEEPROM( VSCP_EEPROM_END + REG_DM_START + 
-                                    1 + ( VSCP_SIZE_STD_DM_ROW * i ), 0b11000000);
+                                    1 + ( VSCP_SIZE_STD_DM_ROW * i ), 0b10000000);
   writeEEPROM( VSCP_EEPROM_END + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_CLASSFILTER, 0x14 );
   writeEEPROM( VSCP_EEPROM_END + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_CLASSMASK, 0xff );
   writeEEPROM( VSCP_EEPROM_END + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_TYPEFILTER, 0x03 );
   writeEEPROM( VSCP_EEPROM_END + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_TYPEMASK, 0xff );
   }
 
+  writeEEPROM( VSCP_EEPROM_END + REG_DM_START + 0 + VSCP_DM_POS_ACTION, 1);
+//  writeEEPROM( VSCP_EEPROM_END + REG_DM_START + 8 + VSCP_DM_POS_ACTION, 2);
   // Decision matrix storage
 //  for ( pos = REG_DM_START; pos < ( REG_DM_START + DESCION_MATRIX_ELEMENTS * 8 ); pos++ ) {
 //    writeEEPROM( pos + VSCP_EEPROM_END, 0 );
@@ -1127,7 +1132,7 @@ uart_puts("doDM");
 
             // Should the originating id be checked and if so is it the same?
 
-            if ( !( dmflags & VSCP_DM_FLAG_CHECK_OADDR ) &&
+            if ( ( dmflags & VSCP_DM_FLAG_CHECK_OADDR ) &&
                     !(  vscp_imsg.oaddr == 
                         readEEPROM( VSCP_EEPROM_END + REG_DM_START +
                                         ( VSCP_SIZE_STD_DM_ROW * i ) ) ) ) {
@@ -1189,9 +1194,10 @@ uart_puts("doDM");
 
                 // OK Trigger this action
                 switch ( readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTION  ) ) {
-
+//                                      0x41         + 0x70         +  0 or 1   + 
                     case ACTION_CTRL_LED:			// Enable relays in arg. bitarry
-                        doActionCtrlLed( dmflags, readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+//                        doActionCtrlLed( dmflags, readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+                        doActionCtrlLed( dmflags, vscp_imsg.data[ 0 ] );
                         break;
 
                     case ACTION_HELLO_WORLD: 		// Disable relays in arg. bitarry

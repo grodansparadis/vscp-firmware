@@ -46,13 +46,14 @@ void doActionCtrlLed( unsigned char dmflags, unsigned char arg )
 {
 	unsigned char i;
 	unsigned char val;
-uart_puts("action\n");	
-	for ( i=0; i<8; i++ ) {
+uart_puts("action");	
+//	for ( i=0; i<8; i++ ) {
 		
 		// If the rely should not be handled just move on
-		if ( !( arg & ( 1 << i ) ) ) continue;
-		
+//		if ( !( arg & ( 1 << i ) ) ) continue;
+
 		// Check if subzone should match and if so if it match
+/*
 		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE ) {
 			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_END + 
 															REG_SWITCH0_SUBZONE + 
@@ -60,11 +61,12 @@ uart_puts("action\n");
 				continue;
 			}
 		}
-			
-		val = readEEPROM( VSCP_EEPROM_END + REG_SWITCH0_SUBZONE + i );
+*/			
+//		val = readEEPROM( VSCP_EEPROM_END + REG_SWITCH0_SUBZONE + i );
 		
 	
-		PORTB ^= _BV(i);
+//		PORTB ^= _BV(i);
+		PORTC ^= _BV(arg);
 									
 //		// Should off event be sent?
 //		if( val & RELAY_CONTROLBIT_ONEVENT ) {
@@ -75,7 +77,7 @@ uart_puts("action\n");
 //		if( val & RELAY_CONTROLBIT_STARTEVENT ) {
 //			SendInformationEvent( i, VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_START );
 //		}
-	}	
+//	}	
 }
 
 
