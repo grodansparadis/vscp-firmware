@@ -61,7 +61,7 @@
 #include "can_at90can32.h"
 #include "uart.h"
 #include "vscp_firmware.h"
-#include <vscp_class.h>
+#include "vscp_class.h"
 #include "vscp_type.h"
 #include "vscp_registers.h"
 #include "vscp_actions.c"
