@@ -33,11 +33,11 @@
 
 // * * * Actions * * *
 #define ACTION_NOOP							0
-#define ACTION_CTRL_LED						1
-#define ACTION_HELLO_WORLD					2
+#define ACTION_ACTION1						1
+#define ACTION_ACTION2						2
 
 
 // Prototypes
-void doActionCtrlLed( unsigned char dmflags, unsigned char arg );
-void doActionHelloWorld( unsigned char dmflags, unsigned char arg );
+void doActionAction1();
+void doActionAction2();
 

@@ -26,12 +26,8 @@
  * ******************************************************************************
 */
 
-#ifndef CAN128_TEST_COMPILER_H
-#define CAN128_TEST_COMPILER_H
-
-
-
-
+#ifndef CAN32_TEST_COMPILER_H
+#define CAN32_TEST_COMPILER_H
 
 #endif
 

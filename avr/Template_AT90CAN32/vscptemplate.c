@@ -37,32 +37,6 @@
 		PORTA Pin 0 - Init button
 */
 
-/* ts 09/03/2009:
-             Olimex AVR-CAN Board (AT90CAN128)
-                PORTE pin 4 - Status LED
-                PORTE pin 5 - Button
-*/
-
-
-
-#ifdef OLIMEX_AT90CAN128
-
-#define LED_STATUS_ON       ((PORTE &= ~_BV(4)))
-#define LED_STATUS_OFF      ((PORTE |= _BV(4)))
-#define LED_STATUS_TOGGLE   ((PORTE ^= _BV(4)))
-#define BTN_INIT_PRESSED    (!(PINE & _BV(5)))
-
-#define BTN_INIT_PRESSED    (!(PINA & _BV(0)))
-#define BTN_SW1_PRESSED     (!(PINA & _BV(1)))
-#define BTN_SW2_PRESSED     (!(PINA & _BV(2)))
-#define BTN_SW3_PRESSED     (!(PINA & _BV(3)))
-#define BTN_SW4_PRESSED     (!(PINA & _BV(4)))
-#define BTN_SW5_PRESSED     (!(PINA & _BV(5)))
-#define BTN_SW6_PRESSED     (!(PINA & _BV(6)))
-#define BTN_SW7_PRESSED     (!(PINA & _BV(7)))
-
-#else
-
 #define LED_STATUS_ON       ((PORTB &= ~_BV(0)))
 #define LED_STATUS_OFF      ((PORTB |= _BV(0)))
 #define LED_STATUS_TOGGLE   ((PORTB ^= _BV(0)))
@@ -75,9 +49,6 @@
 #define BTN_SW5_PRESSED     (!(PINA & _BV(5)))
 #define BTN_SW6_PRESSED     (!(PINA & _BV(6)))
 #define BTN_SW7_PRESSED     (!(PINA & _BV(7)))
-
-#endif
-
 
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
@@ -277,38 +248,12 @@ int main( void )
   //  stdout = &mystdout;
   uint8_t i;
 
-#ifdef OLIMEX_AT90CAN128
-	PORTA   = 0xff;     // Activate pull-ups
-	DDRA    = 0x00;     // Inputs
-
-	PORTB   = 0x00;
-	DDRB    = 0x00;
-
-	PORTC   = 0x00;
-	DDRC    = 0x00;
-
-	PORTD   = 0x00;
-	DDRD    = 0x20;
-
-	PORTE   = 0x00;     // LED on
-	DDRE    = 0x92;     // LED2 output, LED1 output, TX output
-
-	PORTF   = 0x00;
-	DDRF    = 0x00;
-
-	PORTG   = 0x00;
-	DDRG    = 0x00;
-    
-#else
-
     PORTA   = 0xff;     // Activate pull-ups
     DDRA = 0x00;	    // Port A all inputs
 	
     DDRB = 0xFF;	    // Port B all outputs 
     PORTB = 0xFF;	    // all LEDS off
     
-#endif
-
     // Initialize UART
     UCSRA = 0;
     UCSRC = MSK_UART_8BIT;	// 8N1
@@ -327,11 +272,9 @@ int main( void )
         uart_puts("Failed to open channel!!\n");
     }
 
-#ifdef OLIMEX_AT90CAN128
-    uart_puts( "VSCP AT90CAN32 Test (OLIMEX AT90CANx)\n" );
-#else
-    uart_puts( "VSCP AT90CAN32 Test TX\n" );
-#endif
+    uart_puts( "VSCP AT90CAN32\n" );
+    uart_puts( "Template firmware\n" );
+
 
 	// Check VSCP persistent storage and
 	// restore if needed
@@ -1170,12 +1113,12 @@ uart_puts("doDM\n");
                 // OK Trigger this action
                 switch ( readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTION  ) ) {
 
-                    case ACTION_CTRL_LED:			// Enable relays in arg. bitarry
-                        doActionCtrlLed( dmflags, readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+                    case ACTION_ACTION1:
+                        doActionAction1();
                         break;
 
-                    case ACTION_HELLO_WORLD: 		// Disable relays in arg. bitarry
-                        doActionHelloWorld(dmflags,  readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );	
+                    case ACTION_ACTION2:
+                        doActionAction2();	
                         break;
 
 

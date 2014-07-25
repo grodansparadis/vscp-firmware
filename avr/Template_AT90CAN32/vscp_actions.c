@@ -39,54 +39,23 @@
 #include "vscptest.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-// doActionCtrlLed
+// doActionAction1
 // 
 
-void doActionCtrlLed( unsigned char dmflags, unsigned char arg )
+void doActionAction1()
 {
-	unsigned char i;
-	unsigned char val;
-uart_puts("action\n");	
-	for ( i=0; i<8; i++ ) {
-		
-		// If the rely should not be handled just move on
-		if ( !( arg & ( 1 << i ) ) ) continue;
-		
-		// Check if subzone should match and if so if it match
-		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE ) {
-			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_END + 
-															REG_SWITCH0_SUBZONE + 
-															i ) ) {
-				continue;
-			}
-		}
-			
-		val = readEEPROM( VSCP_EEPROM_END + REG_SWITCH0_SUBZONE + i );
-		
-	
-		PORTB ^= _BV(i);
-									
-//		// Should off event be sent?
-//		if( val & RELAY_CONTROLBIT_ONEVENT ) {
-//			SendInformationEvent( i, VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_ON );			
-//		}
-		
-		// Should stop event be sent?
-//		if( val & RELAY_CONTROLBIT_STARTEVENT ) {
-//			SendInformationEvent( i, VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_START );
-//		}
-	}	
+// code for Action1 is written here
 }
 
 
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// doActionHelloWorld
+// doActionAction2
 //
 
-void doActionHelloWorld( unsigned char dmflags, unsigned char arg )
+void doActionAction2()
 {
-uart_puts("Hello World!\n");
+// code for Action2 written here
 }
 

@@ -26,8 +26,8 @@
  * ******************************************************************************
 */
 
-#ifndef CAN128_TEST_PROJDEFS_H
-#define CAN128_TEST_PROJDEFS_H
+#ifndef CAN32_TEST_PROJDEFS_H
+#define CAN32_TEST_PROJDEFS_H
 
 #include <avr/io.h>
 
@@ -37,8 +37,6 @@
 //
 // Undefine one of the following suitable for the
 // platform you want to compile for 
-//#define ATMEL_STK501
-//#define OLIMEX_AT90CAN128
 
 
 // System clock in kHz
@@ -78,17 +76,12 @@
 
 // VSCP Defines
 // ============
-//
-// Described in vscp.h
-
-// If GUID should be in EEPROM define the following
-//#define GUID_IN_EEPROM
 
 // If manufacturing D and GUID should bw possible to write when page_select = 0xffff
 // undef the following
 #define ENABLE_WRITE_2PROTECTED_LOCATIONS
 
-// Disable initial nickname discovery by undefining the following
+// Disable initial nickname discovery by uncommenting the following
 //#define DISABLE_AUTOMATIC_NICKNAME_DISCOVERY
 
 #endif
