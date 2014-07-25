@@ -64,7 +64,7 @@
 #include "vscp_type.h"
 #include "vscp_registers.h"
 #include "vscp_actions.c"
-#include "vscptest.h"
+#include "vscptemplate.h"
 
 #ifndef GUID_IN_EEPROM
 // GUID is stored in ROM for this module
@@ -82,7 +82,7 @@ const uint8_t GUID[ 16 ] = {
 
 // Device string is stored in ROM for this module (max 32 bytes)
 // a webserver should be running on the pc used for VSCPworks (example apache)
-const uint8_t vscp_deviceURL[]  = "127.0.0.1/mdf/avr32_01.xml";
+const uint8_t vscp_deviceURL[]  = "lljm/mdf/templ_at90can32.xml";
 
 // Manufacturer id's is stored in ROM for this module
 // offset 0 - Manufacturer device id 0
