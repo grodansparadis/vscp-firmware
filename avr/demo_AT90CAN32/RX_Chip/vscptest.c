@@ -601,6 +601,8 @@ int writeEEPROM( uint8_t addr, uint8_t data )
 
 uint8_t vscp_readAppReg( uint8_t reg )
 {
+    uart_puts( "Entering readAppReg class\n" );
+
     uint8_t rv;
 
 
