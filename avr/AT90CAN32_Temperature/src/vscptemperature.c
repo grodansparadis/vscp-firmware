@@ -42,13 +42,6 @@
 #define LED_STATUS_TOGGLE   ((PORTB ^= _BV(0)))
 
 #define BTN_INIT_PRESSED    (!(PINA & _BV(0)))
-#define BTN_SW1_PRESSED     (!(PINA & _BV(1)))
-#define BTN_SW2_PRESSED     (!(PINA & _BV(2)))
-#define BTN_SW3_PRESSED     (!(PINA & _BV(3)))
-#define BTN_SW4_PRESSED     (!(PINA & _BV(4)))
-#define BTN_SW5_PRESSED     (!(PINA & _BV(5)))
-#define BTN_SW6_PRESSED     (!(PINA & _BV(6)))
-#define BTN_SW7_PRESSED     (!(PINA & _BV(7)))
 
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
@@ -64,7 +57,7 @@
 #include "vscp_type.h"
 #include "vscp_registers.h"
 #include "vscp_actions.c"
-#include "vscptemplate.h"
+#include "vscptemperature.h"
 
 #ifndef GUID_IN_EEPROM
 // GUID is stored in ROM for this module
@@ -82,7 +75,7 @@ const uint8_t GUID[ 16 ] = {
 
 // Device string is stored in ROM for this module (max 32 bytes)
 // a webserver should be running on the pc used for VSCPworks (example apache)
-const uint8_t vscp_deviceURL[]  = "lljm/mdf/templ_at90can32.xml";
+const uint8_t vscp_deviceURL[]  = "lljm/mdf/temp_at90can32.xml";
 
 // Manufacturer id's is stored in ROM for this module
 // offset 0 - Manufacturer device id 0
@@ -109,6 +102,8 @@ static void init_app_eeprom( void );
 static void doDM( void );
 static void doWork();
 
+// Counter for seconds between measurements
+uint8_t measurement_seconds;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Timer 0 Compare interupt
@@ -131,68 +126,6 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
     vscp_initbtncnt = 0;
   }
   
-  // Check for Switch 1
-  if ( BTN_SW1_PRESSED ) {
-    // Active
-    btncnt[1]++;
-  }
-  else {
-    btncnt[1] = 0;
-  }
-  
-  // Check for Switch 2
-  if ( BTN_SW2_PRESSED ) {
-    // Active
-    btncnt[2]++;
-  }
-  else {
-    btncnt[2] = 0;
-  }
-  
-  // Check for Switch 3
-  if ( BTN_SW3_PRESSED ) {
-    // Active
-    btncnt[3]++;
-  }
-  else {
-    btncnt[3] = 0;
-  }
-  
-  // Check for Switch 4
-  if ( BTN_SW4_PRESSED ) {
-    // Active
-    btncnt[4]++;
-  }
-  else {
-    btncnt[4] = 0;
-  }
-  
-  // Check for Switch 5
-  if ( BTN_SW5_PRESSED ) {
-    // Active
-    btncnt[5]++;
-  }
-  else {
-    btncnt[5] = 0;
-  }
-  
-  // Check for Switch 6
-  if ( BTN_SW6_PRESSED ) {
-    // Active
-    btncnt[6]++;
-  }
-  else {
-    btncnt[6] = 0;
-  }
-  
-  // Check for Switch 7
-  if ( BTN_SW7_PRESSED ) {
-    // Active
-    btncnt[7]++;
-  }
-  else {
-    btncnt[7] = 0;
-  }
     
   // Status LED
   vscp_statuscnt++;
@@ -273,7 +206,7 @@ int main( void )
     }
 
     uart_puts( "VSCP AT90CAN32\n" );
-    uart_puts( "Template firmware\n" );
+    uart_puts( "Temperature sensor\n" );
 
 
 	// Check VSCP persistent storage and
@@ -309,7 +242,7 @@ int main( void )
 	  if ( measurement_clock > 1000 ) {
 	    
             measurement_clock = 0;
-	    
+            measurement_seconds++;
             // Do VSCP one second jobs 
             vscp_doOneSecondWork();
 	    
@@ -406,15 +339,6 @@ static void init_app_eeprom( void )
   
   writeEEPROM( REG_ZONE + VSCP_EEPROM_END, 0 );
   writeEEPROM( REG_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH0_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH1_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH2_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH3_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH4_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH5_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH6_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH7_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_LED_CONTROL + VSCP_EEPROM_END, 0 );
   
   // Decision matrix storage
   for ( pos = REG_DM_START; pos < ( REG_DM_START + DESCION_MATRIX_ELEMENTS * 8 ); pos++ ) {
@@ -569,51 +493,6 @@ uint8_t vscp_readAppReg( uint8_t reg )
         rv =  readEEPROM( REG_SUBZONE + VSCP_EEPROM_END );
     }
             
-    // SubZone for LED0
-    else if ( REG_SWITCH0_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH0_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED1
-    else if ( REG_SWITCH1_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH1_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED2
-    else if ( REG_SWITCH2_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH2_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED3
-    else if ( REG_SWITCH3_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH3_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED4
-    else if ( REG_SWITCH4_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH4_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED5
-    else if ( REG_SWITCH5_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH5_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED6
-    else if ( REG_SWITCH6_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH6_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED7
-    else if ( REG_SWITCH7_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH7_SUBZONE + VSCP_EEPROM_END );
-    }    
-
-    // Read LED status
-    else if ( REG_LED_CONTROL == reg ) {
-        // Return inverted because we want a '1' to represent 'on'
-        rv =  ~PORTB;
-    }
     
     // DM register space    for ( pos = REG_DM_DUMMY; pos < ( REG_DM_DUMMY + DESCION_MATRIX_ELEMENTS * 8 ); pos++ ) {
     else if ( ( reg >= REG_DM_START ) && ( reg < REG_DM_START + DESCION_MATRIX_ELEMENTS * 8) ) {
@@ -651,65 +530,7 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
             rv =  readEEPROM( REG_SUBZONE + VSCP_EEPROM_END );
     }	
             
-    // SubZone for LED0
-    else if ( REG_SWITCH0_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH0_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH0_SUBZONE + VSCP_EEPROM_END );
-    }
 
-    // SubZone for LED1
-    else if ( REG_SWITCH1_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH1_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH1_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED2
-    else if ( REG_SWITCH2_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH2_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH2_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED3
-    else if ( REG_SWITCH3_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH3_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH3_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED4
-    else if ( REG_SWITCH4_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH4_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH4_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED5
-    else if ( REG_SWITCH5_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH5_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH5_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED6
-    else if ( REG_SWITCH6_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH6_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH6_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED7
-    else if ( REG_SWITCH7_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH7_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH7_SUBZONE + VSCP_EEPROM_END );
-    } 
-
-    // Write LED status
-    else if ( REG_LED_CONTROL == reg ) {
-#ifdef OLIMEX_AT90CAN128
-        PORTE = (uint8_t)(~(val | 1));
-        rv = ~PORTE;
-#else        
-        PORTB = (uint8_t)(~(val | 1));
-        rv = ~PORTB;
-#endif            
-    }
-    
     // DM register space
     else if ( ( reg >= REG_DM_START ) && ( reg < 0x80) ) {
         writeEEPROM(( VSCP_EEPROM_END + reg ), val );
@@ -1161,7 +982,7 @@ void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId 
 
     vscp_omsg.data[ 0 ] = idx;	// Register
     vscp_omsg.data[ 1 ] = readEEPROM( VSCP_EEPROM_END + REG_ZONE );
-    vscp_omsg.data[ 2 ] = readEEPROM( VSCP_EEPROM_END + REG_SWITCH0_SUBZONE + idx );
+    vscp_omsg.data[ 2 ] = readEEPROM( VSCP_EEPROM_END + idx );
 
     vscp_sendEvent();	// Send data
 }
@@ -1175,6 +996,10 @@ void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId 
 void doWork( void )
 {
 
+    if ( measurement_seconds > 30 ) { //send temperature every 30 seconds
+            measurement_seconds = 0;
+         SendInformationEvent( 0x48, VSCP_CLASS1_MEASUREMENT, VSCP_TYPE_MEASUREMENT_TEMPERATURE );
+        }
 }
 
 

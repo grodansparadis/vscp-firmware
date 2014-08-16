@@ -38,18 +38,6 @@
 #define REG_ZONE						0
 #define REG_SUBZONE						1
 
-#define REG_SWITCH0_SUBZONE             2   // Reserved for Init button / status LED
-#define REG_SWITCH1_SUBZONE             3
-#define REG_SWITCH2_SUBZONE             4
-#define REG_SWITCH3_SUBZONE             5
-#define REG_SWITCH4_SUBZONE             6
-#define REG_SWITCH5_SUBZONE             7
-#define REG_SWITCH6_SUBZONE             8
-#define REG_SWITCH7_SUBZONE             9
-
-#define REG_LED_CONTROL					10  // LED Control
-
-
 //#define REG_DMATRIX_START               0x70
 
 // This marks the space for the decision matrix start. It

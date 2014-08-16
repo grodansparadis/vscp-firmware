@@ -36,7 +36,7 @@
 #include "vscp_type.h"
 #include "vscp_actions.h"
 #include "vscp_registers.h"
-#include "vscptemplate.h"
+#include "vscptemperature.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // doActionAction1

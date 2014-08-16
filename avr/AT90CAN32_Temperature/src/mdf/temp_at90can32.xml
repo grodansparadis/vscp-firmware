@@ -3,12 +3,12 @@
 <!-- 2014-07-25  Jean-Marc Beaune -->
 <vscp>
 <module>
-	<name>VSCP AVR AT90CAN32 Module template</name>
+	<name>VSCP AVR AT90CAN32 Temperature Module</name>
  	<model>A</model>
         <version>0.0.0</version>
-   <description lang="en">This is a configuration template used as a base for development on AT90CAN32 devices.</description>
+   <description lang="en">Temperature sensor sending temperature on the bus at regular interval.</description>
   	<infourl>http://www.vscp.org</infourl>
-    <changed>2014-07-25</changed>
+    <changed>2014-08-14</changed>
   	<buffersize>8</buffersize>
    <manufacturer>
    	<name>Jean-Marc Beaune</name>
@@ -400,7 +400,7 @@
     
     </dmatrix>        
 	
-	<events>No event set in the template.</events>
+	<events>No event set.</events>
 	
 </module>	
 </vscp>	

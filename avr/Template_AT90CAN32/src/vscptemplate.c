@@ -874,6 +874,7 @@ void vscp_setGUID( uint8_t idx, uint8_t data )
 
 uint8_t vscp_getMDF_URL( uint8_t idx )
 {
+    uart_puts("Passing through vscp_getMDF_URL()\n");
     return vscp_deviceURL[ idx ];  
 }
 
