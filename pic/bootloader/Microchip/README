@@ -1,9 +1,0 @@
-This folder contains Microchip bootloaders
-==========================================
-
-vscp_can_bootloader_18f
-=======================
-PIC Bootloader code = 0x01   Described here 
-http://www.vscp.org/wiki/doku.php/can_bootloader_for_pic18_devices?s[]=boot&s[]=loader
-
-

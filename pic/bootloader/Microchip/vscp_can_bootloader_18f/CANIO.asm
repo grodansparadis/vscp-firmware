@@ -49,7 +49,7 @@
 ;*			verification is provided by performing self verification and 
 ;*			checksum of all written data (except for control data).
 ;* 
-;* The bootloader is essencially a register controlled system. The control 
+;* The bootloader is essentially a register controlled system. The control 
 ;* registers hold information that dictates how the bootloader functions. 
 ;* Such information includes a generic pointer to memory, control bits to 
 ;* assist special write and erase operations, and special command registers
@@ -66,7 +66,7 @@
 ;* XXXXXXXXXXX 0 0 8 XXXXXXXX XXXXXX00 ADDRL ADDRH ADDRU RESVD CTLBT SPCMD CPDTL CPDTH
 ;* XXXXXXXXXXX 0 0 8 XXXXXXXX XXXXXX01 DATA0 DATA1 DATA2 DATA3 DATA4 DATA5 DATA6 DATA7
 ;*
-;* The following responce commands are only used for PG mode.
+;* The following response commands are only used for PG mode.
 ;* Get commands received from source  (Master --> Slave)
 ;* Uses control registers to get data. Eight bytes are always assumed.
 ;* XXXXXXXXXXX 0 0 0 XXXXXXXX XXXXXX10 _NA__ _NA__ _NA__ _NA__ _NA__ _NA__ _NA__ _NA__
@@ -155,15 +155,21 @@
 ; Changes copyright (c) 2004-2014 Ake Hedman, Grodans Paradis AB
 ;
 ; - Watchdog timer updated during wait for CAN message.
-; - Symbolic init of mode control bits.
-
+; - Symbolic init. of mode control bits.
+; - VSCP adoptions.
 
 ; *****************************************************************************
 #include 	p18cxxx.inc
 #include	canio.def
 ; *****************************************************************************
 
-
+CONFIG WDT = ON, WDTPS = 128
+CONFIG OSC = HSPLL
+CONFIG BOREN = BOACTIVE
+CONFIG STVREN = ON
+CONFIG BORV = 3
+CONFIG LVP = ON
+CONFIG CPB = ON
 
 ; *****************************************************************************
 #ifndef		EEADRH
@@ -344,14 +350,14 @@ _UpdateChksum:
 ; *****************************************************************************
 ; Function: 	 VOID _CANInit(CAN, BOOT)
 ;
-; PreCondition:	Enter only after a reset has occured.
+; PreCondition:	Enter only after a reset has occurred.
 ;
 ; Input:    	CAN control information, bootloader control information
 ;                               
 ; Output:   	None. 
 ;
 ; Side 
-; Effects: 		N/A. Only run imediately after reset.
+; Effects: 		N/A. Only run immediately after reset.
 ;
 ; Stack 
 ; Requirements: N/A
@@ -369,7 +375,7 @@ _UpdateChksum:
 _CANInit:		
 
 	clrf	EECON1
-	clrf	EEADR					; Point to first location of EEDATA
+	clrf	EEADR					; Point to first location of EEDATA (BOOTFLAG)
 	clrf	EEADRH	
     bsf		EECON1, RD				; Read the control code
 	incfsz	EEDATA, W
@@ -430,7 +436,7 @@ bootload_mode:
 		
 	clrf	CANCON					; Enter Normal mode
 
-	bra 	_CANSendAck2				; AKHE Inital messagefrom boot loader
+	bra 	_CANSendAck2			; AKHE Initial message from boot loader
 	
 ; *****************************************************************************
 	
@@ -439,7 +445,7 @@ bootload_mode:
 	
 	
 ; *****************************************************************************
-; This routine is essencially a polling loop that waits for a 
+; This routine is essentially a polling loop that waits for a 
 ; receive event from RXB0 of the CAN module. When data is 
 ; received, FSR0 is set to point to the TX or RX buffer depending
 ; upon whether the request was a 'put' or a 'get'. 
@@ -531,7 +537,7 @@ _ReadWriteMemory:
 
 ; *****************************************************************************
 ; This routine reads or writes the bootloader control registers.
-; Then is executes any imediate command received.
+; Then is executes any immediate command received.
 
 _ControlReg:
 
@@ -551,7 +557,7 @@ _ControlRegLp1:
 	
 #ifdef 	ALLOW_GET_CMD
 	btfsc	CAN_PG_BIT	
-	bra		_CANSendResponce		; Send responce if get
+	bra		_CANSendResponce		; Send response if get
 #endif
 ; *********************************************************
 
@@ -730,9 +736,9 @@ _DecodeJp2:
 ; 				is also available. A write lock indicator is in place to 
 ; 				insure intentional write operations.
 ;
-; 				Note: write operations must be on 8-byte boundries and 
+; 				Note: write operations must be on 8-byte boundaries and 
 ; 				must be 8 bytes long. Also erase operations can only
-; 				occur on 64-byte boundries.
+; 				occur on 64-byte boundaries.
 ; *****************************************************************************
 #ifdef 	ALLOW_GET_CMD
 _PMRead:
