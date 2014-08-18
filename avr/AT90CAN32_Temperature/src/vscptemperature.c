@@ -55,6 +55,7 @@
 #include "vscp_firmware.h"
 #include "vscp_class.h"
 #include "vscp_type.h"
+#include "methods.h"
 #include "vscp_registers.h"
 #include "vscp_actions.c"
 #include "vscptemperature.h"
@@ -102,8 +103,9 @@ static void init_app_eeprom( void );
 static void doDM( void );
 static void doWork();
 
-// Counter for seconds between measurements
-uint8_t measurement_seconds;
+// Counter for seconds between measurements, do a first measurement
+uint8_t measurement_seconds = 0xFF;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Timer 0 Compare interupt
@@ -988,6 +990,24 @@ void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// SendInformationEventExtended same function as SendInformationEvent but 
+// with more options to have more control over the events sent
+// SendInformationEvent is not altered to remain compatible with common routines
+
+void SendInformationEventExtended(uint8_t priority, uint8_t zone, uint8_t subzone, uint8_t idx, uint8_t eventClass, uint8_t eventTypeId )
+{
+    vscp_omsg.priority = priority;
+    vscp_omsg.flags = VSCP_VALID_MSG + 3;
+    vscp_omsg.class = eventClass;
+    vscp_omsg.type = eventTypeId;
+
+    vscp_omsg.data[ 0 ] = idx;  // Register
+    vscp_omsg.data[ 1 ] = zone;
+    vscp_omsg.data[ 2 ] = subzone;
+
+    vscp_sendEvent(); // Send data
+}
+////////////////////////////////////////////////////////////////////////////////
 // doWork
 //
 // Do work here
@@ -998,7 +1018,7 @@ void doWork( void )
 
     if ( measurement_seconds > 30 ) { //send temperature every 30 seconds
             measurement_seconds = 0;
-         SendInformationEvent( 0x48, VSCP_CLASS1_MEASUREMENT, VSCP_TYPE_MEASUREMENT_TEMPERATURE );
+         SendInformationEventExtended( 0x00, 0x01, 0x5c, 0x88, VSCP_CLASS1_MEASUREMENT, VSCP_TYPE_MEASUREMENT_TEMPERATURE );
         }
 }
 
