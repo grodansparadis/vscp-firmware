@@ -35,6 +35,7 @@
 
 		PORTB Pin 0 - Status LED
 		PORTA Pin 0 - Init button
+    PORTC Pin 0 - DS1820 DQ pin
 */
 
 #define LED_STATUS_ON       ((PORTB &= ~_BV(0)))
@@ -1016,9 +1017,23 @@ void SendInformationEventExtended(uint8_t priority, uint8_t zone, uint8_t subzon
 void doWork( void )
 {
 
+int measured_temp = 201;
+
     if ( measurement_seconds > 30 ) { //send temperature every 30 seconds
             measurement_seconds = 0;
-         SendInformationEventExtended( 0x00, 0x01, 0x5c, 0x88, VSCP_CLASS1_MEASUREMENT, VSCP_TYPE_MEASUREMENT_TEMPERATURE );
+
+            vscp_omsg.priority = 0x00;
+            vscp_omsg.flags = VSCP_VALID_MSG + 4;
+            vscp_omsg.class = VSCP_CLASS1_MEASUREMENT;
+            vscp_omsg.type = VSCP_TYPE_MEASUREMENT_TEMPERATURE;
+
+            vscp_omsg.data[ 0 ] = 0x88;
+            vscp_omsg.data[ 1 ] = 0x01;
+            vscp_omsg.data[ 2 ] = 0xFF;
+            vscp_omsg.data[ 3 ] = 0x0D;
+
+            vscp_sendEvent(); // Send data
+
         }
 }
 
