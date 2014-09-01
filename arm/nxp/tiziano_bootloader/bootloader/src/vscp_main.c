@@ -166,9 +166,9 @@ int exec_vscp(void)
 			if ( vscp_imsg.flag & VSCP_VALID_MSG ) 	// incoming event?
 			{	
 				// Yes, incoming message
-				if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.class ) 
+				if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class ) 
 				{	
-					switch( vscp_imsg.type ) 
+					switch( vscp_imsg.vscp_type ) 
 					{
 						case VSCP_TYPE_PROTOCOL_SEGCTRL_HEARTBEAT:
 							vscp_rcv_heartbeat();
@@ -217,8 +217,8 @@ int exec_vscp(void)
 							{
 								vscp_omsg.flags = VSCP_VALID_MSG + 8 ;	 
 								vscp_omsg.priority = VSCP_PRIORITY_HIGH;	
-								vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-								vscp_omsg.type = VSCP_TYPE_PROTOCOL_ACK_BOOT_LOADER;
+								vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+								vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_ACK_BOOT_LOADER;
 								vscp_omsg.data[ 0 ] = 2;	// MSB internal flash block size
 								vscp_omsg.data[ 1 ] = 2; 	// MSB spi flash block size
 								vscp_omsg.data[ 2 ] = 0;	// LSB spi flash block size
@@ -244,16 +244,16 @@ int exec_vscp(void)
 									case 0:
 										vscp_omsg.flags = VSCP_VALID_MSG + 4 ;	 
 										vscp_omsg.priority = VSCP_PRIORITY_HIGH;	
-										vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-										vscp_omsg.type = VSCP_TYPE_PROTOCOL_START_BLOCK_ACK;
+										vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+										vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_START_BLOCK_ACK;
 										//PrintString((UINT8 const *)"\n\rDEBUG:VSCP_TYPE_PROTOCOL_START_BLOCK_ACK");
 										vscp_sendEvent();
 										break;
 									case 1:
 										vscp_omsg.flags = VSCP_VALID_MSG + 4 ;	 
 										vscp_omsg.priority = VSCP_PRIORITY_HIGH;	
-										vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-										vscp_omsg.type = VSCP_TYPE_PROTOCOL_START_BLOCK_NACK;
+										vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+										vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_START_BLOCK_NACK;
 										PrintString((UINT8 const *)"\n\rDEBUG:VSCP_TYPE_PROTOCOL_START_BLOCK_NACK");
 										vscp_sendEvent();
 										break;
@@ -270,8 +270,8 @@ int exec_vscp(void)
 									case 0:
 										vscp_omsg.flags = VSCP_VALID_MSG + 6 ;	 
 										vscp_omsg.priority = VSCP_PRIORITY_HIGH;	
-										vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-										vscp_omsg.type = VSCP_TYPE_PROTOCOL_BLOCK_DATA_ACK;
+										vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+										vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_BLOCK_DATA_ACK;
 										//PrintString((UINT8 const *)"\n\rDEBUG:VSCP_TYPE_PROTOCOL_BLOCK_DATA_ACK");
 										//PrintString((UINT8 const *)"\n\rblock ack");
 										vscp_sendEvent();
@@ -279,8 +279,8 @@ int exec_vscp(void)
 									case 1:
 										vscp_omsg.flags = VSCP_VALID_MSG + 5 ;	 
 										vscp_omsg.priority = VSCP_PRIORITY_HIGH;	
-										vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-										vscp_omsg.type = VSCP_TYPE_PROTOCOL_BLOCK_DATA_NACK;
+										vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+										vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_BLOCK_DATA_NACK;
 										PrintString((UINT8 const *)"\n\rDEBUG:VSCP_TYPE_PROTOCOL_BLOCK_DATA_NACK");
 										vscp_sendEvent();
 										break;
@@ -297,15 +297,15 @@ int exec_vscp(void)
 									case 0:
 										vscp_omsg.flags = VSCP_VALID_MSG + 4 ;	 
 										vscp_omsg.priority = VSCP_PRIORITY_HIGH;	
-										vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-										vscp_omsg.type = VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA_ACK;
+										vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+										vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA_ACK;
 										vscp_sendEvent();
 										break;
 									default:
 										vscp_omsg.flags = VSCP_VALID_MSG + 5 ;	 
 										vscp_omsg.priority = VSCP_PRIORITY_HIGH;	
-										vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-										vscp_omsg.type = VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA_NACK;
+										vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+										vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA_NACK;
 										PrintString((UINT8 const *)"\n\rDEBUG:VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA_NACK");
 										vscp_sendEvent();
 										break;
@@ -320,8 +320,8 @@ int exec_vscp(void)
 									case 0:
 										vscp_omsg.flags = VSCP_VALID_MSG + 8 ;	 
 										vscp_omsg.priority = VSCP_PRIORITY_HIGH;	
-										vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-										vscp_omsg.type = VSCP_TYPE_PROTOCOL_ACTIVATENEWIMAGE_ACK;
+										vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+										vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_ACTIVATENEWIMAGE_ACK;
 										vscp_omsg.data[ 0 ] = 2;	// MSB internal flash block size
 										vscp_omsg.data[ 1 ] = 2; 	// MSB spi flash block size
 										vscp_omsg.data[ 2 ] = 0;	// LSB spi flash block size
@@ -341,8 +341,8 @@ int exec_vscp(void)
 									default:
 										vscp_omsg.flags = VSCP_VALID_MSG + 1 ;	 
 										vscp_omsg.priority = VSCP_PRIORITY_HIGH;	
-										vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-										vscp_omsg.type = VSCP_TYPE_PROTOCOL_ACTIVATENEWIMAGE_NACK;
+										vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+										vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_ACTIVATENEWIMAGE_NACK;
 										vscp_sendEvent();
 										break;
 								}

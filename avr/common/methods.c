@@ -390,8 +390,8 @@ void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId 
 {
 	vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
 	vscp_omsg.flags = VSCP_VALID_MSG + 3;
-	vscp_omsg.class = eventClass;
-	vscp_omsg.type = eventTypeId;
+	vscp_omsg.vscp_class = eventClass;
+	vscp_omsg.vscp_type = eventTypeId;
 
 	vscp_omsg.data[ 0 ] = idx;	// Register
 	vscp_omsg.data[ 1 ] = eeprom_read_byte(&STD_REG_ZONE);

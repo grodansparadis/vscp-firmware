@@ -318,8 +318,8 @@ void doWork( void )
 			
 			vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
 			vscp_omsg.flags = VSCP_VALID_MSG + 4;
-			vscp_omsg.class = VSCP_CLASS1_MEASUREMENT;
-			vscp_omsg.type = VSCP_TYPE_MEASUREMENT_TEMPERATURE;
+			vscp_omsg.vscp_class = VSCP_CLASS1_MEASUREMENT;
+			vscp_omsg.vscp_type = VSCP_TYPE_MEASUREMENT_TEMPERATURE;
 			vscp_omsg.data[ 0 ] = 0x80 + ( readEEPROM( EEPROM_TEMP_UNIT ) << 3 );
 			vscp_omsg.data[ 1 ] = 0x02; // Exponent
 			
@@ -338,8 +338,8 @@ void doWork( void )
 			
 			vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
 			vscp_omsg.flags = VSCP_VALID_MSG + 4;
-			vscp_omsg.class = VSCP_CLASS1_MEASUREMENT;
-			vscp_omsg.type = VSCP_TYPE_MEASUREMENT_HUMIDITY;
+			vscp_omsg.vscp_class = VSCP_CLASS1_MEASUREMENT;
+			vscp_omsg.vscp_type = VSCP_TYPE_MEASUREMENT_HUMIDITY;
 			vscp_omsg.data[ 0 ] = 0x80;
 			vscp_omsg.data[ 1 ] = 0x02; // Exponent
 			vscp_omsg.data[ 2 ] = ( ( current_humidity  & 0xFF00 ) >> 8 );
@@ -358,8 +358,8 @@ void doWork( void )
 			
 			vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
 			vscp_omsg.flags = VSCP_VALID_MSG + 4;
-			vscp_omsg.class = VSCP_CLASS1_MEASUREMENT;
-			vscp_omsg.type = VSCP_TYPE_MEASUREMENT_DEWPOINT;
+			vscp_omsg.vscp_class = VSCP_CLASS1_MEASUREMENT;
+			vscp_omsg.vscp_type = VSCP_TYPE_MEASUREMENT_DEWPOINT;
 			vscp_omsg.data[ 0 ] = 0x80 + ( readEEPROM( EEPROM_TEMP_UNIT ) << 3 );
 			vscp_omsg.data[ 1 ] = 0x02; // Exponent
 			
@@ -780,8 +780,8 @@ int sendAlarmEvent( unsigned char nAlarm )
 {
 	vscp_omsg.priority = VSCP_PRIORITY_HIGH;
 	vscp_omsg.flags = VSCP_VALID_MSG + 2;
-	vscp_omsg.class = VSCP_CLASS1_ALARM;
-	vscp_omsg.type = VSCP_TYPE_ALARM_ALARM;
+	vscp_omsg.vscp_class = VSCP_CLASS1_ALARM;
+	vscp_omsg.vscp_type = VSCP_TYPE_ALARM_ALARM;
 	vscp_omsg.data[ 0 ] = nAlarm;
 	vscp_omsg.data[ 1 ] = vscp_alarmstatus;
 
@@ -802,8 +802,8 @@ int sendErrorEvent( unsigned char nError )
 {
 	vscp_omsg.priority = VSCP_PRIORITY_HIGH;
 	vscp_omsg.flags = VSCP_VALID_MSG + 3;
-	vscp_omsg.class = VSCP_CLASS2_LEVEL1_INFORMATION;
-	vscp_omsg.type = VSCP_TYPE_INFORMATION_ERROR;
+	vscp_omsg.vscp_class = VSCP_CLASS2_LEVEL1_INFORMATION;
+	vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_ERROR;
 	vscp_omsg.data[ 0 ] = nError;
 	vscp_omsg.data[ 1 ] = readEEPROM( EEPROM_ZONE ); 	// Zone
 	vscp_omsg.data[ 2 ] = readEEPROM( EEPROM_SUBZONE ); // Suz Zone
@@ -1514,8 +1514,8 @@ void vscp_getEmbeddedMdfInfo( void )
 	
 	vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
 	vscp_omsg.flags = VSCP_VALID_MSG + 3;
-	vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-	vscp_omsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+	vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
 
 	vscp_omsg.data[ 0 ] = 0;
 	vscp_omsg.data[ 1 ] = 0;

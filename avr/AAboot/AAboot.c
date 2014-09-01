@@ -123,8 +123,8 @@ void mainbootloader()
 	
 	vscp_omsg.priority = 7;
 	vscp_omsg.flags = VSCP_VALID_MSG + 8;
-	vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-	vscp_omsg.type =  VSCP_TYPE_PROTOCOL_ACK_BOOT_LOADER;
+	vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	vscp_omsg.vscp_type =  VSCP_TYPE_PROTOCOL_ACK_BOOT_LOADER;
 	vscp_omsg.data[ 0 ] = 0x00;
 	vscp_omsg.data[ 1 ] = 0x00;
 	vscp_omsg.data[ 2 ] = (BTL_BLOCKSIZE & 0xFF00) >> 8;
@@ -155,7 +155,7 @@ void mainbootloader()
                     char buf[30];
                     uint8_t i;
                     sprintf(buf, "rx: %03x/%02x/%02x/",
-                    vscp_imsg.class, vscp_imsg.type, vscp_imsg.oaddr);
+                    vscp_imsg.vscp_class, vscp_imsg.vscp_type, vscp_imsg.oaddr);
                     for (i=0; i<(vscp_imsg.flags&0xf); i++) 
 					{
                         char dbuf[5];
@@ -165,9 +165,9 @@ void mainbootloader()
                     uart_puts(buf);
 				#endif
                 //vscp_handleProtocolEvent();
-				if (vscp_imsg.class == VSCP_CLASS1_PROTOCOL)
+				if (vscp_imsg.vscp_class == VSCP_CLASS1_PROTOCOL)
 				{
-					switch( vscp_imsg.type ) 
+					switch( vscp_imsg.vscp_type ) 
 					{
 						case VSCP_TYPE_PROTOCOL_START_BLOCK:
 						
@@ -201,7 +201,7 @@ void mainbootloader()
 	                char buf[30];
 	                uint8_t i;
 	                sprintf(buf, "rx: %03x/%02x/%02x/",
-	                vscp_imsg.class, vscp_imsg.type, vscp_imsg.oaddr);
+	                vscp_imsg.vscp_class, vscp_imsg.vscp_type, vscp_imsg.oaddr);
 	                for (i=0; i<(vscp_imsg.flags&0xf); i++) 
 					{
 	                    char dbuf[5];
@@ -210,9 +210,9 @@ void mainbootloader()
 	                }
 	                uart_puts(buf);
 				#endif
-				if (vscp_imsg.class == VSCP_CLASS1_PROTOCOL)
+				if (vscp_imsg.vscp_class == VSCP_CLASS1_PROTOCOL)
 				{
-					switch( vscp_imsg.type ) 
+					switch( vscp_imsg.vscp_type ) 
 						{
 						case VSCP_TYPE_PROTOCOL_BLOCK_DATA:
 							#ifdef PRINT_DEBUG_EVENTS				
@@ -242,8 +242,8 @@ void mainbootloader()
 					// send confirm block event
 						vscp_omsg.priority = 0;
 						vscp_omsg.flags = VSCP_VALID_MSG + 4;
-			    		vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-				    	vscp_omsg.type =  VSCP_TYPE_PROTOCOL_BLOCK_DATA_ACK;
+			    		vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+				    	vscp_omsg.vscp_type =  VSCP_TYPE_PROTOCOL_BLOCK_DATA_ACK;
 						vscp_omsg.data[ 0 ] = 0; //MSB 
 						vscp_omsg.data[ 1 ] = 0;
 						vscp_omsg.data[ 2 ] = (BTL_PAGE & 0xFF00) >> 8;
@@ -261,7 +261,7 @@ void mainbootloader()
 	    	vscp_getEvent();
 			if ( vscp_imsg.flags & VSCP_VALID_MSG ) 
 			{	// incoming message?
-				if ((vscp_imsg.class == VSCP_CLASS1_PROTOCOL)&(vscp_imsg.type == VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA)) 
+				if ((vscp_imsg.vscp_class == VSCP_CLASS1_PROTOCOL)&(vscp_imsg.vscp_type == VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA)) 
 				{
 					#ifdef PRINT_DEBUG_EVENTS				
 						uart_puts("BOOT_WRITE");
@@ -270,8 +270,8 @@ void mainbootloader()
 					// send ACK program block event 
 					vscp_omsg.priority = 0;
 					vscp_omsg.flags = VSCP_VALID_MSG;
-		    		vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-			    	vscp_omsg.type =  VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA_ACK;
+		    		vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+			    	vscp_omsg.vscp_type =  VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA_ACK;
 					vscp_sendEvent();	// Send ACK
 					BTL_STAT = 'A';  //page written, back Awaiting new block 
 				}
@@ -359,7 +359,7 @@ void mainvscp()
 	                    char buf[30];
 	                    uint8_t i;
 	                    sprintf(buf, "rx: %03x/%02x/%02x/",
-	                    vscp_imsg.class, vscp_imsg.type, vscp_imsg.oaddr);
+	                    vscp_imsg.vscp_class, vscp_imsg.vscp_type, vscp_imsg.oaddr);
 	                    for (i=0; i<(vscp_imsg.flags&0xf); i++) 
 						{
 	                        char dbuf[5];
@@ -922,8 +922,8 @@ void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId 
 {
     vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
     vscp_omsg.flags = VSCP_VALID_MSG + 3;
-    vscp_omsg.class = eventClass;
-    vscp_omsg.type = eventTypeId;
+    vscp_omsg.vscp_class = eventClass;
+    vscp_omsg.vscp_type = eventTypeId;
 
     vscp_omsg.data[ 0 ] = idx;	// Register
     vscp_omsg.data[ 1 ] = readEEPROM( VSCP_EEPROM_END + REG_ZONE );
@@ -946,8 +946,8 @@ void SendInformationEventExtended(uint8_t priority, uint8_t zone, uint8_t subzon
 {
     vscp_omsg.priority = priority;
     vscp_omsg.flags = VSCP_VALID_MSG + 3;
-    vscp_omsg.class = eventClass;
-    vscp_omsg.type = eventTypeId;
+    vscp_omsg.vscp_class = eventClass;
+    vscp_omsg.vscp_type = eventTypeId;
 
     vscp_omsg.data[ 0 ] = idx;	// Register
     vscp_omsg.data[ 1 ] = zone;

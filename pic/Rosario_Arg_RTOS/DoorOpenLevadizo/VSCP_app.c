@@ -65,8 +65,8 @@ extern VSCP_msg_t SendMsg;
 void read_app_register( uint08_t reg )
 {
 	SendMsg.priority = VSCP_PRIORITY_MEDIUM;
-	SendMsg.class = VSCP_CLASS1_PROTOCOL;
-	SendMsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+	SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
 	SendMsg.length =  2;
 	SendMsg.data[0] = reg;
 	SendMsg.data[1] = 0x00; // default read
@@ -95,8 +95,8 @@ void read_app_register( uint08_t reg )
 void write_app_register( uint08_t reg, uint08_t val )
 {
 	SendMsg.priority = VSCP_PRIORITY_MEDIUM;
-	SendMsg.class = VSCP_CLASS1_PROTOCOL;
-	SendMsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+	SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
 	SendMsg.length = 2;
 	SendMsg.data[0] = reg;
 	SendMsg.data[1] = ~val; // error return

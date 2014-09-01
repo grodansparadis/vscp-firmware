@@ -1062,8 +1062,8 @@ void vscp_getEmbeddedMdfInfo( void )
 	
 	vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
 	vscp_omsg.flags = VSCP_VALID_MSG + 3;
-	vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-	vscp_omsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+	vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
 
 	vscp_omsg.data[ 0 ] = 0;
 	vscp_omsg.data[ 1 ] = 0;
@@ -1171,8 +1171,8 @@ void doWork( void )
 			// Event part 1 of 2
             vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
             vscp_omsg.flags = VSCP_VALID_MSG + 8;
-            vscp_omsg.class = VSCP_CLASS1_INFORMATION;
-            vscp_omsg.type = VSCP_TYPE_INFORMATION_TOKEN_ACTIVITY;
+            vscp_omsg.vscp_class = VSCP_CLASS1_INFORMATION;
+            vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_TOKEN_ACTIVITY;
 
             vscp_omsg.data[ 0 ] = 8;          // Touched and released | RFID Token. 40-bits 
             vscp_omsg.data[ 1 ] = readEEPROM( VSCP_EEPROM_END + REG_ZONE );          // Device zone 
@@ -1189,8 +1189,8 @@ void doWork( void )
 			// Event Part 2 of 2
 			vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
             vscp_omsg.flags = VSCP_VALID_MSG + 8;
-            vscp_omsg.class = VSCP_CLASS1_INFORMATION;
-            vscp_omsg.type = VSCP_TYPE_INFORMATION_TOKEN_ACTIVITY;
+            vscp_omsg.vscp_class = VSCP_CLASS1_INFORMATION;
+            vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_TOKEN_ACTIVITY;
 
             vscp_omsg.data[ 0 ] = 7;          // Touched and released | RFID Token. 64-bits 
             vscp_omsg.data[ 1 ] = readEEPROM( VSCP_EEPROM_END + REG_ZONE );          // Device zone 
@@ -1276,8 +1276,8 @@ void read_app_register( unsigned char reg )
 
 	vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
 	vscp_omsg.flags = VSCP_VALID_MSG + 2;
-	vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-	vscp_omsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+	vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
 
 	vscp_omsg.data[ 0 ] = reg;
 	vscp_omsg.data[ 1 ] = 0x00; // default read	 
@@ -1302,8 +1302,8 @@ void write_app_register( unsigned char reg, unsigned char val )
 
 	vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
 	vscp_omsg.flags = VSCP_VALID_MSG + 2;
-	vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-	vscp_omsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+	vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
 
 	vscp_omsg.data[ 0 ] = reg;
 	vscp_omsg.data[ 1 ] = val;
@@ -1327,8 +1327,8 @@ void sendDMatrixInfo( void )
 {
 	vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
 	vscp_omsg.flags = VSCP_VALID_MSG + 2;
-	vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-	vscp_omsg.type = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
+	vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
 
 	vscp_omsg.data[ 0 ] = DESCION_MATRIX_ELEMENTS;
 	vscp_omsg.data[ 1 ] = REG_DESCION_MATRIX;
@@ -1344,8 +1344,8 @@ void SendInformationEvent( unsigned char idx, unsigned char eventClass, unsigned
 {
 	vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
 	vscp_omsg.flags = VSCP_VALID_MSG + 3;
-	vscp_omsg.class = eventClass;
-	vscp_omsg.type = eventTypeId;
+	vscp_omsg.vscp_class = eventClass;
+	vscp_omsg.vscp_type = eventTypeId;
 
 	vscp_omsg.data[ 0 ] = idx;	// Register
 	vscp_omsg.data[ 1 ] = readEEPROM( VSCP_EEPROM_END + REG_ZONE );
@@ -1370,7 +1370,7 @@ void doDM( void )
 	unsigned char type_mask;
 	
 	// Don't deal with the control functionality
-	if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.class ) return;
+	if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class ) return;
 	
 	for ( i=0; i<DESCION_MATRIX_ELEMENTS; i++ ) {
 		
@@ -1415,8 +1415,8 @@ void doDM( void )
 										( 8 * i ) + 
 										VSCP_DM_POS_TYPEMASK  );
 				
-			if ( !( ( class_filter ^ vscp_imsg.class ) & class_mask ) &&
-				 	!( ( type_filter ^ vscp_imsg.type ) & type_mask )) {
+			if ( !( ( class_filter ^ vscp_imsg.vscp_class ) & class_mask ) &&
+				 	!( ( type_filter ^ vscp_imsg.vscp_type ) & type_mask )) {
 					 						
 				// OK Trigger this action
 				if ( readEEPROM( VSCP_EEPROM_END + REG_DESCION_MATRIX + ( 8 * i ) + VSCP_DM_POS_ACTION  ) ) 

@@ -26,8 +26,8 @@ void do_work(void)
 		// Do something useful, send a message every second
 		vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
 		vscp_omsg.flags = VSCP_VALID_MSG + 6;
-		vscp_omsg.class = VSCP_CLASS1_MEASUREMENT;
-		vscp_omsg.type =VSCP_TYPE_MEASUREMENT_ELECTRIC_CURRENT;
+		vscp_omsg.vscp_class = VSCP_CLASS1_MEASUREMENT;
+		vscp_omsg.vscp_type =VSCP_TYPE_MEASUREMENT_ELECTRIC_CURRENT;
 		vscp_omsg.data[ 0 ] = 0x60; //data coding integer, default unit and index
 		array_write(vscp_omsg.data, 1, 4, (void*)&sens_current_raw);
 		vscp_omsg.data[ 5 ] = adstatus;
@@ -47,8 +47,8 @@ void do_work(void)
 			// Do something useful, send a message every second
 			vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
 			vscp_omsg.flags = VSCP_VALID_MSG + 3;
-			vscp_omsg.class = VSCP_CLASS1_MEASUREMENT;
-			vscp_omsg.type =VSCP_TYPE_MEASUREMENT_TEMPERATURE;
+			vscp_omsg.vscp_class = VSCP_CLASS1_MEASUREMENT;
+			vscp_omsg.vscp_type =VSCP_TYPE_MEASUREMENT_TEMPERATURE;
 			vscp_omsg.data[ 0 ] = 0x60; //data coding integer, default unit and index
 			array_write(vscp_omsg.data, 1, 2, (void*)&sens_temp_raw);
 			vscp_sendEvent();
