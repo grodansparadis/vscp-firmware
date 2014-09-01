@@ -60,6 +60,8 @@
 #include "vscp_registers.h"
 #include "vscp_actions.c"
 #include "vscptemperature.h"
+#include "onewire.h"
+#include "ds18x20.h"
 
 #ifndef GUID_IN_EEPROM
 // GUID is stored in ROM for this module
@@ -1017,10 +1019,12 @@ void SendInformationEventExtended(uint8_t priority, uint8_t zone, uint8_t subzon
 void doWork( void )
 {
 
-int measured_temp = 201;
 
     if ( measurement_seconds > 30 ) { //send temperature every 30 seconds
             measurement_seconds = 0;
+
+            uart_puts("Measuring temperature\n");
+
 
             vscp_omsg.priority = 0x00;
             vscp_omsg.flags = VSCP_VALID_MSG + 4;
