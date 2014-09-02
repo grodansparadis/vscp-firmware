@@ -106,6 +106,45 @@ static void init_app_eeprom( void );
 static void doDM( void );
 static void doWork();
 
+#define MAXSENSORS 5
+
+uint8_t gSensorIDs[MAXSENSORS][OW_ROMCODE_SIZE];
+
+  static uint8_t search_sensors(void)
+{
+  uint8_t i;
+  uint8_t id[OW_ROMCODE_SIZE];
+  uint8_t diff, nSensors;
+  
+  uart_puts("Scanning Bus for DS18X20");
+  
+  ow_reset();
+
+  nSensors = 0;
+  
+  diff = OW_SEARCH_FIRST;
+  while ( diff != OW_LAST_DEVICE && nSensors < MAXSENSORS ) {
+    DS18X20_find_sensor( &diff, &id[0] );
+    
+    if( diff == OW_PRESENCE_ERR ) {
+        uart_puts( "No Sensor found");
+      break;
+    }
+    
+    if( diff == OW_DATA_ERR ) {
+        uart_puts( "Bus Error");
+      break;
+    }
+    
+    for ( i=0; i < OW_ROMCODE_SIZE; i++ )
+      gSensorIDs[nSensors][i] = id[i];
+    
+    nSensors++;
+  }
+  
+  return nSensors;
+}
+
 // Counter for seconds between measurements, do a first measurement
 uint8_t measurement_seconds = 0xFF;
 
@@ -184,7 +223,9 @@ int main( void )
 
 {
   //  stdout = &mystdout;
-  uint8_t i;
+  uint8_t nSensors, i;
+
+
 
     PORTA   = 0xff;     // Activate pull-ups
     DDRA = 0x00;	    // Port A all inputs
@@ -204,6 +245,16 @@ int main( void )
     initTimer();
 
     sei(); // Enable interrupts
+
+    #ifndef OW_ONE_BUS
+      ow_set_bus(&PINC,&PORTC,&DDRC,PC0);
+    #endif
+
+    nSensors = search_sensors();
+
+    char buf[30];
+    sprintf(buf, "NbSensors: %i", nSensors);
+    uart_puts(buf);
 
     // Init can
     if ( ERROR_OK != can_Open( CAN_BITRATE_125K, 0, 0, 0 ) ) {

@@ -21,9 +21,10 @@ TARGET = $(PRG).elf
 OBJ = vscptemperature.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/can_at90can32.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/uart.o
-OBJ += $(VSCP_FIRMWARE)/common/vscp_firmware.c
+OBJ += $(VSCP_FIRMWARE)/common/vscp_firmware.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/onewire.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/ds18x20.o
+OBJ += $(VSCP_FIRMWARE)/avr/common/crc8.o
 
 
 MCU_TARGET	= at90can32
@@ -52,7 +53,7 @@ CC             = avr-gcc
 
 # Override is only needed by avr-lib build system.
 
-override CFLAGS        = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS) $(patsubst %,-I %,$(EXTRAINCDIRS))
+override CFLAGS        = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS) $(patsubst %,-I %,$(EXTRAINCDIRS)) -std=c99
 override LDFLAGS       = -Wl,-Map,$(PRG).map
 
 OBJCOPY        = avr-objcopy
