@@ -4,7 +4,7 @@ Adopted for MPLABX.
 fuses now programmed correctly.
 readme.txt renamed to README for consistency.
 version.txt renamed to HISTORY for consistency.
-Distribution files for PIC18F2580, PIC18F2680, PIC18F25K80, PIC18F26K80 available.
+Distribution files for PIC18F2580, PIC18F2680 (PIC18F25K80, PIC18F26K80) available.
 
 2010-03-21 AKHE  Version 0.2.1
 ==============================

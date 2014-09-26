@@ -132,8 +132,8 @@ void vscp_init(void)
     vscp_omsg.class = 0;
     vscp_omsg.type = 0;
 
-    vscp_errorcnt = 0; // No errors yet
-    vscp_alarmstatus = 0; // No alarmstatus
+    vscp_errorcnt = 0;      // No errors yet
+    vscp_alarmstatus = 0;   // No alarmstatus
 
     vscp_probe_address = 0;
 
