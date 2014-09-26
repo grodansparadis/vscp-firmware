@@ -145,8 +145,8 @@ void mainbootloader()
 	
 	vscp_omsg.priority = 7;
 	vscp_omsg.flags = VSCP_VALID_MSG + 8;
-	vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-	vscp_omsg.type =  VSCP_TYPE_PROTOCOL_ACK_BOOT_LOADER;
+	vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	vscp_omsg.vscp_type =  VSCP_TYPE_PROTOCOL_ACK_BOOT_LOADER;
 	vscp_omsg.data[ 0 ] = 0x00;
 	vscp_omsg.data[ 1 ] = 0x00;
 	vscp_omsg.data[ 2 ] = (BTL_BLOCKSIZE & 0xFF00) >> 8;
@@ -179,7 +179,7 @@ void mainbootloader()
                     char buf[30];
                     uint8_t i;
                     sprintf(buf, "rx: %03x/%02x/%02x/",
-                    vscp_imsg.class, vscp_imsg.type, vscp_imsg.oaddr);
+                    vscp_imsg.vscp_class, vscp_imsg.vscp_type, vscp_imsg.oaddr);
                     for (i=0; i<(vscp_imsg.flags&0xf); i++) 
 					{
                         char dbuf[5];
@@ -189,9 +189,9 @@ void mainbootloader()
                     uart_puts(buf);
 				#endif
                 //vscp_handleProtocolEvent();
-				if (vscp_imsg.class == VSCP_CLASS1_PROTOCOL)
+				if (vscp_imsg.vscp_class == VSCP_CLASS1_PROTOCOL)
 				{
-					switch( vscp_imsg.type ) 
+					switch( vscp_imsg.vscp_type ) 
 					{
 						case VSCP_TYPE_PROTOCOL_START_BLOCK:
 
@@ -233,7 +233,7 @@ void mainbootloader()
 	                char buf[30];
 	                uint8_t i;
 	                sprintf(buf, "rx: %03x/%02x/%02x/",
-	                vscp_imsg.class, vscp_imsg.type, vscp_imsg.oaddr);
+	                vscp_imsg.vscp_class, vscp_imsg.vscp_type, vscp_imsg.oaddr);
 	                for (i=0; i<(vscp_imsg.flags&0xf); i++) 
 					{
 	                    char dbuf[5];
@@ -242,11 +242,11 @@ void mainbootloader()
 	                }
 	                uart_puts(buf);
 				#endif
-				if (vscp_imsg.class == VSCP_CLASS1_PROTOCOL)
+				if (vscp_imsg.vscp_class == VSCP_CLASS1_PROTOCOL)
 				{
 					//LED_PORT ^= (1<< LED_PIN_NUMBER);  // Toggle LED
 
-					switch( vscp_imsg.type ) 
+					switch( vscp_imsg.vscp_type ) 
 						{
 						case VSCP_TYPE_PROTOCOL_BLOCK_DATA:
 							//LED_PORT &= ~(1<< LED_PIN_NUMBER);  // ON LED
@@ -291,8 +291,8 @@ void mainbootloader()
 							// send confirm block event
 								vscp_omsg.priority = 0;
 								vscp_omsg.flags = VSCP_VALID_MSG + 4;
-			    				vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-				    			vscp_omsg.type =  VSCP_TYPE_PROTOCOL_BLOCK_DATA_ACK;
+			    				vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+				    			vscp_omsg.vscp_type =  VSCP_TYPE_PROTOCOL_BLOCK_DATA_ACK;
 								vscp_omsg.data[ 0 ] = (uint8_t)(crc_16>>8); //MSB 
 								vscp_omsg.data[ 1 ] = (uint8_t)(crc_16);
 								vscp_omsg.data[ 2 ] = (BTL_PAGE & 0xFF00) >> 8;
@@ -324,7 +324,7 @@ void mainbootloader()
 				//LED_PORT ^= 0xff;
 				//vscp_imsg.flags &= ~(VSCP_VALID_MSG);
 
-				if ((vscp_imsg.class == VSCP_CLASS1_PROTOCOL)&&(vscp_imsg.type == VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA)) 
+				if ((vscp_imsg.vscp_class == VSCP_CLASS1_PROTOCOL)&&(vscp_imsg.vscp_type == VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA)) 
 				{
 					/*
 					if(hhh >6)
@@ -343,8 +343,8 @@ void mainbootloader()
 					// send ACK program block event 
 					vscp_omsg.priority = 0;
 					vscp_omsg.flags = VSCP_VALID_MSG;
-		    		vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-			    	vscp_omsg.type =  VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA_ACK;
+		    		vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+			    	vscp_omsg.vscp_type =  VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA_ACK;
 					vscp_sendEvent();	// Send ACK
 					BTL_STAT = 'A';  //page written, back Awaiting new block 
 				}
@@ -670,14 +670,14 @@ void vscp_init(void)
     // Init incoming event
     vscp_imsg.flags = 0;
     vscp_imsg.priority = 0;
-    vscp_imsg.class = 0;
-    vscp_imsg.type = 0;
+    vscp_imsg.vscp_class = 0;
+    vscp_imsg.vscp_type = 0;
 
     // Init outgoing event
     vscp_omsg.flags = 0;
     vscp_omsg.priority = 0;
-    vscp_omsg.class = 0;
-    vscp_omsg.type = 0;
+    vscp_omsg.vscp_class = 0;
+    vscp_omsg.vscp_type = 0;
 
 /*    vscp_errorcnt = 0; // No errors yet
     vscp_alarmstatus = 0; // No alarmstatus
@@ -708,8 +708,8 @@ int8_t vscp_sendEvent(void)
 {
     int8_t rv;
 
-    if (!(rv = sendVSCPFrame(vscp_omsg.class,
-            vscp_omsg.type,
+    if (!(rv = sendVSCPFrame(vscp_omsg.vscp_class,
+            vscp_omsg.vscp_type,
             vscp_nickname,
             vscp_omsg.priority,
             (vscp_omsg.flags & 0x0f),
@@ -735,8 +735,8 @@ int8_t vscp_getEvent(void)
     if (vscp_imsg.flags & VSCP_VALID_MSG) return TRUE;
 
 
-    if ((rv = getVSCPFrame(&vscp_imsg.class,
-            &vscp_imsg.type,
+    if ((rv = getVSCPFrame(&vscp_imsg.vscp_class,
+            &vscp_imsg.vscp_type,
             &vscp_imsg.oaddr,
             &vscp_imsg.priority,
             &vscp_imsg.flags,

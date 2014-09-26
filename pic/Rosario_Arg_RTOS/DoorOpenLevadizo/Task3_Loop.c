@@ -138,8 +138,8 @@ TASK(VSCP_Loop)
       	CloseLimit = PORTAbits.RA1;			// Read Open and close limit switch (Normal Closed)
 				
 				SND1_message.priority = VSCP_PRIORITY_HIGH;		// inform change of state to open
-				SND1_message.class = VSCP_CLASS1_INFORMATION;				
-				SND1_message.type = VSCP_TYPE_INFORMATION_OPENED;
+				SND1_message.vscp_class = VSCP_CLASS1_INFORMATION;				
+				SND1_message.vscp_type = VSCP_TYPE_INFORMATION_OPENED;
 				SND1_message.length  = 8;
 				SND1_message.data[0] = 0x01;
 				SND1_message.data[1] = 0xff;									// send to all zones
@@ -297,8 +297,8 @@ void ReadAndOut( void)
 	if( AlertClosed)
 	{
 		SND1_message.priority = VSCP_PRIORITY_HIGH;		// inform change of state to closed
-		SND1_message.class = VSCP_CLASS1_INFORMATION;				
-		SND1_message.type = VSCP_TYPE_INFORMATION_CLOSED;
+		SND1_message.vscp_class = VSCP_CLASS1_INFORMATION;				
+		SND1_message.vscp_type = VSCP_TYPE_INFORMATION_CLOSED;
 		SND1_message.length  = 8;
 		SND1_message.data[0] = 0x01;
 		SND1_message.data[1] = 0xff;									// send to all zones

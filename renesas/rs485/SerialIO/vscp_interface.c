@@ -596,8 +596,8 @@ void vscp_getEmbeddedMdfInfo(void)
 	BYTE	msgIndex;
 	
 	vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
-	vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-	vscp_omsg.type = VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE;
+	vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE;
 
 #if 1
 
@@ -665,7 +665,7 @@ void vscp_doDecisionMatrix(void)
 	struct _dmrow *decision;
 
 	/* Q - CLASS1_PROTOCOL event ? */
-	if (vscp_imsg.class == VSCP_CLASS1_PROTOCOL) 
+	if (vscp_imsg.vscp_class == VSCP_CLASS1_PROTOCOL) 
 	{
 		/* yes - ignore it */
 		return;
@@ -702,8 +702,8 @@ void vscp_doDecisionMatrix(void)
 			
 			class_filter = ((decision->flags & VSCP_DM_FLAG_CLASS_FILTER) << 8) | decision->class_filter;
 			class_mask = ((decision->flags & VSCP_DM_FLAG_CLASS_MASK) << 8) | decision->class_mask;
-			if (	!((vscp_imsg.class ^ class_filter) & class_mask)
-				&&	!((vscp_imsg.type ^ decision->type_filter) & decision->type_mask))
+			if (	!((vscp_imsg.vscp_class ^ class_filter) & class_mask)
+				&&	!((vscp_imsg.vscp_type ^ decision->type_filter) & decision->type_mask))
 			{
 				if (decision->action_param <= APP_REG_LAST_CONTACT)
 				{
@@ -785,8 +785,8 @@ void vscp_sendInformationEvent(BYTE index, BYTE eventClass, BYTE eventType)
 	
 	vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
 	vscp_omsg.flags = VSCP_VALID_MSG + 3;
-	vscp_omsg.class = eventClass;
-	vscp_omsg.type = eventType;
+	vscp_omsg.vscp_class = eventClass;
+	vscp_omsg.vscp_type = eventType;
 	vscp_omsg.data[0] = index;
 	vscp_omsg.data[1] = *NVM_ReadBytes(NVM_OFFSET(NvmZone));
 	subzone = *(NVM_ReadBytes(NVM_OFFSET(NvmReportSubzones[index])));

@@ -383,7 +383,7 @@ int main( void )
 	      char buf[30];
 	      uint8_t i;
 	      sprintf(buf, "rx: %03x - %02x - %02x -",
-          vscp_imsg.class, vscp_imsg.type, vscp_imsg.oaddr);
+          vscp_imsg.vscp_class, vscp_imsg.vscp_type, vscp_imsg.oaddr);
 	      for (i=0; i<(vscp_imsg.flags&0xf); i++) {
 		char dbuf[5];
 		sprintf(dbuf, "/%02x", vscp_imsg.data[i]);
@@ -1109,7 +1109,7 @@ static void doDM( void )
 
 uart_puts("doDM");
     // Don't deal with the control functionality
-    if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.class ) return;
+    if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class ) return;
 
     for ( i=0; i<DESCION_MATRIX_ELEMENTS; i++ ) {
 
@@ -1159,7 +1159,7 @@ uart_puts("doDM");
                                                     ( VSCP_SIZE_STD_DM_ROW * i ) + 
                                                     VSCP_DM_POS_CLASSFILTER  );
 
-            sprintf(buf, "class_filter: %03x", class_filter ^ vscp_imsg.class );
+            sprintf(buf, "class_filter: %03x", class_filter ^ vscp_imsg.vscp_class );
             uart_puts(buf);
 
             class_mask = ( ( dmflags & VSCP_DM_FLAG_CLASS_MASK ) << 8 ) + 
@@ -1189,8 +1189,8 @@ uart_puts("doDM");
 
 
 
-            if ( !( ( class_filter ^ vscp_imsg.class ) & class_mask ) &&
-                    !( ( type_filter ^ vscp_imsg.type ) & type_mask )) {
+            if ( !( ( class_filter ^ vscp_imsg.vscp_class ) & class_mask ) &&
+                    !( ( type_filter ^ vscp_imsg.vscp_type ) & type_mask )) {
 
                 uart_puts( "Class and type filter OK");
 
@@ -1241,8 +1241,8 @@ void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId 
 {
     vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
     vscp_omsg.flags = VSCP_VALID_MSG + 3;
-    vscp_omsg.class = eventClass;
-    vscp_omsg.type = eventTypeId;
+    vscp_omsg.vscp_class = eventClass;
+    vscp_omsg.vscp_type = eventTypeId;
 
     vscp_omsg.data[ 0 ] = idx;	// Register
     vscp_omsg.data[ 1 ] = readEEPROM( VSCP_EEPROM_END + REG_ZONE );

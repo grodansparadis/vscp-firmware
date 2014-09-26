@@ -103,8 +103,8 @@ int sendHeartBeat( void )
 	
 	vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
 	vscp_omsg.flags = VSCP_VALID_MSG + 3;
-	vscp_omsg.class = VSCP_CLASS1_INFORMATION;
-	vscp_omsg.type = VSCP_TYPE_INFORMATION_NODE_HEARTBEAT;
+	vscp_omsg.vscp_class = VSCP_CLASS1_INFORMATION;
+	vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_NODE_HEARTBEAT;
 	
 	for(i=0; i < sizeof(CONTROLSTATE); i++)
 	{
