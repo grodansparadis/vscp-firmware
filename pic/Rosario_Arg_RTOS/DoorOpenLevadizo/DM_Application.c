@@ -55,7 +55,7 @@ void doDecisionMatrix( void)
 			type_filter  = readEEPROM( REG_DMATRIX_START + DMATRIX_POS_TYPEFILTER + ( DMATRIX_LEN * i));
 			type_mask 	 = readEEPROM( REG_DMATRIX_START + DMATRIX_POS_TYPEMASK 	+ ( DMATRIX_LEN * i));
 				
-			if ( !(( class_filter ^ RxMsg.class) & class_mask) && !(( type_filter ^ RxMsg.type) & type_mask)) 
+			if ( !(( class_filter ^ RxMsg.vscp_class) & class_mask) && !(( type_filter ^ RxMsg.vscp_type) & type_mask)) 
 			{
 				switch( readEEPROM( REG_DMATRIX_START + DMATRIX_POS_ACTION + ( DMATRIX_LEN * i))) 
 				{

@@ -157,14 +157,14 @@ void vscp_init( void )
 	// Init incoming message
 	vscp_imsg.flag = 0;	
 	vscp_imsg.priority = 0;
-	vscp_imsg.class = 0;
-	vscp_imsg.type = 0;
+	vscp_imsg.vscp_class = 0;
+	vscp_imsg.vscp_type = 0;
 
 	// Init outgoing message
 	vscp_omsg.flags = 0;
 	vscp_omsg.priority = 0;	
-	vscp_omsg.class = 0;
-	vscp_omsg.type = 0;
+	vscp_omsg.vscp_class = 0;
+	vscp_omsg.vscp_type = 0;
 
 	vscp_errorcnt = 0;					// No errors yet
 	vscp_alarmstatus = 0;				// No alarmstatus
@@ -231,8 +231,8 @@ void vscp_probe( void )
 				
 				vscp_omsg.flags = VSCP_VALID_MSG + 1 ;	// one databyte 
 				vscp_omsg.priority = VSCP_PRIORITY_HIGH;	
-				vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-				vscp_omsg.type = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
+				vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+				vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
 				vscp_omsg.data[ 0 ] = vscp_probe_address;			
 				
 				// send the probe
@@ -250,8 +250,8 @@ void vscp_probe( void )
 				// Tell system we are giving up
 				vscp_omsg.flags = VSCP_VALID_MSG + 1 ;	// one databyte 
 				vscp_omsg.priority = VSCP_PRIORITY_HIGH;
-				vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-				vscp_omsg.type = VSCP_TYPE_PROTOCOL_NO_NICKNAME;			
+				vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+				vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_NO_NICKNAME;			
 				
 				// send the error event
 				vscp_sendEvent();
@@ -264,8 +264,8 @@ void vscp_probe( void )
 			if ( vscp_imsg.flag & VSCP_VALID_MSG ) {	// incoming message?
 				PrintString( (UINT8 const *)"\n\rricevuto" );
 				// Yes, incoming message
-				if ( ( VSCP_CLASS1_PROTOCOL == vscp_imsg.class ) && 
-					( VSCP_TYPE_PROTOCOL_PROBE_ACK == vscp_imsg.type ) ) {
+				if ( ( VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class ) && 
+					( VSCP_TYPE_PROTOCOL_PROBE_ACK == vscp_imsg.vscp_type ) ) {
 					//PrintString( "\n\rricevuto" );
 					// Yes it was an ack from the segment master or a node
 					if ( 0 == vscp_probe_address ) {
@@ -348,8 +348,8 @@ void vscp_rcv_preactive( void )
 {
 	if ( vscp_imsg.flag & VSCP_VALID_MSG ) {	// incoming message?
 
-		if ( ( VSCP_CLASS1_PROTOCOL == vscp_imsg.class )  && 
-						(  VSCP_TYPE_PROTOCOL_SET_NICKNAME == vscp_imsg.type ) &&
+		if ( ( VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class )  && 
+						(  VSCP_TYPE_PROTOCOL_SET_NICKNAME == vscp_imsg.vscp_type ) &&
 						(  VSCP_ADDRESS_FREE == vscp_imsg.data[ 0 ] ) ) {
 						
 			// Assign nickname
@@ -383,8 +383,8 @@ void vscp_active( void )
 {
 	vscp_omsg.flags = VSCP_VALID_MSG + 1 ;	// one databyte 
 	vscp_omsg.priority = VSCP_PRIORITY_HIGH;	
-	vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-	vscp_omsg.type = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
+	vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
 	vscp_omsg.data[ 0 ] = vscp_nickname;			
 				
 	// send the message
@@ -400,8 +400,8 @@ void vscp_active( void )
 int8_t vscp_sendEvent( void )
 {
     uint32_t id = ( (uint32_t)vscp_omsg.priority << 26 ) |
-						( (uint32_t)vscp_omsg.class << 16 ) |
-						( (uint32_t)vscp_omsg.type << 8) |
+						( (uint32_t)vscp_omsg.vscp_class << 16 ) |
+						( (uint32_t)vscp_omsg.vscp_type << 8) |
 							 vscp_nickname;		// nodeaddress (our address)
 
 	if ( !sendCANFrame( id, (vscp_omsg.flags & 0x0f), vscp_omsg.data ) ) {
@@ -430,8 +430,8 @@ int8_t vscp_getEvent( void )
 
 		vscp_imsg.flag = dlc;
 		vscp_imsg.priority = (uint16_t)( 0x07 & ( id >> 26 ) );
-		vscp_imsg.class = (uint16_t)( 0x1ff & ( id >> 16 ) );
-		vscp_imsg.type = (uint8_t)( 0xff & ( id >> 8 ) ); 
+		vscp_imsg.vscp_class = (uint16_t)( 0x1ff & ( id >> 16 ) );
+		vscp_imsg.vscp_type = (uint8_t)( 0xff & ( id >> 8 ) ); 
 		vscp_imsg.oaddr = (uint8_t)( 0xff & id );
 
 		vscp_imsg.flag |= VSCP_VALID_MSG;
@@ -512,8 +512,8 @@ void vscp_rcv_new_node_online( void )
 		//PrintString( "\n\rNEW_NODE_ONLINE" );
 		vscp_omsg.flags = VSCP_VALID_MSG;
 		vscp_omsg.priority = VSCP_PRIORITY_HIGH;	
-		vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-		vscp_omsg.type = VSCP_TYPE_PROTOCOL_PROBE_ACK;		
+		vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+		vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_PROBE_ACK;		
 		vscp_sendEvent();				
 
 	}
@@ -527,8 +527,8 @@ void vscp_rcv_readreg( void )
 {
 	vscp_omsg.priority = VSCP_PRIORITY_HIGH;
 	vscp_omsg.flags = VSCP_VALID_MSG + 2;
-	vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-	vscp_omsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+	vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
 	
 	vscp_omsg.data[ 0 ] =  vscp_imsg.data[ 1 ];
 	vscp_omsg.data[ 1 ] =  0;  // Default
@@ -653,8 +653,8 @@ void vscp_rcv_writereg( void )
 {
 	vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
 	vscp_omsg.flags = VSCP_VALID_MSG + 2;
-	vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-	vscp_omsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+	vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
 	vscp_omsg.data[ 0 ] = vscp_nickname; 
 
 	if ( ( vscp_imsg.data[ 1 ] > ( VSCP_REG_VSCP_MINOR_VERSION + 1 ) ) && 

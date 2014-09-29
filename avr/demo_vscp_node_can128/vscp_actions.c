@@ -46,7 +46,7 @@ void doActionCtrlLed( unsigned char dmflags, unsigned char arg )
 {
 	unsigned char i;
 	unsigned char val;
-uart_puts("action\n");	
+	uart_puts("action\n");	
 	for ( i=0; i<8; i++ ) {
 		
 		// If the rely should not be handled just move on

@@ -123,8 +123,8 @@ TASK(VSCP_ProtEngine)
 		
 			VSCP_deqMsgRx(&RxMsg);					// Yes, incoming message
 					
-			if ( VSCP_CLASS1_PROTOCOL == RxMsg.class ) {
-				switch( RxMsg.type ) {
+			if ( VSCP_CLASS1_PROTOCOL == RxMsg.vscp_class ) {
+				switch( RxMsg.vscp_type ) {
 	
 					case VSCP_TYPE_PROTOCOL_SEGCTRL_HEARTBEAT:
 						vscp_handleHeartbeat();
@@ -252,8 +252,8 @@ TASK(VSCP_ProtEngine)
 //						if ( pos && ( 0 == ( pos % 7 ) ) ) {	   
 //							
 //							SendMsg.priority = VSCP_PRIORITY_NORMAL;	
-//							SendMsg.class = VSCP_CLASS1_PROTOCOL;
-//							SendMsg.type = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
+//							SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+//							SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
 //							SendMsg.data[ 0 ] = pos/7;	// index
 //											
 //							SendMsg.length = 7; // Count = 7			
@@ -271,8 +271,8 @@ TASK(VSCP_ProtEngine)
 //					// Send any pending event
 //					if ( bSent ) {
 //						SendMsg.priority = VSCP_PRIORITY_NORMAL;	
-//						SendMsg.class = VSCP_CLASS1_PROTOCOL;
-//						SendMsg.type = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
+//						SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+//						SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
 //						SendMsg.data[ 0 ] = pos/7;	// index
 //																	
 //						// send the event
@@ -295,8 +295,8 @@ TASK(VSCP_ProtEngine)
 //					}
 //									
 //					SendMsg.priority = VSCP_PRIORITY_NORMAL;	
-//					SendMsg.class = VSCP_CLASS1_PROTOCOL;
-//					SendMsg.type = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
+//					SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+//					SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
 //					SendMsg.data[ 0 ] = 0;	// index
 //					SendMsg.length = 
 //												( RxMsg.flags & 0x0f ) - 2;
@@ -312,8 +312,8 @@ TASK(VSCP_ProtEngine)
 //									
 //					SendMsg.priority = VSCP_PRIORITY_NORMAL;
 //					SendMsg.length = 2;
-//					SendMsg.class = VSCP_CLASS1_PROTOCOL;
-//					SendMsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+//					SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+//					SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
 //										
 //					SendMsg.data[ 0 ] = RxMsg.data[ 1 ];
 //					SendMsg.data[ 1 ] = vscp_writeAppReg( 
@@ -330,8 +330,8 @@ TASK(VSCP_ProtEngine)
 //									
 //					SendMsg.priority = VSCP_PRIORITY_NORMAL;
 //					SendMsg.length = 2;
-//					SendMsg.class = VSCP_CLASS1_PROTOCOL;
-//					SendMsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+//					SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+//					SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
 //										
 //					SendMsg.data[ 0 ] = RxMsg.data[ 1 ];
 //					SendMsg.data[ 1 ] = vscp_writeAppReg( 
@@ -354,8 +354,8 @@ TASK(VSCP_ProtEngine)
 //									
 //						SendMsg.priority = VSCP_PRIORITY_NORMAL;
 //						SendMsg.length = 8;
-//						SendMsg.class = VSCP_CLASS1_PROTOCOL;
-//						SendMsg.type = VSCP_TYPE_PROTOCOL_WHO_IS_THERE_RESPONSE;
+//						SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+//						SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_WHO_IS_THERE_RESPONSE;
 //						SendMsg.data[ 0 ] = j;	
 //										
 //						for ( i = 1; i < 8; i++ ) {
@@ -379,8 +379,8 @@ TASK(VSCP_ProtEngine)
 //								
 //				SendMsg.priority = VSCP_PRIORITY_NORMAL;
 //				SendMsg.length = 7;
-//				SendMsg.class = VSCP_CLASS1_PROTOCOL;
-//				SendMsg.type = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
+//				SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+//				SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
 //										
 //				vscp_getMatrixInfo();
 //								
@@ -407,8 +407,8 @@ TASK(VSCP_ProtEngine)
 //									
 //					SendMsg.priority = VSCP_PRIORITY_NORMAL;
 //					SendMsg.length = 3 + RxMsg.data[ 3 ];
-//					SendMsg.class = VSCP_CLASS1_PROTOCOL;
-//					SendMsg.type = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
+//					SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+//					SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
 //									
 //					for ( i=RxMsg.data[ 2 ];
 //							i < ( RxMsg.data[ 2 ] + RxMsg.data[ 3 ] );
@@ -438,8 +438,8 @@ TASK(VSCP_ProtEngine)
 //					
 //					SendMsg.priority = VSCP_PRIORITY_NORMAL;
 //					SendMsg.length = 3 + RxMsg.data[ 3 ];
-//					SendMsg.class = VSCP_CLASS1_PROTOCOL;
-//					SendMsg.type = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
+//					SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+//					SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
 //					
 //					for ( i=RxMsg.data[ 2 ];
 //							i < ( RxMsg.data[ 2 ] + RxMsg.data[ 3 ] );

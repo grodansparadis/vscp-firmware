@@ -332,8 +332,8 @@ void main()
 				if ( vscp_imsg.flag & VSCP_VALID_MSG ) {	// incoming message?
 					
 					// Yes, incoming message
-					if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.class ) {
-						switch( vscp_imsg.type ) {
+					if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class ) {
+						switch( vscp_imsg.vscp_type ) {
 
 							case VSCP_TYPE_PROTOCOL_SEGCTRL_HEARTBEAT:
 								vscp_rcv_heartbeat();
@@ -721,8 +721,8 @@ void read_app_register( unsigned char reg )
 
 	vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
 	vscp_omsg.flags = VSCP_VALID_MSG + 2;
-	vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-	vscp_omsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+	vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
 
 	vscp_omsg.data[ 0 ] = reg;
 	vscp_omsg.data[ 1 ] = 0x00; // default read
@@ -945,8 +945,8 @@ void write_app_register( unsigned char reg, unsigned char val )
 
 	vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
 	vscp_omsg.flags = VSCP_VALID_MSG + 2;
-	vscp_omsg.class = VSCP_CLASS1_PROTOCOL;
-	vscp_omsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+	vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
 
 	vscp_omsg.data[ 0 ] = reg;
 	vscp_omsg.data[ 1 ] = ~val; // error return

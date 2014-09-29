@@ -64,8 +64,8 @@ low end hardware device.
  */
 
 
-#include "vscp_compiler.h" 	// This file should be in your project folder
-#include "vscp_projdefs.h"	// This file should be in your project folder
+#include <vscp_compiler.h> 	// This file should be in your project folder
+#include <vscp_projdefs.h>	// This file should be in your project folder
 #include <inttypes.h>
 
 
@@ -204,8 +204,8 @@ struct _imsg {
     uint8_t flags; ///< Input message flags
 
     uint8_t priority; ///< Priority for the message 0-7
-    uint16_t class; ///< VSCP class
-    uint8_t type; ///< VSCP type
+    uint16_t vscp_class; ///< VSCP class
+    uint8_t vscp_type; ///< VSCP type
     uint8_t oaddr; ///< Packet originating address
     uint8_t data[8]; ///< data bytes
 };
@@ -229,8 +229,8 @@ struct _omsg {
     uint8_t flags; ///< Output message flags
 
     uint8_t priority; ///< Priority for the message 0-7
-    uint16_t class; ///< VSCP class
-    uint8_t type; ///< VSCP type
+    uint16_t vscp_class; ///< VSCP class
+    uint8_t vscp_type; ///< VSCP type
     /// Originating address is always *this* node
     uint8_t data[8]; ///< data bytes
 };

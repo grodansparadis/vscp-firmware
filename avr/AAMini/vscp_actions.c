@@ -190,7 +190,7 @@ void doFollow()
 
 	uint8_t i=0;
 
-	if ( VSCP_CLASS1_INFORMATION != vscp_imsg.class ) return; //only information events are processed
+	if ( VSCP_CLASS1_INFORMATION != vscp_imsg.vscp_class ) return; //only information events are processed
 	
 	if ( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_END + REG_ZONE  ) ) 
 			{
@@ -200,7 +200,7 @@ void doFollow()
             	return;
 			}
     
-	if ( VSCP_TYPE_INFORMATION_ON == vscp_imsg.type ) 
+	if ( VSCP_TYPE_INFORMATION_ON == vscp_imsg.vscp_type ) 
 	{
 		#ifdef PRINT_CAN_EVENTS
 		uart_puts( "debug  informationON\n" );
@@ -234,7 +234,7 @@ void doFollow()
 		}
 	}
 
-	if ( VSCP_TYPE_INFORMATION_OFF == vscp_imsg.type ) 
+	if ( VSCP_TYPE_INFORMATION_OFF == vscp_imsg.vscp_type ) 
 	{
 		#ifdef PRINT_CAN_EVENTS
 		uart_puts( "debug  informationOFF\n" );

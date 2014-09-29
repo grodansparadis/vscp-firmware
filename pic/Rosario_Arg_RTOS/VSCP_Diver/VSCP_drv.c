@@ -342,9 +342,9 @@ StatusType CopyFrameBuffer2Hard(pTXBUF_t pTxbuf)
     return(returned_type);
   
   pTxbuf->EIDL 		= VSCP_current_message.nickname;
-  pTxbuf->EIDH 		= VSCP_current_message.type;
-  pTxbuf->SIDL 		= (VSCP_current_message.class & 0x03)|((VSCP_current_message.class << 3)& 0xE0)| 0x08;  //set Extended Identifier Enable Bit
-  pTxbuf->SIDH 		= ((VSCP_current_message.class >> 5) & 0x0f)|((VSCP_current_message.priority << 5) & 0xE0);
+  pTxbuf->EIDH 		= VSCP_current_message.vscp_type;
+  pTxbuf->SIDL 		= (VSCP_current_message.vscp_class & 0x03)|((VSCP_current_message.vscp_class << 3)& 0xE0)| 0x08;  //set Extended Identifier Enable Bit
+  pTxbuf->SIDH 		= ((VSCP_current_message.vscp_class >> 5) & 0x0f)|((VSCP_current_message.priority << 5) & 0xE0);
   pTxbuf->DLC  		= VSCP_current_message.length;
   pTxbuf->DATA[0] = VSCP_current_message.data[0];
   pTxbuf->DATA[1] = VSCP_current_message.data[1];
@@ -538,9 +538,9 @@ StatusType CopyHard2FrameBuffer(void)
 	VSCP_msg_t VSCP_current_message;
    
   VSCP_current_message.priority = (RXB0SIDH & 0xE0)>>5;
-  VSCP_current_message.class = (uint16_t)((RXB0SIDL & 0xE0)>>3) + (uint16_t)(RXB0SIDL & 0x03);
-  VSCP_current_message.class += (uint16_t)(((uint16_t)RXB0SIDH & 0x000F)<<5);
-  VSCP_current_message.type = RXB0EIDH;
+  VSCP_current_message.vscp_class = (uint16_t)((RXB0SIDL & 0xE0)>>3) + (uint16_t)(RXB0SIDL & 0x03);
+  VSCP_current_message.vscp_class += (uint16_t)(((uint16_t)RXB0SIDH & 0x000F)<<5);
+  VSCP_current_message.vscp_type = RXB0EIDH;
   VSCP_current_message.nickname = RXB0EIDL;
   VSCP_current_message.length  = RXB0DLC & 0x0F;
   VSCP_current_message.data[0] = RXB0D0;

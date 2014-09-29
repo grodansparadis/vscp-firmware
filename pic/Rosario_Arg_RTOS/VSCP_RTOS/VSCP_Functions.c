@@ -110,14 +110,14 @@ void vscp_init( void )
 
 	// Init incoming message
 	RxMsg.priority = 0;
-	RxMsg.class = 0;
-	RxMsg.type = 0;
+	RxMsg.vscp_class = 0;
+	RxMsg.vscp_type = 0;
   RxMsg.length = 0;		
 
 	// Init outgoing message
 	SendMsg.priority = 0;	
-	SendMsg.class = 0;
-	SendMsg.type = 0;
+	SendMsg.vscp_class = 0;
+	SendMsg.vscp_type = 0;
   SendMsg.length = 0;		
 
   vscp_alarmstatus = 0;				// No alarmstatus
@@ -170,8 +170,8 @@ void vscp_handleProbeState( void )
 		case VSCP_SUBSTATE_NONE:
 			if ( VSCP_ADDRESS_FREE != vscp_probe_address ) {
 				SendMsg.priority = VSCP_PRIORITY_HIGH;	
-				SendMsg.class = VSCP_CLASS1_PROTOCOL;
-				SendMsg.type = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
+				SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+				SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
 				SendMsg.length =  1 ;	
 				SendMsg.data[ 0 ] = vscp_probe_address;			
 				// send the probe
@@ -184,8 +184,8 @@ void vscp_handleProbeState( void )
 				vscp_node_state = VSCP_STATE_ERROR;
 				// Tell system we are giving up
 				SendMsg.priority = VSCP_PRIORITY_HIGH;	
-				SendMsg.class = VSCP_CLASS1_PROTOCOL;
-				SendMsg.type = VSCP_TYPE_PROTOCOL_PROBE_ACK;
+				SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+				SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_PROBE_ACK;
 				SendMsg.data[ 0 ] = 0xff;				// we are unassigned			
 				SendMsg.length =  1 ;
 				// send the error event
@@ -196,8 +196,8 @@ void vscp_handleProbeState( void )
 		case VSCP_SUBSTATE_INIT_PROBE_SENT:
 			if ( E_OK == VSCP_deqMsgRx( &RxMsg)) {	// incoming message?
 				// Yes, incoming message
-				if ( ( VSCP_CLASS1_PROTOCOL == RxMsg.class ) && 
-					( VSCP_TYPE_PROTOCOL_PROBE_ACK == RxMsg.type ) ) {
+				if ( ( VSCP_CLASS1_PROTOCOL == RxMsg.vscp_class ) && 
+					( VSCP_TYPE_PROTOCOL_PROBE_ACK == RxMsg.vscp_type ) ) {
 					// Yes it was an ack from the segment master or a node
 					if ( !vscp_probe_address ) {
 						// Master controller answered
@@ -256,8 +256,8 @@ void vscp_handleReactive( void )
 	if ( E_OK == VSCP_deqMsgRx( &RxMsg)) {	// incoming message?
 				// Yes, incoming message
 
-		if (( VSCP_CLASS1_PROTOCOL == RxMsg.class)  && 
-				( VSCP_TYPE_PROTOCOL_SET_NICKNAME == RxMsg.type) &&
+		if (( VSCP_CLASS1_PROTOCOL == RxMsg.vscp_class)  && 
+				( VSCP_TYPE_PROTOCOL_SET_NICKNAME == RxMsg.vscp_type) &&
 				( VSCP_ADDRESS_FREE == RxMsg.data[0])) {
 						
 			// Assign nickname
@@ -284,8 +284,8 @@ void vscp_handleReactive( void )
 void vscp_goActiveState( void )
 {
 	SendMsg.priority = VSCP_PRIORITY_HIGH;	
-	SendMsg.class = VSCP_CLASS1_PROTOCOL;
-	SendMsg.type = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
+	SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
 	SendMsg.length =  1 ;	// one databyte 
 	SendMsg.data[0] = vscp_nickname;			
 				
@@ -354,8 +354,8 @@ void vscp_newNodeOnline( void )
 
 		SendMsg.length = 0;
 		SendMsg.priority = VSCP_PRIORITY_HIGH;	
-		SendMsg.class = VSCP_CLASS1_PROTOCOL;
-		SendMsg.type = VSCP_TYPE_PROTOCOL_PROBE_ACK;		
+		SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+		SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_PROBE_ACK;		
 		VSCP_enqMsgTx( &SendMsg, FALSE);				
 	}
 }
@@ -367,8 +367,8 @@ void vscp_readStdReg( void )
 {
 	SendMsg.priority = VSCP_PRIORITY_HIGH;
 	SendMsg.length =  2;
-	SendMsg.class = VSCP_CLASS1_PROTOCOL;
-	SendMsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+	SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
 	
 	SendMsg.data[0] =  RxMsg.data[1];
 	SendMsg.data[1] =  0;  // Default
@@ -466,8 +466,8 @@ void vscp_writeStdReg( void )
 {
 	SendMsg.priority = VSCP_PRIORITY_MEDIUM;
 	SendMsg.length =  2;
-	SendMsg.class = VSCP_CLASS1_PROTOCOL;
-	SendMsg.type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+	SendMsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+	SendMsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
 	SendMsg.data[0] = vscp_nickname; 
 
 	if (( RxMsg.data[1] > ( VSCP_REG_VSCP_MINOR_VERSION + 1 )) && 

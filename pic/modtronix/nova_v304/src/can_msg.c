@@ -90,9 +90,9 @@ void process_can_message()
 				if ( vscp_imsg.flag & VSCP_VALID_MSG ) {	// incoming message?
 					
 					// Yes, incoming message
-					if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.class ) {
+					if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class ) {
 						
-						switch( vscp_imsg.type ) {
+						switch( vscp_imsg.vscp_type ) {
 
 							case VSCP_TYPE_SEGCTRL_HEARTBEAT:
 								vscp_rcv_heartbeat();

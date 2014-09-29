@@ -46,8 +46,8 @@ only the "normal" firmware is possible to upgrade! The bootloader can only be pr
 -select HEX file
 -press UPLOAD
 
-upload should start immediatly (unless you build in some extra precautions in your firmware)
-When upload is not succesful, the bootloader blocks the firmware. You should always be able to restart the upload of the firmware, untill succesful upload is completed.
+upload should start immediately (unless you build in some extra precautions in your firmware)
+When upload is not successful, the bootloader blocks the firmware. You should always be able to restart the upload of the firmware, untill succesful upload is completed.
 
 
 

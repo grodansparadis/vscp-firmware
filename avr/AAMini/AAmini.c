@@ -308,7 +308,7 @@ int main( void )
 	                    char buf[30];
 	                    uint8_t i;
 	                    sprintf(buf, "rx: %03x/%02x/%02x/",
-	                    vscp_imsg.class, vscp_imsg.type, vscp_imsg.oaddr);
+	                    vscp_imsg.vscp_class, vscp_imsg.vscp_type, vscp_imsg.oaddr);
 	                    for (i=0; i<(vscp_imsg.flags&0xf); i++) 
 						{
 	                        char dbuf[5];
@@ -527,7 +527,7 @@ static void doDM( void )
     uint8_t type_mask;
 
     // Don't deal with the control functionality
-    if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.class ) return;
+    if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class ) return;
 
 	#ifdef PRINT_CAN_EVENTS
 	uart_puts( "debug  doDM2\n" );
@@ -604,8 +604,8 @@ static void doDM( void )
                                         VSCP_DM_POS_TYPEMASK  );
 
 
-            if ( !( ( class_filter ^ vscp_imsg.class ) & class_mask ) &&
-                    !( ( type_filter ^ vscp_imsg.type ) & type_mask )) {
+            if ( !( ( class_filter ^ vscp_imsg.vscp_class ) & class_mask ) &&
+                    !( ( type_filter ^ vscp_imsg.vscp_type ) & type_mask )) {
 			
 			#ifdef PRINT_CAN_EVENTS
 			uart_puts( "debug  doDMtrigger\n" );
@@ -645,8 +645,8 @@ void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId 
 {
     vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
     vscp_omsg.flags = VSCP_VALID_MSG + 3;
-    vscp_omsg.class = eventClass;
-    vscp_omsg.type = eventTypeId;
+    vscp_omsg.vscp_class = eventClass;
+    vscp_omsg.vscp_type = eventTypeId;
 
     vscp_omsg.data[ 0 ] = idx;	// Register
     vscp_omsg.data[ 1 ] = readEEPROM( VSCP_EEPROM_REGISTER + REG_ZONE + idx );
@@ -669,8 +669,8 @@ void SendInformationEventExtended(uint8_t priority, uint8_t zone, uint8_t subzon
 {
     vscp_omsg.priority = priority;
     vscp_omsg.flags = VSCP_VALID_MSG + 3;
-    vscp_omsg.class = eventClass;
-    vscp_omsg.type = eventTypeId;
+    vscp_omsg.vscp_class = eventClass;
+    vscp_omsg.vscp_type = eventTypeId;
 
     vscp_omsg.data[ 0 ] = idx;	// dummy Register
     vscp_omsg.data[ 1 ] = zone;
