@@ -223,7 +223,7 @@ int main( void )
 
 {
   //  stdout = &mystdout;
-  uint8_t nSensors, i;
+  uint8_t i;
 
 
 
@@ -245,16 +245,6 @@ int main( void )
     initTimer();
 
     sei(); // Enable interrupts
-
-    #ifndef OW_ONE_BUS
-      ow_set_bus(&PINC,&PORTC,&DDRC,PC0);
-    #endif
-
-    nSensors = search_sensors();
-
-    char buf[30];
-    sprintf(buf, "NbSensors: %i", nSensors);
-    uart_puts(buf);
 
     // Init can
     if ( ERROR_OK != can_Open( CAN_BITRATE_125K, 0, 0, 0 ) ) {
@@ -1069,8 +1059,23 @@ void SendInformationEventExtended(uint8_t priority, uint8_t zone, uint8_t subzon
 
 void doWork( void )
 {
+  int nSensors;
 
 
+    if ( measurement_seconds > 1 ) { //send temperature every 30 seconds
+            measurement_seconds = 0;
+
+    #ifndef OW_ONE_BUS
+      ow_set_bus(&PINC,&PORTC,&DDRC,PC0);
+    #endif
+
+    nSensors = search_sensors();
+
+    char buf[30];
+    sprintf(buf, "NbSensors: %i", nSensors);
+    uart_puts(buf);
+        }
+/*
     if ( measurement_seconds > 30 ) { //send temperature every 30 seconds
             measurement_seconds = 0;
 
@@ -1090,6 +1095,7 @@ void doWork( void )
             vscp_sendEvent(); // Send data
 
         }
+*/
 }
 
 

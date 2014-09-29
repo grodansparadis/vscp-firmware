@@ -34,6 +34,8 @@
 // Undefine to print received and sent CAN events on serial channel
 #define PRINT_CAN_EVENTS
 
+#define OW_ONE_BUS
+
 //
 // Undefine one of the following suitable for the
 // platform you want to compile for 
