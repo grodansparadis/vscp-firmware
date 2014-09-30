@@ -4,6 +4,7 @@
 *.o
 *.sym
 *.map
+*.elf
 
 # Compiled Dynamic libraries
 *.so
@@ -22,12 +23,4 @@
 *.lnk
 Thumbs.db
 *.pnps
-<<<<<<< HEAD
-/avr/demo_vscp_node_can128/*.elf
-/avr/demo_vscp_node_can128/*.bin
-=======
-*.~
-*~
 
-
->>>>>>> 67407126a5087b9a760d13670cb42d8ae711fb65

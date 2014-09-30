@@ -1066,7 +1066,8 @@ void doWork( void )
             measurement_seconds = 0;
 
     #ifndef OW_ONE_BUS
-      ow_set_bus(&PINC,&PORTC,&DDRC,PC0);
+      uart_puts("OW_ONE_BUS is defined\n");
+//      ow_set_bus(&PINC,&PORTC,&DDRC,PC0);
     #endif
 
     nSensors = search_sensors();
