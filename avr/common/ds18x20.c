@@ -176,6 +176,7 @@ uint8_t DS18X20_read_meas_all_verbose( void )
     diff = ow_rom_search( diff, &id[0] );
 
     if( diff == OW_PRESENCE_ERR ) {
+
 //      uart_puts_P( "No Sensor found\r" );
       return OW_PRESENCE_ERR; // <--- early exit!
     }

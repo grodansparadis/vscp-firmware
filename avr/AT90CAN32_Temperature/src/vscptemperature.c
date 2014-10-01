@@ -106,44 +106,6 @@ static void init_app_eeprom( void );
 static void doDM( void );
 static void doWork();
 
-#define MAXSENSORS 5
-
-uint8_t gSensorIDs[MAXSENSORS][OW_ROMCODE_SIZE];
-
-  static uint8_t search_sensors(void)
-{
-  uint8_t i;
-  uint8_t id[OW_ROMCODE_SIZE];
-  uint8_t diff, nSensors;
-  
-  uart_puts("Scanning Bus for DS18X20");
-  
-  ow_reset();
-
-  nSensors = 0;
-  
-  diff = OW_SEARCH_FIRST;
-  while ( diff != OW_LAST_DEVICE && nSensors < MAXSENSORS ) {
-    DS18X20_find_sensor( &diff, &id[0] );
-    
-    if( diff == OW_PRESENCE_ERR ) {
-        uart_puts( "No Sensor found");
-      break;
-    }
-    
-    if( diff == OW_DATA_ERR ) {
-        uart_puts( "Bus Error");
-      break;
-    }
-    
-    for ( i=0; i < OW_ROMCODE_SIZE; i++ )
-      gSensorIDs[nSensors][i] = id[i];
-    
-    nSensors++;
-  }
-  
-  return nSensors;
-}
 
 // Counter for seconds between measurements, do a first measurement
 uint8_t measurement_seconds = 0xFF;
@@ -1059,22 +1021,28 @@ void SendInformationEventExtended(uint8_t priority, uint8_t zone, uint8_t subzon
 
 void doWork( void )
 {
-  int nSensors;
+//  int nSensors;
 
 
     if ( measurement_seconds > 1 ) { //send temperature every 30 seconds
             measurement_seconds = 0;
 
-    #ifndef OW_ONE_BUS
+    #ifdef OW_ONE_BUS
       uart_puts("OW_ONE_BUS is defined\n");
-//      ow_set_bus(&PINC,&PORTC,&DDRC,PC0);
     #endif
 
-    nSensors = search_sensors();
+    #ifndef OW_ONE_BUS
+      uart_puts("OW_ONE_BUS is not defined\n");
+    #endif
+
+//    nSensors = search_sensors();
+
+    DS18X20_read_meas_all_verbose();
 
     char buf[30];
-    sprintf(buf, "NbSensors: %i", nSensors);
+    sprintf(buf, "DS18X20_OK: %i", DS18X20_OK);
     uart_puts(buf);
+
         }
 /*
     if ( measurement_seconds > 30 ) { //send temperature every 30 seconds

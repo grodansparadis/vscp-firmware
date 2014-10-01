@@ -16,7 +16,8 @@ extern "C" {
    If not defined make sure to call ow_set_bus() before using 
    a bus. Runtime bus-select increases code size by around 300 
    bytes so use OW_ONE_BUS if possible */
-// #define OW_ONE_BUS
+
+#define OW_ONE_BUS
 
 #ifdef OW_ONE_BUS
 
