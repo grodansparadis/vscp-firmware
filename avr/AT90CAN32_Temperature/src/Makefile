@@ -43,9 +43,10 @@ EXTRAINCDIRS  += .
 # 'FOSC' is oscillator frequency in K
 # Define 'USE_UART0' for uart0 'USE_UART1' for uart1
 # 'BAUDRATE' for the configred baudrate
-//DEFS			=
-DEFS           = -DFOSC=16000 -DUSE_UART2 -DBAUDRATE=38400
-LIBS            =
+//DEFS		=
+DEFS        = -DFOSC=16000 -DUSE_UART2 -DBAUDRATE=38400 -DF_CPU=16000000UL
+LIBS        =
+
 
 # You should not have to change anything below here.
 

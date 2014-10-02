@@ -1022,9 +1022,10 @@ void SendInformationEventExtended(uint8_t priority, uint8_t zone, uint8_t subzon
 void doWork( void )
 {
 //  int nSensors;
+  int convertresult;
 
 
-    if ( measurement_seconds > 1 ) { //send temperature every 30 seconds
+    if ( measurement_seconds > 5 ) { //send temperature every 30 seconds
             measurement_seconds = 0;
 
     #ifdef OW_ONE_BUS
@@ -1037,10 +1038,10 @@ void doWork( void )
 
 //    nSensors = search_sensors();
 
-    DS18X20_read_meas_all_verbose();
+    convertresult = DS18X20_read_meas_all_verbose();
 
     char buf[30];
-    sprintf(buf, "DS18X20_OK: %i", DS18X20_OK);
+    sprintf(buf, "Convertresult = %i", convertresult);
     uart_puts(buf);
 
         }

@@ -62,3 +62,45 @@ void uart_puts( char * sz )
 	uart_putchar('\n');
 	
 }
+
+/*************************************************************************
+Function: uart_put_int()
+Purpose:  transmit integer as ASCII to UART
+Input:    integer value
+Returns:  none
+**************************************************************************/
+void uart_put_int( const int val )
+{
+	char buffer[10];
+	uart_puts( itoa( val, buffer, 10 ) );
+} /* uart_puti */
+
+/*************************************************************************
+Function: uart_puthex_nibble()
+Purpose:  transmit lower nibble as ASCII-hex to UART
+Input:    byte value
+Returns:  none
+**************************************************************************/
+void uart_puthex_nibble(const unsigned char b)
+{
+	unsigned char  c = b & 0x0f;
+	if ( c > 9 ) { 
+		c += 'A'-10; 
+	}
+	else {
+		c += '0';
+	}
+	uart_putchar(c);
+} /* uart_puthex_nibble */
+
+/*************************************************************************
+Function: uart_puthex_byte()
+Purpose:  transmit upper and lower nibble as ASCII-hex to UART
+Input:    byte value
+Returns:  none
+**************************************************************************/
+void uart_puthex_byte( const unsigned char  b )
+{
+	uart_puthex_nibble( b >> 4 );
+	uart_puthex_nibble( b );
+} /* uart_puthex_byte */
