@@ -16,30 +16,24 @@ extern "C" {
    If not defined make sure to call ow_set_bus() before using 
    a bus. Runtime bus-select increases code size by around 300 
    bytes so use OW_ONE_BUS if possible */
-
-#define OW_ONE_BUS
+// #define OW_ONE_BUS
 
 #ifdef OW_ONE_BUS
 
-#define OW_PIN  PC0
-#define OW_IN   PINC
-#define OW_OUT  PORTC
-#define OW_DDR  DDRC
+#define OW_PIN  PD6
+#define OW_IN   PIND
+#define OW_OUT  PORTD
+#define OW_DDR  DDRD
 #define OW_CONF_DELAYOFFSET 0
 
 #else 
-
 #if ( F_CPU < 1843200 )
-
 #warning | Experimental multi-bus-mode is not tested for 
 #warning | frequencies below 1,84MHz. Use OW_ONE_WIRE or
 #warning | faster clock-source (i.e. internal 2MHz R/C-Osc.).
-
 #endif
-
 #define OW_CONF_CYCLESPERACCESS 13
 #define OW_CONF_DELAYOFFSET ( (uint16_t)( ((OW_CONF_CYCLESPERACCESS) * 1000000L) / F_CPU ) )
-
 #endif
 
 // Recovery time (T_Rec) minimum 1usec - increase for long lines 
@@ -53,7 +47,7 @@ extern "C" {
 // Based on information from Sascha Schade. Experimental but worked in tests
 // with one DS18B20 and one DS18S20 on a rather short bus (60cm), where both 
 // sensores have been parasite-powered.
-#define OW_USE_INTERNAL_PULLUP     0  /* 0=external, 1=internal */
+#define OW_USE_INTERNAL_PULLUP     1  /* 0=external, 1=internal */
 
 /*******************************************/
 

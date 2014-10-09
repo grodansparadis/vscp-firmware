@@ -47,11 +47,10 @@ changelog:
    if you run out of program-memory */
 #include <string.h>
 #include "uart.h"
-#include "uart_addon.h"
+//#include "uart_addon.h"
 
 static int16_t DS18X20_raw_to_decicelsius( uint8_t fc, uint8_t sp[] );
 
-/*
 void DS18X20_show_id_uart( uint8_t *id, size_t n )
 {
   size_t i;
@@ -176,22 +175,22 @@ uint8_t DS18X20_read_meas_all_verbose( void )
     diff = ow_rom_search( diff, &id[0] );
 
     if( diff == OW_PRESENCE_ERR ) {
-      uart_puts( "No Sensor found\r" );
+      uart_puts_P( "No Sensor found\r" );
       return OW_PRESENCE_ERR; // <--- early exit!
     }
     
     if( diff == OW_DATA_ERR ) {
-      uart_puts( "Bus Error\r" );
+      uart_puts_P( "Bus Error\r" );
       return OW_DATA_ERR;     // <--- early exit!
     }
     
-//    DS18X20_show_id_uart( id, OW_ROMCODE_SIZE );
+    DS18X20_show_id_uart( id, OW_ROMCODE_SIZE );
     
     if( id[0] == DS18B20_FAMILY_CODE || id[0] == DS18S20_FAMILY_CODE ||
         id[0] == DS1822_FAMILY_CODE ) { 
       // temperature sensor
       
-//      uart_putc ('\r');
+      uart_putc ('\r');
       
       ow_byte_wr( DS18X20_READ );           // read command
       
@@ -199,58 +198,58 @@ uint8_t DS18X20_read_meas_all_verbose( void )
         sp[i]=ow_byte_rd();
       }
       
-//      show_sp_uart( sp, DS18X20_SP_SIZE );
+      show_sp_uart( sp, DS18X20_SP_SIZE );
 
       if ( crc8( &sp[0], DS18X20_SP_SIZE ) ) {
-        uart_puts( " CRC FAIL " );
+        uart_puts_P( " CRC FAIL " );
       } else {
-        uart_puts( " CRC O.K. " );
+        uart_puts_P( " CRC O.K. " );
       }
-//      uart_putc ('\r');
+      uart_putc ('\r');
     
       meas = sp[0]; // LSB Temp. from Scrachpad-Data
       meas |= (uint16_t) (sp[1] << 8); // MSB
       
-      uart_puts( " T_raw=");
-//      uart_puthex_byte( (uint8_t)(meas >> 8) );
-//      uart_puthex_byte( (uint8_t)meas );
-      uart_puts( " " );
+      uart_puts_P( " T_raw=");
+      uart_puthex_byte( (uint8_t)(meas >> 8) );
+      uart_puthex_byte( (uint8_t)meas );
+      uart_puts_P( " " );
 
       if( id[0] == DS18S20_FAMILY_CODE ) { // 18S20
-        uart_puts( "S20/09" );
+        uart_puts_P( "S20/09" );
       }
       else if ( id[0] == DS18B20_FAMILY_CODE ||
                 id[0] == DS1822_FAMILY_CODE ) { // 18B20 or 1822
         i=sp[DS18B20_CONF_REG];
         if ( (i & DS18B20_12_BIT) == DS18B20_12_BIT ) {
-          uart_puts( "B20/12" );
+          uart_puts_P( "B20/12" );
         }
         else if ( (i & DS18B20_11_BIT) == DS18B20_11_BIT ) {
-          uart_puts( "B20/11" );
+          uart_puts_P( "B20/11" );
         }
         else if ( (i & DS18B20_10_BIT) == DS18B20_10_BIT ) {
-          uart_puts( " B20/10 " );
+          uart_puts_P( " B20/10 " );
         }
         else { // if ( (i & DS18B20_9_BIT) == DS18B20_9_BIT ) { 
-          uart_puts( "B20/09" );
+          uart_puts_P( "B20/09" );
         }
       }     
-      uart_puts(" ");
+      uart_puts_P(" ");
       
       DS18X20_meas_to_cel( id[0], sp, &subzero, &cel, &cel_frac_bits );
-//      DS18X20_uart_put_temp( subzero, cel, cel_frac_bits );
+      DS18X20_uart_put_temp( subzero, cel, cel_frac_bits );
 
       decicelsius = DS18X20_raw_to_decicelsius( id[0], sp );
       if ( decicelsius == DS18X20_INVALID_DECICELSIUS ) {
-        uart_puts("* INVALID *");
+        uart_puts_P("* INVALID *");
       } else {
-        uart_puts(" conv: ");
-//        uart_put_int(decicelsius);
-        uart_puts(" deci°C ");
+        uart_puts_P(" conv: ");
+        uart_put_int(decicelsius);
+        uart_puts_P(" deci°C ");
         DS18X20_format_from_decicelsius( decicelsius, s, 10 );
-        uart_puts(" fmt: ");
+        uart_puts_P(" fmt: ");
         uart_puts(s);
-        uart_puts(" °C ");
+        uart_puts_P(" °C ");
       }
 
       uart_puts("\r");
@@ -259,7 +258,7 @@ uint8_t DS18X20_read_meas_all_verbose( void )
     
   } // loop all sensors
   
-  uart_puts( "\r" );
+  uart_puts_P( "\r" );
   
   return DS18X20_OK;
 }
@@ -335,7 +334,7 @@ uint8_t DS18X20_start_meas( uint8_t with_power_extern, uint8_t id[])
     ret = DS18X20_OK;
   } 
   else { 
-//    uart_puts_P_verbose( "DS18X20_start_meas: Short Circuit!\r" );
+    uart_puts_P_verbose( "DS18X20_start_meas: Short Circuit!\r" );
     ret = DS18X20_START_FAIL;
   }
 
@@ -681,7 +680,7 @@ uint8_t DS18X20_write_scratchpad( uint8_t id[],
     ret = DS18X20_OK;
   } 
   else { 
-//    uart_puts_P_verbose( "DS18X20_write_scratchpad: Short Circuit!\r" );
+    uart_puts_P_verbose( "DS18X20_write_scratchpad: Short Circuit!\r" );
     ret = DS18X20_ERROR;
   }
 
@@ -697,7 +696,7 @@ uint8_t DS18X20_read_scratchpad( uint8_t id[], uint8_t sp[], uint8_t n )
     ret = read_scratchpad( id, sp, n );
   } 
   else {
-//    uart_puts_P_verbose( "DS18X20_read_scratchpad: Short Circuit!\r" );
+    uart_puts_P_verbose( "DS18X20_read_scratchpad: Short Circuit!\r" );
     ret = DS18X20_ERROR;
   }
 
@@ -724,7 +723,7 @@ uint8_t DS18X20_scratchpad_to_eeprom( uint8_t with_power_extern,
     ret = DS18X20_OK;
   } 
   else { 
-//    uart_puts_P_verbose( "DS18X20_copy_scratchpad: Short Circuit!\r" );
+    uart_puts_P_verbose( "DS18X20_copy_scratchpad: Short Circuit!\r" );
     ret = DS18X20_START_FAIL;
   }
 
@@ -745,12 +744,12 @@ uint8_t DS18X20_eeprom_to_scratchpad( uint8_t id[] )
     if ( retry_count ) {
       ret = DS18X20_OK;
     } else {
-//      uart_puts_P_verbose( "DS18X20_recall_E2: timeout!\r" );
+      uart_puts_P_verbose( "DS18X20_recall_E2: timeout!\r" );
       ret = DS18X20_ERROR;
     }
   } 
   else { 
-//    uart_puts_P_verbose( "DS18X20_recall_E2: Short Circuit!\r" );
+    uart_puts_P_verbose( "DS18X20_recall_E2: Short Circuit!\r" );
     ret = DS18X20_ERROR;
   }
 

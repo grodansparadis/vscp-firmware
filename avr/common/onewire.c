@@ -12,11 +12,11 @@ modified by Martin Thomas (mthomas(at)rhrk.uni-kl.de)
 
 
 #include <avr/io.h>
+
 #include <util/delay.h>
 #include <util/atomic.h>
 
 #include "onewire.h"
-#include "uart.h"
 
 #ifdef OW_ONE_BUS
 
@@ -76,7 +76,6 @@ void ow_parasite_disable(void)
 
 uint8_t ow_reset(void)
 {
-
 	uint8_t err;
 	
 	OW_OUT_LOW();

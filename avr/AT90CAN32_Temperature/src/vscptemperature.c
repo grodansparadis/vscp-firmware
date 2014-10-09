@@ -44,10 +44,15 @@
 
 #define BTN_INIT_PRESSED    (!(PINA & _BV(0)))
 
+#include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
+#include <avr/eeprom.h>
+#include <util/delay.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
+#include <util/delay.h>
 #include "vscp_projdefs.h"
 #include "vscp_compiler.h"
 #include "version.h"
@@ -110,7 +115,47 @@ static void doWork();
 // Counter for seconds between measurements, do a first measurement
 uint8_t measurement_seconds = 0xFF;
 
+#define MAXSENSORS 5
 
+#define NEWLINESTR "\r\n"
+
+
+uint8_t gSensorIDs[MAXSENSORS][OW_ROMCODE_SIZE];
+
+static uint8_t search_sensors(void)
+{
+  uint8_t i;
+  uint8_t id[OW_ROMCODE_SIZE];
+  uint8_t diff, nSensors;
+  
+  uart_puts( "Scanning Bus for DS18X20" );
+  
+  ow_reset();
+
+  nSensors = 0;
+  
+  diff = OW_SEARCH_FIRST;
+  while ( diff != OW_LAST_DEVICE && nSensors < MAXSENSORS ) {
+    DS18X20_find_sensor( &diff, &id[0] );
+    
+    if( diff == OW_PRESENCE_ERR ) {
+      uart_puts( "No Sensor found" );
+      break;
+    }
+    
+    if( diff == OW_DATA_ERR ) {
+      uart_puts( "Bus Error" );
+      break;
+    }
+    
+    for ( i=0; i < OW_ROMCODE_SIZE; i++ )
+      gSensorIDs[nSensors][i] = id[i];
+    
+    nSensors++;
+  }
+  
+  return nSensors;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Timer 0 Compare interupt
 //
@@ -207,6 +252,10 @@ int main( void )
     initTimer();
 
     sei(); // Enable interrupts
+
+    #ifndef OW_ONE_BUS
+      ow_set_bus(&PINC,&PORTC,&DDRC,PC0);
+    #endif
 
     // Init can
     if ( ERROR_OK != can_Open( CAN_BITRATE_125K, 0, 0, 0 ) ) {
@@ -1019,32 +1068,36 @@ void SendInformationEventExtended(uint8_t priority, uint8_t zone, uint8_t subzon
 // Do work here
 //
 
+
 void doWork( void )
 {
-//  int nSensors;
-  int convertresult;
+  uint8_t nSensors, i;
+  int16_t decicelsius;
+  char buf[30];
+  char buf2[10];
+
+
 
 
     if ( measurement_seconds > 5 ) { //send temperature every 30 seconds
             measurement_seconds = 0;
 
-    #ifdef OW_ONE_BUS
-      uart_puts("OW_ONE_BUS is defined\n");
-    #endif
+    uart_puts("Measuring temperature.\n");
+    nSensors = search_sensors();
 
-    #ifndef OW_ONE_BUS
-      uart_puts("OW_ONE_BUS is not defined\n");
-    #endif
+    i = gSensorIDs[0][0]; // family-code for conversion-routine
+    sprintf(buf, "i: %i", i);
+    uart_puts( buf );
 
-//    nSensors = search_sensors();
+    DS18X20_start_meas( DS18X20_POWER_PARASITE, NULL );
+    _delay_ms( DS18B20_TCONV_12BIT );
+    DS18X20_read_decicelsius_single( i, &decicelsius );
 
-    convertresult = DS18X20_read_meas_all_verbose();
+    uart_puts( itoa( decicelsius, buf2, 10 ) );
+//            uart1_put_temp( decicelsius );
 
-    char buf[30];
-    sprintf(buf, "Convertresult = %i", convertresult);
-    uart_puts(buf);
-
-        }
+    
+}
 /*
     if ( measurement_seconds > 30 ) { //send temperature every 30 seconds
             measurement_seconds = 0;

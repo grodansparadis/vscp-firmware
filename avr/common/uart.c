@@ -43,6 +43,16 @@ void uart_putchar( char ch )
   while( !( UCSRA & MSK_UART_DRE ) );
   UDR = ch;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// uart_putc
+//
+
+void uart_putc( char ch )
+{
+  while( !( UCSRA & MSK_UART_DRE ) );
+  UDR = ch;
+}
     
 ///////////////////////////////////////////////////////////////////////////////
 // uart_puts
@@ -63,6 +73,22 @@ void uart_puts( char * sz )
 	
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// uart_puts_P
+//
+
+void uart_puts_P( char * sz )
+{
+ 	register char ch;
+
+	//for (;ch=*sz++; ) {
+	while ( ( ch = *sz++ ) ) {
+		if ( ch == '\n' ) uart_putchar('\r');
+  		uart_putchar( ch );
+    }
+	
+}
+
 /*************************************************************************
 Function: uart_put_int()
 Purpose:  transmit integer as ASCII to UART
@@ -74,6 +100,18 @@ void uart_put_int( const int val )
 	char buffer[10];
 	uart_puts( itoa( val, buffer, 10 ) );
 } /* uart_puti */
+
+/*************************************************************************
+Function: uart_puthex_byte()
+Purpose:  transmit upper and lower nibble as ASCII-hex to UART
+Input:    byte value
+Returns:  none
+**************************************************************************/
+void uart_puthex_byte( const unsigned char  b )
+{
+	uart_puthex_nibble( b >> 4 );
+	uart_puthex_nibble( b );
+} /* uart_puthex_byte */
 
 /*************************************************************************
 Function: uart_puthex_nibble()
@@ -90,17 +128,5 @@ void uart_puthex_nibble(const unsigned char b)
 	else {
 		c += '0';
 	}
-	uart_putchar(c);
+	uart_putc(c);
 } /* uart_puthex_nibble */
-
-/*************************************************************************
-Function: uart_puthex_byte()
-Purpose:  transmit upper and lower nibble as ASCII-hex to UART
-Input:    byte value
-Returns:  none
-**************************************************************************/
-void uart_puthex_byte( const unsigned char  b )
-{
-	uart_puthex_nibble( b >> 4 );
-	uart_puthex_nibble( b );
-} /* uart_puthex_byte */
