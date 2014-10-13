@@ -1094,8 +1094,11 @@ void doWork( void )
     DS18X20_read_decicelsius_single( i, &decicelsius );
 
     uart_puts( itoa( decicelsius, buf2, 10 ) );
-//            uart1_put_temp( decicelsius );
 
+    sprintf(buf, "decicelsius: %i", decicelsius & 0xff);
+    uart_puts( buf );
+    sprintf( buf, "decicelsius >> 8: %i", decicelsius >> 8 );
+    uart_puts( buf );
     
 }
 /*
