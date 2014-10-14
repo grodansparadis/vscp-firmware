@@ -1079,7 +1079,7 @@ void doWork( void )
 
 
 
-    if ( measurement_seconds > 5 ) { //send temperature every 30 seconds
+    if ( measurement_seconds > 10 ) { //send temperature every 30 seconds
             measurement_seconds = 0;
 
     uart_puts("Measuring temperature.\n");
@@ -1100,28 +1100,26 @@ void doWork( void )
     sprintf( buf, "decicelsius >> 8: %i", decicelsius >> 8 );
     uart_puts( buf );
     
-}
-/*
-    if ( measurement_seconds > 30 ) { //send temperature every 30 seconds
-            measurement_seconds = 0;
 
-            uart_puts("Measuring temperature\n");
+    uart_puts("Sending data on the CAN bus\n");
 
 
-            vscp_omsg.priority = 0x00;
-            vscp_omsg.flags = VSCP_VALID_MSG + 4;
-            vscp_omsg.class = VSCP_CLASS1_MEASUREMENT;
-            vscp_omsg.type = VSCP_TYPE_MEASUREMENT_TEMPERATURE;
+    vscp_omsg.priority = 0x00;
+    vscp_omsg.flags = VSCP_VALID_MSG + 4;
+    vscp_omsg.vscp_class = VSCP_CLASS1_MEASUREMENT;
+    vscp_omsg.vscp_type = VSCP_TYPE_MEASUREMENT_TEMPERATURE;
 
-            vscp_omsg.data[ 0 ] = 0x88;
-            vscp_omsg.data[ 1 ] = 0x01;
-            vscp_omsg.data[ 2 ] = 0xFF;
-            vscp_omsg.data[ 3 ] = 0x0D;
+    vscp_omsg.data[ 0 ] = 0x88; // data type set as two's complement
+    vscp_omsg.data[ 1 ] = 0x01; // number of decimals
+//    vscp_omsg.data[ 2 ] = 0xFF;
+//    vscp_omsg.data[ 3 ] = 0x0E;
+    vscp_omsg.data[ 2 ] = decicelsius >> 8;
+    vscp_omsg.data[ 3 ] = decicelsius & 0xff;
 
-            vscp_sendEvent(); // Send data
+    vscp_sendEvent(); // Send data
+  }
 
-        }
-*/
+
 }
 
 
