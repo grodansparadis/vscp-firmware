@@ -1111,10 +1111,8 @@ void doWork( void )
 
     vscp_omsg.data[ 0 ] = 0x88; // data type set as two's complement
     vscp_omsg.data[ 1 ] = 0x01; // number of decimals
-//    vscp_omsg.data[ 2 ] = 0xFF;
-//    vscp_omsg.data[ 3 ] = 0x0E;
-    vscp_omsg.data[ 2 ] = decicelsius >> 8;
-    vscp_omsg.data[ 3 ] = decicelsius & 0xff;
+    vscp_omsg.data[ 2 ] = decicelsius >> 8; // first half of the temperature
+    vscp_omsg.data[ 3 ] = decicelsius & 0xff; // second half of the temperature
 
     vscp_sendEvent(); // Send data
   }
