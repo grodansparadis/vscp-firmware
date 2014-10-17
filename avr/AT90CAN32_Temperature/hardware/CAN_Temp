@@ -1,0 +1,5194 @@
+%!PS-Adobe-2.0
+%%Creator: wxWidgets PostScript renderer
+%%CreationDate: Sun Aug 25 16:23:06 2013
+%%Orientation: Landscape
+%%DocumentPaperSizes: A4
+%%EndComments
+
+%%BeginProlog
+/conicto {
+    /to_y exch def
+    /to_x exch def
+    /conic_cntrl_y exch def
+    /conic_cntrl_x exch def
+    currentpoint
+    /p0_y exch def
+    /p0_x exch def
+    /p1_x p0_x conic_cntrl_x p0_x sub 2 3 div mul add def
+    /p1_y p0_y conic_cntrl_y p0_y sub 2 3 div mul add def
+    /p2_x p1_x to_x p0_x sub 1 3 div mul add def
+    /p2_y p1_y to_y p0_y sub 1 3 div mul add def
+    p1_x p1_y p2_x p2_y to_x to_y curveto
+}  bind def
+/ellipsedict 8 dict def
+ellipsedict /mtrx matrix put
+/ellipse {
+    ellipsedict begin
+    /endangle exch def
+    /startangle exch def
+    /yrad exch def
+    /xrad exch def
+    /y exch def
+    /x exch def
+    /savematrix mtrx currentmatrix def
+    x y translate
+    xrad yrad scale
+    0 0 1 startangle endangle arc
+    savematrix setmatrix
+    end
+    } def
+/ellipticarcdict 8 dict def
+ellipticarcdict /mtrx matrix put
+/ellipticarc
+{ ellipticarcdict begin
+  /do_fill exch def
+  /endangle exch def
+  /startangle exch def
+  /yrad exch def
+  /xrad exch def 
+  /y exch def
+  /x exch def
+  /savematrix mtrx currentmatrix def
+  x y translate
+  xrad yrad scale
+  do_fill { 0 0 moveto } if
+  0 0 1 startangle endangle arc
+  savematrix setmatrix
+  do_fill { fill }{ stroke } ifelse
+  end
+} def
+% define 'colorimage' if it isn't defined
+%   ('colortogray' and 'mergeprocs' come from xwd2ps
+%     via xgrab)
+/colorimage where   % do we know about 'colorimage'?
+  { pop }           % yes: pop off the 'dict' returned
+  {                 % no:  define one
+    /colortogray {  % define an RGB->I function
+      /rgbdata exch store    % call input 'rgbdata'
+      rgbdata length 3 idiv
+      /npixls exch store
+      /rgbindx 0 store
+      0 1 npixls 1 sub {
+        grays exch
+        rgbdata rgbindx       get 20 mul    % Red
+        rgbdata rgbindx 1 add get 32 mul    % Green
+        rgbdata rgbindx 2 add get 12 mul    % Blue
+        add add 64 idiv      % I = .5G + .31R + .18B
+        put
+        /rgbindx rgbindx 3 add store
+      } for
+      grays 0 npixls getinterval
+    } bind def
+
+    % Utility procedure for colorimage operator.
+    % This procedure takes two procedures off the
+    % stack and merges them into a single procedure.
+
+    /mergeprocs { % def
+      dup length
+      3 -1 roll
+      dup
+      length
+      dup
+      5 1 roll
+      3 -1 roll
+      add
+      array cvx
+      dup
+      3 -1 roll
+      0 exch
+      putinterval
+      dup
+      4 2 roll
+      putinterval
+    } bind def
+
+    /colorimage { % def
+      pop pop     % remove 'false 3' operands
+      {colortogray} mergeprocs
+      image
+    } bind def
+  } ifelse          % end of 'false' case
+
+/reencodeISO {
+dup dup findfont dup length dict begin
+{ 1 index /FID ne { def }{ pop pop } ifelse } forall
+/Encoding ISOLatin1Encoding def
+currentdict end definefont
+} def
+/ISOLatin1Encoding [
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quoteright
+/parenleft/parenright/asterisk/plus/comma/minus/period/slash
+/zero/one/two/three/four/five/six/seven/eight/nine/colon/semicolon
+/less/equal/greater/question/at/A/B/C/D/E/F/G/H/I/J/K/L/M/N
+/O/P/Q/R/S/T/U/V/W/X/Y/Z/bracketleft/backslash/bracketright
+/asciicircum/underscore/quoteleft/a/b/c/d/e/f/g/h/i/j/k/l/m
+/n/o/p/q/r/s/t/u/v/w/x/y/z/braceleft/bar/braceright/asciitilde
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/.notdef/dotlessi/grave/acute/circumflex/tilde/macron/breve
+/dotaccent/dieresis/.notdef/ring/cedilla/.notdef/hungarumlaut
+/ogonek/caron/space/exclamdown/cent/sterling/currency/yen/brokenbar
+/section/dieresis/copyright/ordfeminine/guillemotleft/logicalnot
+/hyphen/registered/macron/degree/plusminus/twosuperior/threesuperior
+/acute/mu/paragraph/periodcentered/cedilla/onesuperior/ordmasculine
+/guillemotright/onequarter/onehalf/threequarters/questiondown
+/Agrave/Aacute/Acircumflex/Atilde/Adieresis/Aring/AE/Ccedilla
+/Egrave/Eacute/Ecircumflex/Edieresis/Igrave/Iacute/Icircumflex
+/Idieresis/Eth/Ntilde/Ograve/Oacute/Ocircumflex/Otilde/Odieresis
+/multiply/Oslash/Ugrave/Uacute/Ucircumflex/Udieresis/Yacute
+/Thorn/germandbls/agrave/aacute/acircumflex/atilde/adieresis
+/aring/ae/ccedilla/egrave/eacute/ecircumflex/edieresis/igrave
+/iacute/icircumflex/idieresis/eth/ntilde/ograve/oacute/ocircumflex
+/otilde/odieresis/divide/oslash/ugrave/uacute/ucircumflex/udieresis
+/yacute/thorn/ydieresis
+] def
+
+/DrawSplineSection {
+    /y3 exch def
+    /x3 exch def
+    /y2 exch def
+    /x2 exch def
+    /y1 exch def
+    /x1 exch def
+    /xa x1 x2 x1 sub 0.666667 mul add def
+    /ya y1 y2 y1 sub 0.666667 mul add def
+    /xb x3 x2 x3 sub 0.666667 mul add def
+    /yb y3 y2 y3 sub 0.666667 mul add def
+    x1 y1 lineto
+    xa ya xb yb x3 y3 curveto
+    } def
+%%EndProlog
+1.000000 setlinewidth
+%%Page: 1
+90 rotate
+0.12000000 0.12000000 scale
+0 -4958 translate
+3.594000 setlinewidth
+3.594000 setlinewidth
+newpath
+240 4720 moveto
+240 4720 lineto
+240 248 lineto
+6769 248 lineto
+6769 4720 lineto
+closepath
+stroke
+3.594000 setlinewidth
+newpath
+282 4678 moveto
+282 4678 lineto
+282 290 lineto
+6727 290 lineto
+6727 4678 lineto
+closepath
+stroke
+3.594000 setlinewidth
+newpath
+1545 4720 moveto
+1545 4678 lineto
+stroke
+3.594000 setlinewidth
+newpath
+901 4687 moveto
+884 4687 lineto
+stroke
+3.594000 setlinewidth
+newpath
+884 4687 moveto
+884 4687 lineto
+stroke
+3.594000 setlinewidth
+newpath
+893 4687 moveto
+893 4717 lineto
+890 4713 lineto
+887 4710 lineto
+884 4709 lineto
+stroke
+3.594000 setlinewidth
+newpath
+884 4709 moveto
+884 4709 lineto
+stroke
+3.594000 setlinewidth
+newpath
+1545 248 moveto
+1545 290 lineto
+stroke
+3.594000 setlinewidth
+newpath
+901 257 moveto
+884 257 lineto
+stroke
+3.594000 setlinewidth
+newpath
+884 257 moveto
+884 257 lineto
+stroke
+3.594000 setlinewidth
+newpath
+893 257 moveto
+893 286 lineto
+890 282 lineto
+887 279 lineto
+884 278 lineto
+stroke
+3.594000 setlinewidth
+newpath
+884 278 moveto
+884 278 lineto
+stroke
+3.594000 setlinewidth
+newpath
+2851 4720 moveto
+2851 4678 lineto
+stroke
+3.594000 setlinewidth
+newpath
+2190 4714 moveto
+2191 4716 lineto
+2194 4717 lineto
+2201 4717 lineto
+2204 4716 lineto
+2205 4714 lineto
+2207 4712 lineto
+2207 4709 lineto
+2205 4704 lineto
+2188 4687 lineto
+2207 4687 lineto
+stroke
+3.594000 setlinewidth
+newpath
+2207 4687 moveto
+2207 4687 lineto
+stroke
+3.594000 setlinewidth
+newpath
+2851 248 moveto
+2851 290 lineto
+stroke
+3.594000 setlinewidth
+newpath
+2190 284 moveto
+2191 285 lineto
+2194 286 lineto
+2201 286 lineto
+2204 285 lineto
+2205 284 lineto
+2207 281 lineto
+2207 278 lineto
+2205 274 lineto
+2188 257 lineto
+2207 257 lineto
+stroke
+3.594000 setlinewidth
+newpath
+2207 257 moveto
+2207 257 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4157 4720 moveto
+4157 4678 lineto
+stroke
+3.594000 setlinewidth
+newpath
+3494 4717 moveto
+3513 4717 lineto
+3503 4706 lineto
+3507 4706 lineto
+3510 4704 lineto
+3511 4703 lineto
+3513 4700 lineto
+3513 4693 lineto
+3511 4690 lineto
+3510 4689 lineto
+3507 4687 lineto
+3498 4687 lineto
+3496 4689 lineto
+3494 4690 lineto
+stroke
+3.594000 setlinewidth
+newpath
+3494 4690 moveto
+3494 4690 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4157 248 moveto
+4157 290 lineto
+stroke
+3.594000 setlinewidth
+newpath
+3494 286 moveto
+3513 286 lineto
+3503 275 lineto
+3507 275 lineto
+3510 274 lineto
+3511 272 lineto
+3513 269 lineto
+3513 262 lineto
+3511 259 lineto
+3510 258 lineto
+3507 257 lineto
+3498 257 lineto
+3496 258 lineto
+3494 259 lineto
+stroke
+3.594000 setlinewidth
+newpath
+3494 259 moveto
+3494 259 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5463 4720 moveto
+5463 4678 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4816 4707 moveto
+4816 4687 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4816 4687 moveto
+4816 4687 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4809 4719 moveto
+4801 4697 lineto
+4820 4697 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4820 4697 moveto
+4820 4697 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5463 248 moveto
+5463 290 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4816 276 moveto
+4816 257 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4816 257 moveto
+4816 257 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4809 288 moveto
+4801 266 lineto
+4820 266 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4820 266 moveto
+4820 266 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6123 4717 moveto
+6109 4717 lineto
+6107 4703 lineto
+6109 4704 lineto
+6112 4706 lineto
+6119 4706 lineto
+6121 4704 lineto
+6123 4703 lineto
+6124 4700 lineto
+6124 4693 lineto
+6123 4690 lineto
+6121 4689 lineto
+6119 4687 lineto
+6112 4687 lineto
+6109 4689 lineto
+6107 4690 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6107 4690 moveto
+6107 4690 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6123 286 moveto
+6109 286 lineto
+6107 272 lineto
+6109 274 lineto
+6112 275 lineto
+6119 275 lineto
+6121 274 lineto
+6123 272 lineto
+6124 269 lineto
+6124 262 lineto
+6123 259 lineto
+6121 258 lineto
+6119 257 lineto
+6112 257 lineto
+6109 258 lineto
+6107 259 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6107 259 moveto
+6107 259 lineto
+stroke
+3.594000 setlinewidth
+newpath
+240 3229 moveto
+282 3229 lineto
+stroke
+3.594000 setlinewidth
+newpath
+253 3971 moveto
+268 3971 lineto
+stroke
+3.594000 setlinewidth
+newpath
+268 3971 moveto
+268 3971 lineto
+stroke
+3.594000 setlinewidth
+newpath
+251 3963 moveto
+261 3992 lineto
+271 3963 lineto
+stroke
+3.594000 setlinewidth
+newpath
+271 3963 moveto
+271 3963 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6769 3229 moveto
+6727 3229 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6741 3879 moveto
+6755 3879 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6755 3879 moveto
+6755 3879 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6738 3870 moveto
+6748 3900 lineto
+6758 3870 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6758 3870 moveto
+6758 3870 lineto
+stroke
+3.594000 setlinewidth
+newpath
+240 1739 moveto
+282 1739 lineto
+stroke
+3.594000 setlinewidth
+newpath
+263 2487 moveto
+267 2486 lineto
+268 2484 lineto
+270 2482 lineto
+270 2477 lineto
+268 2474 lineto
+267 2473 lineto
+264 2472 lineto
+253 2472 lineto
+253 2502 lineto
+263 2502 lineto
+266 2500 lineto
+267 2499 lineto
+268 2496 lineto
+268 2493 lineto
+267 2490 lineto
+266 2489 lineto
+263 2487 lineto
+253 2487 lineto
+stroke
+3.594000 setlinewidth
+newpath
+253 2487 moveto
+253 2487 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6769 1739 moveto
+6727 1739 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6750 2395 moveto
+6754 2394 lineto
+6756 2392 lineto
+6757 2389 lineto
+6757 2385 lineto
+6756 2382 lineto
+6754 2381 lineto
+6751 2379 lineto
+6740 2379 lineto
+6740 2409 lineto
+6750 2409 lineto
+6753 2408 lineto
+6754 2406 lineto
+6756 2404 lineto
+6756 2401 lineto
+6754 2398 lineto
+6753 2396 lineto
+6750 2395 lineto
+6740 2395 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6740 2395 moveto
+6740 2395 lineto
+stroke
+3.594000 setlinewidth
+newpath
+270 984 moveto
+268 982 lineto
+264 981 lineto
+261 981 lineto
+257 982 lineto
+254 985 lineto
+253 988 lineto
+251 994 lineto
+251 998 lineto
+253 1004 lineto
+254 1006 lineto
+257 1009 lineto
+261 1011 lineto
+264 1011 lineto
+268 1009 lineto
+270 1008 lineto
+stroke
+3.594000 setlinewidth
+newpath
+270 1008 moveto
+270 1008 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6757 891 moveto
+6756 890 lineto
+6751 888 lineto
+6748 888 lineto
+6744 890 lineto
+6741 893 lineto
+6740 896 lineto
+6738 901 lineto
+6738 906 lineto
+6740 911 lineto
+6741 914 lineto
+6744 917 lineto
+6748 918 lineto
+6751 918 lineto
+6756 917 lineto
+6757 916 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6757 916 moveto
+6757 916 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4759 383 moveto
+4759 419 lineto
+4767 419 lineto
+4772 417 lineto
+4776 414 lineto
+4777 410 lineto
+4779 403 lineto
+4779 398 lineto
+4777 391 lineto
+4776 388 lineto
+4772 385 lineto
+4767 383 lineto
+4759 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4810 383 moveto
+4810 402 lineto
+4808 405 lineto
+4805 407 lineto
+4798 407 lineto
+4795 405 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4795 405 moveto
+4795 405 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4810 385 moveto
+4807 383 lineto
+4798 383 lineto
+4795 385 lineto
+4793 388 lineto
+4793 391 lineto
+4795 395 lineto
+4798 397 lineto
+4807 397 lineto
+4810 398 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4810 398 moveto
+4810 398 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4822 407 moveto
+4836 407 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4836 407 moveto
+4836 407 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4827 419 moveto
+4827 388 lineto
+4829 385 lineto
+4832 383 lineto
+4836 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4836 383 moveto
+4836 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4861 385 moveto
+4858 383 lineto
+4851 383 lineto
+4848 385 lineto
+4846 388 lineto
+4846 402 lineto
+4848 405 lineto
+4851 407 lineto
+4858 407 lineto
+4861 405 lineto
+4863 402 lineto
+4863 398 lineto
+4846 395 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4846 395 moveto
+4846 395 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4878 386 moveto
+4880 385 lineto
+4878 383 lineto
+4877 385 lineto
+4878 386 lineto
+4878 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4878 383 moveto
+4878 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4878 405 moveto
+4880 403 lineto
+4878 402 lineto
+4877 403 lineto
+4878 405 lineto
+4878 402 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4878 402 moveto
+4878 402 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4921 415 moveto
+4923 417 lineto
+4926 419 lineto
+4935 419 lineto
+4938 417 lineto
+4940 415 lineto
+4942 412 lineto
+4942 409 lineto
+4940 403 lineto
+4920 383 lineto
+4942 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4942 383 moveto
+4942 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4974 419 moveto
+4957 419 lineto
+4955 402 lineto
+4957 403 lineto
+4961 405 lineto
+4969 405 lineto
+4973 403 lineto
+4974 402 lineto
+4976 398 lineto
+4976 390 lineto
+4974 386 lineto
+4973 385 lineto
+4969 383 lineto
+4961 383 lineto
+4957 385 lineto
+4955 386 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4955 386 moveto
+4955 386 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5034 383 moveto
+5034 402 lineto
+5032 405 lineto
+5029 407 lineto
+5022 407 lineto
+5019 405 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5019 405 moveto
+5019 405 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5034 385 moveto
+5031 383 lineto
+5022 383 lineto
+5019 385 lineto
+5017 388 lineto
+5017 391 lineto
+5019 395 lineto
+5022 397 lineto
+5031 397 lineto
+5034 398 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5034 398 moveto
+5034 398 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5067 407 moveto
+5067 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5067 383 moveto
+5067 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5051 407 moveto
+5051 388 lineto
+5053 385 lineto
+5056 383 lineto
+5061 383 lineto
+5065 385 lineto
+5067 386 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5067 386 moveto
+5067 386 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5099 407 moveto
+5099 378 lineto
+5097 374 lineto
+5096 373 lineto
+5092 371 lineto
+5087 371 lineto
+5084 373 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5084 373 moveto
+5084 373 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5099 385 moveto
+5096 383 lineto
+5089 383 lineto
+5085 385 lineto
+5084 386 lineto
+5082 390 lineto
+5082 400 lineto
+5084 403 lineto
+5085 405 lineto
+5089 407 lineto
+5096 407 lineto
+5099 405 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5099 405 moveto
+5099 405 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5142 415 moveto
+5144 417 lineto
+5147 419 lineto
+5156 419 lineto
+5159 417 lineto
+5161 415 lineto
+5162 412 lineto
+5162 409 lineto
+5161 403 lineto
+5140 383 lineto
+5162 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5162 383 moveto
+5163 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5185 419 moveto
+5188 419 lineto
+5192 417 lineto
+5193 415 lineto
+5195 412 lineto
+5197 405 lineto
+5197 397 lineto
+5195 390 lineto
+5193 386 lineto
+5192 385 lineto
+5188 383 lineto
+5185 383 lineto
+5181 385 lineto
+5180 386 lineto
+5178 390 lineto
+5176 397 lineto
+5176 405 lineto
+5178 412 lineto
+5180 415 lineto
+5181 417 lineto
+5185 419 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5231 383 moveto
+5210 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5210 383 moveto
+5210 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5221 383 moveto
+5221 419 lineto
+5217 414 lineto
+5214 410 lineto
+5210 409 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5210 409 moveto
+5210 409 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5243 419 moveto
+5265 419 lineto
+5253 405 lineto
+5258 405 lineto
+5262 403 lineto
+5263 402 lineto
+5265 398 lineto
+5265 390 lineto
+5263 386 lineto
+5262 385 lineto
+5258 383 lineto
+5248 383 lineto
+5245 385 lineto
+5243 386 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5243 386 moveto
+5243 386 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4255 311 moveto
+4255 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4255 347 moveto
+4256 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4276 311 moveto
+4261 332 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4261 332 moveto
+4261 332 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4276 347 moveto
+4255 326 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4255 326 moveto
+4256 326 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4291 311 moveto
+4291 335 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4291 335 moveto
+4291 335 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4291 347 moveto
+4290 345 lineto
+4291 344 lineto
+4293 345 lineto
+4291 347 lineto
+4291 344 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4291 344 moveto
+4291 344 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4329 314 moveto
+4327 313 lineto
+4322 311 lineto
+4319 311 lineto
+4314 313 lineto
+4310 316 lineto
+4309 320 lineto
+4307 326 lineto
+4307 332 lineto
+4309 338 lineto
+4310 342 lineto
+4314 345 lineto
+4319 347 lineto
+4322 347 lineto
+4327 345 lineto
+4329 344 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4329 344 moveto
+4329 344 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4360 311 moveto
+4360 330 lineto
+4358 333 lineto
+4355 335 lineto
+4348 335 lineto
+4344 333 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4344 333 moveto
+4345 333 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4360 313 moveto
+4356 311 lineto
+4348 311 lineto
+4344 313 lineto
+4343 316 lineto
+4343 320 lineto
+4344 323 lineto
+4348 325 lineto
+4356 325 lineto
+4360 326 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4360 326 moveto
+4360 326 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4392 311 moveto
+4392 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4392 347 moveto
+4392 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4392 313 moveto
+4389 311 lineto
+4382 311 lineto
+4379 313 lineto
+4377 314 lineto
+4375 318 lineto
+4375 328 lineto
+4377 332 lineto
+4379 333 lineto
+4382 335 lineto
+4389 335 lineto
+4392 333 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4392 333 moveto
+4392 333 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4437 330 moveto
+4449 330 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4449 330 moveto
+4449 330 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4454 311 moveto
+4437 311 lineto
+4437 347 lineto
+4454 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4454 347 moveto
+4454 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4469 314 moveto
+4471 313 lineto
+4469 311 lineto
+4468 313 lineto
+4469 314 lineto
+4469 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4469 311 moveto
+4469 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4487 311 moveto
+4487 347 lineto
+4495 347 lineto
+4500 345 lineto
+4504 342 lineto
+4505 338 lineto
+4507 332 lineto
+4507 326 lineto
+4505 320 lineto
+4504 316 lineto
+4500 313 lineto
+4495 311 lineto
+4487 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4523 314 moveto
+4524 313 lineto
+4523 311 lineto
+4521 313 lineto
+4523 314 lineto
+4523 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4523 311 moveto
+4523 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4538 321 moveto
+4555 321 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4555 321 moveto
+4555 321 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4534 311 moveto
+4546 347 lineto
+4558 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4558 311 moveto
+4559 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4570 314 moveto
+4572 313 lineto
+4570 311 lineto
+4569 313 lineto
+4570 314 lineto
+4570 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4570 311 moveto
+4570 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4642 335 moveto
+4642 299 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4642 299 moveto
+4642 299 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4642 333 moveto
+4646 335 lineto
+4653 335 lineto
+4656 333 lineto
+4658 332 lineto
+4659 328 lineto
+4659 318 lineto
+4658 314 lineto
+4656 313 lineto
+4653 311 lineto
+4646 311 lineto
+4642 313 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4642 313 moveto
+4642 313 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4690 313 moveto
+4687 311 lineto
+4680 311 lineto
+4677 313 lineto
+4675 314 lineto
+4673 318 lineto
+4673 328 lineto
+4675 332 lineto
+4677 333 lineto
+4680 335 lineto
+4687 335 lineto
+4690 333 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4690 333 moveto
+4690 333 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4706 311 moveto
+4706 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4706 347 moveto
+4706 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4706 333 moveto
+4709 335 lineto
+4716 335 lineto
+4719 333 lineto
+4721 332 lineto
+4723 328 lineto
+4723 318 lineto
+4721 314 lineto
+4719 313 lineto
+4716 311 lineto
+4709 311 lineto
+4706 313 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4706 313 moveto
+4706 313 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4738 335 moveto
+4738 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4738 311 moveto
+4738 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4738 332 moveto
+4740 333 lineto
+4743 335 lineto
+4748 335 lineto
+4752 333 lineto
+4754 330 lineto
+4754 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4754 311 moveto
+4754 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4784 313 moveto
+4781 311 lineto
+4774 311 lineto
+4771 313 lineto
+4769 316 lineto
+4769 330 lineto
+4771 333 lineto
+4774 335 lineto
+4781 335 lineto
+4784 333 lineto
+4786 330 lineto
+4786 326 lineto
+4769 323 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4769 323 moveto
+4769 323 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4798 335 moveto
+4805 311 lineto
+4812 328 lineto
+4819 311 lineto
+4825 335 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4825 335 moveto
+4825 335 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4877 297 moveto
+4875 299 lineto
+4872 304 lineto
+4870 308 lineto
+4868 313 lineto
+4867 321 lineto
+4867 328 lineto
+4868 337 lineto
+4870 342 lineto
+4872 345 lineto
+4875 350 lineto
+4877 352 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4877 352 moveto
+4877 352 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4889 344 moveto
+4890 345 lineto
+4894 347 lineto
+4902 347 lineto
+4906 345 lineto
+4908 344 lineto
+4909 340 lineto
+4909 337 lineto
+4908 332 lineto
+4887 311 lineto
+4909 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4909 311 moveto
+4909 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4932 347 moveto
+4935 347 lineto
+4938 345 lineto
+4940 344 lineto
+4942 340 lineto
+4943 333 lineto
+4943 325 lineto
+4942 318 lineto
+4940 314 lineto
+4938 313 lineto
+4935 311 lineto
+4932 311 lineto
+4928 313 lineto
+4926 314 lineto
+4925 318 lineto
+4923 325 lineto
+4923 333 lineto
+4925 340 lineto
+4926 344 lineto
+4928 345 lineto
+4932 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4978 311 moveto
+4957 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4957 311 moveto
+4957 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4967 311 moveto
+4967 347 lineto
+4964 342 lineto
+4961 338 lineto
+4957 337 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4957 337 moveto
+4957 337 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5012 311 moveto
+4991 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4991 311 moveto
+4991 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5002 311 moveto
+5002 347 lineto
+4998 342 lineto
+4995 338 lineto
+4991 337 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4991 337 moveto
+4991 337 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5027 325 moveto
+5055 325 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5055 325 moveto
+5055 325 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5072 335 moveto
+5072 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5072 311 moveto
+5072 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5072 332 moveto
+5073 333 lineto
+5077 335 lineto
+5082 335 lineto
+5085 333 lineto
+5087 330 lineto
+5087 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5087 311 moveto
+5087 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5109 311 moveto
+5106 313 lineto
+5104 314 lineto
+5103 318 lineto
+5103 328 lineto
+5104 332 lineto
+5106 333 lineto
+5109 335 lineto
+5115 335 lineto
+5118 333 lineto
+5120 332 lineto
+5121 328 lineto
+5121 318 lineto
+5120 314 lineto
+5118 313 lineto
+5115 311 lineto
+5109 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5133 335 moveto
+5142 311 lineto
+5151 335 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5151 335 moveto
+5151 335 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5164 325 moveto
+5192 325 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5192 325 moveto
+5192 325 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5205 347 moveto
+5228 347 lineto
+5216 333 lineto
+5221 333 lineto
+5224 332 lineto
+5226 330 lineto
+5228 326 lineto
+5228 318 lineto
+5226 314 lineto
+5224 313 lineto
+5221 311 lineto
+5210 311 lineto
+5207 313 lineto
+5205 314 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5205 314 moveto
+5205 314 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5250 347 moveto
+5253 347 lineto
+5257 345 lineto
+5258 344 lineto
+5260 340 lineto
+5262 333 lineto
+5262 325 lineto
+5260 318 lineto
+5258 314 lineto
+5257 313 lineto
+5253 311 lineto
+5250 311 lineto
+5246 313 lineto
+5245 314 lineto
+5243 318 lineto
+5241 325 lineto
+5241 333 lineto
+5243 340 lineto
+5245 344 lineto
+5246 345 lineto
+5250 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5274 297 moveto
+5275 299 lineto
+5279 304 lineto
+5281 308 lineto
+5282 313 lineto
+5284 321 lineto
+5284 328 lineto
+5282 337 lineto
+5281 342 lineto
+5279 345 lineto
+5275 350 lineto
+5274 352 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5274 352 moveto
+5274 352 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5301 325 moveto
+5328 325 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5328 325 moveto
+5329 325 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5344 313 moveto
+5347 311 lineto
+5354 311 lineto
+5358 313 lineto
+5359 316 lineto
+5359 318 lineto
+5358 321 lineto
+5354 323 lineto
+5349 323 lineto
+5346 325 lineto
+5344 328 lineto
+5344 330 lineto
+5346 333 lineto
+5349 335 lineto
+5354 335 lineto
+5358 333 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5358 333 moveto
+5358 333 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5370 335 moveto
+5383 335 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5383 335 moveto
+5383 335 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5375 347 moveto
+5375 316 lineto
+5376 313 lineto
+5380 311 lineto
+5383 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5383 311 moveto
+5383 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5411 311 moveto
+5411 330 lineto
+5409 333 lineto
+5405 335 lineto
+5399 335 lineto
+5395 333 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5395 333 moveto
+5395 333 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5411 313 moveto
+5407 311 lineto
+5399 311 lineto
+5395 313 lineto
+5394 316 lineto
+5394 320 lineto
+5395 323 lineto
+5399 325 lineto
+5407 325 lineto
+5411 326 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5411 326 moveto
+5411 326 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5428 311 moveto
+5428 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5428 347 moveto
+5428 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5428 333 moveto
+5431 335 lineto
+5438 335 lineto
+5441 333 lineto
+5443 332 lineto
+5445 328 lineto
+5445 318 lineto
+5443 314 lineto
+5441 313 lineto
+5438 311 lineto
+5431 311 lineto
+5428 313 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5428 313 moveto
+5428 313 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5465 311 moveto
+5462 313 lineto
+5460 316 lineto
+5460 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5460 347 moveto
+5460 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5493 313 moveto
+5489 311 lineto
+5483 311 lineto
+5479 313 lineto
+5477 316 lineto
+5477 330 lineto
+5479 333 lineto
+5483 335 lineto
+5489 335 lineto
+5493 333 lineto
+5495 330 lineto
+5495 326 lineto
+5477 323 lineto
+stroke
+3.594000 setlinewidth
+newpath
+5477 323 moveto
+5477 323 lineto
+stroke
+7.188000 setlinewidth
+7.188000 setlinewidth
+newpath
+6265 383 moveto
+6253 400 lineto
+stroke
+7.188000 setlinewidth
+newpath
+6253 400 moveto
+6253 400 lineto
+stroke
+7.188000 setlinewidth
+newpath
+6244 383 moveto
+6244 419 lineto
+6258 419 lineto
+6261 417 lineto
+6263 415 lineto
+6265 412 lineto
+6265 407 lineto
+6263 403 lineto
+6261 402 lineto
+6258 400 lineto
+6244 400 lineto
+stroke
+7.188000 setlinewidth
+newpath
+6244 400 moveto
+6244 400 lineto
+stroke
+7.188000 setlinewidth
+newpath
+6294 385 moveto
+6290 383 lineto
+6284 383 lineto
+6280 385 lineto
+6278 388 lineto
+6278 402 lineto
+6280 405 lineto
+6284 407 lineto
+6290 407 lineto
+6294 405 lineto
+6295 402 lineto
+6295 398 lineto
+6278 395 lineto
+stroke
+7.188000 setlinewidth
+newpath
+6278 395 moveto
+6278 395 lineto
+stroke
+7.188000 setlinewidth
+newpath
+6307 407 moveto
+6316 383 lineto
+6325 407 lineto
+stroke
+7.188000 setlinewidth
+newpath
+6325 407 moveto
+6325 407 lineto
+stroke
+7.188000 setlinewidth
+newpath
+6338 386 moveto
+6340 385 lineto
+6338 383 lineto
+6337 385 lineto
+6338 386 lineto
+6338 383 lineto
+stroke
+7.188000 setlinewidth
+newpath
+6338 383 moveto
+6338 383 lineto
+stroke
+7.188000 setlinewidth
+newpath
+6338 405 moveto
+6340 403 lineto
+6338 402 lineto
+6337 403 lineto
+6338 405 lineto
+6338 402 lineto
+stroke
+7.188000 setlinewidth
+newpath
+6338 402 moveto
+6338 402 lineto
+stroke
+3.594000 setlinewidth
+3.594000 setlinewidth
+newpath
+4254 385 moveto
+4259 383 lineto
+4267 383 lineto
+4271 385 lineto
+4273 386 lineto
+4274 390 lineto
+4274 393 lineto
+4273 397 lineto
+4271 398 lineto
+4267 400 lineto
+4261 402 lineto
+4257 403 lineto
+4255 405 lineto
+4254 409 lineto
+4254 412 lineto
+4255 415 lineto
+4257 417 lineto
+4261 419 lineto
+4269 419 lineto
+4274 417 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4274 417 moveto
+4274 417 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4290 383 moveto
+4290 407 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4290 407 moveto
+4290 407 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4290 419 moveto
+4288 417 lineto
+4290 415 lineto
+4291 417 lineto
+4290 419 lineto
+4290 415 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4290 415 moveto
+4290 415 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4303 407 moveto
+4322 407 lineto
+4303 383 lineto
+4322 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4322 383 moveto
+4322 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4350 385 moveto
+4346 383 lineto
+4339 383 lineto
+4336 385 lineto
+4334 388 lineto
+4334 402 lineto
+4336 405 lineto
+4339 407 lineto
+4346 407 lineto
+4350 405 lineto
+4351 402 lineto
+4351 398 lineto
+4334 395 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4334 395 moveto
+4334 395 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4367 386 moveto
+4368 385 lineto
+4367 383 lineto
+4365 385 lineto
+4367 386 lineto
+4367 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4367 383 moveto
+4367 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4367 405 moveto
+4368 403 lineto
+4367 402 lineto
+4365 403 lineto
+4367 405 lineto
+4367 402 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4367 402 moveto
+4367 402 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4409 393 moveto
+4427 393 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4427 393 moveto
+4427 393 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4406 383 moveto
+4418 419 lineto
+4430 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4430 383 moveto
+4430 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4457 407 moveto
+4457 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4457 383 moveto
+4457 383 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4449 421 moveto
+4440 395 lineto
+4463 395 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4463 395 moveto
+4463 395 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6244 311 moveto
+6244 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6244 347 moveto
+6244 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6277 311 moveto
+6277 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6277 347 moveto
+6277 347 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6277 313 moveto
+6273 311 lineto
+6266 311 lineto
+6263 313 lineto
+6261 314 lineto
+6260 318 lineto
+6260 328 lineto
+6261 332 lineto
+6263 333 lineto
+6266 335 lineto
+6273 335 lineto
+6277 333 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6277 333 moveto
+6277 333 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6294 314 moveto
+6295 313 lineto
+6294 311 lineto
+6292 313 lineto
+6294 314 lineto
+6294 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6294 311 moveto
+6294 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6294 333 moveto
+6295 332 lineto
+6294 330 lineto
+6292 332 lineto
+6294 333 lineto
+6294 330 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6294 330 moveto
+6294 330 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6357 311 moveto
+6337 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6337 311 moveto
+6337 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6347 311 moveto
+6347 347 lineto
+6343 342 lineto
+6340 338 lineto
+6337 337 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6337 337 moveto
+6337 337 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6398 349 moveto
+6367 302 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6367 302 moveto
+6367 302 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6429 311 moveto
+6408 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6408 311 moveto
+6409 311 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6419 311 moveto
+6419 347 lineto
+6415 342 lineto
+6412 338 lineto
+6408 337 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6408 337 moveto
+6409 337 lineto
+stroke
+7.188000 setlinewidth
+7.188000 setlinewidth
+newpath
+4250 491 moveto
+4271 491 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4271 491 moveto
+4271 491 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4261 455 moveto
+4261 491 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4261 491 moveto
+4261 491 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4283 455 moveto
+4283 479 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4283 479 moveto
+4283 479 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4283 491 moveto
+4281 489 lineto
+4283 487 lineto
+4285 489 lineto
+4283 491 lineto
+4283 487 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4283 487 moveto
+4283 487 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4295 479 moveto
+4309 479 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4309 479 moveto
+4309 479 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4300 491 moveto
+4300 460 lineto
+4302 456 lineto
+4305 455 lineto
+4309 455 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4309 455 moveto
+4309 455 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4326 455 moveto
+4322 456 lineto
+4321 460 lineto
+4321 491 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4321 491 moveto
+4321 491 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4353 456 moveto
+4350 455 lineto
+4343 455 lineto
+4339 456 lineto
+4338 460 lineto
+4338 474 lineto
+4339 477 lineto
+4343 479 lineto
+4350 479 lineto
+4353 477 lineto
+4355 474 lineto
+4355 470 lineto
+4338 467 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4338 467 moveto
+4338 467 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4370 458 moveto
+4372 456 lineto
+4370 455 lineto
+4368 456 lineto
+4370 458 lineto
+4370 455 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4370 455 moveto
+4370 455 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4370 477 moveto
+4372 475 lineto
+4370 474 lineto
+4368 475 lineto
+4370 477 lineto
+4370 474 lineto
+stroke
+7.188000 setlinewidth
+newpath
+4370 474 moveto
+4370 474 lineto
+stroke
+3.594000 setlinewidth
+3.594000 setlinewidth
+newpath
+4267 617 moveto
+4255 617 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4255 617 moveto
+4256 617 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4255 599 moveto
+4255 634 lineto
+4273 634 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4273 634 moveto
+4273 634 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4286 599 moveto
+4286 622 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4286 622 moveto
+4286 622 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4286 634 moveto
+4285 633 lineto
+4286 631 lineto
+4288 633 lineto
+4286 634 lineto
+4286 631 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4286 631 moveto
+4286 631 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4309 599 moveto
+4305 600 lineto
+4303 604 lineto
+4303 634 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4303 634 moveto
+4303 634 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4336 600 moveto
+4332 599 lineto
+4326 599 lineto
+4322 600 lineto
+4320 604 lineto
+4320 617 lineto
+4322 621 lineto
+4326 622 lineto
+4332 622 lineto
+4336 621 lineto
+4338 617 lineto
+4338 614 lineto
+4320 610 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4320 610 moveto
+4321 610 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4353 602 moveto
+4355 600 lineto
+4353 599 lineto
+4351 600 lineto
+4353 602 lineto
+4353 599 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4353 599 moveto
+4353 599 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4353 621 moveto
+4355 619 lineto
+4353 617 lineto
+4351 619 lineto
+4353 621 lineto
+4353 617 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4353 617 moveto
+4353 617 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4418 602 moveto
+4416 600 lineto
+4411 599 lineto
+4408 599 lineto
+4403 600 lineto
+4399 604 lineto
+4397 607 lineto
+4396 614 lineto
+4396 619 lineto
+4397 626 lineto
+4399 629 lineto
+4403 633 lineto
+4408 634 lineto
+4411 634 lineto
+4416 633 lineto
+4418 631 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4418 631 moveto
+4418 631 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4432 609 moveto
+4449 609 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4449 609 moveto
+4449 609 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4428 599 moveto
+4440 634 lineto
+4452 599 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4452 599 moveto
+4452 599 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4464 599 moveto
+4464 634 lineto
+4485 599 lineto
+4485 634 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4485 634 moveto
+4485 634 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4493 595 moveto
+4521 595 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4521 595 moveto
+4521 595 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4524 634 moveto
+4545 634 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4545 634 moveto
+4545 634 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4534 599 moveto
+4534 634 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4534 634 moveto
+4534 634 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4570 600 moveto
+4567 599 lineto
+4560 599 lineto
+4557 600 lineto
+4555 604 lineto
+4555 617 lineto
+4557 621 lineto
+4560 622 lineto
+4567 622 lineto
+4570 621 lineto
+4572 617 lineto
+4572 614 lineto
+4555 610 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4555 610 moveto
+4555 610 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4587 599 moveto
+4587 622 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4587 622 moveto
+4588 622 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4587 619 moveto
+4589 621 lineto
+4593 622 lineto
+4598 622 lineto
+4601 621 lineto
+4603 617 lineto
+4603 599 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4603 599 moveto
+4603 599 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4603 617 moveto
+4605 621 lineto
+4608 622 lineto
+4613 622 lineto
+4617 621 lineto
+4618 617 lineto
+4618 599 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4618 599 moveto
+4618 599 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4635 622 moveto
+4635 587 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4635 587 moveto
+4635 587 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4635 621 moveto
+4639 622 lineto
+4646 622 lineto
+4649 621 lineto
+4651 619 lineto
+4652 616 lineto
+4652 605 lineto
+4651 602 lineto
+4649 600 lineto
+4646 599 lineto
+4639 599 lineto
+4635 600 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4635 600 moveto
+4635 600 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4668 602 moveto
+4670 600 lineto
+4668 599 lineto
+4666 600 lineto
+4668 602 lineto
+4668 599 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4668 599 moveto
+4668 599 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4685 599 moveto
+4685 634 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4685 634 moveto
+4685 634 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4685 621 moveto
+4688 622 lineto
+4695 622 lineto
+4699 621 lineto
+4700 619 lineto
+4702 616 lineto
+4702 605 lineto
+4700 602 lineto
+4699 600 lineto
+4695 599 lineto
+4688 599 lineto
+4685 600 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4685 600 moveto
+4685 600 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4718 599 moveto
+4718 622 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4718 622 moveto
+4718 622 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4718 616 moveto
+4719 619 lineto
+4721 621 lineto
+4724 622 lineto
+4728 622 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4728 622 moveto
+4728 622 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4755 599 moveto
+4755 634 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4755 634 moveto
+4755 634 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4755 600 moveto
+4752 599 lineto
+4745 599 lineto
+4741 600 lineto
+4740 602 lineto
+4738 605 lineto
+4738 616 lineto
+4740 619 lineto
+4741 621 lineto
+4745 622 lineto
+4752 622 lineto
+4755 621 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4755 621 moveto
+4755 621 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4254 528 moveto
+4259 527 lineto
+4267 527 lineto
+4271 528 lineto
+4273 530 lineto
+4274 533 lineto
+4274 537 lineto
+4273 540 lineto
+4271 542 lineto
+4267 544 lineto
+4261 545 lineto
+4257 547 lineto
+4255 549 lineto
+4254 552 lineto
+4254 556 lineto
+4255 559 lineto
+4257 561 lineto
+4261 563 lineto
+4269 563 lineto
+4274 561 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4274 561 moveto
+4274 561 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4290 527 moveto
+4290 563 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4290 563 moveto
+4290 563 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4305 527 moveto
+4305 545 lineto
+4303 549 lineto
+4300 551 lineto
+4295 551 lineto
+4291 549 lineto
+4290 547 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4290 547 moveto
+4290 547 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4336 528 moveto
+4332 527 lineto
+4326 527 lineto
+4322 528 lineto
+4320 532 lineto
+4320 545 lineto
+4322 549 lineto
+4326 551 lineto
+4332 551 lineto
+4336 549 lineto
+4338 545 lineto
+4338 542 lineto
+4320 539 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4320 539 moveto
+4321 539 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4367 528 moveto
+4363 527 lineto
+4356 527 lineto
+4353 528 lineto
+4351 532 lineto
+4351 545 lineto
+4353 549 lineto
+4356 551 lineto
+4363 551 lineto
+4367 549 lineto
+4368 545 lineto
+4368 542 lineto
+4351 539 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4351 539 moveto
+4351 539 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4379 551 moveto
+4392 551 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4392 551 moveto
+4392 551 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4384 563 moveto
+4384 532 lineto
+4385 528 lineto
+4389 527 lineto
+4392 527 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4392 527 moveto
+4392 527 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4404 530 moveto
+4406 528 lineto
+4404 527 lineto
+4403 528 lineto
+4404 530 lineto
+4404 527 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4404 527 moveto
+4404 527 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4404 549 moveto
+4406 547 lineto
+4404 545 lineto
+4403 547 lineto
+4404 549 lineto
+4404 545 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4404 545 moveto
+4404 545 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4468 527 moveto
+4447 527 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4447 527 moveto
+4447 527 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4457 527 moveto
+4457 563 lineto
+4454 557 lineto
+4451 554 lineto
+4447 552 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4447 552 moveto
+4447 552 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4509 564 moveto
+4478 518 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4478 518 moveto
+4478 518 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4540 527 moveto
+4519 527 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4519 527 moveto
+4519 527 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4529 527 moveto
+4529 563 lineto
+4526 557 lineto
+4522 554 lineto
+4519 552 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4519 552 moveto
+4519 552 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4211 649 moveto
+4211 290 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4211 649 moveto
+6727 649 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4211 649 moveto
+6727 649 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4211 505 moveto
+6727 505 lineto
+stroke
+3.594000 setlinewidth
+newpath
+6200 433 moveto
+6200 290 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4211 361 moveto
+6727 361 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4211 433 moveto
+6727 433 lineto
+stroke
+3.594000 setlinewidth
+newpath
+4606 433 moveto
+4606 361 lineto
+stroke
+11.800000 setlinewidth
+11.800000 setlinewidth
+newpath
+2591 3283 moveto
+2696 3283 lineto
+stroke
+11.800000 setlinewidth
+newpath
+2696 3283 moveto
+2725 3313 lineto
+stroke
+11.800000 setlinewidth
+newpath
+2725 3373 moveto
+2860 3373 lineto
+stroke
+11.800000 setlinewidth
+newpath
+2725 3373 moveto
+2681 3373 lineto
+stroke
+11.800000 setlinewidth
+newpath
+2681 3373 moveto
+2591 3462 lineto
+stroke
+0.000000 setlinewidth
+newpath
+4163 2774 16 16 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4163 2774 16 16 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4163 2774 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4163 2774 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3983 2774 16 16 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3983 2774 16 16 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3983 2774 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3983 2774 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3774 3672 16 16 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3774 3672 16 16 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3774 3672 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3774 3672 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3594 3672 16 16 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3594 3672 16 16 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3594 3672 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3594 3672 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2591 3283 16 16 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2591 3283 16 16 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2591 3283 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2591 3283 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2591 3462 16 16 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2591 3462 16 16 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2591 3462 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2591 3462 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4175 2546 moveto
+4175 2582 lineto
+4211 2582 lineto
+4211 2546 lineto
+eofill
+0.000000 setlinewidth
+newpath
+4175 2546 moveto
+4175 2582 lineto
+4211 2582 lineto
+4211 2546 lineto
+closepath
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4193 2564 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4193 2564 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4193 2624 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4193 2624 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4193 2624 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4193 2624 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4253 2564 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4253 2564 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4253 2564 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4253 2564 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4253 2624 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4253 2624 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4253 2624 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4253 2624 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4313 2564 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4313 2564 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4313 2564 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4313 2564 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4313 2624 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4313 2624 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4313 2624 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4313 2624 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2707 3451 moveto
+2743 3451 lineto
+2743 3415 lineto
+2707 3415 lineto
+eofill
+0.000000 setlinewidth
+newpath
+2707 3451 moveto
+2743 3451 lineto
+2743 3415 lineto
+2707 3415 lineto
+closepath
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2725 3433 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2725 3433 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2725 3373 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2725 3373 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2725 3373 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2725 3373 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2725 3313 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2725 3313 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2725 3313 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2725 3313 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3459 3672 20 20 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3459 3672 20 20 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3459 3672 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3459 3672 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3519 3672 20 20 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3519 3672 20 20 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3519 3672 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3519 3672 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4972 3073 45 45 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4972 3073 45 45 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4972 3073 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4972 3073 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4972 2953 45 45 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4972 2953 45 45 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4972 2953 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4972 2953 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4972 2714 45 45 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4972 2714 45 45 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4972 2714 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4972 2714 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4972 2594 45 45 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4972 2594 45 45 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4972 2594 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4972 2594 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4301 3534 moveto
+4301 3480 lineto
+4264 3480 lineto
+4264 3534 lineto
+eofill
+0.000000 setlinewidth
+newpath
+4301 3534 moveto
+4301 3480 lineto
+4264 3480 lineto
+4264 3534 lineto
+closepath
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4283 3507 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4283 3507 4 4 0 360 ellipse
+stroke
+37.138000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+37.138000 setlinewidth
+newpath
+4223 3499 moveto
+4223 3516 lineto
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4223 3507 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4223 3507 4 4 0 360 ellipse
+stroke
+37.138000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+37.138000 setlinewidth
+newpath
+4163 3499 moveto
+4163 3516 lineto
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4163 3507 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4163 3507 4 4 0 360 ellipse
+stroke
+37.138000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+37.138000 setlinewidth
+newpath
+4103 3499 moveto
+4103 3516 lineto
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4103 3507 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4103 3507 4 4 0 360 ellipse
+stroke
+37.138000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+37.138000 setlinewidth
+newpath
+4103 3319 moveto
+4103 3336 lineto
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4103 3328 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4103 3328 4 4 0 360 ellipse
+stroke
+37.138000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+37.138000 setlinewidth
+newpath
+4163 3319 moveto
+4163 3336 lineto
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4163 3328 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4163 3328 4 4 0 360 ellipse
+stroke
+37.138000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+37.138000 setlinewidth
+newpath
+4223 3319 moveto
+4223 3336 lineto
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4223 3328 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4223 3328 4 4 0 360 ellipse
+stroke
+37.138000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+37.138000 setlinewidth
+newpath
+4283 3319 moveto
+4283 3336 lineto
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4283 3328 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4283 3328 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3998 3013 16 16 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3998 3013 16 16 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3998 3013 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3998 3013 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3998 2953 16 16 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3998 2953 16 16 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3998 2953 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3998 2953 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4163 2938 16 16 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4163 2938 16 16 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4163 2938 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4163 2938 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4103 2938 16 16 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4103 2938 16 16 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4103 2938 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4103 2938 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4702 2699 16 16 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4702 2699 16 16 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4702 2699 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4702 2699 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4642 2699 16 16 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4642 2699 16 16 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4642 2699 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4642 2699 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4702 3073 16 16 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4702 3073 16 16 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4702 3073 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4702 3073 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4642 3073 16 16 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4642 3073 16 16 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4642 3073 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4642 3073 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4163 3028 16 16 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4163 3028 16 16 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4163 3028 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4163 3028 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4103 3028 16 16 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4103 3028 16 16 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4103 3028 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4103 3028 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2920 2534 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2920 2534 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2920 2534 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2920 2534 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2980 2534 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2980 2534 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2980 2534 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2980 2534 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3040 2534 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3040 2534 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3040 2534 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3040 2534 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3100 2534 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3100 2534 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3100 2534 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3100 2534 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3160 2534 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3160 2534 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3160 2534 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3160 2534 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3220 2534 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3220 2534 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3220 2534 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3220 2534 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3280 2534 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3280 2534 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3280 2534 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3280 2534 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3339 2534 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3339 2534 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3339 2534 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3339 2534 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3399 2534 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3399 2534 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3399 2534 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3399 2534 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3459 2534 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3459 2534 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3459 2534 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3459 2534 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3519 2534 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3519 2534 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3519 2534 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3519 2534 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3579 2534 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3579 2534 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3579 2534 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3579 2534 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3639 2534 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3639 2534 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3639 2534 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3639 2534 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3699 2534 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3699 2534 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3699 2534 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3699 2534 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3759 2534 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3759 2534 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3759 2534 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3759 2534 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3819 2534 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3819 2534 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3819 2534 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3819 2534 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3879 2594 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3879 2594 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3879 2594 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3879 2594 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3879 2654 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3879 2654 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3879 2654 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3879 2654 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3879 2714 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3879 2714 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3879 2714 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3879 2714 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3879 2774 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3879 2774 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3879 2774 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3879 2774 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3879 2834 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3879 2834 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3879 2834 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3879 2834 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3879 2893 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3879 2893 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3879 2893 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3879 2893 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3879 2953 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3879 2953 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3879 2953 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3879 2953 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3879 3013 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3879 3013 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3879 3013 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3879 3013 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3879 3073 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3879 3073 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3879 3073 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3879 3073 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3879 3133 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3879 3133 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3879 3133 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3879 3133 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3879 3193 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3879 3193 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3879 3193 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3879 3193 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3879 3253 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3879 3253 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3879 3253 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3879 3253 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3879 3313 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3879 3313 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3879 3313 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3879 3313 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3879 3373 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3879 3373 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3879 3373 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3879 3373 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3879 3433 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3879 3433 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3879 3433 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3879 3433 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3879 3492 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3879 3492 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3879 3492 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3879 3492 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3819 3552 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3819 3552 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3819 3552 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3819 3552 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3759 3552 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3759 3552 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3759 3552 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3759 3552 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3699 3552 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3699 3552 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3699 3552 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3699 3552 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3639 3552 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3639 3552 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3639 3552 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3639 3552 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3579 3552 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3579 3552 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3579 3552 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3579 3552 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3519 3552 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3519 3552 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3519 3552 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3519 3552 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3459 3552 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3459 3552 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3459 3552 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3459 3552 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3399 3552 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3399 3552 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3399 3552 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3399 3552 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3339 3552 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3339 3552 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3339 3552 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3339 3552 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3280 3552 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3280 3552 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3280 3552 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3280 3552 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3220 3552 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3220 3552 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3220 3552 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3220 3552 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3160 3552 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3160 3552 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3160 3552 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3160 3552 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3100 3552 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3100 3552 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3100 3552 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3100 3552 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+3040 3552 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+3040 3552 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+3040 3552 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+3040 3552 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2980 3552 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2980 3552 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2980 3552 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2980 3552 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2920 3552 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2920 3552 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2920 3552 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2920 3552 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2860 3492 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2860 3492 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2860 3492 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2860 3492 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2860 3433 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2860 3433 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2860 3433 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2860 3433 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2860 3373 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2860 3373 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2860 3373 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2860 3373 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2860 3313 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2860 3313 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2860 3313 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2860 3313 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2860 3253 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2860 3253 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2860 3253 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2860 3253 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2860 3193 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2860 3193 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2860 3193 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2860 3193 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2860 3133 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2860 3133 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2860 3133 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2860 3133 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2860 3073 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2860 3073 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2860 3073 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2860 3073 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2860 3013 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2860 3013 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2860 3013 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2860 3013 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2860 2953 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2860 2953 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2860 2953 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2860 2953 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2860 2893 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2860 2893 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2860 2893 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2860 2893 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2860 2834 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2860 2834 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2860 2834 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2860 2834 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2860 2774 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2860 2774 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2860 2774 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2860 2774 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2860 2714 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2860 2714 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2860 2714 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2860 2714 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2860 2654 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2860 2654 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2860 2654 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2860 2654 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+2860 2594 18 18 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+2860 2594 18 18 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+2860 2594 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+2860 2594 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+5346 3388 45 45 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+5346 3388 45 45 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+5346 3388 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+5346 3388 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+5346 3268 45 45 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+5346 3268 45 45 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+5346 3268 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+5346 3268 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+5301 3552 moveto
+5391 3552 lineto
+5391 3462 lineto
+5301 3462 lineto
+eofill
+0.000000 setlinewidth
+newpath
+5301 3552 moveto
+5391 3552 lineto
+5391 3462 lineto
+5301 3462 lineto
+closepath
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+5346 3507 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+5346 3507 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+5346 3148 45 45 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+5346 3148 45 45 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+5346 3148 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+5346 3148 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+5346 2714 45 45 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+5346 2714 45 45 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+5346 2714 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+5346 2714 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+5346 2834 45 45 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+5346 2834 45 45 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+5346 2834 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+5346 2834 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+5391 2549 moveto
+5301 2549 lineto
+5301 2639 lineto
+5391 2639 lineto
+eofill
+0.000000 setlinewidth
+newpath
+5391 2549 moveto
+5301 2549 lineto
+5301 2639 lineto
+5391 2639 lineto
+closepath
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+5346 2594 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+5346 2594 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+5346 2953 45 45 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+5346 2953 45 45 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+5346 2953 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+5346 2953 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4807 2893 moveto
+4807 2834 lineto
+4747 2834 lineto
+4747 2893 lineto
+eofill
+0.000000 setlinewidth
+newpath
+4807 2893 moveto
+4807 2834 lineto
+4747 2834 lineto
+4747 2893 lineto
+closepath
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4777 2863 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4777 2863 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4657 2863 30 30 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4657 2863 30 30 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4657 2863 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4657 2863 4 4 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.00000000 0.00000000 0.00000000 setrgbcolor
+newpath
+4537 2863 30 30 0 360 ellipse
+fill
+0.000000 setlinewidth
+newpath
+4537 2863 30 30 0 360 ellipse
+stroke
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+1.00000000 1.00000000 1.00000000 setrgbcolor
+newpath
+4537 2863 4 4 0 360 ellipse
+fill
+0.000000 setlinewidth
+0.50196078 0.50196078 0.00000000 setrgbcolor
+newpath
+4537 2863 4 4 0 360 ellipse
+stroke
+showpage
