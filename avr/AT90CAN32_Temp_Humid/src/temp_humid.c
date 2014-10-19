@@ -64,7 +64,7 @@
 #include "methods.h"
 #include "vscp_registers.h"
 #include "vscp_actions.c"
-#include "vscptemperature.h"
+#include "temp_humid.h"
 #include "onewire.h"
 #include "ds18x20.h"
 
@@ -1069,13 +1069,32 @@ void SendInformationEventExtended(uint8_t priority, uint8_t zone, uint8_t subzon
 //
 
 
+void init_adc()
+{
+  //analog channel 0 and Vref=AVcc
+  ADMUX |= (1<<REFS0);
+  //Enale the ADC, prescaler=8
+  ADCSRA = (1<<ADEN)|(0<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
+
+}
+
+uint16_t ReadADC(uint8_t ADCchannel)
+{
+  //select ADC channel with safety mask
+  ADMUX = (ADMUX & 0xF0) | (ADCchannel & 0x0F);
+  //single conversion mode
+  ADCSRA |= (1<<ADSC);
+  // wait until ADC conversion is complete
+  while( ADCSRA & (1<<ADSC) );
+  return ADC;
+}
+
 void doWork( void )
 {
   uint8_t nSensors, i;
-  int16_t decicelsius;
+  int16_t decicelsius, humidity16;
   char buf[30];
   char buf2[10];
-
 
 
 
@@ -1115,9 +1134,20 @@ void doWork( void )
     vscp_omsg.data[ 3 ] = decicelsius & 0xff; // second half of the temperature
 
     vscp_sendEvent(); // Send data
+ 
+    init_adc();
+
+    humidity16  = ReadADC( 0 ) - 41 * 100 / 157;
+
+    vscp_omsg.vscp_type = VSCP_TYPE_MEASUREMENT_HUMIDITY;
+
+    vscp_omsg.data[ 0 ] = 0x88; // data type set as two's complement
+    vscp_omsg.data[ 1 ] = 0x01; // number of decimals
+    vscp_omsg.data[ 2 ] = humidity16 >> 8; // first half of the temperature
+    vscp_omsg.data[ 3 ] = humidity16 & 0xff; // second half of the temperature
+
+    vscp_sendEvent(); // Send data
   }
 
 
 }
-
-

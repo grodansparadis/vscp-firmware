@@ -13,12 +13,12 @@ endif
 # $(info > VSCP Paths set to $(VSCP_HOME) and $(VSCP_FIRMWARE) respectivly)
 
 
-PRG = vscptemperature_can32
+PRG = temp_humid
 
 #Used along with avr-size
 TARGET = $(PRG).elf
 
-OBJ = vscptemperature.o
+OBJ = temp_humid.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/can_at90can32.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/uart.o
 OBJ += $(VSCP_FIRMWARE)/common/vscp_firmware.o
