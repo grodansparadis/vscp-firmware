@@ -29,14 +29,14 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:CAN_Temp-cache
+LIBS:Temp_Humid-cache
 EELAYER 27 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title ""
-Date "17 oct 2014"
+Date "20 oct 2014"
 Rev ""
 Comp ""
 Comment1 ""
@@ -69,7 +69,6 @@ $EndComp
 NoConn ~ 6500 3800
 NoConn ~ 6500 3900
 NoConn ~ 6500 4000
-NoConn ~ 6500 4150
 NoConn ~ 6500 4250
 NoConn ~ 6500 4350
 NoConn ~ 6500 4450
@@ -592,28 +591,9 @@ Wire Wire Line
 Wire Wire Line
 	2900 3850 2600 3850
 Connection ~ 2600 3850
-$Comp
-L CONN_2 P4
-U 1 1 544180F6
-P 7500 2550
-F 0 "P4" V 7450 2550 40  0000 C CNN
-F 1 "CONN_2" V 7550 2550 40  0000 C CNN
-F 2 "" H 7500 2550 60  0000 C CNN
-F 3 "" H 7500 2550 60  0000 C CNN
-	1    7500 2550
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	6800 2450 7150 2450
-Wire Wire Line
-	6850 2650 7150 2650
 NoConn ~ 6500 2850
 Wire Wire Line
-	6850 2650 6850 2750
-Wire Wire Line
 	6850 2750 6500 2750
-Wire Wire Line
-	6800 2450 6800 2650
 Wire Wire Line
 	6800 2650 6500 2650
 Wire Wire Line
@@ -667,4 +647,67 @@ Wire Wire Line
 Wire Wire Line
 	3700 2450 3100 2450
 Connection ~ 3100 2450
+$Comp
+L DS1820 U5
+U 1 1 54456AA5
+P 7250 5000
+F 0 "U5" H 7250 4300 60  0000 C CNN
+F 1 "HIH4000" H 7250 5000 60  0000 C CNN
+F 2 "" H 7250 5000 60  0000 C CNN
+F 3 "" H 7250 5000 60  0000 C CNN
+	1    7250 5000
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	6500 4150 6850 4150
+Wire Wire Line
+	6850 4150 6850 4300
+Wire Wire Line
+	6850 4300 7250 4300
+Wire Wire Line
+	7250 4300 7250 4450
+Wire Wire Line
+	7350 4450 8400 4450
+Connection ~ 8400 4450
+$Comp
+L +5V #PWR014
+U 1 1 54456BCE
+P 6800 4600
+F 0 "#PWR014" H 6800 4690 20  0001 C CNN
+F 1 "+5V" H 6800 4690 30  0000 C CNN
+F 2 "" H 6800 4600 60  0001 C CNN
+F 3 "" H 6800 4600 60  0001 C CNN
+	1    6800 4600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7150 4450 6950 4450
+Wire Wire Line
+	6950 4450 6950 4750
+Wire Wire Line
+	6950 4750 6800 4750
+Wire Wire Line
+	6800 4750 6800 4600
+$Comp
+L CONN_3 K?
+U 1 1 544570D5
+P 7500 2550
+F 0 "K?" V 7450 2550 50  0000 C CNN
+F 1 "CONN_3" V 7550 2550 40  0000 C CNN
+F 2 "" H 7500 2550 60  0000 C CNN
+F 3 "" H 7500 2550 60  0000 C CNN
+	1    7500 2550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7150 2650 6850 2650
+Wire Wire Line
+	6850 2650 6850 2750
+Wire Wire Line
+	7150 2550 6800 2550
+Wire Wire Line
+	6800 2550 6800 2650
+Wire Wire Line
+	7150 2450 7150 1700
+Connection ~ 7150 1700
 $EndSCHEMATC

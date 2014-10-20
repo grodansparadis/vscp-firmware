@@ -38,9 +38,9 @@
     PORTC Pin 0 - DS1820 DQ pin
 */
 
-#define LED_STATUS_ON       ((PORTB &= ~_BV(0)))
-#define LED_STATUS_OFF      ((PORTB |= _BV(0)))
-#define LED_STATUS_TOGGLE   ((PORTB ^= _BV(0)))
+#define LED_STATUS_ON       ((PORTA &= ~_BV(7)))
+#define LED_STATUS_OFF      ((PORTA |= _BV(7)))
+#define LED_STATUS_TOGGLE   ((PORTA ^= _BV(7)))
 
 #define BTN_INIT_PRESSED    (!(PINA & _BV(0)))
 
@@ -1137,14 +1137,13 @@ void doWork( void )
  
     init_adc();
 
-    humidity16  = ReadADC( 0 ) - 41 * 100 / 157;
+    humidity16  = floor((ReadADC( 0 ) - 41 * 100 / 157)/10);
 
     vscp_omsg.vscp_type = VSCP_TYPE_MEASUREMENT_HUMIDITY;
 
-    vscp_omsg.data[ 0 ] = 0x88; // data type set as two's complement
-    vscp_omsg.data[ 1 ] = 0x01; // number of decimals
-    vscp_omsg.data[ 2 ] = humidity16 >> 8; // first half of the temperature
-    vscp_omsg.data[ 3 ] = humidity16 & 0xff; // second half of the temperature
+    vscp_omsg.flags = VSCP_VALID_MSG + 2;
+    vscp_omsg.data[ 0 ] = 0x60; // data type
+    vscp_omsg.data[ 1 ] = humidity16 & 0xff; // second half of humidity
 
     vscp_sendEvent(); // Send data
   }

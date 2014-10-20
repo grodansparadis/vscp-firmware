@@ -1,6 +1,8 @@
 [Dolphin]
 HeaderColumnWidths=692,62,124
-Timestamp=2013,12,27,20,56,2
+SortOrder=1
+SortRole=date
+Timestamp=2014,10,20,23,21,23
 Version=3
 ViewMode=1
 
