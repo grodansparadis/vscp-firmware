@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2013-may-18)-stable date = Mon 20 Oct 2014 10:16:36 PM CEST
+Cmp-Mod V01 Created by CvPcb (2013-may-18)-stable date = Wed 22 Oct 2014 12:08:32 AM CEST
 
 BeginCmp
 TimeStamp = /52152F87;
@@ -46,7 +46,7 @@ BeginCmp
 TimeStamp = /52152F89;
 Reference = P1;
 ValeurCmp = CONN_3X2;
-IdModule  = pin_array_3x2;
+IdModule  = Pin_2x3_smd;
 EndCmp
 
 BeginCmp
@@ -88,7 +88,7 @@ BeginCmp
 TimeStamp = /54418504;
 Reference = SW1;
 ValeurCmp = SW_PUSH;
-IdModule  = SW_PUSH_SMALL;
+IdModule  = Switch_SPC;
 EndCmp
 
 BeginCmp
@@ -109,7 +109,7 @@ BeginCmp
 TimeStamp = /52BC76CC;
 Reference = U3;
 ValeurCmp = 7805;
-IdModule  = DPAK3;
+IdModule  = SOT223;
 EndCmp
 
 BeginCmp
@@ -130,7 +130,7 @@ BeginCmp
 TimeStamp = /52152F85;
 Reference = X1;
 ValeurCmp = 16MHz;
-IdModule  = SM1206;
+IdModule  = Crystal_HC49-SD_SMD_RevA_09Aug2010;
 EndCmp
 
 EndListe

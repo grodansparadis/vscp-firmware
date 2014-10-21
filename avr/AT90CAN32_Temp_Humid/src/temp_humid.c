@@ -33,14 +33,14 @@
 		Used Hardware resources
 		=======================
 
-		PORTB Pin 0 - Status LED
+		PORTC Pin 7 - Status LED
 		PORTA Pin 0 - Init button
     PORTC Pin 0 - DS1820 DQ pin
 */
 
-#define LED_STATUS_ON       ((PORTA &= ~_BV(7)))
-#define LED_STATUS_OFF      ((PORTA |= _BV(7)))
-#define LED_STATUS_TOGGLE   ((PORTA ^= _BV(7)))
+#define LED_STATUS_ON       ((PORTC &= ~_BV(7)))
+#define LED_STATUS_OFF      ((PORTC |= _BV(7)))
+#define LED_STATUS_TOGGLE   ((PORTC ^= _BV(7)))
 
 #define BTN_INIT_PRESSED    (!(PINA & _BV(0)))
 
@@ -237,8 +237,11 @@ int main( void )
     PORTA   = 0xff;     // Activate pull-ups
     DDRA = 0x00;	    // Port A all inputs
 	
-    DDRB = 0xFF;	    // Port B all outputs 
-    PORTB = 0xFF;	    // all LEDS off
+    DDRB = 0xFF;      // Port B all outputs 
+    PORTB = 0xFF;     // all LEDS off
+
+    DDRC = 0xFF;      // Port B all outputs 
+    PORTC = 0xFF;     // all LEDS off
     
     // Initialize UART
     UCSRA = 0;

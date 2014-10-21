@@ -1,4 +1,4 @@
-update=Thu 26 Dec 2013 11:36:03 PM CET
+update=Wed 22 Oct 2014 12:08:02 AM CEST
 version=1
 last_client=pcbnew
 [general]
@@ -70,12 +70,12 @@ version=1
 NetIExt=net
 [pcbnew]
 version=1
-LastNetListRead=CAN_Temp.net
+LastNetListRead=Temp_Humid.net
 UseCmpFile=1
-PadDrill="    0.600000"
-PadDrillOvalY="    0.600000"
-PadSizeH="    1.400000"
-PadSizeV="    1.400000"
+PadDrill="    0.000000"
+PadDrillOvalY="    0.000000"
+PadSizeH="    1.500000"
+PadSizeV="    2.330000"
 PcbTextSizeV="    1.500000"
 PcbTextSizeH="    1.500000"
 PcbTextThickness="    0.300000"
@@ -101,3 +101,6 @@ LibName9=dip_sockets
 LibName10=pga_sockets
 LibName11=valves
 LibName12=SIL-16
+LibName13=Crystals_RevB_25Apr2012
+LibName14=Switch-SPS
+LibName15=pin_2x3_smd
