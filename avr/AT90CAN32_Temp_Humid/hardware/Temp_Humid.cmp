@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2013-may-18)-stable date = Wed 22 Oct 2014 12:08:32 AM CEST
+Cmp-Mod V01 Created by CvPcb (2013-may-18)-stable date = Sun 26 Oct 2014 08:16:35 PM CET
 
 BeginCmp
 TimeStamp = /52152F87;
@@ -29,6 +29,20 @@ IdModule  = SM1206;
 EndCmp
 
 BeginCmp
+TimeStamp = /544964C0;
+Reference = C5;
+ValeurCmp = 100nF;
+IdModule  = SM1206;
+EndCmp
+
+BeginCmp
+TimeStamp = /544966BB;
+Reference = C6;
+ValeurCmp = 100nF;
+IdModule  = SM1206;
+EndCmp
+
+BeginCmp
 TimeStamp = /52152F8E;
 Reference = D1;
 ValeurCmp = LED;
@@ -47,20 +61,6 @@ TimeStamp = /52152F89;
 Reference = P1;
 ValeurCmp = CONN_3X2;
 IdModule  = Pin_2x3_smd;
-EndCmp
-
-BeginCmp
-TimeStamp = /521A104B;
-Reference = P2;
-ValeurCmp = CONN_4;
-IdModule  = PIN_ARRAY_4x1;
-EndCmp
-
-BeginCmp
-TimeStamp = /521A1139;
-Reference = P3;
-ValeurCmp = CONN_4;
-IdModule  = PIN_ARRAY_4x1;
 EndCmp
 
 BeginCmp
@@ -124,6 +124,13 @@ TimeStamp = /54456AA5;
 Reference = U5;
 ValeurCmp = HIH4000;
 IdModule  = PIN_ARRAY_3X1;
+EndCmp
+
+BeginCmp
+TimeStamp = /544D40F4;
+Reference = U6;
+ValeurCmp = RJ45_DUAL;
+IdModule  = RJ45_DUAL;
 EndCmp
 
 BeginCmp
