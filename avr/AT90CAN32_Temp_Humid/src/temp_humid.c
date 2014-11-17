@@ -33,14 +33,14 @@
 		Used Hardware resources
 		=======================
 
-		PORTB Pin 0 - Status LED
+		PORTC Pin 7 - Status LED
 		PORTA Pin 0 - Init button
     PORTC Pin 0 - DS1820 DQ pin
 */
 
-#define LED_STATUS_ON       ((PORTB &= ~_BV(0)))
-#define LED_STATUS_OFF      ((PORTB |= _BV(0)))
-#define LED_STATUS_TOGGLE   ((PORTB ^= _BV(0)))
+#define LED_STATUS_ON       ((PORTC &= ~_BV(7)))
+#define LED_STATUS_OFF      ((PORTC |= _BV(7)))
+#define LED_STATUS_TOGGLE   ((PORTC ^= _BV(7)))
 
 #define BTN_INIT_PRESSED    (!(PINA & _BV(0)))
 
@@ -64,7 +64,7 @@
 #include "methods.h"
 #include "vscp_registers.h"
 #include "vscp_actions.c"
-#include "vscptemperature.h"
+#include "temp_humid.h"
 #include "onewire.h"
 #include "ds18x20.h"
 
@@ -77,8 +77,8 @@
 // IMPORTANT!!!!!
 // The GUID is stored MSB byte first
 const uint8_t GUID[ 16 ] = {
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x04, 0x03, 0x02, 0x01
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFC,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02
 };
 #endif
 
@@ -237,8 +237,11 @@ int main( void )
     PORTA   = 0xff;     // Activate pull-ups
     DDRA = 0x00;	    // Port A all inputs
 	
-    DDRB = 0xFF;	    // Port B all outputs 
-    PORTB = 0xFF;	    // all LEDS off
+    DDRB = 0xFF;      // Port B all outputs 
+    PORTB = 0xFF;     // all LEDS off
+
+    DDRC = 0xFF;      // Port B all outputs 
+    PORTC = 0xFF;     // all LEDS off
     
     // Initialize UART
     UCSRA = 0;
@@ -1069,17 +1072,36 @@ void SendInformationEventExtended(uint8_t priority, uint8_t zone, uint8_t subzon
 //
 
 
+void init_adc()
+{
+  //analog channel 0 and Vref=AVcc
+  ADMUX |= (1<<REFS0);
+  //Enale the ADC, prescaler=8
+  ADCSRA = (1<<ADEN)|(0<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
+
+}
+
+uint16_t ReadADC(uint8_t ADCchannel)
+{
+  //select ADC channel with safety mask
+  ADMUX = (ADMUX & 0xF0) | (ADCchannel & 0x0F);
+  //single conversion mode
+  ADCSRA |= (1<<ADSC);
+  // wait until ADC conversion is complete
+  while( ADCSRA & (1<<ADSC) );
+  return ADC;
+}
+
 void doWork( void )
 {
   uint8_t nSensors, i;
-  int16_t decicelsius;
+  int16_t decicelsius, humidity16;
   char buf[30];
   char buf2[10];
 
 
 
-
-    if ( measurement_seconds > 5 ) { //send temperature every 30 seconds
+    if ( measurement_seconds > 10 ) { //send temperature every 30 seconds
             measurement_seconds = 0;
 
     uart_puts("Measuring temperature.\n");
@@ -1100,28 +1122,34 @@ void doWork( void )
     sprintf( buf, "decicelsius >> 8: %i", decicelsius >> 8 );
     uart_puts( buf );
     
+
+    uart_puts("Sending data on the CAN bus\n");
+
+
+    vscp_omsg.priority = 0x00;
+    vscp_omsg.flags = VSCP_VALID_MSG + 4;
+    vscp_omsg.vscp_class = VSCP_CLASS1_MEASUREMENT;
+    vscp_omsg.vscp_type = VSCP_TYPE_MEASUREMENT_TEMPERATURE;
+
+    vscp_omsg.data[ 0 ] = 0x88; // data type set as two's complement
+    vscp_omsg.data[ 1 ] = 0x01; // number of decimals
+    vscp_omsg.data[ 2 ] = decicelsius >> 8; // first half of the temperature
+    vscp_omsg.data[ 3 ] = decicelsius & 0xff; // second half of the temperature
+
+    vscp_sendEvent(); // Send data
+ 
+    init_adc();
+
+    humidity16  = floor((ReadADC( 0 ) - 41 * 100 / 157)/10);
+
+    vscp_omsg.vscp_type = VSCP_TYPE_MEASUREMENT_HUMIDITY;
+
+    vscp_omsg.flags = VSCP_VALID_MSG + 2;
+    vscp_omsg.data[ 0 ] = 0x60; // data type
+    vscp_omsg.data[ 1 ] = humidity16 & 0xff; // second half of humidity
+
+    vscp_sendEvent(); // Send data
+  }
+
+
 }
-/*
-    if ( measurement_seconds > 30 ) { //send temperature every 30 seconds
-            measurement_seconds = 0;
-
-            uart_puts("Measuring temperature\n");
-
-
-            vscp_omsg.priority = 0x00;
-            vscp_omsg.flags = VSCP_VALID_MSG + 4;
-            vscp_omsg.class = VSCP_CLASS1_MEASUREMENT;
-            vscp_omsg.type = VSCP_TYPE_MEASUREMENT_TEMPERATURE;
-
-            vscp_omsg.data[ 0 ] = 0x88;
-            vscp_omsg.data[ 1 ] = 0x01;
-            vscp_omsg.data[ 2 ] = 0xFF;
-            vscp_omsg.data[ 3 ] = 0x0D;
-
-            vscp_sendEvent(); // Send data
-
-        }
-*/
-}
-
-

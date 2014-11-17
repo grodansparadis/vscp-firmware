@@ -1,0 +1,143 @@
+Cmp-Mod V01 Created by CvPcb (2013-may-18)-stable date = Sun 26 Oct 2014 08:16:35 PM CET
+
+BeginCmp
+TimeStamp = /52152F87;
+Reference = C1;
+ValeurCmp = 22pf;
+IdModule  = SM1206;
+EndCmp
+
+BeginCmp
+TimeStamp = /52152F86;
+Reference = C2;
+ValeurCmp = 22pf;
+IdModule  = SM1206;
+EndCmp
+
+BeginCmp
+TimeStamp = /52BC77C3;
+Reference = C3;
+ValeurCmp = 100nF;
+IdModule  = SM1206;
+EndCmp
+
+BeginCmp
+TimeStamp = /52BC77D5;
+Reference = C4;
+ValeurCmp = 0.33uF;
+IdModule  = SM1206;
+EndCmp
+
+BeginCmp
+TimeStamp = /544964C0;
+Reference = C5;
+ValeurCmp = 100nF;
+IdModule  = SM1206;
+EndCmp
+
+BeginCmp
+TimeStamp = /544966BB;
+Reference = C6;
+ValeurCmp = 100nF;
+IdModule  = SM1206;
+EndCmp
+
+BeginCmp
+TimeStamp = /52152F8E;
+Reference = D1;
+ValeurCmp = LED;
+IdModule  = LED-1206;
+EndCmp
+
+BeginCmp
+TimeStamp = /544570D5;
+Reference = K1;
+ValeurCmp = CONN_3;
+IdModule  = PIN_ARRAY_3X1;
+EndCmp
+
+BeginCmp
+TimeStamp = /52152F89;
+Reference = P1;
+ValeurCmp = CONN_3X2;
+IdModule  = Pin_2x3_smd;
+EndCmp
+
+BeginCmp
+TimeStamp = /52152F8C;
+Reference = R1;
+ValeurCmp = 10k;
+IdModule  = SM1206;
+EndCmp
+
+BeginCmp
+TimeStamp = /52152F90;
+Reference = R2;
+ValeurCmp = 300;
+IdModule  = SM1206;
+EndCmp
+
+BeginCmp
+TimeStamp = /52152F84;
+Reference = R3;
+ValeurCmp = 470k;
+IdModule  = SM1206;
+EndCmp
+
+BeginCmp
+TimeStamp = /54418504;
+Reference = SW1;
+ValeurCmp = SW_PUSH;
+IdModule  = Switch_SPC;
+EndCmp
+
+BeginCmp
+TimeStamp = /52152F8F;
+Reference = U1;
+ValeurCmp = DS1820;
+IdModule  = PIN_ARRAY_3X1;
+EndCmp
+
+BeginCmp
+TimeStamp = /52152F75;
+Reference = U2;
+ValeurCmp = AT90CAN32;
+IdModule  = TQFP64_08;
+EndCmp
+
+BeginCmp
+TimeStamp = /52BC76CC;
+Reference = U3;
+ValeurCmp = 7805;
+IdModule  = SOT223;
+EndCmp
+
+BeginCmp
+TimeStamp = /52152F80;
+Reference = U4;
+ValeurCmp = MCP2551;
+IdModule  = SO8E;
+EndCmp
+
+BeginCmp
+TimeStamp = /54456AA5;
+Reference = U5;
+ValeurCmp = HIH4000;
+IdModule  = PIN_ARRAY_3X1;
+EndCmp
+
+BeginCmp
+TimeStamp = /544D40F4;
+Reference = U6;
+ValeurCmp = RJ45_DUAL;
+IdModule  = RJ45_DUAL;
+EndCmp
+
+BeginCmp
+TimeStamp = /52152F85;
+Reference = X1;
+ValeurCmp = 16MHz;
+IdModule  = Crystal_HC49-SD_SMD_RevA_09Aug2010;
+EndCmp
+
+EndListe
