@@ -1,0 +1,80 @@
+Cmp-Mod V01 Created by CvPcb (2013-may-18)-stable date = Tue 28 Oct 2014 09:04:05 PM CET
+
+BeginCmp
+TimeStamp = /544C2F9D;
+Reference = K1;
+ValeurCmp = CONN_3;
+IdModule  = bornier3;
+EndCmp
+
+BeginCmp
+TimeStamp = /544FF6DC;
+Reference = K2;
+ValeurCmp = CONN_3;
+IdModule  = bornier3;
+EndCmp
+
+BeginCmp
+TimeStamp = /544C2F49;
+Reference = P1;
+ValeurCmp = CONN_1;
+IdModule  = 1pin;
+EndCmp
+
+BeginCmp
+TimeStamp = /544C2F6A;
+Reference = P2;
+ValeurCmp = CONN_1;
+IdModule  = 1pin;
+EndCmp
+
+BeginCmp
+TimeStamp = /544C2F70;
+Reference = P3;
+ValeurCmp = CONN_1;
+IdModule  = 1pin;
+EndCmp
+
+BeginCmp
+TimeStamp = /544C2F84;
+Reference = P5;
+ValeurCmp = CONN_4;
+IdModule  = bornier4;
+EndCmp
+
+BeginCmp
+TimeStamp = /544C2F7C;
+Reference = P6;
+ValeurCmp = CONN_1;
+IdModule  = 1pin;
+EndCmp
+
+BeginCmp
+TimeStamp = /544C2F60;
+Reference = P7;
+ValeurCmp = CONN_1;
+IdModule  = 1pin;
+EndCmp
+
+BeginCmp
+TimeStamp = /544C2F76;
+Reference = P8;
+ValeurCmp = CONN_1;
+IdModule  = 1pin;
+EndCmp
+
+BeginCmp
+TimeStamp = /544D6287;
+Reference = P9;
+ValeurCmp = FUSE;
+IdModule  = PIN_ARRAY_2X1;
+EndCmp
+
+BeginCmp
+TimeStamp = /544D5C0C;
+Reference = U1;
+ValeurCmp = RJ45_DUAL;
+IdModule  = RJ45_DUAL;
+EndCmp
+
+EndListe

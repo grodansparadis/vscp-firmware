@@ -1,0 +1,5 @@
+This is a power supply board hosting a Crovisa 558B005 2x24V transformer and a Velleman symetric supply power +/-12V.
+
+One side has pin holes to solder 230V AC wires, the other side has a dual RJ45 connector to inject power on the CAN bus.
+
+CAN terminator is not included on the bus so this board can be connected anywhere on the bus.
