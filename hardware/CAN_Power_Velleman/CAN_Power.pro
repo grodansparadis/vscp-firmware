@@ -1,6 +1,6 @@
-update=Sun 26 Oct 2014 09:44:28 PM CET
+update=Mon 17 Nov 2014 10:27:19 PM CET
 version=1
-last_client=cvpcb
+last_client=eeschema
 [pcbnew]
 version=1
 PadDrlX=320
@@ -34,6 +34,11 @@ LibName12=/home/mamac/Electronic/kicad/modules/Molex_RJ45_Dual
 LibDir=
 [general]
 version=1
+[cvpcb]
+version=1
+NetIExt=net
+[cvpcb/libraries]
+EquName1=devcms
 [eeschema]
 version=1
 LibDir=
@@ -74,8 +79,3 @@ LibName28=atmel
 LibName29=contrib
 LibName30=valves
 LibName31=/home/mamac/Electronic/kicad/library/Molex_Dual_RJ45
-[cvpcb]
-version=1
-NetIExt=net
-[cvpcb/libraries]
-EquName1=devcms
