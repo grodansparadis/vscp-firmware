@@ -1,0 +1,17 @@
+Cmp-Mod V01 Created by CvPcb (2013-may-18)-stable date = Tue 28 Oct 2014 09:39:51 PM CET
+
+BeginCmp
+TimeStamp = /544FFEF3;
+Reference = K1;
+ValeurCmp = CONN_3;
+IdModule  = PIN_ARRAY_3X1;
+EndCmp
+
+BeginCmp
+TimeStamp = /544D6ABA;
+Reference = U1;
+ValeurCmp = RJ45_DUAL;
+IdModule  = RJ45_DUAL;
+EndCmp
+
+EndListe
