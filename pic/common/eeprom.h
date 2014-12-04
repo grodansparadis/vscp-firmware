@@ -30,10 +30,10 @@ void writeULongEEPROM( uint16_t address, uint8_t data );
 
 #ifdef EEPROM_STRING
 void readStringEEPROM( uint16_t address, 
-						uint8_t string[], 
-						uint8_t final_character );
+                            uint8_t string[],
+                            uint8_t final_character );
 void writeStringEEPROM( uint16_t address, 
-						uint8_t string[] ) ;
+                            uint8_t string[] ) ;
 #endif
 
 
