@@ -1229,7 +1229,7 @@ void vscp_handleProtocolEvent(void)
                     vscp_omsg.flags = VSCP_VALID_MSG + 4 + ((vscp_imsg.flags & 0x0f) - 4);
                     vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
                     vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
-                    vscp_omsg.data[0] = 0; // index of event, this is the first
+                    vscp_omsg.data[0] = 0; // index of event, this is the first and only
                     vscp_omsg.data[1] = vscp_imsg.data[1]; // mirror page msb
                     vscp_omsg.data[2] = vscp_imsg.data[2]; // mirror page lsb
                     vscp_omsg.data[3] = vscp_imsg.data[3]; // Register
