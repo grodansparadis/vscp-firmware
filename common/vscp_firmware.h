@@ -346,7 +346,7 @@ void vscp_handleProbeState(void);
         exceeded the init process is started again to give the segment controler
         more chances to do its job.
  */
-void vscp_handlePeActiveState(void);
+void vscp_handlePreActiveState(void);
 
 /*!
         Handle incoming CLASS1.PROTOCOL event
