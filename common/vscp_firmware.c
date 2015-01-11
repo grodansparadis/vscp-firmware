@@ -63,9 +63,9 @@ uint8_t vscp_errorcnt;      // VSCP/CAN errors
 uint8_t vscp_alarmstatus;   // VSCP Alarm Status
 
 uint8_t vscp_node_state;    // State machine state
-uint8_t vscp_node_substate; // State machine substate
+uint8_t vscp_node_substate; // State machine sub state
 
-uint8_t vscp_probe_cnt;     // Number of timout probes
+uint8_t vscp_probe_cnt;     // Number of timeout probes
 
 // Incoming event
 struct _imsg vscp_imsg;
@@ -74,14 +74,14 @@ struct _imsg vscp_imsg;
 struct _omsg vscp_omsg;
 
 uint8_t vscp_probe_address; // Address used during initialization
-uint8_t vscp_initledfunc;   // Init LED functionality
+uint8_t vscp_initledfunc;   // Init. LED functionality
 
 volatile uint16_t vscp_timer; // 1 ms timer counter
-//	Shold be externally updated.
+//	increase externally bye one every millisecond
 
 volatile uint8_t vscp_initbtncnt; // init button counter
 //  increase this value externally by one each millisecond
-//  the initbutton is pressed. Set to sero when button
+//  the initbutton is pressed. Set to zero when button
 // is released.
 
 volatile uint8_t vscp_statuscnt; // status LED counter
@@ -120,20 +120,20 @@ void vscp_init(void)
     //	if zero set to uninitialized
     if (!vscp_nickname) vscp_nickname = VSCP_ADDRESS_FREE;
 
-    // Init incoming event
+    // Init. incoming event
     vscp_imsg.flags = 0;
     vscp_imsg.priority = 0;
     vscp_imsg.vscp_class = 0;
     vscp_imsg.vscp_type = 0;
 
-    // Init outgoing event
+    // Init. outgoing event
     vscp_omsg.flags = 0;
     vscp_omsg.priority = 0;
     vscp_omsg.vscp_class = 0;
     vscp_omsg.vscp_type = 0;
 
     vscp_errorcnt = 0;      // No errors yet
-    vscp_alarmstatus = 0;   // No alarmstatus
+    vscp_alarmstatus = 0;   // No alarm status
 
     vscp_probe_address = 0;
 
@@ -786,471 +786,471 @@ void vscp_handleProtocolEvent(void)
 
         switch (vscp_imsg.vscp_type) {
 
-            case VSCP_TYPE_PROTOCOL_SEGCTRL_HEARTBEAT:
+        case VSCP_TYPE_PROTOCOL_SEGCTRL_HEARTBEAT:
 
-                vscp_handleHeartbeat();
+            vscp_handleHeartbeat();
+            break;
+
+        case VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE:
+
+            vscp_newNodeOnline();
+            break;
+
+        case VSCP_TYPE_PROTOCOL_SET_NICKNAME:
+
+            vscp_handleSetNickname();
+            break;
+
+        case VSCP_TYPE_PROTOCOL_DROP_NICKNAME:
+
+            vscp_handleDropNickname();
+            break;
+
+        case VSCP_TYPE_PROTOCOL_READ_REGISTER:
+
+            if ((2 == (vscp_imsg.flags & 0x0f)) &&
+                (vscp_nickname == vscp_imsg.data[ 0 ])) {
+
+                if (vscp_imsg.data[ 1 ] < 0x80) {
+
+                    // Read application specific register
+                    vscp_omsg.data[ 1 ] = vscp_readAppReg(vscp_imsg.data[ 1 ]);
+
+                    // Register to read
+                    vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
+
+                    vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
+                    vscp_omsg.flags = VSCP_VALID_MSG + 2;
+                    vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+                    vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+
+                    // Send reply data
+                    vscp_sendEvent();
+                } else {
+
+                    // Read VSCP register
+                    vscp_omsg.data[ 1 ] =
+                        vscp_readStdReg(vscp_imsg.data[ 1 ]);
+
+                    // Register to read
+                    vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
+
+                    vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
+                    vscp_omsg.flags = VSCP_VALID_MSG + 2;
+                    vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+                    vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+
+                    // Send event
+                    vscp_sendEvent();
+                }
+            }
+            break;
+
+        case VSCP_TYPE_PROTOCOL_WRITE_REGISTER:
+
+            if ((3 == (vscp_imsg.flags & 0x0f)) &&
+                (vscp_nickname == vscp_imsg.data[ 0 ])) {
+
+                if (vscp_imsg.data[ 1 ] < 0x80) {
+
+                    // Write application specific register
+                    vscp_omsg.data[ 1 ] =
+                        vscp_writeAppReg(vscp_imsg.data[ 1 ], vscp_imsg.data[ 2 ]);
+
+                    // Register read
+                    vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
+
+                    vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
+                    vscp_omsg.flags = VSCP_VALID_MSG + 2;
+                    vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+                    vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+
+                    // Send reply
+                    vscp_sendEvent();
+
+                } else {
+
+                    // Write VSCP register
+                    vscp_omsg.data[ 1 ] =
+                        vscp_writeStdReg(vscp_imsg.data[ 1 ], vscp_imsg.data[ 2 ]);
+
+                    // Register read
+                    vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
+
+                    vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
+                    vscp_omsg.flags = VSCP_VALID_MSG + 2;
+                    vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+                    vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+
+                    // Write event
+                    vscp_sendEvent();
+                }
+            }
+            break;
+
+        case VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER:
+            if ((vscp_nickname == vscp_imsg.data[ 0 ]) &&
+                (9 == vscp_imsg.data[ 1 ])) // AVR algorithm 0
+            {
+                vscp_goBootloaderMode();
+            }
+
+            if ((vscp_nickname == vscp_imsg.data[ 0 ]) &&
+                (1 == vscp_imsg.data[ 1 ]) && // microchip PIC algorithm
+                (vscp_getGUID(0) == vscp_imsg.data[ 2 ]) &&
+                (vscp_getGUID(3) == vscp_imsg.data[ 3 ]) &&
+                (vscp_getGUID(5) == vscp_imsg.data[ 4 ]) &&
+                (vscp_getGUID(7) == vscp_imsg.data[ 5 ]) &&
+                ((vscp_page_select >> 8) == vscp_imsg.data[ 6 ]) &&
+                ((vscp_page_select & 0xff) == vscp_imsg.data[ 7 ])) {
+
+                vscp_goBootloaderMode();
+
+            }
+            break;
+
+        case VSCP_TYPE_PROTOCOL_RESET_DEVICE:
+
+            switch (vscp_imsg.data[ 0 ] >> 4) {
+
+            case 0:
+                if ((vscp_getGUID(0) == vscp_imsg.data[ 1 ]) &&
+                    (vscp_getGUID(1) == vscp_imsg.data[ 2 ]) &&
+                    (vscp_getGUID(2) == vscp_imsg.data[ 3 ]) &&
+                    (vscp_getGUID(3) == vscp_imsg.data[ 4 ])) {
+                    vscp_guid_reset |= 0x10;
+                }
                 break;
 
-            case VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE:
-
-                vscp_newNodeOnline();
+            case 1:
+                if ((vscp_getGUID(4) == vscp_imsg.data[ 1 ]) &&
+                    (vscp_getGUID(5) == vscp_imsg.data[ 2 ]) &&
+                    (vscp_getGUID(6) == vscp_imsg.data[ 3 ]) &&
+                    (vscp_getGUID(7) == vscp_imsg.data[ 4 ])) {
+                    vscp_guid_reset |= 0x20;
+                }
                 break;
 
-            case VSCP_TYPE_PROTOCOL_SET_NICKNAME:
-
-                vscp_handleSetNickname();
+            case 2:
+                if ((vscp_getGUID(8) == vscp_imsg.data[ 1 ]) &&
+                    (vscp_getGUID(9) == vscp_imsg.data[ 2 ]) &&
+                    (vscp_getGUID(10) == vscp_imsg.data[ 3 ]) &&
+                    (vscp_getGUID(11) == vscp_imsg.data[ 4 ])) {
+                    vscp_guid_reset |= 0x40;
+                }
                 break;
 
-            case VSCP_TYPE_PROTOCOL_DROP_NICKNAME:
-
-                vscp_handleDropNickname();
+            case 3:
+                if ((vscp_getGUID(12) == vscp_imsg.data[ 1 ]) &&
+                    (vscp_getGUID(13) == vscp_imsg.data[ 2 ]) &&
+                    (vscp_getGUID(14) == vscp_imsg.data[ 3 ]) &&
+                    (vscp_getGUID(15) == vscp_imsg.data[ 4 ])) {
+                    vscp_guid_reset |= 0x80;
+                }
                 break;
 
-            case VSCP_TYPE_PROTOCOL_READ_REGISTER:
+            default:
+                vscp_guid_reset = 0;
+                break;
+            }
 
-                if ((2 == (vscp_imsg.flags & 0x0f)) &&
-                        (vscp_nickname == vscp_imsg.data[ 0 ])) {
+            if (0xf0 == (vscp_guid_reset & 0xf0)) {
+                // Do a reset
+                vscp_init();
+            }
+            break;
 
-                    if (vscp_imsg.data[ 1 ] < 0x80) {
+        case VSCP_TYPE_PROTOCOL_PAGE_READ:
 
-                        // Read application specific register
-                        vscp_omsg.data[ 1 ] = vscp_readAppReg(vscp_imsg.data[ 1 ]);
+            if (vscp_nickname == vscp_imsg.data[ 0 ]) {
 
-                        // Register to read
-                        vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
-                        
-                        vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
-                        vscp_omsg.flags = VSCP_VALID_MSG + 2;
-                        vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
-                        vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+                uint8_t i;
+                uint8_t pos = 0;
+                uint8_t offset = vscp_imsg.data[ 1 ];
+                uint8_t len = vscp_imsg.data[ 2 ];
 
-                        // Send reply data
-                        vscp_sendEvent();
-                    } else {
+                for (i = 0; i < len; i++) {
+                    vscp_omsg.data[ (i % 7) + 1 ] = vscp_readRegister(offset + i);
 
-                        // Read VSCP register
-                        vscp_omsg.data[ 1 ] =
-                                vscp_readStdReg(vscp_imsg.data[ 1 ]);
+                    if ((i % 7) == 6 || i == (len - 1)) {
+                        uint8_t bytes;
 
-                        // Register to read
-                        vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
-                        
+                        if ((i % 7) == 6) bytes = 7;
+                        else bytes = (i % 7) + 1;
+
+                        vscp_omsg.flags = VSCP_VALID_MSG + bytes + 1;
                         vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
-                        vscp_omsg.flags = VSCP_VALID_MSG + 2;
                         vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
-                        vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-                        
-                        // Send event
+                        vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
+                        vscp_omsg.data[ 0 ] = pos; // index
+
+                        // send the event
                         vscp_sendEvent();
+                        pos++;
                     }
                 }
-                break;
+            }
+            break;
 
-            case VSCP_TYPE_PROTOCOL_WRITE_REGISTER:
+        case VSCP_TYPE_PROTOCOL_PAGE_WRITE:
 
-                if ((3 == (vscp_imsg.flags & 0x0f)) &&
-                        (vscp_nickname == vscp_imsg.data[ 0 ])) {
+            if (vscp_nickname == vscp_imsg.data[ 0 ]) {
+                uint8_t i;
+                uint8_t pos = vscp_imsg.data[ 1 ];
+                uint8_t len = (vscp_imsg.flags - 2) & 0x07;
 
-                    if (vscp_imsg.data[ 1 ] < 0x80) {
-
-                        // Write application specific register
-                        vscp_omsg.data[ 1 ] =
-                                vscp_writeAppReg(vscp_imsg.data[ 1 ], vscp_imsg.data[ 2 ]);
-                        
-                        // Register read
-                        vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
-
-                        vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
-                        vscp_omsg.flags = VSCP_VALID_MSG + 2;
-                        vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
-                        vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-                        
-                        // Send reply
-                        vscp_sendEvent();
-                        
-                    } else {
-
-                        // Write VSCP register
-                        vscp_omsg.data[ 1 ] =
-                                vscp_writeStdReg(vscp_imsg.data[ 1 ], vscp_imsg.data[ 2 ]);
-                        
-                        // Register read
-                        vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
-
-                        vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
-                        vscp_omsg.flags = VSCP_VALID_MSG + 2;
-                        vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
-                        vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-                        
-                        // Write event
-                        vscp_sendEvent();
-                    }
+                for (i = 0; i < len; i++) {
+                    // Write VSCP register
+                    vscp_writeRegister(pos + i, vscp_imsg.data[ 2 + i ]);
+                    vscp_omsg.data[ 1 + i ] = vscp_readRegister(pos + i);
                 }
-                break;
 
-            case VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER:
-                if ((vscp_nickname == vscp_imsg.data[ 0 ]) &&
-                        (9 == vscp_imsg.data[ 1 ])) // AVR algorithm 0
+                vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
+                vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+                vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
+                vscp_omsg.data[ 0 ] = 0; // index
+                vscp_omsg.flags = VSCP_VALID_MSG + len + 1;
+
+                // send the event
+                vscp_sendEvent();
+
+            }
+            break;
+
+        case VSCP_TYPE_PROTOCOL_INCREMENT_REGISTER:
+
+            if (vscp_nickname == vscp_imsg.data[ 0 ]) {
+
+                vscp_omsg.data[ 1 ] = vscp_writeAppReg(
+                    vscp_imsg.data[ 1 ],
+                    vscp_readAppReg(vscp_imsg.data[ 1 ]) + 1);
+
+                vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
+
+                vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
+                vscp_omsg.flags = VSCP_VALID_MSG + 2;
+                vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+                vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+
+                // send the event
+                vscp_sendEvent();
+            }
+            break;
+
+        case VSCP_TYPE_PROTOCOL_DECREMENT_REGISTER:
+
+            if (vscp_nickname == vscp_imsg.data[ 0 ]) {
+
+                vscp_omsg.data[ 1 ] = vscp_writeAppReg(
+                    vscp_imsg.data[ 1 ],
+                    vscp_readAppReg(vscp_imsg.data[ 1 ]) - 1);
+
+                vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
+
+                vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
+                vscp_omsg.flags = VSCP_VALID_MSG + 2;
+                vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+                vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+
+                // send the event
+                vscp_sendEvent();
+            }
+            break;
+
+        case VSCP_TYPE_PROTOCOL_WHO_IS_THERE:
+
+            if ((vscp_nickname == vscp_imsg.data[ 0 ]) ||
+                (0xff == vscp_imsg.data[ 0 ])) {
+
+                uint8_t i, j, k = 0;
+
+                // Send data
+
+                vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
+                vscp_omsg.flags = VSCP_VALID_MSG + 8;
+                vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+                vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_WHO_IS_THERE_RESPONSE;
+
+                for (i = 0; i < 3; i++) // fill up with GUID
                 {
-                    vscp_goBootloaderMode();
-                }
+                    vscp_omsg.data[0] = i;
 
-                if ((vscp_nickname == vscp_imsg.data[ 0 ]) &&
-                        (1 == vscp_imsg.data[ 1 ]) && // microchip PIC algorithm
-                        (vscp_getGUID(0) == vscp_imsg.data[ 2 ]) &&
-                        (vscp_getGUID(3) == vscp_imsg.data[ 3 ]) &&
-                        (vscp_getGUID(5) == vscp_imsg.data[ 4 ]) &&
-                        (vscp_getGUID(7) == vscp_imsg.data[ 5 ]) &&
-                        ((vscp_page_select >> 8) == vscp_imsg.data[ 6 ]) &&
-                        ((vscp_page_select & 0xff) == vscp_imsg.data[ 7 ])) {
-
-                    vscp_goBootloaderMode();
-
-                }
-                break;
-
-            case VSCP_TYPE_PROTOCOL_RESET_DEVICE:
-
-                switch (vscp_imsg.data[ 0 ] >> 4) {
-
-                    case 0:
-                        if ((vscp_getGUID(0) == vscp_imsg.data[ 1 ]) &&
-                                (vscp_getGUID(1) == vscp_imsg.data[ 2 ]) &&
-                                (vscp_getGUID(2) == vscp_imsg.data[ 3 ]) &&
-                                (vscp_getGUID(3) == vscp_imsg.data[ 4 ])) {
-                            vscp_guid_reset |= 0x10;
-                        }
-                        break;
-
-                    case 1:
-                        if ((vscp_getGUID(4) == vscp_imsg.data[ 1 ]) &&
-                                (vscp_getGUID(5) == vscp_imsg.data[ 2 ]) &&
-                                (vscp_getGUID(6) == vscp_imsg.data[ 3 ]) &&
-                                (vscp_getGUID(7) == vscp_imsg.data[ 4 ])) {
-                            vscp_guid_reset |= 0x20;
-                        }
-                        break;
-
-                    case 2:
-                        if ((vscp_getGUID(8) == vscp_imsg.data[ 1 ]) &&
-                                (vscp_getGUID(9) == vscp_imsg.data[ 2 ]) &&
-                                (vscp_getGUID(10) == vscp_imsg.data[ 3 ]) &&
-                                (vscp_getGUID(11) == vscp_imsg.data[ 4 ])) {
-                            vscp_guid_reset |= 0x40;
-                        }
-                        break;
-
-                    case 3:
-                        if ((vscp_getGUID(12) == vscp_imsg.data[ 1 ]) &&
-                                (vscp_getGUID(13) == vscp_imsg.data[ 2 ]) &&
-                                (vscp_getGUID(14) == vscp_imsg.data[ 3 ]) &&
-                                (vscp_getGUID(15) == vscp_imsg.data[ 4 ])) {
-                            vscp_guid_reset |= 0x80;
-                        }
-                        break;
-
-                    default:
-                        vscp_guid_reset = 0;
-                        break;
-                }
-
-                if (0xf0 == (vscp_guid_reset & 0xf0)) {
-                    // Do a reset
-                    vscp_init();
-                }
-                break;
-
-            case VSCP_TYPE_PROTOCOL_PAGE_READ:
-
-                if (vscp_nickname == vscp_imsg.data[ 0 ]) {
-
-                    uint8_t i;
-                    uint8_t pos = 0;
-                    uint8_t offset = vscp_imsg.data[ 1 ];
-                    uint8_t len = vscp_imsg.data[ 2 ];
-
-                    for (i = 0; i < len; i++) {
-                        vscp_omsg.data[ (i % 7) + 1 ] = vscp_readRegister(offset + i);
-
-                        if ((i % 7) == 6 || i == (len - 1)) {
-                            uint8_t bytes;
-
-                            if ((i % 7) == 6) bytes = 7;
-                            else bytes = (i % 7) + 1;
-
-                            vscp_omsg.flags = VSCP_VALID_MSG + bytes + 1;
-                            vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
-                            vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
-                            vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
-                            vscp_omsg.data[ 0 ] = pos; // index
-
-                            // send the event
-                            vscp_sendEvent();
-                            pos++;
-                        }
-                    }
-                }
-                break;
-
-            case VSCP_TYPE_PROTOCOL_PAGE_WRITE:
-
-                if (vscp_nickname == vscp_imsg.data[ 0 ]) {
-                    uint8_t i;
-                    uint8_t pos = vscp_imsg.data[ 1 ];
-                    uint8_t len = (vscp_imsg.flags - 2) & 0x07;
-
-                    for (i = 0; i < len; i++) {
-                        // Write VSCP register
-                        vscp_writeRegister(pos + i, vscp_imsg.data[ 2 + i ]);
-                        vscp_omsg.data[ 1 + i ] = vscp_readRegister(pos + i);
-                    }
-
-                    vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
-                    vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
-                    vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
-                    vscp_omsg.data[ 0 ] = 0; // index
-                    vscp_omsg.flags = VSCP_VALID_MSG + len + 1;
-
-                    // send the event
-                    vscp_sendEvent();
-
-                }
-                break;
-
-            case VSCP_TYPE_PROTOCOL_INCREMENT_REGISTER:
-
-                if (vscp_nickname == vscp_imsg.data[ 0 ]) {
-
-                    vscp_omsg.data[ 1 ] = vscp_writeAppReg(
-                            vscp_imsg.data[ 1 ],
-                            vscp_readAppReg(vscp_imsg.data[ 1 ]) + 1);
-                    
-                    vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
-                    
-                    vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
-                    vscp_omsg.flags = VSCP_VALID_MSG + 2;
-                    vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
-                    vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-
-                    // send the event
-                    vscp_sendEvent();
-                }
-                break;
-
-            case VSCP_TYPE_PROTOCOL_DECREMENT_REGISTER:
-
-                if (vscp_nickname == vscp_imsg.data[ 0 ]) {
-
-                    vscp_omsg.data[ 1 ] = vscp_writeAppReg(
-                            vscp_imsg.data[ 1 ],
-                            vscp_readAppReg(vscp_imsg.data[ 1 ]) - 1);
-
-                    vscp_omsg.data[ 0 ] = vscp_imsg.data[ 1 ];
-                    
-                    vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
-                    vscp_omsg.flags = VSCP_VALID_MSG + 2;
-                    vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
-                    vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-
-                    // send the event
-                    vscp_sendEvent();
-                }
-                break;
-
-            case VSCP_TYPE_PROTOCOL_WHO_IS_THERE:
-
-                if ((vscp_nickname == vscp_imsg.data[ 0 ]) ||
-                        (0xff == vscp_imsg.data[ 0 ])) {
-
-                    uint8_t i, j, k = 0;
-
-                    // Send data
-
-                    vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
-                    vscp_omsg.flags = VSCP_VALID_MSG + 8;
-                    vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
-                    vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_WHO_IS_THERE_RESPONSE;
-
-                    for (i = 0; i < 3; i++) // fill up with GUID
-                    {
-                        vscp_omsg.data[0] = i;
-
-                        for (j = 1; j < 8; j++) {
-                            vscp_omsg.data[j] = vscp_getGUID(15 - k++);
-                            if (k > 16)
-                                break;
-                        }
-
+                    for (j = 1; j < 8; j++) {
+                        vscp_omsg.data[j] = vscp_getGUID(15 - k++);
                         if (k > 16)
                             break;
-
-                        vscp_sendEvent();
                     }
 
-                    for (j = 0; j < 5; j++) // fillup previous event with MDF
-                    {
-                        if (vscp_getMDF_URL(j) > 0)
-                            vscp_omsg.data[3 + j] = vscp_getMDF_URL(j);
-                        else
-                            vscp_omsg.data[3 + j] = 0;
-                    }
-
-                    vscp_sendEvent();
-
-                    k = 5; // start offset
-                    for (i = 3; i < 7; i++) // fill up with the rest of GUID
-                    {
-                        vscp_omsg.data[0] = i;
-
-                        for (j = 1; j < 8; j++) {
-                            vscp_omsg.data[j] = vscp_getMDF_URL(k++);
-                        }
-                        vscp_sendEvent();
-                    }
-
-                }
-                break;
-
-
-            case VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO:
-
-                if (vscp_nickname == vscp_imsg.data[ 0 ]) {
-                    
-                    vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
-                    vscp_omsg.flags = VSCP_VALID_MSG + 7;
-                    vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
-                    vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
-
-                    vscp_getMatrixInfo((char *) vscp_omsg.data);
-
-                    // send the event
-                    vscp_sendEvent();
-                }
-                break;
-
-			#ifdef EMBEDDED_MDF
-            case VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF:
-
-                vscp_getEmbeddedMdfInfo();
-                break;
-			#endif
-
-            case VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_READ:
-
-                if (vscp_nickname == vscp_imsg.data[0]) {
-
-                    uint16_t page_save;
-                    uint8_t byte = 0, bytes = 0;
-                    uint8_t bytes_this_time, cb;
-					
-                    // if data byte 4 of the request is present probably more than 1 register should be
-                    // read/written, therefore check lower 4 bits of the flags and decide
-                    if ((vscp_imsg.flags & 0x0f) > 3) {
-
-                        // 'number of registers was specified', thus take that value
-                        bytes = vscp_imsg.data[4];
-                        // if number of bytes was zero it makes no sense thus force to read 1 register
-                        if (bytes == 0)
-                            bytes = 1;
-                        }
-                        else {
-                            bytes = 1;
-                        }
-
-                        // Save the current page
-                        page_save = vscp_page_select;
-
-                        // Assign the requested page, this variable is used in the implementation
-                        // specific function 'vscp_readAppReg()' and 'vscp_writeAppReg()' to actually
-                        // switch pages there
-                        vscp_page_select = ((vscp_imsg.data[1]<<8) | vscp_imsg.data[2]);
-
-                        // Construct response event
-                        vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
-                        vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
-                        vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
-                        vscp_omsg.data[0] = 0; // index of event, this is the first
-                        vscp_omsg.data[1] = vscp_imsg.data[1]; // mirror page msb
-                        vscp_omsg.data[2] = vscp_imsg.data[2]; // mirror page lsb
-
-			do {
-                            // calculate bytes to transfer in this event
-                            if ((bytes - byte) >= 4) {
-                                bytes_this_time = 4;
-                            }
-                            else {
-                                bytes_this_time = (bytes - byte);
-                            }
-
-
-                            // define length of this event
-                            vscp_omsg.flags = VSCP_VALID_MSG + 4 + bytes_this_time;
-                            vscp_omsg.data[3] =
-                                    vscp_imsg.data[3] + byte; // first register in this event
-
-                            // Put up to four registers to data space
-                            for ( cb = 0; cb < bytes_this_time; cb++) {
-                                vscp_omsg.data[ (4 + cb) ] =
-                                vscp_readRegister( (vscp_imsg.data[3] + byte + cb) );
-                            }
-
-                            // send the event
-                            vscp_sendEvent();
-
-                            // increment byte by bytes_this_time and the event number by one
-                            byte = byte + bytes_this_time;
-
-                            // increment the index
-                            vscp_omsg.data[0] +=1 ;
-						}
-                            while (byte < bytes);
-
-                            // Restore the saved page
-                            vscp_page_select = page_save;
-
-                        }
+                    if (k > 16)
                         break;
 
-            case VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_WRITE:
-
-                if (vscp_nickname == vscp_imsg.data[ 0 ]) {
-
-                    uint8_t i;
-                    uint16_t page_save;
-
-                    // Save the current page
-                    page_save = vscp_page_select;
-
-                    // Assign the requested page
-                    // specific function 'vscp_readAppReg()' and 'vscp_writeAppReg()' to actually
-                    vscp_page_select = (vscp_imsg.data[1]<<8) | vscp_imsg.data[2];
-
-                    vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
-                    vscp_omsg.flags = VSCP_VALID_MSG + 4 + ((vscp_imsg.flags & 0x0f) - 4);
-                    vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
-                    vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
-                    vscp_omsg.data[0] = 0; // index of event, this is the first and only
-                    vscp_omsg.data[1] = vscp_imsg.data[1]; // mirror page msb
-                    vscp_omsg.data[2] = vscp_imsg.data[2]; // mirror page lsb
-                    vscp_omsg.data[3] = vscp_imsg.data[3]; // Register
-
-                    for ( i = vscp_imsg.data[ 3 ]; // register to write
-                            // number of registers to write comes from byte length of write event
-                            // reduced by four bytes
-                            i < (vscp_imsg.data[ 3 ] + ((vscp_imsg.flags & 0x0f) - 4));
-                            i++ ) {
-                        vscp_omsg.data[ 4 + (i - vscp_imsg.data[ 3 ]) ] =
-                            vscp_writeRegister( i, vscp_imsg.data[ 4 + (i - vscp_imsg.data[ 3 ]) ] );
-                    }
-
-                    // Restore the saved page
-                    vscp_page_select = page_save;
-
-                    // send the event
                     vscp_sendEvent();
-
                 }
-                break;
+
+                for (j = 0; j < 5; j++) // fillup previous event with MDF
+                {
+                    if (vscp_getMDF_URL(j) > 0)
+                        vscp_omsg.data[3 + j] = vscp_getMDF_URL(j);
+                    else
+                        vscp_omsg.data[3 + j] = 0;
+                }
+
+                vscp_sendEvent();
+
+                k = 5; // start offset
+                for (i = 3; i < 7; i++) // fill up with the rest of GUID
+                {
+                    vscp_omsg.data[0] = i;
+
+                    for (j = 1; j < 8; j++) {
+                        vscp_omsg.data[j] = vscp_getMDF_URL(k++);
+                    }
+                    vscp_sendEvent();
+                }
+
+            }
+            break;
+
+
+        case VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO:
+
+            if (vscp_nickname == vscp_imsg.data[ 0 ]) {
+
+                vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
+                vscp_omsg.flags = VSCP_VALID_MSG + 7;
+                vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+                vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
+
+                vscp_getMatrixInfo((char *) vscp_omsg.data);
+
+                // send the event
+                vscp_sendEvent();
+            }
+            break;
+
+#ifdef EMBEDDED_MDF
+        case VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF:
+
+            vscp_getEmbeddedMdfInfo();
+            break;
+#endif
+
+        case VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_READ:
+
+            if ( vscp_nickname == vscp_imsg.data[0] ) {
+
+                uint16_t page_save;
+                uint8_t byte = 0, bytes = 0;
+                uint8_t bytes_this_time, cb;
+
+                // if data byte 4 of the request is present probably more than 1 register should be
+                // read/written, therefore check lower 4 bits of the flags and decide
+                if ( ( vscp_imsg.flags & 0x0f) > 3 ) {
+
+                    // Number of registers was specified', thus take that value
+                    bytes = vscp_imsg.data[4];
+                    // if number of bytes was zero we read one byte 
+                    if ( 0 == bytes ) {
+                        bytes = 1;
+					} 
+				}
+				else {
+					bytes = 1;
+				}
+
+				// Save the current page
+				page_save = vscp_page_select;
+
+				// Assign the requested page, this variable is used in the implementation
+				// specific function 'vscp_readAppReg()' and 'vscp_writeAppReg()' to actually
+				// switch pages there
+				vscp_page_select = ((vscp_imsg.data[1] << 8) | vscp_imsg.data[2]);
+
+				// Construct response event
+				vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
+				vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+				vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
+				vscp_omsg.data[0] = 0; // index of event, this is the first
+				vscp_omsg.data[1] = vscp_imsg.data[1]; // mirror page msb
+				vscp_omsg.data[2] = vscp_imsg.data[2]; // mirror page lsb
+
+				do {
+                    // calculate bytes to transfer in this event
+                    if ( ( bytes - byte ) >= 4 ) {
+                        bytes_this_time = 4;
+					} 
+					else {
+						bytes_this_time = (bytes - byte);
+					}
+
+					// define length of this event
+					vscp_omsg.flags = VSCP_VALID_MSG + 4 + bytes_this_time;
+					vscp_omsg.data[3] =
+                    vscp_imsg.data[3] + byte; // first register in this event
+
+					// Put up to four registers to data space
+					for ( cb = 0; cb < bytes_this_time; cb++ ) {
+                        vscp_omsg.data[ (4 + cb) ] =
+							vscp_readRegister( ( vscp_imsg.data[3] + byte + cb ) );
+					}
+
+					// send the event
+					vscp_sendEvent();
+
+					// increment byte by bytes_this_time and the event number by one
+					byte += bytes_this_time;
+
+					// increment the index
+					vscp_omsg.data[0] += 1;
+						
+				} while (byte < bytes);
+
+				// Restore the saved page
+				vscp_page_select = page_save;
+
+			}
+            break;
+
+        case VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_WRITE:
+
+            if ( vscp_nickname == vscp_imsg.data[ 0 ] ) {
+
+                uint8_t i;
+                uint16_t page_save;
+
+                // Save the current page
+                page_save = vscp_page_select;
+
+                // Assign the requested page
+                // specific function 'vscp_readAppReg()' and 'vscp_writeAppReg()' to actually
+                vscp_page_select = (vscp_imsg.data[1] << 8) | vscp_imsg.data[2];
+
+                for (i = vscp_imsg.data[ 3 ]; // register to write
+                        // number of registers to write comes from byte length of write event
+                        // reduced by four bytes
+                        i < (vscp_imsg.data[ 3 ] + ((vscp_imsg.flags & 0x0f) - 4));
+                        i++) {
+                    vscp_omsg.data[ 4 + (i - vscp_imsg.data[ 3 ]) ] =
+                        vscp_writeRegister(i, vscp_imsg.data[ 4 + (i - vscp_imsg.data[ 3 ]) ]);
+                }
+
+                // Restore the saved page
+                vscp_page_select = page_save;
+
+                vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
+                vscp_omsg.flags = VSCP_VALID_MSG + 4 + ((vscp_imsg.flags & 0x0f) - 4);
+                vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+                vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
+                vscp_omsg.data[0] = 0; // index of event, this is the first and only
+                vscp_omsg.data[1] = vscp_imsg.data[1]; // mirror page msb
+                vscp_omsg.data[2] = vscp_imsg.data[2]; // mirror page lsb
+                vscp_omsg.data[3] = vscp_imsg.data[3]; // Register
+
+                // send the event
+                vscp_sendEvent();
+
+            }
+            break;
 
 
             default:
@@ -1272,12 +1272,12 @@ int8_t vscp_sendEvent(void)
 {
     int8_t rv;
 
-    if (!(rv = sendVSCPFrame(vscp_omsg.vscp_class,
-            vscp_omsg.vscp_type,
-            vscp_nickname,
-            vscp_omsg.priority,
-            (vscp_omsg.flags & 0x0f),
-            vscp_omsg.data))) {
+    if ( !(rv = sendVSCPFrame( vscp_omsg.vscp_class,
+                                vscp_omsg.vscp_type,
+                                vscp_nickname,
+                                vscp_omsg.priority,
+                                (vscp_omsg.flags & 0x0f),
+                                vscp_omsg.data ) ) ) {
         vscp_errorcnt++;
     }
 

@@ -226,11 +226,11 @@ struct _omsg {
             Bit 1 - Number of data bytes\n
             Bit 0 - Number of data bytes LSB\n
      */
-    uint8_t flags; ///< Output message flags
+    uint8_t flags;          ///< Output message flags
 
-    uint8_t priority; ///< Priority for the message 0-7
-    uint16_t vscp_class; ///< VSCP class
-    uint8_t vscp_type; ///< VSCP type
+    uint8_t priority;       ///< Priority for the message 0-7
+    uint16_t vscp_class;    ///< VSCP class
+    uint8_t vscp_type;      ///< VSCP type
     /// Originating address is always *this* node
     uint8_t data[8]; ///< data bytes
 };
@@ -507,7 +507,8 @@ uint8_t vscp_getSubMinorVersion(void);
         Get GUID from permament storage
  */
 uint8_t vscp_getGUID(uint8_t idx);
-void vscp_setGUID(uint8_t idx, uint8_t data);
+void vscp_setGUID(uint8_t idx, uint8_t data);   // Only if write to protected
+                                                // locations is enabled
 
 /*!
         User ID 0 idx=0
