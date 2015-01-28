@@ -38,10 +38,12 @@
 #define REG_ZONE						0
 #define REG_SUBZONE						1
 
+//#define REG_TEMP_INTERVAL				0x6F	// interval to send temperature
+
 //#define REG_DMATRIX_START               0x70
 
 // This marks the space for the decision matrix start. It
 // is just a dummy for EEPROM storage and do not represent the
 // actual register position
-#define REG_DM_START                   0x70
+#define REG_DM_START                   	0x70
 

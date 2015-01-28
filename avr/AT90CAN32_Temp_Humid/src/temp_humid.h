@@ -77,8 +77,6 @@
 #define VSCP_EEPROM_END                     0x41	// marks end of VSCP EEPROM usage
                                                     //   (next free position)
 
-
-
 // Prototypes
 void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId );;
 int readEEPROM( uint8_t addr );

@@ -5,7 +5,7 @@
 <module>
 	<name>VSCP AVR AT90CAN32 Temperature Module</name>
  	<model>A</model>
-        <version>0.0.0</version>
+        <version>0.0.1</version>
    <description lang="en">Temperature sensor sending temperature on the bus at regular interval.</description>
   	<infourl>http://www.vscp.org</infourl>
     <changed>2014-08-14</changed>

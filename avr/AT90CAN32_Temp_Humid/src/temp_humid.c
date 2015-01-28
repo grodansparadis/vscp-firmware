@@ -119,6 +119,8 @@ uint8_t measurement_seconds = 0xFF;
 
 #define NEWLINESTR "\r\n"
 
+// Set time elapsed between two measurements
+//writeEEPROM( REG_TEMP_INTERVAL, 0x0A );
 
 uint8_t gSensorIDs[MAXSENSORS][OW_ROMCODE_SIZE];
 
@@ -1101,7 +1103,8 @@ void doWork( void )
 
 
 
-    if ( measurement_seconds > 10 ) { //send temperature every 30 seconds
+//    if ( measurement_seconds > readEEPROM( REG_TEMP_INTERVAL ) ) {
+    if ( measurement_seconds > 10 ) {
             measurement_seconds = 0;
 
     uart_puts("Measuring temperature.\n");
