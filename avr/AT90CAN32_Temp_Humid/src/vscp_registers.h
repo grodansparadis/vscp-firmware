@@ -38,7 +38,8 @@
 #define REG_ZONE						0
 #define REG_SUBZONE						1
 
-//#define REG_TEMP_INTERVAL				0x6F	// interval to send temperature
+#define REG_MEASUREMENT_INTERVAL_MSB	2	// interval between two measurements
+#define REG_MEASUREMENT_INTERVAL_LSB	3
 
 //#define REG_DMATRIX_START               0x70
 

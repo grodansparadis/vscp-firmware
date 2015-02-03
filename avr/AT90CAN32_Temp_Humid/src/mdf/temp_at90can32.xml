@@ -63,16 +63,15 @@
 		</reg>
 
         <reg page="0" offset="2" >
-            <name lang="en">Reserved</name>
-            <description lang="en">This register is reserved.</description>
+            <name lang="en">REG_MEASUREMENT_INTERVAL_MSB</name>
+            <description lang="en">Most significant byte for measurement interval. Defines the time between two measurements</description>
             <access>rw</access>
         </reg>        
-
         <reg page="0" offset="3" >
-            <name lang="en"></name>
-            <description lang="en"></description>
+            <name lang="en">REG_MEASUREMENT_INTERVAL_LSB</name>
+            <description lang="en">Least significant byte for measurement interval. Defines the time between two measurements</description>
             <access>rw</access>
-        </reg>
+        </reg>        
 
         <reg page="0" offset="4" >
             <name lang="en"></name>
@@ -156,9 +155,7 @@
             </bit>
             
 		</reg>
-				
-			
-		
+
 		
 		<!-- DM Row 1 -->
 		<reg page="0" offset="112" >

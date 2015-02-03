@@ -113,7 +113,7 @@ static void doWork();
 
 
 // Counter for seconds between measurements, do a first measurement
-uint8_t measurement_seconds = 0xFF;
+uint16_t measurement_seconds = 0;
 
 #define MAXSENSORS 5
 
@@ -270,7 +270,6 @@ int main( void )
     uart_puts( "VSCP AT90CAN32\n" );
     uart_puts( "Temperature sensor\n" );
 
-
 	// Check VSCP persistent storage and
 	// restore if needed
 	if ( !vscp_check_pstorage() ) {
@@ -292,8 +291,8 @@ int main( void )
             writeEEPROM( VSCP_EEPROM_NICKNAME, VSCP_ADDRESS_FREE );
             vscp_init();
             uart_puts("Node initialization");
-            
-	  }
+  
+    }
 	  
 	  
 	  // Check for any valid CAN message
@@ -304,7 +303,7 @@ int main( void )
 	  if ( measurement_clock > 1000 ) {
 	    
             measurement_clock = 0;
-            measurement_seconds++;
+            measurement_seconds--;
             // Do VSCP one second jobs 
             vscp_doOneSecondWork();
 	    
@@ -462,10 +461,21 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
     memcpy( msg.byte, pData, size );
   }
   
+ /*
   if ( ERROR_OK != can_SendFrame( &msg ) ) {
     return FALSE;
   }
-  
+ */
+  uint8_t timeout = 200;
+  int8_t ret = ERROR_OK;
+
+  do {
+
+      ret = can_SendFrame( &msg );
+      --timeout;
+
+  } while((ERROR_OK != ret) && (0 < timeout));
+
   return TRUE;
 }
 
@@ -543,7 +553,6 @@ uint8_t vscp_readAppReg( uint8_t reg )
 {
     uint8_t rv;
 
-
     // Zone
     if ( REG_ZONE == reg ) {
         //rv =  readEEPROM( REG_ZONE + VSCP_EEPROM_END );
@@ -559,6 +568,14 @@ uint8_t vscp_readAppReg( uint8_t reg )
     // DM register space    for ( pos = REG_DM_DUMMY; pos < ( REG_DM_DUMMY + DESCION_MATRIX_ELEMENTS * 8 ); pos++ ) {
     else if ( ( reg >= REG_DM_START ) && ( reg < REG_DM_START + DESCION_MATRIX_ELEMENTS * 8) ) {
         rv =  readEEPROM( VSCP_EEPROM_END +  reg  );
+    }
+
+    else if ( reg == REG_MEASUREMENT_INTERVAL_MSB ) {
+        rv = readEEPROM( VSCP_EEPROM_END +  reg );
+    }
+
+    else if ( reg == REG_MEASUREMENT_INTERVAL_LSB ) {
+        rv = readEEPROM( VSCP_EEPROM_END +  reg );
     }
 
     else {
@@ -577,6 +594,12 @@ uint8_t vscp_readAppReg( uint8_t reg )
 uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
 {
     uint8_t rv;
+    char buf[30];
+
+    sprintf(buf, "Writing app reg: %x", VSCP_EEPROM_END + reg);
+    uart_puts( buf );
+    sprintf(buf, "Writing value: %x", val);
+    uart_puts( buf );
 
     rv = ~val; // error return
 
@@ -598,7 +621,17 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
         writeEEPROM(( VSCP_EEPROM_END + reg ), val );
         rv =  readEEPROM(( VSCP_EEPROM_END + reg ) );
     }
-	
+
+    else if ( reg == REG_MEASUREMENT_INTERVAL_MSB ) {
+        writeEEPROM(( VSCP_EEPROM_END + reg ), val );
+        rv = readEEPROM( VSCP_EEPROM_END +  reg );
+    }
+  
+    else if ( reg == REG_MEASUREMENT_INTERVAL_LSB ) {
+        writeEEPROM(( VSCP_EEPROM_END + reg ), val );
+        rv = readEEPROM( VSCP_EEPROM_END +  reg );
+    }
+  
 
     else {
         rv = ~val; // error return	
@@ -1104,8 +1137,8 @@ void doWork( void )
 
 
 //    if ( measurement_seconds > readEEPROM( REG_TEMP_INTERVAL ) ) {
-    if ( measurement_seconds > 10 ) {
-            measurement_seconds = 0;
+    if ( measurement_seconds == 0) {
+            measurement_seconds = readEEPROM( VSCP_EEPROM_END +  REG_MEASUREMENT_INTERVAL_MSB  ) * 256 + readEEPROM( VSCP_EEPROM_END +  REG_MEASUREMENT_INTERVAL_LSB  );
 
     uart_puts("Measuring temperature.\n");
     nSensors = search_sensors();
