@@ -434,13 +434,14 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
 		      uint8_t *pData )
 {
   CANMsg msg;
+
   
-  
+   
 #ifdef PRINT_CAN_EVENTS
   char buf[32];
   uint8_t i;
   
-  sprintf(buf, "tx: %03x/%02x/%02x/", vscpclass, vscptype, nodeid);
+  sprintf(buf, "tx: %03x/%02x/%02x/\n", vscpclass, vscptype, nodeid);
   for (i=0; i<size; i++) {
     char dbuf[5];
     sprintf(dbuf, "/%02x", pData[i]);
@@ -449,6 +450,9 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
   uart_puts(buf);
 #endif
   
+   sprintf(buf, "Passing through sendVSCPFrame - %x", 0xff);
+    uart_puts( buf );
+
   msg.id = ( (uint32_t)priority << 26 ) |
     ( (uint32_t)vscpclass << 16 ) |
     ( (uint32_t)vscptype << 8) |
