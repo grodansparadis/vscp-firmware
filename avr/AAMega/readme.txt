@@ -1,7 +1,9 @@
 This project is aimed to act as a base for home-automation
 It was based on the work  by Ake Hedman, eurosource
 
-Hardware supported: custom hardware (AAmega) Schematics are available, but due to a few minor bugs, i'm not spreading them to the public yet. If you are interested, i'll supply them after a simple request.
+Hardware supported: custom hardware (AAmega) Schematics are available, but 
+due to a few minor bugs, I'm not spreading them to the public yet. If you are 
+interested, I'll supply them after a simple request.
 
 All hardware related routines are placed in hardware.h / .c
 
