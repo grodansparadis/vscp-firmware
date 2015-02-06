@@ -352,10 +352,10 @@ int main( void )
 	      uint8_t i;
 	      sprintf(buf, "rx: %03x/%02x/%02x/",
           vscp_imsg.vscp_class, vscp_imsg.vscp_type, vscp_imsg.oaddr);
+          uart_puts(buf);
 	      for (i=0; i<(vscp_imsg.flags&0xf); i++) {
-		char dbuf[5];
-		sprintf(dbuf, "/%02x", vscp_imsg.data[i]);
-		strcat(buf, dbuf);
+		    sprintf(buf, "/%02x", vscp_imsg.data[i]);
+		    uart_puts(buf);
 	      }
 	      uart_puts(buf);
 #endif
