@@ -45,6 +45,7 @@
 #define BTN_INIT_PRESSED    (!(PINA & _BV(0)))
 
 #include <avr/io.h>
+#include <avr/wdt.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
@@ -100,8 +101,12 @@ const uint8_t vscp_manufacturer_id[8] = {
 };
 
 
+#define   wdt_disable();
+
 // Variables
 volatile uint16_t measurement_clock;	// 1 ms timer counter
+
+uint8_t sendTimer; // timer for sendVSCPFrame
 
 int16_t btncnt[ 8 ];    // Switch counters
 
@@ -304,6 +309,7 @@ int main( void )
 	    
             measurement_clock = 0;
             measurement_seconds--;
+            sendTimer++;
             // Do VSCP one second jobs 
             vscp_doOneSecondWork();
 	    
@@ -440,7 +446,11 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
 #ifdef PRINT_CAN_EVENTS
   char buf[32];
   uint8_t i;
-  
+
+ sprintf(buf, "Sending frame with size %x", size);
+  uart_puts( buf );
+
+
   sprintf(buf, "tx: %03x/%02x/%02x/\n", vscpclass, vscptype, nodeid);
   for (i=0; i<size; i++) {
     char dbuf[5];
@@ -450,9 +460,6 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
   uart_puts(buf);
 #endif
   
-   sprintf(buf, "Passing through sendVSCPFrame - %x", 0xff);
-    uart_puts( buf );
-
   msg.id = ( (uint32_t)priority << 26 ) |
     ( (uint32_t)vscpclass << 16 ) |
     ( (uint32_t)vscptype << 8) |
@@ -465,22 +472,29 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
     memcpy( msg.byte, pData, size );
   }
   
- /*
+
+/*
   if ( ERROR_OK != can_SendFrame( &msg ) ) {
     return FALSE;
   }
- */
-  uint8_t timeout = 200;
-  int8_t ret = ERROR_OK;
+*/
 
-  do {
+  int8_t rv = FALSE;
+  sendTimer = 0;
 
-      ret = can_SendFrame( &msg );
-      --timeout;
+  while(sendTimer < 1)
+  {
+    if ( can_SendFrame( &msg ) == ERROR_OK )
+      {
+        rv = TRUE;
+        break;
+      }
 
-  } while((ERROR_OK != ret) && (0 < timeout));
+  }
 
-  return TRUE;
+  msg.flags = 0;
+  return rv;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
