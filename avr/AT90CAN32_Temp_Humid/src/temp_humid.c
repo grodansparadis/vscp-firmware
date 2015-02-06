@@ -106,8 +106,6 @@ const uint8_t vscp_manufacturer_id[8] = {
 // Variables
 volatile uint16_t measurement_clock;	// 1 ms timer counter
 
-uint8_t sendTimer; // timer for sendVSCPFrame
-
 int16_t btncnt[ 8 ];    // Switch counters
 
 // Prototypes
@@ -309,7 +307,6 @@ int main( void )
 	    
             measurement_clock = 0;
             measurement_seconds--;
-            sendTimer++;
             // Do VSCP one second jobs 
             vscp_doOneSecondWork();
 	    
