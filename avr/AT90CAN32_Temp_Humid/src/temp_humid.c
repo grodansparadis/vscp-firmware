@@ -45,7 +45,6 @@
 #define BTN_INIT_PRESSED    (!(PINA & _BV(0)))
 
 #include <avr/io.h>
-#include <avr/wdt.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
@@ -100,8 +99,6 @@ const uint8_t vscp_manufacturer_id[8] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-
-#define   wdt_disable();
 
 // Variables
 volatile uint16_t measurement_clock;	// 1 ms timer counter
