@@ -28,7 +28,8 @@
  *
  * ******************************************************************************
 */
-
+#ifndef TEMP_HUMID_H
+#define TEMP_HUMID_H
 
 // # of elements in decision matrix
 #define DESCION_MATRIX_ELEMENTS             2
@@ -82,4 +83,4 @@ void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId 
 int readEEPROM( uint8_t addr );
 int writeEEPROM( uint8_t addr, uint8_t data );
 
-
+#endif  /* TEMP_HUMID_H */

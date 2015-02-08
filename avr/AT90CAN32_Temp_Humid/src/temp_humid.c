@@ -63,7 +63,7 @@
 #include "vscp_type.h"
 #include "methods.h"
 #include "vscp_registers.h"
-#include "vscp_actions.c"
+#include "vscp_actions.h"
 #include "temp_humid.h"
 #include "onewire.h"
 #include "ds18x20.h"
@@ -102,8 +102,6 @@ const uint8_t vscp_manufacturer_id[8] = {
 
 // Variables
 volatile uint16_t measurement_clock;	// 1 ms timer counter
-
-uint8_t sendTimer; // timer for sendVSCPFrame
 
 int16_t btncnt[ 8 ];    // Switch counters
 
@@ -306,7 +304,6 @@ int main( void )
 	    
             measurement_clock = 0;
             measurement_seconds--;
-            sendTimer++;
             // Do VSCP one second jobs 
             vscp_doOneSecondWork();
 	    
@@ -349,10 +346,10 @@ int main( void )
 	      uint8_t i;
 	      sprintf(buf, "rx: %03x/%02x/%02x/",
           vscp_imsg.vscp_class, vscp_imsg.vscp_type, vscp_imsg.oaddr);
+          uart_puts(buf);
 	      for (i=0; i<(vscp_imsg.flags&0xf); i++) {
-		char dbuf[5];
-		sprintf(dbuf, "/%02x", vscp_imsg.data[i]);
-		strcat(buf, dbuf);
+		    sprintf(buf, "/%02x", vscp_imsg.data[i]);
+		    uart_puts(buf);
 	      }
 	      uart_puts(buf);
 #endif
@@ -437,9 +434,16 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
 		      uint8_t *pData )
 {
   CANMsg msg;
-
+  uint8_t timeout = 200;
+  int8_t canRet = ERROR_OK;
+  int8_t rv = FALSE;
   
-   
+  /* If necessary, limit the size to avoid buffer out of bounce access. */
+  if (8 < size)
+  {
+    size = 8;
+  }
+
 #ifdef PRINT_CAN_EVENTS
   char buf[32];
   uint8_t i;
@@ -449,12 +453,13 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
 
 
   sprintf(buf, "tx: %03x/%02x/%02x/\n", vscpclass, vscptype, nodeid);
-  for (i=0; i<size; i++) {
-    char dbuf[5];
-    sprintf(dbuf, "/%02x", pData[i]);
-    strcat(buf, dbuf);
-  }
   uart_puts(buf);
+  
+  for (i=0; i<size; i++) {
+    sprintf(buf, "/%02x", pData[i]);
+    uart_puts(buf);
+  }
+  
 #endif
   
   msg.id = ( (uint32_t)priority << 26 ) |
@@ -476,20 +481,18 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
   }
 */
 
-  int8_t rv = FALSE;
-  sendTimer = 0;
+  do {
 
-  while(sendTimer < 1)
+      canRet = can_SendFrame( &msg );
+      --timeout;
+
+  } while((ERROR_OK != canRet) && (0 < timeout));
+  
+  if (ERROR_OK == canRet)
   {
-    if ( can_SendFrame( &msg ) == ERROR_OK )
-      {
-        rv = TRUE;
-        break;
-      }
-
+    rv = TRUE;
   }
-
-  msg.flags = 0;
+  
   return rv;
 
 }
