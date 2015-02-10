@@ -1,6 +1,6 @@
-update=Sun 26 Oct 2014 08:16:16 PM CET
+update=Tue 10 Feb 2015 09:02:47 PM CET
 version=1
-last_client=cvpcb
+last_client=eeschema
 [general]
 version=1
 [pcbnew]
@@ -40,6 +40,9 @@ LibName14=Switch-SPS
 LibName15=pin_2x3_smd
 LibName16=Molex_RJ45_Dual
 LibDir=/usr/share/kicad/modules;/home/mamac/Electronic/kicad/modules
+[cvpcb]
+version=1
+NetIExt=net
 [eeschema]
 version=1
 LibDir=/home/mamac/Electronic/kicad/library
@@ -80,6 +83,3 @@ LibName28=atmel
 LibName29=contrib
 LibName30=valves
 LibName31=Molex_Dual_RJ45
-[cvpcb]
-version=1
-NetIExt=net
