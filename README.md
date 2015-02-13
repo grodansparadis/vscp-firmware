@@ -23,8 +23,8 @@ Documentation on how to build your own nodes from this code is here
 http://www.vscp.org/docs/vscpfirmware/doku.php?id=start
 
 
-The main reference implementations for VSCP for CAN is the Paris and the Kelvin modules
-which both can find here http://www.grodansparadis.com/products.html  Both are available as 
-ready made modules, bare pcb's and software and hardware is fully open and free.
+The main reference implementations for VSCP over CAN is the Paris and the Kelvin modules
+which both can found here http://www.grodansparadis.com/products.html  Both are available as 
+ready made modules, bare pcb's and software and hardware is and will always be fully open and free.
 
-Ake Hedman <akhe@grodansparadis.com>, Grodans Paradis AB
+Ake Hedman <akhe@grodansparadis.com>, <a href="http://www.grodansparadis.com">Grodans Paradis AB</a>
