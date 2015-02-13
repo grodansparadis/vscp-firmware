@@ -26,8 +26,9 @@
  * ******************************************************************************
 */
 
-#ifndef CAN32_TEST_COMPILER_H
-#define CAN32_TEST_COMPILER_H
+#ifndef VSCP_COMPILER_H
+#define VSCP_COMPILER_H
 
-#endif
+#endif  /* VSCP_COMPILER_H */
+
 

@@ -30,6 +30,8 @@
  * ******************************************************************************
 */
 
+#ifndef VSCP_ACTIONS_H
+#define VSCP_ACTIONS_H
 
 // * * * Actions * * *
 #define ACTION_NOOP							0
@@ -38,6 +40,7 @@
 
 
 // Prototypes
-void doActionAction1();
-void doActionAction2();
+extern void doActionAction1(void);
+extern void doActionAction2(void);
 
+#endif  /* VSCP_ACTIONS_H */

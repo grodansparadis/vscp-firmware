@@ -42,7 +42,7 @@
 // doActionAction1
 // 
 
-void doActionAction1()
+void doActionAction1(void)
 {
 // code for Action1 is written here
 }
@@ -54,7 +54,7 @@ void doActionAction1()
 // doActionAction2
 //
 
-void doActionAction2()
+void doActionAction2(void)
 {
 // code for Action2 written here
 }
