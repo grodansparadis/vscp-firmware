@@ -7,7 +7,7 @@ is here https://github.com/grodansparadis/can4vscp_paris
 The Kelvin NTC module is documented here http://www.grodansparadis.com/kelvinntc10k/kelvin_ntc10ka.html
 and it's repository is here https://github.com/grodansparadis/can4vscp_kelvin_ntc10k
 
-
+The VSCP PIC1 bootloader for PIC18F devices can be found here https://github.com/grodansparadis/vscp_pic1_bootloader
 
 
 Both Kelvin and Paris can be bought ready built or as bar pcb's from Grodans Paradis AB  http://www.frogshop.se
