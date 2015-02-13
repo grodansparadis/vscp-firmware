@@ -1,0 +1,13 @@
+The Paris and Kelvin projects which is the official reference projects for VSCP using the PIC microprocessor
+has been moved to github and both also have there own documentation pages.
+
+The Paris module is documented here  http://www.grodansparadis.com/paris/paris.html and it's repository
+is here https://github.com/grodansparadis/can4vscp_paris
+
+The Kelvin NTC module is documented here http://www.grodansparadis.com/kelvinntc10k/kelvin_ntc10ka.html
+and it's repository is here https://github.com/grodansparadis/can4vscp_kelvin_ntc10k
+
+
+
+
+Both Kelvin and Paris can be bought ready built or as bar pcb's from Grodans Paradis AB  http://www.frogshop.se
