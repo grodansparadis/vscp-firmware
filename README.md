@@ -11,7 +11,7 @@ files for a specific architecture (folder /{arch}/common) reside.
 
 Most important files for implementers are:
 
-/common/vscp_firmware.* (for Level I nodes) and
+/common/vscp_firmware.* (for Level I nodes) and<br>
 /common/vscp_firmware_level2.* (forLevel II nodes)
 
 which implements the VSCP protocol. There are also some references to
