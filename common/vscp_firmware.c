@@ -68,7 +68,7 @@ uint8_t vscp_alarmstatus;   // VSCP Alarm Status
 uint8_t vscp_node_state;    // State machine state
 uint8_t vscp_node_substate; // State machine sub state
 
-uint8_t vscp_probe_cnt;     // Number of timeout probes
+uint8_t vscp_probe_cnt;     // Number of time-out probes
 
 // Incoming event
 struct _imsg vscp_imsg;
@@ -76,18 +76,18 @@ struct _imsg vscp_imsg;
 // Outgoing event
 struct _omsg vscp_omsg;
 
-uint8_t vscp_probe_address; // Address used during initialization
-uint8_t vscp_initledfunc;   // Init. LED functionality
+uint8_t vscp_probe_address;         // Address used during initialization
+uint8_t vscp_initledfunc;           // Init. LED functionality
 
-volatile uint16_t vscp_timer; // 1 ms timer counter
+volatile uint16_t vscp_timer;       // 1 ms timer counter
 //	increase externally bye one every millisecond
 
-volatile uint8_t vscp_initbtncnt; // init button counter
+volatile uint8_t vscp_initbtncnt;   // init button counter
 //  increase this value externally by one each millisecond
 //  the initbutton is pressed. Set to zero when button
 // is released.
 
-volatile uint8_t vscp_statuscnt; // status LED counter
+volatile uint8_t vscp_statuscnt;    // status LED counter
 //	increase externally bye one every millisecond
 
 volatile uint16_t vscp_configtimer; // configuration timer
@@ -164,7 +164,7 @@ void vscp_init(void)
 
 int8_t vscp_check_pstorage(void)
 {
-    // controlbyte == 01xxxxxx means initialized
+    // control byte == 01xxxxxx means initialized
     // everything else is uninitialized
     if ((vscp_getSegmentCRC() & 0xc0) == 0x40) {
         return TRUE;
@@ -204,7 +204,7 @@ void vscp_handleProbeState(void)
 
             if (VSCP_ADDRESS_FREE != vscp_probe_address) {
 
-                vscp_omsg.flags = VSCP_VALID_MSG + 1; // one databyte
+                vscp_omsg.flags = VSCP_VALID_MSG + 1; // one data byte
                 vscp_omsg.priority = VSCP_PRIORITY_HIGH;
                 vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
                 vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
@@ -222,8 +222,8 @@ void vscp_handleProbeState(void)
                 vscp_node_state = VSCP_STATE_ERROR;
 
                 // Tell system we are giving up
-                vscp_omsg.flags = VSCP_VALID_MSG + 1; // one databyte
-                vscp_omsg.data[ 0 ] = 0xff; // we are unassigned
+                vscp_omsg.flags = VSCP_VALID_MSG + 1;   // one data byte
+                vscp_omsg.data[ 0 ] = 0xff;             // we are unassigned
                 vscp_omsg.priority = VSCP_PRIORITY_LOW;
                 vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
                 vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_PROBE_ACK;
@@ -261,16 +261,16 @@ void vscp_handleProbeState(void)
                 }
             } else {
 
-                if (vscp_timer > VSCP_PROBE_TIMEOUT) { // Check for timeout
+                if (vscp_timer > VSCP_PROBE_TIMEOUT) { // Check for time-out
 
-                    vscp_probe_cnt++; // Another timeout
+                    vscp_probe_cnt++; // Another time-out
 
                     if (vscp_probe_cnt >= VSCP_PROBE_TIMEOUT_COUNT) {
 
-                        // Yes we have a timeout
+                        // Yes we have a time-out
                         if (0 == vscp_probe_address) { // master controller probe?
 
-                            // No master controler on segment, try next node
+                            // No master controller on segment, try next node
                             vscp_probe_address++;
                             vscp_node_substate = VSCP_SUBSTATE_NONE;
                             vscp_timer = 0;
@@ -348,7 +348,7 @@ void vscp_handlePreActiveState(void)
 
 void vscp_goActiveState(void)
 {
-    vscp_omsg.flags = VSCP_VALID_MSG + 1; // one databyte
+    vscp_omsg.flags = VSCP_VALID_MSG + 1; // one data byte
     vscp_omsg.priority = VSCP_PRIORITY_HIGH;
     vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
     vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
@@ -368,7 +368,7 @@ void vscp_goActiveState(void)
 
 void vscp_sendHeartBeat(uint8_t zone, uint8_t subzone)
 {
-    vscp_omsg.flags = VSCP_VALID_MSG + 3; // three databyte
+    vscp_omsg.flags = VSCP_VALID_MSG + 3; // three data byte
     vscp_omsg.priority = VSCP_PRIORITY_LOW;
     vscp_omsg.vscp_class = VSCP_CLASS1_INFORMATION;
     vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_NODE_HEARTBEAT;
@@ -448,7 +448,7 @@ void vscp_handleDropNickname(void)
 			// bit 6 set: reset persistent storage, continue to check other
 			// options in byte 1
 			if (vscp_imsg.data[1] & (1<<6)) {
-				// reset persistant storage here
+				// reset persistent storage here
 				}
 			// bit 5 set: reset device, keep nickname, disregard other option
 			// below this by using 'brake'
@@ -456,7 +456,7 @@ void vscp_handleDropNickname(void)
 				vscp_hardreset();
 				brake = 1;}
 
-			// bit 7 set: go idle, e.g. stay in an endless loop until repower
+			// bit 7 set: go idle, e.g. stay in an endless loop until re-power
 			if ((vscp_imsg.data[1] & (1<<7)) && (brake == 0)) { 
 				vscp_nickname = VSCP_ADDRESS_FREE;
 				vscp_writeNicknamePermanent(VSCP_ADDRESS_FREE);
@@ -467,7 +467,7 @@ void vscp_handleDropNickname(void)
 		// none of the options from byte 1 have been used or byte 1 itself
 		// has not been transmitted at all
 		if ((bytes == 1) || ((bytes > 1) && (vscp_imsg.data[1] == 0))) {
-			// this is the regular behavior without using byte 1 options
+			// this is the regular behaviour without using byte 1 options
 			vscp_nickname = VSCP_ADDRESS_FREE;
 			vscp_writeNicknamePermanent(VSCP_ADDRESS_FREE);
 	        vscp_init();
@@ -497,7 +497,7 @@ void vscp_newNodeOnline(void)
 
         // This is a probe which use our nickname
         // we have to respond to tell the new node that
-        // ths nickname is in use
+        // this nickname is in use
 
         vscp_omsg.flags = VSCP_VALID_MSG;
         vscp_omsg.priority = VSCP_PRIORITY_HIGH;
@@ -611,7 +611,7 @@ uint8_t vscp_readStdReg(uint8_t reg)
     }
     else if (reg < VSCP_REG_MANUFACTUR_ID0) {
 
-        // * * * Read from persitant locations * * *
+        // * * * Read from persistent locations * * *
         rv = vscp_getUserID(reg - VSCP_REG_USERID0);
 
     }
@@ -1090,7 +1090,7 @@ void vscp_handleProtocolEvent(void)
                     vscp_sendEvent();
                 }
 
-                for (j = 0; j < 5; j++) // fillup previous event with MDF
+                for (j = 0; j < 5; j++) // fill up previous event with MDF
                 {
                     if (vscp_getMDF_URL(j) > 0)
                         vscp_omsg.data[3 + j] = vscp_getMDF_URL(j);
