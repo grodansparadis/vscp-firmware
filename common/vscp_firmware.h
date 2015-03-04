@@ -451,7 +451,7 @@ int8_t vscp_getEvent(void);
 
 // --------------------------- External Functions -----------------------------
 //
-// All functions below should be implemented by the application
+// All methods/callbacks below should be implemented by the application
 //
 // --------------------------- External Functions -----------------------------
 
@@ -492,11 +492,9 @@ int8_t sendVSCPFrame(uint16_t vscpclass,
 
 
 /*!
-    *********************************************************
-    The following methods must be defined
+    The following methods/callbacks must be defined
     in the application and should return firmware version
     information
-    *********************************************************
  */
 uint8_t vscp_getMajorVersion(void);
 uint8_t vscp_getMinorVersion(void);
@@ -577,15 +575,15 @@ uint8_t vscp_getSegmentCRC(void);
  */
 void vscp_setSegmentCRC(uint8_t crc);
 
-/*! 
-        Write control byte permanent storage
- */
-void vscp_setControlByte(uint8_t ctrl);
-
 /*!
         Fetch control byte from permanent storage
  */
 uint8_t vscp_getControlByte(void);
+
+/*! 
+        Write control byte permanent storage
+ */
+void vscp_setControlByte(uint8_t ctrl);
 
 /*! 
         Get page select bytes
