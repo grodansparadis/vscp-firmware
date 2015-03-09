@@ -449,13 +449,21 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
 		      uint8_t *pData )
 {
   CANMsg msg;
-  
+  uint8_t timeout = 200;
+  int8_t canRet = ERROR_OK;
+  int8_t rv = FALSE;
+
+  /* If necessary, limit the size to avoid buffer out of bounce access. */
+  if (8 < size)
+  {
+    size = 8;
+  }
   
 #ifdef PRINT_CAN_EVENTS
   char buf[32];
   uint8_t i;
   
-  sprintf(buf, "tx: %03x/%02x/%02x/", vscpclass, vscptype, nodeid);
+  sprintf(buf, "tx: %03x/%02x/%02x/\n", vscpclass, vscptype, nodeid);
   for (i=0; i<size; i++) {
     char dbuf[5];
     sprintf(dbuf, "/%02x", pData[i]);
@@ -476,11 +484,20 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
     memcpy( msg.byte, pData, size );
   }
   
-  if ( ERROR_OK != can_SendFrame( &msg ) ) {
-    return FALSE;
+  do {
+
+      canRet = can_SendFrame( &msg );
+      --timeout;
+
+  } while((ERROR_OK != canRet) && (0 < timeout));
+  
+  if (ERROR_OK == canRet)
+  {
+    rv = TRUE;
   }
   
-  return TRUE;
+  return rv;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////

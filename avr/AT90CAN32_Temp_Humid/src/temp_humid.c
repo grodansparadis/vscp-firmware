@@ -448,18 +448,13 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
   char buf[32];
   uint8_t i;
 
- sprintf(buf, "Sending frame with size %x", size);
-  uart_puts( buf );
-
-
   sprintf(buf, "tx: %03x/%02x/%02x/\n", vscpclass, vscptype, nodeid);
-  uart_puts(buf);
-  
   for (i=0; i<size; i++) {
-    sprintf(buf, "/%02x", pData[i]);
-    uart_puts(buf);
+    char dbuf[5];
+    sprintf(dbuf, "/%02x", pData[i]);
+    strcat(buf, dbuf);
   }
-  
+  uart_puts(buf);
 #endif
   
   msg.id = ( (uint32_t)priority << 26 ) |
@@ -474,13 +469,6 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
     memcpy( msg.byte, pData, size );
   }
   
-
-/*
-  if ( ERROR_OK != can_SendFrame( &msg ) ) {
-    return FALSE;
-  }
-*/
-
   do {
 
       canRet = can_SendFrame( &msg );
