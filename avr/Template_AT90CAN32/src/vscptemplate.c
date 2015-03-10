@@ -33,13 +33,13 @@
 		Used Hardware resources
 		=======================
 
-		PORTB Pin 0 - Status LED
+    PORTC Pin 7 - Status LED
 		PORTA Pin 0 - Init button
 */
 
-#define LED_STATUS_ON       ((PORTB &= ~_BV(0)))
-#define LED_STATUS_OFF      ((PORTB |= _BV(0)))
-#define LED_STATUS_TOGGLE   ((PORTB ^= _BV(0)))
+#define LED_STATUS_ON       ((PORTC &= ~_BV(7)))
+#define LED_STATUS_OFF      ((PORTC |= _BV(7)))
+#define LED_STATUS_TOGGLE   ((PORTC ^= _BV(7)))
 
 #define BTN_INIT_PRESSED    (!(PINA & _BV(0)))
 #define BTN_SW1_PRESSED     (!(PINA & _BV(1)))
@@ -254,6 +254,9 @@ int main( void )
     DDRB = 0xFF;	    // Port B all outputs 
     PORTB = 0xFF;	    // all LEDS off
     
+    DDRC = 0xFF;      // Port C all outputs 
+    PORTC = 0xFF;     // all LEDS off
+
     // Initialize UART
     UCSRA = 0;
     UCSRC = MSK_UART_8BIT;	// 8N1
