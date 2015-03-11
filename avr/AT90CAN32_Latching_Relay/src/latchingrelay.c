@@ -64,7 +64,7 @@
 #include "vscp_type.h"
 #include "vscp_registers.h"
 #include "vscp_actions.c"
-#include "vscptemplate.h"
+#include "latchingrelay.h"
 
 #ifndef GUID_IN_EEPROM
 // GUID is stored in ROM for this module
@@ -580,8 +580,7 @@ uint8_t vscp_readAppReg( uint8_t reg )
 
     // Zone
     if ( REG_ZONE == reg ) {
-        //rv =  readEEPROM( REG_ZONE + VSCP_EEPROM_END );
-		rv = 32;
+        rv =  readEEPROM( REG_ZONE + VSCP_EEPROM_END );
     }
 
     // SubZone
@@ -589,51 +588,6 @@ uint8_t vscp_readAppReg( uint8_t reg )
         rv =  readEEPROM( REG_SUBZONE + VSCP_EEPROM_END );
     }
             
-    // SubZone for LED0
-    else if ( REG_SWITCH0_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH0_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED1
-    else if ( REG_SWITCH1_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH1_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED2
-    else if ( REG_SWITCH2_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH2_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED3
-    else if ( REG_SWITCH3_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH3_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED4
-    else if ( REG_SWITCH4_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH4_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED5
-    else if ( REG_SWITCH5_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH5_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED6
-    else if ( REG_SWITCH6_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH6_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED7
-    else if ( REG_SWITCH7_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH7_SUBZONE + VSCP_EEPROM_END );
-    }    
-
-    // Read LED status
-    else if ( REG_LED_CONTROL == reg ) {
-        // Return inverted because we want a '1' to represent 'on'
-        rv =  ~PORTB;
-    }
     
     // DM register space    for ( pos = REG_DM_DUMMY; pos < ( REG_DM_DUMMY + DESCION_MATRIX_ELEMENTS * 8 ); pos++ ) {
     else if ( ( reg >= REG_DM_START ) && ( reg < REG_DM_START + DESCION_MATRIX_ELEMENTS * 8) ) {
@@ -656,6 +610,12 @@ uint8_t vscp_readAppReg( uint8_t reg )
 uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
 {
     uint8_t rv;
+    char buf[30];
+
+    sprintf(buf, "Writing app reg: %x", VSCP_EEPROM_END + reg);
+    uart_puts( buf );
+    sprintf(buf, "Writing value: %x", val);
+    uart_puts( buf );
 
     rv = ~val; // error return
 
@@ -663,6 +623,7 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
     if ( REG_ZONE == reg ) {
         writeEEPROM( REG_ZONE + VSCP_EEPROM_END, val );
         rv =  readEEPROM( REG_ZONE + VSCP_EEPROM_END );
+        uart_puts("wrote reg_zone\n");
     }
 
     // SubZone
@@ -671,64 +632,7 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
             rv =  readEEPROM( REG_SUBZONE + VSCP_EEPROM_END );
     }	
             
-    // SubZone for LED0
-    else if ( REG_SWITCH0_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH0_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH0_SUBZONE + VSCP_EEPROM_END );
-    }
 
-    // SubZone for LED1
-    else if ( REG_SWITCH1_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH1_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH1_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED2
-    else if ( REG_SWITCH2_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH2_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH2_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED3
-    else if ( REG_SWITCH3_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH3_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH3_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED4
-    else if ( REG_SWITCH4_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH4_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH4_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED5
-    else if ( REG_SWITCH5_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH5_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH5_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED6
-    else if ( REG_SWITCH6_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH6_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH6_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED7
-    else if ( REG_SWITCH7_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH7_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH7_SUBZONE + VSCP_EEPROM_END );
-    } 
-
-    // Write LED status
-    else if ( REG_LED_CONTROL == reg ) {
-#ifdef OLIMEX_AT90CAN128
-        PORTE = (uint8_t)(~(val | 1));
-        rv = ~PORTE;
-#else        
-        PORTB = (uint8_t)(~(val | 1));
-        rv = ~PORTB;
-#endif            
-    }
     
     // DM register space
     else if ( ( reg >= REG_DM_START ) && ( reg < 0x80) ) {
