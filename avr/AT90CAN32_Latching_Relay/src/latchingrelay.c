@@ -455,11 +455,11 @@ static void init_app_eeprom( void )
 //
 
 int8_t sendVSCPFrame( uint16_t vscpclass,
-		      uint8_t vscptype,
-		      uint8_t nodeid,
-		      uint8_t priority,
-		      uint8_t size,
-		      uint8_t *pData )
+          uint8_t vscptype,
+          uint8_t nodeid,
+          uint8_t priority,
+          uint8_t size,
+          uint8_t *pData )
 {
   CANMsg msg;
   uint8_t timeout = 200;
@@ -477,18 +477,17 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
   uint8_t i;
   
   sprintf(buf, "tx: %03x/%02x/%02x/\n", vscpclass, vscptype, nodeid);
-  for (i=0; i<size; i++) {
-    char dbuf[5];
-    sprintf(dbuf, "/%02x", pData[i]);
-    strcat(buf, dbuf);
-  }
   uart_puts(buf);
+  for (i = 0; i < size; i++) {
+    sprintf(buf, "/%02x", pData[i]);
+    uart_puts(buf);
+  }
 #endif
   
   msg.id = ( (uint32_t)priority << 26 ) |
     ( (uint32_t)vscpclass << 16 ) |
     ( (uint32_t)vscptype << 8) |
-    nodeid;		// nodeaddress (our address)
+    nodeid;   // nodeaddress (our address)
   
   
   msg.flags = CAN_IDFLAG_EXTENDED;
