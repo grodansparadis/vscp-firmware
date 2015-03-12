@@ -467,12 +467,11 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
   uint8_t i;
   
   sprintf(buf, "tx: %03x/%02x/%02x/\n", vscpclass, vscptype, nodeid);
-  for (i=0; i<size; i++) {
-    char dbuf[5];
-    sprintf(dbuf, "/%02x", pData[i]);
-    strcat(buf, dbuf);
-  }
   uart_puts(buf);
+  for (i = 0; i < size; i++) {
+    sprintf(buf, "/%02x", pData[i]);
+    uart_puts(buf);
+  }
 #endif
   
   msg.id = ( (uint32_t)priority << 26 ) |
@@ -503,7 +502,7 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
 
 }
 
-///////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////
 // getVSCPFrame
 //
 //
@@ -589,51 +588,6 @@ uint8_t vscp_readAppReg( uint8_t reg )
         rv =  readEEPROM( REG_SUBZONE + VSCP_EEPROM_END );
     }
             
-    // SubZone for LED0
-    else if ( REG_SWITCH0_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH0_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED1
-    else if ( REG_SWITCH1_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH1_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED2
-    else if ( REG_SWITCH2_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH2_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED3
-    else if ( REG_SWITCH3_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH3_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED4
-    else if ( REG_SWITCH4_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH4_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED5
-    else if ( REG_SWITCH5_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH5_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED6
-    else if ( REG_SWITCH6_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH6_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED7
-    else if ( REG_SWITCH7_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH7_SUBZONE + VSCP_EEPROM_END );
-    }    
-
-    // Read LED status
-    else if ( REG_LED_CONTROL == reg ) {
-        // Return inverted because we want a '1' to represent 'on'
-        rv =  ~PORTB;
-    }
     
     // DM register space    for ( pos = REG_DM_DUMMY; pos < ( REG_DM_DUMMY + DESCION_MATRIX_ELEMENTS * 8 ); pos++ ) {
     else if ( ( reg >= REG_DM_START ) && ( reg < REG_DM_START + DESCION_MATRIX_ELEMENTS * 8) ) {
