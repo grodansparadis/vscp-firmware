@@ -34,12 +34,22 @@
 		=======================
 
     PORTC Pin 7 - Status LED
+    PORTC Pin 0 - set relay ON
+    PORTC Pin 1 - set relay OFF
 		PORTA Pin 0 - Init button
 */
 
 #define LED_STATUS_ON       ((PORTC &= ~_BV(7)))
 #define LED_STATUS_OFF      ((PORTC |= _BV(7)))
 #define LED_STATUS_TOGGLE   ((PORTC ^= _BV(7)))
+
+#define RELAY_ON_ON       ((PORTC &= ~_BV(0)))
+#define RELAY_ON_OFF      ((PORTC |= _BV(0)))
+#define RELAY_ON_TOGGLE   ((PORTC ^= _BV(0)))
+
+#define RELAY_OFF_ON       ((PORTC &= ~_BV(1)))
+#define RELAY_OFF_OFF      ((PORTC |= _BV(1)))
+#define RELAY_OFF_TOGGLE   ((PORTC ^= _BV(1)))
 
 #define BTN_INIT_PRESSED    (!(PINA & _BV(0)))
 #define BTN_SW1_PRESSED     (!(PINA & _BV(1)))
@@ -99,7 +109,7 @@ const uint8_t vscp_manufacturer_id[8] = {
 
 
 // Variables
-volatile uint16_t measurement_clock;	// 1 ms timer counter
+volatile uint16_t measurement_clock;  // 1 ms timer counter
 
 int16_t btncnt[ 8 ];    // Switch counters
 
