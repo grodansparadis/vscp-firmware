@@ -132,6 +132,8 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
   vscp_timer++;
   measurement_clock++;
 
+  relay_pulse_width--;
+
   // Check for init button
   if ( BTN_INIT_PRESSED ) {
     // Active
@@ -141,68 +143,6 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
     vscp_initbtncnt = 0;
   }
   
-  // Check for Switch 1
-  if ( BTN_SW1_PRESSED ) {
-    // Active
-    btncnt[1]++;
-  }
-  else {
-    btncnt[1] = 0;
-  }
-  
-  // Check for Switch 2
-  if ( BTN_SW2_PRESSED ) {
-    // Active
-    btncnt[2]++;
-  }
-  else {
-    btncnt[2] = 0;
-  }
-  
-  // Check for Switch 3
-  if ( BTN_SW3_PRESSED ) {
-    // Active
-    btncnt[3]++;
-  }
-  else {
-    btncnt[3] = 0;
-  }
-  
-  // Check for Switch 4
-  if ( BTN_SW4_PRESSED ) {
-    // Active
-    btncnt[4]++;
-  }
-  else {
-    btncnt[4] = 0;
-  }
-  
-  // Check for Switch 5
-  if ( BTN_SW5_PRESSED ) {
-    // Active
-    btncnt[5]++;
-  }
-  else {
-    btncnt[5] = 0;
-  }
-  
-  // Check for Switch 6
-  if ( BTN_SW6_PRESSED ) {
-    // Active
-    btncnt[6]++;
-  }
-  else {
-    btncnt[6] = 0;
-  }
-  
-  // Check for Switch 7
-  if ( BTN_SW7_PRESSED ) {
-    // Active
-    btncnt[7]++;
-  }
-  else {
-    btncnt[7] = 0;
-  }
     
   // Status LED
   vscp_statuscnt++;
@@ -262,10 +202,10 @@ int main( void )
     DDRA = 0x00;	    // Port A all inputs
 	
     DDRB = 0xFF;	    // Port B all outputs 
-    PORTB = 0xFF;	    // all LEDS off
+    PORTB = 0x00;	    // all LEDS off
     
     DDRC = 0xFF;      // Port C all outputs 
-    PORTC = 0xFF;     // all LEDS off
+    PORTC = 0x00;     // all LEDS off
 
     // Initialize UART
     UCSRA = 0;
@@ -286,7 +226,7 @@ int main( void )
     }
 
     uart_puts( "VSCP AT90CAN32\n" );
-    uart_puts( "Template firmware\n" );
+    uart_puts( "Latching relay module\n" );
 
 
 	// Check VSCP persistent storage and
@@ -322,7 +262,7 @@ int main( void )
 	  if ( measurement_clock > 1000 ) {
 	    
             measurement_clock = 0;
-	    
+
             // Do VSCP one second jobs 
             vscp_doOneSecondWork();
 	    
@@ -419,15 +359,7 @@ static void init_app_eeprom( void )
   
   writeEEPROM( REG_ZONE + VSCP_EEPROM_END, 0 );
   writeEEPROM( REG_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH0_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH1_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH2_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH3_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH4_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH5_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH6_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH7_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_LED_CONTROL + VSCP_EEPROM_END, 0 );
+//  writeEEPROM( REG_LED_CONTROL + VSCP_EEPROM_END, 0 );
   
   // Decision matrix storage
   for ( pos = REG_DM_START; pos < ( REG_DM_START + DESCION_MATRIX_ELEMENTS * 8 ); pos++ ) {
@@ -999,12 +931,20 @@ uart_puts("doDM\n");
     for ( i=0; i<DESCION_MATRIX_ELEMENTS; i++ ) {
 
         // Get DM flags for this row
-        dmflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 
-                                    1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
-		uart_puts( "debug  doDM check rows\n" );
+        dmflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
+
+        char buf[30];
+        sprintf(buf, "dmflags for row %i: %i\n", i, dmflags);
+        uart_puts(buf);
+
+
+		uart_puts( "Checking DM rows\n" );
+
         // Is the DM row enabled?
         if ( dmflags & VSCP_DM_FLAG_ENABLED ) {
-			uart_puts( "debug  doDM row enabled\n" );
+
+			uart_puts( "DM flag enabled - [OK]\n" );
+
             // Should the originating id be checked and if so is it the same?
             if ( !( dmflags & VSCP_DM_FLAG_CHECK_OADDR ) &&
                     !(  vscp_imsg.oaddr == 
@@ -1016,8 +956,13 @@ uart_puts("doDM\n");
 
             // Check if zone should match and if so if it match
             if ( dmflags & VSCP_DM_FLAG_CHECK_ZONE  ) {
+                    uart_puts( "Zone should match\n" );
+
                 if ( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_END + REG_ZONE  ) ) {
+
+                    uart_puts( "Zone mismatch, continue...\n" );
                     continue;
+
                 }	
             }				
 			
@@ -1048,6 +993,7 @@ uart_puts("doDM\n");
                 switch ( readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTION  ) ) {
 
                     case ACTION_ACTION1:
+                        uart_puts( "Executing action 1\n" );
                         doActionAction1();
                         break;
 
@@ -1095,7 +1041,7 @@ void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId 
 
     vscp_omsg.data[ 0 ] = idx;	// Register
     vscp_omsg.data[ 1 ] = readEEPROM( VSCP_EEPROM_END + REG_ZONE );
-    vscp_omsg.data[ 2 ] = readEEPROM( VSCP_EEPROM_END + REG_SWITCH0_SUBZONE + idx );
+    vscp_omsg.data[ 2 ] = readEEPROM( VSCP_EEPROM_END + REG_SUBZONE + idx );
 
     vscp_sendEvent();	// Send data
 }

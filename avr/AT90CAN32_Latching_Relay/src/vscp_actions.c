@@ -42,9 +42,15 @@
 // doActionAction1
 // 
 
+volatile uint8_t relay_pulse_width = 100;  // pull-up timer to change relay state
+
 void doActionAction1()
 {
-// code for Action1 is written here
+
+RELAY_ON_TOGGLE;
+
+relay_pulse_width = 100; // ms pulse width
+
 }
 
 
