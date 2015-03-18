@@ -43,12 +43,12 @@
 #define LED_STATUS_OFF      ((PORTC |= _BV(7)))
 #define LED_STATUS_TOGGLE   ((PORTC ^= _BV(7)))
 
-#define RELAY_ON_ON       ((PORTC &= ~_BV(0)))
-#define RELAY_ON_OFF      ((PORTC |= _BV(0)))
+#define RELAY_ON_ON       ((PORTC |= _BV(0)))
+#define RELAY_ON_OFF      ((PORTC &= ~_BV(0)))
 #define RELAY_ON_TOGGLE   ((PORTC ^= _BV(0)))
 
-#define RELAY_OFF_ON       ((PORTC &= ~_BV(1)))
-#define RELAY_OFF_OFF      ((PORTC |= _BV(1)))
+#define RELAY_OFF_ON       ((PORTC |= _BV(1)))
+#define RELAY_OFF_OFF      ((PORTC &= ~_BV(1)))
 #define RELAY_OFF_TOGGLE   ((PORTC ^= _BV(1)))
 
 #define BTN_INIT_PRESSED    (!(PINA & _BV(0)))
@@ -132,8 +132,6 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
   vscp_timer++;
   measurement_clock++;
 
-  relay_pulse_width--;
-
   // Check for init button
   if ( BTN_INIT_PRESSED ) {
     // Active
@@ -158,7 +156,14 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
     LED_STATUS_OFF;
     vscp_statuscnt = 0;
   }
-  
+
+  relay_pulse_width++;
+  if(relay_pulse_width > 200) // pulse width in miliseconds
+  {
+    RELAY_ON_OFF;
+    RELAY_OFF_OFF;
+  }
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -262,6 +267,8 @@ int main( void )
 	  if ( measurement_clock > 1000 ) {
 	    
             measurement_clock = 0;
+
+            relay_pulse_width--;
 
             // Do VSCP one second jobs 
             vscp_doOneSecondWork();
@@ -956,7 +963,7 @@ uart_puts("doDM\n");
 
             // Check if zone should match and if so if it match
             if ( dmflags & VSCP_DM_FLAG_CHECK_ZONE  ) {
-                    uart_puts( "Zone should match\n" );
+                    uart_puts( "Zone should match...\n" );
 
                 if ( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_END + REG_ZONE  ) ) {
 
@@ -964,6 +971,7 @@ uart_puts("doDM\n");
                     continue;
 
                 }	
+                    uart_puts( "Zone match - [OK]\n" );
             }				
 			
             class_filter = ( ( dmflags & VSCP_DM_FLAG_CLASS_FILTER ) << 8 ) + 
@@ -995,6 +1003,9 @@ uart_puts("doDM\n");
                     case ACTION_ACTION1:
                         uart_puts( "Executing action 1\n" );
                         doActionAction1();
+                        sprintf(buf, "relay_pulse_width : %i\n", relay_pulse_width);
+                        uart_puts(buf);
+
                         break;
 
                     case ACTION_ACTION2:
@@ -1054,6 +1065,15 @@ void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId 
 
 void doWork( void )
 {
+
+  if(relay_pulse_width == 0)
+  {
+    RELAY_ON_OFF;
+  }
+//  else
+//  {
+//    relay_pulse_width--;
+//  }
 
 }
 

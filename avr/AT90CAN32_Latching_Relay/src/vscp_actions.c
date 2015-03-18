@@ -38,18 +38,19 @@
 #include "vscp_registers.h"
 #include "latchingrelay.h"
 
+volatile uint8_t relay_pulse_width;  // pull-up timer to change relay state
+
 ///////////////////////////////////////////////////////////////////////////////
 // doActionAction1
 // 
 
-volatile uint8_t relay_pulse_width = 100;  // pull-up timer to change relay state
 
 void doActionAction1()
 {
 
-RELAY_ON_TOGGLE;
+RELAY_ON_ON;
 
-relay_pulse_width = 100; // ms pulse width
+relay_pulse_width = 0;
 
 }
 
@@ -62,6 +63,10 @@ relay_pulse_width = 100; // ms pulse width
 
 void doActionAction2()
 {
-// code for Action2 written here
+
+RELAY_OFF_ON;
+
+relay_pulse_width = 0;
+
 }
 
