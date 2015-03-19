@@ -80,10 +80,15 @@
 		<reg page="0" offset="113" >
 			<name lang="en">Decision matrix row 1: flags </name>
 			<description lang="en">
-			Row 1 of decision matrix. Flags. Set selection behaviour.\n
-            The enable bit can be used to disable a decion matrix row while it is edited.\n
-			The zone and use subzone bits can be activated to have a check on the zone/subzone information of an event.\n  
-            That is the zone/subzone of the machine must match the one of the event to trigger the DM row.\n  
+			Row 1 of decision matrix.\n
+			7 - Row is enabled if set to 1\n
+			6 - oaddr should match nickname of event (=1) or don't care (=0)\n
+			5 - Indicates hard-coded originating address if set to 1\n
+			4 - Match Zone to trigger DM entry if set to 1\n
+			3 - Match sub-zone to trigger DM entry if set to 1\n
+			2 - Reserved\n
+			1 - Class-mask bit 8\n
+			0 - Class-filter bit 8\n
 			</description>
 			<access>rw</access>
 			<bit pos="0" default="0" >
@@ -98,11 +103,11 @@
 				<name lang="en">Reserved bit</name>
       	   <description lang="en">This bit is not used.</description> 
 			</bit>
-			<bit pos="3" default="false" >
+			<bit pos="3" default="true" >
 				<name lang="en">Subzone match</name>
       	   <description lang="en">If set to one subzone should be matched to trigger DM entry action.</description> 
 			</bit>
-			<bit pos="4" default="false" >
+			<bit pos="4" default="true" >
 				<name lang="en">Zone match</name>
       	   <description lang="en">If set to one zone should be matched to trigger DM entry action.</description> 
 			</bit>
@@ -114,7 +119,7 @@
 				<name lang="en">Check Originating address</name>
       	   <description lang="en">If set to one the originating address should be checked and match to trigger DM entry action.</description> 
 			</bit>
-			<bit pos="7" default="false" >
+			<bit pos="7" default="true" >
 				<name lang="en">Enable</name>
       	   <description lang="en">Enable (1) or disable (0)the decison matrix row.</description> 
 			</bit>												
@@ -187,9 +192,15 @@
 		<reg page="0" offset="121" >
 			<name lang="en">Decision matrix row 2: flags </name>
 			<description lang="en">
-			Row 1 of decision matrix. Flags. Set selection behaviour.\n
-			The enable bit can be used to disable a decion matrix row while it is edited.\n
-			The zone and use subzone bits can be activated to have a check on the zone/subzone information of an event. That is the zone/subzone of the machine must match the one of the event to trigger the DM row.\n  
+			Row 1 of decision matrix.\n
+			7 - Row is enabled if set to 1\n
+			6 - oaddr should match nickname of event (=1) or don't care (=0)\n
+			5 - Indicates hard-coded originating address if set to 1\n
+			4 - Match Zone to trigger DM entry if set to 1\n
+			3 - Match sub-zone to trigger DM entry if set to 1\n
+			2 - Reserved\n
+			1 - Class-mask bit 8\n
+			0 - Class-filter bit 8\n
 			</description>
 			<access>rw</access>
 			<bit pos="0" default="0" >
@@ -204,11 +215,11 @@
 				<name lang="en">Reserved bit</name>
       	   <description lang="en">This bit is not used.</description> 
 			</bit>
-			<bit pos="3" default="false" >
+			<bit pos="3" default="true" >
 				<name lang="en">Subzone match</name>
       	   <description lang="en">If set to one subzone should be matched to trigger DM entry action.</description> 
 			</bit>
-			<bit pos="4" default="false" >
+			<bit pos="4" default="true" >
 				<name lang="en">Zone match</name>
       	   <description lang="en">If set to one zone should be matched to trigger DM entry action.</description> 
 			</bit>
@@ -220,7 +231,7 @@
 				<name lang="en">Check Originating address</name>
       	   <description lang="en">If set to one the originating address should be checked and match to trigger DM entry action.</description> 
 			</bit>
-			<bit pos="7" default="false" >
+			<bit pos="7" default="true" >
 				<name lang="en">Enable</name>
       	   <description lang="en">Enable (1) or disable (0)the decison matrix row.</description> 
 			</bit>												

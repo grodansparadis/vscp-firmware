@@ -1001,14 +1001,12 @@ uart_puts("doDM\n");
                 switch ( readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTION  ) ) {
 
                     case ACTION_ACTION1:
-                        uart_puts( "Executing action 1\n" );
+                        uart_puts( "Running action 1\n" );
                         doActionAction1();
-                        sprintf(buf, "relay_pulse_width : %i\n", relay_pulse_width);
-                        uart_puts(buf);
-
                         break;
 
                     case ACTION_ACTION2:
+                        uart_puts( "Running action 2\n" );
                         doActionAction2();	
                         break;
 
