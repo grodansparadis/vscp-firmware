@@ -305,6 +305,7 @@ extern uint8_t vscp_probe_address;  ///< Probe address for nickname discovery
 extern volatile uint8_t vscp_initbtncnt;    ///< init. button counter
 extern volatile uint8_t vscp_statuscnt;     ///< status LED counter
 extern uint16_t vscp_page_select;   ///< Selected Register Page
+extern volatile uint16_t vscp_configtimer; ///< configuration timer
 
 extern const uint8_t vscp_deviceURL[]; ///<  GUID
 
@@ -677,9 +678,9 @@ uint32_t vscp_getFamilyType(void);
 void vscp_restoreDefaults(void);
 
 #ifdef DROP_NICKNAME_EXTENDED_FEATURES
-	void vscp_hardreset(void);
-	void vscp_wait_ms(uint16_t ms);
-	void vscp_wait_s(uint16_t ms);
+	void vscp_hardreset(void);              // Do a hard reset of the device
+	void vscp_wait_ms(uint16_t ms);         // Wait for milliseconds
+	void vscp_wait_s(uint16_t sec);         // Wait for seconds
 #endif
 
 #endif
