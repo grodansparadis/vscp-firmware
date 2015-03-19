@@ -33,13 +33,13 @@
 		Used Hardware resources
 		=======================
 
-		PORTB Pin 0 - Status LED
+    PORTC Pin 7 - Status LED
 		PORTA Pin 0 - Init button
 */
 
-#define LED_STATUS_ON       ((PORTB &= ~_BV(0)))
-#define LED_STATUS_OFF      ((PORTB |= _BV(0)))
-#define LED_STATUS_TOGGLE   ((PORTB ^= _BV(0)))
+#define LED_STATUS_ON       ((PORTC &= ~_BV(7)))
+#define LED_STATUS_OFF      ((PORTC |= _BV(7)))
+#define LED_STATUS_TOGGLE   ((PORTC ^= _BV(7)))
 
 #define BTN_INIT_PRESSED    (!(PINA & _BV(0)))
 #define BTN_SW1_PRESSED     (!(PINA & _BV(1)))
@@ -254,6 +254,9 @@ int main( void )
     DDRB = 0xFF;	    // Port B all outputs 
     PORTB = 0xFF;	    // all LEDS off
     
+    DDRC = 0xFF;      // Port C all outputs 
+    PORTC = 0xFF;     // all LEDS off
+
     // Initialize UART
     UCSRA = 0;
     UCSRC = MSK_UART_8BIT;	// 8N1
@@ -449,19 +452,26 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
 		      uint8_t *pData )
 {
   CANMsg msg;
-  
+  uint8_t timeout = 200;
+  int8_t canRet = ERROR_OK;
+  int8_t rv = FALSE;
+
+  /* If necessary, limit the size to avoid buffer out of bounce access. */
+  if (8 < size)
+  {
+    size = 8;
+  }
   
 #ifdef PRINT_CAN_EVENTS
   char buf[32];
   uint8_t i;
   
-  sprintf(buf, "tx: %03x/%02x/%02x/", vscpclass, vscptype, nodeid);
-  for (i=0; i<size; i++) {
-    char dbuf[5];
-    sprintf(dbuf, "/%02x", pData[i]);
-    strcat(buf, dbuf);
-  }
+  sprintf(buf, "tx: %03x/%02x/%02x/\n", vscpclass, vscptype, nodeid);
   uart_puts(buf);
+  for (i = 0; i < size; i++) {
+    sprintf(buf, "/%02x", pData[i]);
+    uart_puts(buf);
+  }
 #endif
   
   msg.id = ( (uint32_t)priority << 26 ) |
@@ -476,14 +486,23 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
     memcpy( msg.byte, pData, size );
   }
   
-  if ( ERROR_OK != can_SendFrame( &msg ) ) {
-    return FALSE;
+  do {
+
+      canRet = can_SendFrame( &msg );
+      --timeout;
+
+  } while((ERROR_OK != canRet) && (0 < timeout));
+  
+  if (ERROR_OK == canRet)
+  {
+    rv = TRUE;
   }
   
-  return TRUE;
+  return rv;
+
 }
 
-///////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////
 // getVSCPFrame
 //
 //
@@ -569,51 +588,6 @@ uint8_t vscp_readAppReg( uint8_t reg )
         rv =  readEEPROM( REG_SUBZONE + VSCP_EEPROM_END );
     }
             
-    // SubZone for LED0
-    else if ( REG_SWITCH0_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH0_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED1
-    else if ( REG_SWITCH1_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH1_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED2
-    else if ( REG_SWITCH2_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH2_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED3
-    else if ( REG_SWITCH3_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH3_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED4
-    else if ( REG_SWITCH4_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH4_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED5
-    else if ( REG_SWITCH5_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH5_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED6
-    else if ( REG_SWITCH6_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH6_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED7
-    else if ( REG_SWITCH7_SUBZONE == reg ) {
-        rv =  readEEPROM( REG_SWITCH7_SUBZONE + VSCP_EEPROM_END );
-    }    
-
-    // Read LED status
-    else if ( REG_LED_CONTROL == reg ) {
-        // Return inverted because we want a '1' to represent 'on'
-        rv =  ~PORTB;
-    }
     
     // DM register space    for ( pos = REG_DM_DUMMY; pos < ( REG_DM_DUMMY + DESCION_MATRIX_ELEMENTS * 8 ); pos++ ) {
     else if ( ( reg >= REG_DM_START ) && ( reg < REG_DM_START + DESCION_MATRIX_ELEMENTS * 8) ) {

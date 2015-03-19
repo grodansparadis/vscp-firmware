@@ -101,9 +101,9 @@ const uint8_t vscp_manufacturer_id[8] = {
 
 
 // Variables
-volatile uint16_t measurement_clock;	// 1 ms timer counter
+volatile uint16_t measurement_clock = 0;	// 1 ms timer counter
 
-int16_t btncnt[ 8 ];    // Switch counters
+static int16_t btncnt[ 8 ]; // Switch counters
 
 // Prototypes
 static void initTimer();
@@ -113,7 +113,7 @@ static void doWork();
 
 
 // Counter for seconds between measurements, do a first measurement
-uint16_t measurement_seconds = 0;
+static uint16_t measurement_seconds = 0;
 
 #define MAXSENSORS 5
 
@@ -122,7 +122,7 @@ uint16_t measurement_seconds = 0;
 // Set time elapsed between two measurements
 //writeEEPROM( REG_TEMP_INTERVAL, 0x0A );
 
-uint8_t gSensorIDs[MAXSENSORS][OW_ROMCODE_SIZE];
+static uint8_t gSensorIDs[MAXSENSORS][OW_ROMCODE_SIZE];
 
 static uint8_t search_sensors(void)
 {
@@ -137,7 +137,7 @@ static uint8_t search_sensors(void)
   nSensors = 0;
   
   diff = OW_SEARCH_FIRST;
-  while ( diff != OW_LAST_DEVICE && nSensors < MAXSENSORS ) {
+  while ( ( diff != OW_LAST_DEVICE ) && ( nSensors < MAXSENSORS ) ) {
     DS18X20_find_sensor( &diff, &id[0] );
     
     if( diff == OW_PRESENCE_ERR ) {
@@ -231,10 +231,8 @@ static void initTimer()
 int main( void )
 
 {
-  //  stdout = &mystdout;
-  uint8_t i;
-
-
+    //  stdout = &mystdout;
+    uint8_t i;
 
     PORTA   = 0xff;     // Activate pull-ups
     DDRA = 0x00;	    // Port A all inputs
@@ -343,11 +341,10 @@ int main( void )
 	    if ( vscp_imsg.flags & VSCP_VALID_MSG ) {	// incoming message?
 #ifdef PRINT_CAN_EVENTS
 	      char buf[30];
-	      uint8_t i;
 	      sprintf(buf, "rx: %03x/%02x/%02x/",
           vscp_imsg.vscp_class, vscp_imsg.vscp_type, vscp_imsg.oaddr);
           uart_puts(buf);
-	      for (i=0; i<(vscp_imsg.flags&0xf); i++) {
+	      for (i = 0; i < (vscp_imsg.flags & 0x0f); i++) {
 		    sprintf(buf, "/%02x", vscp_imsg.data[i]);
 		    uart_puts(buf);
 	      }
@@ -448,18 +445,12 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
   char buf[32];
   uint8_t i;
 
- sprintf(buf, "Sending frame with size %x", size);
-  uart_puts( buf );
-
-
   sprintf(buf, "tx: %03x/%02x/%02x/\n", vscpclass, vscptype, nodeid);
   uart_puts(buf);
-  
-  for (i=0; i<size; i++) {
+  for (i = 0; i < size; i++) {
     sprintf(buf, "/%02x", pData[i]);
     uart_puts(buf);
   }
-  
 #endif
   
   msg.id = ( (uint32_t)priority << 26 ) |
@@ -474,13 +465,6 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
     memcpy( msg.byte, pData, size );
   }
   
-
-/*
-  if ( ERROR_OK != can_SendFrame( &msg ) ) {
-    return FALSE;
-  }
-*/
-
   do {
 
       canRet = can_SendFrame( &msg );
@@ -992,7 +976,8 @@ static void doDM( void )
     uint8_t type_filter;
     uint8_t type_mask;
 
-uart_puts("doDM\n");
+    uart_puts("doDM\n");
+    
     // Don't deal with the control functionality
     if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class ) return;
 
