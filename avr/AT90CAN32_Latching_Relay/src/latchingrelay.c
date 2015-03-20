@@ -970,9 +970,22 @@ uart_puts("doDM\n");
                     uart_puts( "Zone mismatch, continue...\n" );
                     continue;
 
-                }	
+                } 
                     uart_puts( "Zone match - [OK]\n" );
-            }				
+            }       
+
+            // Check if subzone should match and if so if it match
+            if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE  ) {
+                    uart_puts( "Subzone should match...\n" );
+
+                if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_END + REG_SUBZONE  ) ) {
+
+                    uart_puts( "Subzone mismatch, continue...\n" );
+                    continue;
+
+                } 
+                    uart_puts( "Subzone match - [OK]\n" );
+            }       
 			
             class_filter = ( ( dmflags & VSCP_DM_FLAG_CLASS_FILTER ) << 8 ) + 
                                     readEEPROM( VSCP_EEPROM_END + 
