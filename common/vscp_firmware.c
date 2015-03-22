@@ -733,7 +733,8 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value)
                 (0xff != (vscp_page_select & 0xff))) {
             // return complement to indicate error
             rv = ~value;
-        } else {
+        }
+        else {
             vscp_setGUID(reg - VSCP_REG_GUID, value);
             rv = vscp_getGUID(reg - VSCP_REG_GUID);
         }
@@ -892,14 +893,9 @@ void vscp_handleProtocolEvent(void)
             break;
 
         case VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER:
-            if ((vscp_nickname == vscp_imsg.data[ 0 ]) &&
-                (9 == vscp_imsg.data[ 1 ])) // AVR algorithm 0
-            {
-                vscp_goBootloaderMode();
-            }
 
             if ((vscp_nickname == vscp_imsg.data[ 0 ]) &&
-                (1 == vscp_imsg.data[ 1 ]) && // microchip PIC algorithm
+                // byte 1 contains algorithm. Handle in callback.
                 (vscp_getGUID(0) == vscp_imsg.data[ 2 ]) &&
                 (vscp_getGUID(3) == vscp_imsg.data[ 3 ]) &&
                 (vscp_getGUID(5) == vscp_imsg.data[ 4 ]) &&
@@ -907,7 +903,7 @@ void vscp_handleProtocolEvent(void)
                 ((vscp_page_select >> 8) == vscp_imsg.data[ 6 ]) &&
                 ((vscp_page_select & 0xff) == vscp_imsg.data[ 7 ])) {
 
-                vscp_goBootloaderMode();
+                vscp_goBootloaderMode( vscp_imsg.data[ 1 ] );
 
             }
             break;
