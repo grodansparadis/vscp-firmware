@@ -39,6 +39,8 @@
 #include "latchingrelay.h"
 
 volatile uint8_t relay_pulse_width;  // pull-up timer to change relay state
+volatile uint8_t relay_timer_enabled;  // time before relay switch back to the off position
+								// if set to 0 then no timer
 
 ///////////////////////////////////////////////////////////////////////////////
 // doActionAction1
@@ -51,6 +53,8 @@ void doActionAction1()
 RELAY_ON_ON;
 
 relay_pulse_width = 0;
+
+relay_timer_enabled = 1;
 
 }
 

@@ -110,6 +110,7 @@ const uint8_t vscp_manufacturer_id[8] = {
 
 // Variables
 volatile uint16_t measurement_clock;  // 1 ms timer counter
+volatile uint16_t relay_timer;  // relay timer
 
 int16_t btncnt[ 8 ];    // Switch counters
 
@@ -268,11 +269,23 @@ int main( void )
 	    
             measurement_clock = 0;
 
-            relay_pulse_width--;
-
             // Do VSCP one second jobs 
             vscp_doOneSecondWork();
-	    
+
+    if(readEEPROM( VSCP_EEPROM_END +  REG_RELAY_TIMER_MSB  ) * 256 + readEEPROM( VSCP_EEPROM_END +  REG_RELAY_TIMER_LSB  ) != 0)
+    {
+      if(relay_timer_enabled == 1)
+      {
+        relay_timer++;
+        if(relay_timer == readEEPROM( VSCP_EEPROM_END +  REG_RELAY_TIMER_MSB  ) * 256 + readEEPROM( VSCP_EEPROM_END +  REG_RELAY_TIMER_LSB  ))
+        {
+          relay_timer_enabled = 0;
+          relay_timer = 0;
+          doActionAction2();          
+        }
+      }
+
+    }
 	    
 	  }
 	  
@@ -536,6 +549,13 @@ uint8_t vscp_readAppReg( uint8_t reg )
         rv =  readEEPROM( REG_SUBZONE + VSCP_EEPROM_END );
     }
             
+    else if ( reg == REG_RELAY_TIMER_MSB ) {
+        rv = readEEPROM( VSCP_EEPROM_END +  reg );
+    }
+
+    else if ( reg == REG_RELAY_TIMER_LSB ) {
+        rv = readEEPROM( VSCP_EEPROM_END +  reg );
+    }
     
     // DM register space    for ( pos = REG_DM_DUMMY; pos < ( REG_DM_DUMMY + DESCION_MATRIX_ELEMENTS * 8 ); pos++ ) {
     else if ( ( reg >= REG_DM_START ) && ( reg < REG_DM_START + DESCION_MATRIX_ELEMENTS * 8) ) {
@@ -580,6 +600,15 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
             rv =  readEEPROM( REG_SUBZONE + VSCP_EEPROM_END );
     }	
             
+    else if ( reg == REG_RELAY_TIMER_MSB ) {
+        writeEEPROM(( VSCP_EEPROM_END + reg ), val );
+        rv = readEEPROM( VSCP_EEPROM_END +  reg );
+    }
+
+    else if ( reg == REG_RELAY_TIMER_LSB ) {
+        writeEEPROM(( VSCP_EEPROM_END + reg ), val );
+        rv = readEEPROM( VSCP_EEPROM_END +  reg );
+    }
 
     
     // DM register space
@@ -940,11 +969,6 @@ uart_puts("doDM\n");
         // Get DM flags for this row
         dmflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
 
-        char buf[30];
-        sprintf(buf, "dmflags for row %i: %i\n", i, dmflags);
-        uart_puts(buf);
-
-
 		uart_puts( "Checking DM rows\n" );
 
         // Is the DM row enabled?
@@ -1016,12 +1040,12 @@ uart_puts("doDM\n");
                     case ACTION_ACTION1:
                         uart_puts( "Running action 1\n" );
                         doActionAction1();
-                        break;
+                        continue;
 
                     case ACTION_ACTION2:
                         uart_puts( "Running action 2\n" );
                         doActionAction2();	
-                        break;
+                        continue;
 
 
                 } // case	
@@ -1077,15 +1101,4 @@ void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId 
 void doWork( void )
 {
 
-  if(relay_pulse_width == 0)
-  {
-    RELAY_ON_OFF;
-  }
-//  else
-//  {
-//    relay_pulse_width--;
-//  }
-
 }
-
-

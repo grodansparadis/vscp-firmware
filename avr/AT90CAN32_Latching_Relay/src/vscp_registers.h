@@ -38,10 +38,8 @@
 #define REG_ZONE						0
 #define REG_SUBZONE						1
 
-//#define REG_LED_CONTROL					10  // LED Control
-
-
-//#define REG_DMATRIX_START               0x70
+#define REG_RELAY_TIMER_MSB				2
+#define REG_RELAY_TIMER_LSB				3
 
 // This marks the space for the decision matrix start. It
 // is just a dummy for EEPROM storage and do not represent the

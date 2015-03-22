@@ -61,6 +61,16 @@
 			<description lang="en">Subzone this module belongs to</description>
 			<access>rw</access>
 		</reg>
+		<reg page="0" offset="2" >
+			<name lang="en">Relay timer MSB</name>
+			<description lang="en">Relay timer MSB, if timer value = 0 then no timer</description>
+			<access>rw</access>
+		</reg>
+		<reg page="0" offset="3" >
+			<name lang="en">Relay timer LSB</name>
+			<description lang="en">Relay timer LSB, if timer value = 0 then no timer</description>
+			<access>rw</access>
+		</reg>
 
 				
 			
