@@ -40,6 +40,7 @@
 
 #define REG_RELAY_TIMER_MSB				2
 #define REG_RELAY_TIMER_LSB				3
+#define REG_RELAY_STATUS				4
 
 // This marks the space for the decision matrix start. It
 // is just a dummy for EEPROM storage and do not represent the

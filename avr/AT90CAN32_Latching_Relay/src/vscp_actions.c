@@ -56,6 +56,8 @@ relay_pulse_width = 0;
 
 relay_timer_enabled = 1;
 
+writeEEPROM(( VSCP_EEPROM_END + REG_RELAY_STATUS ), 1 );
+
 }
 
 
@@ -71,6 +73,8 @@ void doActionAction2()
 RELAY_OFF_ON;
 
 relay_pulse_width = 0;
+
+writeEEPROM(( VSCP_EEPROM_END + REG_RELAY_STATUS ), 0 );
 
 }
 

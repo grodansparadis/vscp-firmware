@@ -557,6 +557,10 @@ uint8_t vscp_readAppReg( uint8_t reg )
         rv = readEEPROM( VSCP_EEPROM_END +  reg );
     }
     
+    else if ( reg == REG_RELAY_STATUS ) {
+        rv = readEEPROM( VSCP_EEPROM_END +  reg );
+    }
+    
     // DM register space    for ( pos = REG_DM_DUMMY; pos < ( REG_DM_DUMMY + DESCION_MATRIX_ELEMENTS * 8 ); pos++ ) {
     else if ( ( reg >= REG_DM_START ) && ( reg < REG_DM_START + DESCION_MATRIX_ELEMENTS * 8) ) {
         rv =  readEEPROM( VSCP_EEPROM_END +  reg  );
@@ -606,6 +610,11 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
     }
 
     else if ( reg == REG_RELAY_TIMER_LSB ) {
+        writeEEPROM(( VSCP_EEPROM_END + reg ), val );
+        rv = readEEPROM( VSCP_EEPROM_END +  reg );
+    }
+
+    else if ( reg == REG_RELAY_STATUS ) {
         writeEEPROM(( VSCP_EEPROM_END + reg ), val );
         rv = readEEPROM( VSCP_EEPROM_END +  reg );
     }
