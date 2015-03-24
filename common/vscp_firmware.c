@@ -900,11 +900,10 @@ void vscp_handleProtocolEvent(void)
                 (vscp_getGUID(3) == vscp_imsg.data[ 3 ]) &&
                 (vscp_getGUID(5) == vscp_imsg.data[ 4 ]) &&
                 (vscp_getGUID(7) == vscp_imsg.data[ 5 ]) &&
-                ((vscp_page_select >> 8) == vscp_imsg.data[ 6 ]) &&
+                (((vscp_page_select >> 8) & 0xff) == vscp_imsg.data[ 6 ]) &&
                 ((vscp_page_select & 0xff) == vscp_imsg.data[ 7 ])) {
 
                 vscp_goBootloaderMode( vscp_imsg.data[ 1 ] );
-
             }
             break;
 

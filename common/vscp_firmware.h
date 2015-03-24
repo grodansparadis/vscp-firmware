@@ -85,13 +85,13 @@ low end hardware device.
 // activated.
 
 // Bootloaders
-#define VSCP_BOOTLOADER_VSCP		0x00	// VSCP boot loader algorithm
+#define VSCP_BOOTLOADER_VSCP            0x00	// VSCP boot loader algorithm
 #define VSCP_BOOTLOADER_PIC1            0x01	// PIC algorithm 0
-#define VSCP_BOOTLOADER_AVR1		0x10	// AVR algorithm 0
-#define VSCP_BOOTLOADER_LPC1		0x20	// NXP/Philips LPC algorithm 0
-#define VSCP_BOOTLOADER_NXP1		0x20
+#define VSCP_BOOTLOADER_AVR1            0x10	// AVR algorithm 0
+#define VSCP_BOOTLOADER_LPC1            0x20	// NXP/Philips LPC algorithm 0
+#define VSCP_BOOTLOADER_NXP1            0x20
 #define VSCP_BOOTLOADER_ST              0x30	// ST STR algorithm 0
-#define VSCP_BOOTLOADER_NONE		0xff
+#define VSCP_BOOTLOADER_NONE            0xff
 
 #define  VSCP_LEVEL1_COMMON_REGISTER_START      0x80
 
@@ -133,7 +133,7 @@ low end hardware device.
 
 #define VSCP_REG_ALARMSTATUS            0x80
 #define VSCP_REG_VSCP_MAJOR_VERSION     0x81
-#define VSCP_REG_VSCP_MINOR_VERSION	0x82
+#define VSCP_REG_VSCP_MINOR_VERSION     0x82
 
 #define VSCP_REG_NODE_CONTROL           0x83
 
