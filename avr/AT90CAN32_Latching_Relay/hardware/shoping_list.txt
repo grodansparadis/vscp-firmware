@@ -1,0 +1,13 @@
+Diode 1n4148 *2 - 1621821RL
+Bornier 3 points 240V - 1845623
+EMBASE CMS 2X3 VOIES * 2 - 9689737
+Transistor NPN 45VDC SOT-363 - 1924322
+Switch - 2396053
+bistable relay - 2060857
+AT90CAN 32 - 1455066
+regul tension 7805 - 2296030
+MCP2551 - 9758569
+double RJ45 - 9251901
+Quartz - 1842294
+boitier sonde temperature - 
+Boitier relay - 
