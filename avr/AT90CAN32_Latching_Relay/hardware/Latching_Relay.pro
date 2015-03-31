@@ -1,6 +1,6 @@
-update=Tue 10 Feb 2015 09:02:47 PM CET
+update=Thu 26 Mar 2015 10:23:34 PM CET
 version=1
-last_client=eeschema
+last_client=cvpcb
 [general]
 version=1
 [pcbnew]
@@ -39,10 +39,9 @@ LibName13=Crystals_RevB_25Apr2012
 LibName14=Switch-SPS
 LibName15=pin_2x3_smd
 LibName16=Molex_RJ45_Dual
+LibName17=diodes
+LibName18=Relay
 LibDir=/usr/share/kicad/modules;/home/mamac/Electronic/kicad/modules
-[cvpcb]
-version=1
-NetIExt=net
 [eeschema]
 version=1
 LibDir=/home/mamac/Electronic/kicad/library
@@ -83,3 +82,7 @@ LibName28=atmel
 LibName29=contrib
 LibName30=valves
 LibName31=Molex_Dual_RJ45
+LibName32=Relay
+[cvpcb]
+version=1
+NetIExt=net

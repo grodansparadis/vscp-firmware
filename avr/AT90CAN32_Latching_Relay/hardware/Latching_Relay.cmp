@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2013-may-18)-stable date = Wed 25 Mar 2015 10:09:20 PM CET
+Cmp-Mod V01 Created by CvPcb (2013-may-18)-stable date = Mon 30 Mar 2015 10:39:00 PM CEST
 
 BeginCmp
 TimeStamp = /52152F87;
@@ -22,23 +22,23 @@ IdModule  = SM1206;
 EndCmp
 
 BeginCmp
-TimeStamp = /52BC77D5;
-Reference = C4;
-ValeurCmp = 0.33uF;
-IdModule  = SM1206;
-EndCmp
-
-BeginCmp
 TimeStamp = /544964C0;
-Reference = C5;
+Reference = C4;
 ValeurCmp = 100nF;
 IdModule  = SM1206;
 EndCmp
 
 BeginCmp
 TimeStamp = /544966BB;
-Reference = C6;
+Reference = C5;
 ValeurCmp = 100nF;
+IdModule  = SM1206;
+EndCmp
+
+BeginCmp
+TimeStamp = /52BC77D5;
+Reference = C6;
+ValeurCmp = 0.33uF;
 IdModule  = SM1206;
 EndCmp
 
@@ -50,28 +50,14 @@ IdModule  = LED-1206;
 EndCmp
 
 BeginCmp
-TimeStamp = /5511D5C8;
-Reference = D2;
-ValeurCmp = DIODE;
-IdModule  = SM1206;
-EndCmp
-
-BeginCmp
-TimeStamp = /5511D718;
-Reference = D3;
-ValeurCmp = DIODE;
-IdModule  = SM1206;
+TimeStamp = /5511D864;
+Reference = K1;
+ValeurCmp = CONN_3;
+IdModule  = bornier3;
 EndCmp
 
 BeginCmp
 TimeStamp = /544570D5;
-Reference = K1;
-ValeurCmp = CONN_3;
-IdModule  = PIN_ARRAY_3X1;
-EndCmp
-
-BeginCmp
-TimeStamp = /5511D864;
 Reference = K2;
 ValeurCmp = CONN_3;
 IdModule  = PIN_ARRAY_3X1;
@@ -82,20 +68,6 @@ TimeStamp = /52152F89;
 Reference = P1;
 ValeurCmp = CONN_3X2;
 IdModule  = Pin_2x3_smd;
-EndCmp
-
-BeginCmp
-TimeStamp = /5511CA67;
-Reference = Q1;
-ValeurCmp = BC237;
-IdModule  = SOT353;
-EndCmp
-
-BeginCmp
-TimeStamp = /5511CA7E;
-Reference = Q2;
-ValeurCmp = BC237;
-IdModule  = SOT353;
 EndCmp
 
 BeginCmp
@@ -113,20 +85,6 @@ IdModule  = SM1206;
 EndCmp
 
 BeginCmp
-TimeStamp = /5511C93D;
-Reference = R3;
-ValeurCmp = 300;
-IdModule  = SM1206;
-EndCmp
-
-BeginCmp
-TimeStamp = /5511C928;
-Reference = R4;
-ValeurCmp = 300;
-IdModule  = SM1206;
-EndCmp
-
-BeginCmp
 TimeStamp = /54418504;
 Reference = SW1;
 ValeurCmp = SW_PUSH;
@@ -134,29 +92,36 @@ IdModule  = Switch_SPC;
 EndCmp
 
 BeginCmp
-TimeStamp = /5511D3E6;
+TimeStamp = /55147B82;
 Reference = U1;
 ValeurCmp = RELAY_BISTABLE;
-IdModule  = PIN_ARRAY_3X1;
+IdModule  = PCB relay bistable;
+EndCmp
+
+BeginCmp
+TimeStamp = /5515B38B;
+Reference = U2;
+ValeurCmp = ULN2003A;
+IdModule  = SO16E;
 EndCmp
 
 BeginCmp
 TimeStamp = /52152F75;
-Reference = U2;
+Reference = U3;
 ValeurCmp = AT90CAN32;
 IdModule  = TQFP64_08;
 EndCmp
 
 BeginCmp
 TimeStamp = /52BC76CC;
-Reference = U3;
+Reference = U4;
 ValeurCmp = 7805;
 IdModule  = SOT223;
 EndCmp
 
 BeginCmp
 TimeStamp = /52152F80;
-Reference = U4;
+Reference = U5;
 ValeurCmp = MCP2551;
 IdModule  = SO8E;
 EndCmp
