@@ -71,16 +71,7 @@
 			<description lang="en">Relay timer LSB, if timer value = 0 then no timer</description>
 			<access>rw</access>
 		</reg>
-		<reg page="0" offset="4" >
-			<name lang="en">Relay status</name>
-			<description lang="en">0 = relay is off\n 1 = relay is on</description>
-			<access>r</access>
-		</reg>
 
-				
-			
-		
-		
 		<!-- DM Row 1 -->
 		<reg page="0" offset="112" >
 			<name lang="en">Decision matrix row 1: Oaddr </name>
@@ -92,7 +83,7 @@
 			<access>rw</access>
 		</reg>
 		
-		<reg page="0" offset="113" >
+		<reg page="0" offset="113" default="0x98" >
 			<name lang="en">Decision matrix row 1: flags </name>
 			<description lang="en">
 			Row 1 of decision matrix.\n
@@ -141,7 +132,7 @@
 			</bit>												
 		</reg>		
 		
-		<reg page="0" offset="114" >
+		<reg page="0" offset="114" default="0xFF" >
 			<name lang="en">Decision matrix row 1: Class mask (low eight bits) </name>
 			<description lang="en">
 			The lowest eight bits of the class mask that defines the events that should trigger the action of thsi decision matrix row.\n
@@ -151,7 +142,7 @@
 			<access>rw</access>
 		</reg>
 		
-		<reg page="0" offset="115" >
+		<reg page="0" offset="115" default="0x1E" >
 			<name lang="en">Decision matrix row 1: Class filter (low eight bits) </name>
 			<description lang="en">
 			The lowest eight bits of the class filter that defines the events that should trigger the action of thsi decision matrix row.\n
@@ -161,7 +152,7 @@
 			<access>rw</access>
 		</reg>
 		
-		<reg page="0" offset="116" >
+		<reg page="0" offset="116" default="0xFF" >
 			<name lang="en">Decision matrix row 1: Type mask</name>
 			<description lang="en">
 			Type mask that defines the events that should trigger the action of this decision matrix row.\n
@@ -170,7 +161,7 @@
 			<access>rw</access>
 		</reg>	
 		
-		<reg page="0" offset="117" >
+		<reg page="0" offset="117" default="0x05" >
 			<name lang="en">Decision matrix row 1: Type filter</name>
 			<description lang="en">
 			Type filter that defines the events that should trigger the action of this decision matrix row.\n
@@ -179,7 +170,7 @@
 			<access>rw</access>
 		</reg>	
 		
-		<reg page="0" offset="118" >
+		<reg page="0" offset="118" default="0x01" >
 			<name lang="en">Decision matrix row 1: Action</name>
 			<description lang="en">
 			This is the action or operation that should be performed if the filtering is satisfied.\n
@@ -210,7 +201,7 @@
 			<access>rw</access>
 		</reg>
 		
-		<reg page="0" offset="121" >
+		<reg page="0" offset="121" default="0x98" >
 			<name lang="en">Decision matrix row 2: flags </name>
 			<description lang="en">
 			Row 1 of decision matrix.\n
@@ -259,7 +250,7 @@
 			</bit>												
 		</reg>		
 		
-		<reg page="0" offset="122" >
+		<reg page="0" offset="122" default="0xFF" >
 			<name lang="en">Decision matrix row 2: Class mask (low eight bits) </name>
 			<description lang="en">
 			The lowest eight bits of the class mask that defines the events that should trigger the action of thsi decision matrix row.\n
@@ -269,7 +260,7 @@
 			<access>rw</access>
 		</reg>
 		
-		<reg page="0" offset="123" >
+		<reg page="0" offset="123" default="0x1E" >
 			<name lang="en">Decision matrix row 2: Class filter (low eight bits) </name>
 			<description lang="en">
 			The lowest eight bits of the class filter that defines the events that should trigger the action of thsi decision matrix row.\n
@@ -279,7 +270,7 @@
 			<access>rw</access>
 		</reg>
 		
-		<reg page="0" offset="124" >
+		<reg page="0" offset="124" default="0xFF" >
 			<name lang="en">Decision matrix row 2: Type mask</name>
 			<description lang="en">
 			Type mask that defines the events that should trigger the action of this decision matrix row.\n
@@ -288,7 +279,7 @@
 			<access>rw</access>
 		</reg>	
 		
-		<reg page="0" offset="125" >
+		<reg page="0" offset="125" default="0x06" >
 			<name lang="en">Decision matrix row 2: Type filter</name>
 			<description lang="en">
 			Type filter that defines the events that should trigger the action of this decision matrix row.\n
@@ -297,7 +288,7 @@
 			<access>rw</access>
 		</reg>	
 		
-		<reg page="0" offset="126" >
+		<reg page="0" offset="126" default="0x02" >
 			<name lang="en">Decision matrix row 2: Action</name>
 			<description lang="en">
 			This is the action or operation that should be performed if the filtering is satisfied. Only action code 0�00 is predefined and means No-Operation. All other codes are application specific and typical application defined codes could do measurement, send predefined event etc.\n

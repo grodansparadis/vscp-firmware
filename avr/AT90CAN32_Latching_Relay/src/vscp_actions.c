@@ -56,8 +56,16 @@ relay_pulse_width = 0;
 
 relay_timer_enabled = 1;
 
-writeEEPROM(( VSCP_EEPROM_END + REG_RELAY_STATUS ), 1 );
+vscp_omsg.priority = 0x00;
+vscp_omsg.flags = VSCP_VALID_MSG + 4;
+vscp_omsg.vscp_class = VSCP_CLASS1_INFORMATION;
+vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_ON;
 
+vscp_omsg.data[ 0 ] = 0x00;
+vscp_omsg.data[ 1 ] = readEEPROM( REG_ZONE + VSCP_EEPROM_END ); // byte 1 for zone
+vscp_omsg.data[ 2 ] = readEEPROM( REG_SUBZONE + VSCP_EEPROM_END ); // byte 2 for subzone
+
+vscp_sendEvent(); // Send data
 }
 
 
@@ -74,7 +82,16 @@ RELAY_OFF_ON;
 
 relay_pulse_width = 0;
 
-writeEEPROM(( VSCP_EEPROM_END + REG_RELAY_STATUS ), 0 );
+vscp_omsg.priority = 0x00;
+vscp_omsg.flags = VSCP_VALID_MSG + 4;
+vscp_omsg.vscp_class = VSCP_CLASS1_INFORMATION;
+vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_OFF;
+
+vscp_omsg.data[ 0 ] = 0x00;
+vscp_omsg.data[ 1 ] = readEEPROM( REG_ZONE + VSCP_EEPROM_END ); // byte 1 for zone
+vscp_omsg.data[ 2 ] = readEEPROM( REG_SUBZONE + VSCP_EEPROM_END ); // byte 2 for subzone
+
+vscp_sendEvent(); // Send data
 
 }
 
