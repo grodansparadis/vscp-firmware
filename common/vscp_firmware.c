@@ -653,6 +653,20 @@ uint8_t vscp_readStdReg(uint8_t reg)
         // * * * Register Pages Used * * *
         rv = vscp_getRegisterPagesUsed();
     }
+    else if ( ( reg >= VSCP_REG_STANDARD_DEVICE_FAMILY_CODE ) &&
+              ( reg < ( VSCP_REG_STANDARD_DEVICE_FAMILY_CODE + 4 ) ) ) {
+
+        uint32_t code = vscp_getFamilyCode();
+        uint8_t idx = reg - VSCP_REG_STANDARD_DEVICE_FAMILY_CODE;
+        rv = code >> ( ( ( 3 - idx ) * 8 ) & 0xff );
+    }
+    else if ( ( reg >= VSCP_REG_STANDARD_DEVICE_TYPE_CODE ) &&
+              ( reg < ( VSCP_REG_STANDARD_DEVICE_TYPE_CODE + 4 ) ) ) {
+
+        uint32_t code = vscp_getFamilyType();
+        uint8_t idx = reg - VSCP_REG_STANDARD_DEVICE_TYPE_CODE;
+        rv = code >> ( ( ( 3 - idx ) * 8 ) & 0xff );
+    }
     else if ((reg > (VSCP_REG_GUID - 1)) &&
             (reg < VSCP_REG_DEVICE_URL)) {
 
@@ -660,7 +674,7 @@ uint8_t vscp_readStdReg(uint8_t reg)
         rv = vscp_getGUID(reg - VSCP_REG_GUID);
 
     }
-    else {
+    else if ( reg >= VSCP_REG_DEVICE_URL ) {
 
         // * * * The device URL * * *
         rv = vscp_getMDF_URL(reg - VSCP_REG_DEVICE_URL);
@@ -739,21 +753,7 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value)
             rv = vscp_getGUID(reg - VSCP_REG_GUID);
         }
     }
-#endif
-	else if ( ( reg >= VSCP_REG_STANDARD_DEVICE_FAMILY_CODE ) &&
-		 		( reg < VSCP_REG_STANDARD_DEVICE_TYPE_CODE ) ) {
-
-		uint32_t code = vscp_getFamilyCode();
-		uint8_t idx = reg - VSCP_REG_STANDARD_DEVICE_FAMILY_CODE;
-		rv = code >> (((3-idx)*8) & 0xff);	
-	}
-	else if ( ( reg >= VSCP_REG_STANDARD_DEVICE_TYPE_CODE ) &&
-		 		( reg < VSCP_REG_DEFAULT_CONFIG_RESTORE ) ) {
-
-		uint32_t code = vscp_getFamilyType();
-		uint8_t idx = reg - VSCP_REG_STANDARD_DEVICE_TYPE_CODE;
-		rv = code >> (((3-idx)*8) & 0xff);
-	}
+#endif	
 	else if ( VSCP_REG_DEFAULT_CONFIG_RESTORE == reg ) {
 		if ( 0x55 == value ) {
 			vscp_configtimer = 0;
@@ -970,11 +970,16 @@ void vscp_handleProtocolEvent(void)
                 for (i = 0; i < len; i++) {
                     vscp_omsg.data[ (i % 7) + 1 ] = vscp_readRegister(offset + i);
 
-                    if ((i % 7) == 6 || i == (len - 1)) {
+                    if ( (i % 7) == 6 || i == (len - 1) ) {
+
                         uint8_t bytes;
 
-                        if ((i % 7) == 6) bytes = 7;
-                        else bytes = (i % 7) + 1;
+                        if ( ( i % 7 ) == 6 ) {
+                            bytes = 7;
+                        }
+                        else {
+                            bytes = ( i % 7 ) + 1;
+                        }
 
                         vscp_omsg.flags = VSCP_VALID_MSG + bytes + 1;
                         vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
