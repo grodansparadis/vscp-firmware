@@ -85,13 +85,13 @@ low end hardware device.
 // activated.
 
 // Bootloaders
-#define VSCP_BOOTLOADER_VSCP		0x00	// VSCP boot loader algorithm
-#define VSCP_BOOTLOADER_PIC1        0x01	// PIC algorithm 0
-#define VSCP_BOOTLOADER_AVR1		0x10	// AVR algorithm 0
-#define VSCP_BOOTLOADER_LPC1		0x20	// NXP/Philips LPC algorithm 0
-#define VSCP_BOOTLOADER_NXP1		0x20
-#define VSCP_BOOTLOADER_ST          0x30	// ST STR algorithm 0
-#define VSCP_BOOTLOADER_NONE		0xff
+#define VSCP_BOOTLOADER_VSCP            0x00	// VSCP boot loader algorithm
+#define VSCP_BOOTLOADER_PIC1            0x01	// PIC algorithm 0
+#define VSCP_BOOTLOADER_AVR1            0x10	// AVR algorithm 0
+#define VSCP_BOOTLOADER_LPC1            0x20	// NXP/Philips LPC algorithm 0
+#define VSCP_BOOTLOADER_NXP1            0x20
+#define VSCP_BOOTLOADER_ST              0x30	// ST STR algorithm 0
+#define VSCP_BOOTLOADER_NONE            0xff
 
 #define  VSCP_LEVEL1_COMMON_REGISTER_START      0x80
 
@@ -133,7 +133,7 @@ low end hardware device.
 
 #define VSCP_REG_ALARMSTATUS            0x80
 #define VSCP_REG_VSCP_MAJOR_VERSION     0x81
-#define VSCP_REG_VSCP_MINOR_VERSION	0x82
+#define VSCP_REG_VSCP_MINOR_VERSION     0x82
 
 #define VSCP_REG_NODE_CONTROL           0x83
 
@@ -305,6 +305,7 @@ extern uint8_t vscp_probe_address;  ///< Probe address for nickname discovery
 extern volatile uint8_t vscp_initbtncnt;    ///< init. button counter
 extern volatile uint8_t vscp_statuscnt;     ///< status LED counter
 extern uint16_t vscp_page_select;   ///< Selected Register Page
+extern volatile uint16_t vscp_configtimer; ///< configuration timer
 
 extern const uint8_t vscp_deviceURL[]; ///<  GUID
 
@@ -535,7 +536,7 @@ void vscp_setManufacturerId(uint8_t idx, uint8_t data);
 /*!
         Get boot loader algorithm from permanent storage
  */
-uint8_t vscp_getBootLoaderAlgorithm(void);
+uint8_t vscp_getBootLoaderAlgorithm( void );
 
 /*! 
         Get buffer size
@@ -641,7 +642,7 @@ void vscp_getEmbeddedMdfInfo(void);
         This routine force the system into boot loader mode according
         to the selected protocol.
  */
-void vscp_goBootloaderMode(void);
+void vscp_goBootloaderMode( uint8_t algorithm );
 
 /*!
         Get Zone for device
@@ -677,9 +678,9 @@ uint32_t vscp_getFamilyType(void);
 void vscp_restoreDefaults(void);
 
 #ifdef DROP_NICKNAME_EXTENDED_FEATURES
-	void vscp_hardreset(void);
-	void vscp_wait_ms(uint16_t ms);
-	void vscp_wait_s(uint16_t ms);
+	void vscp_hardreset(void);              // Do a hard reset of the device
+	void vscp_wait_ms(uint16_t ms);         // Wait for milliseconds
+	void vscp_wait_s(uint16_t sec);         // Wait for seconds
 #endif
 
 #endif

@@ -653,6 +653,20 @@ uint8_t vscp_readStdReg(uint8_t reg)
         // * * * Register Pages Used * * *
         rv = vscp_getRegisterPagesUsed();
     }
+    else if ( ( reg >= VSCP_REG_STANDARD_DEVICE_FAMILY_CODE ) &&
+              ( reg < ( VSCP_REG_STANDARD_DEVICE_FAMILY_CODE + 4 ) ) ) {
+
+        uint32_t code = vscp_getFamilyCode();
+        uint8_t idx = reg - VSCP_REG_STANDARD_DEVICE_FAMILY_CODE;
+        rv = code >> ( ( ( 3 - idx ) * 8 ) & 0xff );
+    }
+    else if ( ( reg >= VSCP_REG_STANDARD_DEVICE_TYPE_CODE ) &&
+              ( reg < ( VSCP_REG_STANDARD_DEVICE_TYPE_CODE + 4 ) ) ) {
+
+        uint32_t code = vscp_getFamilyType();
+        uint8_t idx = reg - VSCP_REG_STANDARD_DEVICE_TYPE_CODE;
+        rv = code >> ( ( ( 3 - idx ) * 8 ) & 0xff );
+    }
     else if ((reg > (VSCP_REG_GUID - 1)) &&
             (reg < VSCP_REG_DEVICE_URL)) {
 
@@ -660,7 +674,7 @@ uint8_t vscp_readStdReg(uint8_t reg)
         rv = vscp_getGUID(reg - VSCP_REG_GUID);
 
     }
-    else {
+    else if ( reg >= VSCP_REG_DEVICE_URL ) {
 
         // * * * The device URL * * *
         rv = vscp_getMDF_URL(reg - VSCP_REG_DEVICE_URL);
@@ -733,26 +747,13 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value)
                 (0xff != (vscp_page_select & 0xff))) {
             // return complement to indicate error
             rv = ~value;
-        } else {
+        }
+        else {
             vscp_setGUID(reg - VSCP_REG_GUID, value);
             rv = vscp_getGUID(reg - VSCP_REG_GUID);
         }
     }
-#endif
-	else if ( ( reg >= VSCP_REG_STANDARD_DEVICE_FAMILY_CODE ) &&
-		 		( reg < VSCP_REG_STANDARD_DEVICE_TYPE_CODE ) ) {
-
-		uint32_t code = vscp_getFamilyCode();
-		uint8_t idx = reg - VSCP_REG_STANDARD_DEVICE_FAMILY_CODE;
-		rv = code >> (((3-idx)*8) & 0xff);	
-	}
-	else if ( ( reg >= VSCP_REG_STANDARD_DEVICE_TYPE_CODE ) &&
-		 		( reg < VSCP_REG_DEFAULT_CONFIG_RESTORE ) ) {
-
-		uint32_t code = vscp_getFamilyType();
-		uint8_t idx = reg - VSCP_REG_STANDARD_DEVICE_TYPE_CODE;
-		rv = code >> (((3-idx)*8) & 0xff);
-	}
+#endif	
 	else if ( VSCP_REG_DEFAULT_CONFIG_RESTORE == reg ) {
 		if ( 0x55 == value ) {
 			vscp_configtimer = 0;
@@ -892,23 +893,17 @@ void vscp_handleProtocolEvent(void)
             break;
 
         case VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER:
-            if ((vscp_nickname == vscp_imsg.data[ 0 ]) &&
-                (9 == vscp_imsg.data[ 1 ])) // AVR algorithm 0
-            {
-                vscp_goBootloaderMode();
-            }
 
             if ((vscp_nickname == vscp_imsg.data[ 0 ]) &&
-                (1 == vscp_imsg.data[ 1 ]) && // microchip PIC algorithm
+                // byte 1 contains algorithm. Handle in callback.
                 (vscp_getGUID(0) == vscp_imsg.data[ 2 ]) &&
                 (vscp_getGUID(3) == vscp_imsg.data[ 3 ]) &&
                 (vscp_getGUID(5) == vscp_imsg.data[ 4 ]) &&
                 (vscp_getGUID(7) == vscp_imsg.data[ 5 ]) &&
-                ((vscp_page_select >> 8) == vscp_imsg.data[ 6 ]) &&
+                (((vscp_page_select >> 8) & 0xff) == vscp_imsg.data[ 6 ]) &&
                 ((vscp_page_select & 0xff) == vscp_imsg.data[ 7 ])) {
 
-                vscp_goBootloaderMode();
-
+                vscp_goBootloaderMode( vscp_imsg.data[ 1 ] );
             }
             break;
 
@@ -975,11 +970,16 @@ void vscp_handleProtocolEvent(void)
                 for (i = 0; i < len; i++) {
                     vscp_omsg.data[ (i % 7) + 1 ] = vscp_readRegister(offset + i);
 
-                    if ((i % 7) == 6 || i == (len - 1)) {
+                    if ( (i % 7) == 6 || i == (len - 1) ) {
+
                         uint8_t bytes;
 
-                        if ((i % 7) == 6) bytes = 7;
-                        else bytes = (i % 7) + 1;
+                        if ( ( i % 7 ) == 6 ) {
+                            bytes = 7;
+                        }
+                        else {
+                            bytes = ( i % 7 ) + 1;
+                        }
 
                         vscp_omsg.flags = VSCP_VALID_MSG + bytes + 1;
                         vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
