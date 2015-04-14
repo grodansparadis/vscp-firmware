@@ -1171,7 +1171,7 @@ void doWork( void )
     vscp_omsg.vscp_type = VSCP_TYPE_MEASUREMENT_TEMPERATURE;
 
     vscp_omsg.data[ 0 ] = 0x88; // data type set as two's complement
-    vscp_omsg.data[ 1 ] = 0x00; // number of decimals
+    vscp_omsg.data[ 1 ] = 0x81; // number of decimals
     vscp_omsg.data[ 2 ] = decicelsius >> 8; // first half of the temperature
     vscp_omsg.data[ 3 ] = decicelsius & 0xff; // second half of the temperature
 
