@@ -701,11 +701,10 @@ uint8_t vscp_getSubzone( void )
 //	to the selected protocol.
 //
 
-void vscp_goBootloaderMode( void )
+void vscp_goBootloaderMode( uint8_t algorithm )
 {
     // TODO
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_getEmbeddedMdfInfo
