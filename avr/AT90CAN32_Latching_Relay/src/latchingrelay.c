@@ -1,9 +1,9 @@
 /* ******************************************************************************
- *  VSCP (Very Simple Control Protocol)
- *  http://www.vscp.org
+ * 	VSCP (Very Simple Control Protocol)
+ * 	http://www.vscp.org
  *
- *  2006-04-21
- *  akhe@eurosource.se
+ * 	2006-04-21
+ * 	akhe@eurosource.se
  *
  *  Copyright (C) 2006-2011 Ake Hedman, eurosource
  *
@@ -23,23 +23,33 @@
  *    misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  *
- *  This file is part of VSCP - Very Simple Control Protocol
- *  http://www.vscp.org
+ *	This file is part of VSCP - Very Simple Control Protocol
+ *	http://www.vscp.org
  *
  * ******************************************************************************
 */
 
 /*
-    Used Hardware resources
-    =======================
+		Used Hardware resources
+		=======================
 
     PORTC Pin 7 - Status LED
-    PORTA Pin 0 - Init button
+    PORTC Pin 0 - set relay ON
+    PORTC Pin 1 - set relay OFF
+		PORTA Pin 0 - Init button
 */
 
 #define LED_STATUS_ON       ((PORTC &= ~_BV(7)))
 #define LED_STATUS_OFF      ((PORTC |= _BV(7)))
 #define LED_STATUS_TOGGLE   ((PORTC ^= _BV(7)))
+
+#define RELAY_ON_ON       ((PORTC |= _BV(0)))
+#define RELAY_ON_OFF      ((PORTC &= ~_BV(0)))
+#define RELAY_ON_TOGGLE   ((PORTC ^= _BV(0)))
+
+#define RELAY_OFF_ON       ((PORTC |= _BV(1)))
+#define RELAY_OFF_OFF      ((PORTC &= ~_BV(1)))
+#define RELAY_OFF_TOGGLE   ((PORTC ^= _BV(1)))
 
 #define BTN_INIT_PRESSED    (!(PINA & _BV(0)))
 #define BTN_SW1_PRESSED     (!(PINA & _BV(1)))
@@ -64,19 +74,19 @@
 #include "vscp_type.h"
 #include "vscp_registers.h"
 #include "vscp_actions.c"
-#include "vscptemplate.h"
+#include "latchingrelay.h"
 
 #ifndef GUID_IN_EEPROM
 // GUID is stored in ROM for this module
-//    IMPORTANT!!!
-//    if using this GUID in a real environment
-//    please set the four MSB to a unique id.
+//		IMPORTANT!!!
+//		if using this GUID in a real environment
+//		please set the four MSB to a unique id.
 //
 // IMPORTANT!!!!!
 // The GUID is stored MSB byte first
 const uint8_t GUID[ 16 ] = {
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00, 0x04, 0x03, 0x02, 0x01
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x04, 0x03, 0x02, 0x01
 };
 #endif
 
@@ -94,12 +104,13 @@ const uint8_t vscp_deviceURL[]  = "lljm/mdf/templ_at90can32.xml";
 // offset 6 - Manufacturer subdevice id 2
 // offset 7 - Manufacturer subdevice id 3
 const uint8_t vscp_manufacturer_id[8] = {
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
 
 // Variables
 volatile uint16_t measurement_clock;  // 1 ms timer counter
+volatile uint16_t relay_timer;  // relay timer
 
 int16_t btncnt[ 8 ];    // Switch counters
 
@@ -131,68 +142,6 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
     vscp_initbtncnt = 0;
   }
   
-  // Check for Switch 1
-  if ( BTN_SW1_PRESSED ) {
-    // Active
-    btncnt[1]++;
-  }
-  else {
-    btncnt[1] = 0;
-  }
-  
-  // Check for Switch 2
-  if ( BTN_SW2_PRESSED ) {
-    // Active
-    btncnt[2]++;
-  }
-  else {
-    btncnt[2] = 0;
-  }
-  
-  // Check for Switch 3
-  if ( BTN_SW3_PRESSED ) {
-    // Active
-    btncnt[3]++;
-  }
-  else {
-    btncnt[3] = 0;
-  }
-  
-  // Check for Switch 4
-  if ( BTN_SW4_PRESSED ) {
-    // Active
-    btncnt[4]++;
-  }
-  else {
-    btncnt[4] = 0;
-  }
-  
-  // Check for Switch 5
-  if ( BTN_SW5_PRESSED ) {
-    // Active
-    btncnt[5]++;
-  }
-  else {
-    btncnt[5] = 0;
-  }
-  
-  // Check for Switch 6
-  if ( BTN_SW6_PRESSED ) {
-    // Active
-    btncnt[6]++;
-  }
-  else {
-    btncnt[6] = 0;
-  }
-  
-  // Check for Switch 7
-  if ( BTN_SW7_PRESSED ) {
-    // Active
-    btncnt[7]++;
-  }
-  else {
-    btncnt[7] = 0;
-  }
     
   // Status LED
   vscp_statuscnt++;
@@ -208,7 +157,14 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
     LED_STATUS_OFF;
     vscp_statuscnt = 0;
   }
-  
+
+  relay_pulse_width++;
+  if(relay_pulse_width > 200) // pulse width in miliseconds
+  {
+    RELAY_ON_OFF;
+    RELAY_OFF_OFF;
+  }
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -217,21 +173,21 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
 
 static void initTimer()
 {
-  // Enable timer0 compare interrupt
-  TIMSK0 = ( 1 << OCIE0A );
+	// Enable timer0 compare interrupt
+	TIMSK0 = ( 1 << OCIE0A );
 
     // Sets the compare value
-  // OCR0A = fclk/(2nf) - 1 = fclk/512000 - 1
+	// OCR0A = fclk/(2nf) - 1 = fclk/512000 - 1
 #ifndef FOSC
 #error You must define FOSC in yor makefile
 #elif FOSC == 8000
-  OCR0A = 32;
+	OCR0A = 32;
 #elif FOSC == 16000
-  OCR0A = 61;
+	OCR0A = 61;
 #endif
 
-  // Set Clear on Timer Compare (CTC) mode, CLK/256 prescaler
-  TCCR0A = ( 1 << WGM01 ) | ( 0 << WGM00 ) | ( 4 << CS00 );
+	// Set Clear on Timer Compare (CTC) mode, CLK/256 prescaler
+	TCCR0A = ( 1 << WGM01 ) | ( 0 << WGM00 ) | ( 4 << CS00 );
 }
 
 
@@ -249,17 +205,17 @@ int main( void )
   uint8_t i;
 
     PORTA   = 0xff;     // Activate pull-ups
-    DDRA = 0x00;      // Port A all inputs
-  
-    DDRB = 0xFF;      // Port B all outputs 
-    PORTB = 0xFF;     // all LEDS off
+    DDRA = 0x00;	    // Port A all inputs
+	
+    DDRB = 0xFF;	    // Port B all outputs 
+    PORTB = 0x00;	    // all LEDS off
     
     DDRC = 0xFF;      // Port C all outputs 
-    PORTC = 0xFF;     // all LEDS off
+    PORTC = 0x00;     // all LEDS off
 
     // Initialize UART
     UCSRA = 0;
-    UCSRC = MSK_UART_8BIT;  // 8N1
+    UCSRC = MSK_UART_8BIT;	// 8N1
     
     Uart_set_baudrate( 38400 );
     
@@ -276,127 +232,141 @@ int main( void )
     }
 
     uart_puts( "VSCP AT90CAN32\n" );
-    uart_puts( "Template firmware\n" );
+    uart_puts( "Latching relay module\n" );
 
 
-  // Check VSCP persistent storage and
-  // restore if needed
-  if ( !vscp_check_pstorage() ) {
+	// Check VSCP persistent storage and
+	// restore if needed
+	if ( !vscp_check_pstorage() ) {
 
-    // Spoiled or not initialized - reinitialize
-    init_app_eeprom();
+		// Spoiled or not initialized - reinitialize
+		init_app_eeprom();
 
-  }
+	}
 
-  vscp_init();      // Initialize the VSCP functionality
+	vscp_init();			// Initialize the VSCP functionality
 
-  while ( 1 ) {  // Loop Forever
-    
-    
-    if ( ( vscp_initbtncnt > 200 ) && ( VSCP_STATE_INIT != vscp_node_state ) ) {
-      
+	while ( 1 ) {  // Loop Forever
+	  
+	  
+	  if ( ( vscp_initbtncnt > 200 ) && ( VSCP_STATE_INIT != vscp_node_state ) ) {
+	    
             // State 0 button pressed
             vscp_nickname = VSCP_ADDRESS_FREE;
             writeEEPROM( VSCP_EEPROM_NICKNAME, VSCP_ADDRESS_FREE );
             vscp_init();
             uart_puts("Node initialization");
             
-    }
-    
-    
-    // Check for any valid CAN message
-    vscp_imsg.flags = 0;
-    vscp_getEvent();
-    
-    // do a work if it's time for it
-    if ( measurement_clock > 1000 ) {
-      
+	  }
+	  
+	  
+	  // Check for any valid CAN message
+	  vscp_imsg.flags = 0;
+	  vscp_getEvent();
+	  
+	  // do a work if it's time for it
+	  if ( measurement_clock > 1000 ) {
+	    
             measurement_clock = 0;
-      
+
             // Do VSCP one second jobs 
             vscp_doOneSecondWork();
-      
-      
-    }
-    
-    switch ( vscp_node_state ) {
-      
-    case VSCP_STATE_STARTUP:        // Cold/warm reset
-      
-      
-      // Get nickname from EEPROM
-      if ( VSCP_ADDRESS_FREE == vscp_nickname ) {
-        // new on segment need a nickname
-        vscp_node_state = VSCP_STATE_INIT;  
-      }
-      else {
-        // been here before - go on
-        vscp_node_state = VSCP_STATE_ACTIVE;
-        vscp_goActiveState();
-      }
-      break;
-      
-      
-    case VSCP_STATE_INIT:           // Assigning nickname
-      vscp_handleProbeState();
-      break;
-      
-    case VSCP_STATE_PREACTIVE:      // Waiting for host initialisation
-      vscp_goActiveState();         
-      break;
-      
-      
-    case VSCP_STATE_ACTIVE:         // The normal state
-      
-      
-      if ( vscp_imsg.flags & VSCP_VALID_MSG ) { // incoming message?
-#ifdef PRINT_CAN_EVENTS
-        char buf[30];
-        uint8_t i;
-        sprintf(buf, "rx: %03x/%02x/%02x/",
-          vscp_imsg.vscp_class, vscp_imsg.vscp_type, vscp_imsg.oaddr);
-        for (i=0; i<(vscp_imsg.flags&0xf); i++) {
-    char dbuf[5];
-    sprintf(dbuf, "/%02x", vscp_imsg.data[i]);
-    strcat(buf, dbuf);
+
+    if(readEEPROM( VSCP_EEPROM_END +  REG_RELAY_TIMER_MSB  ) * 256 + readEEPROM( VSCP_EEPROM_END +  REG_RELAY_TIMER_LSB  ) != 0)
+    {
+      if(relay_timer_enabled == 1)
+      {
+        relay_timer++;
+        if(relay_timer == readEEPROM( VSCP_EEPROM_END +  REG_RELAY_TIMER_MSB  ) * 256 + readEEPROM( VSCP_EEPROM_END +  REG_RELAY_TIMER_LSB  ))
+        {
+          relay_timer_enabled = 0;
+          relay_timer = 0;
+          doActionAction2();          
         }
-        uart_puts(buf);
-#endif
-        vscp_handleProtocolEvent();
-        
-        doDM();
-        
       }
-      break;
-      
-      
-    case VSCP_STATE_ERROR:          // Everything is *very* *very* bad.
-      vscp_error();
-      break;
-      
-    default:                        // Should not be here...
-      vscp_node_state = VSCP_STATE_STARTUP;
-      break;
-      
-      
-    } // switch 
-    
-    
-    
-    for ( i=1; i<8; i++ ) {
+
+    }
+	    
+	  }
+	  
+	  switch ( vscp_node_state ) {
+	    
+	  case VSCP_STATE_STARTUP:        // Cold/warm reset
+	    
+	    
+	    // Get nickname from EEPROM
+	    if ( VSCP_ADDRESS_FREE == vscp_nickname ) {
+	      // new on segment need a nickname
+	      vscp_node_state = VSCP_STATE_INIT; 	
+	    }
+	    else {
+	      // been here before - go on
+	      vscp_node_state = VSCP_STATE_ACTIVE;
+	      vscp_goActiveState();
+	    }
+	    break;
+	    
+	    
+	  case VSCP_STATE_INIT:           // Assigning nickname
+	    vscp_handleProbeState();
+	    break;
+	    
+	  case VSCP_STATE_PREACTIVE:      // Waiting for host initialisation
+	    vscp_goActiveState();					
+	    break;
+	    
+	    
+	  case VSCP_STATE_ACTIVE:         // The normal state
+	    
+	    
+	    if ( vscp_imsg.flags & VSCP_VALID_MSG ) {	// incoming message?
+#ifdef PRINT_CAN_EVENTS
+	      char buf[30];
+	      uint8_t i;
+	      sprintf(buf, "rx: %03x/%02x/%02x/",
+          vscp_imsg.vscp_class, vscp_imsg.vscp_type, vscp_imsg.oaddr);
+	      for (i=0; i<(vscp_imsg.flags&0xf); i++) {
+		char dbuf[5];
+		sprintf(dbuf, "/%02x", vscp_imsg.data[i]);
+		strcat(buf, dbuf);
+	      }
+	      uart_puts(buf);
+#endif
+	      vscp_handleProtocolEvent();
+	      
+	      doDM();
+	      
+	    }
+	    break;
+	    
+	    
+	  case VSCP_STATE_ERROR:          // Everything is *very* *very* bad.
+	    vscp_error();
+	    break;
+	    
+	  default:                        // Should not be here...
+	    vscp_node_state = VSCP_STATE_STARTUP;
+	    break;
+	    
+	    
+	  } // switch 
+	  
+	  
+	  
+	  for ( i=1; i<8; i++ ) {
             
             if ( btncnt[ i ] > 200 ) {
-        uart_puts("Button Pressed!");
-        SendInformationEvent( i-1, VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_ON );
-        btncnt[ i ] = -300;
+	      uart_puts("Button Pressed!");
+	      SendInformationEvent( i-1, VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_ON );
+	      btncnt[ i ] = -300;
             }
             
-    }
-    
-    doWork();
-    
-  } // while
-  
+	  }
+	  
+	  doWork();
+	  
+	} // while
+	
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -409,15 +379,7 @@ static void init_app_eeprom( void )
   
   writeEEPROM( REG_ZONE + VSCP_EEPROM_END, 0 );
   writeEEPROM( REG_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH0_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH1_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH2_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH3_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH4_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH5_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH6_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_SWITCH7_SUBZONE + VSCP_EEPROM_END, 0 );
-  writeEEPROM( REG_LED_CONTROL + VSCP_EEPROM_END, 0 );
+//  writeEEPROM( REG_LED_CONTROL + VSCP_EEPROM_END, 0 );
   
   // Decision matrix storage
   for ( pos = REG_DM_START; pos < ( REG_DM_START + DESCION_MATRIX_ELEMENTS * 8 ); pos++ ) {
@@ -429,8 +391,8 @@ static void init_app_eeprom( void )
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//              VSCP Functions
-//              --------------
+//   						VSCP Functions
+//							--------------
 //
 // All methods below must be implemented to handle VSCP functionality
 //
@@ -502,17 +464,17 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
 
 }
 
-  ///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // getVSCPFrame
 //
 //
 
 int8_t getVSCPFrame( uint16_t *pvscpclass,
-         uint8_t *pvscptype,
-         uint8_t *pNodeId,
-         uint8_t *pPriority,
-         uint8_t *pSize,
-         uint8_t *pData )
+		     uint8_t *pvscptype,
+		     uint8_t *pNodeId,
+		     uint8_t *pPriority,
+		     uint8_t *pSize,
+		     uint8_t *pData )
 {
   CANMsg msg;
   
@@ -579,8 +541,7 @@ uint8_t vscp_readAppReg( uint8_t reg )
 
     // Zone
     if ( REG_ZONE == reg ) {
-        //rv =  readEEPROM( REG_ZONE + VSCP_EEPROM_END );
-    rv = 32;
+        rv =  readEEPROM( REG_ZONE + VSCP_EEPROM_END );
     }
 
     // SubZone
@@ -588,6 +549,13 @@ uint8_t vscp_readAppReg( uint8_t reg )
         rv =  readEEPROM( REG_SUBZONE + VSCP_EEPROM_END );
     }
             
+    else if ( reg == REG_RELAY_TIMER_MSB ) {
+        rv = readEEPROM( VSCP_EEPROM_END +  reg );
+    }
+
+    else if ( reg == REG_RELAY_TIMER_LSB ) {
+        rv = readEEPROM( VSCP_EEPROM_END +  reg );
+    }
     
     // DM register space    for ( pos = REG_DM_DUMMY; pos < ( REG_DM_DUMMY + DESCION_MATRIX_ELEMENTS * 8 ); pos++ ) {
     else if ( ( reg >= REG_DM_START ) && ( reg < REG_DM_START + DESCION_MATRIX_ELEMENTS * 8) ) {
@@ -610,6 +578,12 @@ uint8_t vscp_readAppReg( uint8_t reg )
 uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
 {
     uint8_t rv;
+    char buf[30];
+
+    sprintf(buf, "Writing app reg: %x", VSCP_EEPROM_END + reg);
+    uart_puts( buf );
+    sprintf(buf, "Writing value: %x", val);
+    uart_puts( buf );
 
     rv = ~val; // error return
 
@@ -617,86 +591,38 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
     if ( REG_ZONE == reg ) {
         writeEEPROM( REG_ZONE + VSCP_EEPROM_END, val );
         rv =  readEEPROM( REG_ZONE + VSCP_EEPROM_END );
+        uart_puts("wrote reg_zone\n");
     }
 
     // SubZone
-  else if ( REG_SUBZONE == reg ) {
+	else if ( REG_SUBZONE == reg ) {
             writeEEPROM( REG_SUBZONE + VSCP_EEPROM_END, val );
             rv =  readEEPROM( REG_SUBZONE + VSCP_EEPROM_END );
-    } 
+    }	
             
-    // SubZone for LED0
-    else if ( REG_SWITCH0_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH0_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH0_SUBZONE + VSCP_EEPROM_END );
+    else if ( reg == REG_RELAY_TIMER_MSB ) {
+        writeEEPROM(( VSCP_EEPROM_END + reg ), val );
+        rv = readEEPROM( VSCP_EEPROM_END +  reg );
     }
 
-    // SubZone for LED1
-    else if ( REG_SWITCH1_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH1_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH1_SUBZONE + VSCP_EEPROM_END );
+    else if ( reg == REG_RELAY_TIMER_LSB ) {
+        writeEEPROM(( VSCP_EEPROM_END + reg ), val );
+        rv = readEEPROM( VSCP_EEPROM_END +  reg );
     }
 
-    // SubZone for LED2
-    else if ( REG_SWITCH2_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH2_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH2_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED3
-    else if ( REG_SWITCH3_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH3_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH3_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED4
-    else if ( REG_SWITCH4_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH4_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH4_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED5
-    else if ( REG_SWITCH5_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH5_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH5_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED6
-    else if ( REG_SWITCH6_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH6_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH6_SUBZONE + VSCP_EEPROM_END );
-    }
-
-    // SubZone for LED7
-    else if ( REG_SWITCH7_SUBZONE == reg ) {
-            writeEEPROM( REG_SWITCH7_SUBZONE + VSCP_EEPROM_END, val );
-            rv =  readEEPROM( REG_SWITCH7_SUBZONE + VSCP_EEPROM_END );
-    } 
-
-    // Write LED status
-    else if ( REG_LED_CONTROL == reg ) {
-#ifdef OLIMEX_AT90CAN128
-        PORTE = (uint8_t)(~(val | 1));
-        rv = ~PORTE;
-#else        
-        PORTB = (uint8_t)(~(val | 1));
-        rv = ~PORTB;
-#endif            
-    }
-    
     // DM register space
     else if ( ( reg >= REG_DM_START ) && ( reg < 0x80) ) {
         writeEEPROM(( VSCP_EEPROM_END + reg ), val );
         rv =  readEEPROM(( VSCP_EEPROM_END + reg ) );
     }
-  
+	
 
     else {
-        rv = ~val; // error return  
+        rv = ~val; // error return	
     }
 
 
-    return rv;  
+    return rv;	
 
 }
 
@@ -713,9 +639,9 @@ uint8_t vscp_readNicknamePermanent( void )
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//  vscp_writeNicknamePermanent
+// 	vscp_writeNicknamePermanent
 //
-//  Write nickname to permanent storage
+//	Write nickname to permanent storage
 //
 
 void vscp_writeNicknamePermanent( uint8_t nickname )
@@ -725,10 +651,10 @@ void vscp_writeNicknamePermanent( uint8_t nickname )
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  vscp_getZone
+//	vscp_getZone
 //
-//  Get Zone for device
-//  Just return zero if not used.
+//	Get Zone for device
+//	Just return zero if not used.
 //
 
 uint8_t vscp_getZone( void )
@@ -738,10 +664,10 @@ uint8_t vscp_getZone( void )
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  vscp_getSubzone
+//	vscp_getSubzone
 //
-//  Get Subzone for device
-//  Just return zero if not used.
+//	Get Subzone for device
+// 	Just return zero if not used.
 //
 
 uint8_t vscp_getSubzone( void )
@@ -750,11 +676,11 @@ uint8_t vscp_getSubzone( void )
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//  vscp_goBootloaderMode
+//	vscp_goBootloaderMode
 //
-//  Go bootloader mode
-//  This routine force the system into bootloader mode according
-//  to the selected protocol.
+//	Go bootloader mode
+//	This routine force the system into bootloader mode according
+//	to the selected protocol.
 //
 
 void vscp_goBootloaderMode( void )
@@ -766,10 +692,10 @@ void vscp_goBootloaderMode( void )
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_getEmbeddedMdfInfo
 //
-//  Get embedded MDF info
-//  If available this routine sends an embedded MDF file
-//  in several events. See specification CLASS1.PROTOCOL
-//  Type=35/36
+//	Get embedded MDF info
+//	If available this routine sends an embedded MDF file
+//	in several events. See specification CLASS1.PROTOCOL
+//	Type=35/36
 //
 
 void vscp_getEmbeddedMdfInfo( void )
@@ -835,8 +761,8 @@ uint8_t vscp_getGUID( uint8_t idx )
 void vscp_setGUID( uint8_t idx, uint8_t data )
 {
 #ifdef GUID_IN_EEPROM
-    writeEEPROM( VSCP_EEPROM_REG_GUID + idx, data );  
-#endif  
+    writeEEPROM( VSCP_EEPROM_REG_GUID + idx, data );	
+#endif	
 
 }
 
@@ -860,7 +786,7 @@ uint8_t vscp_getMDF_URL( uint8_t idx )
 
 uint8_t vscp_getUserID( uint8_t idx )
 {
-    return readEEPROM( VSCP_EEPROM_REG_USERID + idx );  
+    return readEEPROM( VSCP_EEPROM_REG_USERID + idx );	
 
 }
 
@@ -881,7 +807,7 @@ void vscp_setUserID( uint8_t idx, uint8_t data )
 
 uint8_t vscp_getManufacturerId( uint8_t idx )
 {
-    return readEEPROM( VSCP_EEPROM_REG_MANUFACTUR_ID0 + idx );  
+    return readEEPROM( VSCP_EEPROM_REG_MANUFACTUR_ID0 + idx );	
 
 }
 
@@ -893,7 +819,7 @@ uint8_t vscp_getManufacturerId( uint8_t idx )
 
 void vscp_setManufacturerId( uint8_t idx, uint8_t data )
 {
-    writeEEPROM( VSCP_EEPROM_REG_MANUFACTUR_ID0 + idx, data );  
+    writeEEPROM( VSCP_EEPROM_REG_MANUFACTUR_ID0 + idx, data );	
 
 }
 
@@ -905,7 +831,7 @@ void vscp_setManufacturerId( uint8_t idx, uint8_t data )
 
 uint8_t vscp_getBootLoaderAlgorithm( void )
 {
-    return VSCP_BOOTLOADER_AVR1;  
+    return VSCP_BOOTLOADER_AVR1; 	
 
 }
 
@@ -917,7 +843,7 @@ uint8_t vscp_getBootLoaderAlgorithm( void )
 
 uint8_t vscp_getBufferSize( void )
 {
-    return VSCP_SIZE_STD_DM_ROW;  // Standard CAN frame
+    return VSCP_SIZE_STD_DM_ROW;	// Standard CAN frame
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1040,28 +966,50 @@ uart_puts("doDM\n");
     for ( i=0; i<DESCION_MATRIX_ELEMENTS; i++ ) {
 
         // Get DM flags for this row
-        dmflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 
-                                    1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
-    uart_puts( "debug  doDM check rows\n" );
+        dmflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
+
+		uart_puts( "Checking DM rows\n" );
+
         // Is the DM row enabled?
         if ( dmflags & VSCP_DM_FLAG_ENABLED ) {
-      uart_puts( "debug  doDM row enabled\n" );
+
+			uart_puts( "DM flag enabled - [OK]\n" );
+
             // Should the originating id be checked and if so is it the same?
             if ( !( dmflags & VSCP_DM_FLAG_CHECK_OADDR ) &&
                     !(  vscp_imsg.oaddr == 
                         readEEPROM( VSCP_EEPROM_END + REG_DM_START +
                                         ( VSCP_SIZE_STD_DM_ROW * i ) ) ) ) {
-                continue;         
-            } 
-      
+                continue;					
+            }	
+			
 
             // Check if zone should match and if so if it match
             if ( dmflags & VSCP_DM_FLAG_CHECK_ZONE  ) {
+                    uart_puts( "Zone should match...\n" );
+
                 if ( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_END + REG_ZONE  ) ) {
+
+                    uart_puts( "Zone mismatch, continue...\n" );
                     continue;
+
                 } 
+                    uart_puts( "Zone match - [OK]\n" );
             }       
-      
+
+            // Check if subzone should match and if so if it match
+            if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE  ) {
+                    uart_puts( "Subzone should match...\n" );
+
+                if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_END + REG_SUBZONE  ) ) {
+
+                    uart_puts( "Subzone mismatch, continue...\n" );
+                    continue;
+
+                } 
+                    uart_puts( "Subzone match - [OK]\n" );
+            }       
+			
             class_filter = ( ( dmflags & VSCP_DM_FLAG_CLASS_FILTER ) << 8 ) + 
                                     readEEPROM( VSCP_EEPROM_END + 
                                                     REG_DM_START + 
@@ -1089,18 +1037,20 @@ uart_puts("doDM\n");
                 switch ( readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTION  ) ) {
 
                     case ACTION_ACTION1:
+                        uart_puts( "Running action 1\n" );
                         doActionAction1();
-                        break;
+                        continue;
 
                     case ACTION_ACTION2:
-                        doActionAction2();  
-                        break;
+                        uart_puts( "Running action 2\n" );
+                        doActionAction2();	
+                        continue;
 
 
-                } // case 
+                } // case	
             } // Filter/mask
         } // Row enabled
-    } // for each row 
+    } // for each row	
 
 }
 
@@ -1134,11 +1084,11 @@ void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId 
     vscp_omsg.vscp_class = eventClass;
     vscp_omsg.vscp_type = eventTypeId;
 
-    vscp_omsg.data[ 0 ] = idx;  // Register
+    vscp_omsg.data[ 0 ] = idx;	// Register
     vscp_omsg.data[ 1 ] = readEEPROM( VSCP_EEPROM_END + REG_ZONE );
-    vscp_omsg.data[ 2 ] = readEEPROM( VSCP_EEPROM_END + REG_SWITCH0_SUBZONE + idx );
+    vscp_omsg.data[ 2 ] = readEEPROM( VSCP_EEPROM_END + REG_SUBZONE + idx );
 
-    vscp_sendEvent(); // Send data
+    vscp_sendEvent();	// Send data
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1151,5 +1101,3 @@ void doWork( void )
 {
 
 }
-
-

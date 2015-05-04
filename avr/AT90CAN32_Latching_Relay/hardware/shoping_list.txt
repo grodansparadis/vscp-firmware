@@ -1,0 +1,12 @@
+3 points connector - 2007996		x2	OK
+EMBASE CMS 2X3 VOIES - 9689737		x2	OK
+Switch - 2396053			x2	OK
+bistable relay - 2060857		x2	OK
+AT90CAN 32 - 1455066			x2	OK
+regul tension 7805 - 2296030		x2	OK
+MCP2551 - 9758569			x2	OK
+double RJ45 - 9251901			x2	OK
+Quartz - 1842294			x2	OK
+Led blue - SM 1206 - 2217976		x20	OK
+ULN2003ADE4 - 1125398			x2	OK
+HIH4000 - 1187548			x1	OK
