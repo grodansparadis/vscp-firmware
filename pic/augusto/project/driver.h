@@ -37,6 +37,11 @@ extern "C" {
 #define OFFSET_LAT_TO_TRIS 0x09
 #define PIN_OUT_SIZE 8
 #define PIN_IN_SIZE 8
+#define HARDWARE_DEBOUNCE_THRESOLD 10
+
+#if (HARDWARE_DEBOUNCE_THRESOLD>15)
+#error("Thresold is too big")
+#endif
 
 //VSCP button and led definition
 #define vscp_ledPin  PORTAbits.RA2
@@ -61,11 +66,14 @@ typedef struct {
 extern uint8_t vscp_zone;
 extern struct _omsg vscp_omsg;
 
+
+void hardware_reinit(); //Internal usage
+
 void hardware_setup();
 void setOutput (unsigned char pin, unsigned char state);
 uint8_t getInput (unsigned char pin);
 void TMR0_interrupt();
-void hardware_freeRunning();
+void hardware_10mS();
 
 
 #define VSCP_BOARD_EEPROM_LENGTH 3*PIN_IN_SIZE + 2*PIN_OUT_SIZE

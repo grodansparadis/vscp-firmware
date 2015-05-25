@@ -134,6 +134,7 @@ void init_app_eeprom(void){
 void init_app_ram(void){
     init_augusto_ram();
 }
+
 //***************************************************************************
 // Main() - Main Routine
 //***************************************************************************
@@ -146,18 +147,27 @@ void main(){
     if ( !vscp_check_pstorage() )   // Check VSCP persistent storage and
         init_app_eeprom();          // restore if needed
     vscp_init();                    // Initialize the VSCP functionality
+
+    hardware_reinit; // TODO: remove it
     
     while(1){ //Handler scheduler
         ClrWdt();			// Feed the dog
         if(timeEvent._10mS){    //10mS Event
             timeEvent._10mS = 0;
             vscp_10mS_Running();
+            hardware_10mS();
         }
         if(timeEvent._100mS){   //100mS Event
             timeEvent._100mS = 0;
             vscp_100mS_Running();
             vscp_ledActivity();
-            vscp_omsg.flags = VSCP_VALID_MSG + 5;// three data byte
+
+            uint8_t data=0;
+            for (uint8_t i=0; i<8; i++){
+                data = (data << 1) + getInput(i);
+            }
+            
+            vscp_omsg.flags = VSCP_VALID_MSG + 6;// three data byte
             vscp_omsg.priority = VSCP_PRIORITY_LOW;
             vscp_omsg.vscp_class = VSCP_CLASS1_LAB;
             vscp_omsg.vscp_type = 0x02;
@@ -166,16 +176,8 @@ void main(){
             vscp_omsg.data[ 2 ] = PORTC;
             vscp_omsg.data[ 3 ] = PORTD;
             vscp_omsg.data[ 4 ] = PORTE;
+            vscp_omsg.data[ 5 ] = data;
             // send the event
-            vscp_sendEvent();
-
-            vscp_omsg.vscp_class = VSCP_CLASS1_LAB;
-            vscp_omsg.vscp_type = 0x01;
-            vscp_omsg.data[ 0 ] = LATA;
-            vscp_omsg.data[ 1 ] = LATB;
-            vscp_omsg.data[ 2 ] = LATC;
-            vscp_omsg.data[ 3 ] = LATD;
-            vscp_omsg.data[ 4 ] = LATE;
             vscp_sendEvent();
 
             vscp_omsg.flags = VSCP_VALID_MSG + 5;// three data byte
@@ -197,7 +199,7 @@ void main(){
             greenLed_pin = !greenLed_pin;
         }
         vscp_freeRunning();
-        hardware_freeRunning();
+        
         //TODO: Handling the override event
     }
 

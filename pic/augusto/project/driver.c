@@ -31,6 +31,7 @@ struct vscpBoard_inputVar{
     unsigned offEvent: 1;
     unsigned onEvent: 1;
     unsigned buttonEvent: 1;
+    unsigned debounce: 4; //For debounce time
 }input[PIN_IN_SIZE];
 
 /* DEFINITION OF STATUS / CONFIGURATION BYTE OF OUTPUT PIN
@@ -53,8 +54,6 @@ struct vscpBoard_outputVar{
 uint8_t zoneForInput[PIN_IN_SIZE];
 uint8_t subzoneForInput[PIN_IN_SIZE];
 uint8_t subzoneForOutput[PIN_OUT_SIZE];
-
-void hardware_reinit(); //Internal usage
 
 void IO_setup();  //Internal usage
 void TMR0_setup();//Internal usage
@@ -93,7 +92,6 @@ uint8_t getInput (unsigned char pin){
     return input[pin].currentStatus;
 }
 void hardware_setup(){
-    //hardware_reinit(); //TODO: to be removed
     IO_setup();
     vscp18f_init( TRUE );
     TMR0_setup();
@@ -119,35 +117,42 @@ void hardware_reinit(){
     }
 }
 
-// TODO: REFACT TO 10mS + debounce counter
-void hardware_freeRunning(){
+void hardware_10mS(){
     uint8_t newState;
     for (uint8_t i = 0; i < PIN_IN_SIZE; i++){
         newState = (((*(IN_PIN_PORT[i]) & IN_PIN_NUM[i]) > 0)^ input[i].reversedLogic );
         if (newState != input[i].currentStatus){
-            vscp_omsg.vscp_class = VSCP_CLASS1_INFORMATION;
-            vscp_omsg.flags = VSCP_VALID_MSG + 3;
-            vscp_omsg.priority = 3;
-            vscp_omsg.data[1] = zoneForInput[i];
-            vscp_omsg.data[2] = subzoneForInput[i];
-            if (input[i].buttonEvent){
-                vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_BUTTON;
-                vscp_omsg.data[0]= newState;
-                vscp_sendEvent();
+            input[i].debounce++;
+            if (input[i].debounce >= HARDWARE_DEBOUNCE_THRESOLD){
+                input[i].currentStatus = newState;
+                vscp_omsg.vscp_class = VSCP_CLASS1_INFORMATION;
+                vscp_omsg.priority = 3;
+                vscp_omsg.data[1] = zoneForInput[i];
+                vscp_omsg.data[2] = subzoneForInput[i];
+                if (input[i].buttonEvent){
+                    vscp_omsg.flags = VSCP_VALID_MSG + 3;
+                    vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_BUTTON;
+                    vscp_omsg.data[0]= newState;
+                    vscp_sendEvent();
+                    redLed_pin = !redLed_pin;
+                }
+                if (input[i].onEvent & (newState == 1)){
+                    vscp_omsg.flags = VSCP_VALID_MSG + 3;
+                    vscp_omsg.data[0]= 0;
+                    if (input[i].doorLogic == 1) vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_OPENED;
+                    else vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_ON;
+                    vscp_sendEvent();
+                }
+                if (input[i].offEvent & (newState == 0)){
+                    vscp_omsg.flags = VSCP_VALID_MSG + 3;
+                    vscp_omsg.data[0]= 0;
+                    if (input[i].doorLogic == 1) vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_CLOSED;
+                    else vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_OFF;
+                    vscp_sendEvent();
+                }
             }
-            if (input[i].onEvent & (newState == 1)){
-                vscp_omsg.data[0]= 0;
-                if (input[i].doorLogic == 1) vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_OPENED;
-                else vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_ON;
-                vscp_sendEvent();
-            }
-            if (input[i].offEvent & (newState == 0)){
-                vscp_omsg.data[0]= 0;
-                if (input[i].doorLogic == 1) vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_CLOSED;
-                else vscp_omsg.vscp_type = VSCP_TYPE_INFORMATION_OFF;
-                vscp_sendEvent();
-            }
-            input[i].currentStatus = newState;
+        }else{
+            input[i].debounce = 0;
         }
     }
 }
@@ -228,7 +233,6 @@ void IO_setup(){
     }
     
 }
-
 
 void TMR0_setup(){
 /* Timer0 Configuration
@@ -365,6 +369,7 @@ void setInputStruct(struct vscpBoard_inputVar *in, uint8_t value){
     (*in).offEvent = ((value & 0x20)>0);
     (*in).onEvent = ((value & 0x40)>0);
     (*in).buttonEvent = ((value & 0x80)>0);
+    (*in).debounce = 0;
 }
 
 
