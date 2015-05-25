@@ -70,19 +70,19 @@ low end hardware device.
 //  				VSCP Constants
 // ******************************************************************************
 
-#define VSCP_MAJOR_VERSION		1    ///< VSCP Major version
-#define VSCP_MINOR_VERSION      5    ///< VSCP Minor Version
+#define VSCP_MAJOR_VERSION		        1    // VSCP Major version
+#define VSCP_MINOR_VERSION              5    // VSCP Minor Version
 
-#define VSCP_ADDRESS_MASTER     0x00
-#define VSCP_ADDRESS_FREE       0xff
+#define VSCP_ADDRESS_MASTER             0x00
+#define VSCP_ADDRESS_FREE               0xff
 
-#define VSCP_SIZE_GUID          16   ///< # GUID bytes
-#define VSCP_SIZE_DEVURL        32   ///< # of device URL bytes
-#define VSCP_SIZE_STD_DM_ROW    8    ///< Size for level I decision matrix row
+#define VSCP_SIZE_GUID                  16   // # GUID bytes
+#define VSCP_SIZE_DEVURL                32   // # of device URL bytes
+#define VSCP_SIZE_STD_DM_ROW            8    // Size for level I decision matrix row
 
-#define VSCP_BOOT_FLAG          0xff // Boot flag is stored in persistent storage
-// and if it is there the boot loader will be
-// activated.
+#define VSCP_BOOT_FLAG          0xff         // Boot flag is stored in persistent storage
+                                             // and if it is there the boot loader will be
+                                             // activated.
 
 // Bootloaders
 #define VSCP_BOOTLOADER_VSCP            0x00	// VSCP boot loader algorithm
@@ -131,105 +131,109 @@ low end hardware device.
 //  			VSCP Register - Logical positions
 // ******************************************************************************
 
-#define VSCP_REG_ALARMSTATUS            0x80
-#define VSCP_REG_VSCP_MAJOR_VERSION     0x81
-#define VSCP_REG_VSCP_MINOR_VERSION     0x82
+#define VSCP_REG_ALARMSTATUS                0x80
+#define VSCP_REG_VSCP_MAJOR_VERSION         0x81
+#define VSCP_REG_VSCP_MINOR_VERSION         0x82
 
-#define VSCP_REG_NODE_CONTROL           0x83
+#define VSCP_REG_NODE_CONTROL               0x83
 
-#define VSCP_REG_USERID0                0x84
-#define VSCP_REG_USERID1                0x85
-#define VSCP_REG_USERID2                0x86
-#define VSCP_REG_USERID3                0x87
-#define VSCP_REG_USERID4				0x88
+#define VSCP_REG_USERID0                    0x84
+#define VSCP_REG_USERID1                    0x85
+#define VSCP_REG_USERID2                    0x86
+#define VSCP_REG_USERID3                    0x87
+#define VSCP_REG_USERID4                    0x88
 
-#define VSCP_REG_MANUFACTUR_ID0			0x89
-#define VSCP_REG_MANUFACTUR_ID1			0x8A
-#define VSCP_REG_MANUFACTUR_ID2			0x8B
-#define VSCP_REG_MANUFACTUR_ID3			0x8C
+#define VSCP_REG_MANUFACTUR_ID0             0x89
+#define VSCP_REG_MANUFACTUR_ID1             0x8A
+#define VSCP_REG_MANUFACTUR_ID2             0x8B
+#define VSCP_REG_MANUFACTUR_ID3             0x8C
 
-#define VSCP_REG_MANUFACTUR_SUBID0		0x8D
-#define VSCP_REG_MANUFACTUR_SUBID1		0x8E
-#define VSCP_REG_MANUFACTUR_SUBID2		0x8F
-#define VSCP_REG_MANUFACTUR_SUBID3		0x90
+#define VSCP_REG_MANUFACTUR_SUBID0          0x8D
+#define VSCP_REG_MANUFACTUR_SUBID1          0x8E
+#define VSCP_REG_MANUFACTUR_SUBID2          0x8F
+#define VSCP_REG_MANUFACTUR_SUBID3          0x90
 
-#define VSCP_REG_NICKNAME_ID			0x91
+#define VSCP_REG_NICKNAME_ID                0x91
 
-#define VSCP_REG_PAGE_SELECT_MSB        0x92
-#define VSCP_REG_PAGE_SELECT_LSB        0x93
+#define VSCP_REG_PAGE_SELECT_MSB            0x92
+#define VSCP_REG_PAGE_SELECT_LSB            0x93
 
 #define VSCP_REG_FIRMWARE_MAJOR_VERSION		0x94
 #define VSCP_REG_FIRMWARE_MINOR_VERSION		0x95
 #define VSCP_REG_FIRMWARE_SUB_MINOR_VERSION	0x96
 
-#define VSCP_REG_BOOT_LOADER_ALGORITHM  0x97
-#define VSCP_REG_BUFFER_SIZE            0x98
-#define VSCP_REG_PAGES_USED             0x99
+#define VSCP_REG_BOOT_LOADER_ALGORITHM      0x97
+#define VSCP_REG_BUFFER_SIZE                0x98
+#define VSCP_REG_PAGES_USED                 0x99
 
 // 32-bit
-#define VSCP_REG_STANDARD_DEVICE_FAMILY_CODE	0x9A
+#define VSCP_REG_STANDARD_DEVICE_FAMILY_CODE 0x9A
 
 // 32-bit
-#define VSCP_REG_STANDARD_DEVICE_TYPE_CODE		0x9E
+#define VSCP_REG_STANDARD_DEVICE_TYPE_CODE  0x9E
 
-#define VSCP_REG_DEFAULT_CONFIG_RESTORE			0xA2
+#define VSCP_REG_DEFAULT_CONFIG_RESTORE     0xA2
 
-#define VSCP_REG_GUID                   0xD0
-#define VSCP_REG_DEVICE_URL             0xE0
+#define VSCP_REG_GUID                       0xD0
+#define VSCP_REG_DEVICE_URL                 0xE0
 
 // INIT LED function codes
-#define VSCP_LED_OFF		        	0x00
-#define VSCP_LED_ON                     0x01
-#define VSCP_LED_BLINK1                 0x02
+#define VSCP_LED_OFF                        0x00
+#define VSCP_LED_ON                         0x01
+#define VSCP_LED_BLINK1                     0x02
 
 /*!
-        \struct _imsg
-        Input message
- */
+    \struct _imsg
+    Input event
+    This is an event fetched either directly from a
+    transport layer or from a fifo.
+*/
 struct _imsg {
     /*!
-            Input message flags\n
-            ==================\n
-            Bit 7 - Set if message valid\n
-            Bit 6 - Reserved\n
-            Bit 5 - Hard coded (will never be set)\n
-            Bit 3 - Number of data bytes MSB\n
-            Bit 2 - Number of data bytes \n
-            Bit 1 - Number of data bytes\n
-            Bit 0 - Number of data bytes LSB\n
+        Input message flags\n
+        ==================\n
+        Bit 7 - Set if message valid\n
+        Bit 6 - Reserved\n
+        Bit 5 - Hard coded (will never be set)\n
+        Bit 3 - Number of data bytes MSB\n
+        Bit 2 - Number of data bytes \n
+        Bit 1 - Number of data bytes\n
+        Bit 0 - Number of data bytes LSB\n
      */
-    uint8_t flags; ///< Input message flags
+    uint8_t flags;          // Input message flags
 
-    uint8_t priority; ///< Priority for the message 0-7
-    uint16_t vscp_class; ///< VSCP class
-    uint8_t vscp_type; ///< VSCP type
-    uint8_t oaddr; ///< Packet originating address
-    uint8_t data[8]; ///< data bytes
+    uint8_t priority;       // Priority for the message 0-7
+    uint16_t vscp_class;    // VSCP class
+    uint8_t vscp_type;      // VSCP type
+    uint8_t oaddr;          // Packet originating address
+    uint8_t data[8];        // data bytes
 };
 
 /*!
-        \struct _omsg
-        Output message
+    \struct _omsg
+    Output Event
+    This is an event that will be sent out. Either directly or
+    put in a fifo.
  */
 struct _omsg {
     /*!
-            Output message flags ( Message to send )\n
-            ========================================
-            Bit 7 - Set if message should be sent (cleared when sent)\n
-            Bit 6 - Reserved\n
-            Bit 5 - Reserved\n
-            Bit 2 - Number of data bytes MSB\n
-            Bit 2 - Number of data bytes \n
-            Bit 1 - Number of data bytes\n
-            Bit 0 - Number of data bytes LSB\n
+        Output message flags ( Message to send )\n
+        ========================================
+        Bit 7 - Set if message should be sent (cleared when sent)\n
+        Bit 6 - Reserved\n
+        Bit 5 - Reserved\n
+        Bit 2 - Number of data bytes MSB\n
+        Bit 2 - Number of data bytes \n
+        Bit 1 - Number of data bytes\n
+        Bit 0 - Number of data bytes LSB\n
      */
-    uint8_t flags;          ///< Output message flags
+    uint8_t flags;          // Output message flags
 
-    uint8_t priority;       ///< Priority for the message 0-7
-    uint16_t vscp_class;    ///< VSCP class
-    uint8_t vscp_type;      ///< VSCP type
+    uint8_t priority;       // Priority for the message 0-7
+    uint16_t vscp_class;    // VSCP class
+    uint8_t vscp_type;      // VSCP type
     /// Originating address is always *this* node
-    uint8_t data[8]; ///< data bytes
+    uint8_t data[8];        // data bytes
 };
 
 /*!
@@ -273,159 +277,159 @@ struct _omsg {
 #define VSCP_DM_FLAG_CLASS_FILTER	  		0x01
 
 /*!
-        \struct _dmrow
-        Decision matrix row element (for RAM storage)
-        Each DM row consist of a structure of this type.
+    \struct _dmrow
+    Decision matrix row element (for RAM storage)
+    Each DM row consist of a structure of this type.
  */
 struct _dmrow {
-    uint8_t oaddr;          ///< Originating address
-    uint8_t flags;          ///< Decision matrix row flags
-    uint8_t class_mask;     ///< Mask for class (lower eight bits)
-    uint8_t class_filter;   ///< Filter for class (lower eight bits)
-    uint8_t type_mask;      ///< Mask for type
-    uint8_t type_filter;    ///< Filter for type
-    uint8_t action;         ///< Action code
-    uint8_t action_param;   ///< Action parameter
+    uint8_t oaddr;          // Originating address
+    uint8_t flags;          // Decision matrix row flags
+    uint8_t class_mask;     // Mask for class (lower eight bits)
+    uint8_t class_filter;   // Filter for class (lower eight bits)
+    uint8_t type_mask;      // Mask for type
+    uint8_t type_filter;    // Filter for type
+    uint8_t action;         // Action code
+    uint8_t action_param;   // Action parameter
 };
 
 // -----------------------------------------------------------------------------
 
-/// External - VSCP Data
-extern uint8_t vscp_nickname;       ///< Assigned node nickname
-extern uint8_t vscp_errorcnt;       ///< VSCP error counter
-extern uint8_t vscp_alarmstatus;    ///< VSCP alarm status register
-extern uint8_t vscp_node_state;     ///< VSCP state machine main state
-extern uint8_t vscp_node_substate;  ///< VSCP state machine sub state
-extern uint8_t vscp_initledfunc;    ///<
-///           The following are defined in vscp.c
-extern struct _imsg vscp_imsg;      ///< Current input event
-extern struct _omsg vscp_omsg;      ///< Current outgoing event
-extern volatile uint16_t vscp_timer;///< 1 ms timer counter
-extern uint8_t vscp_probe_address;  ///< Probe address for nickname discovery
-extern volatile uint8_t vscp_initbtncnt;    ///< init. button counter
-extern volatile uint8_t vscp_statuscnt;     ///< status LED counter
-extern uint16_t vscp_page_select;   ///< Selected Register Page
-extern volatile uint16_t vscp_configtimer; ///< configuration timer
+// External - VSCP Data
+extern uint8_t vscp_nickname;       // Assigned node nickname
+extern uint8_t vscp_errorcnt;       // VSCP error counter
+extern uint8_t vscp_alarmstatus;    // VSCP alarm status register
+extern uint8_t vscp_node_state;     // VSCP state machine main state
+extern uint8_t vscp_node_substate;  // VSCP state machine sub state
+extern uint8_t vscp_initledfunc;    //
+// The following are defined in vscp.c
+extern struct _imsg vscp_imsg;      // Current input event
+extern struct _omsg vscp_omsg;      // Current outgoing event
+extern volatile uint16_t vscp_timer;// 1 ms timer counter
+extern uint8_t vscp_probe_address;  // Probe address for nickname discovery
+extern volatile uint8_t vscp_initbtncnt;    // init. button counter
+extern volatile uint8_t vscp_statuscnt;     // status LED counter
+extern uint16_t vscp_page_select;   // Selected Register Page
+extern volatile uint16_t vscp_configtimer; // configuration timer
 
-extern const uint8_t vscp_deviceURL[]; ///<  GUID
+extern const uint8_t vscp_deviceURL[]; //  GUID
 
 // Prototypes
 
 /*!
-        \fn vscp_init
-        Init the VSCP firmware.
+    \fn vscp_init
+    Init the VSCP firmware.
 	
-        Call this before entering the main loop.
+    Call this before entering the main loop.
  */
 void vscp_init(void);
 
 
 /*!
-        Set VSCP error state
+    Set VSCP error state
  */
 void vscp_error(void);
 
 /*!
-        Handle nickname probing
+    Handle nickname probing
 	
-        This routine should be called periodically while
-        in state VSCP_STATE_INIT
+    This routine should be called periodically while
+    in state VSCP_STATE_INIT
  */
 void vscp_handleProbeState(void);
 
 /*!
-        Handle the pre active state
+    Handle the pre active state
 	
-        This state is entered if a nod with nickname=0 answers the
-        probe.Zero is reserved for a segment controller and if it
-        is available and acknowledge this way that it is the node should
-        wait for the segment controller to set its nickname. This should
-        happen before a pre-set time-out (1 second) and if this time is
-        exceeded the init. process is started again to give the segment controller
-        more chances to do its job.
+    This state is entered if a nod with nickname=0 answers the
+    probe.Zero is reserved for a segment controller and if it
+    is available and acknowledge this way that it is the node should
+    wait for the segment controller to set its nickname. This should
+    happen before a pre-set time-out (1 second) and if this time is
+    exceeded the init. process is started again to give the segment controller
+    more chances to do its job.
  */
 void vscp_handlePreActiveState(void);
 
 /*!
-        Handle incoming CLASS1.PROTOCOL event
+    Handle incoming CLASS1.PROTOCOL event
 	
-        The event should be in the vscp_imsg buffer on entry.
+    The event should be in the vscp_imsg buffer on entry.
  */
 void vscp_handleProtocolEvent(void);
 
 /*!
-        Go to the active state
+    Go to the active state
 	
-        This mean the node sends new node on-line and informs other nodes
-        about its acquired nickname.
+    This mean the node sends new node on-line and informs other nodes
+    about its acquired nickname.
  */
 void vscp_goActiveState(void);
 
 /*!
-        Send periodic heartbeat
-        This event should be called by the application periodic
-        to inform the world about its existence and tell it's
-        alive.
-        @param zone Zone the module belongs to or zero if no zone.
-        @param subzone Subzone the module belongs to or zero if no subzone.
+    Send periodic heartbeat
+    This event should be called by the application periodic
+    to inform the world about its existence and tell it's
+    alive.
+    @param zone Zone the module belongs to or zero if no zone.
+    @param subzone Subzone the module belongs to or zero if no subzone.
  */
 void vscp_sendHeartBeat(uint8_t zone, uint8_t subzone);
 
 /*!
-        Handle received VSCP segment controller heartbeat
+    Handle received VSCP segment controller heartbeat
  */
 void vscp_handleHeartbeat(void);
 
 /*!
-        Handle Set Nickname event
+    Handle Set Nickname event
  */
 void vscp_handleSetNickname(void);
 
 /*!
-        Handle Drop Nickname
+    Handle Drop Nickname
  */
 void vscp_handleDropNickname(void);
 
 /*!
-        Report a new node on the bus
+    Report a new node on the bus
  */
 void vscp_newNodeOnline(void);
 
 /*!
-        Read a VSCP register
-        @param reg register to read.
-        @return Content of register.
+    Read a VSCP register
+    @param reg register to read.
+    @return Content of register.
  */
 uint8_t vscp_readRegister(uint8_t reg);
 
 /*!
-        Read standard register (upper part)
-        @param reg Register to read (>=0x80)
-        @return Register content or 0xff for nn valid register
+    Read standard register (upper part)
+    @param reg Register to read (>=0x80)
+    @return Register content or 0xff for nn valid register
  */
 uint8_t vscp_readStdReg(uint8_t reg);
 
 /*!
-        Write VSCP register
-        @param reg Register to write to
-        @param value Value to write
-        @return Content of register after write.
+    Write VSCP register
+    @param reg Register to write to
+    @param value Value to write
+    @return Content of register after write.
  */
 uint8_t vscp_writeRegister(uint8_t reg, uint8_t value);
 
 /*!
-        Write standard register (upper part)
-        @param reg Register to write to
-        @param value Value to write
-        @return Content of register after write.
+    Write standard register (upper part)
+    @param reg Register to write to
+    @param value Value to write
+    @return Content of register after write.
  */
 uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value);
 
 /*!
-        Do One second work
+    Do One second work
 	
-        This routine should be called once a second by the
-        application.
+    This routine should be called once a second by the
+    application.
  */
 void vscp_doOneSecondWork(void);
 
@@ -437,14 +441,14 @@ int8_t vscp_check_pstorage(void);
 
 
 /*!
-        Send VSCP event in the out-buffer.
-        @return TRUE on success.
+    Send VSCP event in the out-buffer.
+    @return TRUE on success.
  */
 int8_t vscp_sendEvent(void);
 
 /*!
-        Get VSCP Event if there is no message in the input buffer.
-        @return TRUE if a valid event is placed in the in-buffer.
+    Get VSCP Event if there is no message in the input buffer.
+    @return TRUE if a valid event is placed in the in-buffer.
  */
 int8_t vscp_getEvent(void);
 
@@ -462,7 +466,7 @@ int8_t vscp_getEvent(void);
     @param pvscpclass Pointer to variable that will get VSCP class.
     @param pvscptype Ponter to variable which will get VSCP type.
     @param pNodeId Pointer to variable which will get nodeid.
-        @param pPriority Pointer to variable which will get priority (0-7).
+    @param pPriority Pointer to variable which will get priority (0-7).
     @param pSize Pointer to variable that will get data size.
     @param pData pinter to array that will get event data.
     @return TRUE on success.
@@ -478,18 +482,18 @@ int8_t getVSCPFrame(uint16_t *pvscpclass,
     Send a VSCP frame 
     @param vscpclass VSCP class for event.
     @param vscptype VSCP type for event.
-        @param nodeid Nodeid for originating node.
-        @param priority Priority for event.
+    @param nodeid Nodeid for originating node.
+    @param priority Priority for event.
     @param size Size of data portion.
     @param pData Pointer to event data.
     @return TRUE on success.
  */
-int8_t sendVSCPFrame(uint16_t vscpclass,
-        uint8_t vscptype,
-        uint8_t nodeid,
-        uint8_t priority,
-        uint8_t size,
-        uint8_t *pData);
+int8_t sendVSCPFrame( uint16_t vscpclass,
+                        uint8_t vscptype,
+                        uint8_t nodeid,
+                        uint8_t priority,
+                        uint8_t size,
+                        uint8_t *pData );
 
 
 /*!
@@ -497,128 +501,128 @@ int8_t sendVSCPFrame(uint16_t vscpclass,
     in the application and should return firmware version
     information
  */
-uint8_t vscp_getMajorVersion(void);
-uint8_t vscp_getMinorVersion(void);
-uint8_t vscp_getSubMinorVersion(void);
+uint8_t vscp_getMajorVersion( void );
+uint8_t vscp_getMinorVersion( void );
+uint8_t vscp_getSubMinorVersion( void );
 
 /*! 
-        Get GUID from permanent storage
+    Get GUID from permanent storage
  */
 uint8_t vscp_getGUID(uint8_t idx);
 void vscp_setGUID(uint8_t idx, uint8_t data);   // Only if write to protected
                                                 // locations is enabled
 
 /*!
-        User ID 0 idx=0
-        User ID 1 idx=1
-        User ID 2 idx=2
-        User ID 3 idx=3
+    User ID 0 idx=0
+    User ID 1 idx=1
+    User ID 2 idx=2
+    User ID 3 idx=3
  */
 uint8_t vscp_getUserID(uint8_t idx);
 void vscp_setUserID(uint8_t idx, uint8_t data);
 
 /*!
-        Handle manufacturer id.
+    Handle manufacturer id.
 	
-        Not that both main and sub id are fetched here
-                Manufacturer device ID byte 0 - idx=0
-                Manufacturer device ID byte 1 - idx=1
-                Manufacturer device ID byte 2 - idx=2
-                Manufacturer device ID byte 3 - idx=3
-                Manufacturer device sub ID byte 0 - idx=4
-                Manufacturer device sub ID byte 1 - idx=5
-                Manufacturer device sub ID byte 2 - idx=6
-                Manufacturer device sub ID byte 3 - idx=7
+    Not that both main and sub id are fetched here
+        Manufacturer device ID byte 0 - idx=0
+        Manufacturer device ID byte 1 - idx=1
+        Manufacturer device ID byte 2 - idx=2
+        Manufacturer device ID byte 3 - idx=3
+        Manufacturer device sub ID byte 0 - idx=4
+        Manufacturer device sub ID byte 1 - idx=5
+        Manufacturer device sub ID byte 2 - idx=6
+        Manufacturer device sub ID byte 3 - idx=7
  */
 uint8_t vscp_getManufacturerId(uint8_t idx);
 void vscp_setManufacturerId(uint8_t idx, uint8_t data);
 
 /*!
-        Get boot loader algorithm from permanent storage
+    Get boot loader algorithm from permanent storage
  */
 uint8_t vscp_getBootLoaderAlgorithm( void );
 
 /*! 
-        Get buffer size
+    Get buffer size
  */
 uint8_t vscp_getBufferSize(void);
 
 /*! 
-        Get number of register pages used by app.
+    Get number of register pages used by app.
  */
 uint8_t vscp_getRegisterPagesUsed(void);
 
 /*!
-        Get URL from device from permanent storage
-        index 0-15
+    Get URL from device from permanent storage
+    index 0-15
  */
 uint8_t vscp_getMDF_URL(uint8_t idx);
 
 /*!
-        Fetch nickname from permanent storage
-        @return read nickname.
+    Fetch nickname from permanent storage
+    @return read nickname.
  */
 uint8_t vscp_readNicknamePermanent(void);
 
 /*! 
-        Write nickname to permanent storage
-        @param nickname to write
+    Write nickname to permanent storage
+    @param nickname to write
  */
 void vscp_writeNicknamePermanent(uint8_t nickname);
 
 /*! 
-        Fetch segment CRC from permanent storage
+    Fetch segment CRC from permanent storage
  */
 uint8_t vscp_getSegmentCRC(void);
 
 /*! 
-        Write segment CRC to permanent storage
+    Write segment CRC to permanent storage
  */
 void vscp_setSegmentCRC(uint8_t crc);
 
 /*!
-        Fetch control byte from permanent storage
+    Fetch control byte from permanent storage
  */
 uint8_t vscp_getControlByte(void);
 
 /*! 
-        Write control byte permanent storage
+    Write control byte permanent storage
  */
 void vscp_setControlByte(uint8_t ctrl);
 
 /*! 
-        Get page select bytes
-                idx=0 - byte 0 MSB
-                idx=1 - byte 1 LSB
+    Get page select bytes
+        idx=0 - byte 0 MSB
+        idx=1 - byte 1 LSB
  */
 uint8_t vscp_getPageSelect(uint8_t idx);
 
 /*!
-        Set page select registers
-        @param idx 0 for LSB, 1 for MSB
-        @param data Byte to set of page select registers
+    Set page select registers
+    @param idx 0 for LSB, 1 for MSB
+    @param data Byte to set of page select registers
  */
 void vscp_setPageSelect(uint8_t idx, uint8_t data);
 
 /*!
-        Read application register (lower part)
-        @param reg Register to read (<0x80)
-        @return Register content or 0x00 for non valid register
+    Read application register (lower part)
+    @param reg Register to read (<0x80)
+    @return Register content or 0x00 for non valid register
  */
 uint8_t vscp_readAppReg(uint8_t reg);
 
 /*!
-        Write application register (lower part)
-        @param reg Register to read (<0x80)
-        @param value Value to write to register.
-        @return Register content or 0xff for non valid register
+    Write application register (lower part)
+    @param reg Register to read (<0x80)
+    @param value Value to write to register.
+    @return Register content or 0xff for non valid register
  */
 uint8_t vscp_writeAppReg(uint8_t reg, uint8_t value);
 
 /*!
-        Get DM matrix info
-        The output message data structure should be filled with
-        the following data by this routine.
+    Get DM matrix info
+    The output message data structure should be filled with
+    the following data by this routine.
         byte 0 - Number of DM rows. 0 if none.
         byte 1 - offset in register space.
         byte 2 - start page MSB
@@ -630,50 +634,49 @@ uint8_t vscp_writeAppReg(uint8_t reg, uint8_t value);
 void vscp_getMatrixInfo(char *pData);
 
 /*!
-        Get embedded MDF info
-        If available this routine sends an embedded MDF file
-        in several events. See specification CLASS1.PROTOCOL
-        Type=35/36
+    Get embedded MDF info
+    If available this routine sends an embedded MDF file
+    in several events. See specification CLASS1.PROTOCOL
+    Type=35/36
  */
 void vscp_getEmbeddedMdfInfo(void);
 
 /*!
-        Go boot loader mode
-        This routine force the system into boot loader mode according
-        to the selected protocol.
+    Go boot loader mode
+    This routine force the system into boot loader mode according
+    to the selected protocol.
  */
 void vscp_goBootloaderMode( uint8_t algorithm );
 
 /*!
-        Get Zone for device
-        Just return zero if not used.
+    Get Zone for device
+    Just return zero if not used.
  */
 uint8_t vscp_getZone(void);
 
 /*!
-        Get Subzone for device
-        Just return zero if not used.
-    
+    Get Subzone for device
+    Just return zero if not used.    
  */
 uint8_t vscp_getSubzone(void);
 
 /*!
-		Get device family code
-		return zero for not known.
+    Get device family code
+    return zero for not known.
 */
 uint32_t vscp_getFamilyCode(void);
 
 /*!
-		Get device family type
-		return zero for not known.
+    Get device family type
+    return zero for not known.
 */
 uint32_t vscp_getFamilyType(void);
 
 /*!
-		Restore defaults
-		If 0x55/0xaa is written to register location
-		162 within one second defaults should be loaded
-		by the device.
+    Restore defaults
+    If 0x55/0xaa is written to register location
+    162 within one second defaults should be loaded
+    by the device.
  */
 void vscp_restoreDefaults(void);
 

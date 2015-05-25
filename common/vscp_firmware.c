@@ -80,18 +80,20 @@ uint8_t vscp_probe_address;         // Address used during initialization
 uint8_t vscp_initledfunc;           // Init. LED functionality
 
 volatile uint16_t vscp_timer;       // 1 ms timer counter
-//	increase externally bye one every millisecond
+                                    //	increase externally bye one every millisecond
 
-volatile uint8_t vscp_initbtncnt;   // init button counter
+// init button counter
 //  increase this value externally by one each millisecond
 //  the initbutton is pressed. Set to zero when button
-// is released.
+//  is released.
+volatile uint8_t vscp_initbtncnt;   
+
 
 volatile uint8_t vscp_statuscnt;    // status LED counter
-//	increase externally bye one every millisecond
+                                    //	increase externally bye one every millisecond
 
 volatile uint16_t vscp_configtimer; // configuration timer
-//	increase externally bye one every millisecond
+                                    //	increase externally bye one every millisecond
 
 // page selector
 uint16_t vscp_page_select;
@@ -216,7 +218,8 @@ void vscp_handleProbeState(void)
                 vscp_node_substate = VSCP_SUBSTATE_INIT_PROBE_SENT;
                 vscp_timer = 0;
 
-            } else {
+            } 
+            else {
 
                 // No free address -> error
                 vscp_node_state = VSCP_STATE_ERROR;
@@ -250,7 +253,8 @@ void vscp_handleProbeState(void)
                         vscp_node_state = VSCP_STATE_PREACTIVE;
                         vscp_timer = 0; // reset timer
 
-                    } else {
+                    } 
+                    else {
 
                         // node answered, try next address
                         vscp_probe_address++;
@@ -259,7 +263,8 @@ void vscp_handleProbeState(void)
 
                     }
                 }
-            } else {
+            } 
+            else {
 
                 if (vscp_timer > VSCP_PROBE_TIMEOUT) { // Check for time-out
 
@@ -276,7 +281,8 @@ void vscp_handleProbeState(void)
                             vscp_timer = 0;
                             vscp_probe_cnt = 0;
 
-                        } else {
+                        } 
+                        else {
 
                             // We have found a free address - use it
                             vscp_nickname = vscp_probe_address;
@@ -290,7 +296,8 @@ void vscp_handleProbeState(void)
                             vscp_goActiveState();
 
                         }
-                    } else {
+                    } 
+                    else {
                         vscp_node_substate = VSCP_SUBSTATE_NONE;
                     }
                 } // Timeout
@@ -331,7 +338,8 @@ void vscp_handlePreActiveState(void)
             // Go active state
             vscp_node_state = VSCP_STATE_ACTIVE;
         }
-    } else {
+    } 
+    else {
         // Check for time out
         if (vscp_timer > VSCP_PROBE_TIMEOUT) {
             // Yes, we have a timeout
@@ -412,7 +420,7 @@ void vscp_handleHeartbeat(void)
 
 void vscp_handleSetNickname(void)
 {
-    if ((2 == (vscp_imsg.flags & 0x0f)) &&
+    if ( ( 2 == (vscp_imsg.flags & 0x0f ) ) &&
             (vscp_nickname == vscp_imsg.data[ 0 ])) {
 
         // Yes, we are addressed
@@ -437,7 +445,7 @@ void vscp_handleDropNickname(void)
     if ((bytes >= 1) && (vscp_nickname == vscp_imsg.data[ 0 ])) {
         // Yes, we are addressed
 
-	#ifdef DROP_NICKNAME_EXTENDED_FEATURES
+#ifdef DROP_NICKNAME_EXTENDED_FEATURES
 		// Optional Byte 1: 
 		// bit7 - go idle do not start, bit6 - reset persistent storage
 		// bit5 - reset device but keep nickname
@@ -463,7 +471,7 @@ void vscp_handleDropNickname(void)
 				for (;;) {}; // wait forever
 				}
 			}
-	#endif
+#endif
 		// none of the options from byte 1 have been used or byte 1 itself
 		// has not been transmitted at all
 		if ((bytes == 1) || ((bytes > 1) && (vscp_imsg.data[1] == 0))) {
@@ -472,7 +480,7 @@ void vscp_handleDropNickname(void)
 			vscp_writeNicknamePermanent(VSCP_ADDRESS_FREE);
 	        vscp_init();
 			}
-	#ifdef DROP_NICKNAME_EXTENDED_FEATURES
+#ifdef DROP_NICKNAME_EXTENDED_FEATURES
 		// now check if timing was passed in byte 2
 		if (bytes > 2) {
 			// and waiting for options that made sense
@@ -482,7 +490,7 @@ void vscp_handleDropNickname(void)
 				vscp_wait_s(vscp_imsg.data[2]);
 				}
 		}
-	#endif
+#endif
     }
 }
 
@@ -492,7 +500,7 @@ void vscp_handleDropNickname(void)
 
 void vscp_newNodeOnline(void)
 {
-    if ((1 == (vscp_imsg.flags & 0x0f)) &&
+    if ( ( 1 == ( vscp_imsg.flags & 0x0f ) ) &&
             (vscp_nickname == vscp_imsg.data[ 0 ])) {
 
         // This is a probe which use our nickname
@@ -553,7 +561,8 @@ uint8_t vscp_readRegister(uint8_t reg)
 {
     if (reg >= 0x80) {
         return vscp_readStdReg(reg);
-    } else {
+    } 
+    else {
         return vscp_readAppReg(reg);
     }
 }
@@ -692,7 +701,8 @@ uint8_t vscp_writeRegister(uint8_t reg, uint8_t value)
 {
     if (reg >= 0x80) {
         return vscp_writeStdReg(reg, value);
-    } else {
+    } 
+    else {
         return vscp_writeAppReg(reg, value);
     }
 }
@@ -735,7 +745,8 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value)
                 (0xff != (vscp_page_select & 0xff))) {
             // return complement to indicate error
             rv = ~value;
-        } else {
+        } 
+        else {
             // Write
             vscp_setManufacturerId(reg - VSCP_REG_MANUFACTUR_ID0, value);
             rv = vscp_getManufacturerId(reg - VSCP_REG_MANUFACTUR_ID0);
@@ -812,7 +823,7 @@ void vscp_handleProtocolEvent(void)
 
         case VSCP_TYPE_PROTOCOL_READ_REGISTER:
 
-            if ((2 == (vscp_imsg.flags & 0x0f)) &&
+            if ( ( 2 == (vscp_imsg.flags & 0x0f) ) &&
                 (vscp_nickname == vscp_imsg.data[ 0 ])) {
 
                 if (vscp_imsg.data[ 1 ] < 0x80) {
@@ -830,7 +841,8 @@ void vscp_handleProtocolEvent(void)
 
                     // Send reply data
                     vscp_sendEvent();
-                } else {
+                } 
+                else {
 
                     // Read VSCP register
                     vscp_omsg.data[ 1 ] =
@@ -872,7 +884,8 @@ void vscp_handleProtocolEvent(void)
                     // Send reply
                     vscp_sendEvent();
 
-                } else {
+                } 
+                else {
 
                     // Write VSCP register
                     vscp_omsg.data[ 1 ] =

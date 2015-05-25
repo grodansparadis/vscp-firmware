@@ -4,7 +4,7 @@
 // Code collected from the Microchip C18 forum
 // Copyright (C) 2003 JasonK
 //
-// Changes (C) 2005-2012 Ake Hedman, eurosource <akhe@eurosource.se>
+// Changes (C) 2005-2015 Ake Hedman, eurosource <akhe@eurosource.se>
 //
 
 #include <p18cxxx.h>
