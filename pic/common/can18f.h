@@ -72,9 +72,11 @@
 #error "Compiler not supported."
 #endif
 
+#if !defined(_BOOL)
 typedef enum _BOOL {
     FALSE = 0, TRUE
 } BOOL;
+#endif
 
 // CAN 18F operation modes
 #define CAN18F_MODE_BITS	0b11100000
