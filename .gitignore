@@ -24,3 +24,11 @@
 Thumbs.db
 *.pnps
 
+*.pre
+*.p1
+*.sdb
+*.rlf
+*.obj
+*.hxl
+*.cmf
+

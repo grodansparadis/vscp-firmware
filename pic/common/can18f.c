@@ -126,10 +126,20 @@ void vscp18f_init(BOOL bExtended) {
     // SAM = 0
     // Seg2 Freely prog.
     // Phaseseg2 = 2
+#if (_XTAL_FREQ == 32000000)
+    BRGCON1 = 0x07;
+    BRGCON2 = 0xac;
+    BRGCON3 = 0x03;
+#else
+<<<<<<< HEAD
+#error("Current crystal frequency is not supported")
+=======
     BRGCON1 = 0x09;
     BRGCON2 = 0xbc;
     BRGCON3 = 0x01;
-
+#warning("Current crystal frequency is not supported")
+>>>>>>> hotfix
+#endif
     // Receive only valid extended messages
     // Receive buffer 0 overflow will write to buffer 1
     if (bExtended) {
@@ -359,12 +369,22 @@ BOOL vscp18f_sendMsg(uint32_t id, uint8_t* data, uint8_t dlc, uint8_t flags) {
     //
 
 #if defined(MCHP_C18)
-    _asm
-    bsf RXB0CON, 3, 0
-            _endasm
+    #if defined(__18F248) || defined(__18F258) ||defined(__18F448) || defined(__18F458)
+        _asm
+        bsf RXB0CON, 3, 0
+                _endasm
+    #else
+        #error "PIC 18Fxxx(x) not supported."
+    #endif
 #endif
 #if defined(HITECH_C18)
-            asm("bsf _RXB0CON,3");
+    #if defined(__18F248) || defined(__18F258) ||defined(__18F448) || defined(__18F458)
+        asm("bsf _RXB0CON,3");
+    #elif defined(__18F2480) || defined(__18F2580)  ||defined(__18F4480) || defined(__18F4580)
+        RXB0RTRR0 = 1;
+    #else
+    #error "PIC 18Fxxx(x) not supported."
+    #endif
 #endif
 
     //
@@ -400,12 +420,12 @@ BOOL vscp18f_readMsg(uint32_t *id, uint8_t *data, uint8_t *dlc, uint8_t *flags) 
         PIR3bits.RXB0IF = 0;
 
         // Record and forget any previous overflow 
-#if defined(__18F248) || defined(__18F258)       
+#if defined(__18F248) || defined(__18F258) ||defined(__18F448) || defined(__18F458)
         if (COMSTATbits.RXB0OVFL) {
             *flags |= CAN_RX_OVERFLOW;
             COMSTATbits.RXB0OVFL = 0;
         }
-#elif defined(__18F2480) || defined(__18F2580)
+#elif defined(__18F2480) || defined(__18F2580) ||defined(__18F4480) || defined(__18F4580)
         if (COMSTATbits.RXB0OVFL) {
             *flags |= CAN_RX_OVERFLOW;
             COMSTATbits.RXB0OVFL = 0;
@@ -443,12 +463,12 @@ BOOL vscp18f_readMsg(uint32_t *id, uint8_t *data, uint8_t *dlc, uint8_t *flags) 
         PIR3bits.RXB1IF = 0;
 
         // Record and forget any previous overflow
-#if defined(__18F248) || defined(__18F258)        
+#if defined(__18F248) || defined(__18F258) ||defined(__18F448) || defined(__18F458)
         if (COMSTATbits.RXB0OVFL) {
             *flags |= CAN_RX_OVERFLOW;
             COMSTATbits.RXB1OVFL = 0;
         }
-#elif defined(__18F2480) || defined(__18F2580) 
+#elif defined(__18F2480) || defined(__18F2580)  ||defined(__18F4480) || defined(__18F4580)
         if (COMSTATbits.RXB0OVFL) {
             *flags |= CAN_RX_OVERFLOW;
             COMSTATbits.RXB1OVFL = 0;
