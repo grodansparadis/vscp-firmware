@@ -38,32 +38,8 @@
 #define	TRUE			1
 #define	FALSE			0
 
-//
-// 8 MHz with PLL => 8 MHz
-// 1:4 prescaler => 1 MHz (1 uS cycle )
-// 1 ms == 1000 uS 
-// 65535 - 1000 = 64535 = 0xfc17
-//
-// Timer2 use 250 and prescaler 1:4
-//
-//#define TIMER0_RELOAD_VALUE		0xfc17
 
-//
-// 10 MHz with PLL => 40 MHz
-// 1:4 prescaler => 1.25 MHz ( 0.800 uS cycle )
-// 1 ms == 1000 uS 
-// 65535 - 1250 = 64285 = 0xfb1d
-//
 
-//#define TIMER0_RELOAD_VALUE		0xfb1d
-
-//
-// Timer 2 is used as a 1 ms clock
-// 156 is loaded eight time to give ~1250 cycles
-// Timer2 use 156 and prescaler 1:4, Postscaler 1:16
-// 100 ns * 56 * 4 * 16 ~ 1 ms
-//
-#define TIMER2_RELOAD_VALUE		94 //adapted to Hasselt
 
 //
 // Size for array used for temp mean calculations
@@ -75,31 +51,18 @@
  * 0000 - 0000     01   Bootloader check
  * 0001 - 0001     01   VSCP Address ID
  * 0002 - 0002     01   Eeprom checksum
- * 0003 - 0003     01   VSCP Zone
- * 0004 - 000B     08   GUID Lowest bytes
- * 000C - 0010     05   User ID
- * 0011 - 0038     40   Augusto Driver
+ * 0003 - 0038     40   Augusto Driver
+ *
+ */
+
+#define NEXT                            0x07
+
+
+/* Register map
+ * Page 0
  *
  */
 /*
-
-#define VSCP_EEPROM_BOOTLOADER_FLAG		0x00	// Reserved for bootloader	 
-#define VSCP_EEPROM_NICKNAME        VSCP_EEPROM_BOOTLOADER_FLAG + 0x01	// Persistant nickname id storage
-#define VSCP_EEPROM_SEGMENT_CRC     VSCP_EEPROM_NICKNAME + 0x01	// Persistant segment crc storage
-#define VSCP_EEPROM_GUID            VSCP_EEPROM_SEGMENT_CRC + 0x01
-#define VSCP_EEPROM_USERID          VSCP_EEPROM_GUID + 0x08
-
-// The following can be stored in flash or eeprom
-
-#define VSCP_EEPROM_REG_MANUFACTUR_ID0		0x09
-#define VSCP_EEPROM_REG_MANUFACTUR_ID1		0x0A
-#define VSCP_EEPROM_REG_MANUFACTUR_ID2		0x0B
-#define VSCP_EEPROM_REG_MANUFACTUR_ID3		0x0C
-
-#define VSCP_EEPROM_REG_MANUFACTUR_SUBID0	0x0D	
-#define VSCP_EEPROM_REG_MANUFACTUR_SUBID1	0x0E	
-#define VSCP_EEPROM_REG_MANUFACTUR_SUBID2	0x0F	
-#define VSCP_EEPROM_REG_MANUFACTUR_SUBID3	0x10
 
 // The following can be stored in program ROM (recommended) or in EEPROM 
 

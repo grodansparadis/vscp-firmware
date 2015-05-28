@@ -131,10 +131,14 @@ void vscp18f_init(BOOL bExtended) {
     BRGCON2 = 0xac;
     BRGCON3 = 0x03;
 #else
+<<<<<<< HEAD
+#error("Current crystal frequency is not supported")
+=======
     BRGCON1 = 0x09;
     BRGCON2 = 0xbc;
     BRGCON3 = 0x01;
 #warning("Current crystal frequency is not supported")
+>>>>>>> hotfix
 #endif
     // Receive only valid extended messages
     // Receive buffer 0 overflow will write to buffer 1

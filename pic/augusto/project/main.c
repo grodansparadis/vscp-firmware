@@ -46,12 +46,12 @@
 
 #include <driver.h>
 
-uint8_t firmwareVersion[3] = {0,0,1};
-uint8_t GuID[16] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFC,
-                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+const uint8_t firmwareVersion[3] = {0,0,1};
+const uint8_t GuID[16] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFC,
+                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-uint8_t deviceFamilyCode=0x00;
-uint8_t deviceFamilyType=0x00;
+const uint8_t deviceFamilyCode=0x00;
+const uint8_t deviceFamilyType=0x00;
 
 
 void _startup (void);
@@ -126,7 +126,7 @@ void interrupt isr_high(){
 
 
 void init_app_eeprom(void){
-    init_augusto_eeprom();
+    //sinit_augusto_eeprom();
 //  WE_initEEPROM(&WE_data[1], WE_DATA_0);
 //  vscp_setSegmentCRC(WE_DATA_0 & 0xFF);
 }
@@ -134,6 +134,8 @@ void init_app_eeprom(void){
 void init_app_ram(void){
     init_augusto_ram();
 }
+//TODO: se mando più di 3 messaggi consecutivi, li perdo
+
 //***************************************************************************
 // Main() - Main Routine
 //***************************************************************************
@@ -152,44 +154,46 @@ void main(){
         if(timeEvent._10mS){    //10mS Event
             timeEvent._10mS = 0;
             vscp_10mS_Running();
+            hardware_10mS();
         }
         if(timeEvent._100mS){   //100mS Event
             timeEvent._100mS = 0;
             vscp_100mS_Running();
             vscp_ledActivity();
-            vscp_omsg.flags = VSCP_VALID_MSG + 5;// three data byte
+
+            
+            vscp_omsg.flags = VSCP_VALID_MSG + 8;// three data byte
             vscp_omsg.priority = VSCP_PRIORITY_LOW;
             vscp_omsg.vscp_class = VSCP_CLASS1_LAB;
-            vscp_omsg.vscp_type = 0x02;
-            vscp_omsg.data[ 0 ] = PORTA;
-            vscp_omsg.data[ 1 ] = PORTB;
-            vscp_omsg.data[ 2 ] = PORTC;
-            vscp_omsg.data[ 3 ] = PORTD;
-            vscp_omsg.data[ 4 ] = PORTE;
-            // send the event
-            vscp_sendEvent();
-
-            vscp_omsg.vscp_class = VSCP_CLASS1_LAB;
             vscp_omsg.vscp_type = 0x01;
-            vscp_omsg.data[ 0 ] = LATA;
-            vscp_omsg.data[ 1 ] = LATB;
-            vscp_omsg.data[ 2 ] = LATC;
-            vscp_omsg.data[ 3 ] = LATD;
-            vscp_omsg.data[ 4 ] = LATE;
-            vscp_sendEvent();
+            for (uint8_t i=0; i<8; i++)
+                vscp_omsg.data[i] = hardware_saveStructForInput(hardware_input[i]);
+            //vscp_sendEvent();
 
-            vscp_omsg.flags = VSCP_VALID_MSG + 5;// three data byte
-            vscp_omsg.vscp_type = 0x00;
-            vscp_omsg.data[ 0 ] = TRISA;
-            vscp_omsg.data[ 1 ] = TRISB;
-            vscp_omsg.data[ 2 ] = TRISC;
-            vscp_omsg.data[ 3 ] = TRISD;
-            vscp_omsg.data[ 4 ] = TRISE;
+            vscp_omsg.flags = VSCP_VALID_MSG + 8;// three data byte
+            vscp_omsg.vscp_type = 0x02;
+            for (uint8_t i=0; i<8; i++)
+                vscp_omsg.data[i] = hardware_saveStructForOutput(hardware_output[i]);
             // send the event
             vscp_sendEvent();
+
+//            vscp_omsg.flags = VSCP_VALID_MSG + 8;// three data byte
+//            vscp_omsg.vscp_type = 0x03;
+//            for (uint8_t i=0; i<8; i++)
+//                vscp_omsg.data[i] = subzoneForInput[i];
+//            // send the event
+//            vscp_sendEvent();
+
+            vscp_omsg.flags = VSCP_VALID_MSG + 8;// three data byte
+            vscp_omsg.vscp_type = 0x04;
+            for (uint8_t i=0; i<8; i++)
+                vscp_omsg.data[i] = hardware_subzoneForOutput[i];
+            // send the event
+            vscp_sendEvent();
+
 
             for (uint8_t i=0; i<8; i++)
-                setOutput(i,getInput(i));
+                setOutput(i,hardware_input[i].currentStatus);
         }
         if(timeEvent._1s){      //1second Event
             timeEvent._1s = 0;
@@ -197,7 +201,7 @@ void main(){
             greenLed_pin = !greenLed_pin;
         }
         vscp_freeRunning();
-        hardware_freeRunning();
+        
         //TODO: Handling the override event
     }
 
