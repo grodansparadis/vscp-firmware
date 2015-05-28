@@ -10,12 +10,9 @@
 #include <driver.h>
 #include <can18f.h>
 
-#include <augusto_eeprom_layout.h>
-
 extern const char mdfLink[];
-extern void doApplicationDM(int DecisionMatrixIndex);
 struct _dmrow decisionMatrix[VSCP_DM_SIZE];
-
+uint8_t vscp_zone;
 
 /* Main flow chart */
 void vscp_freeRunning(){
@@ -101,19 +98,6 @@ void doDM( ){
     } // for each row
 }
 
-void vscp_debugMsg(uint8_t subzone, char *msg, uint8_t size, uint8_t msgIdx){
-    char length, data[8];
-    if (vscp_nickname == VSCP_ADDRESS_FREE) return;
-    data[1]=vscp_zone; data[2] = subzone;
-    for (char i=0; i < (char)((size/5)+1); i++){ 
-        length = size - (5*i); if (length>5) length = 5;
-        if (length==0) return;
-        data[0] = i;
-        for (char k=0; k<length; k++) data[k+3] = *(msg+(i*5)+k);
-        sendVSCPFrame(0x1FF, 0xF0 + (msgIdx & 0x0F), vscp_nickname, 0x07, length+3, data);
-    }
-}
-
 void loadDecisionMatrixFromEEPROM(){
     for (char i=0; i<VSCP_DM_SIZE; i++){
         decisionMatrix[i].oaddr = eeprom_read(VSCP_DM_EEPROM_START_LOC + 8*i + 0);
@@ -141,6 +125,7 @@ void saveDecisionMatrixToEEPROM(){
 
 void init_augusto_ram( void ){
 }
+
 void init_augusto_eeprom(){
     eeprom_write(VSCP_EEPROM_ZONE, 0);
     for (char i=0; i<VSCP_DM_SIZE*8; i++) //Re-init DM

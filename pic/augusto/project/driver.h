@@ -39,6 +39,11 @@ extern "C" {
 #define PIN_IN_SIZE 8
 #define HARDWARE_DEBOUNCE_THRESOLD 10
 
+#define VSCP_BOARD_EEPROM_LENGTH 3*PIN_IN_SIZE + 2*PIN_OUT_SIZE
+#define TMR0H_INIT 0x63
+#define TMR0L_INIT 0xC0
+
+
 #if (HARDWARE_DEBOUNCE_THRESOLD>15)
 #error("Thresold is too big")
 #endif
@@ -65,7 +70,49 @@ typedef struct {
 
 extern uint8_t vscp_zone;
 extern struct _omsg vscp_omsg;
+extern struct vscpBoard_inputVar hardware_input[PIN_IN_SIZE];
+extern struct vscpBoard_outputVar hardware_output[PIN_OUT_SIZE];
+extern uint8_t hardware_zoneForInput[PIN_IN_SIZE];
+extern uint8_t hardware_subzoneForInput[PIN_IN_SIZE];
+extern uint8_t hardware_subzoneForOutput[PIN_OUT_SIZE];
 
+
+/* DEFINITION OF STATUS / CONFIGURATION BYTE OF INPUT PIN
+ * bit 0: currentStatus
+ * bit 1: Reversed logic
+ * bit 2: Reserved for future use ****
+ * bit 3: Reserved for future use ****
+ * bit 4: 0=Button/switch, 1=door/window switch
+ * bit 5: OFF/ Closed event is required
+ * bit 6: ON / Opened event is required
+ * bit 7: Button event is required
+ */
+struct vscpBoard_inputVar{
+    unsigned currentStatus: 1;
+    unsigned reversedLogic: 1;
+    unsigned doorLogic: 1;
+    unsigned offEvent: 1;
+    unsigned onEvent: 1;
+    unsigned buttonEvent: 1;
+    unsigned debounce: 4; //For debounce time
+};
+
+/* DEFINITION OF STATUS / CONFIGURATION BYTE OF OUTPUT PIN
+ * bit 0: currentStatus
+ * bit 1: Reversed logic
+ * bit 2: Reserved for future use ****
+ * bit 3: Reserved for future use ****
+ * bit 4: Reserved for future use ****
+ * bit 5: OFF is required
+ * bit 6: ON is required
+ * bit 7: Reserved for future use ****
+ */
+struct vscpBoard_outputVar{
+    unsigned currentStatus: 1;
+    unsigned reversedLogic: 1;
+    unsigned offEvent: 1;
+    unsigned onEvent: 1;
+};
 
 void hardware_reinit(); //Internal usage
 
@@ -75,11 +122,10 @@ uint8_t getInput (unsigned char pin);
 void TMR0_interrupt();
 void hardware_10mS();
 
-
-#define VSCP_BOARD_EEPROM_LENGTH 3*PIN_IN_SIZE + 2*PIN_OUT_SIZE
-#define TMR0H_INIT 0x63
-#define TMR0L_INIT 0xC0
-
+uint8_t hardware_saveStructForInput(struct vscpBoard_inputVar in);
+uint8_t hardware_saveStructForOutput(struct vscpBoard_outputVar out);
+void hardware_loadStructForOutput(struct vscpBoard_outputVar *out, uint8_t value);
+void hardware_loadStructForInput(struct vscpBoard_inputVar *in, uint8_t value);
 
 #ifdef	__cplusplus
 }
