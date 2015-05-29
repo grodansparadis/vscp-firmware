@@ -424,6 +424,7 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
     size = 8;
   }
   
+/*
 #ifdef PRINT_CAN_EVENTS
   char buf[32];
   uint8_t i;
@@ -435,6 +436,7 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
     uart_puts(buf);
   }
 #endif
+*/
   
   msg.id = ( (uint32_t)priority << 26 ) |
     ( (uint32_t)vscpclass << 16 ) |
