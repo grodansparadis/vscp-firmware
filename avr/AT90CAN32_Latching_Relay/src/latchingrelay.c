@@ -114,8 +114,6 @@ volatile uint16_t relay_timer;  // relay timer
 
 int16_t btncnt[ 8 ];    // Switch counters
 
-uint8_t sendVSCPFrame_timeout = 0;
-
 // Prototypes
 static void initTimer();
 static void init_app_eeprom( void );
@@ -271,8 +269,6 @@ int main( void )
 	    
             measurement_clock = 0;
 
-            sendVSCPFrame_timeout++;
-
             // Do VSCP one second jobs 
             vscp_doOneSecondWork();
 
@@ -418,6 +414,7 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
           uint8_t *pData )
 {
   CANMsg msg;
+  uint8_t timeout = 200;
   int8_t canRet = ERROR_OK;
   int8_t rv = FALSE;
 
@@ -453,13 +450,12 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
     memcpy( msg.byte, pData, size );
   }
   
-  sendVSCPFrame_timeout = 0;
-
   do {
 
       canRet = can_SendFrame( &msg );
+      --timeout;
 
-  } while( ( ERROR_OK != canRet ) && ( sendVSCPFrame_timeout < 1 ) );
+  } while( ( ERROR_OK != canRet ) && (0 < timeout));
   
   if (ERROR_OK == canRet)
   {
