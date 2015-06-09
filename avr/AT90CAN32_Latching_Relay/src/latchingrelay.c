@@ -110,6 +110,8 @@ const uint8_t vscp_manufacturer_id[8] = {
 
 // Variables
 volatile uint16_t measurement_clock;  // 1 ms timer counter
+volatile uint16_t measurement_clock2;  // 1 ms timer counter
+volatile uint16_t sendVSCPFrame_timeout;
 volatile uint16_t relay_timer;  // relay timer
 
 int16_t btncnt[ 8 ];    // Switch counters
@@ -132,6 +134,13 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
   // handle millisecond counter
   vscp_timer++;
   measurement_clock++;
+  measurement_clock2++;
+
+  if ( measurement_clock2 > 1000 ) {
+    measurement_clock2 = 0;
+    uart_puts("Resetting sendVSCPFrame_timeout\n");
+    sendVSCPFrame_timeout++;
+  }
 
   // Check for init button
   if ( BTN_INIT_PRESSED ) {
@@ -159,7 +168,7 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
   }
 
   relay_pulse_width++;
-  if(relay_pulse_width > 200) // pulse width in miliseconds
+  if(relay_pulse_width > 200) // pulse width in milliseconds
   {
     RELAY_ON_OFF;
     RELAY_OFF_OFF;
@@ -418,13 +427,13 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
   int8_t canRet = ERROR_OK;
   int8_t rv = FALSE;
 
-  /* If necessary, limit the size to avoid buffer out of bounce access. */
+  /* If necessary, limit the size to avoid buffer out of bounds access. */
   if (8 < size)
   {
     size = 8;
   }
   
-/*
+
 #ifdef PRINT_CAN_EVENTS
   char buf[32];
   uint8_t i;
@@ -436,7 +445,6 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
     uart_puts(buf);
   }
 #endif
-*/
   
   msg.id = ( (uint32_t)priority << 26 ) |
     ( (uint32_t)vscpclass << 16 ) |
@@ -450,12 +458,13 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
     memcpy( msg.byte, pData, size );
   }
   
+  sendVSCPFrame_timeout = 0;
+  
   do {
 
       canRet = can_SendFrame( &msg );
-      --timeout;
 
-  } while( ( ERROR_OK != canRet ) && (0 < timeout));
+  } while( ( ERROR_OK != canRet ) && (sendVSCPFrame_timeout < 1));
   
   if (ERROR_OK == canRet)
   {
