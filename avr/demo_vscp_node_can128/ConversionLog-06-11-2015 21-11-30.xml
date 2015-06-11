@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<?xml-stylesheet type='text/xsl' href='AVRStudioConversionLog.xslt'?>
+<ConversionLog BrandName="Atmel Studio 6.2 Project ConversionLog">
+  <Project name="demo_vscp_node_can128" id="demo_vscp_node_can128" status="Success">
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:23</DateTime>
+      <Message>Source Project Path: C:\Users\grodansparadis\development\vscp_firmware\avr\demo_vscp_node_can128\demo_vscp_node_can128.aps</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:23</DateTime>
+      <Message>Studio5 Project Path: C:\Users\grodansparadis\development\vscp_firmware\avr\demo_vscp_node_can128\demo_vscp_node_can128.avrgccproj</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:23</DateTime>
+      <Message>Studio5 Solution Path: C:\Users\grodansparadis\development\vscp_firmware\avr\demo_vscp_node_can128\demo_vscp_node_can128.atsln</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:23</DateTime>
+      <Message>Started : Processing General settings from source project</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:23</DateTime>
+      <Message>Completed : Processing General settings from source project</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:23</DateTime>
+      <Message>Started : Processing Project files information from source project</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:23</DateTime>
+      <Message>Completed : Processing Project files information from source project</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:23</DateTime>
+      <Message>Started : Processing Build Dependency settings from the source project</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Warning</Type>
+      <DateTime>2015-06-11 21:11:23</DateTime>
+      <Message>Skipped reading Build Dependency settings from source project. It is either invalid or not provided.</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Completed : Processing Build Dependency settings from the source project</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Started : Processing ProjectLevel Toolchain settings from source project</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Completed : Processing ProjectLevel Toolchain settings from source project</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Started : Processing Toolchain settings from source project [Configuration default]</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Completed : Processing Toolchain settings from source project [Configuration default]</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Started : Processing external makefile settings [Configuration default]</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Completed : Processing external makefile settings [Configuration default]</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Started : Processing File level Toolchain settings from Source Project [Configuration default]</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Completed : Processing File level Toolchain settings from Source Project [Configuration default]</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Started : Processing Pre/Post Build event settings from source project [Configuration default]</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Warning</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Skipped reading Pre/Post build event settings from source project. It is either invalid or not provided.</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Completed : Processing Pre/Post Build event settings from source project [Configuration default]</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Started : Create Atmel Studio 6.2 Project</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Completed : Create Atmel Studio 6.2 Project</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Started : Updating Atmel Studio 6.2 GeneralSettings</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Completed : Updating Atmel Studio 6.2 GeneralSettings</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Started : Updating Atmel Studio 6.2 FileInformation</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Completed : Updating Atmel Studio 6.2 FileInformation</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Started : Copying Files</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Completed : Copying Files</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:24</DateTime>
+      <Message>Started : Saving Atmel Studio 6.2 Solution</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:27</DateTime>
+      <Message>Completed : Saving Atmel Studio 6.2 Solution</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:27</DateTime>
+      <Message>Started : Updating Configurations In Atmel Studio 6.2 Project</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:28</DateTime>
+      <Message>Completed : Updating Configurations In Atmel Studio 6.2 Project</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:28</DateTime>
+      <Message>Started : Updating Build Dependencies in Atmel Studio 6.2 Solution for the project</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:28</DateTime>
+      <Message>Completed : Updating Build Dependencies in Atmel Studio 6.2 Solution for the project</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:28</DateTime>
+      <Message>Started : Updating ProjectLevelToolchainSettings In Atmel Studio 6.2 Project</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:28</DateTime>
+      <Message>Completed : Updating ProjectLevelToolchainSettings In Atmel Studio 6.2 Project</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:28</DateTime>
+      <Message>Started : Updating ToolChainSettings In Atmel Studio 6.2 Project [Configuration default]</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:28</DateTime>
+      <Message>Completed : Updating ToolChainSettings In Atmel Studio 6.2 Project [Configuration default]</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:28</DateTime>
+      <Message>Started : Updating FileLevelSettings In Atmel Studio 6.2 Project [Configuration default]</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:28</DateTime>
+      <Message>Completed : Updating FileLevelSettings In Atmel Studio 6.2 Project [Configuration default]</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:28</DateTime>
+      <Message>Started : Updating ExternalMakeFileSettings In Atmel Studio 6.2 Project [Configuration default]</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:28</DateTime>
+      <Message>Completed : Updating ExternalMakeFileSettings In Atmel Studio 6.2 Project [Configuration default]</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:28</DateTime>
+      <Message>Started : Updating BuildEvents In Atmel Studio 6.2 Project [Configuration default]</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Info</Type>
+      <DateTime>2015-06-11 21:11:28</DateTime>
+      <Message>Completed : Updating BuildEvents In Atmel Studio 6.2 Project [Configuration default]</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+    <LogEntry>
+      <Type>Success</Type>
+      <DateTime>2015-06-11 21:11:28</DateTime>
+      <Message>Atmel Studio 6.2 Project Created Successfully</Message>
+      <Exception>
+      </Exception>
+    </LogEntry>
+  </Project>
+</ConversionLog>

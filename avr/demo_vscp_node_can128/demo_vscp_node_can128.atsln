@@ -1,0 +1,17 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "demo_vscp_node_can128", "demo_vscp_node_can128.cproj", "{756D6865-E7BC-479D-AAAE-3FF8E3D11655}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		default|AVR = default|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{756D6865-E7BC-479D-AAAE-3FF8E3D11655}.default|AVR.ActiveCfg = default|AVR
+		{756D6865-E7BC-479D-AAAE-3FF8E3D11655}.default|AVR.Build.0 = default|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
