@@ -22,18 +22,18 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
     CANMsg msg;
 
 
-#ifdef PRINT_CAN_EVENTS
-	char buf[32];
-	uint8_t i;
+		#ifdef PRINT_CAN_EVENTS
+			char buf[32];
+			uint8_t i;
 
-	sprintf(buf, "tx: %03x/%02x/%02x/", vscpclass, vscptype, nodeid);
-	for (i=0; i<size; i++) {
-		char dbuf[5];
-		sprintf(dbuf, "/%02x", pData[i]);
-		strcat(buf, dbuf);
-	}
-	uart_puts(buf);
-#endif
+			sprintf(buf, "tx: %03x/%02x/%02x/", vscpclass, vscptype, nodeid);
+			for (i=0; i<size; i++) {
+				char dbuf[5];
+				sprintf(dbuf, "/%02x", pData[i]);
+				strcat(buf, dbuf);
+			}
+			uart_puts(buf);
+		#endif
 
 	msg.id = ( (uint32_t)priority << 26 ) |
 		( (uint32_t)vscpclass << 16 ) |
@@ -93,8 +93,12 @@ int8_t getVSCPFrame( uint16_t *pvscpclass,
 int readEEPROM( uint8_t addr )
 {
 	// we now use the avrlib-eeprom functions
-	uint8_t test = eeprom_read_byte( &addr );
-	return test;
+	//uint8_t test = eeprom_read_byte( &addr );
+	//return test;
+	    while ( EECR & ( 1 << EEWE ) );
+	    EEAR = addr;
+	    EECR |= ( 1 << EERE );
+	    return EEDR;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -104,8 +108,14 @@ int readEEPROM( uint8_t addr )
 int writeEEPROM( uint8_t addr, uint8_t data )
 {
 	// we now use the avrlib-eeprom update functions, saves some write cycles
-	eeprom_update_byte(&addr, data);
-	return TRUE;
+	//eeprom_update_byte(&addr, data);
+	//return TRUE;
+	    while ( EECR & ( 1 << EEWE ) );
+	    EEAR = addr;
+	    EEDR=data;
+	    EECR |= ( 1 << EEMWE );
+	    EECR |= ( 1 << EEWE );
+	    return TRUE;
 }
 
 
@@ -386,6 +396,7 @@ void vscp_getMatrixInfo( char *pData )
 ///////////////////////////////////////////////////////////////////////////////
 // SendInformationEvent
 //
+/* application specific
 void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId ) 
 {
 	vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
@@ -399,4 +410,4 @@ void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId 
 
 	vscp_sendEvent();	// Send data
 }
-
+*/

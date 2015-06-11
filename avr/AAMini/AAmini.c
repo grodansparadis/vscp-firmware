@@ -19,8 +19,10 @@
  * more information about VSCP: http://www.vscp.org
  *---------------------------------------------------------------------------
 */
+
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
+#include <avr/eeprom.h>
 #include "methods.h"
 #include <stdio.h>
 #include <string.h>
@@ -53,7 +55,8 @@ const uint8_t GUID[ 16 ] = {
 #include "methods.c"
 
 // Device string is stored in ROM for this module (max 32 bytes)
-const uint8_t vscp_deviceURL[]  = "127.0.0.1/mdf/aamini02.xml";
+//const uint8_t vscp_deviceURL[]  = "127.0.0.1/mdf/aamini02.xml";
+const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/AAMini02.xml";
 
 
 // Manufacturer id's is stored in ROM for this module
@@ -188,7 +191,6 @@ static void initTimer()
 
 int main( void )
 
-
 {
     uint8_t i;
 	unsigned char lastoutput, currentoutput; //detection change on output
@@ -224,7 +226,7 @@ int main( void )
 	#if BOARD == 0
 			uart_puts( "OLIMEX AT90CAN128\n" );
 	#elif BOARD == 1
-		uart_puts( "AAMINI 0.0a\n" );
+		uart_puts( "AAMINI 0.0a2015\n" );
 	#endif
 	#endif
 
@@ -334,6 +336,7 @@ int main( void )
 
         } // switch 
 
+
 		// check inputs
         for ( i=1; i<9; i++ ) 
 		{
@@ -341,7 +344,9 @@ int main( void )
 				{
 					if (!(ReadSwitch (i)))
 					{
-						//uart_puts("Button Pressed!");
+						#ifdef PRINT_IO_EVENTS
+							uart_puts("Button Pressed!");
+						#endif
 						SendInformationEventExtended(VSCP_PRIORITY_MEDIUM, 
 							readEEPROM( VSCP_EEPROM_REGISTER + REG_ZONE ), 
 							readEEPROM( VSCP_EEPROM_REGISTER + REG_SUBZONE + i),
@@ -433,7 +438,9 @@ static void init_app_eeprom( void )
 uint8_t vscp_readAppReg( uint8_t reg )
 {
     uint8_t rv;
-
+	#ifdef PRINT_VSCP_EVENTS
+	uart_puts( "vscp_readAppReg\n" );
+	#endif
 
 	if ((reg >= REG_ZONE) & (reg <= REG_ZONE_END))
 	{
@@ -500,11 +507,9 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
 
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 //                       Implemention of Decision Matrix
 //////////////////////////////////////////////////////////////////////////////
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -515,7 +520,7 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
 
 static void doDM( void )
 {
-	#ifdef PRINT_CAN_EVENTS
+	#ifdef PRINT_DM_EVENTS
 	uart_puts( "debug  doDM\n" );
     #endif
 
@@ -529,19 +534,19 @@ static void doDM( void )
     // Don't deal with the control functionality
     if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class ) return;
 
-	#ifdef PRINT_CAN_EVENTS
+	#ifdef PRINT_DM_EVENTS
 	uart_puts( "debug  doDM2\n" );
     #endif
     for ( i=0; i<DESCION_MATRIX_ELEMENTS; i++ ) {
         // Get DM flags for this row
         dmflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 
                                     1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
-		#ifdef PRINT_CAN_EVENTS
+		#ifdef PRINT_DM_EVENTS
 		uart_puts( "debug  doDM check rows\n" );
     	#endif
         // Is the DM row enabled?
         if ( dmflags & VSCP_DM_FLAG_ENABLED ) {
-			#ifdef PRINT_CAN_EVENTS
+			#ifdef PRINT_DM_EVENTS
 			uart_puts( "debug  doDM row enabled\n" );
     		#endif
             // Should the originating id be checked and if so is it the same?
@@ -551,19 +556,19 @@ static void doDM( void )
                                         ( VSCP_SIZE_STD_DM_ROW * i ) ) ) ) {
                 continue;					
             }	
-			#ifdef PRINT_CAN_EVENTS
+			#ifdef PRINT_DM_EVENTS
 			uart_puts( "debug  doDM check zone\n" );
     		#endif
             // Check if zone should match and if so if it match
             if ( dmflags & VSCP_DM_FLAG_CHECK_ZONE  ) {
                 if ( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_END + REG_ZONE  ) ) {
-					#ifdef PRINT_CAN_EVENTS
+					#ifdef PRINT_DM_EVENTS
 					uart_puts( "zone mismatch\n" );
                     #endif
             		continue;
                 }	
             }				
-			#ifdef PRINT_CAN_EVENTS
+			#ifdef PRINT_DM_EVENTS
 			uart_puts( "zone match\n" );
 			#endif
             // Check if subzone should match and if so if it match
@@ -577,7 +582,7 @@ static void doDM( void )
                     continue;
                 }	
             }				
-			#ifdef PRINT_CAN_EVENTS
+			#ifdef PRINT_DM_EVENTS
 			uart_puts( "subzone match\n" );
 			#endif
 
@@ -607,7 +612,7 @@ static void doDM( void )
             if ( !( ( class_filter ^ vscp_imsg.vscp_class ) & class_mask ) &&
                     !( ( type_filter ^ vscp_imsg.vscp_type ) & type_mask )) {
 			
-			#ifdef PRINT_CAN_EVENTS
+			#ifdef PRINT_DM_EVENTS
 			uart_puts( "debug  doDMtrigger\n" );
 			#endif
 
@@ -629,7 +634,7 @@ static void doDM( void )
 
 				} // case	
             } 
-			#ifdef PRINT_CAN_EVENTS
+			#ifdef PRINT_DM_EVENTS
 			else uart_puts( "// Filter/mask");
 			#endif
         } // Row enabled
@@ -637,10 +642,26 @@ static void doDM( void )
 }
 
 
+uint32_t vscp_getFamilyCode(void)
+{
+	return 0;
+}
+
+uint32_t vscp_getFamilyType(void)
+{
+	return 0;
+}
+
+void vscp_restoreDefaults(void)
+{
+// to do
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // SendInformationEvent
 //
-/*
+
 void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId )
 {
     vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
@@ -654,7 +675,7 @@ void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId 
 
     vscp_sendEvent();	// Send data
 }
-*/
+
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 //                       end of VSCP Required Methods
@@ -686,11 +707,11 @@ void SendInformationEventExtended(uint8_t priority, uint8_t zone, uint8_t subzon
 // Do work here
 //
 
+
 void doWork( void )
 {
 
 }
-
 
 
 
