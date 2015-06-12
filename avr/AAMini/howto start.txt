@@ -1,0 +1,15 @@
+clone repositorys 
+
+
+set as environment-variable:
+vscp_home
+vscp_firmware
+RESTART PC (WINXP)
+
+
+
+create new project within avrstudio4, name it the same as the folder (AAmini)
+point to the aamega directory
+edit current configuration options
+choose external makefile (included in directory)
+add source files: AAMini.c contains the main

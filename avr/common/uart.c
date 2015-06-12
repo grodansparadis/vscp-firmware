@@ -33,6 +33,7 @@
 #include "vscp_projdefs.h"
 #include <avr/io.h>
 #include "uart.h"
+#include <stdlib.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 // uart_putchar

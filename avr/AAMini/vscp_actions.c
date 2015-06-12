@@ -184,7 +184,7 @@ void doFollow()
 // The routine expects vscp_imsg to contain a valid incoming event
 //
 {
-	#ifdef PRINT_CAN_EVENTS
+	#ifdef PRINT_DM_EVENTS
 	uart_puts( "debug  doFollow\n" );
     #endif
 
@@ -194,16 +194,16 @@ void doFollow()
 	
 	if ( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_END + REG_ZONE  ) ) 
 			{
-				#ifdef PRINT_CAN_EVENTS
+				#ifdef PRINT_DM_EVENTS
 				uart_puts( "zone mismatch\n" );
                 #endif
             	return;
 			}
     
-	if ( VSCP_TYPE_INFORMATION_ON == vscp_imsg.vscp_type ) 
+	if ( VSCP_TYPE_INFORMATION_ON == vscp_imsg.vscp_type) 
 	{
-		#ifdef PRINT_CAN_EVENTS
-		uart_puts( "debug  informationON\n" );
+		#ifdef PRINT_DM_EVENTS
+		uart_puts( "doFollow informationON\n" );
     	#endif	
 
 		//read Follow eeprom register into ram
@@ -220,12 +220,12 @@ void doFollow()
 				}
 			else if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + + REG_OUTPUT1_SUBZONE + i  ) ) 
 				{
-				#ifdef PRINT_CAN_EVENTS
+				#ifdef PRINT_DM_EVENTS
 				uart_puts( "subzone mismatch\n" );
 				#endif
                 continue;
                 }	
-            #ifdef PRINT_CAN_EVENTS
+            #ifdef PRINT_DM_EVENTS
 			uart_puts( "subzone match\n" );
 			#endif
 
@@ -237,7 +237,7 @@ void doFollow()
 	if ( VSCP_TYPE_INFORMATION_OFF == vscp_imsg.vscp_type ) 
 	{
 		#ifdef PRINT_CAN_EVENTS
-		uart_puts( "debug  informationOFF\n" );
+		uart_puts( "doFollow informationOFF\n" );
     	#endif	
 	
 		//read Follow eeprom register into ram
