@@ -36,6 +36,14 @@
 #define ACTION_ACTION1						1
 #define ACTION_ACTION2						2
 
+#define RELAY_ON_ON       ((PORTC |= _BV(0)))
+#define RELAY_ON_OFF      ((PORTC &= ~_BV(0)))
+#define RELAY_ON_TOGGLE   ((PORTC ^= _BV(0)))
+
+#define RELAY_OFF_ON       ((PORTC |= _BV(1)))
+#define RELAY_OFF_OFF      ((PORTC &= ~_BV(1)))
+#define RELAY_OFF_TOGGLE   ((PORTC ^= _BV(1)))
+
 
 // Prototypes
 void doActionAction1();

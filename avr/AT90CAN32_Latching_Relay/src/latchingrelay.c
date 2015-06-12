@@ -43,14 +43,6 @@
 #define LED_STATUS_OFF      ((PORTC |= _BV(7)))
 #define LED_STATUS_TOGGLE   ((PORTC ^= _BV(7)))
 
-#define RELAY_ON_ON       ((PORTC |= _BV(0)))
-#define RELAY_ON_OFF      ((PORTC &= ~_BV(0)))
-#define RELAY_ON_TOGGLE   ((PORTC ^= _BV(0)))
-
-#define RELAY_OFF_ON       ((PORTC |= _BV(1)))
-#define RELAY_OFF_OFF      ((PORTC &= ~_BV(1)))
-#define RELAY_OFF_TOGGLE   ((PORTC ^= _BV(1)))
-
 #define BTN_INIT_PRESSED    (!(PINA & _BV(0)))
 #define BTN_SW1_PRESSED     (!(PINA & _BV(1)))
 #define BTN_SW2_PRESSED     (!(PINA & _BV(2)))
@@ -68,13 +60,19 @@
 #include "vscp_compiler.h"
 #include "version.h"
 #include "can_at90can32.h"
+#ifdef USART_DEBUG 
 #include "uart.h"
+#endif
 #include "vscp_firmware.h"
 #include "vscp_class.h"
 #include "vscp_type.h"
 #include "vscp_registers.h"
-#include "vscp_actions.c"
+#include "vscp_actions.h"
 #include "latchingrelay.h"
+
+// From actions.c
+extern uint8_t relay_pulse_width;
+extern uint8_t relay_timer_enabled;
 
 #ifndef GUID_IN_EEPROM
 // GUID is stored in ROM for this module
@@ -138,7 +136,9 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
 
   if ( measurement_clock2 > 1000 ) {
     measurement_clock2 = 0;
+#ifdef USART_DEBUG     
     uart_puts("Resetting sendVSCPFrame_timeout\n");
+#endif    
     sendVSCPFrame_timeout++;
   }
 
@@ -222,6 +222,7 @@ int main( void )
     DDRC = 0xFF;      // Port C all outputs 
     PORTC = 0x00;     // all LEDS off
 
+#ifdef USART_DEBUG 
     // Initialize UART
     UCSRA = 0;
     UCSRC = MSK_UART_8BIT;	// 8N1
@@ -229,6 +230,7 @@ int main( void )
     Uart_set_baudrate( 38400 );
     
     UCSRB = MSK_UART_ENABLE_TX | MSK_UART_ENABLE_RX;
+#endif    
 
     // Initialize the 1ms timer
     initTimer();
@@ -240,9 +242,10 @@ int main( void )
         uart_puts("Failed to open channel!!\n");
     }
 
+#ifdef USART_DEBUG 
     uart_puts( "VSCP AT90CAN32\n" );
     uart_puts( "Latching relay module\n" );
-
+#endif
 
 	// Check VSCP persistent storage and
 	// restore if needed
@@ -264,8 +267,10 @@ int main( void )
             vscp_nickname = VSCP_ADDRESS_FREE;
             writeEEPROM( VSCP_EEPROM_NICKNAME, VSCP_ADDRESS_FREE );
             vscp_init();
+#ifdef USART_DEBUG             
             uart_puts("Node initialization");
-            
+#endif
+
 	  }
 	  
 	  
@@ -330,7 +335,7 @@ int main( void )
 	    
 	    if ( vscp_imsg.flags & VSCP_VALID_MSG ) {	// incoming message?
 #ifdef PRINT_CAN_EVENTS
-	      char buf[30];
+	      char buf[40];
 	      uint8_t i;
 	      sprintf(buf, "rx: %03x/%02x/%02x/",
           vscp_imsg.vscp_class, vscp_imsg.vscp_type, vscp_imsg.oaddr);
@@ -339,12 +344,19 @@ int main( void )
 		sprintf(dbuf, "/%02x", vscp_imsg.data[i]);
 		strcat(buf, dbuf);
 	      }
+#ifdef USART_DEBUG            
 	      uart_puts(buf);
 #endif
-	      vscp_handleProtocolEvent();
-	      
-	      doDM();
-	      
+#endif
+
+
+        if (VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class) {
+          vscp_handleProtocolEvent();
+        }
+        else {
+          doDM();
+        }
+
 	    }
 	    break;
 	    
@@ -365,7 +377,9 @@ int main( void )
 	  for ( i=1; i<8; i++ ) {
             
             if ( btncnt[ i ] > 200 ) {
+#ifdef USART_DEBUG                 
 	      uart_puts("Button Pressed!");
+#endif           
 	      SendInformationEvent( i-1, VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_ON );
 	      btncnt[ i ] = -300;
             }
@@ -423,8 +437,6 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
           uint8_t *pData )
 {
   CANMsg msg;
-  uint8_t timeout = 200;
-  int8_t canRet = ERROR_OK;
   int8_t rv = FALSE;
 
   /* If necessary, limit the size to avoid buffer out of bounds access. */
@@ -438,11 +450,15 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
   char buf[32];
   uint8_t i;
   
+  #ifdef USART_DEBUG  
   sprintf(buf, "tx: %03x/%02x/%02x/\n", vscpclass, vscptype, nodeid);
   uart_puts(buf);
+  #endif  
   for (i = 0; i < size; i++) {
+  #ifdef USART_DEBUG       
     sprintf(buf, "/%02x", pData[i]);
     uart_puts(buf);
+  #endif    
   }
 #endif
   
@@ -459,17 +475,9 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
   }
   
   sendVSCPFrame_timeout = 0;
-  
   do {
-
-      canRet = can_SendFrame( &msg );
-
-  } while( ( ERROR_OK != canRet ) && (sendVSCPFrame_timeout < 1));
-  
-  if (ERROR_OK == canRet)
-  {
-    rv = TRUE;
-  }
+      if ( ERROR_OK == can_SendFrame( &msg ) ) return TRUE;
+  } while( sendVSCPFrame_timeout < 1 );
   
   return rv;
 
@@ -591,10 +599,12 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
     uint8_t rv;
     char buf[30];
 
+#ifdef USART_DEBUG 
     sprintf(buf, "Writing app reg: %x", VSCP_EEPROM_END + reg);
     uart_puts( buf );
     sprintf(buf, "Writing value: %x", val);
     uart_puts( buf );
+#endif    
 
     rv = ~val; // error return
 
@@ -602,7 +612,9 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
     if ( REG_ZONE == reg ) {
         writeEEPROM( REG_ZONE + VSCP_EEPROM_END, val );
         rv =  readEEPROM( REG_ZONE + VSCP_EEPROM_END );
+#ifdef USART_DEBUG         
         uart_puts("wrote reg_zone\n");
+#endif        
     }
 
     // SubZone
@@ -785,7 +797,9 @@ void vscp_setGUID( uint8_t idx, uint8_t data )
 
 uint8_t vscp_getMDF_URL( uint8_t idx )
 {
+#ifdef USART_DEBUG     
     uart_puts("Passing through vscp_getMDF_URL()\n");
+#endif    
     return vscp_deviceURL[ idx ];  
 }
 
@@ -970,7 +984,9 @@ static void doDM( void )
     uint8_t type_filter;
     uint8_t type_mask;
 
+#ifdef USART_DEBUG 
 uart_puts("doDM\n");
+#endif    
     // Don't deal with the control functionality
     if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class ) return;
 
@@ -979,12 +995,16 @@ uart_puts("doDM\n");
         // Get DM flags for this row
         dmflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
 
+#ifdef USART_DEBUG 
 		uart_puts( "Checking DM rows\n" );
+#endif        
 
         // Is the DM row enabled?
         if ( dmflags & VSCP_DM_FLAG_ENABLED ) {
 
+#ifdef USART_DEBUG 
 			uart_puts( "DM flag enabled - [OK]\n" );
+#endif            
 
             // Should the originating id be checked and if so is it the same?
             if ( !( dmflags & VSCP_DM_FLAG_CHECK_OADDR ) &&
@@ -997,28 +1017,40 @@ uart_puts("doDM\n");
 
             // Check if zone should match and if so if it match
             if ( dmflags & VSCP_DM_FLAG_CHECK_ZONE  ) {
+#ifdef USART_DEBUG                 
                     uart_puts( "Zone should match...\n" );
+#endif                    
 
                 if ( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_END + REG_ZONE  ) ) {
 
+#ifdef USART_DEBUG 
                     uart_puts( "Zone mismatch, continue...\n" );
+#endif                    
                     continue;
 
                 } 
+#ifdef USART_DEBUG                 
                     uart_puts( "Zone match - [OK]\n" );
+#endif                    
             }       
 
             // Check if subzone should match and if so if it match
             if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE  ) {
+#ifdef USART_DEBUG                 
                     uart_puts( "Subzone should match...\n" );
+#endif                    
 
                 if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_END + REG_SUBZONE  ) ) {
 
+#ifdef USART_DEBUG 
                     uart_puts( "Subzone mismatch, continue...\n" );
+#endif                    
                     continue;
 
                 } 
+#ifdef USART_DEBUG                 
                     uart_puts( "Subzone match - [OK]\n" );
+#endif                    
             }       
 			
             class_filter = ( ( dmflags & VSCP_DM_FLAG_CLASS_FILTER ) << 8 ) + 
@@ -1048,12 +1080,16 @@ uart_puts("doDM\n");
                 switch ( readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTION  ) ) {
 
                     case ACTION_ACTION1:
+                        #ifdef USART_DEBUG                     
                         uart_puts( "Running action 1\n" );
+                        #endif                        
                         doActionAction1();
                         continue;
 
                     case ACTION_ACTION2:
+                        #ifdef USART_DEBUG                     
                         uart_puts( "Running action 2\n" );
+                        #endif                        
                         doActionAction2();	
                         continue;
 
@@ -1080,7 +1116,9 @@ void vscp_getMatrixInfo( char *pData )
     pData[ 4 ] = 0;
     pData[ 5 ] = 0;
     pData[ 6 ] = 0;
+#ifdef USART_DEBUG     
     uart_puts("DM\n");
+#endif    
 }
 
 

@@ -19,6 +19,7 @@ PRG = template_vscp_node_can32
 TARGET = $(PRG).elf
 
 OBJ = vscptemplate.o
+OBJ += vscp_actions.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/can_at90can32.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/uart.o
 OBJ += $(VSCP_FIRMWARE)/common/vscp_firmware.c

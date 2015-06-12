@@ -340,7 +340,7 @@ int main( void )
 	    
 	    if ( vscp_imsg.flags & VSCP_VALID_MSG ) {	// incoming message?
 #ifdef PRINT_CAN_EVENTS
-	      char buf[30];
+	      char buf[40];
 	      sprintf(buf, "rx: %03x/%02x/%02x/",
           vscp_imsg.vscp_class, vscp_imsg.vscp_type, vscp_imsg.oaddr);
           uart_puts(buf);
@@ -350,9 +350,12 @@ int main( void )
 	      }
 	      uart_puts(buf);
 #endif
-	      vscp_handleProtocolEvent();
-	      
-	      doDM();
+        if (VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class) {
+          vscp_handleProtocolEvent();
+        }
+        else {
+          doDM();
+        }
 	      
 	    }
 	    break;

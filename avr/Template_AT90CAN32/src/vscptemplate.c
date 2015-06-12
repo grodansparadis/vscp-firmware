@@ -63,7 +63,7 @@
 #include "vscp_class.h"
 #include "vscp_type.h"
 #include "vscp_registers.h"
-#include "vscp_actions.c"
+#include "vscp_actions.h"
 #include "vscptemplate.h"
 
 #ifndef GUID_IN_EEPROM
@@ -100,6 +100,8 @@ const uint8_t vscp_manufacturer_id[8] = {
 
 // Variables
 volatile uint16_t measurement_clock;  // 1 ms timer counter
+volatile uint16_t measurement_clock2;  // 1 ms timer counter
+volatile uint16_t sendVSCPFrame_timeout;
 
 int16_t btncnt[ 8 ];    // Switch counters
 
@@ -121,6 +123,15 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
   // handle millisecond counter
   vscp_timer++;
   measurement_clock++;
+  measurement_clock2++;
+
+  if ( measurement_clock2 > 1000 ) {
+    measurement_clock2 = 0;
+#ifdef USART_DEBUG     
+    uart_puts("Resetting sendVSCPFrame_timeout\n");
+#endif    
+    sendVSCPFrame_timeout++;
+  }
 
   // Check for init button
   if ( BTN_INIT_PRESSED ) {
@@ -351,7 +362,7 @@ int main( void )
       
       if ( vscp_imsg.flags & VSCP_VALID_MSG ) { // incoming message?
 #ifdef PRINT_CAN_EVENTS
-        char buf[30];
+        char buf[40];
         uint8_t i;
         sprintf(buf, "rx: %03x/%02x/%02x/",
           vscp_imsg.vscp_class, vscp_imsg.vscp_type, vscp_imsg.oaddr);
@@ -362,9 +373,13 @@ int main( void )
         }
         uart_puts(buf);
 #endif
-        vscp_handleProtocolEvent();
-        
-        doDM();
+
+        if (VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class) {
+          vscp_handleProtocolEvent();
+        }
+        else {
+          doDM();
+        }
         
       }
       break;
@@ -452,25 +467,28 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
           uint8_t *pData )
 {
   CANMsg msg;
-  uint8_t timeout = 200;
-  int8_t canRet = ERROR_OK;
   int8_t rv = FALSE;
 
-  /* If necessary, limit the size to avoid buffer out of bounce access. */
+  /* If necessary, limit the size to avoid buffer out of bounds access. */
   if (8 < size)
   {
     size = 8;
   }
   
+
 #ifdef PRINT_CAN_EVENTS
   char buf[32];
   uint8_t i;
   
+  #ifdef USART_DEBUG  
   sprintf(buf, "tx: %03x/%02x/%02x/\n", vscpclass, vscptype, nodeid);
   uart_puts(buf);
+  #endif  
   for (i = 0; i < size; i++) {
+  #ifdef USART_DEBUG       
     sprintf(buf, "/%02x", pData[i]);
     uart_puts(buf);
+  #endif    
   }
 #endif
   
@@ -486,17 +504,10 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
     memcpy( msg.byte, pData, size );
   }
   
+  sendVSCPFrame_timeout = 0;
   do {
-
-      canRet = can_SendFrame( &msg );
-      --timeout;
-
-  } while((ERROR_OK != canRet) && (0 < timeout));
-  
-  if (ERROR_OK == canRet)
-  {
-    rv = TRUE;
-  }
+      if ( ERROR_OK == can_SendFrame( &msg ) ) return TRUE;
+  } while( sendVSCPFrame_timeout < 1 );
   
   return rv;
 
