@@ -995,7 +995,7 @@ void vscp_handleProtocolEvent(void)
                         }
 
                         vscp_omsg.flags = VSCP_VALID_MSG + bytes + 1;
-                        vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
+                        vscp_omsg.priority = VSCP_PRIORITY_LOW;
                         vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
                         vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
                         vscp_omsg.data[ 0 ] = pos; // index
@@ -1021,7 +1021,7 @@ void vscp_handleProtocolEvent(void)
                     vscp_omsg.data[ 1 + i ] = vscp_readRegister(pos + i);
                 }
 
-                vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
+                vscp_omsg.priority = VSCP_PRIORITY_LOW;
                 vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
                 vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
                 vscp_omsg.data[ 0 ] = 0; // index
@@ -1183,7 +1183,7 @@ void vscp_handleProtocolEvent(void)
 				vscp_page_select = ((vscp_imsg.data[1] << 8) | vscp_imsg.data[2]);
 
 				// Construct response event
-				vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
+				vscp_omsg.priority = VSCP_PRIORITY_LOW;
 				vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
 				vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
 				vscp_omsg.data[0] = 0; // index of event, this is the first
@@ -1253,7 +1253,7 @@ void vscp_handleProtocolEvent(void)
                 // Restore the saved page
                 vscp_page_select = page_save;
 
-                vscp_omsg.priority = VSCP_PRIORITY_NORMAL;
+                vscp_omsg.priority = VSCP_PRIORITY_LOW;
                 vscp_omsg.flags = VSCP_VALID_MSG + 4 + ((vscp_imsg.flags & 0x0f) - 4);
                 vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
                 vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
