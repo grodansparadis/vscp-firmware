@@ -9,8 +9,10 @@ If you port this project to use another compiler please use the vscp_compiler.h 
 compiler specific stuff. This file and the vscp_projdefs.h should be included in every file
 of the project.
 
-The MDF file describes the VSCP functionality in full.
+The Atmelstudio project is in the subfolder project.  A orebuilt hex file for the stk-500/501 is
+available at http://www.grodansparadis.com/downloads/demo_vscp_node_can128_stk500_v4.hex
 
+The MDF file describes the VSCP functionality in full.
 
 SW0 - Init. button. Press to initiate node and start nickname process.
 SW1 - Send ON event, Zone set by register 0, Subzone set by register 3. 
