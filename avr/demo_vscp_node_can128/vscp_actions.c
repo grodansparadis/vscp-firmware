@@ -6,6 +6,7 @@
  * 	akhe@eurosource.se
  *
  *  Copyright (C) 2006-2011 Ake Hedman, eurosource
+ *  Copyright (C) 2011-2015 Ake Hedman, Grodans Paradis AB
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -31,12 +32,12 @@
 
 #include "vscp_compiler.h"
 #include "vscp_projdefs.h"
-#include "vscp_firmware.h"
-#include "vscp_class.h"
-#include "vscp_type.h"
+#include <vscp_firmware.h>
+#include <vscp_class.h>
+#include <vscp_type.h>
 #include "vscp_actions.h"
 #include "vscp_registers.h"
-#include "vscptest.h"
+#include "main.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // doActionCtrlLed
@@ -87,6 +88,6 @@ void doActionCtrlLed( unsigned char dmflags, unsigned char arg )
 
 void doActionHelloWorld( unsigned char dmflags, unsigned char arg )
 {
-uart_puts("Hello World!\n");
+	uart_puts("Hello World!\n");
 }
 

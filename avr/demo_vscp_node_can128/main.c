@@ -3,9 +3,10 @@
  * 	http://www.vscp.org
  *
  * 	2006-04-21
- * 	akhe@eurosource.se
+ * 	akhe@eurosource.se / akhe@grodansparadis.com
  *
  *  Copyright (C) 2006-2011 Ake Hedman, eurosource
+ *  Copyright (C) 2011-2015 Ake Hedman, Grodans Paradis AB
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -17,7 +18,7 @@
  *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
- *    in a product, an acknowledgment in the product documentation would be
+ *    in a product, an acknowledgement in the product documentation would be
  *    appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
  *    misrepresented as being the original software.
@@ -86,14 +87,14 @@
 #include "vscp_projdefs.h"
 #include "vscp_compiler.h"
 #include "version.h"
-#include "can_at90can128.h"
-#include "uart.h"
-#include "vscp_firmware.h"
-#include "vscp_class.h"
-#include "vscp_type.h"
+#include <can_at90can128.h>
+#include <uart.h>
+#include <vscp_firmware.h>
+#include <vscp_class.h>
+#include <vscp_type.h>
 #include "vscp_registers.h"
-#include "vscp_actions.c"
-#include "vscptest.h"
+#include "vscp_actions.h"
+#include "main.h"
 
 #ifndef GUID_IN_EEPROM
 // GUID is stored in ROM for this module
@@ -110,8 +111,7 @@ const uint8_t GUID[ 16 ] = {
 #endif
 
 // Device string is stored in ROM for this module (max 32 bytes)
-// a webserver should be running on the pc used for VSCPworks (example apache)
-const uint8_t vscp_deviceURL[]  = "127.0.0.1/mdf/avr128_01.xml";
+const uint8_t vscp_deviceURL[]  = "eurosource.se/avr128_02.xml";
 
 // Manufacturer id's is stored in ROM for this module
 // offset 0 - Manufacturer device id 0
@@ -129,8 +129,9 @@ const uint8_t vscp_manufacturer_id[8] = {
 
 // Variables
 volatile uint16_t measurement_clock;	// 1 ms timer counter
+volatile uint16_t can_resend_timer;		// timer for CAN resend timeout
 
-int16_t btncnt[ 8 ];    // Switch counters
+int16_t btncnt[ 8 ];					// Switch counters
 
 // Prototypes
 static void initTimer();
@@ -150,6 +151,7 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
 	// handle millisecond counter
 	vscp_timer++;
 	measurement_clock++;
+	can_resend_timer++;
 
 	// Check for init button
 	if ( BTN_INIT_PRESSED ) {
@@ -309,7 +311,7 @@ int main( void )
 
     // Initialize UART
     UCSRA = 0;
-    UCSRC = MSK_UART_8BIT;	// 8N1
+    UCSRC = MSK_UART_8BIT;	    // 8N1
     Uart_set_baudrate( 9600 );
      
     UCSRB = MSK_UART_ENABLE_TX | MSK_UART_ENABLE_RX;
@@ -321,9 +323,9 @@ int main( void )
     sei(); // Enable interrupts
 
 
-    // Init can
+    // Init. can
     if ( ERROR_OK != can_Open( CAN_BITRATE_125K, 0, 0, 0 ) ) {
-        uart_puts("Failed to open channel!!\n");
+        uart_puts("Failed to open CAN channel!!\n");
     }
 
 
@@ -332,7 +334,7 @@ int main( void )
 #ifdef OLIMEX_AT90CAN128
 	uart_puts( "VSCP AT90CAN128 Test (OLIMEX AT90CANx)\n" );
 #else
-	uart_puts( "VSCP AT90CAN128 Test\n" );
+	uart_puts( "VSCP AT90CAN128 Generic Test (stk-500)\n" );
 #endif
 
 	// Check VSCP persistent storage and
@@ -344,13 +346,13 @@ int main( void )
 
 	}
 
-	vscp_init();			// Initialize the VSCP functionality
+	vscp_init();            // Initialize the VSCP functionality
 
 
-    while ( 1 ) {  // Loop Forever
+    while ( 1 ) {           // Loop Forever
 
-
-        if ( ( vscp_initbtncnt > 200 ) && ( VSCP_STATE_INIT != vscp_node_state ) ) {
+        if ( ( vscp_initbtncnt > 200 ) && 
+                ( VSCP_STATE_INIT != vscp_node_state ) ) {
 	
             // State 0 button pressed
             vscp_nickname = VSCP_ADDRESS_FREE;
@@ -359,7 +361,6 @@ int main( void )
             uart_puts("Node initialization");
             
         }
-
 
         // Check for any valid CAN message
         vscp_imsg.flags = 0;
@@ -378,7 +379,6 @@ int main( void )
         switch ( vscp_node_state ) {
 
             case VSCP_STATE_STARTUP:        // Cold/warm reset
-
 
                 // Get nickname from EEPROM
                 if ( VSCP_ADDRESS_FREE == vscp_nickname ) {
@@ -407,7 +407,7 @@ int main( void )
 
                 if ( vscp_imsg.flags & VSCP_VALID_MSG ) {	// incoming message?
 #ifdef PRINT_CAN_EVENTS
-                    char buf[30];
+                    char buf[40];
                     uint8_t i;
                     sprintf(buf, "rx: %03x/%02x/%02x/",
                     vscp_imsg.vscp_class, vscp_imsg.vscp_type, vscp_imsg.oaddr);
@@ -418,9 +418,12 @@ int main( void )
                     }
                     uart_puts(buf);
 #endif
-                    vscp_handleProtocolEvent();
-
-					doDM();
+                    if (VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class) {
+                        vscp_handleProtocolEvent();
+                    }                        
+                    else {
+					    doDM();
+                    }                        
 
                 }
                 break;
@@ -535,11 +538,14 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
 		memcpy( msg.byte, pData, size );
 	}
 
-    if ( ERROR_OK != can_SendFrame( &msg ) ) {
-        return FALSE;
-    }
+	can_resend_timer = 0;
+    while ( can_resend_timer < 1000 ) {
+		if ( ERROR_OK == can_SendFrame( &msg ) ) {
+			return TRUE;
+		}
+	}
 
-    return TRUE;
+    return FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -842,7 +848,7 @@ uint8_t vscp_getSubzone( void )
 //	to the selected protocol.
 //
 
-void vscp_goBootloaderMode( void )
+void vscp_goBootloaderMode( uint8_t algorithm )
 {
     // TODO
 }
@@ -1096,7 +1102,7 @@ void vscp_restoreDefaults(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//                       Implemention of Decision Matrix
+//                       Implementation of Decision Matrix
 //////////////////////////////////////////////////////////////////////////////
 
 
@@ -1117,7 +1123,7 @@ static void doDM( void )
     uint8_t type_filter;
     uint8_t type_mask;
 
-uart_puts("doDM\n");
+    uart_puts("doDM\n");
     // Don't deal with the control functionality
     if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class ) return;
 
@@ -1191,7 +1197,7 @@ uart_puts("doDM\n");
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Send Decsion Matrix Information
+// Send Decision Matrix Information
 //
 
 void vscp_getMatrixInfo( char *pData )

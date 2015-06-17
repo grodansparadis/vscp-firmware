@@ -46,7 +46,7 @@ PRG = demo_vscp_node_can128
 #Used along with avr-size
 TARGET = $(PRG).elf
 
-OBJ = vscptest.o
+OBJ = main.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/can_at90can128.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/uart.o
 OBJ += $(VSCP_FIRMWARE)/common/vscp_firmware.c

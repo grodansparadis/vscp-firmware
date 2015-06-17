@@ -32,7 +32,7 @@
 #include <avr/io.h>
 
 // Undefine to print received and sent CAN events on serial channel
-#define PRINT_CAN_EVENTS
+//#define PRINT_CAN_EVENTS
 
 //
 // Undefine one of the following suitable for the

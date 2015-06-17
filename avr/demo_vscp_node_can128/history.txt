@@ -1,0 +1,3 @@
+History for the demo_vscp_node_can128 demo project
+
+2015-06-17 AKHE - Chenged to use AVR Studio.
