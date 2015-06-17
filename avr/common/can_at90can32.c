@@ -75,7 +75,7 @@ void clrAllMob( void )
 ///////////////////////////////////////////////////////////////////////////////
 // getFreeMob
 //
-// We use the first MOB for reciption so the search is 
+// We use the first MOB for reception so the search is 
 // started from MOB == 1
 //
 // Returns ERROR_BUFFER_FULL if no free Mob available.

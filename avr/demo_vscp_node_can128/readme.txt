@@ -1,6 +1,6 @@
 This project is a very simple project that show the use of VSCP on the AT90CAN128 chip. 
 Code is built using AVR studio. It is tested on the AVR STK-501 board or the Olimex 
-AT90CAN128 board.
+AT90CAN128 board (https://www.olimex.com/Products/AVR/Development/AVR-CAN/).
 
 Project configurations are done in the file vscp_projdefs.h  Also paths to include folders is 
 in the Makefile and with a moves source tree you probably have to change the paths.
