@@ -1155,8 +1155,8 @@ void vscp_handleProtocolEvent(void)
 
             if ( vscp_nickname == vscp_imsg.data[0] ) {
 
-                uint16_t page_save;
-                uint8_t byte = 0, bytes = 0;
+                uint16_t page_save, bytes = 0;
+                uint8_t byte = 0;
                 uint8_t bytes_this_time, cb;
 
                 // if data byte 4 of the request is present probably more than 1 register should be
@@ -1164,11 +1164,11 @@ void vscp_handleProtocolEvent(void)
                 if ( ( vscp_imsg.flags & 0x0f) > 3 ) {
 
                     // Number of registers was specified', thus take that value
-                    bytes = vscp_imsg.data[4];
-                    // if number of bytes was zero we read one byte 
-                    if ( 0 == bytes ) {
-                        bytes = 1;
-					} 
+                    bytes = (uint16_t)vscp_imsg.data[4];
+                    // if number of bytes was zero we read 256 bytes
+                    if (bytes == 0) bytes = 256;
+                    // insane range checking
+                    if (bytes > 256) bytes = 256;
 				}
 				else {
 					bytes = 1;

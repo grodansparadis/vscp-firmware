@@ -56,7 +56,7 @@ void vscp_wait_s(uint16_t tsec);
 
 	uint8_t vscp_getSubzone( void );
 
-	void vscp_goBootloaderMode( void );
+	void vscp_goBootloaderMode( uint8_t );
 
 	uint8_t vscp_getMajorVersion();
 
