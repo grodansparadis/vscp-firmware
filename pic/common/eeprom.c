@@ -4,7 +4,8 @@
 // Code collected from the Microchip C18 forum
 // Copyright (C) 2003 JasonK
 //
-// Changes (C) 2005-2015 Ake Hedman, eurosource <akhe@eurosource.se>
+// Changes & additions (C) 2005-2015 Ake Hedman, Grodans Paradis AB 
+// <akhe@grodansparadis.com>
 //
 
 #include <p18cxxx.h>
@@ -39,9 +40,10 @@ void writeEEPROM( uint16_t address, uint8_t data )
 	EECON1bits.WR = 1;		// Set WR bit to begin write
 	INTCONbits.GIE = 1;		// Enable Interrupts
 
-#if defined(__18F25K80) || defined(__18F26K80) || defined(__18F45K80) || defined(__18F46K80) || defined(__18F65K80) || defined(__18F66K80)
+#if defined(__18F25K80) || defined(__18F26K80) || defined(__18F45K80) || defined(__18F46K80) || defined(__18F65K80) || defined(__18F66K80) 
     while (!PIR4bits.EEIF); // wait for interrupt to signal write complete
     PIR4bits.EEIF = 0;      // clear EEPROM write operation interrupt flag
+    Nop();
 #else
     while (!PIR2bits.EEIF); // wait for interrupt to signal write complete
     PIR2bits.EEIF = 0;      // clear EEPROM write operation interrupt flag
@@ -99,6 +101,7 @@ uint8_t readEEPROM( uint16_t address )
 	EECON1bits.EEPGD= 0; 	// Point to data memory 
 	EECON1bits.CFGS = 0; 	// Access program FLASH or Data EEPROM Memory 
 	EECON1bits.RD = 1; 		// Enable read 
+    Nop();
 	data = EEDATA; 
 
 	return data; 
