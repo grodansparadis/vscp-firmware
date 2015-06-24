@@ -166,7 +166,7 @@ void vscp_init(void)
 
 int8_t vscp_check_pstorage(void)
 {
-    // control byte == 01xxxxxx means initialized
+    // control byte == 0b01xxxxxx means initialized
     // everything else is uninitialized
     if ((vscp_getSegmentCRC() & 0xc0) == 0x40) {
         return TRUE;
@@ -1309,18 +1309,18 @@ int8_t vscp_getEvent(void)
     int8_t rv;
 
 
-    // Dont read in new event if there already is an event
+    // Don't read in new event if there already is an event
     // in the input buffer. We return TRUE though to indicate there is
     // a valid event.
     if (vscp_imsg.flags & VSCP_VALID_MSG) return TRUE;
 
 
-    if ((rv = getVSCPFrame(&vscp_imsg.vscp_class,
-            &vscp_imsg.vscp_type,
-            &vscp_imsg.oaddr,
-            &vscp_imsg.priority,
-            &vscp_imsg.flags,
-            vscp_imsg.data))) {
+    if ((rv = getVSCPFrame( &vscp_imsg.vscp_class,
+                                &vscp_imsg.vscp_type,
+                                &vscp_imsg.oaddr,
+                                &vscp_imsg.priority,
+                                &vscp_imsg.flags,
+                                vscp_imsg.data ) ) ) {
 
         vscp_imsg.flags |= VSCP_VALID_MSG;
     }
