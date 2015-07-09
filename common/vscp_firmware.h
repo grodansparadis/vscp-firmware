@@ -70,19 +70,19 @@ low end hardware device.
 //  				VSCP Constants
 // ******************************************************************************
 
-#define VSCP_MAJOR_VERSION		        1    // VSCP Major version
-#define VSCP_MINOR_VERSION              5    // VSCP Minor Version
+#define VSCP_MAJOR_VERSION		        1       // VSCP Major version
+#define VSCP_MINOR_VERSION              5       // VSCP Minor Version
 
 #define VSCP_ADDRESS_MASTER             0x00
 #define VSCP_ADDRESS_FREE               0xff
 
-#define VSCP_SIZE_GUID                  16   // # GUID bytes
-#define VSCP_SIZE_DEVURL                32   // # of device URL bytes
-#define VSCP_SIZE_STD_DM_ROW            8    // Size for level I decision matrix row
+#define VSCP_SIZE_GUID                  16      // # GUID bytes
+#define VSCP_SIZE_DEVURL                32      // # of device URL bytes
+#define VSCP_SIZE_STD_DM_ROW            8       // Size for level I decision matrix row
 
-#define VSCP_BOOT_FLAG          0xff         // Boot flag is stored in persistent storage
-                                             // and if it is there the boot loader will be
-                                             // activated.
+#define VSCP_BOOT_FLAG                  0xff    // Boot flag is stored in persistent storage
+                                                // and if it is there the boot loader will be
+                                                // activated.
 
 // Bootloaders
 #define VSCP_BOOTLOADER_VSCP            0x00	// VSCP boot loader algorithm
@@ -93,7 +93,7 @@ low end hardware device.
 #define VSCP_BOOTLOADER_ST              0x30	// ST STR algorithm 0
 #define VSCP_BOOTLOADER_NONE            0xff
 
-#define  VSCP_LEVEL1_COMMON_REGISTER_START      0x80
+#define  VSCP_LEVEL1_COMMON_REGISTER_START 0x80
 
 // State machine states 
 #define VSCP_STATE_STARTUP              0x00	// Cold/warm reset
@@ -122,7 +122,6 @@ low end hardware device.
 #define VSCP_PRIORITY1                  0x06
 #define VSCP_PRIORITY0                  0x07
 #define VSCP_PRIORITY_LOW               0x07
-
 
 #define VSCP_PROBE_TIMEOUT              1000    // ms - one second
 #define VSCP_PROBE_TIMEOUT_COUNT        3       // Max # probe time-outs allowed
@@ -295,23 +294,23 @@ struct _dmrow {
 // -----------------------------------------------------------------------------
 
 // External - VSCP Data
-extern uint8_t vscp_nickname;       // Assigned node nickname
-extern uint8_t vscp_errorcnt;       // VSCP error counter
-extern uint8_t vscp_alarmstatus;    // VSCP alarm status register
-extern uint8_t vscp_node_state;     // VSCP state machine main state
-extern uint8_t vscp_node_substate;  // VSCP state machine sub state
-extern uint8_t vscp_initledfunc;    //
+extern uint8_t vscp_nickname;               // Assigned node nickname
+extern uint8_t vscp_errorcnt;               // VSCP error counter
+extern uint8_t vscp_alarmstatus;            // VSCP alarm status register
+extern uint8_t vscp_node_state;             // VSCP state machine main state
+extern uint8_t vscp_node_substate;          // VSCP state machine sub state
+extern uint8_t vscp_initledfunc;            //
 // The following are defined in vscp.c
-extern struct _imsg vscp_imsg;      // Current input event
-extern struct _omsg vscp_omsg;      // Current outgoing event
-extern volatile uint16_t vscp_timer;// 1 ms timer counter
-extern uint8_t vscp_probe_address;  // Probe address for nickname discovery
+extern struct _imsg vscp_imsg;              // Current input event
+extern struct _omsg vscp_omsg;              // Current outgoing event
+extern volatile uint16_t vscp_timer;        // 1 ms timer counter
+extern uint8_t vscp_probe_address;          // Probe address for nickname discovery
 extern volatile uint8_t vscp_initbtncnt;    // init. button counter
 extern volatile uint8_t vscp_statuscnt;     // status LED counter
-extern uint16_t vscp_page_select;   // Selected Register Page
-extern volatile uint16_t vscp_configtimer; // configuration timer
+extern uint16_t vscp_page_select;           // Selected Register Page
+extern volatile uint16_t vscp_configtimer;  // configuration timer
 
-extern const uint8_t vscp_deviceURL[]; //  GUID
+extern const uint8_t vscp_deviceURL[];      //  GUID
 
 // Prototypes
 
@@ -434,11 +433,9 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value);
 void vscp_doOneSecondWork(void);
 
 /*!
-
+    Check if we need to initialize persistent data
  */
 int8_t vscp_check_pstorage(void);
-
-
 
 /*!
     Send VSCP event in the out-buffer.
@@ -471,18 +468,18 @@ int8_t vscp_getEvent(void);
     @param pData pinter to array that will get event data.
     @return TRUE on success.
  */
-int8_t getVSCPFrame(uint16_t *pvscpclass,
-        uint8_t *pvscptype,
-        uint8_t *pNodeId,
-        uint8_t *pPriority,
-        uint8_t *pSize,
-        uint8_t *pData);
+int8_t getVSCPFrame( uint16_t *pvscpclass,
+                        uint8_t *pvscptype,
+                        uint8_t *pNodeId,
+                        uint8_t *pPriority,
+                        uint8_t *pSize,
+                        uint8_t *pData);
 
 /*!
     Send a VSCP frame 
     @param vscpclass VSCP class for event.
     @param vscptype VSCP type for event.
-    @param nodeid Nodeid for originating node.
+    @param nodeid Node id for originating node.
     @param priority Priority for event.
     @param size Size of data portion.
     @param pData Pointer to event data.
@@ -497,9 +494,7 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
 
 
 /*!
-    The following methods/callbacks must be defined
-    in the application and should return firmware version
-    information
+    Get firmware version information
  */
 uint8_t vscp_getMajorVersion( void );
 uint8_t vscp_getMinorVersion( void );
