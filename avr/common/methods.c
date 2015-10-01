@@ -22,7 +22,7 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
     CANMsg msg;
 
 
-		#ifdef PRINT_CAN_EVENTS
+/*		#ifdef PRINT_CAN_EVENTS
 			char buf[32];
 			uint8_t i;
 
@@ -34,7 +34,7 @@ int8_t sendVSCPFrame( uint16_t vscpclass,
 			}
 			uart_puts(buf);
 		#endif
-
+*/
 	msg.id = ( (uint32_t)priority << 26 ) |
 		( (uint32_t)vscpclass << 16 ) |
 		( (uint32_t)vscptype << 8) |
@@ -93,12 +93,12 @@ int8_t getVSCPFrame( uint16_t *pvscpclass,
 int readEEPROM( uint8_t addr )
 {
 	// we now use the avrlib-eeprom functions
-	//uint8_t test = eeprom_read_byte( &addr );
-	//return test;
-	    while ( EECR & ( 1 << EEWE ) );
-	    EEAR = addr;
-	    EECR |= ( 1 << EERE );
-	    return EEDR;
+	uint8_t test = eeprom_read_byte( addr );
+	return test;
+	//  while ( EECR & ( 1 << EEWE ) );
+	//  EEAR = addr;
+	//  EECR |= ( 1 << EERE );
+	//  return EEDR;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -108,14 +108,15 @@ int readEEPROM( uint8_t addr )
 int writeEEPROM( uint8_t addr, uint8_t data )
 {
 	// we now use the avrlib-eeprom update functions, saves some write cycles
-	//eeprom_update_byte(&addr, data);
-	//return TRUE;
-	    while ( EECR & ( 1 << EEWE ) );
+	eeprom_update_byte(addr, data);
+	return TRUE;
+	/*    while ( EECR & ( 1 << EEWE ) );
 	    EEAR = addr;
 	    EEDR=data;
 	    EECR |= ( 1 << EEMWE );
 	    EECR |= ( 1 << EEWE );
 	    return TRUE;
+		*/
 }
 
 
