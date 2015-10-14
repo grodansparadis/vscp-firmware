@@ -1,46 +1,49 @@
-//actual bootloader routines
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-success nr 1
-	uint32_t i=0; 
-    
-
-
-
-//999999999999999999999999999999999   
-   uint8_t c[256] = "0123456789"; 
-
-   for(i = 10; i < 256; i++) 
-      c[i] = 0xAA; 
-
-   boot_program_page(0x02, c); 
-
-   return (0); 
-
-while(1)
-{}
-succes nr 2
-uint8_t testpage[BTL_BLOCKSIZE+1] = "1234567890123456";
-								boot_program_page (1,testpage);
-								boot_program_page (0xF0,testpage); //messes up previous write, minimum pagesize is then 0x100
-
-succes 3 , complete blocks
-//test page writing
-								uint8_t testpage[BTL_BLOCKSIZE+1] = "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456";
-								boot_program_page (0x00,testpage);
-								testpage[0] = 'A';
-								boot_program_page (0x100,testpage);
-
-
+/*-------------------------------------------------------------------------------------------- 
+ * VSCP bootloader support for AVR v0.0
+ * 
+ * include this file along with bootloader.h to enable bootloader support in the AVR-device
+ * 
+ * only 1 line should also be included in the firmware project:
+ * #define VSCP_EEPROM_BOOTLOADER_FLAG         0x00	// Reserved for bootloader	 
+ *
+ *-------------------------------------------------------------------------------------------
 */
+
+#include <avr/wdt.h>
+#include "bootloader.h"
+///////////////////////////////////////////////////////////////////////////////
+//	vscp_goBootloaderMode
+//
+//	Go bootloader mode
+//	This routine force the system into bootloader mode according
+//	to the selected protocol.
+//
+
+void vscp_goBootloaderMode( uint8_t algo )
+{
+    writeEEPROM( VSCP_EEPROM_BOOTLOADER_FLAG, BTL_LOAD );
+	#ifdef PRINT_VSCP_EVENTS
+	uart_puts( "\n #####jumping to bootloader!\n" );
+	#endif
+	//reboot using WD
+	cli();
+	wdt_enable(WDTO_1S);
+	while(1);
+}
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_getBootLoaderAlgorithm
+//
+// Get the bootloader algorithm code
+//
+
+uint8_t vscp_getBootLoaderAlgorithm( void )
+{
+    return VSCP_BOOTLOADER_AVR1; 	
+
+}
+
+
