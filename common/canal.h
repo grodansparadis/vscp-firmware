@@ -25,12 +25,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// History
-// =======
-//
-// 2007-10-31 AKHE - Blocking and driver properties added
-// 2006-05-16 AKHE - Added fastmode defines.
-// 2005-08-09 AKHE - Added error info to canalStatus structure.
+//            !!!!!!!!!!!!!!!!!!!!  W A R N I N G  !!!!!!!!!!!!!!!!!!!!
+// This file may be a copy of the original file. This is because the file is
+// copied to other projects as a convinience. Thus editing the copy will not make
+// it to the original and will be overwritten.
+// The original file can be foud in the vscp_softare source tree under 
+// src/vscp/common 
 
 #ifndef ___CANAL_H___
 #define ___CANAL_H___
@@ -40,8 +40,6 @@
 #ifndef EXPORT
 #define EXPORT
 #endif
-
-
 
 #ifdef WIN32
 #ifndef WINAPI
@@ -284,7 +282,7 @@ int CanalBlockingReceive( long handle, PCANALMSG pCanalMsg, unsigned long timeou
 	Check a CANAL channel for message availability. 
 
 	@param handle - Handle to open physical CANAL channel.
-	@return Zero if no message is available or the number of messages is
+	@return Zero if no message is available or the number of messages if
 	there are messages waiting to be received.
 */
 #ifdef WIN32
@@ -535,7 +533,7 @@ const char * CanalGetDriverInfo( void );
 
 // * * * TCP/IP FAST mode interface constants
 
-// FAST mode primary states
+// FAST mode primary states (deprecated)
 #define CANAL_BINARY_FRAME_TYPE_VSCP        0       // VSCP event
 #define CANAL_BINARY_FRAME_TYPE_ERROR       1       // ACK/NACK/errors
 #define CANAL_BINARY_FRAME_TYPE_COMMAND     2       // Command frame
@@ -545,7 +543,7 @@ const char * CanalGetDriverInfo( void );
 #define CANAL_BINARY_COMMAND_READ           1       // Read one frame
 #define CANAL_BINARY_COMMAND_CLOSE          2       // Close communication channel
 
-// FAST error codes
+// FAST error codes (deprecated)
 #define CANAL_BINARY_ERROR_NONE             0       // OK
 #define CANAL_BINARY_ERROR_GENERAL          1       // General error
 #define CANAL_BINARY_ERROR_TO_SMALL         2       // Packet smaller then min. packet
