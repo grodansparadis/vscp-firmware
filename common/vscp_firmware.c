@@ -686,8 +686,7 @@ uint8_t vscp_readStdReg(uint8_t reg)
     else if ( reg >= VSCP_REG_DEVICE_URL ) {
 
         // * * * The device URL * * *
-        rv = vscp_getMDF_URL(reg - VSCP_REG_DEVICE_URL);
-		
+        rv = vscp_getMDF_URL(reg - VSCP_REG_DEVICE_URL);	
 		
     }
 
@@ -1212,18 +1211,7 @@ void vscp_handleProtocolEvent(void)
 
 					// send the event
 					vscp_sendEvent();
-					
-					//add some delay so zvr/bus/converter/daemon buffer can handle the traffic
-					// 1400 NOP for 16Mhz crystal
-					//todo check if message is sent before next sendevent is called, thus nu delay necessary
-					unsigned int i =0;
-					 for (i =0; i<1400; i++)
-					 {
-						__asm__ __volatile__ ("nop");
-							 
-					 }
-					 
-								
+													
 					// increment byte by bytes_this_time and the event number by one
 					byte += bytes_this_time;
 

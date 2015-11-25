@@ -641,7 +641,7 @@ void vscp_getEmbeddedMdfInfo(void);
     This routine force the system into boot loader mode according
     to the selected protocol.
  */
-//void vscp_goBootloaderMode( uint8_t algorithm );
+void vscp_goBootloaderMode( uint8_t algorithm );
 
 /*!
     Get Zone for device
