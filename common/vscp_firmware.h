@@ -65,6 +65,17 @@ low end hardware device.
 #include <vscp_projdefs.h>	// This file should be in your project folder
 #include <inttypes.h>
 
+// Macros
+
+// This macro construct a signed integer from two unsigned chars in a safe way
+#define construct_signed16( msb, lsb )  ((int16_t)( (((uint16_t)msb)<<8) + \
+                                                            (uint16_t)lsb) )  
+
+// This macro construct a signed long from four unsigned chars in a safe way
+#define construct_signed32( b0, b1, b2, b3 )  ((int32_t)( (((uint32_t)b0)<<24) + \
+                                                            (((uint32_t)b0)<<16) + \
+                                                            (((uint32_t)b0)<<8) + \
+                                                            ((uint32_t)b0);
 
 // ******************************************************************************
 //  				VSCP Constants
