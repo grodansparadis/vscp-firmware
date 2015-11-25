@@ -39,6 +39,7 @@
 #include "vscp_registers.h"
 #include "vscp_actions.c"
 #include "bootsupport.c"
+//#include "bootloader.c"
 #ifndef GUID_IN_EEPROM
 // GUID is stored in ROM for this module
 //		IMPORTANT!!!
@@ -57,6 +58,7 @@ const uint8_t GUID[ 16 ] = {
 // Device string is stored in ROM for this module (max 32 bytes)
 //const uint8_t vscp_deviceURL[]  = "127.0.0.1/mdf/aamini02.xml";
 const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/AAMini02.xml";
+// add mdfhost to hosts file on PC to link to ip/host name
 
 
 // Manufacturer id's is stored in ROM for this module
@@ -222,14 +224,14 @@ int main( void )
     }
 
 
-	#ifdef PRINT_CAN_EVENTS
+	#ifdef PRINT_GENERAL_EVENTS
 	#if BOARD == 0
 			uart_puts( "OLIMEX AT90CAN128\n" );
 	#elif BOARD == 1
 		uart_puts( "AAMINI 0.0a2015\n" );
 	#endif
 	#endif
-
+	
 
 	// Check VSCP persistent storage and
 	// restore if needed
@@ -306,7 +308,7 @@ int main( void )
             case VSCP_STATE_ACTIVE:         // The normal state
                 if ( vscp_imsg.flags & VSCP_VALID_MSG ) 
 				{	// incoming message?
-					#ifdef PRINT_CAN_EVENTS
+					/*#ifdef PRINT_CAN_EVENTS
 	                    char buf[30];
 	                    uint8_t i;
 	                    sprintf(buf, "rx: %03x/%02x/%02x/",
@@ -319,22 +321,31 @@ int main( void )
 	                    }
 	                    uart_puts(buf);
 					#endif
-                    vscp_handleProtocolEvent();
-					doDM();					// run message through DM
-					doFollow();
+                    */
+					 if (VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class) {
+	                     vscp_handleProtocolEvent();
+                     }
+                     else {
+	                     doDM();
+						 doFollow();
+                     }
+					//vscp_handleProtocolEvent();
+
                 }
                 break;
 
-
             case VSCP_STATE_ERROR:          // Everything is *very* *very* bad.
+				uart_puts("vscp_error");
                 vscp_error();
                 break;
 
             default:                        // Should not be here...
+				uart_puts("vscp_default");
                 vscp_node_state = VSCP_STATE_STARTUP;
                 break;
 
         } // switch 
+
 
 
 		// check inputs
@@ -441,14 +452,13 @@ uint8_t vscp_readAppReg( uint8_t reg )
 	#ifdef PRINT_VSCP_EVENTS
 	uart_puts( "vscp_readAppReg\n" );
 	#endif
-
+	
 	if ((reg >= REG_ZONE) & (reg <= REG_ZONE_END))
 	{
 		rv =  readEEPROM( reg + VSCP_EEPROM_REGISTER);
 	}
-
-
-
+	
+	
     // DM register space    
     else if ( ( reg >= REG_DM_START ) & ( reg <  REG_DM_START + (DESCION_MATRIX_ELEMENTS * 8) ) )
 	{
@@ -457,7 +467,8 @@ uint8_t vscp_readAppReg( uint8_t reg )
 
 
     else {
-        rv = 0x00;
+        rv = 0xff;
+		
     }
 
    // Read actual output state
@@ -476,7 +487,16 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
 
     rv = ~val; // error return
 
-	if ((reg >= REG_ZONE) & (reg <= REG_ZONE_END))
+
+   	// write actual output state
+   	if ( REG_OUTPUT_STATE == reg )
+   	{
+	   	outputport = ~val;
+	   	__asm__ __volatile__ ("nop");
+	   	rv =  ~read_output;
+   	}
+
+	else if ((reg >= REG_ZONE) & (reg <= REG_ZONE_END))
 	{
 		writeEEPROM(VSCP_EEPROM_REGISTER + reg, val); 
 		rv =  readEEPROM( reg + VSCP_EEPROM_REGISTER);
@@ -488,18 +508,6 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
         writeEEPROM(VSCP_EEPROM_REGISTER + reg, val); 
 		rv =  readEEPROM( VSCP_EEPROM_REGISTER +  reg  );
     }
-
-   	// write actual output state
-   	if ( REG_OUTPUT_STATE == reg ) 
-   	{
-   		outputport = ~val;
-		rv =  ~read_output;
-	}
-   
-    else {
-        rv = ~val; // error return	
-    }
-
 
     return rv;	
 

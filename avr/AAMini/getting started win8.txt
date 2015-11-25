@@ -1,0 +1,6 @@
++ set environment variable (system / advanced system settings / advanced / environment variables)
+	VSCP_SOFTWARE & VSCP_FIRMWARE
+
++ create new project AAMini
++ copy repository over this project.
++ with build-options choose "use external makefile"

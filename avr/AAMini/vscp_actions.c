@@ -30,12 +30,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 void doActionToggleOut( unsigned char dmflags, unsigned char arg )
 {
-#ifdef PRINT_CAN_EVENTS
+#ifdef PRINT_DM_EVENTS
 uart_puts( "debug doActionToggleOut\n" );
 #endif
 
 	unsigned char i;
-	unsigned char val;
+	//unsigned char val;
 	
 	for ( i=0; i<8; i++ ) 
 	{
@@ -52,7 +52,7 @@ uart_puts( "debug doActionToggleOut\n" );
 				}
 		}
 			
-		val = readEEPROM( VSCP_EEPROM_END + REG_OUTPUT1_SUBZONE + i );
+		//val = readEEPROM( VSCP_EEPROM_END + REG_OUTPUT1_SUBZONE + i );
 		
 		// Do nothing if disabled
 		//if ( !( val & RELAY_CONTROLBIT_ENABLED ) ) continue;
@@ -68,7 +68,7 @@ void doActionOnOut( unsigned char dmflags, unsigned char arg )
 {
 uart_puts( "debug doActionOnOut\n" );
 	unsigned char i;
-	unsigned char val;
+	//unsigned char val;
 	
 	for ( i=0; i<8; i++ ) 
 	{
@@ -86,7 +86,7 @@ uart_puts( "debug doActionOnOut\n" );
 			}
 		}
 			
-		val = readEEPROM( VSCP_EEPROM_END + REG_OUTPUT1_SUBZONE + i );
+		//val = readEEPROM( VSCP_EEPROM_END + REG_OUTPUT1_SUBZONE + i );
 		
 		outputport &= ~ _BV(i);
 
@@ -102,7 +102,7 @@ void doActionOffOut( unsigned char dmflags, unsigned char arg )
 {
 uart_puts( "debug doActionOffOut\n" );
 	unsigned char i;
-	unsigned char val;
+	//unsigned char val;
 	
 	for ( i=0; i<8; i++ ) 
 	{
@@ -120,7 +120,7 @@ uart_puts( "debug doActionOffOut\n" );
 				}
 		}
 			
-		val = readEEPROM( VSCP_EEPROM_END + REG_OUTPUT1_SUBZONE + i );
+		//val = readEEPROM( VSCP_EEPROM_END + REG_OUTPUT1_SUBZONE + i );
 		
 		outputport |= _BV(i);
 
@@ -131,7 +131,7 @@ uart_puts( "debug doActionOffOut\n" );
 
 
 
-#ifdef PRINT_CAN_EVENTS
+#ifdef PRINT_DM_EVENTS
 ///////////////////////////////////////////////////////////////////////////////
 // doActionHelloWorld
 //
@@ -148,7 +148,7 @@ void vscp_outputevent(unsigned char current,unsigned char previous)
 unsigned char change=0,i=0,j=1;
 
 change = current^previous; //only changed bits are left!
-#ifdef PRINT_CAN_EVENTS
+#ifdef PRINT_IO_EVENTS
 uart_puts( "OUTPUT change detected!\n" );
 #endif
 
@@ -187,6 +187,9 @@ void doFollow()
 	#ifdef PRINT_DM_EVENTS
 	uart_puts( "debug  doFollow\n" );
     #endif
+	
+	// Don't deal with the control functionality
+	//if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class ) return;
 
 	uint8_t i=0;
 
@@ -236,7 +239,7 @@ void doFollow()
 
 	if ( VSCP_TYPE_INFORMATION_OFF == vscp_imsg.vscp_type ) 
 	{
-		#ifdef PRINT_CAN_EVENTS
+		#ifdef PRINT_DM_EVENTS
 		uart_puts( "doFollow informationOFF\n" );
     	#endif	
 	
@@ -254,12 +257,12 @@ void doFollow()
 				}
 			else if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + + REG_OUTPUT1_SUBZONE + i  ) ) 
 				{
-				#ifdef PRINT_CAN_EVENTS
+				#ifdef PRINT_DM_EVENTS
 				uart_puts( "subzone mismatch\n" );
 				#endif
                 continue;
                 }	
-            #ifdef PRINT_CAN_EVENTS
+            #ifdef PRINT_DM_EVENTS
 			uart_puts( "subzone match\n" );
 			#endif
 

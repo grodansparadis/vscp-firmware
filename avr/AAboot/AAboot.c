@@ -1,6 +1,5 @@
 //AVR bootloader 0.0
 
-
 #include "vscp_projdefs.h"
 #include "vscp_compiler.h"
 #include <avr/pgmspace.h>
@@ -33,7 +32,7 @@ const uint8_t GUID[ 16 ] = {
 };
 #endif
 
-
+//no mdf for bootloader
 // Device string is stored in ROM for this module (max 32 bytes)
 //const uint8_t vscp_deviceURL[]  = "127.0.0.1/mdf/AAboot01.xml";
 
@@ -648,7 +647,7 @@ uint8_t vscp_getSubzone( void )
 //	to the selected protocol.
 //
 
-void vscp_goBootloaderMode( void )
+void vscp_goBootloaderMode( uint8_t algo )
 {
     uart_puts( "\n #####already bootloader!\n" );
 }
@@ -878,7 +877,20 @@ uint8_t vscp_getControlByte( void )
     return readEEPROM( VSCP_EEPROM_CONTROL );
 }
 
+uint32_t vscp_getFamilyCode(void)
+{
+	return 0;
+}
 
+uint32_t vscp_getFamilyType(void)
+{
+	return 0;
+}
+
+void vscp_restoreDefaults(void)
+{
+	// to do
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 //                       Implemention of Decision Matrix

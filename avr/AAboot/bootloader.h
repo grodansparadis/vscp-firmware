@@ -2,7 +2,9 @@
  * bootloader definitions to be used in firmware & bootloader routines
  *--------------------------------------------------------------------------------------------
 */  
+#ifndef _BOOTLOADER_H_
 
+#define _BOOTLOADER_H_ 1
 
 
 #define BTL_RUN			0x00 	//RUN, continue to application
@@ -29,6 +31,9 @@
 #endif
 
 
+void vscp_goBootloaderMode( uint8_t algo );
+
+#endif
 //define BOOTSTART in makefile!
 
 
