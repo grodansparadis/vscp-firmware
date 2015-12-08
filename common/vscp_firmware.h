@@ -71,11 +71,22 @@ low end hardware device.
 #define construct_signed16( msb, lsb )  ((int16_t)( (((uint16_t)msb)<<8) + \
                                                             (uint16_t)lsb) )  
 
+// This macro construct a unsigned integer from two unsigned chars in a safe way
+#define construct_unsigned16( msb, lsb )  ((uint16_t)( (((uint16_t)msb)<<8) + \
+                                                            (uint16_t)lsb) ) 
+
 // This macro construct a signed long from four unsigned chars in a safe way
 #define construct_signed32( b0, b1, b2, b3 )  ((int32_t)( (((uint32_t)b0)<<24) + \
                                                             (((uint32_t)b0)<<16) + \
                                                             (((uint32_t)b0)<<8) + \
                                                             ((uint32_t)b0);
+
+// This macro construct a unsigned long from four unsigned chars in a safe way
+#define construct_unsigned32( b0, b1, b2, b3 )  ((uint32_t)( (((uint32_t)b0)<<24) + \
+                                                            (((uint32_t)b0)<<16) + \
+                                                            (((uint32_t)b0)<<8) + \
+                                                            ((uint32_t)b0);
+
 
 // ******************************************************************************
 //  				VSCP Constants

@@ -686,8 +686,8 @@ uint8_t vscp_readStdReg(uint8_t reg)
     else if ( reg >= VSCP_REG_DEVICE_URL ) {
 
         // * * * The device URL * * *
-        rv = vscp_getMDF_URL(reg - VSCP_REG_DEVICE_URL);	
-		
+        rv = vscp_getMDF_URL(reg - VSCP_REG_DEVICE_URL);
+
     }
 
     return rv;
@@ -1152,6 +1152,7 @@ void vscp_handleProtocolEvent(void)
 #endif
 
         case VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_READ:
+
             if ( vscp_nickname == vscp_imsg.data[0] ) {
 
                 uint16_t page_save, bytes = 0;
@@ -1211,7 +1212,7 @@ void vscp_handleProtocolEvent(void)
 
 					// send the event
 					vscp_sendEvent();
-													
+
 					// increment byte by bytes_this_time and the event number by one
 					byte += bytes_this_time;
 
@@ -1286,6 +1287,7 @@ void vscp_handleProtocolEvent(void)
 int8_t vscp_sendEvent(void)
 {
     int8_t rv;
+
     if ( !(rv = sendVSCPFrame( vscp_omsg.vscp_class,
                                 vscp_omsg.vscp_type,
                                 vscp_nickname,
