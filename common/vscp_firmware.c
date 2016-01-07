@@ -166,22 +166,22 @@ void vscp_init(void)
 
 int8_t vscp_check_pstorage(void)
 {
-    // control byte == 0b01xxxxxx means initialized
-    // everything else is uninitialized
-    if ((vscp_getSegmentCRC() & 0xc0) == 0x40) {
+    // Check if persistent storage is initialized.
+    if ( ( VSCP_INITIALIZED_BYTE0_VALUE == vscp_getControlByte( VSCP_INITIALIZED_BYTE0_INDEX ) ) &&
+           ( VSCP_INITIALIZED_BYTE1_VALUE == vscp_getControlByte( VSCP_INITIALIZED_BYTE1_INDEX ) ) ) {
         return TRUE;
     }
 
+    // Initialize persistent storage
+    vscp_init_pstorage();
+
     // No nickname yet.
-    vscp_writeNicknamePermanent(0xff);
-
-    // No segment CRC yet.
-    vscp_setSegmentCRC(0x00);
-
-    // Initial startup
-    // write allowed
-    vscp_setControlByte(0xA0);
-
+    vscp_writeNicknamePermanent( 0xff );
+    
+    // Mark persistent storage as initialized
+    vscp_setControlByte( VSCP_INITIALIZED_BYTE0_INDEX, VSCP_INITIALIZED_BYTE0_VALUE );
+    vscp_setControlByte( VSCP_INITIALIZED_BYTE1_INDEX, VSCP_INITIALIZED_BYTE1_VALUE );
+    
     return FALSE;
 }
 
@@ -289,7 +289,6 @@ void vscp_handleProbeState(void)
                             vscp_node_state = VSCP_STATE_ACTIVE;
                             vscp_node_substate = VSCP_SUBSTATE_NONE;
                             vscp_writeNicknamePermanent(vscp_nickname);
-                            vscp_setSegmentCRC(0x40); // segment code (non server segment )
 
                             // Report success
                             vscp_probe_cnt = 0;
@@ -333,8 +332,7 @@ void vscp_handlePreActiveState(void)
             // Assign nickname
             vscp_nickname = vscp_imsg.data[ 1 ];
             vscp_writeNicknamePermanent(vscp_nickname);
-            vscp_setSegmentCRC(0x40);
-
+            
             // Go active state
             vscp_node_state = VSCP_STATE_ACTIVE;
         }
@@ -394,24 +392,7 @@ void vscp_sendHeartBeat(uint8_t zone, uint8_t subzone)
 
 void vscp_handleHeartbeat(void)
 {
-	if ( !vscp_getSegmentCRC() ) {
-		if ( ( 5 == (vscp_imsg.flags & 0x0f ) ) &&
-				(vscp_getSegmentCRC() != vscp_imsg.data[ 0 ])) {
-
-			// Stored CRC are different than received
-			// We must be on a different segment
-			vscp_setSegmentCRC(vscp_imsg.data[ 0 ]);
-
-			// Introduce ourself in the proper way and start from the beginning
-			vscp_nickname = VSCP_ADDRESS_FREE;
-			vscp_writeNicknamePermanent(VSCP_ADDRESS_FREE);
-			vscp_node_state = VSCP_STATE_INIT;
-		}
-	}
-	else {
-		// First heartbeat seen by this node
-		vscp_setSegmentCRC(vscp_imsg.data[ 0 ]);
-	}
+	;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -426,7 +407,7 @@ void vscp_handleSetNickname(void)
         // Yes, we are addressed
         vscp_nickname = vscp_imsg.data[ 1 ];
         vscp_writeNicknamePermanent(vscp_nickname);
-        vscp_setSegmentCRC(0x40);
+
     }
 }
 
@@ -594,10 +575,10 @@ uint8_t vscp_readStdReg(uint8_t reg)
         rv = VSCP_MINOR_VERSION;
 
     }
-    else if (VSCP_REG_NODE_CONTROL == reg) {
+    else if (VSCP_REG_NODE_ERROR_COUNTER == reg) {
 
         // * * * Reserved * * *
-        rv = 0;
+        rv = vscp_errorcnt;
 
     }
     else if (VSCP_REG_FIRMWARE_MAJOR_VERSION == reg) {
@@ -715,7 +696,10 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value)
 {
     uint8_t rv = ~value;
 
-    if ((reg > (VSCP_REG_VSCP_MINOR_VERSION + 1)) &&
+    if ( reg == VSCP_REG_NODE_ERROR_COUNTER ) {
+       rv = vscp_errorcnt = 0;   // Anything written resets
+    }
+    else if ((reg >= (VSCP_REG_USERID0)) &&
             (reg < VSCP_REG_MANUFACTUR_ID0)) {
 
         // * * * User Client ID * * *

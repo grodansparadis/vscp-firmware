@@ -93,7 +93,7 @@ low end hardware device.
 // ******************************************************************************
 
 #define VSCP_MAJOR_VERSION		        1       // VSCP Major version
-#define VSCP_MINOR_VERSION              5       // VSCP Minor Version
+#define VSCP_MINOR_VERSION              6       // VSCP Minor Version
 
 #define VSCP_ADDRESS_MASTER             0x00
 #define VSCP_ADDRESS_FREE               0xff
@@ -148,6 +148,17 @@ low end hardware device.
 #define VSCP_PROBE_TIMEOUT              1000    // ms - one second
 #define VSCP_PROBE_TIMEOUT_COUNT        3       // Max # probe time-outs allowed
 
+// Two bytes used to indicate that persistent storage is
+// initialized. They are read with vscp_getControlByte which
+// for index = 0/1 should return 0x55/0xAA if the persistent
+// storage is initialized.
+
+#define VSCP_INITIALIZED_BYTE0_INDEX    0
+#define VSCP_INITIALIZED_BYTE1_INDEX    1
+
+#define VSCP_INITIALIZED_BYTE0_VALUE    0x55
+#define VSCP_INITIALIZED_BYTE1_VALUE    0xAA
+
 // ******************************************************************************
 //  			VSCP Register - Logical positions
 // ******************************************************************************
@@ -156,7 +167,7 @@ low end hardware device.
 #define VSCP_REG_VSCP_MAJOR_VERSION         0x81
 #define VSCP_REG_VSCP_MINOR_VERSION         0x82
 
-#define VSCP_REG_NODE_CONTROL               0x83
+#define VSCP_REG_NODE_ERROR_COUNTER         0x83
 
 #define VSCP_REG_USERID0                    0x84
 #define VSCP_REG_USERID1                    0x85
@@ -587,25 +598,20 @@ uint8_t vscp_readNicknamePermanent(void);
  */
 void vscp_writeNicknamePermanent(uint8_t nickname);
 
-/*! 
-    Fetch segment CRC from permanent storage
+/*!
+    Fetch control byte from permanent storage (idx=0/1)
  */
-uint8_t vscp_getSegmentCRC(void);
+uint8_t vscp_getControlByte( uint8_t idx );
 
 /*! 
-    Write segment CRC to permanent storage
+    Write control byte permanent storage (idx=0/1)
  */
-void vscp_setSegmentCRC(uint8_t crc);
+void vscp_setControlByte(uint8_t idx, uint8_t ctrl);
 
 /*!
-    Fetch control byte from permanent storage
+    Initialize persistent storage
  */
-uint8_t vscp_getControlByte(void);
-
-/*! 
-    Write control byte permanent storage
- */
-void vscp_setControlByte(uint8_t ctrl);
+void vscp_init_pstorage( void );
 
 /*! 
     Get page select bytes
