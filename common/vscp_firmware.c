@@ -167,8 +167,10 @@ void vscp_init(void)
 int8_t vscp_check_pstorage(void)
 {
     // Check if persistent storage is initialized.
-    if ( ( VSCP_INITIALIZED_BYTE0_VALUE == vscp_getControlByte( VSCP_INITIALIZED_BYTE0_INDEX ) ) &&
-           ( VSCP_INITIALIZED_BYTE1_VALUE == vscp_getControlByte( VSCP_INITIALIZED_BYTE1_INDEX ) ) ) {
+    if ( ( VSCP_INITIALIZED_BYTE0_VALUE == 
+                    vscp_getControlByte( VSCP_INITIALIZED_BYTE0_INDEX ) ) &&
+           ( VSCP_INITIALIZED_BYTE1_VALUE == 
+                    vscp_getControlByte( VSCP_INITIALIZED_BYTE1_INDEX ) ) ) {
         return TRUE;
     }
 
@@ -179,8 +181,10 @@ int8_t vscp_check_pstorage(void)
     vscp_writeNicknamePermanent( 0xff );
     
     // Mark persistent storage as initialized
-    vscp_setControlByte( VSCP_INITIALIZED_BYTE0_INDEX, VSCP_INITIALIZED_BYTE0_VALUE );
-    vscp_setControlByte( VSCP_INITIALIZED_BYTE1_INDEX, VSCP_INITIALIZED_BYTE1_VALUE );
+    vscp_setControlByte( VSCP_INITIALIZED_BYTE0_INDEX, 
+                            VSCP_INITIALIZED_BYTE0_VALUE );
+    vscp_setControlByte( VSCP_INITIALIZED_BYTE1_INDEX, 
+                            VSCP_INITIALIZED_BYTE1_VALUE );
     
     return FALSE;
 }
@@ -348,6 +352,8 @@ void vscp_handlePreActiveState(void)
     }
 }
 
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_goActiveState
 //
@@ -417,60 +423,62 @@ void vscp_handleSetNickname(void)
 
 void vscp_handleDropNickname(void)
 {
-	uint8_t bytes = vscp_imsg.flags & 0x0f;
+    uint8_t bytes = vscp_imsg.flags & 0x0f;
 
-	#ifdef DROP_NICKNAME_EXTENDED_FEATURES
-	uint8_t brake = 0;
-	#endif
-	
+    #ifdef DROP_NICKNAME_EXTENDED_FEATURES
+    uint8_t brake = 0;
+    #endif
+
     if ((bytes >= 1) && (vscp_nickname == vscp_imsg.data[ 0 ])) {
         // Yes, we are addressed
 
 #ifdef DROP_NICKNAME_EXTENDED_FEATURES
-		// Optional Byte 1: 
-		// bit7 - go idle do not start, bit6 - reset persistent storage
-		// bit5 - reset device but keep nickname
-		// bit5 and bit 7 are concurrent, here I give bit 5 higher priority
-		// Optional byte 2: time in seconds before restarting (makes only sense
-		// with either none of the bits or only bit 5 of byte1 set.
-		if (bytes >= 2) {  // byte 1 does exist
-			// bit 6 set: reset persistent storage, continue to check other
-			// options in byte 1
-			if (vscp_imsg.data[1] & (1<<6)) {
-				// reset persistent storage here
-				}
-			// bit 5 set: reset device, keep nickname, disregard other option
-			// below this by using 'brake'
-			if ((vscp_imsg.data[1] & (1<<5)) && (brake == 0)) {
-				vscp_hardreset();
-				brake = 1;}
+        // Optional Byte 1: 
+        // bit7 - go idle do not start, bit6 - reset persistent storage
+        // bit5 - reset device but keep nickname
+        // bit5 and bit 7 are concurrent, here I give bit 5 higher priority
+        // Optional byte 2: time in seconds before restarting (makes only sense
+        // with either none of the bits or only bit 5 of byte1 set.
+        if (bytes >= 2) {  // byte 1 does exist
+            // bit 6 set: reset persistent storage, continue to check other
+            // options in byte 1
+            if (vscp_imsg.data[1] & (1<<6)) {
+                // reset persistent storage here
+            }
+            // bit 5 set: reset device, keep nickname, disregard other option
+            // below this by using 'brake'
+            if ((vscp_imsg.data[1] & (1<<5)) && (brake == 0)) {
+                vscp_hardreset();
+                brake = 1;
+            }
 
-			// bit 7 set: go idle, e.g. stay in an endless loop until re-power
-			if ((vscp_imsg.data[1] & (1<<7)) && (brake == 0)) { 
-				vscp_nickname = VSCP_ADDRESS_FREE;
-				vscp_writeNicknamePermanent(VSCP_ADDRESS_FREE);
-				for (;;) {}; // wait forever
-				}
-			}
+            // bit 7 set: go idle, e.g. stay in an endless loop until re-power
+            if ((vscp_imsg.data[1] & (1<<7)) && (brake == 0)) { 
+                vscp_nickname = VSCP_ADDRESS_FREE;
+                vscp_writeNicknamePermanent(VSCP_ADDRESS_FREE);
+                for (;;) {}; // wait forever
+            }
+        }
 #endif
-		// none of the options from byte 1 have been used or byte 1 itself
-		// has not been transmitted at all
-		if ((bytes == 1) || ((bytes > 1) && (vscp_imsg.data[1] == 0))) {
-			// this is the regular behaviour without using byte 1 options
-			vscp_nickname = VSCP_ADDRESS_FREE;
-			vscp_writeNicknamePermanent(VSCP_ADDRESS_FREE);
-	        vscp_init();
-			}
+        // none of the options from byte 1 have been used or byte 1 itself
+        // has not been transmitted at all
+        if ((bytes == 1) || ((bytes > 1) && (vscp_imsg.data[1] == 0))) {
+            // this is the regular behaviour without using byte 1 options
+            vscp_nickname = VSCP_ADDRESS_FREE;
+            vscp_writeNicknamePermanent(VSCP_ADDRESS_FREE);
+            vscp_init();
+        }
 #ifdef DROP_NICKNAME_EXTENDED_FEATURES
-		// now check if timing was passed in byte 2
-		if (bytes > 2) {
-			// and waiting for options that made sense
-			if ( (vscp_imsg.data[1] == 0) || ( vscp_imsg.data[1] & (1<<6)) ||
-			( vscp_imsg.data[1] & (1<<5)) ) {
-				// wait platform independently
-				vscp_wait_s(vscp_imsg.data[2]);
-				}
-		}
+        // now check if timing was passed in byte 2
+        if (bytes > 2) {
+            // and waiting for options that made sense
+            if ( (vscp_imsg.data[1] == 0) || 
+                    ( vscp_imsg.data[1] & (1<<6)) ||
+                    ( vscp_imsg.data[1] & (1<<5)) ) {
+                // wait platform independently
+                vscp_wait_s(vscp_imsg.data[2]);
+            }
+        }
 #endif
     }
 }
@@ -749,22 +757,22 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value)
         }
     }
 #endif	
-	else if ( VSCP_REG_DEFAULT_CONFIG_RESTORE == reg ) {
-		if ( 0x55 == value ) {
-			vscp_configtimer = 0;
-			rv = 0x55;
-		}
-		else if ( 0xaa == value ) {
-			if ( vscp_configtimer < 1000 ) {
-				vscp_restoreDefaults();
-				rv = 0xaa;	
-			}
-			else {
-				rv = 0;	// false		
-			}
-		}
-			
-	}
+    else if ( VSCP_REG_DEFAULT_CONFIG_RESTORE == reg ) {
+        if ( 0x55 == value ) {
+            vscp_configtimer = 0;
+            rv = 0x55;
+        }
+        else if ( 0xaa == value ) {
+            if ( vscp_configtimer < 1000 ) {
+                vscp_restoreDefaults();
+                rv = 0xaa;	
+            }
+            else {
+                rv = 0;	// false		
+            }
+        }
+
+    }
     else {
         // return complement to indicate error
         rv = ~value;
@@ -1153,62 +1161,62 @@ void vscp_handleProtocolEvent(void)
                     if (bytes == 0) bytes = 256;
                     // insane range checking
                     if (bytes > 256) bytes = 256;
-				}
-				else {
-					bytes = 1;
-				}
+                }
+                else {
+                    bytes = 1;
+                }
 
-				// Save the current page
-				page_save = vscp_page_select;
+                // Save the current page
+                page_save = vscp_page_select;
 
-				// Assign the requested page, this variable is used in the implementation
-				// specific function 'vscp_readAppReg()' and 'vscp_writeAppReg()' to actually
-				// switch pages there
-				vscp_page_select = ((vscp_imsg.data[1] << 8) | vscp_imsg.data[2]);
+                // Assign the requested page, this variable is used in the implementation
+                // specific function 'vscp_readAppReg()' and 'vscp_writeAppReg()' to actually
+                // switch pages there
+                vscp_page_select = ((vscp_imsg.data[1] << 8) | vscp_imsg.data[2]);
 
-				// Construct response event
-				vscp_omsg.priority = VSCP_PRIORITY_LOW;
-				vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
-				vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
-				vscp_omsg.data[0] = 0; // index of event, this is the first
-				vscp_omsg.data[1] = vscp_imsg.data[1]; // mirror page msb
-				vscp_omsg.data[2] = vscp_imsg.data[2]; // mirror page lsb
+                // Construct response event
+                vscp_omsg.priority = VSCP_PRIORITY_LOW;
+                vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+                vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
+                vscp_omsg.data[0] = 0; // index of event, this is the first
+                vscp_omsg.data[1] = vscp_imsg.data[1]; // mirror page msb
+                vscp_omsg.data[2] = vscp_imsg.data[2]; // mirror page lsb
 
-				do {
+                do {
                     // calculate bytes to transfer in this event
                     if ( ( bytes - byte ) >= 4 ) {
                         bytes_this_time = 4;
-					} 
-					else {
-						bytes_this_time = (bytes - byte);
-					}
+                    } 
+                    else {
+                        bytes_this_time = (bytes - byte);
+                    }
 
-					// define length of this event
-					vscp_omsg.flags = VSCP_VALID_MSG + 4 + bytes_this_time;
-					vscp_omsg.data[3] =
+                    // define length of this event
+                    vscp_omsg.flags = VSCP_VALID_MSG + 4 + bytes_this_time;
+                    vscp_omsg.data[3] =
                     vscp_imsg.data[3] + byte; // first register in this event
 
-					// Put up to four registers to data space
-					for ( cb = 0; cb < bytes_this_time; cb++ ) {
+                    // Put up to four registers to data space
+                    for ( cb = 0; cb < bytes_this_time; cb++ ) {
                         vscp_omsg.data[ (4 + cb) ] =
-							vscp_readRegister( ( vscp_imsg.data[3] + byte + cb ) );
-					}
+                        vscp_readRegister( ( vscp_imsg.data[3] + byte + cb ) );
+                    }
 
-					// send the event
-					vscp_sendEvent();
+                    // send the event
+                    vscp_sendEvent();
 
-					// increment byte by bytes_this_time and the event number by one
-					byte += bytes_this_time;
+                    // increment byte by bytes_this_time and the event number by one
+                    byte += bytes_this_time;
 
-					// increment the index
-					vscp_omsg.data[0] += 1;
-						
-				} while (byte < bytes);
+                    // increment the index
+                    vscp_omsg.data[0] += 1;
 
-				// Restore the saved page
-				vscp_page_select = page_save;
+                } while (byte < bytes);
 
-			}
+                // Restore the saved page
+                vscp_page_select = page_save;
+
+            }
             break;
 
         case VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_WRITE:
