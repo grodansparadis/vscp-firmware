@@ -27,6 +27,10 @@
  * ******************************************************************************
 */
 
+/*
+    Include in vscp_project.h if your project does not have inttypes.h
+*/
+
 #ifndef	_MACHTYPES_H_
 #define	_MACHTYPES_H_
 
