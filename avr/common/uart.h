@@ -95,3 +95,4 @@
 // Prototypes
 void uart_putchar( char ch );
 void uart_puts( char * sz );
+void uart_puthex_byte( const unsigned char  b );

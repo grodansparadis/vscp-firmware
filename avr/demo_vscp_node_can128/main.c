@@ -6,7 +6,7 @@
  * 	akhe@eurosource.se / akhe@grodansparadis.com
  *
  *  Copyright (C) 2006-2011 Ake Hedman, eurosource
- *  Copyright (C) 2011-2015 Ake Hedman, Grodans Paradis AB
+ *  Copyright (C) 2011-2016 Ake Hedman, Grodans Paradis AB
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
  *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
- *    in a product, an acknowledgement in the product documentation would be
+ *    in a product, an acknowledgment in the product documentation would be
  *    appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
  *    misrepresented as being the original software.
@@ -35,7 +35,7 @@
 		=======================
 
 		PORTB Pin 0 - Status LED
-		PORTA Pin 0 - Init button
+		PORTA Pin 0 - Init. button
 */
 
 /* ts 09/03/2009:
@@ -118,10 +118,10 @@ const uint8_t vscp_deviceURL[]  = "eurosource.se/avr128_02.xml";
 // offset 1 - Manufacturer device id 1
 // offset 2 - Manufacturer device id 2
 // offset 3 - Manufacturer device id 3
-// offset 4 - Manufacturer subdevice id 0
-// offset 5 - Manufacturer subdevice id 1
-// offset 6 - Manufacturer subdevice id 2
-// offset 7 - Manufacturer subdevice id 3
+// offset 4 - Manufacturer sub device id 0
+// offset 5 - Manufacturer sub device id 1
+// offset 6 - Manufacturer sub device id 2
+// offset 7 - Manufacturer sub device id 3
 const uint8_t vscp_manufacturer_id[8] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
@@ -141,7 +141,7 @@ static void doWork();
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Timer 0 Compare interupt
+// Timer 0 Compare interrupt
 //
 // We should come to this point once every millisecond
 //
@@ -1057,25 +1057,6 @@ void vscp_setSegmentCRC( uint8_t crc )
     writeEEPROM( VSCP_EEPROM_SEGMENT_CRC, crc );
 }
 
-///////////////////////////////////////////////////////////////////////////////
-//  vscp_setControlByte
-//
-
-void vscp_setControlByte( uint8_t ctrl )
-{
-    writeEEPROM( VSCP_EEPROM_CONTROL, ctrl );
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-//  vscp_getControlByte
-//
-
-uint8_t vscp_getControlByte( void )
-{
-    return readEEPROM( VSCP_EEPROM_CONTROL );
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //  vscp_getFamilyCode
@@ -1094,11 +1075,47 @@ uint32_t vscp_getFamilyType(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//  vscp_getControlByte
+//
+// Fetch control byte from permanent storage (idx=0/1)
+//
+
+uint8_t vscp_getControlByte( uint8_t idx )
+{
+	if ( idx <= 1 ) {
+	    readEEPROM( VSCP_EEPROM_CONTROL0 + idx );	                    
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//  vscp_setControlByte
+// 
+// Write control byte permanent storage (idx=0/1)
+//
+
+void vscp_setControlByte(uint8_t idx, uint8_t ctrl)
+{
+	if ( idx <= 1 ) {
+		writeEEPROM( VSCP_EEPROM_CONTROL0 + idx, ctrl );			
+	}
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 //  vscp_restoreDefaults
 //
 void vscp_restoreDefaults(void)
 {
 // to do
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//  vscp_init_pstorage
+//
+
+void vscp_init_pstorage( void )
+{
+    init_app_eeprom();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
