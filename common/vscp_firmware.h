@@ -104,7 +104,7 @@
 
 #define VSCP_BOOT_FLAG                  0xff    // Boot flag is stored in persistent storage
                                                 // and if it is there the boot loader will be
-                                                // activated.
+                                                // activated. All other vales start app.
 
 // Bootloaders
 #define VSCP_BOOTLOADER_VSCP            0x00    // VSCP boot loader algorithm
