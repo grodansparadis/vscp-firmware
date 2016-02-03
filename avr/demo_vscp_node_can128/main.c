@@ -153,7 +153,7 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
 	measurement_clock++;
 	can_resend_timer++;
 
-	// Check for init button
+	// Check for init. button
 	if ( BTN_INIT_PRESSED ) {
 		// Active
 		vscp_initbtncnt++;
@@ -397,7 +397,7 @@ int main( void )
                 vscp_handleProbeState();
                 break;
 
-            case VSCP_STATE_PREACTIVE:      // Waiting for host initialisation
+            case VSCP_STATE_PREACTIVE:      // Waiting for host initialization
                 vscp_goActiveState();					
                 break;
 

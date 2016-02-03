@@ -39,24 +39,24 @@
 
 
 /*!
-        \file vscp_firmware.h
-        \brief VSCP firmware stack
+    \file vscp_firmware.h
+    \brief VSCP firmware stack
 
-This file contains the firmware needed to implement VSCP in a 
-low end hardware device.
+    This file contains the firmware needed to implement VSCP in a 
+    low end hardware device.
 
- Notes about defines
- -------------------
+    Notes about defines
+    -------------------
 
- Normally make the following defines in the vscp_projdefs.h file
+    Normally make the following defines in the vscp_projdefs.h file
 
- ENABLE_WRITE_2PROTECTED_LOCATIONS
- =================================
- to make it possible to write GUID, 
+    ENABLE_WRITE_2PROTECTED_LOCATIONS
+    =================================
+    to make it possible to write GUID, 
                         manufacturer id,
                         manufacturer sub device id
- page_low (0x92) and page_high (0x93) should both contain 0xff
- NOTE the storage must be in EEPROM also for it to work.
+    page_low (0x92) and page_high (0x93) should both contain 0xff
+    NOTE the storage must be in EEPROM also for it to work.
 
  */
 
@@ -92,7 +92,7 @@ low end hardware device.
 //  				VSCP Constants
 // ******************************************************************************
 
-#define VSCP_MAJOR_VERSION		        1       // VSCP Major version
+#define VSCP_MAJOR_VERSION              1       // VSCP Major version
 #define VSCP_MINOR_VERSION              6       // VSCP Minor Version
 
 #define VSCP_ADDRESS_MASTER             0x00
@@ -107,30 +107,30 @@ low end hardware device.
                                                 // activated.
 
 // Bootloaders
-#define VSCP_BOOTLOADER_VSCP            0x00	// VSCP boot loader algorithm
-#define VSCP_BOOTLOADER_PIC1            0x01	// PIC algorithm 0
-#define VSCP_BOOTLOADER_AVR1            0x10	// AVR algorithm 0
-#define VSCP_BOOTLOADER_LPC1            0x20	// NXP/Philips LPC algorithm 0
+#define VSCP_BOOTLOADER_VSCP            0x00    // VSCP boot loader algorithm
+#define VSCP_BOOTLOADER_PIC1            0x01    // PIC algorithm 0
+#define VSCP_BOOTLOADER_AVR1            0x10    // AVR algorithm 0
+#define VSCP_BOOTLOADER_LPC1            0x20    // NXP/Philips LPC algorithm 0
 #define VSCP_BOOTLOADER_NXP1            0x20
-#define VSCP_BOOTLOADER_ST              0x30	// ST STR algorithm 0
+#define VSCP_BOOTLOADER_ST              0x30    // ST STR algorithm 0
 #define VSCP_BOOTLOADER_NONE            0xff
 
 #define  VSCP_LEVEL1_COMMON_REGISTER_START 0x80
 
 // State machine states 
-#define VSCP_STATE_STARTUP              0x00	// Cold/warm reset
-#define VSCP_STATE_INIT                 0x01	// Assigning nickname
-#define VSCP_STATE_PREACTIVE            0x02	// Waiting for host initialization
-#define VSCP_STATE_ACTIVE               0x03	// The normal state
-#define VSCP_STATE_ERROR                0x04	// error state. Big problems.
+#define VSCP_STATE_STARTUP              0x00    // Cold/warm reset
+#define VSCP_STATE_INIT                 0x01    // Assigning nickname
+#define VSCP_STATE_PREACTIVE            0x02    // Waiting for host initialization
+#define VSCP_STATE_ACTIVE               0x03    // The normal state
+#define VSCP_STATE_ERROR                0x04    // error state. Big problems.
 
 // State machine sub states 
-#define VSCP_SUBSTATE_NONE              0x00	// No state
-#define VSCP_SUBSTATE_INIT_PROBE_SENT   0x01	// probe sent
-#define VSCP_SUBSTATE_INIT_PROBE_ACK    0x02	// probe ACK received
+#define VSCP_SUBSTATE_NONE              0x00    // No state
+#define VSCP_SUBSTATE_INIT_PROBE_SENT   0x01    // probe sent
+#define VSCP_SUBSTATE_INIT_PROBE_ACK    0x02    // probe ACK received
 
 // Helper consts and 
-#define VSCP_VALID_MSG                  0x80	// Bit 7 set in flags
+#define VSCP_VALID_MSG                  0x80    // Bit 7 set in flags
 
 #define VSCP_PRIORITY7                  0x00
 #define VSCP_PRIORITY_HIGH              0x00
@@ -153,11 +153,11 @@ low end hardware device.
 // for index = 0/1 should return 0x55/0xAA if the persistent
 // storage is initialized.
 
-#define VSCP_INITIALIZED_BYTE0_INDEX    0
-#define VSCP_INITIALIZED_BYTE1_INDEX    1
+#define VSCP_INITIALIZED_BYTE0_INDEX        0
+#define VSCP_INITIALIZED_BYTE1_INDEX        1
 
-#define VSCP_INITIALIZED_BYTE0_VALUE    0x55
-#define VSCP_INITIALIZED_BYTE1_VALUE    0xAA
+#define VSCP_INITIALIZED_BYTE0_VALUE        0x55
+#define VSCP_INITIALIZED_BYTE1_VALUE        0xAA
 
 // ******************************************************************************
 //  			VSCP Register - Logical positions
@@ -190,8 +190,8 @@ low end hardware device.
 #define VSCP_REG_PAGE_SELECT_MSB            0x92
 #define VSCP_REG_PAGE_SELECT_LSB            0x93
 
-#define VSCP_REG_FIRMWARE_MAJOR_VERSION		0x94
-#define VSCP_REG_FIRMWARE_MINOR_VERSION		0x95
+#define VSCP_REG_FIRMWARE_MAJOR_VERSION     0x94
+#define VSCP_REG_FIRMWARE_MINOR_VERSION     0x95
 #define VSCP_REG_FIRMWARE_SUB_MINOR_VERSION	0x96
 
 #define VSCP_REG_BOOT_LOADER_ALGORITHM      0x97
@@ -291,22 +291,22 @@ struct _omsg {
         Action = 0 is always NOOP, "no operation".
  */
 
-#define VSCP_DM_POS_OADDR			      	0
-#define VSCP_DM_POS_FLAGS			      	1
-#define VSCP_DM_POS_CLASSMASK		   		2
-#define VSCP_DM_POS_CLASSFILTER		  		3
+#define VSCP_DM_POS_OADDR                   0
+#define VSCP_DM_POS_FLAGS                   1
+#define VSCP_DM_POS_CLASSMASK               2
+#define VSCP_DM_POS_CLASSFILTER             3
 #define VSCP_DM_POS_TYPEMASK                4
-#define VSCP_DM_POS_TYPEFILTER		  		5
-#define VSCP_DM_POS_ACTION			    	6
-#define VSCP_DM_POS_ACTIONPARAM		  		7
+#define VSCP_DM_POS_TYPEFILTER              5
+#define VSCP_DM_POS_ACTION                  6
+#define VSCP_DM_POS_ACTIONPARAM             7
 
 #define VSCP_DM_FLAG_ENABLED                0x80
-#define VSCP_DM_FLAG_CHECK_OADDR	  		0x40
-#define VSCP_DM_FLAG_HARDCODED		  		0x20
-#define VSCP_DM_FLAG_CHECK_ZONE		  		0x10
-#define VSCP_DM_FLAG_CHECK_SUBZONE			0x08
-#define VSCP_DM_FLAG_CLASS_MASK		  		0x02
-#define VSCP_DM_FLAG_CLASS_FILTER	  		0x01
+#define VSCP_DM_FLAG_CHECK_OADDR            0x40
+#define VSCP_DM_FLAG_HARDCODED              0x20
+#define VSCP_DM_FLAG_CHECK_ZONE             0x10
+#define VSCP_DM_FLAG_CHECK_SUBZONE          0x08
+#define VSCP_DM_FLAG_CLASS_MASK             0x02
+#define VSCP_DM_FLAG_CLASS_FILTER           0x01
 
 /*!
     \struct _dmrow
@@ -350,7 +350,7 @@ extern const uint8_t vscp_deviceURL[];      //  GUID
 /*!
     \fn vscp_init
     Init the VSCP firmware.
-	
+
     Call this before entering the main loop.
  */
 void vscp_init(void);
@@ -363,7 +363,7 @@ void vscp_error(void);
 
 /*!
     Handle nickname probing
-	
+
     This routine should be called periodically while
     in state VSCP_STATE_INIT
  */
@@ -371,7 +371,7 @@ void vscp_handleProbeState(void);
 
 /*!
     Handle the pre active state
-	
+
     This state is entered if a nod with nickname=0 answers the
     probe.Zero is reserved for a segment controller and if it
     is available and acknowledge this way that it is the node should
@@ -384,14 +384,14 @@ void vscp_handlePreActiveState(void);
 
 /*!
     Handle incoming CLASS1.PROTOCOL event
-	
+
     The event should be in the vscp_imsg buffer on entry.
  */
 void vscp_handleProtocolEvent(void);
 
 /*!
     Go to the active state
-	
+
     This mean the node sends new node on-line and informs other nodes
     about its acquired nickname.
  */
@@ -459,7 +459,7 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value);
 
 /*!
     Do One second work
-	
+
     This routine should be called once a second by the
     application.
  */
@@ -704,9 +704,9 @@ uint32_t vscp_getFamilyType(void);
 void vscp_restoreDefaults(void);
 
 #ifdef DROP_NICKNAME_EXTENDED_FEATURES
-	void vscp_hardreset(void);              // Do a hard reset of the device
-	void vscp_wait_ms(uint16_t ms);         // Wait for milliseconds
-	void vscp_wait_s(uint16_t sec);         // Wait for seconds
+    void vscp_hardreset(void);              // Do a hard reset of the device
+    void vscp_wait_ms(uint16_t ms);         // Wait for milliseconds
+    void vscp_wait_s(uint16_t sec);         // Wait for seconds
 #endif
 
 #endif
