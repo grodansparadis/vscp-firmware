@@ -131,3 +131,65 @@ void uart_puthex_nibble(const unsigned char b)
 	}
 	uart_putc(c);
 } /* uart_puthex_nibble */
+
+
+/*************************************************************************
+Function: uart_sendChar( char data )
+Purpose:  Send a character
+Input:    byte value
+Returns:  none
+**************************************************************************/
+void uart_sendChar ( char data )
+{
+    int i = 0;
+    // to send data with the usart put the data in the usart data register
+    UDR0 = data;
+    
+    // check to see if the global interrupts are enabled
+    if (SREG & 0x80)
+    {
+        // wait until the byte is sent or we count out
+        while ( !(UCSR0A&0x40) && (i<10000) )
+        {
+            asm ("nop");
+            i++;
+        }
+    }
+    else
+    // wait until the byte is sent
+    while ( !(UCSR0A&0x40) );
+    
+    // clear the TXCflag
+    UCSR0A=(UCSR0A|0x40);
+}
+
+/*************************************************************************
+Function: uart_sendCharHex( char data )
+Purpose:  Output HEX value
+Input:    byte value
+Returns:  none
+**************************************************************************/
+void uart_sendCharHex (char data)
+{
+    // sends out a byte in its HEX-notation
+    unsigned char dataC = 0;
+    dataC = data; //backup
+    
+    data = (data >> 4);
+    data = (data & 0x0F);
+    if ((data >= 0) && (data <= 9)) uart_sendChar(data+0x30);
+    else {
+        uart_sendChar(data+0x37);
+    }    
+
+    data = (dataC & 0x0F); //start from the backup
+    if ((data >= 0) && (data <= 9)) uart_sendChar(data+0x30);
+    else {
+        uart_sendChar(data+0x37);
+    }        
+    
+    uart_sendChar (' ');
+
+    
+}
+
