@@ -32,6 +32,9 @@ Thumbs.db
 *.hxl
 *.cmf
 
+*.c~
+*.h~
+
 /avr/demo_vscp_node_can128/Debug
 /avr/demo_vscp_node_can128/bin
 /avr/demo_vscp_node_can128/demo_vscp_node_can128
