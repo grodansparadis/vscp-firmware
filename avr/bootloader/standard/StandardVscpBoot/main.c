@@ -80,12 +80,12 @@ int main( void )
     if ( 0 == vscpboot_readInitButton()  )  {
         vscpboot_setBootFlag( VSCPBOOT_FLAG_BOOT );
         vscpboot_setNickname( VSCPBOOT_NICKNAME_BOOT );
-        vscpboot_bootloader();   // Will not return    
+        vscpboot_loader();   // Will not return    
     }
 
     if ( vscpboot_getBootFlag() ) {
         // We should enter bootloader
-        vscpboot_bootloader();   // Will not return
+        vscpboot_loader();   // Will not return
     }
     else {
         // We should start application code

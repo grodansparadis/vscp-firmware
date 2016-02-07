@@ -82,7 +82,7 @@ void vscpboot_loader( void )
                 e.priority = VSCP_PRIORITY_NORMAL;
                 e.vscp_class = VSCP_CLASS1_PROTOCOL;
                 e.vscp_type = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
-                e.data[ 0 ] = vscp_nickname;
+                e.data[ 0 ] = vscpboot_nickname;
                 vscpboot_sendEvent( &e );
                 
                 vscpboot_timer = 0;
@@ -195,7 +195,7 @@ ENTER_BOOT_MODE:
                                                  
                             if ( vscpboot_sendEvent( &e ) ) {	// ACK program block request
                                 memset( blockdata, 0xFF, sizeof( blockdata ) );
-                                state = STATE_BLOCKDATA
+                                state = STATE_BLOCKDATA;
                             }
                              
                         }                                                                            

@@ -142,10 +142,6 @@
       <SubType>compile</SubType>
       <Link>vscp_firmware.h</Link>
     </Compile>
-    <Compile Include="..\..\..\common\can_at90can128.h">
-      <SubType>compile</SubType>
-      <Link>can_at90can128.h</Link>
-    </Compile>
     <Compile Include="..\..\..\common\uart.c">
       <SubType>compile</SubType>
       <Link>uart.c</Link>
@@ -158,6 +154,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="can_at90can128.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="can_at90can128.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="crc.c">
@@ -185,9 +184,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="vscp_projdefs.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="vscp_registers.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="vscp_type.h">

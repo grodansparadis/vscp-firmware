@@ -79,13 +79,13 @@ low end hardware device.
 #define construct_signed32( b0, b1, b2, b3 )  ((int32_t)( (((uint32_t)b0)<<24) + \
                                                             (((uint32_t)b0)<<16) + \
                                                             (((uint32_t)b0)<<8) + \
-                                                            ((uint32_t)b0)
+                                                            (uint32_t)b0 ) )
 
 // This macro construct a unsigned long from four unsigned chars in a safe way
 #define construct_unsigned32( b0, b1, b2, b3 )  ((uint32_t)( (((uint32_t)b0)<<24) + \
                                                             (((uint32_t)b0)<<16) + \
                                                             (((uint32_t)b0)<<8) + \
-                                                            ((uint32_t)b0)
+                                                            (uint32_t)b0 ) )
 
 
 // ******************************************************************************
