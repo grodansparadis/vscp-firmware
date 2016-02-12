@@ -39,24 +39,24 @@
 
 
 /*!
-    \file vscp_firmware.h
-    \brief VSCP firmware stack
+        \file vscp_firmware.h
+        \brief VSCP firmware stack
 
-    This file contains the firmware needed to implement VSCP in a 
-    low end hardware device.
+This file contains the firmware needed to implement VSCP in a 
+low end hardware device.
 
-    Notes about defines
-    -------------------
+ Notes about defines
+ -------------------
 
-    Normally make the following defines in the vscp_projdefs.h file
+ Normally make the following defines in the vscp_projdefs.h file
 
-    ENABLE_WRITE_2PROTECTED_LOCATIONS
-    =================================
-    to make it possible to write GUID, 
+ ENABLE_WRITE_2PROTECTED_LOCATIONS
+ =================================
+ to make it possible to write GUID, 
                         manufacturer id,
                         manufacturer sub device id
-    page_low (0x92) and page_high (0x93) should both contain 0xff
-    NOTE the storage must be in EEPROM also for it to work.
+ page_low (0x92) and page_high (0x93) should both contain 0xff
+ NOTE the storage must be in EEPROM also for it to work.
 
  */
 
@@ -79,20 +79,20 @@
 #define construct_signed32( b0, b1, b2, b3 )  ((int32_t)( (((uint32_t)b0)<<24) + \
                                                             (((uint32_t)b0)<<16) + \
                                                             (((uint32_t)b0)<<8) + \
-                                                            ((uint32_t)b0);
+                                                            (uint32_t)b0 ) )
 
 // This macro construct a unsigned long from four unsigned chars in a safe way
 #define construct_unsigned32( b0, b1, b2, b3 )  ((uint32_t)( (((uint32_t)b0)<<24) + \
                                                             (((uint32_t)b0)<<16) + \
                                                             (((uint32_t)b0)<<8) + \
-                                                            ((uint32_t)b0);
+                                                            (uint32_t)b0 ) )
 
 
 // ******************************************************************************
 //  				VSCP Constants
 // ******************************************************************************
 
-#define VSCP_MAJOR_VERSION              1       // VSCP Major version
+#define VSCP_MAJOR_VERSION		        1       // VSCP Major version
 #define VSCP_MINOR_VERSION              6       // VSCP Minor Version
 
 #define VSCP_ADDRESS_MASTER             0x00
@@ -104,33 +104,33 @@
 
 #define VSCP_BOOT_FLAG                  0xff    // Boot flag is stored in persistent storage
                                                 // and if it is there the boot loader will be
-                                                // activated. All other vales start app.
+                                                // activated.
 
 // Bootloaders
-#define VSCP_BOOTLOADER_VSCP            0x00    // VSCP boot loader algorithm
-#define VSCP_BOOTLOADER_PIC1            0x01    // PIC algorithm 0
-#define VSCP_BOOTLOADER_AVR1            0x10    // AVR algorithm 0
-#define VSCP_BOOTLOADER_LPC1            0x20    // NXP/Philips LPC algorithm 0
+#define VSCP_BOOTLOADER_VSCP            0x00	// VSCP boot loader algorithm
+#define VSCP_BOOTLOADER_PIC1            0x01	// PIC algorithm 0
+#define VSCP_BOOTLOADER_AVR1            0x10	// AVR algorithm 0
+#define VSCP_BOOTLOADER_LPC1            0x20	// NXP/Philips LPC algorithm 0
 #define VSCP_BOOTLOADER_NXP1            0x20
-#define VSCP_BOOTLOADER_ST              0x30    // ST STR algorithm 0
+#define VSCP_BOOTLOADER_ST              0x30	// ST STR algorithm 0
 #define VSCP_BOOTLOADER_NONE            0xff
 
 #define  VSCP_LEVEL1_COMMON_REGISTER_START 0x80
 
 // State machine states 
-#define VSCP_STATE_STARTUP              0x00    // Cold/warm reset
-#define VSCP_STATE_INIT                 0x01    // Assigning nickname
-#define VSCP_STATE_PREACTIVE            0x02    // Waiting for host initialization
-#define VSCP_STATE_ACTIVE               0x03    // The normal state
-#define VSCP_STATE_ERROR                0x04    // error state. Big problems.
+#define VSCP_STATE_STARTUP              0x00	// Cold/warm reset
+#define VSCP_STATE_INIT                 0x01	// Assigning nickname
+#define VSCP_STATE_PREACTIVE            0x02	// Waiting for host initialization
+#define VSCP_STATE_ACTIVE               0x03	// The normal state
+#define VSCP_STATE_ERROR                0x04	// error state. Big problems.
 
 // State machine sub states 
-#define VSCP_SUBSTATE_NONE              0x00    // No state
-#define VSCP_SUBSTATE_INIT_PROBE_SENT   0x01    // probe sent
-#define VSCP_SUBSTATE_INIT_PROBE_ACK    0x02    // probe ACK received
+#define VSCP_SUBSTATE_NONE              0x00	// No state
+#define VSCP_SUBSTATE_INIT_PROBE_SENT   0x01	// probe sent
+#define VSCP_SUBSTATE_INIT_PROBE_ACK    0x02	// probe ACK received
 
 // Helper consts and 
-#define VSCP_VALID_MSG                  0x80    // Bit 7 set in flags
+#define VSCP_VALID_MSG                  0x80	// Bit 7 set in flags
 
 #define VSCP_PRIORITY7                  0x00
 #define VSCP_PRIORITY_HIGH              0x00
@@ -153,11 +153,11 @@
 // for index = 0/1 should return 0x55/0xAA if the persistent
 // storage is initialized.
 
-#define VSCP_INITIALIZED_BYTE0_INDEX        0
-#define VSCP_INITIALIZED_BYTE1_INDEX        1
+#define VSCP_INITIALIZED_BYTE0_INDEX    0
+#define VSCP_INITIALIZED_BYTE1_INDEX    1
 
-#define VSCP_INITIALIZED_BYTE0_VALUE        0x55
-#define VSCP_INITIALIZED_BYTE1_VALUE        0xAA
+#define VSCP_INITIALIZED_BYTE0_VALUE    0x55
+#define VSCP_INITIALIZED_BYTE1_VALUE    0xAA
 
 // ******************************************************************************
 //  			VSCP Register - Logical positions
@@ -190,8 +190,8 @@
 #define VSCP_REG_PAGE_SELECT_MSB            0x92
 #define VSCP_REG_PAGE_SELECT_LSB            0x93
 
-#define VSCP_REG_FIRMWARE_MAJOR_VERSION     0x94
-#define VSCP_REG_FIRMWARE_MINOR_VERSION     0x95
+#define VSCP_REG_FIRMWARE_MAJOR_VERSION		0x94
+#define VSCP_REG_FIRMWARE_MINOR_VERSION		0x95
 #define VSCP_REG_FIRMWARE_SUB_MINOR_VERSION	0x96
 
 #define VSCP_REG_BOOT_LOADER_ALGORITHM      0x97
@@ -214,17 +214,12 @@
 #define VSCP_LED_ON                         0x01
 #define VSCP_LED_BLINK1                     0x02
 
-/*!
-    \struct _imsg
-    Input event
-    This is an event fetched either directly from a
-    transport layer or from a fifo.
-*/
-struct _imsg {
+
+typedef struct vscpevent_t {
     /*!
         Input message flags\n
         ==================\n
-        Bit 7 - Set if message valid\n
+        Bit 7 - Set if message valid./Set if message should be sent (cleared when sent)\n
         Bit 6 - Reserved\n
         Bit 5 - Hard coded (will never be set)\n
         Bit 3 - Number of data bytes MSB\n
@@ -239,34 +234,18 @@ struct _imsg {
     uint8_t vscp_type;      // VSCP type
     uint8_t oaddr;          // Packet originating address
     uint8_t data[8];        // data bytes
-};
+} vscpevent;
 
-/*!
-    \struct _omsg
-    Output Event
-    This is an event that will be sent out. Either directly or
-    put in a fifo.
- */
-struct _omsg {
-    /*!
-        Output message flags ( Message to send )\n
-        ========================================
-        Bit 7 - Set if message should be sent (cleared when sent)\n
-        Bit 6 - Reserved\n
-        Bit 5 - Reserved\n
-        Bit 2 - Number of data bytes MSB\n
-        Bit 2 - Number of data bytes \n
-        Bit 1 - Number of data bytes\n
-        Bit 0 - Number of data bytes LSB\n
-     */
-    uint8_t flags;          // Output message flags
 
-    uint8_t priority;       // Priority for the message 0-7
-    uint16_t vscp_class;    // VSCP class
-    uint8_t vscp_type;      // VSCP type
-    /// Originating address is always *this* node
-    uint8_t data[8];        // data bytes
-};
+//////////////////////////////////////////////////////////
+//                  Deprecated
+// imsg and omsg has been deprecated and is replaced by 
+// vscpmsg from version 1.6.0
+//////////////////////////////////////////////////////////
+
+    
+    
+
 
 /*!
         Decision Matrix - definitions
@@ -291,22 +270,22 @@ struct _omsg {
         Action = 0 is always NOOP, "no operation".
  */
 
-#define VSCP_DM_POS_OADDR                   0
-#define VSCP_DM_POS_FLAGS                   1
-#define VSCP_DM_POS_CLASSMASK               2
-#define VSCP_DM_POS_CLASSFILTER             3
+#define VSCP_DM_POS_OADDR			      	0
+#define VSCP_DM_POS_FLAGS			      	1
+#define VSCP_DM_POS_CLASSMASK		   		2
+#define VSCP_DM_POS_CLASSFILTER		  		3
 #define VSCP_DM_POS_TYPEMASK                4
-#define VSCP_DM_POS_TYPEFILTER              5
-#define VSCP_DM_POS_ACTION                  6
-#define VSCP_DM_POS_ACTIONPARAM             7
+#define VSCP_DM_POS_TYPEFILTER		  		5
+#define VSCP_DM_POS_ACTION			    	6
+#define VSCP_DM_POS_ACTIONPARAM		  		7
 
 #define VSCP_DM_FLAG_ENABLED                0x80
-#define VSCP_DM_FLAG_CHECK_OADDR            0x40
-#define VSCP_DM_FLAG_HARDCODED              0x20
-#define VSCP_DM_FLAG_CHECK_ZONE             0x10
-#define VSCP_DM_FLAG_CHECK_SUBZONE          0x08
-#define VSCP_DM_FLAG_CLASS_MASK             0x02
-#define VSCP_DM_FLAG_CLASS_FILTER           0x01
+#define VSCP_DM_FLAG_CHECK_OADDR	  		0x40
+#define VSCP_DM_FLAG_HARDCODED		  		0x20
+#define VSCP_DM_FLAG_CHECK_ZONE		  		0x10
+#define VSCP_DM_FLAG_CHECK_SUBZONE			0x08
+#define VSCP_DM_FLAG_CLASS_MASK		  		0x02
+#define VSCP_DM_FLAG_CLASS_FILTER	  		0x01
 
 /*!
     \struct _dmrow
@@ -350,7 +329,7 @@ extern const uint8_t vscp_deviceURL[];      //  GUID
 /*!
     \fn vscp_init
     Init the VSCP firmware.
-
+	
     Call this before entering the main loop.
  */
 void vscp_init(void);
@@ -363,7 +342,7 @@ void vscp_error(void);
 
 /*!
     Handle nickname probing
-
+	
     This routine should be called periodically while
     in state VSCP_STATE_INIT
  */
@@ -371,7 +350,7 @@ void vscp_handleProbeState(void);
 
 /*!
     Handle the pre active state
-
+	
     This state is entered if a nod with nickname=0 answers the
     probe.Zero is reserved for a segment controller and if it
     is available and acknowledge this way that it is the node should
@@ -384,14 +363,14 @@ void vscp_handlePreActiveState(void);
 
 /*!
     Handle incoming CLASS1.PROTOCOL event
-
+	
     The event should be in the vscp_imsg buffer on entry.
  */
 void vscp_handleProtocolEvent(void);
 
 /*!
     Go to the active state
-
+	
     This mean the node sends new node on-line and informs other nodes
     about its acquired nickname.
  */
@@ -459,7 +438,7 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value);
 
 /*!
     Do One second work
-
+	
     This routine should be called once a second by the
     application.
  */
@@ -704,9 +683,9 @@ uint32_t vscp_getFamilyType(void);
 void vscp_restoreDefaults(void);
 
 #ifdef DROP_NICKNAME_EXTENDED_FEATURES
-    void vscp_hardreset(void);              // Do a hard reset of the device
-    void vscp_wait_ms(uint16_t ms);         // Wait for milliseconds
-    void vscp_wait_s(uint16_t sec);         // Wait for seconds
+	void vscp_hardreset(void);              // Do a hard reset of the device
+	void vscp_wait_ms(uint16_t ms);         // Wait for milliseconds
+	void vscp_wait_s(uint16_t sec);         // Wait for seconds
 #endif
 
 #endif

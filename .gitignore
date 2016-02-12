@@ -45,3 +45,6 @@ Thumbs.db
 /avr/demo_vscp_node_can128/project/project/Debug/project.eep
 /avr/demo_vscp_node_can128/project/project/Debug/project.hex
 /avr/demo_vscp_node_can128/project/project/Debug/project.lss
+/avr/bootloader/standard/StandardVscpBoot/Debug/Makefile
+/avr/bootloader/standard/StandardVscpBoot/Debug/makedep.mk
+/avr/bootloader/standard/StandardVscpBoot/StandardVscpBoot.componentinfo.xml

@@ -5,7 +5,7 @@
  * 	2006-03-20
  * 	akhe@eurosource.se
  *
- *  Copyright (C) 2006-2007 Ake Hedman, eurosource
+ *  Copyright (C) 2006-2016 Ake Hedman, Paradise of the Frog AB
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -29,8 +29,13 @@
  * ******************************************************************************
 */
 
+
+#ifndef	__CAN_AT90CAN1238__H
+#define	__CAN_AT90CAN1238__H
+
+
 /*       
- *  MOB = 0 is used for receiption.
+ *  MOB = 0 is used for reception.
  *  MOB = 1-14 is used for transmission.     
  */
 
@@ -42,9 +47,6 @@
 #ifndef  TRUE
 #define  TRUE   1
 #endif
-
-#ifndef	__CAN_AT90CAN1238__H
-#define	__CAN_AT90CAN1238__H
 
 #ifdef F_CPU
 #ifndef FOSC
@@ -201,14 +203,14 @@
 // Set current MOB
 #define setMob(idx) (CANPAGE = (idx << 4))
 
-#define MOB_RECEIVE		0	// MOB used to receive frames
+#define MOB_RECEIVE		    0	// MOB used to receive frames
 
 // Masks for AT90CAN128
 #define CAN_MASK_RTR   		0x04
 #define CAN_MASK_EXTENDED   0x10
 #define CAN_MASK_SIZE   	0x0F
 
-// Standard busrates
+// Standard bitrates
 #define	CAN_BITRATE_10K		0
 #define	CAN_BITRATE_20K		1
 #define	CAN_BITRATE_50K		2
@@ -221,20 +223,20 @@
 #define CAN_BITRATE_MANUAL	255
 
 /// ID flags
-#define CAN_IDFLAG_STANDARD			0x00000000	// Standard message id (11-bit)
-#define CAN_IDFLAG_EXTENDED			0x00000001	// Extended message id (29-bit)
-#define CAN_IDFLAG_RTR				0x00000002	// RTR-Frame
-#define CAN_IDFLAG_ERROR			0x00000004	// This package is an error indication (id holds error code)
+#define CAN_IDFLAG_STANDARD	0x00000000	// Standard message id (11-bit)
+#define CAN_IDFLAG_EXTENDED	0x00000001	// Extended message id (29-bit)
+#define CAN_IDFLAG_RTR		0x00000002	// RTR-Frame
+#define CAN_IDFLAG_ERROR	0x00000004	// This package is an error indication (id holds error code)
 
 #define ERROR_OK			0	// all is well
 #define ERROR_BUFFER_FULL	-1	// No buffer available for transmit
 #define ERROR_BUFFER_EMPTY	-2	// No frame to read
-#define ERROR_BITRATE		-3	// Errornious bitrate
+#define ERROR_BITRATE		-3	// Invalid bitrate
 
 //
 //  CAN Message structure
 //
-typedef struct {
+typedef struct CANMsg_t {
     unsigned long id;
     unsigned char len;
     unsigned char flags;
