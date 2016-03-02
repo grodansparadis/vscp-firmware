@@ -69,6 +69,7 @@ void vscpboot_loader( void )
     
     uint32_t blockno;                           // Current block to program
     uint8_t blockdata[ VSCPBOOT_BLOCKSIZE ];    // Block data buffer
+    uint16_t offset;                            // offset into blockdata 
     
     while ( 1 ) {     // not only diamonds are forever...
         
@@ -122,7 +123,7 @@ ENTER_BOOT_MODE:
               
                     if ( ( e.vscp_class == VSCP_CLASS1_PROTOCOL ) &&
                             ( e.vscp_type == VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER ) && 
-                            ( 8 == ( e.flags & 7 ) ) &&                 // Eight data bytes
+                            ( 8 == ( e.flags & 0x0F ) ) &&                 // Eight data bytes
                             ( vscpboot_nickname == e.data[ 0 ] ) &&     // Our nickname
                             ( VSCP_BOOTLOADER_VSCP == e.data[ 1 ] ) &&  // VSCP boot algorithm
                             ( vscpboot_getGUID( 0 ) == e.data[ 2 ] ) && // GUID 0
@@ -171,7 +172,8 @@ ENTER_BOOT_MODE:
 
                     if ( ( e.vscp_class == VSCP_CLASS1_PROTOCOL ) &&
                             ( e.vscp_type == VSCP_TYPE_PROTOCOL_START_BLOCK ) &&
-                            (( e.flags & 7 ) >= 4 ) ) {   
+                            ( ( e.flags & 0x0F ) >= 4 ) ) { 
+                                  
                         blockno =  construct_unsigned32( e.data[0],
                                                          e.data[1],
                                                          e.data[2],
@@ -182,7 +184,7 @@ ENTER_BOOT_MODE:
                             e.priority = VSCP_PRIORITY_NORMAL;
                             e.flags = 0;
                             e.vscp_class = VSCP_CLASS1_PROTOCOL;
-                            e.vscp_type =  VSCP_TYPE_PROTOCOL_BLOCK_DATA_NACK;
+                            e.vscp_type =  VSCP_TYPE_PROTOCOL_START_BLOCK_NACK;
                             vscpboot_sendEvent( &e );	// NACK start block request                        
                         }                            
                         else {            
@@ -191,24 +193,79 @@ ENTER_BOOT_MODE:
                             e.priority = VSCP_PRIORITY_NORMAL;
                             e.flags = 0;
                             e.vscp_class = VSCP_CLASS1_PROTOCOL;
-                            e.vscp_type =  VSCP_TYPE_PROTOCOL_BLOCK_DATA_ACK;
+                            e.vscp_type =  VSCP_TYPE_PROTOCOL_START_BLOCK_ACK;
                                                  
                             if ( vscpboot_sendEvent( &e ) ) {	// ACK program block request
                                 memset( blockdata, 0xFF, sizeof( blockdata ) );
                                 state = STATE_BLOCKDATA;
+                                offset = 0;
                             }
                              
                         }                                                                            
                     }
                     else {
+                        // Is this an abort?
+                        if ( ( e.vscp_class == VSCP_CLASS1_PROTOCOL ) &&
+                        ( e.vscp_type == VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER ) ) {
+                            state = STATE_BOOTWAIT;
+                            goto  ENTER_BOOT_MODE;
+                        }
+                    }                       
+                }
+                                                        
+                break; 
+                
+            // ----------------------------------------------------------------
+            case STATE_BLOCKDATA:
+            if ( vscpboot_getEvent( &e ) ) { 
+                
+                if ( ( e.vscp_class == VSCP_CLASS1_PROTOCOL ) &&
+                    ( e.vscp_type == VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER ) && 
+                    ( 8 == ( e.flags & 0x0F ) ) ) {
+
+                    // copy in data                    
+                    memcpy( blockdata + offset, e.data, 8 );
+                    offset += 8;  
+                    
+                    // ACK the block data
+                    e.priority = VSCP_PRIORITY_NORMAL;
+                    e.flags = 0;
+                    e.vscp_class = VSCP_CLASS1_PROTOCOL;
+                    e.vscp_type =  VSCP_TYPE_PROTOCOL_BLOCK_DATA_ACK;                    
+                    vscpboot_sendEvent( &e );                                          
+                    
+                    // Check if the block is full
+                    if ( offset == sizeof( blockdata ) ) {
+                     
+                        // ACK the block 
+                        
+                        
+                        
                         e.priority = VSCP_PRIORITY_NORMAL;
                         e.flags = 0;
                         e.vscp_class = VSCP_CLASS1_PROTOCOL;
-                        e.vscp_type =  VSCP_TYPE_PROTOCOL_BLOCK_DATA_NACK;
-                        vscpboot_sendEvent( &e );	// NACK start block request    
-                    }                       
-                }                                         
-                break;         
+                        e.vscp_type =  VSCP_TYPE_PROTOCOL_START_BLOCK_ACK;
+                        
+                        if ( vscpboot_sendEvent( &e ) ) {	// ACK program block request
+                            memset( blockdata, 0xFF, sizeof( blockdata ) );
+                            state = STATE_BLOCKDATA;
+                            offset = 0;
+                        }
+                        
+                    }
+                    
+                }                    
+                
+            }
+            else {
+                // Is this an abort?
+                if ( ( e.vscp_class == VSCP_CLASS1_PROTOCOL ) &&
+                ( e.vscp_type == VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER ) ) {
+                    state = STATE_BOOTWAIT;
+                    goto  ENTER_BOOT_MODE;
+                }
+            }
+            break;                           
                 
             // ----------------------------------------------------------------    
             default:

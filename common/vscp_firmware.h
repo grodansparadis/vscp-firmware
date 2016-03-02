@@ -215,7 +215,7 @@ low end hardware device.
 #define VSCP_LED_BLINK1                     0x02
 
 
-typedef struct vscpevent_t {
+typedef struct  {
     /*!
         Input message flags\n
         ==================\n
@@ -234,13 +234,13 @@ typedef struct vscpevent_t {
     uint8_t vscp_type;      // VSCP type
     uint8_t oaddr;          // Packet originating address
     uint8_t data[8];        // data bytes
-} vscpevent;
+} vscpevent_t;
 
 
 //////////////////////////////////////////////////////////
 //                  Deprecated
 // imsg and omsg has been deprecated and is replaced by 
-// vscpmsg from version 1.6.0
+// vscpevent from version 1.6.0
 //////////////////////////////////////////////////////////
 
     
@@ -312,9 +312,9 @@ extern uint8_t vscp_alarmstatus;            // VSCP alarm status register
 extern uint8_t vscp_node_state;             // VSCP state machine main state
 extern uint8_t vscp_node_substate;          // VSCP state machine sub state
 extern uint8_t vscp_initledfunc;            //
-// The following are defined in vscp.c
-extern struct _imsg vscp_imsg;              // Current input event
-extern struct _omsg vscp_omsg;              // Current outgoing event
+// The following are defined in vscp_firmware.c
+extern vscpevent_t vscp_imsg;               // Current input event
+extern vscpevent_t vscp_omsg;               // Current outgoing event
 extern volatile uint16_t vscp_timer;        // 1 ms timer counter
 extern uint8_t vscp_probe_address;          // Probe address for nickname discovery
 extern volatile uint8_t vscp_initbtncnt;    // init. button counter

@@ -71,10 +71,10 @@ uint8_t vscp_node_substate; // State machine sub state
 uint8_t vscp_probe_cnt;     // Number of time-out probes
 
 // Incoming event
-struct _imsg vscp_imsg;
+vscpevent_t vscp_imsg;
 
 // Outgoing event
-struct _omsg vscp_omsg;
+vscpevent_t vscp_omsg;
 
 uint8_t vscp_probe_address;         // Address used during initialization
 uint8_t vscp_initledfunc;           // Init. LED functionality

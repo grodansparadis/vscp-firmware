@@ -130,6 +130,14 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\..\common\crc.c">
+      <SubType>compile</SubType>
+      <Link>crc.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\common\crc.h">
+      <SubType>compile</SubType>
+      <Link>crc.h</Link>
+    </Compile>
     <Compile Include="..\..\..\..\common\vscp_bootloader.c">
       <SubType>compile</SubType>
       <Link>vscp_bootloader.c</Link>
@@ -138,9 +146,25 @@
       <SubType>compile</SubType>
       <Link>vscp_bootloader.h</Link>
     </Compile>
+    <Compile Include="..\..\..\..\common\vscp_class.h">
+      <SubType>compile</SubType>
+      <Link>vscp_class.h</Link>
+    </Compile>
     <Compile Include="..\..\..\..\common\vscp_firmware.h">
       <SubType>compile</SubType>
       <Link>vscp_firmware.h</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\common\vscp_type.h">
+      <SubType>compile</SubType>
+      <Link>vscp_type.h</Link>
+    </Compile>
+    <Compile Include="..\..\..\common\can_at90can128.c">
+      <SubType>compile</SubType>
+      <Link>can_at90can128.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\common\can_at90can128.h">
+      <SubType>compile</SubType>
+      <Link>can_at90can128.h</Link>
     </Compile>
     <Compile Include="..\..\..\common\uart.c">
       <SubType>compile</SubType>
@@ -151,18 +175,6 @@
       <Link>uart.h</Link>
     </Compile>
     <Compile Include="bootloader.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="can_at90can128.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="can_at90can128.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="crc.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="crc.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="hardware.c">
@@ -177,16 +189,10 @@
     <Compile Include="version.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="vscp_class.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="vscp_compiler.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="vscp_projdefs.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="vscp_type.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
