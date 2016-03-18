@@ -4,7 +4,7 @@
 // Code collected from the Microchip C18 forum
 // Copyright (C) 2003 JasonK
 //
-// Changes & additions (C) 2005-2015 Ake Hedman, Grodans Paradis AB 
+// Changes & additions (C) 2005-2016 Ake Hedman, Grodans Paradis AB 
 // <akhe@grodansparadis.com>
 //
 

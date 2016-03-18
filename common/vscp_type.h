@@ -16,7 +16,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2015 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
+ * Copyright (c) 2000-2016 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -1074,5 +1074,6 @@
 #define VSCP2_TYPE_VSCPD_TIMER_RESUMED                          27
 #define VSCP2_TYPE_VSCPD_TIMER_STOPPED                          28
 #define VSCP2_TYPE_VSCPD_TIMER_ELLAPSED                         29
+#define VSCP2_TYPE_VSCPD_NEW_CALCULATION                        30
 
 #endif
