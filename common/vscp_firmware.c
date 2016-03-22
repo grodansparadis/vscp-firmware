@@ -117,13 +117,16 @@ uint8_t vscp_hour;
 
 void vscp_init(void)
 {
-    vscp_initledfunc = VSCP_LED_BLINK1;
+    vscp_initledfunc = VSCP_LED_ON;
 
     // read the nickname id
     vscp_nickname = vscp_readNicknamePermanent();
 
-    //	if zero set to uninitialized
-    if (!vscp_nickname) vscp_nickname = VSCP_ADDRESS_FREE;
+    // if zero set to uninitialized
+    if ( 0 == vscp_nickname) vscp_nickname = VSCP_ADDRESS_FREE;
+    
+    // Start init. blink if no nodeid
+    if ( VSCP_ADDRESS_FREE == vscp_nickname ) vscp_initledfunc = VSCP_LED_BLINK1;
 
     // Init. incoming event
     vscp_imsg.flags = 0;
@@ -174,11 +177,13 @@ int8_t vscp_check_pstorage(void)
         return TRUE;
     }
 
+    vscp_initledfunc = VSCP_LED_BLINK1;
+    
     // Initialize persistent storage
     vscp_init_pstorage();
 
     // No nickname yet.
-    vscp_writeNicknamePermanent( 0xff );
+    vscp_writeNicknamePermanent( VSCP_ADDRESS_FREE );
     
     // Mark persistent storage as initialized
     vscp_setControlByte( VSCP_INITIALIZED_BYTE0_INDEX, 

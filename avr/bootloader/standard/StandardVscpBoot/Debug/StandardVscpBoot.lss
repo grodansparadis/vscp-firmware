@@ -1,0 +1,1159 @@
+
+StandardVscpBoot.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .data         00000010  00800100  0000049e  00000532  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  1 .text         0000049e  00000000  00000000  00000094  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .bss          00000202  00800110  00800110  00000542  2**0
+                  ALLOC
+  3 .comment      00000030  00000000  00000000  00000542  2**0
+                  CONTENTS, READONLY
+  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000574  2**2
+                  CONTENTS, READONLY
+  5 .debug_aranges 000001b8  00000000  00000000  000005b4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_info   0000128a  00000000  00000000  0000076c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_abbrev 000008ce  00000000  00000000  000019f6  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_line   00000ff0  00000000  00000000  000022c4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_frame  00000394  00000000  00000000  000032b4  2**2
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_str    0000060f  00000000  00000000  00003648  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_loc    00001150  00000000  00000000  00003c57  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_ranges 00000158  00000000  00000000  00004da7  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	49 c0       	rjmp	.+146    	; 0x94 <__ctors_end>
+   2:	00 00       	nop
+   4:	64 c0       	rjmp	.+200    	; 0xce <__bad_interrupt>
+   6:	00 00       	nop
+   8:	62 c0       	rjmp	.+196    	; 0xce <__bad_interrupt>
+   a:	00 00       	nop
+   c:	60 c0       	rjmp	.+192    	; 0xce <__bad_interrupt>
+   e:	00 00       	nop
+  10:	5e c0       	rjmp	.+188    	; 0xce <__bad_interrupt>
+  12:	00 00       	nop
+  14:	5c c0       	rjmp	.+184    	; 0xce <__bad_interrupt>
+  16:	00 00       	nop
+  18:	5a c0       	rjmp	.+180    	; 0xce <__bad_interrupt>
+  1a:	00 00       	nop
+  1c:	58 c0       	rjmp	.+176    	; 0xce <__bad_interrupt>
+  1e:	00 00       	nop
+  20:	56 c0       	rjmp	.+172    	; 0xce <__bad_interrupt>
+  22:	00 00       	nop
+  24:	54 c0       	rjmp	.+168    	; 0xce <__bad_interrupt>
+  26:	00 00       	nop
+  28:	52 c0       	rjmp	.+164    	; 0xce <__bad_interrupt>
+  2a:	00 00       	nop
+  2c:	50 c0       	rjmp	.+160    	; 0xce <__bad_interrupt>
+  2e:	00 00       	nop
+  30:	4e c0       	rjmp	.+156    	; 0xce <__bad_interrupt>
+  32:	00 00       	nop
+  34:	4c c0       	rjmp	.+152    	; 0xce <__bad_interrupt>
+  36:	00 00       	nop
+  38:	4a c0       	rjmp	.+148    	; 0xce <__bad_interrupt>
+  3a:	00 00       	nop
+  3c:	48 c0       	rjmp	.+144    	; 0xce <__bad_interrupt>
+  3e:	00 00       	nop
+  40:	c1 c1       	rjmp	.+898    	; 0x3c4 <__vector_16>
+  42:	00 00       	nop
+  44:	44 c0       	rjmp	.+136    	; 0xce <__bad_interrupt>
+  46:	00 00       	nop
+  48:	42 c0       	rjmp	.+132    	; 0xce <__bad_interrupt>
+  4a:	00 00       	nop
+  4c:	40 c0       	rjmp	.+128    	; 0xce <__bad_interrupt>
+  4e:	00 00       	nop
+  50:	3e c0       	rjmp	.+124    	; 0xce <__bad_interrupt>
+  52:	00 00       	nop
+  54:	3c c0       	rjmp	.+120    	; 0xce <__bad_interrupt>
+  56:	00 00       	nop
+  58:	3a c0       	rjmp	.+116    	; 0xce <__bad_interrupt>
+  5a:	00 00       	nop
+  5c:	38 c0       	rjmp	.+112    	; 0xce <__bad_interrupt>
+  5e:	00 00       	nop
+  60:	36 c0       	rjmp	.+108    	; 0xce <__bad_interrupt>
+  62:	00 00       	nop
+  64:	34 c0       	rjmp	.+104    	; 0xce <__bad_interrupt>
+  66:	00 00       	nop
+  68:	32 c0       	rjmp	.+100    	; 0xce <__bad_interrupt>
+  6a:	00 00       	nop
+  6c:	30 c0       	rjmp	.+96     	; 0xce <__bad_interrupt>
+  6e:	00 00       	nop
+  70:	2e c0       	rjmp	.+92     	; 0xce <__bad_interrupt>
+  72:	00 00       	nop
+  74:	2c c0       	rjmp	.+88     	; 0xce <__bad_interrupt>
+  76:	00 00       	nop
+  78:	2a c0       	rjmp	.+84     	; 0xce <__bad_interrupt>
+  7a:	00 00       	nop
+  7c:	28 c0       	rjmp	.+80     	; 0xce <__bad_interrupt>
+  7e:	00 00       	nop
+  80:	26 c0       	rjmp	.+76     	; 0xce <__bad_interrupt>
+  82:	00 00       	nop
+  84:	24 c0       	rjmp	.+72     	; 0xce <__bad_interrupt>
+  86:	00 00       	nop
+  88:	22 c0       	rjmp	.+68     	; 0xce <__bad_interrupt>
+  8a:	00 00       	nop
+  8c:	20 c0       	rjmp	.+64     	; 0xce <__bad_interrupt>
+  8e:	00 00       	nop
+  90:	1e c0       	rjmp	.+60     	; 0xce <__bad_interrupt>
+	...
+
+00000094 <__ctors_end>:
+  94:	11 24       	eor	r1, r1
+  96:	1f be       	out	0x3f, r1	; 63
+  98:	cf ef       	ldi	r28, 0xFF	; 255
+  9a:	d0 e1       	ldi	r29, 0x10	; 16
+  9c:	de bf       	out	0x3e, r29	; 62
+  9e:	cd bf       	out	0x3d, r28	; 61
+
+000000a0 <__do_copy_data>:
+  a0:	11 e0       	ldi	r17, 0x01	; 1
+  a2:	a0 e0       	ldi	r26, 0x00	; 0
+  a4:	b1 e0       	ldi	r27, 0x01	; 1
+  a6:	ee e9       	ldi	r30, 0x9E	; 158
+  a8:	f4 e0       	ldi	r31, 0x04	; 4
+  aa:	00 e0       	ldi	r16, 0x00	; 0
+  ac:	0b bf       	out	0x3b, r16	; 59
+  ae:	02 c0       	rjmp	.+4      	; 0xb4 <__do_copy_data+0x14>
+  b0:	07 90       	elpm	r0, Z+
+  b2:	0d 92       	st	X+, r0
+  b4:	a0 31       	cpi	r26, 0x10	; 16
+  b6:	b1 07       	cpc	r27, r17
+  b8:	d9 f7       	brne	.-10     	; 0xb0 <__do_copy_data+0x10>
+
+000000ba <__do_clear_bss>:
+  ba:	23 e0       	ldi	r18, 0x03	; 3
+  bc:	a0 e1       	ldi	r26, 0x10	; 16
+  be:	b1 e0       	ldi	r27, 0x01	; 1
+  c0:	01 c0       	rjmp	.+2      	; 0xc4 <.do_clear_bss_start>
+
+000000c2 <.do_clear_bss_loop>:
+  c2:	1d 92       	st	X+, r1
+
+000000c4 <.do_clear_bss_start>:
+  c4:	a2 31       	cpi	r26, 0x12	; 18
+  c6:	b2 07       	cpc	r27, r18
+  c8:	e1 f7       	brne	.-8      	; 0xc2 <.do_clear_bss_loop>
+  ca:	ce d1       	rcall	.+924    	; 0x468 <main>
+  cc:	e6 c1       	rjmp	.+972    	; 0x49a <_exit>
+
+000000ce <__bad_interrupt>:
+  ce:	98 cf       	rjmp	.-208    	; 0x0 <__vectors>
+
+000000d0 <crcInit>:
+ * Returns:		None defined.
+ *
+ *********************************************************************/
+void
+crcInit(void)
+{
+  d0:	e2 e1       	ldi	r30, 0x12	; 18
+  d2:	f1 e0       	ldi	r31, 0x01	; 1
+
+
+    /*
+     * Compute the remainder of each possible dividend.
+     */
+    for (dividend = 0; dividend < 256; ++dividend)
+  d4:	40 e0       	ldi	r20, 0x00	; 0
+  d6:	50 e0       	ldi	r21, 0x00	; 0
+    {
+        /*
+         * Start with the dividend followed by zeros.
+         */
+        remainder = dividend << (WIDTH - 8);
+  d8:	38 e0       	ldi	r19, 0x08	; 8
+  da:	94 2f       	mov	r25, r20
+  dc:	88 27       	eor	r24, r24
+  de:	23 2f       	mov	r18, r19
+        for (bit = 8; bit > 0; --bit)
+        {
+            /*
+             * Try to divide the current data bit.
+             */			
+            if (remainder & TOPBIT)
+  e0:	99 23       	and	r25, r25
+  e2:	3c f4       	brge	.+14     	; 0xf2 <crcInit+0x22>
+            {
+                remainder = (remainder << 1) ^ POLYNOMIAL;
+  e4:	88 0f       	add	r24, r24
+  e6:	99 1f       	adc	r25, r25
+  e8:	61 e2       	ldi	r22, 0x21	; 33
+  ea:	86 27       	eor	r24, r22
+  ec:	60 e1       	ldi	r22, 0x10	; 16
+  ee:	96 27       	eor	r25, r22
+  f0:	02 c0       	rjmp	.+4      	; 0xf6 <crcInit+0x26>
+            }
+            else
+            {
+                remainder = (remainder << 1);
+  f2:	88 0f       	add	r24, r24
+  f4:	99 1f       	adc	r25, r25
+  f6:	21 50       	subi	r18, 0x01	; 1
+        remainder = dividend << (WIDTH - 8);
+
+        /*
+         * Perform modulo-2 division, a bit at a time.
+         */
+        for (bit = 8; bit > 0; --bit)
+  f8:	99 f7       	brne	.-26     	; 0xe0 <crcInit+0x10>
+        }
+
+        /*
+         * Store the result into the table.
+         */
+        crcTable[dividend] = remainder;
+  fa:	81 93       	st	Z+, r24
+  fc:	91 93       	st	Z+, r25
+
+
+    /*
+     * Compute the remainder of each possible dividend.
+     */
+    for (dividend = 0; dividend < 256; ++dividend)
+  fe:	4f 5f       	subi	r20, 0xFF	; 255
+ 100:	5f 4f       	sbci	r21, 0xFF	; 255
+ 102:	41 15       	cp	r20, r1
+ 104:	81 e0       	ldi	r24, 0x01	; 1
+ 106:	58 07       	cpc	r21, r24
+ 108:	41 f7       	brne	.-48     	; 0xda <crcInit+0xa>
+         * Store the result into the table.
+         */
+        crcTable[dividend] = remainder;
+    }
+
+}   /* crcInit() */
+ 10a:	08 95       	ret
+
+0000010c <vscpboot_init>:
+uint8_t vscpboot_nickname = 0xFE;       // Assigned node nickname
+
+void vscpboot_init()
+{
+    //Initialize CRC lookup table.
+    crcInit();    
+ 10c:	e1 cf       	rjmp	.-62     	; 0xd0 <crcInit>
+ 10e:	08 95       	ret
+
+00000110 <vscpboot_loader>:
+///////////////////////////////////////////////////////////////////////////////
+// vscpboot_loader
+//
+
+void vscpboot_loader( void )
+{
+ 110:	cf 93       	push	r28
+ 112:	df 93       	push	r29
+ 114:	cd b7       	in	r28, 0x3d	; 61
+ 116:	de b7       	in	r29, 0x3e	; 62
+ 118:	cd 50       	subi	r28, 0x0D	; 13
+ 11a:	d1 40       	sbci	r29, 0x01	; 1
+ 11c:	0f b6       	in	r0, 0x3f	; 63
+ 11e:	f8 94       	cli
+ 120:	de bf       	out	0x3e, r29	; 62
+ 122:	0f be       	out	0x3f, r0	; 63
+ 124:	cd bf       	out	0x3d, r28	; 61
+    vscpevent e;
+    vscpboot_state state = STATE_VIRGIN;        // We haven't done anything yet
+ 126:	10 e0       	ldi	r17, 0x00	; 0
+                                                                     
+                    }
+                    else {
+                        
+                        // Not a valid boot loader entry request - We stay in state
+                        e.priority = VSCP_PRIORITY_NORMAL;
+ 128:	0f 2e       	mov	r0, r31
+ 12a:	f3 e0       	ldi	r31, 0x03	; 3
+ 12c:	ff 2e       	mov	r15, r31
+ 12e:	f0 2d       	mov	r31, r0
+                        e.flags = 0;
+                        e.vscp_class = VSCP_CLASS1_PROTOCOL;
+                        e.vscp_type =  VSCP_TYPE_PROTOCOL_NACK_BOOT_LOADER;
+ 130:	0f 2e       	mov	r0, r31
+ 132:	fe e0       	ldi	r31, 0x0E	; 14
+ 134:	cf 2e       	mov	r12, r31
+ 136:	f0 2d       	mov	r31, r0
+                    }
+                    else {
+                        e.priority = VSCP_PRIORITY_NORMAL;
+                        e.flags = 0;
+                        e.vscp_class = VSCP_CLASS1_PROTOCOL;
+                        e.vscp_type =  VSCP_TYPE_PROTOCOL_BLOCK_DATA_NACK;
+ 138:	0f 2e       	mov	r0, r31
+ 13a:	f2 e1       	ldi	r31, 0x12	; 18
+ 13c:	df 2e       	mov	r13, r31
+ 13e:	f0 2d       	mov	r31, r0
+                            
+                            // ACK the block data
+                            e.priority = VSCP_PRIORITY_NORMAL;
+                            e.flags = 0;
+                            e.vscp_class = VSCP_CLASS1_PROTOCOL;
+                            e.vscp_type =  VSCP_TYPE_PROTOCOL_BLOCK_DATA_ACK;
+ 140:	0f 2e       	mov	r0, r31
+ 142:	f1 e1       	ldi	r31, 0x11	; 17
+ 144:	6f 2e       	mov	r6, r31
+ 146:	f0 2d       	mov	r31, r0
+                                                 
+                            if ( vscpboot_sendEvent( &e ) ) {	// ACK program block request
+                                memset( blockdata, 0xFF, sizeof( blockdata ) );
+                                state = STATE_BLOCKDATA;
+ 148:	68 94       	set
+ 14a:	77 24       	eor	r7, r7
+ 14c:	72 f8       	bld	r7, 2
+            // ----------------------------------------------------------------    
+            case STATE_ANNOUNCE:
+                if ( vscpboot_timer > TIMOUT_ANNOUNCE ) {
+                    
+                    // OK no response
+                    state = STATE_BOOTWAIT;
+ 14e:	68 94       	set
+ 150:	ee 24       	eor	r14, r14
+ 152:	e1 f8       	bld	r14, 1
+        
+            // ----------------------------------------------------------------
+            case STATE_VIRGIN:
+                
+                // Say hello to the world
+                e.flags = 1; // one data byte
+ 154:	01 e0       	ldi	r16, 0x01	; 1
+ 156:	01 c0       	rjmp	.+2      	; 0x15a <vscpboot_loader+0x4a>
+            // ----------------------------------------------------------------    
+            case STATE_ANNOUNCE:
+                if ( vscpboot_timer > TIMOUT_ANNOUNCE ) {
+                    
+                    // OK no response
+                    state = STATE_BOOTWAIT;
+ 158:	1e 2d       	mov	r17, r14
+    uint32_t blockno;                           // Current block to program
+    uint8_t blockdata[ VSCPBOOT_BLOCKSIZE ];    // Block data buffer
+    
+    while ( 1 ) {     // not only diamonds are forever...
+        
+        switch ( state ) {
+ 15a:	12 30       	cpi	r17, 0x02	; 2
+ 15c:	49 f1       	breq	.+82     	; 0x1b0 <vscpboot_loader+0xa0>
+ 15e:	13 30       	cpi	r17, 0x03	; 3
+ 160:	a9 f1       	breq	.+106    	; 0x1cc <vscpboot_loader+0xbc>
+ 162:	11 30       	cpi	r17, 0x01	; 1
+ 164:	89 f0       	breq	.+34     	; 0x188 <vscpboot_loader+0x78>
+        
+            // ----------------------------------------------------------------
+            case STATE_VIRGIN:
+                
+                // Say hello to the world
+                e.flags = 1; // one data byte
+ 166:	09 83       	std	Y+1, r16	; 0x01
+                e.priority = VSCP_PRIORITY_NORMAL;
+ 168:	fa 82       	std	Y+2, r15	; 0x02
+                e.vscp_class = VSCP_CLASS1_PROTOCOL;
+ 16a:	1c 82       	std	Y+4, r1	; 0x04
+ 16c:	1b 82       	std	Y+3, r1	; 0x03
+                e.vscp_type = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
+ 16e:	ed 82       	std	Y+5, r14	; 0x05
+                e.data[ 0 ] = vscpboot_nickname;
+ 170:	80 91 00 01 	lds	r24, 0x0100
+ 174:	8f 83       	std	Y+7, r24	; 0x07
+                vscpboot_sendEvent( &e );
+ 176:	ce 01       	movw	r24, r28
+ 178:	01 96       	adiw	r24, 0x01	; 1
+ 17a:	72 d1       	rcall	.+740    	; 0x460 <vscpboot_sendEvent>
+                
+                vscpboot_timer = 0;
+ 17c:	10 92 11 01 	sts	0x0111, r1
+ 180:	10 92 10 01 	sts	0x0110, r1
+                state =  STATE_ANNOUNCE;
+ 184:	10 2f       	mov	r17, r16
+                
+                break;
+ 186:	e9 cf       	rjmp	.-46     	; 0x15a <vscpboot_loader+0x4a>
+               
+            // ----------------------------------------------------------------    
+            case STATE_ANNOUNCE:
+                if ( vscpboot_timer > TIMOUT_ANNOUNCE ) {
+ 188:	80 91 10 01 	lds	r24, 0x0110
+ 18c:	90 91 11 01 	lds	r25, 0x0111
+ 190:	81 31       	cpi	r24, 0x11	; 17
+ 192:	97 42       	sbci	r25, 0x27	; 39
+ 194:	08 f7       	brcc	.-62     	; 0x158 <vscpboot_loader+0x48>
+                    state = STATE_BOOTWAIT;
+                    
+                }
+                else {
+                   
+                    if ( vscpboot_getEvent( &e ) ) {
+ 196:	ce 01       	movw	r24, r28
+ 198:	01 96       	adiw	r24, 0x01	; 1
+ 19a:	64 d1       	rcall	.+712    	; 0x464 <vscpboot_getEvent>
+ 19c:	89 2b       	or	r24, r25
+ 19e:	e9 f2       	breq	.-70     	; 0x15a <vscpboot_loader+0x4a>
+                        
+                        if ( ( e.vscp_class == VSCP_CLASS1_PROTOCOL ) &&
+ 1a0:	8b 81       	ldd	r24, Y+3	; 0x03
+ 1a2:	9c 81       	ldd	r25, Y+4	; 0x04
+ 1a4:	89 2b       	or	r24, r25
+ 1a6:	c9 f6       	brne	.-78     	; 0x15a <vscpboot_loader+0x4a>
+ 1a8:	8d 81       	ldd	r24, Y+5	; 0x05
+ 1aa:	83 30       	cpi	r24, 0x03	; 3
+ 1ac:	b1 f6       	brne	.-84     	; 0x15a <vscpboot_loader+0x4a>
+                                ( e.vscp_type == VSCP_TYPE_PROTOCOL_PROBE_ACK ) ) {
+                                // We have problems. Another node ACK'ed or nickname
+                                // we can't continue - Go into eternety
+                                while ( 1 );                                
+ 1ae:	ff cf       	rjmp	.-2      	; 0x1ae <vscpboot_loader+0x9e>
+                break; 
+                
+            // ----------------------------------------------------------------    
+            case STATE_BOOTWAIT:
+            
+                if ( vscpboot_getEvent( &e ) ) {
+ 1b0:	ce 01       	movw	r24, r28
+ 1b2:	01 96       	adiw	r24, 0x01	; 1
+ 1b4:	57 d1       	rcall	.+686    	; 0x464 <vscpboot_getEvent>
+ 1b6:	89 2b       	or	r24, r25
+ 1b8:	81 f2       	breq	.-96     	; 0x15a <vscpboot_loader+0x4a>
+                                                                     
+                    }
+                    else {
+                        
+                        // Not a valid boot loader entry request - We stay in state
+                        e.priority = VSCP_PRIORITY_NORMAL;
+ 1ba:	fa 82       	std	Y+2, r15	; 0x02
+                        e.flags = 0;
+ 1bc:	19 82       	std	Y+1, r1	; 0x01
+                        e.vscp_class = VSCP_CLASS1_PROTOCOL;
+ 1be:	1c 82       	std	Y+4, r1	; 0x04
+ 1c0:	1b 82       	std	Y+3, r1	; 0x03
+                        e.vscp_type =  VSCP_TYPE_PROTOCOL_NACK_BOOT_LOADER;
+ 1c2:	cd 82       	std	Y+5, r12	; 0x05
+                        vscpboot_sendEvent( &e );	// NACK bootloader request
+ 1c4:	ce 01       	movw	r24, r28
+ 1c6:	01 96       	adiw	r24, 0x01	; 1
+ 1c8:	4b d1       	rcall	.+662    	; 0x460 <vscpboot_sendEvent>
+ 1ca:	c7 cf       	rjmp	.-114    	; 0x15a <vscpboot_loader+0x4a>
+                }                              
+                break;  
+                
+            // ----------------------------------------------------------------    
+            case STATE_BLOCKWAIT:
+                if ( vscpboot_getEvent( &e ) ) {
+ 1cc:	ce 01       	movw	r24, r28
+ 1ce:	01 96       	adiw	r24, 0x01	; 1
+ 1d0:	49 d1       	rcall	.+658    	; 0x464 <vscpboot_getEvent>
+ 1d2:	89 2b       	or	r24, r25
+ 1d4:	09 f4       	brne	.+2      	; 0x1d8 <vscpboot_loader+0xc8>
+ 1d6:	c1 cf       	rjmp	.-126    	; 0x15a <vscpboot_loader+0x4a>
+
+                    if ( ( e.vscp_class == VSCP_CLASS1_PROTOCOL ) &&
+ 1d8:	8b 81       	ldd	r24, Y+3	; 0x03
+ 1da:	9c 81       	ldd	r25, Y+4	; 0x04
+ 1dc:	89 2b       	or	r24, r25
+ 1de:	09 f0       	breq	.+2      	; 0x1e2 <vscpboot_loader+0xd2>
+ 1e0:	47 c0       	rjmp	.+142    	; 0x270 <vscpboot_loader+0x160>
+ 1e2:	8d 81       	ldd	r24, Y+5	; 0x05
+ 1e4:	8f 30       	cpi	r24, 0x0F	; 15
+ 1e6:	09 f0       	breq	.+2      	; 0x1ea <vscpboot_loader+0xda>
+ 1e8:	43 c0       	rjmp	.+134    	; 0x270 <vscpboot_loader+0x160>
+                            ( e.vscp_type == VSCP_TYPE_PROTOCOL_START_BLOCK ) &&
+                            (( e.flags & 7 ) >= 4 ) ) {   
+ 1ea:	89 81       	ldd	r24, Y+1	; 0x01
+ 1ec:	87 70       	andi	r24, 0x07	; 7
+ 1ee:	90 e0       	ldi	r25, 0x00	; 0
+            // ----------------------------------------------------------------    
+            case STATE_BLOCKWAIT:
+                if ( vscpboot_getEvent( &e ) ) {
+
+                    if ( ( e.vscp_class == VSCP_CLASS1_PROTOCOL ) &&
+                            ( e.vscp_type == VSCP_TYPE_PROTOCOL_START_BLOCK ) &&
+ 1f0:	04 97       	sbiw	r24, 0x04	; 4
+ 1f2:	0c f4       	brge	.+2      	; 0x1f6 <vscpboot_loader+0xe6>
+ 1f4:	3d c0       	rjmp	.+122    	; 0x270 <vscpboot_loader+0x160>
+                            (( e.flags & 7 ) >= 4 ) ) {   
+                        blockno =  construct_unsigned32( e.data[0],
+ 1f6:	8f 81       	ldd	r24, Y+7	; 0x07
+ 1f8:	90 e0       	ldi	r25, 0x00	; 0
+ 1fa:	a0 e0       	ldi	r26, 0x00	; 0
+ 1fc:	b0 e0       	ldi	r27, 0x00	; 0
+ 1fe:	b8 2e       	mov	r11, r24
+ 200:	aa 24       	eor	r10, r10
+ 202:	99 24       	eor	r9, r9
+ 204:	88 24       	eor	r8, r8
+ 206:	bc 01       	movw	r22, r24
+ 208:	55 27       	eor	r21, r21
+ 20a:	44 27       	eor	r20, r20
+ 20c:	48 0d       	add	r20, r8
+ 20e:	59 1d       	adc	r21, r9
+ 210:	6a 1d       	adc	r22, r10
+ 212:	7b 1d       	adc	r23, r11
+ 214:	48 0f       	add	r20, r24
+ 216:	59 1f       	adc	r21, r25
+ 218:	6a 1f       	adc	r22, r26
+ 21a:	7b 1f       	adc	r23, r27
+ 21c:	ba 2f       	mov	r27, r26
+ 21e:	a9 2f       	mov	r26, r25
+ 220:	98 2f       	mov	r25, r24
+ 222:	88 27       	eor	r24, r24
+ 224:	84 0f       	add	r24, r20
+ 226:	95 1f       	adc	r25, r21
+ 228:	a6 1f       	adc	r26, r22
+ 22a:	b7 1f       	adc	r27, r23
+                                                         e.data[1],
+                                                         e.data[2],
+                                                         e.data[3] );
+                                                         
+                        // block number can't be larger than number of available blocks                                                         
+                        if ( blockno >= VSCPBOOT_BLOCKS ) {
+ 22c:	8f 3f       	cpi	r24, 0xFF	; 255
+ 22e:	91 05       	cpc	r25, r1
+ 230:	a1 05       	cpc	r26, r1
+ 232:	b1 05       	cpc	r27, r1
+ 234:	48 f0       	brcs	.+18     	; 0x248 <vscpboot_loader+0x138>
+                            e.priority = VSCP_PRIORITY_NORMAL;
+ 236:	fa 82       	std	Y+2, r15	; 0x02
+                            e.flags = 0;
+ 238:	19 82       	std	Y+1, r1	; 0x01
+                            e.vscp_class = VSCP_CLASS1_PROTOCOL;
+ 23a:	1c 82       	std	Y+4, r1	; 0x04
+ 23c:	1b 82       	std	Y+3, r1	; 0x03
+                            e.vscp_type =  VSCP_TYPE_PROTOCOL_BLOCK_DATA_NACK;
+ 23e:	dd 82       	std	Y+5, r13	; 0x05
+                            vscpboot_sendEvent( &e );	// NACK start block request                        
+ 240:	ce 01       	movw	r24, r28
+ 242:	01 96       	adiw	r24, 0x01	; 1
+ 244:	0d d1       	rcall	.+538    	; 0x460 <vscpboot_sendEvent>
+ 246:	89 cf       	rjmp	.-238    	; 0x15a <vscpboot_loader+0x4a>
+                        }                            
+                        else {            
+                            
+                            // ACK the block data
+                            e.priority = VSCP_PRIORITY_NORMAL;
+ 248:	fa 82       	std	Y+2, r15	; 0x02
+                            e.flags = 0;
+ 24a:	19 82       	std	Y+1, r1	; 0x01
+                            e.vscp_class = VSCP_CLASS1_PROTOCOL;
+ 24c:	1c 82       	std	Y+4, r1	; 0x04
+ 24e:	1b 82       	std	Y+3, r1	; 0x03
+                            e.vscp_type =  VSCP_TYPE_PROTOCOL_BLOCK_DATA_ACK;
+ 250:	6d 82       	std	Y+5, r6	; 0x05
+                                                 
+                            if ( vscpboot_sendEvent( &e ) ) {	// ACK program block request
+ 252:	ce 01       	movw	r24, r28
+ 254:	01 96       	adiw	r24, 0x01	; 1
+ 256:	04 d1       	rcall	.+520    	; 0x460 <vscpboot_sendEvent>
+ 258:	89 2b       	or	r24, r25
+ 25a:	09 f4       	brne	.+2      	; 0x25e <vscpboot_loader+0x14e>
+ 25c:	7e cf       	rjmp	.-260    	; 0x15a <vscpboot_loader+0x4a>
+                                memset( blockdata, 0xFF, sizeof( blockdata ) );
+ 25e:	4f ef       	ldi	r20, 0xFF	; 255
+ 260:	50 e0       	ldi	r21, 0x00	; 0
+ 262:	6f ef       	ldi	r22, 0xFF	; 255
+ 264:	70 e0       	ldi	r23, 0x00	; 0
+ 266:	ce 01       	movw	r24, r28
+ 268:	0f 96       	adiw	r24, 0x0f	; 15
+ 26a:	10 d1       	rcall	.+544    	; 0x48c <memset>
+                                state = STATE_BLOCKDATA;
+ 26c:	17 2d       	mov	r17, r7
+ 26e:	75 cf       	rjmp	.-278    	; 0x15a <vscpboot_loader+0x4a>
+                            }
+                             
+                        }                                                                            
+                    }
+                    else {
+                        e.priority = VSCP_PRIORITY_NORMAL;
+ 270:	fa 82       	std	Y+2, r15	; 0x02
+                        e.flags = 0;
+ 272:	19 82       	std	Y+1, r1	; 0x01
+                        e.vscp_class = VSCP_CLASS1_PROTOCOL;
+ 274:	1c 82       	std	Y+4, r1	; 0x04
+ 276:	1b 82       	std	Y+3, r1	; 0x03
+                        e.vscp_type =  VSCP_TYPE_PROTOCOL_BLOCK_DATA_NACK;
+ 278:	dd 82       	std	Y+5, r13	; 0x05
+                        vscpboot_sendEvent( &e );	// NACK start block request    
+ 27a:	ce 01       	movw	r24, r28
+ 27c:	01 96       	adiw	r24, 0x01	; 1
+ 27e:	f0 d0       	rcall	.+480    	; 0x460 <vscpboot_sendEvent>
+ 280:	6c cf       	rjmp	.-296    	; 0x15a <vscpboot_loader+0x4a>
+
+00000282 <clrMob>:
+        }
+  	}
+  	
+    CANPAGE = Save_page;
+  	return ERROR_BUFFER_FULL;
+}
+ 282:	82 95       	swap	r24
+ 284:	80 7f       	andi	r24, 0xF0	; 240
+ 286:	80 93 ed 00 	sts	0x00ED, r24
+ 28a:	10 92 ee 00 	sts	0x00EE, r1
+ 28e:	10 92 ef 00 	sts	0x00EF, r1
+ 292:	10 92 f0 00 	sts	0x00F0, r1
+ 296:	10 92 f1 00 	sts	0x00F1, r1
+ 29a:	10 92 f2 00 	sts	0x00F2, r1
+ 29e:	10 92 f3 00 	sts	0x00F3, r1
+ 2a2:	10 92 f4 00 	sts	0x00F4, r1
+ 2a6:	10 92 f5 00 	sts	0x00F5, r1
+ 2aa:	10 92 f6 00 	sts	0x00F6, r1
+ 2ae:	10 92 f7 00 	sts	0x00F7, r1
+ 2b2:	88 e0       	ldi	r24, 0x08	; 8
+ 2b4:	ea ef       	ldi	r30, 0xFA	; 250
+ 2b6:	f0 e0       	ldi	r31, 0x00	; 0
+ 2b8:	10 82       	st	Z, r1
+ 2ba:	81 50       	subi	r24, 0x01	; 1
+ 2bc:	e9 f7       	brne	.-6      	; 0x2b8 <clrMob+0x36>
+ 2be:	08 95       	ret
+
+000002c0 <clrAllMob>:
+ 2c0:	cf 93       	push	r28
+ 2c2:	c0 e0       	ldi	r28, 0x00	; 0
+ 2c4:	8c 2f       	mov	r24, r28
+ 2c6:	dd df       	rcall	.-70     	; 0x282 <clrMob>
+ 2c8:	cf 5f       	subi	r28, 0xFF	; 255
+ 2ca:	cf 30       	cpi	r28, 0x0F	; 15
+ 2cc:	d9 f7       	brne	.-10     	; 0x2c4 <clrAllMob+0x4>
+ 2ce:	cf 91       	pop	r28
+ 2d0:	08 95       	ret
+
+000002d2 <can_Open>:
+				unsigned char Btr2 )
+{
+ 	 unsigned char set_btr0, set_btr1, set_btr2;
+	 
+ 	 // Timing
+	 switch ( StdSpeed ) {
+ 2d2:	84 30       	cpi	r24, 0x04	; 4
+ 2d4:	11 f1       	breq	.+68     	; 0x31a <can_Open+0x48>
+ 2d6:	40 f4       	brcc	.+16     	; 0x2e8 <can_Open+0x16>
+ 2d8:	81 30       	cpi	r24, 0x01	; 1
+ 2da:	99 f0       	breq	.+38     	; 0x302 <can_Open+0x30>
+ 2dc:	90 f1       	brcs	.+100    	; 0x342 <can_Open+0x70>
+ 2de:	82 30       	cpi	r24, 0x02	; 2
+ 2e0:	a1 f0       	breq	.+40     	; 0x30a <can_Open+0x38>
+ 2e2:	83 30       	cpi	r24, 0x03	; 3
+ 2e4:	b1 f0       	breq	.+44     	; 0x312 <can_Open+0x40>
+ 2e6:	46 c0       	rjmp	.+140    	; 0x374 <can_Open+0xa2>
+ 2e8:	87 30       	cpi	r24, 0x07	; 7
+ 2ea:	19 f1       	breq	.+70     	; 0x332 <can_Open+0x60>
+ 2ec:	28 f4       	brcc	.+10     	; 0x2f8 <can_Open+0x26>
+ 2ee:	85 30       	cpi	r24, 0x05	; 5
+ 2f0:	c1 f0       	breq	.+48     	; 0x322 <can_Open+0x50>
+ 2f2:	86 30       	cpi	r24, 0x06	; 6
+ 2f4:	d1 f0       	breq	.+52     	; 0x32a <can_Open+0x58>
+ 2f6:	3e c0       	rjmp	.+124    	; 0x374 <can_Open+0xa2>
+ 2f8:	88 30       	cpi	r24, 0x08	; 8
+ 2fa:	f9 f0       	breq	.+62     	; 0x33a <can_Open+0x68>
+ 2fc:	8f 3f       	cpi	r24, 0xFF	; 255
+ 2fe:	21 f1       	breq	.+72     	; 0x348 <can_Open+0x76>
+ 300:	39 c0       	rjmp	.+114    	; 0x374 <can_Open+0xa2>
+			 break;
+			 
+		case CAN_BITRATE_20K:
+			 set_btr0 = CANBT1_20KBPS;
+			 set_btr1 = CANBT2_20KBPS;
+			 set_btr2 = CANBT3_20KBPS;
+ 302:	28 e1       	ldi	r18, 0x18	; 24
+			 set_btr2 = CANBT3_10KBPS;
+			 break;
+			 
+		case CAN_BITRATE_20K:
+			 set_btr0 = CANBT1_20KBPS;
+			 set_btr1 = CANBT2_20KBPS;
+ 304:	4e e0       	ldi	r20, 0x0E	; 14
+			 set_btr1 = CANBT2_10KBPS;
+			 set_btr2 = CANBT3_10KBPS;
+			 break;
+			 
+		case CAN_BITRATE_20K:
+			 set_btr0 = CANBT1_20KBPS;
+ 306:	62 e6       	ldi	r22, 0x62	; 98
+ 308:	1f c0       	rjmp	.+62     	; 0x348 <can_Open+0x76>
+			 break;
+			 
+		case CAN_BITRATE_50K:
+			 set_btr0 = CANBT1_50KBPS;
+			 set_btr1 = CANBT2_50KBPS;
+			 set_btr2 = CANBT3_50KBPS;
+ 30a:	28 e1       	ldi	r18, 0x18	; 24
+			 set_btr2 = CANBT3_20KBPS;
+			 break;
+			 
+		case CAN_BITRATE_50K:
+			 set_btr0 = CANBT1_50KBPS;
+			 set_btr1 = CANBT2_50KBPS;
+ 30c:	4e e0       	ldi	r20, 0x0E	; 14
+			 set_btr1 = CANBT2_20KBPS;
+			 set_btr2 = CANBT3_20KBPS;
+			 break;
+			 
+		case CAN_BITRATE_50K:
+			 set_btr0 = CANBT1_50KBPS;
+ 30e:	64 e2       	ldi	r22, 0x24	; 36
+			 set_btr1 = CANBT2_50KBPS;
+			 set_btr2 = CANBT3_50KBPS;
+			 break;
+ 310:	1b c0       	rjmp	.+54     	; 0x348 <can_Open+0x76>
+			 
+		case CAN_BITRATE_100K:
+			 set_btr0 = CANBT1_100KBPS;
+			 set_btr1 = CANBT2_100KBPS;
+			 set_btr2 = CANBT3_100KBPS;
+ 312:	28 e1       	ldi	r18, 0x18	; 24
+			 set_btr2 = CANBT3_50KBPS;
+			 break;
+			 
+		case CAN_BITRATE_100K:
+			 set_btr0 = CANBT1_100KBPS;
+			 set_btr1 = CANBT2_100KBPS;
+ 314:	4e e0       	ldi	r20, 0x0E	; 14
+			 set_btr1 = CANBT2_50KBPS;
+			 set_btr2 = CANBT3_50KBPS;
+			 break;
+			 
+		case CAN_BITRATE_100K:
+			 set_btr0 = CANBT1_100KBPS;
+ 316:	62 e1       	ldi	r22, 0x12	; 18
+			 set_btr1 = CANBT2_100KBPS;
+			 set_btr2 = CANBT3_100KBPS;
+			 break;
+ 318:	17 c0       	rjmp	.+46     	; 0x348 <can_Open+0x76>
+			 
+		case CAN_BITRATE_125K:
+			 set_btr0 = CANBT1_125KBPS;
+			 set_btr1 = CANBT2_125KBPS;
+			 set_btr2 = CANBT3_125KBPS;
+ 31a:	28 e1       	ldi	r18, 0x18	; 24
+			 set_btr2 = CANBT3_100KBPS;
+			 break;
+			 
+		case CAN_BITRATE_125K:
+			 set_btr0 = CANBT1_125KBPS;
+			 set_btr1 = CANBT2_125KBPS;
+ 31c:	4e e0       	ldi	r20, 0x0E	; 14
+			 set_btr1 = CANBT2_100KBPS;
+			 set_btr2 = CANBT3_100KBPS;
+			 break;
+			 
+		case CAN_BITRATE_125K:
+			 set_btr0 = CANBT1_125KBPS;
+ 31e:	6e e0       	ldi	r22, 0x0E	; 14
+			 set_btr1 = CANBT2_125KBPS;
+			 set_btr2 = CANBT3_125KBPS;
+			 break;
+ 320:	13 c0       	rjmp	.+38     	; 0x348 <can_Open+0x76>
+			 
+		case CAN_BITRATE_250K:
+			 set_btr0 = CANBT1_250KBPS;
+			 set_btr1 = CANBT2_250KBPS;
+			 set_btr2 = CANBT3_250KBPS;
+ 322:	28 e1       	ldi	r18, 0x18	; 24
+			 set_btr2 = CANBT3_125KBPS;
+			 break;
+			 
+		case CAN_BITRATE_250K:
+			 set_btr0 = CANBT1_250KBPS;
+			 set_btr1 = CANBT2_250KBPS;
+ 324:	4e e0       	ldi	r20, 0x0E	; 14
+			 set_btr1 = CANBT2_125KBPS;
+			 set_btr2 = CANBT3_125KBPS;
+			 break;
+			 
+		case CAN_BITRATE_250K:
+			 set_btr0 = CANBT1_250KBPS;
+ 326:	66 e0       	ldi	r22, 0x06	; 6
+			 set_btr1 = CANBT2_250KBPS;
+			 set_btr2 = CANBT3_250KBPS;
+			 break;
+ 328:	0f c0       	rjmp	.+30     	; 0x348 <can_Open+0x76>
+			 
+		case CAN_BITRATE_500K:
+			 set_btr0 = CANBT1_500KBPS;
+			 set_btr1 = CANBT2_500KBPS;
+			 set_btr2 = CANBT3_500KBPS;
+ 32a:	28 e1       	ldi	r18, 0x18	; 24
+			 set_btr2 = CANBT3_250KBPS;
+			 break;
+			 
+		case CAN_BITRATE_500K:
+			 set_btr0 = CANBT1_500KBPS;
+			 set_btr1 = CANBT2_500KBPS;
+ 32c:	4e e0       	ldi	r20, 0x0E	; 14
+			 set_btr1 = CANBT2_250KBPS;
+			 set_btr2 = CANBT3_250KBPS;
+			 break;
+			 
+		case CAN_BITRATE_500K:
+			 set_btr0 = CANBT1_500KBPS;
+ 32e:	62 e0       	ldi	r22, 0x02	; 2
+			 set_btr1 = CANBT2_500KBPS;
+			 set_btr2 = CANBT3_500KBPS;
+			 break;
+ 330:	0b c0       	rjmp	.+22     	; 0x348 <can_Open+0x76>
+			 
+		case CAN_BITRATE_800K:
+			 set_btr0 = CANBT1_800KBPS;
+			 set_btr1 = CANBT2_800KBPS;
+			 set_btr2 = CANBT3_800KBPS;
+ 332:	26 e1       	ldi	r18, 0x16	; 22
+			 set_btr2 = CANBT3_500KBPS;
+			 break;
+			 
+		case CAN_BITRATE_800K:
+			 set_btr0 = CANBT1_800KBPS;
+			 set_btr1 = CANBT2_800KBPS;
+ 334:	44 e0       	ldi	r20, 0x04	; 4
+			 set_btr1 = CANBT2_500KBPS;
+			 set_btr2 = CANBT3_500KBPS;
+			 break;
+			 
+		case CAN_BITRATE_800K:
+			 set_btr0 = CANBT1_800KBPS;
+ 336:	62 e0       	ldi	r22, 0x02	; 2
+			 set_btr1 = CANBT2_800KBPS;
+			 set_btr2 = CANBT3_800KBPS;
+			 break;
+ 338:	07 c0       	rjmp	.+14     	; 0x348 <can_Open+0x76>
+			 
+		case CAN_BITRATE_1M:
+			 set_btr0 = CANBT1_1000KBPS;
+			 set_btr1 = CANBT2_1000KBPS;
+			 set_btr2 = CANBT3_1000KBPS;
+ 33a:	22 e1       	ldi	r18, 0x12	; 18
+			 set_btr2 = CANBT3_800KBPS;
+			 break;
+			 
+		case CAN_BITRATE_1M:
+			 set_btr0 = CANBT1_1000KBPS;
+			 set_btr1 = CANBT2_1000KBPS;
+ 33c:	44 e0       	ldi	r20, 0x04	; 4
+			 set_btr1 = CANBT2_800KBPS;
+			 set_btr2 = CANBT3_800KBPS;
+			 break;
+			 
+		case CAN_BITRATE_1M:
+			 set_btr0 = CANBT1_1000KBPS;
+ 33e:	62 e0       	ldi	r22, 0x02	; 2
+			 set_btr1 = CANBT2_1000KBPS;
+			 set_btr2 = CANBT3_1000KBPS;
+		 	 break;
+ 340:	03 c0       	rjmp	.+6      	; 0x348 <can_Open+0x76>
+	 switch ( StdSpeed ) {
+	 
+	 	case CAN_BITRATE_10K:
+			 set_btr0 = CANBT1_10KBPS;
+			 set_btr1 = CANBT2_10KBPS;
+			 set_btr2 = CANBT3_10KBPS;
+ 342:	28 e1       	ldi	r18, 0x18	; 24
+ 	 // Timing
+	 switch ( StdSpeed ) {
+	 
+	 	case CAN_BITRATE_10K:
+			 set_btr0 = CANBT1_10KBPS;
+			 set_btr1 = CANBT2_10KBPS;
+ 344:	4e e0       	ldi	r20, 0x0E	; 14
+	 
+ 	 // Timing
+	 switch ( StdSpeed ) {
+	 
+	 	case CAN_BITRATE_10K:
+			 set_btr0 = CANBT1_10KBPS;
+ 346:	66 ec       	ldi	r22, 0xC6	; 198
+		default:
+			return ERROR_BITRATE; 
+ 	 }
+	 
+	 // Set bitrate
+	 CANBT1 = set_btr0;
+ 348:	60 93 e2 00 	sts	0x00E2, r22
+	 CANBT2 = set_btr1;
+ 34c:	40 93 e3 00 	sts	0x00E3, r20
+	 CANBT3 = set_btr2;
+ 350:	20 93 e4 00 	sts	0x00E4, r18
+     
+     // Clear all MOB's
+     clrAllMob();
+ 354:	b5 df       	rcall	.-150    	; 0x2c0 <clrAllMob>
+     
+     // MOB 0 is for reception - enable it for receive
+     setMob( 0 );
+ 356:	10 92 ed 00 	sts	0x00ED, r1
+     CANCDMOB |= 0x80;
+ 35a:	ef ee       	ldi	r30, 0xEF	; 239
+ 35c:	f0 e0       	ldi	r31, 0x00	; 0
+ 35e:	80 81       	ld	r24, Z
+ 360:	80 68       	ori	r24, 0x80	; 128
+ 362:	80 83       	st	Z, r24
+	 
+	 CANGCON |= 2;
+ 364:	e8 ed       	ldi	r30, 0xD8	; 216
+ 366:	f0 e0       	ldi	r31, 0x00	; 0
+ 368:	80 81       	ld	r24, Z
+ 36a:	82 60       	ori	r24, 0x02	; 2
+ 36c:	80 83       	st	Z, r24
+	 
+	 // Put CAN Controller is in run state.
+ 	 return ERROR_OK;
+ 36e:	80 e0       	ldi	r24, 0x00	; 0
+ 370:	90 e0       	ldi	r25, 0x00	; 0
+ 372:	08 95       	ret
+		  	 set_btr1 = Btr1;
+	 	  	 set_btr2 = Btr2;
+		  	 break;
+			 
+		default:
+			return ERROR_BITRATE; 
+ 374:	8d ef       	ldi	r24, 0xFD	; 253
+ 376:	9f ef       	ldi	r25, 0xFF	; 255
+	 
+	 CANGCON |= 2;
+	 
+	 // Put CAN Controller is in run state.
+ 	 return ERROR_OK;
+}
+ 378:	08 95       	ret
+
+0000037a <uart_putchar>:
+//
+
+void uart_putc( char ch )
+{
+  while( !( UCSRA & MSK_UART_DRE ) );
+  UDR = ch;
+ 37a:	e0 ec       	ldi	r30, 0xC0	; 192
+ 37c:	f0 e0       	ldi	r31, 0x00	; 0
+ 37e:	90 81       	ld	r25, Z
+ 380:	95 ff       	sbrs	r25, 5
+ 382:	fd cf       	rjmp	.-6      	; 0x37e <uart_putchar+0x4>
+ 384:	80 93 c6 00 	sts	0x00C6, r24
+ 388:	08 95       	ret
+
+0000038a <uart_puts>:
+///////////////////////////////////////////////////////////////////////////////
+// uart_puts
+//
+
+void uart_puts( char * sz )
+{
+ 38a:	0f 93       	push	r16
+ 38c:	1f 93       	push	r17
+ 38e:	cf 93       	push	r28
+ 	register char ch;
+
+	//for (;ch=*sz++; ) {
+	while ( ( ch = *sz++ ) ) {
+ 390:	8c 01       	movw	r16, r24
+ 392:	0f 5f       	subi	r16, 0xFF	; 255
+ 394:	1f 4f       	sbci	r17, 0xFF	; 255
+ 396:	fc 01       	movw	r30, r24
+ 398:	c0 81       	ld	r28, Z
+ 39a:	cc 23       	and	r28, r28
+ 39c:	59 f0       	breq	.+22     	; 0x3b4 <uart_puts+0x2a>
+		if ( ch == '\n' ) uart_putchar('\r');
+ 39e:	ca 30       	cpi	r28, 0x0A	; 10
+ 3a0:	11 f4       	brne	.+4      	; 0x3a6 <uart_puts+0x1c>
+ 3a2:	8d e0       	ldi	r24, 0x0D	; 13
+ 3a4:	ea df       	rcall	.-44     	; 0x37a <uart_putchar>
+  		uart_putchar( ch );
+ 3a6:	8c 2f       	mov	r24, r28
+ 3a8:	e8 df       	rcall	.-48     	; 0x37a <uart_putchar>
+void uart_puts( char * sz )
+{
+ 	register char ch;
+
+	//for (;ch=*sz++; ) {
+	while ( ( ch = *sz++ ) ) {
+ 3aa:	f8 01       	movw	r30, r16
+ 3ac:	c1 91       	ld	r28, Z+
+ 3ae:	8f 01       	movw	r16, r30
+ 3b0:	c1 11       	cpse	r28, r1
+ 3b2:	f5 cf       	rjmp	.-22     	; 0x39e <uart_puts+0x14>
+		if ( ch == '\n' ) uart_putchar('\r');
+  		uart_putchar( ch );
+    }
+
+	uart_putchar('\r');
+ 3b4:	8d e0       	ldi	r24, 0x0D	; 13
+ 3b6:	e1 df       	rcall	.-62     	; 0x37a <uart_putchar>
+	uart_putchar('\n');
+ 3b8:	8a e0       	ldi	r24, 0x0A	; 10
+ 3ba:	df df       	rcall	.-66     	; 0x37a <uart_putchar>
+	
+}
+ 3bc:	cf 91       	pop	r28
+ 3be:	1f 91       	pop	r17
+ 3c0:	0f 91       	pop	r16
+ 3c2:	08 95       	ret
+
+000003c4 <__vector_16>:
+
+    boot_rww_enable ();
+
+    // Re-enable interrupts (if they were ever enabled).
+    SREG = sreg;
+}
+ 3c4:	1f 92       	push	r1
+ 3c6:	0f 92       	push	r0
+ 3c8:	0f b6       	in	r0, 0x3f	; 63
+ 3ca:	0f 92       	push	r0
+ 3cc:	11 24       	eor	r1, r1
+ 3ce:	8f 93       	push	r24
+ 3d0:	9f 93       	push	r25
+ 3d2:	80 91 10 01 	lds	r24, 0x0110
+ 3d6:	90 91 11 01 	lds	r25, 0x0111
+ 3da:	01 96       	adiw	r24, 0x01	; 1
+ 3dc:	90 93 11 01 	sts	0x0111, r25
+ 3e0:	80 93 10 01 	sts	0x0110, r24
+ 3e4:	9f 91       	pop	r25
+ 3e6:	8f 91       	pop	r24
+ 3e8:	0f 90       	pop	r0
+ 3ea:	0f be       	out	0x3f, r0	; 63
+ 3ec:	0f 90       	pop	r0
+ 3ee:	1f 90       	pop	r1
+ 3f0:	18 95       	reti
+
+000003f2 <init_hardware>:
+ 3f2:	8f ef       	ldi	r24, 0xFF	; 255
+ 3f4:	82 b9       	out	0x02, r24	; 2
+ 3f6:	11 b8       	out	0x01, r1	; 1
+ 3f8:	15 b8       	out	0x05, r1	; 5
+ 3fa:	84 b9       	out	0x04, r24	; 4
+ 3fc:	18 b8       	out	0x08, r1	; 8
+ 3fe:	17 b8       	out	0x07, r1	; 7
+ 400:	1b b8       	out	0x0b, r1	; 11
+ 402:	80 e2       	ldi	r24, 0x20	; 32
+ 404:	8a b9       	out	0x0a, r24	; 10
+ 406:	1e b8       	out	0x0e, r1	; 14
+ 408:	8f ed       	ldi	r24, 0xDF	; 223
+ 40a:	8d b9       	out	0x0d, r24	; 13
+ 40c:	11 ba       	out	0x11, r1	; 17
+ 40e:	10 ba       	out	0x10, r1	; 16
+ 410:	14 ba       	out	0x14, r1	; 20
+ 412:	13 ba       	out	0x13, r1	; 19
+ 414:	8d e3       	ldi	r24, 0x3D	; 61
+ 416:	87 bd       	out	0x27, r24	; 39
+ 418:	8c e0       	ldi	r24, 0x0C	; 12
+ 41a:	84 bd       	out	0x24, r24	; 36
+ 41c:	82 e0       	ldi	r24, 0x02	; 2
+ 41e:	80 93 6e 00 	sts	0x006E, r24
+ 422:	10 92 c0 00 	sts	0x00C0, r1
+ 426:	86 e0       	ldi	r24, 0x06	; 6
+ 428:	80 93 c2 00 	sts	0x00C2, r24
+ 42c:	10 92 c5 00 	sts	0x00C5, r1
+ 430:	87 e6       	ldi	r24, 0x67	; 103
+ 432:	80 93 c4 00 	sts	0x00C4, r24
+ 436:	88 e1       	ldi	r24, 0x18	; 24
+ 438:	80 93 c1 00 	sts	0x00C1, r24
+ 43c:	20 e0       	ldi	r18, 0x00	; 0
+ 43e:	40 e0       	ldi	r20, 0x00	; 0
+ 440:	60 e0       	ldi	r22, 0x00	; 0
+ 442:	84 e0       	ldi	r24, 0x04	; 4
+ 444:	46 df       	rcall	.-372    	; 0x2d2 <can_Open>
+ 446:	89 2b       	or	r24, r25
+ 448:	19 f0       	breq	.+6      	; 0x450 <init_hardware+0x5e>
+ 44a:	81 e0       	ldi	r24, 0x01	; 1
+ 44c:	91 e0       	ldi	r25, 0x01	; 1
+ 44e:	9d cf       	rjmp	.-198    	; 0x38a <uart_puts>
+ 450:	08 95       	ret
+
+00000452 <vscpboot_readInitButton>:
+ 452:	82 b1       	in	r24, 0x02	; 2
+ 454:	81 70       	andi	r24, 0x01	; 1
+ 456:	08 95       	ret
+
+00000458 <vscpboot_getBootFlag>:
+ 458:	8f ef       	ldi	r24, 0xFF	; 255
+ 45a:	08 95       	ret
+
+0000045c <vscpboot_setBootFlag>:
+ 45c:	08 95       	ret
+
+0000045e <vscpboot_setNickname>:
+ 45e:	08 95       	ret
+
+00000460 <vscpboot_sendEvent>:
+                                pmsg->data))) {
+      
+    }  */
+
+    return rv;
+}
+ 460:	80 e0       	ldi	r24, 0x00	; 0
+ 462:	08 95       	ret
+
+00000464 <vscpboot_getEvent>:
+    }
+    */
+
+    return rv;
+
+}
+ 464:	80 e0       	ldi	r24, 0x00	; 0
+ 466:	08 95       	ret
+
+00000468 <main>:
+// main
+//
+
+int main( void )
+{
+    vscpboot_init();        // Initialize boot code helpers
+ 468:	51 de       	rcall	.-862    	; 0x10c <vscpboot_init>
+    init_hardware();        // Initialize hardware
+ 46a:	c3 df       	rcall	.-122    	; 0x3f2 <init_hardware>
+    
+    // if init. button is down when a board starts we force 
+    // bootloader start. We also set bootloader flags and
+    // id to 0xFE
+    if ( 0 == vscpboot_readInitButton()  )  {
+ 46c:	f2 df       	rcall	.-28     	; 0x452 <vscpboot_readInitButton>
+ 46e:	81 11       	cpse	r24, r1
+ 470:	05 c0       	rjmp	.+10     	; 0x47c <main+0x14>
+        vscpboot_setBootFlag( VSCPBOOT_FLAG_BOOT );
+ 472:	8f ef       	ldi	r24, 0xFF	; 255
+ 474:	f3 df       	rcall	.-26     	; 0x45c <vscpboot_setBootFlag>
+        vscpboot_setNickname( VSCPBOOT_NICKNAME_BOOT );
+ 476:	8e ef       	ldi	r24, 0xFE	; 254
+ 478:	f2 df       	rcall	.-28     	; 0x45e <vscpboot_setNickname>
+        vscpboot_loader();   // Will not return    
+ 47a:	4a de       	rcall	.-876    	; 0x110 <vscpboot_loader>
+    }
+
+    if ( vscpboot_getBootFlag() ) {
+ 47c:	ed df       	rcall	.-38     	; 0x458 <vscpboot_getBootFlag>
+ 47e:	88 23       	and	r24, r24
+ 480:	11 f0       	breq	.+4      	; 0x486 <main+0x1e>
+        // We should enter bootloader
+        vscpboot_loader();   // Will not return
+ 482:	46 de       	rcall	.-884    	; 0x110 <vscpboot_loader>
+ 484:	02 c0       	rjmp	.+4      	; 0x48a <main+0x22>
+    }
+    else {
+        // We should start application code
+        asm volatile("jmp 0x00" "\n\t");
+ 486:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+    }
+
+	while (1);  // should not be reached
+ 48a:	ff cf       	rjmp	.-2      	; 0x48a <main+0x22>
+
+0000048c <memset>:
+ 48c:	dc 01       	movw	r26, r24
+ 48e:	01 c0       	rjmp	.+2      	; 0x492 <memset+0x6>
+ 490:	6d 93       	st	X+, r22
+ 492:	41 50       	subi	r20, 0x01	; 1
+ 494:	50 40       	sbci	r21, 0x00	; 0
+ 496:	e0 f7       	brcc	.-8      	; 0x490 <memset+0x4>
+ 498:	08 95       	ret
+
+0000049a <_exit>:
+ 49a:	f8 94       	cli
+
+0000049c <__stop_program>:
+ 49c:	ff cf       	rjmp	.-2      	; 0x49c <__stop_program>
