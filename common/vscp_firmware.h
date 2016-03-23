@@ -336,7 +336,8 @@ void vscp_init(void);
 
 
 /*!
-    Set VSCP error state
+    Set VSCP error state. 
+    This is a unit that is sleeping. 
  */
 void vscp_error(void);
 
@@ -461,7 +462,39 @@ int8_t vscp_sendEvent(void);
  */
 int8_t vscp_getEvent(void);
 
+/*!
+    Send error event (CLASS=508). 
+    http://www.vscp.org/docs/vscpspec/doku.php?id=class1.error
+    idx can be used to identify the internal part ("submodule") that was the 
+    origin of the error. Both zone and sub zone are always set to zero.
+    @param type This is the VSCP type
+    @param idx Index to identify possible sub module. Normally set to zero.
+    @return True if event was sent.
+ */
+#ifdef VSCP_FIRMWARE_ENABLE_ERROR_REPORTING
+uint8_t vscp_sendErrorEvent( uint8_t type, uint8_t idx );
+#endif
 
+/*!
+    Send log event (CLASS=509). 
+    http://www.vscp.org/docs/vscpspec/doku.php?id=class1.log
+    For loging first send Type = 2(0x01) Log Start then logging events and when 
+    log is closed send Type = 3 (0x03) Log Stop. To log several things use a 
+    unique if for each and open/close each.  
+    @param type VSCP logevent type.
+    @param id Identifier for the logging channel.
+    @param level Loglevel for this log event.
+    @param idx index for multiframe log event starting at zero.
+    @param pData Log data (Allways 5 bytes).
+    @return TRUE if event was sent.
+ */
+#ifdef VSCP_FIRMWARE_ENABLE_LOGGING
+uint8_t vscp_sendLogEvent( uint8_t type, 
+                            uint8_t id, 
+                            uint8_t level, 
+                            uint8_t idx, 
+                            uint8_t data );
+#endif
 
 // --------------------------- External Functions -----------------------------
 //

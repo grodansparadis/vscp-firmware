@@ -1291,6 +1291,10 @@ int8_t vscp_sendEvent(void)
                                 vscp_omsg.priority,
                                 (vscp_omsg.flags & 0x0f),
                                 vscp_omsg.data ) ) ) {
+        // One would expect us sending an error event here but the most usual
+        // cause of this problem is that the bus is jammed with events so an 
+        // error event sent here would have mad things even worse (and probably
+        // not being delivered anyway ).
         vscp_errorcnt++;
     }
 
@@ -1325,3 +1329,51 @@ int8_t vscp_getEvent(void)
     return rv;
 
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_sendErrorEvent
+//
+
+#ifdef VSCP_FIRMWARE_ENABLE_ERROR_REPORTING
+uint8_t vscp_sendErrorEvent( uint8_t type, uint8_t idx )
+{
+    vscp_omsg.data[ 0 ] = idx;
+    vscp_omsg.data[ 1 ] = 0;    // Zone always zero
+    vscp_omsg.data[ 2 ] = 0;    // Sub zone always zero
+
+    vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
+    vscp_omsg.flags = VSCP_VALID_MSG + 3;
+    vscp_omsg.vscp_class = VSCP_CLASS1_ERROR;
+    vscp_omsg.vscp_type = type;
+
+    // Write event
+    return vscp_sendEvent();
+}
+#endif
+
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_sendLogEvent
+//
+
+#ifdef VSCP_FIRMWARE_ENABLE_LOGGING
+uint8_t vscp_sendLogEvent( uint8_t type, 
+                            uint8_t id, 
+                            uint8_t level, 
+                            uint8_t idx, 
+                            uint8_t data )
+{
+    vscp_omsg.data[ 0 ] = id;
+    vscp_omsg.data[ 1 ] = level;
+    vscp_omsg.data[ 2 ] = idx;
+    memcpy( vscp_omsg.data, data, 5 );
+
+    vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
+    vscp_omsg.flags = VSCP_VALID_MSG + 8;
+    vscp_omsg.vscp_class = VSCP_CLASS1_LOG;
+    vscp_omsg.vscp_type = type;
+
+    // Write event
+    return vscp_sendEvent();
+}        
+#endif
