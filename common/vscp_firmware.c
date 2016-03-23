@@ -1361,12 +1361,12 @@ uint8_t vscp_sendLogEvent( uint8_t type,
                             uint8_t id, 
                             uint8_t level, 
                             uint8_t idx, 
-                            uint8_t data )
+                            uint8_t *pdata )
 {
     vscp_omsg.data[ 0 ] = id;
     vscp_omsg.data[ 1 ] = level;
     vscp_omsg.data[ 2 ] = idx;
-    memcpy( vscp_omsg.data, data, 5 );
+    memcpy( vscp_omsg.data, pdata, 5 );
 
     vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
     vscp_omsg.flags = VSCP_VALID_MSG + 8;

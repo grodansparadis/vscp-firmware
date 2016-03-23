@@ -92,8 +92,9 @@ low end hardware device.
 //  				VSCP Constants
 // ******************************************************************************
 
-#define VSCP_MAJOR_VERSION		        1       // VSCP Major version
+#define VSCP_MAJOR_VERSION		1       // VSCP Major version
 #define VSCP_MINOR_VERSION              6       // VSCP Minor Version
+#define VSCP_SUB_VERSION		1	// VSCP Sub version
 
 #define VSCP_ADDRESS_MASTER             0x00
 #define VSCP_ADDRESS_FREE               0xff
@@ -493,7 +494,7 @@ uint8_t vscp_sendLogEvent( uint8_t type,
                             uint8_t id, 
                             uint8_t level, 
                             uint8_t idx, 
-                            uint8_t data );
+                            uint8_t *pdata );
 #endif
 
 // --------------------------- External Functions -----------------------------
