@@ -55,9 +55,13 @@ void ini_hardware()
 
 }
 
-unsigned char ReadSwitch (unsigned char i)
+/*unsigned char ReadSwitch (unsigned char i)
 {
 return (!(PINA & _BV(i-1)));
 }
-
+*/
+unsigned char CheckInput (unsigned char x, unsigned char i)
+{
+	return (!(x & _BV(i)));
+}
 

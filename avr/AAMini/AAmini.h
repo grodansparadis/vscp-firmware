@@ -21,6 +21,11 @@
  * more information about VSCP: http://www.vscp.org
  *---------------------------------------------------------------------------
 */
+// Variables
+volatile uint16_t measurement_clock;	// 1 ms timer counter
+//volatile uint16_t sendtimer;			// 1 ms timer counter
+volatile uint16_t io_timer;			// 1 ms timer counter
+
 
 
 // # of elements in decision matrix
@@ -58,10 +63,6 @@
 #define VSCP_EEPROM_REGISTER	            0x11	//define the start of memory where registers 0 through 0x7F are stored
 
 
-#define VSCP_EEPROM_REG_ZONE                0x11
-
-#define VSCP_EEPROM_REG_SUBZONE             0x12
-
 // The following can be stored in program ROM (recommended) or in EEPROM 
 
 #define VSCP_EEPROM_REG_GUID                0x11    // Start of GUID MSB	
@@ -70,9 +71,18 @@
 #define VSCP_EEPROM_REG_DEVICE_URL          0x21	// Start of Device URL storage
                                                     // 		0x21 - 0x40		not used
 
+// vscp_eeprom_end should indicate the end of used space to application
 #define VSCP_EEPROM_END                     0x11	// marks end of VSCP EEPROM usage
                                                     //   (next free position) was 0x41
 
+//state machine inputs
+#define inputStateStart	0
+#define inputStateHigh	2
+#define inputStateLow	3
+#define inputButtonStart	1
+#define inputButtonActive	100
+#define inputButtonActiveLongSent	13
+#define inputButtonRelease	7
 
 
 // Prototypes

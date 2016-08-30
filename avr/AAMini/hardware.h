@@ -4,6 +4,7 @@
 
 void ini_hardware();
 unsigned char ReadSwitch (unsigned char i);
+unsigned char CheckInput (unsigned char x, unsigned char i);
 
 
 #define LED_STATUS_ON       ((PORTE &= ~_BV(4)))
@@ -11,6 +12,7 @@ unsigned char ReadSwitch (unsigned char i);
 #define LED_STATUS_TOGGLE   ((PORTE ^= _BV(4)))
 #define BTN_INIT_PRESSED    (!(PINE & _BV(5)))
 
+#define read_input			(PINA) //should equal the in-port
 #define BTN_SW1_PRESSED     (!(PINA & _BV(0)))
 #define BTN_SW2_PRESSED     (!(PINA & _BV(1)))
 #define BTN_SW3_PRESSED     (!(PINA & _BV(2)))
