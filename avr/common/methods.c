@@ -364,9 +364,9 @@ void vscp_setSegmentCRC( uint8_t crc )
 //  vscp_setControlByte
 //
 
-void vscp_setControlByte( uint8_t ctrl )
+void vscp_setControlByte( uint8_t idx, uint8_t ctrl )
 {
-    writeEEPROM( VSCP_EEPROM_CONTROL, ctrl );
+	writeEEPROM( VSCP_EEPROM_CONTROL+idx, ctrl );
 }
 
 
@@ -374,9 +374,9 @@ void vscp_setControlByte( uint8_t ctrl )
 //  vscp_getControlByte
 //
 
-uint8_t vscp_getControlByte( void )
+uint8_t vscp_getControlByte( uint8_t idx )
 {
-    return readEEPROM( VSCP_EEPROM_CONTROL );
+	return readEEPROM( VSCP_EEPROM_CONTROL + idx );
 }
 
 ///////////////////////////////////////////////////////////////////////////////

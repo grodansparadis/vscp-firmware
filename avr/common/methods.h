@@ -52,8 +52,8 @@ void vscp_setNickname( uint8_t nickname );
 uint8_t vscp_getSegmentCRC( void );
 void vscp_setSegmentCRC( uint8_t crc );
 
-void vscp_setControlByte( uint8_t ctrl );
-uint8_t vscp_getControlByte( void );
+//void vscp_setControlByte( uint8_t ctrl ); moved to common/vscp_firmware.h
+//uint8_t vscp_getControlByte( void );
 
 void vscp_getMatrixInfo( char *pData );
 
