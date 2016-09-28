@@ -48,3 +48,9 @@ Thumbs.db
 /avr/bootloader/standard/StandardVscpBoot/Debug/Makefile
 /avr/bootloader/standard/StandardVscpBoot/Debug/makedep.mk
 /avr/bootloader/standard/StandardVscpBoot/StandardVscpBoot.componentinfo.xml
+*.atsuo
+*.bin
+avr/AAMini/AAmini.componentinfo.xml
+avr/AAMini/AAmini.cproj
+*.hex
+avr/AAMega/AAmega.componentinfo.xml

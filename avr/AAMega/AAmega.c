@@ -35,7 +35,7 @@
 #include "vscp_type.h"
 #include "vscp_registers.h"
 #include "vscp_actions.c"
-#include "bootsupport.c"
+#include "../avr/AAboot/AAboot/AAboot/bootsupport.c"
 
 #ifndef GUID_IN_EEPROM
 // GUID is stored in ROM for this module
@@ -54,7 +54,7 @@ const uint8_t GUID[ 16 ] = {
 
 
 // Device string is stored in ROM for this module (max 32 bytes)
-const uint8_t vscp_deviceURL[]  = "127.0.0.1/mdf/aamega00.xml";
+const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/BETAMega.xml";
 
 
 // Manufacturer id's is stored in ROM for this module
@@ -78,7 +78,7 @@ volatile uint16_t measurement_clock;	// 1 ms timer counter
 
 // Prototypes
 static void initTimer();
-static void init_app_eeprom( void );
+//static void init_app_eeprom( void );
 static void doDM( void );
 static void doWork();
 
@@ -151,6 +151,7 @@ static void initTimer()
 //
 int main( void )
 
+
 {
 	unsigned int lastoutput, currentoutput; //detection change on output
 
@@ -166,7 +167,7 @@ int main( void )
 	//check button S1 --> selftest
 	if BTN_SW1_PRESSED
 	{
-		#ifdef PRINT_CAN_EVENTS
+		#ifdef PRINT_GENERAL_EVENTS
 			uart_puts( "AAMEGA selftest\n" );
 		#endif
 		outputport1 = 254;
@@ -207,12 +208,12 @@ int main( void )
 
     // Init can
     if ( ERROR_OK != can_Open( CAN_BITRATE_125K, 0, 0, 0 ) ) {
-		#ifdef PRINT_CAN_EVENTS
+		#ifdef PRINT_GENERAL_EVENTS
         	uart_puts("Failed to open channel!!\n");
 		#endif
     }
 
-	#ifdef PRINT_CAN_EVENTS
+	#ifdef PRINT_GENERAL_EVENTS
 		uart_puts( "AAMEGA 0.1\n" );
 	#endif
 
@@ -222,7 +223,7 @@ int main( void )
 	if ( !vscp_check_pstorage() ) 
 	{
 		// Spoiled or not initialized - reinitialize
-		init_app_eeprom();
+		vscp_init_pstorage();
 	}
 
 
@@ -245,7 +246,7 @@ int main( void )
             vscp_nickname = VSCP_ADDRESS_FREE;
             writeEEPROM( VSCP_EEPROM_NICKNAME, VSCP_ADDRESS_FREE );
             vscp_init();
-			#ifdef PRINT_CAN_EVENTS
+			#ifdef PRINT_GENERAL_EVENTS
             uart_puts("Node initialization");
 			#endif
         }
@@ -291,10 +292,10 @@ int main( void )
                 break;
 
 
-            case VSCP_STATE_ACTIVE:         // The normal state
+             case VSCP_STATE_ACTIVE:         // The normal state
                 if ( vscp_imsg.flags & VSCP_VALID_MSG ) 
 				{	// incoming message?
-					#ifdef PRINT_CAN_EVENTS
+					/*#ifdef PRINT_CAN_EVENTS
 	                    char buf[30];
 	                    uint8_t i;
 	                    sprintf(buf, "rx: %03x/%02x/%02x/",
@@ -307,9 +308,16 @@ int main( void )
 	                    }
 	                    uart_puts(buf);
 					#endif
-                    vscp_handleProtocolEvent();
-					
-					doDM();					// run message through DM
+                    */
+					 if (VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class) 
+					 {
+	                     vscp_handleProtocolEvent();
+                     }
+                     else 
+					 {
+	                     doDM();						 
+                     }
+
                 }
                 break;
 
@@ -342,7 +350,7 @@ int main( void )
 // init_app_eeprom
 // should  only be performed after first startup!
 // all registers cleared!
-
+/*
 static void init_app_eeprom( void )
 {
     uint8_t pos;
@@ -351,8 +359,41 @@ static void init_app_eeprom( void )
 	    writeEEPROM(pos, 0x00 );
 	}
 }
+*/
+///////////////////////////////////////////////////////////////////////////////
+// init_app_eeprom
+// should  only be performed after first startup!
+// all registers cleared!
 
 
+void vscp_init_pstorage( void )
+{
+	#ifdef PRINT_GENERAL_EVENTS
+	uart_puts( "cold start" );
+	#endif
+	// clear all eeprom registers to 0x00
+	uint8_t pos;
+	for (pos = VSCP_EEPROM_REGISTER ; pos <= (VSCP_EEPROM_REGISTER + REG_END) ; pos++)
+	{
+		writeEEPROM(pos, 0x00 );
+	}
+	
+	//set default values
+	//writeEEPROM(VSCP_EEPROM_REGISTER + REG_INPUT_DEBOUNCE, time_debounce);
+	//writeEEPROM(VSCP_EEPROM_REGISTER + REG_INPUT_START, time_start);
+	/*for (pos=0; pos <=7 ;pos++)
+	{
+		writeEEPROM(VSCP_EEPROM_REGISTER + REG_SW1_SHORT_CLASS+(pos*5) ,VSCP_CLASS1_INFORMATION);
+		writeEEPROM(VSCP_EEPROM_REGISTER + REG_SW1_SHORT_TYPE+(pos*5) ,VSCP_TYPE_INFORMATION_BUTTON);
+		//only button values written
+		//writeEEPROM(VSCP_EEPROM_REGISTER + REG_SW1_LONG_CLASS+(pos*4) ,VSCP_CLASS1_INFORMATION);
+		//writeEEPROM(VSCP_EEPROM_REGISTER + REG_SW1_LONG_TYPE+(pos*4) ,VSCP_TYPE_INFORMATION_LONG_CLICK);
+	}*/
+	#ifdef PRINT_GENERAL_EVENTS
+	uart_puts( "default values written" );
+	#endif
+	
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 //   						VSCP Functions
@@ -434,20 +475,16 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
    	if ( REG_OUTPUT_STATE1 == reg ) 
    	{
    		outputport1 = ~val;
+		__asm__ __volatile__ ("nop");
 		rv =  ~read_output1;
 	}
    
    	if ( REG_OUTPUT_STATE2 == reg )
 	{
 		outputport2 = ~bitflip(val);
+		__asm__ __volatile__ ("nop");
 		rv =  ~bitflip(read_output2);
 	}
-
-
-
-    else {
-        rv = ~val; // error return	
-    }
 
 
     return rv;	
@@ -537,23 +574,32 @@ static void doDM( void )
 					 VSCP_DM_POS_ACTION  ) ) {
 					// actions can be found in vscp_actions
 	                case ACTION_OUTP_TOGGLE1:			// Toggle relays
-	                        doActionToggleOut(1, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
-	                        break;
+	                    doActionToggleOut(1, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    break;
 	                case ACTION_OUTP_TOGGLE2:			// Toggle relays
-	                        doActionToggleOut(2, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
-	                        break;
+	                    doActionToggleOut(2, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    break;
 					case ACTION_OUTP_ON1:			// Turn on relays
-	                        doActionOnOut( 1, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
-	                        break;
+	                    doActionOnOut( 1, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    break;
 					case ACTION_OUTP_ON2:			// Turn on relays
-	                        doActionOnOut( 2, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
-	                        break;
+	                    doActionOnOut( 2, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    break;
 					case ACTION_OUTP_OFF1:			// Turn off relays
-	                        doActionOffOut( 1, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
-	                        break;
+	                    doActionOffOut( 1, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    break;
 					case ACTION_OUTP_OFF2:			// Turn off relays
-	                        doActionOffOut( 2, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
-	                        break;
+						doActionOffOut( 2, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    break;
+					case ACTION_DM_TOGGLE:			// Toggle DM row
+						doActionToggleDM( dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+						break;
+					case ACTION_DM_ON:			// DM row ON
+						doActionOnDM( dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+						break;
+					case ACTION_DM_OFF:			// DM row OFF
+						doActionOffDM( dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+						break;
 					} // case	
 
 	            } 
@@ -564,6 +610,28 @@ static void doDM( void )
         } // Row enabled
     } // for each row	
 }
+
+
+uint32_t vscp_getFamilyCode(void)
+{
+	return 0;
+}
+
+uint32_t vscp_getFamilyType(void)
+{
+	return 0;
+}
+
+void vscp_restoreDefaults(void)
+{
+	vscp_init_pstorage();
+	//reboot using WD
+	cli();
+	wdt_enable(WDTO_1S);
+	while(1);
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // SendInformationEvent
 //

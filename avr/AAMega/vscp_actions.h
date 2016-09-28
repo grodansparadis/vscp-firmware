@@ -32,6 +32,9 @@
 #define ACTION_OUTP_ON2						4
 #define ACTION_OUTP_OFF1					5
 #define ACTION_OUTP_OFF2					6
+#define ACTION_DM_TOGGLE					7
+#define ACTION_DM_ON						8
+#define ACTION_DM_OFF						9
 
 //#define ACTION_HELLO_WORLD					2
 
@@ -40,6 +43,9 @@
 void doActionToggleOut(unsigned char port, unsigned char dmflags, unsigned char arg );
 void doActionOnOut(unsigned char port, unsigned char dmflags, unsigned char arg );
 void doActionOffOut(unsigned char port, unsigned char dmflags, unsigned char arg );
+void doActionToggleDM( unsigned char dmflags, unsigned char arg );
+void doActionOnDM( unsigned char dmflags, unsigned char arg );
+void doActionOffDM( unsigned char dmflags, unsigned char arg );
 void doActionHelloWorld( unsigned char dmflags, unsigned char arg );
 void vscp_outputevent(unsigned int current,unsigned int previous);
 unsigned char portflip(unsigned char old_val); //flip over portpin value --> 8 becomes 1, 7 becomes 2 ,...

@@ -143,6 +143,107 @@ uart_puts( "debug doActionOffOut\n" );
 	}						
 }
 
+///////////////////////////////////////////////////////////////////////////////
+void doActionToggleDM( unsigned char dmflags, unsigned char arg )
+{
+	#ifdef PRINT_DM_EVENTS
+	uart_puts( "debug doActionToggleDM\n" );
+	#endif
+
+	unsigned char i;
+	uint8_t dmToggleflags;
+	//unsigned char val;
+	
+	for ( i=0; i<8; i++ )
+	{
+		// If the line should not be handled just move on
+		if ( !( arg & ( 1 << i ) ) ) continue;
+		
+		// Check if subzone should match and if so if it match
+		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE )
+		{
+			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_SUBZONE  ) )
+			{
+				continue;
+			}
+			#ifdef PRINT_DM_EVENTS
+			else uart_puts( "ToggleDM subzone match\n" );
+			#endif
+		}
+		
+		dmToggleflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
+		writeEEPROM(( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i )),dmToggleflags^VSCP_DM_FLAG_ENABLED );		
+
+
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// doActionON DM
+void doActionOnDM( unsigned char dmflags, unsigned char arg )
+{
+	uart_puts( "debug doActionOnDM\n" );
+	unsigned char i;
+	uint8_t dmToggleflags;
+	
+	for ( i=0; i<8; i++ )
+	{
+		uart_puts( "debug doActionOnDM i" );
+		// If the rely should not be handled just move on
+		if ( !( arg & ( 1 << i ) ) ) continue;
+		
+		// Check if subzone should match and if so if it match
+		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE )
+		{
+			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_END +
+			REG_SUBZONE ) )
+			{
+				continue;
+			}
+		}
+		
+		dmToggleflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
+		writeEEPROM(( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i )),dmToggleflags |VSCP_DM_FLAG_ENABLED );
+		
+		//outputport &= ~ _BV(i);
+
+
+	}
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// doActionOFF DM
+void doActionOffDM( unsigned char dmflags, unsigned char arg )
+{
+	uart_puts( "debug doActionOffDM\n" );
+	unsigned char i;
+	uint8_t dmToggleflags;
+	
+	for ( i=0; i<8; i++ )
+	{
+		uart_puts( "debug doActionOffDM i" );
+		// If the rely should not be handled just move on
+		if ( !( arg & ( 1 << i ) ) ) continue;
+		
+		// Check if subzone should match and if so if it match
+		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE )
+		{
+			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_END + REG_SUBZONE) )
+			{
+				continue;
+			}
+		}
+		dmToggleflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
+		writeEEPROM(( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i )),dmToggleflags & ~(VSCP_DM_FLAG_ENABLED) );
+				
+		//outputport |= _BV(i);
+
+
+	}
+}
+
 
 
 

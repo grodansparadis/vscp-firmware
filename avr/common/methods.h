@@ -1,6 +1,7 @@
 #ifndef VSCP_METHODS_H
 #define VSCP_METHODS_H
 
+#include <avr/eeprom.h>
 // Prototypes
 int8_t sendVSCPFrame( uint16_t vscpclass,
                         uint8_t vscptype,
