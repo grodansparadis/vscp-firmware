@@ -74,7 +74,7 @@ const uint8_t vscp_manufacturer_id[8] = {
 // Variables
 volatile uint16_t measurement_clock;	// 1 ms timer counter
 
-//int16_t btncnt[ 1 ];    // Switch counters not used now
+//int16_t btncnt[ 1 ];    // Switch counters 
 
 // Prototypes
 static void initTimer();
@@ -88,13 +88,12 @@ static void doWork();
 //
 // We should come to this point once every millisecond
 //
-
 SIGNAL( SIG_OUTPUT_COMPARE0 )
 {
 	// handle millisecond counter
 	vscp_timer++;
 	measurement_clock++;
-
+	
 	// Check for init button
 	if ( BTN_INIT_PRESSED ) {
 		// Active
@@ -103,11 +102,14 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
 	else {
 		vscp_initbtncnt = 0;
 	}
-   /* // Check for Switch 1 not used now
+   /*// Check for Switch 1 not used now
 	if ( BTN_SW1_PRESSED ) {
 		// Active
 		btncnt[1]++;
-	}*/
+		}
+	else {
+		btncnt[1]=0;
+		}*/
 	// Status LED
 	vscp_statuscnt++;
 	if ( ( VSCP_LED_BLINK1 == vscp_initledfunc ) && ( vscp_statuscnt > 100 ) ) {
@@ -227,6 +229,8 @@ int main( void )
 	}
 
 
+
+
 	// Initialize the VSCP functionality
 	vscp_init();
 
@@ -262,6 +266,13 @@ int main( void )
             // Do VSCP one second jobs 
             vscp_doOneSecondWork();
 			LED_IND_TOGGLE; // toggle indicator LED every second (hartbeat signal)
+			
+
+				
+				
+			
+			
+			
         }
 
         switch ( vscp_node_state ) 
@@ -346,20 +357,7 @@ int main( void )
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// init_app_eeprom
-// should  only be performed after first startup!
-// all registers cleared!
-/*
-static void init_app_eeprom( void )
-{
-    uint8_t pos;
-    for (pos = VSCP_EEPROM_REGISTER ; pos <= REG_END ; pos++)
-	{
-	    writeEEPROM(pos, 0x00 );
-	}
-}
-*/
+
 ///////////////////////////////////////////////////////////////////////////////
 // init_app_eeprom
 // should  only be performed after first startup!
@@ -517,55 +515,53 @@ static void doDM( void )
     uint16_t class_mask;
     uint8_t type_filter;
     uint8_t type_mask;
-	#ifdef PRINT_CAN_EVENTS
-   	char buf[30];
+	#ifdef PRINT_DM_EVENTS
+   	char buf[100];
 	#endif
 
-  
+ 
     // Don't deal with the control functionality
     if ( VSCP_CLASS1_PROTOCOL == vscp_imsg.vscp_class ) return;
-	#ifdef PRINT_CAN_EVENTS
+	#ifdef PRINT_DM_EVENTS
 	uart_puts( "debug  doDM\n" );
     #endif
     for ( i=0; i<DESCION_MATRIX_ELEMENTS; i++ ) {
         // Get DM flags for this row
         dmflags = readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) +VSCP_DM_POS_FLAGS);
-		#ifdef PRINT_CAN_EVENTS
+		#ifdef PRINT_DM_EVENTS
 		sprintf(buf, "check row:%i", i);
 		uart_puts(buf);
-		sprintf(buf, "DM: %02x", dmflags);
+		sprintf(buf, "DMflag: %02x", dmflags);
 		uart_puts(buf);
 
 		#endif
         // Is the DM row enabled?
         if ( dmflags & VSCP_DM_FLAG_ENABLED ) {
-			#ifdef PRINT_CAN_EVENTS
+			#ifdef PRINT_DM_EVENTS
 			uart_puts( "debug  doDM row enabled\n" );
     		#endif
             // Should the originating id be checked and if so is it the same?
-            if ( !( dmflags & VSCP_DM_FLAG_CHECK_OADDR ) &&
+            if ( ( dmflags & VSCP_DM_FLAG_CHECK_OADDR ) &&
                     !(  vscp_imsg.oaddr == 
-                        readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + 
-                                        ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_OADDR ) ) ) {
-                continue;					
-            	}	
+                        readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_OADDR ) ) ) 
+						{
+							#ifdef PRINT_DM_EVENTS
+							uart_puts( "debug  doDM check orig ID\n" );
+    						#endif
+							continue;
+			         	}	
 
 			// zone /subzone verification is done in actionroutine
 
-	            class_filter = readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + 
-	                                                    VSCP_DM_POS_CLASSFILTER  );
-
-
-	             class_mask = ( ( dmflags & VSCP_DM_FLAG_CLASS_MASK ) << 8 ) + readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + 
-	                                                    ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_CLASSMASK  );
+	            class_filter = readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_CLASSFILTER  );
+	            class_mask =  readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_CLASSMASK  );
 	            type_filter = readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_TYPEFILTER );
 	            type_mask = readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_TYPEMASK  );
 
-
-	            if ( !( ( class_filter ^ vscp_imsg.vscp_class ) & class_mask ) &&
-	                    !( ( type_filter ^ vscp_imsg.vscp_type ) & type_mask )) {
+				if (! ( ( class_filter ^ vscp_imsg.vscp_class ) & class_mask ) && !( ( type_filter ^ vscp_imsg.vscp_type ) & type_mask )) 
+				{
 			
-				#ifdef PRINT_CAN_EVENTS
+				#ifdef PRINT_DM_EVENTS
 				uart_puts( "debug  doDMtrigger\n" );
 				#endif
 
@@ -603,8 +599,8 @@ static void doDM( void )
 					} // case	
 
 	            } 
-				#ifdef PRINT_CAN_EVENTS
-				else uart_puts( "// Filter/mask");
+				#ifdef PRINT_DM_EVENTS
+				else uart_puts( "DM end Filter/mask");
 				#endif
 //			}//selection
         } // Row enabled

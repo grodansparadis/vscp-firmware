@@ -27,10 +27,10 @@
 #define CAN128_TEST_COMPILER_H
 
 //***************************debug options********************
-#define PRINT_GENERAL_EVENTS
-#define PRINT_CAN_EVENTS
-#define PRINT_IO_EVENTS
-#define PRINT_VSCP_EVENTS
+//#define PRINT_GENERAL_EVENTS
+//#define PRINT_CAN_EVENTS
+//#define PRINT_IO_EVENTS
+//#define PRINT_VSCP_EVENTS
 #define PRINT_DM_EVENTS
 //
 // Undefine one of the following suitable for the

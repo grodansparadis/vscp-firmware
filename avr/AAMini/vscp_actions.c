@@ -66,13 +66,17 @@ uart_puts( "debug doActionToggleOut\n" );
 // doActionON
 void doActionOnOut( unsigned char dmflags, unsigned char arg )
 {
+#ifdef PRINT_DM_EVENTS
 uart_puts( "debug doActionOnOut\n" );
+#endif
 	unsigned char i;
 	//unsigned char val;
 	
 	for ( i=0; i<8; i++ ) 
 	{
+		#ifdef PRINT_DM_EVENTS
 		uart_puts( "debug doActionOnOut i" );
+		#endif
 		// If the rely should not be handled just move on
 		if ( !( arg & ( 1 << i ) ) ) continue;
 		
@@ -100,13 +104,17 @@ uart_puts( "debug doActionOnOut\n" );
 // doActionOFF
 void doActionOffOut( unsigned char dmflags, unsigned char arg )
 {
+#ifdef PRINT_DM_EVENTS
 uart_puts( "debug doActionOffOut\n" );
+#endif
 	unsigned char i;
 	//unsigned char val;
 	
 	for ( i=0; i<8; i++ ) 
 	{
+		#ifdef PRINT_DM_EVENTS
 		uart_puts( "debug doActionOffOut i" );
+		#endif
 		// If the rely should not be handled just move on
 		if ( !( arg & ( 1 << i ) ) ) continue;
 		
@@ -167,13 +175,17 @@ void doActionToggleDM( unsigned char dmflags, unsigned char arg )
 // doActionON DM
 void doActionOnDM( unsigned char dmflags, unsigned char arg )
 {
+	#ifdef PRINT_DM_EVENTS
 	uart_puts( "debug doActionOnDM\n" );
+	#endif
 	unsigned char i;
 	uint8_t dmToggleflags;
 	
 	for ( i=0; i<8; i++ )
 	{
+		#ifdef PRINT_DM_EVENTS
 		uart_puts( "debug doActionOnDM i" );
+		#endif
 		// If the rely should not be handled just move on
 		if ( !( arg & ( 1 << i ) ) ) continue;
 		
@@ -202,13 +214,17 @@ void doActionOnDM( unsigned char dmflags, unsigned char arg )
 // doActionOFF DM
 void doActionOffDM( unsigned char dmflags, unsigned char arg )
 {
+	#ifdef PRINT_DM_EVENTS
 	uart_puts( "debug doActionOffDM\n" );
+	#endif
 	unsigned char i;
 	uint8_t dmToggleflags;
 	
 	for ( i=0; i<8; i++ )
 	{
+		#ifdef PRINT_DM_EVENTS
 		uart_puts( "debug doActionOffDM i" );
+		#endif
 		// If the rely should not be handled just move on
 		if ( !( arg & ( 1 << i ) ) ) continue;
 		

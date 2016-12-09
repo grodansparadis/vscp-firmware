@@ -30,7 +30,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 void doActionToggleOut( unsigned char port, unsigned char dmflags, unsigned char arg )
 {
-#ifdef PRINT_CAN_EVENTS
+#ifdef PRINT_DM_EVENTS
 uart_puts( "debug doActionToggleOut\n" );
 #endif
 
@@ -69,12 +69,16 @@ uart_puts( "debug doActionToggleOut\n" );
 // doActionON
 void doActionOnOut( unsigned char port, unsigned char dmflags, unsigned char arg )
 {
+#ifdef PRINT_DM_EVENTS
 uart_puts( "debug doActionOnOut\n" );
+#endif
 	unsigned char i;
 	
 	for ( i=0; i<8; i++ ) 
 	{
+		#ifdef PRINT_DM_EVENTS
 		uart_puts( "debug doActionOnOut i" );
+		#endif
 		// If the rely should not be handled just move on
 		if ( !( arg & ( 1 << i ) ) ) continue;
 		
@@ -107,12 +111,16 @@ uart_puts( "debug doActionOnOut\n" );
 // doActionOFF
 void doActionOffOut( unsigned char port, unsigned char dmflags, unsigned char arg )
 {
+#ifdef PRINT_DM_EVENTS
 uart_puts( "debug doActionOffOut\n" );
+#endif
 	unsigned char i;
 	
 	for ( i=0; i<8; i++ ) 
 	{
+		#ifdef PRINT_DM_EVENTS
 		uart_puts( "debug doActionOffOut i" );
+		#endif
 		// If the rely should not be handled just move on
 		if ( !( arg & ( 1 << i ) ) ) continue;
 		
@@ -171,8 +179,8 @@ void doActionToggleDM( unsigned char dmflags, unsigned char arg )
 			#endif
 		}
 		
-		dmToggleflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
-		writeEEPROM(( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i )),dmToggleflags^VSCP_DM_FLAG_ENABLED );		
+		dmToggleflags = readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START  + VSCP_DM_POS_FLAGS + ( VSCP_SIZE_STD_DM_ROW * i ) );
+		writeEEPROM(( VSCP_EEPROM_REGISTER + REG_DM_START  + VSCP_DM_POS_FLAGS + ( VSCP_SIZE_STD_DM_ROW * i )),dmToggleflags^VSCP_DM_FLAG_ENABLED );		
 
 
 	}
@@ -182,28 +190,31 @@ void doActionToggleDM( unsigned char dmflags, unsigned char arg )
 // doActionON DM
 void doActionOnDM( unsigned char dmflags, unsigned char arg )
 {
+	#ifdef PRINT_DM_EVENTS
 	uart_puts( "debug doActionOnDM\n" );
+	#endif
 	unsigned char i;
 	uint8_t dmToggleflags;
 	
 	for ( i=0; i<8; i++ )
 	{
+		#ifdef PRINT_DM_EVENTS
 		uart_puts( "debug doActionOnDM i" );
+		#endif
 		// If the rely should not be handled just move on
 		if ( !( arg & ( 1 << i ) ) ) continue;
 		
 		// Check if subzone should match and if so if it match
 		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE )
 		{
-			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_END +
-			REG_SUBZONE ) )
+			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_SUBZONE ) )
 			{
 				continue;
 			}
 		}
 		
-		dmToggleflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
-		writeEEPROM(( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i )),dmToggleflags |VSCP_DM_FLAG_ENABLED );
+		dmToggleflags = readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START  + VSCP_DM_POS_FLAGS + ( VSCP_SIZE_STD_DM_ROW * i ) );
+		writeEEPROM(( VSCP_EEPROM_REGISTER + REG_DM_START  + VSCP_DM_POS_FLAGS + ( VSCP_SIZE_STD_DM_ROW * i )),dmToggleflags |VSCP_DM_FLAG_ENABLED );
 		
 		//outputport &= ~ _BV(i);
 
@@ -217,26 +228,30 @@ void doActionOnDM( unsigned char dmflags, unsigned char arg )
 // doActionOFF DM
 void doActionOffDM( unsigned char dmflags, unsigned char arg )
 {
+	#ifdef PRINT_DM_EVENTS
 	uart_puts( "debug doActionOffDM\n" );
+	#endif
 	unsigned char i;
 	uint8_t dmToggleflags;
 	
 	for ( i=0; i<8; i++ )
 	{
+		#ifdef PRINT_DM_EVENTS
 		uart_puts( "debug doActionOffDM i" );
+		#endif
 		// If the rely should not be handled just move on
 		if ( !( arg & ( 1 << i ) ) ) continue;
 		
 		// Check if subzone should match and if so if it match
 		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE )
 		{
-			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_END + REG_SUBZONE) )
+			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_SUBZONE) )
 			{
 				continue;
 			}
 		}
-		dmToggleflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
-		writeEEPROM(( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i )),dmToggleflags & ~(VSCP_DM_FLAG_ENABLED) );
+		dmToggleflags = readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START  + VSCP_DM_POS_FLAGS + ( VSCP_SIZE_STD_DM_ROW * i ) );
+		writeEEPROM(( VSCP_EEPROM_REGISTER + REG_DM_START  + VSCP_DM_POS_FLAGS + ( VSCP_SIZE_STD_DM_ROW * i )),dmToggleflags & ~(VSCP_DM_FLAG_ENABLED) );
 				
 		//outputport |= _BV(i);
 
@@ -263,7 +278,7 @@ void vscp_outputevent(unsigned int current,unsigned int previous)
 {
 	unsigned int change=0,i=0,j=1;
 	change = current^previous; //only changed bits are left
-	#ifdef PRINT_CAN_EVENTS
+	#ifdef PRINT_IO_EVENTS
 		uart_puts( "OUTPUT change detected!\n" );
    		char buf[30];
 		sprintf(buf, "current/previous: %04x/%04x/", current, previous);

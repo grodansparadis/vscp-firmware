@@ -16,6 +16,8 @@
  * more information about VSCP: http://www.vscp.org
  *---------------------------------------------------------------------------
 */
+volatile uint16_t io_timer;			// 1 ms timer counter
+
 
 // # of elements in decision matrix
 #define DESCION_MATRIX_ELEMENTS             11

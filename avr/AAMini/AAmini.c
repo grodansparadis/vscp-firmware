@@ -39,7 +39,7 @@
 #include "vscp_type.h"
 #include "vscp_registers.h"
 #include "vscp_actions.c"
-#include "bootloader.c"
+#include "../avr/AAboot/AAboot/AAboot/bootsupport.c"
 
 
 
@@ -60,7 +60,7 @@ const uint8_t GUID[ 16 ] = {
 
 // Device string is stored in ROM for this module (max 32 bytes)
 //const uint8_t vscp_deviceURL[]  = "127.0.0.1/mdf/aamini02.xml";
-const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/Beta03.xml";
+const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/AAMini03.xml";
 // add mdfhost to hosts file on PC to link to ip/host name.
 
 
@@ -137,7 +137,7 @@ static void initTimer()
     // Sets the compare value
 	// OCR0A = fclk/(2nf) - 1 = fclk/512000 - 1
 	#ifndef FOSC
-	#error You must define FOSC in yor makefile
+	#error You must define FOSC in your makefile
 	#elif FOSC == 8000
 	OCR0A = 32;
 	#elif FOSC == 16000
@@ -155,7 +155,6 @@ static void initTimer()
 //
 
 int main( void )
-
 {
     uint8_t i;
 	unsigned char lastoutput, currentoutput; //detection change on output
@@ -170,14 +169,13 @@ int main( void )
     UCSRB = MSK_UART_ENABLE_TX | MSK_UART_ENABLE_RX;
 	
 	//read certain eeprom values into ram
-	unsigned char _debounce  = readEEPROM( VSCP_EEPROM_END + REG_INPUT_DEBOUNCE ) ;
-	unsigned char _start	 = readEEPROM( VSCP_EEPROM_END + REG_INPUT_START ) ;
+	//unsigned char _debounce  = readEEPROM( VSCP_EEPROM_END + REG_INPUT_DEBOUNCE ) ;
+	//unsigned char _start	 = readEEPROM( VSCP_EEPROM_END + REG_INPUT_START ) ;
 	for ( i=0; i<8; i++ ) 
 	{
 	btnstate[ i ] = (readEEPROM(VSCP_EEPROM_END + REG_INPUTBEHAVIOUR ) & _BV(i));
 	btnstate[i] = !(btnstate[i]>>i);
 	}
-
 
     // Initialize the 1ms timer
     initTimer();
@@ -189,17 +187,14 @@ int main( void )
         uart_puts("Failed to open channel!!\n");
     }
 
-
 	#ifdef PRINT_GENERAL_EVENTS
 	#if BOARD == 0
 			uart_puts( "OLIMEX AT90CAN128\n" );
 	#elif BOARD == 1
-		uart_puts( "AAMINI 0.2\n" );
+		uart_puts( "AAMINI 1.0xx\n" );
 	#endif
 	#endif
 	
-
-
 	// Check VSCP persistent storage and
 	// restore if needed
 	if ( !vscp_check_pstorage() ) 
