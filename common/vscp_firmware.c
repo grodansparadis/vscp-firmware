@@ -1,6 +1,6 @@
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // File: vscp_firmware.c
-//
+////////////////////////////////////////////////////////////////////////////////
 
 /* ******************************************************************************
  * 	VSCP (Very Simple Control Protocol) 
@@ -36,9 +36,9 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "vscp_class.h"
-#include "vscp_type.h"
-#include "vscp_firmware.h"
+#include <vscp_class.h>
+#include <vscp_type.h>
+#include <vscp_firmware.h>
 
 #ifndef FALSE
 #define FALSE  0
@@ -122,7 +122,7 @@ void vscp_init(void)
     // read the nickname id
     vscp_nickname = vscp_readNicknamePermanent();
 
-    // if zero set to uninitialized
+    // if zero set to uninitialised
     if ( 0 == vscp_nickname) vscp_nickname = VSCP_ADDRESS_FREE;
     
     // Start init. blink if no nodeid
@@ -152,7 +152,7 @@ void vscp_init(void)
     vscp_probe_cnt = 0;
     vscp_page_select = 0;
 
-    // Initialize time keeping
+    // Initialise time keeping
     vscp_timer = 0;
     vscp_configtimer = 0;
     vscp_second = 0;
@@ -169,7 +169,7 @@ void vscp_init(void)
 
 int8_t vscp_check_pstorage(void)
 {
-    // Check if persistent storage is initialized.
+    // Check if persistent storage is initialised.
     if ( ( VSCP_INITIALIZED_BYTE0_VALUE == 
                     vscp_getControlByte( VSCP_INITIALIZED_BYTE0_INDEX ) ) &&
            ( VSCP_INITIALIZED_BYTE1_VALUE == 
@@ -179,13 +179,13 @@ int8_t vscp_check_pstorage(void)
 
     vscp_initledfunc = VSCP_LED_BLINK1;
     
-    // Initialize persistent storage
+    // Initialise persistent storage
     vscp_init_pstorage();
 
     // No nickname yet.
     vscp_writeNicknamePermanent( VSCP_ADDRESS_FREE );
     
-    // Mark persistent storage as initialized
+    // Mark persistent storage as initialised
     vscp_setControlByte( VSCP_INITIALIZED_BYTE0_INDEX, 
                             VSCP_INITIALIZED_BYTE0_VALUE );
     vscp_setControlByte( VSCP_INITIALIZED_BYTE1_INDEX, 
@@ -1134,7 +1134,7 @@ void vscp_handleProtocolEvent(void)
                 vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
                 vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
 
-                vscp_getMatrixInfo((char *) vscp_omsg.data);
+                vscp_getMatrixInfo( (char *)vscp_omsg.data );
 
                 // send the event
                 vscp_sendEvent();
@@ -1309,14 +1309,12 @@ int8_t vscp_getEvent(void)
 {
     int8_t rv;
 
-
     // Don't read in new event if there already is an event
     // in the input buffer. We return TRUE though to indicate there is
     // a valid event.
     if (vscp_imsg.flags & VSCP_VALID_MSG) return TRUE;
 
-
-    if ((rv = getVSCPFrame( &vscp_imsg.vscp_class,
+    if ( ( rv = getVSCPFrame( &vscp_imsg.vscp_class,
                                 &vscp_imsg.vscp_type,
                                 &vscp_imsg.oaddr,
                                 &vscp_imsg.priority,
@@ -1327,7 +1325,6 @@ int8_t vscp_getEvent(void)
     }
 
     return rv;
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////

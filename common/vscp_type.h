@@ -192,7 +192,9 @@
 #define VSCP_TYPE_MEASUREMENT_IRRADIANCE                    55
 #define VSCP_TYPE_MEASUREMENT_SPECTRAL_RADIANCE             56
 #define VSCP_TYPE_MEASUREMENT_SPECTRAL_IRRADIANCE           57
-
+#define VSCP_TYPE_MEASUREMENT_SOUND_PRESSURE                58
+#define VSCP_TYPE_MEASUREMENT_SOUND_DENSITY                 59
+#define VSCP_TYPE_MEASUREMENT_SOUND_LEVEL                   60
 
 // Class 15 (0x0f) -- DATA
 #define VSCP_TYPE_DATA_GENERAL                              0
@@ -435,6 +437,9 @@
 #define VSCP_TYPE_MEASUREMENT64_IRRADIANCE                  55
 #define VSCP_TYPE_MEASUREMENT64_SPECTRAL_RADIANCE           56
 #define VSCP_TYPE_MEASUREMENT64_SPECTRAL_IRRADIANCE         57
+#define VSCP_TYPE_MEASUREMENT64_SOUND_PRESSURE              58
+#define VSCP_TYPE_MEASUREMENT64_SOUND_DENSITY               59
+#define VSCP_TYPE_MEASUREMENT64_SOUND_LEVEL                 60
 
 // class 65 (0x41) -- CLASS1.MEASUREZONE 
 // Types are the same as CLASS1.MEASUREMENT=10
@@ -495,6 +500,10 @@
 #define VSCP_TYPE_MEASUREZONE_IRRADIANCE                    55
 #define VSCP_TYPE_MEASUREZONE_SPECTRAL_RADIANCE             56
 #define VSCP_TYPE_MEASUREZONE_SPECTRAL_IRRADIANCE           57
+#define VSCP_TYPE_MEASUREZONE_SOUND_PRESSURE                58
+#define VSCP_TYPE_MEASUREZONE_SOUND_DENSITY                 59
+#define VSCP_TYPE_MEASUREZONE_SOUND_LEVEL                   60
+
 
 // class 70 (0x46) -- CLASS1.MEASUREMENT32
 // Types are the same as CLASS1.MEASUREMENT=10
@@ -544,7 +553,7 @@
 #define VSCP_TYPE_MEASUREMENT32_LUMINOUS_ENERGY             43
 #define VSCP_TYPE_MEASUREMENT32_LUMINANCE                   44
 #define VSCP_TYPE_MEASUREMENT32_CHEMICAL_CONCENTRATION      45
-#define VSCP_TYPE_MEASUREMENT32_RESERVED                46
+#define VSCP_TYPE_MEASUREMENT32_RESERVED                    46
 #define VSCP_TYPE_MEASUREMENT32_DOSE_EQVIVALENT             47
 #define VSCP_TYPE_MEASUREMENT32_DEWPOINT                    49
 #define VSCP_TYPE_MEASUREMENT32_RELATIVE_LEVEL              50
@@ -555,6 +564,10 @@
 #define VSCP_TYPE_MEASUREMENT32_IRRADIANCE                  55
 #define VSCP_TYPE_MEASUREMENT32_SPECTRAL_RADIANCE           56
 #define VSCP_TYPE_MEASUREMENT32_SPECTRAL_IRRADIANCE         57
+#define VSCP_TYPE_MEASUREMENT32_SOUND_PRESSURE              58
+#define VSCP_TYPE_MEASUREMENT32_SOUND_DENSITY               59
+#define VSCP_TYPE_MEASUREMENT32_SOUND_LEVEL                 60
+
 
 // class 85 (0x55) -- CLASS1.SETVALUEZONE 
 // Types are the same as CLASS1.MEASUREMENT=10
@@ -615,6 +628,9 @@
 #define VSCP_TYPE_SETVALUEZONE_IRRADIANCE                   55
 #define VSCP_TYPE_SETVALUEZONE_SPECTRAL_RADIANCE            56
 #define VSCP_TYPE_SETVALUEZONE_SPECTRAL_IRRADIANCE          57
+#define VSCP_TYPE_SETVALUEZONE_SOUND_PRESSURE               58
+#define VSCP_TYPE_SETVALUEZONE_SOUND_DENSITY                59
+#define VSCP_TYPE_SETVALUEZONE_SOUND_LEVEL                  60
 
 
 // class 90 (0x5A) -- WATHER
@@ -630,8 +646,8 @@
 #define VSCP_TYPE_WEATHER_WIND_VERY_HIGH                    9
 #define VSCP_TYPE_WEATHER_AIR_FOGGY                         10
 #define VSCP_TYPE_WEATHER_AIR_FREEZING                      11
-#define VSCP_TYPE_WEATHER_AIR_COLD                          12
-#define VSCP_TYPE_WEATHER_AIR_VERY_COLD                     13
+#define VSCP_TYPE_WEATHER_AIR_VERY_COLD                     12
+#define VSCP_TYPE_WEATHER_AIR_COLD                          13
 #define VSCP_TYPE_WEATHER_AIR_NORMAL                        14
 #define VSCP_TYPE_WEATHER_AIR_HOT                           15
 #define VSCP_TYPE_WEATHER_AIR_VERY_HOT                      16    
@@ -684,8 +700,8 @@
 #define VSCP_TYPE_WEATHER_FORECAST_WIND_VERY_HIGH           9
 #define VSCP_TYPE_WEATHER_FORECAST_AIR_FOGGY                10
 #define VSCP_TYPE_WEATHER_FORECAST_AIR_FREEZING             11
-#define VSCP_TYPE_WEATHER_FORECAST_AIR_COLD                 12
-#define VSCP_TYPE_WEATHER_FORECAST_AIR_VERY_COLD            13
+#define VSCP_TYPE_WEATHER_FORECAST_AIR_VERY_COLD            12
+#define VSCP_TYPE_WEATHER_FORECAST_AIR_COLD                 13
 #define VSCP_TYPE_WEATHER_FORECAST_AIR_NORMAL               14
 #define VSCP_TYPE_WEATHER_FORECAST_AIR_HOT                  15
 #define VSCP_TYPE_WEATHER_FORECAST_AIR_VERY_HOT             16    
@@ -724,8 +740,6 @@
 #define VSCP_TYPE_WEATHER_FORECAST_WARNING_LEVEL4           49
 #define VSCP_TYPE_WEATHER_FORECAST_WARNING_LEVEL5           50
 #define VSCP_TYPE_WEATHER_FORECAST_ARMAGEDDON               51
-
-
 
 // class 100 (0x64) -- PHONE
 #define VSCP_TYPE_PHONE_GENERAL                             0
@@ -898,7 +912,7 @@
 #define VSCP_TYPE_LOCAL_GENERAL                             0
 
 ///////////////////////////////////////////////////////////////////////////////
-//              Level II
+//                              Level II
 ///////////////////////////////////////////////////////////////////////////////
 
 // Level II Protocol functionality Class=1024 (0x400)
@@ -985,6 +999,9 @@
 #define VSCP2_TYPE_MEASUREMENT_STR_IRRADIANCE               55
 #define VSCP2_TYPE_MEASUREMENT_STR_SPECTRAL_RADIANCE        56
 #define VSCP2_TYPE_MEASUREMENT_STR_SPECTRAL_IRRADIANCE      57
+#define VSCP2_TYPE_MEASUREMENT_STR_SOUND_PRESSURE           58
+#define VSCP2_TYPE_MEASUREMENT_STR_SOUND_DENSITY            59
+#define VSCP2_TYPE_MEASUREMENT_STR_SOUND_LEVEL              60
 
 // Level II Measurement String Class=1060 (0x424)
 #define VSCP2_TYPE_MEASUREMENT_FLOAT_GENERAL                  0
@@ -1044,6 +1061,9 @@
 #define VSCP2_TYPE_MEASUREMENT_FLOAT_IRRADIANCE               55
 #define VSCP2_TYPE_MEASUREMENT_FLOAT_SPECTRAL_RADIANCE        56
 #define VSCP2_TYPE_MEASUREMENT_FLOAT_SPECTRAL_IRRADIANCE      57
+#define VSCP2_TYPE_MEASUREMENT_FLOAT_SOUND_PRESSURE           58
+#define VSCP2_TYPE_MEASUREMENT_FLOAT_SOUND_DENSITY            59
+#define VSCP2_TYPE_MEASUREMENT_FLOAT_SOUND_LEVEL              60
 
 // Level II VSCPD daemon functionality Class=65535 (0xFFFF)
 #define VSCP2_TYPE_VSCPD_GENERAL                                0
