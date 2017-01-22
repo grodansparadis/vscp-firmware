@@ -54,7 +54,7 @@ const uint8_t GUID[ 16 ] = {
 
 
 // Device string is stored in ROM for this module (max 32 bytes)
-const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/BETAMega.xml";
+const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/DEVMega.xml";
 
 
 // Manufacturer id's is stored in ROM for this module
@@ -73,7 +73,6 @@ const uint8_t vscp_manufacturer_id[8] = {
 
 // Variables
 volatile uint16_t measurement_clock;	// 1 ms timer counter
-
 //int16_t btncnt[ 1 ];    // Switch counters 
 
 // Prototypes
@@ -230,7 +229,6 @@ int main( void )
 
 
 
-
 	// Initialize the VSCP functionality
 	vscp_init();
 
@@ -240,7 +238,12 @@ int main( void )
 	//read default values for output ports
 	outputport1 = ~readEEPROM(VSCP_EEPROM_REGISTER + REG_OUTPUT_DEFAULT_STATE1);
 	outputport2 = ~bitflip(readEEPROM(VSCP_EEPROM_REGISTER + REG_OUTPUT_DEFAULT_STATE2));
-
+	
+	//read timer prescalers
+	unsigned int t ;
+	for (t=1;t<=NRofTimers;t++) 
+	{VSCP_USER_TIMER_PRESCALER[t] = readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_PRE+t-1);}
+			
     while ( 1 ) {  // Loop Forever
 
 
@@ -265,13 +268,65 @@ int main( void )
             measurement_clock = 0;
             // Do VSCP one second jobs 
             vscp_doOneSecondWork();
-			LED_IND_TOGGLE; // toggle indicator LED every second (hartbeat signal)
+			LED_IND_TOGGLE; // toggle indicator LED every second (heartbeat signal)
 			
-
+			char buf[30];
+			//handle timers
+			for (t=1;t<=NRofTimers;t++)
+			{
+				if (VSCP_USER_TIMER[t] != 0) // only active timers
+				{
+					VSCP_USER_TIMER_PRESCALER[t] -= 1; //decrease  prescaler
+					sprintf(buf, "pre-:%i-%i", t,VSCP_USER_TIMER_PRESCALER[t]);
+					uart_puts(buf);
+					if (VSCP_USER_TIMER_PRESCALER[t] == 0)
+					{
+						VSCP_USER_TIMER[t] -= 1;
+						VSCP_USER_TIMER_PRESCALER[t] = readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_PRE+t-1);
+						//uart_puts( "pre0" ); 
+						sprintf(buf, "pre0:%i-timer:%i", t,VSCP_USER_TIMER[t]);
+						uart_puts(buf);
+					}
+					if (VSCP_USER_TIMER[t] == 0)  // when timer reaches 0, perform actions & stop timer
+					{
+						#ifdef PRINT_TIMER_EVENTS
+						sprintf(buf, "T0:%i", t);
+						uart_puts(buf);
+						#endif
+						
+						//actions
+						
+						//send out event
+						// only sent event if class and type are defined
+						if ((readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_CLASS + ((t-1)*12)) != 0x00) & (readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_TYPE + ((t-1)*12)) != 0x00))
+						{
+							uart_puts( "event" );
+							vscp_omsg.priority = VSCP_PRIORITY_MEDIUM;
+							vscp_omsg.flags = VSCP_VALID_MSG + 3;
+							vscp_omsg.vscp_class = readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_CLASS + ((t-1)*12));
+							vscp_omsg.vscp_type = readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_TYPE + ((t-1)*12));
+							vscp_omsg.data[ 0 ] = t;	// timer 
+							vscp_omsg.data[ 1 ] = readEEPROM( VSCP_EEPROM_REGISTER + REG_TIMER1_ZONE + ((t-1)*12) );
+							vscp_omsg.data[ 2 ] = readEEPROM( VSCP_EEPROM_REGISTER + REG_TIMER1_SUBZONE + ((t-1)*12) );
+							vscp_sendEvent();	// Send data 
+						}
+						//toggle bits
+						outputport1 ^= readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_TOGGLE1 + ((t-1)*12));
+						outputport2 ^= bitflip((readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_TOGGLE2 + ((t-1)*12))));
+						// turn on selected bits
+						outputport1 &= ~ readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_ON1 + ((t-1)*12));
+						outputport2 &= ~ bitflip((readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_ON2 + ((t-1)*12))));
+						// turn off selected bits
+						outputport1 |= readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_OFF1 + ((t-1)*12));
+						outputport2 |= bitflip((readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_OFF2 + ((t-1)*12))));
+						// set another (or the same) selected timer
+						VSCP_USER_TIMER[readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_SETTIMER + ((t-1)*12))] = readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_SETTIMER_VALUE + ((t-1)*12));
+						
+					}
+				}
+			}
+			
 				
-				
-			
-			
 			
         }
 
@@ -343,8 +398,6 @@ int main( void )
 
         } // switch 
 
-
-
 		//check outputs and if change detected > send out event
         currentoutput = (((bitflip(read_output2))<<8)&0xFF00) | read_output1 ;
 		if (currentoutput != lastoutput) vscp_outputevent(currentoutput,lastoutput);
@@ -357,11 +410,11 @@ int main( void )
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // init_app_eeprom
 // should  only be performed after first startup!
 // all registers cleared!
+
 
 
 void vscp_init_pstorage( void )
@@ -370,12 +423,12 @@ void vscp_init_pstorage( void )
 	uart_puts( "cold start" );
 	#endif
 	// clear all eeprom registers to 0x00
-	uint8_t pos;
-	for (pos = VSCP_EEPROM_REGISTER ; pos <= (VSCP_EEPROM_REGISTER + REG_END) ; pos++)
+	uint16_t pos;
+	for (pos = VSCP_EEPROM_REGISTER ; pos <= (VSCP_EEPROM_REGISTER + REG_ZONE_END) ; pos++)
 	{
 		writeEEPROM(pos, 0x00 );
 	}
-	
+
 	//set default values
 	//writeEEPROM(VSCP_EEPROM_REGISTER + REG_INPUT_DEBOUNCE, time_debounce);
 	//writeEEPROM(VSCP_EEPROM_REGISTER + REG_INPUT_START, time_start);
@@ -390,7 +443,6 @@ void vscp_init_pstorage( void )
 	#ifdef PRINT_GENERAL_EVENTS
 	uart_puts( "default values written" );
 	#endif
-	
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -404,12 +456,9 @@ void vscp_init_pstorage( void )
 // only routines that are hardware dependant are left here
 ///////////////////////////////////////////////////////////////////////////////
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 //                        VSCP Required Methods
 //////////////////////////////////////////////////////////////////////////////
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_readAppReg
@@ -417,33 +466,72 @@ void vscp_init_pstorage( void )
 
 uint8_t vscp_readAppReg( uint8_t reg )
 {
-    uint8_t rv;
+	    
+	    uint8_t rv;
+	    // Assign the requested page, this variable is used in the implementation
+	    // specific function 'vscp_readAppReg()' and 'vscp_writeAppReg()' to actually
+	    // switch pages there
+	    //vscp_page_select = ((vscp_imsg.data[1] << 8) | vscp_imsg.data[2]);
+	    switch (vscp_page_select)
+	    {
+		case 1:
+		    //#ifdef PRINT_VSCP_EVENTS
+		    //uart_puts( "page1\n" );
+		    //#endif
+		    if ((reg >= 0) & (reg <= PAGE1_END-PAGE1_START))
+		    {
+			    rv =  readEEPROM( VSCP_EEPROM_REGISTER + reg + PAGE1_START);
+		    }
+		    
+		    else
+		    {
+			    rv = 0xA1;
+		    }
+		    
+			// Read actual output state
+			if ( REG_OUTPUT_STATE1-PAGE1_START == reg ) rv =  ~read_output1;
+			if ( REG_OUTPUT_STATE2-PAGE1_START == reg ) rv =  ~bitflip(read_output2);
 
+		    return rv;
+		    break;
+		    
+		case 2:
+			 #ifdef PRINT_VSCP_EVENTS
+		    uart_puts( "page2\n" );
+		    #endif
+			rv = 0xA2; //in case reg not resolved
+			uint8_t i;
+			for (i=1;i<= NRofTimers; i++)
+			{
+				if (reg == i)	rv = VSCP_USER_TIMER[i];
+			} 
 
-	if ((reg >= REG_ZONE) & (reg <= REG_ZONE_END))
-	{
-		rv =  readEEPROM( reg + VSCP_EEPROM_REGISTER);
-	}
-
-
-
-    // DM register space    
-    else if ( ( reg >= REG_DM_START ) & ( reg <  REG_DM_START + (DESCION_MATRIX_ELEMENTS * 8) ) )
-	{
-        rv =  readEEPROM( VSCP_EEPROM_REGISTER +  reg  );
-    }
-
-
-    else {
-        rv = 0x00;
-    }
-
-   // Read actual output state
-   if ( REG_OUTPUT_STATE1 == reg ) rv =  ~read_output1;
-   if ( REG_OUTPUT_STATE2 == reg ) rv =  ~bitflip(read_output2);
-
-    return rv;
-
+		    if ((reg >= REG_TIMER1_PRE-PAGE2_START+NRofTimers) & (reg <= PAGE2_END-PAGE2_START+NRofTimers))
+		    {
+			    rv =  readEEPROM( VSCP_EEPROM_REGISTER + reg + PAGE2_START-NRofTimers);
+		    }
+		    
+			else if (reg == 0) rv = 0x00;
+			
+		    return rv;
+		    break;
+		    
+		 case 0:
+		    // page 0 contains DM
+		    //uart_puts( "page0\n" );
+		    if ( ( reg >= REG_DM_START ) & ( reg <  REG_DM_START + (DESCION_MATRIX_ELEMENTS * 8) ) )
+		    {
+			    rv =  readEEPROM( VSCP_EEPROM_REGISTER +  reg  );
+		    }
+		    else
+		    {
+			    rv = 0xA0;
+		    }
+		    return rv;
+		    break;
+		    default:
+		    return 0xAA;
+	    } //end switch page select
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -455,38 +543,102 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
     uint8_t rv;
 
     rv = ~val; // error return
+    switch (vscp_page_select)
+    {
+	    case 0:
+	    // DM register space
+	    #ifdef PRINT_VSCP_EVENTS
+	    uart_puts( "WRpage0\n" );
+	    #endif
+	    if ( ( reg >= REG_DM_START ) & ( reg <= REG_DM_START + (DESCION_MATRIX_ELEMENTS * 8) ) )
+	    {
+		    writeEEPROM(VSCP_EEPROM_REGISTER + reg, val);
+		    rv =  readEEPROM( VSCP_EEPROM_REGISTER +  reg  );
+	    }
 
-	if ((reg >= REG_ZONE) & (reg <= REG_ZONE_END))
-	{
-		writeEEPROM(VSCP_EEPROM_REGISTER + reg, val); 
-		rv =  readEEPROM( reg + VSCP_EEPROM_REGISTER);
-	}
+	    return rv;
+	    break;
+	    
+	    case 1:
+	    // page 1
+	    #ifdef PRINT_VSCP_EVENTS
+	    uart_puts( "WRpage1\n" );
+	    #endif
+   		// write actual output state
+   		if ( REG_OUTPUT_STATE1 -PAGE1_START== reg )
+   		{
+	   		outputport1 = ~val;
+	   		__asm__ __volatile__ ("nop");
+	   		rv =  ~read_output1;
+   		}
+   	
+   		if ( REG_OUTPUT_STATE2 -PAGE1_START== reg )
+   		{
+	   		outputport2 = ~bitflip(val);
+	   		__asm__ __volatile__ ("nop");
+	   		rv =  ~bitflip(read_output2);
+   		}
 
-    // DM register space    
-    else if ( ( reg >= REG_DM_START ) & ( reg <= REG_DM_START + (DESCION_MATRIX_ELEMENTS * 8) ) )
-	{
-        writeEEPROM(VSCP_EEPROM_REGISTER + reg, val); 
-		rv =  readEEPROM( VSCP_EEPROM_REGISTER +  reg  );
-    }
-
-   	// write actual output state
-   	if ( REG_OUTPUT_STATE1 == reg ) 
-   	{
-   		outputport1 = ~val;
-		__asm__ __volatile__ ("nop");
-		rv =  ~read_output1;
-	}
-   
-   	if ( REG_OUTPUT_STATE2 == reg )
-	{
-		outputport2 = ~bitflip(val);
-		__asm__ __volatile__ ("nop");
-		rv =  ~bitflip(read_output2);
-	}
-
-
+	    else if ((reg >= REG_ZONE-PAGE1_START) & (reg <= REG_ZONE_END-PAGE1_START))
+	    {
+		    #ifdef PRINT_VSCP_EVENTS
+		    uart_puts( "WRp1R\n" );
+		    #endif
+		    writeEEPROM(VSCP_EEPROM_REGISTER + reg + PAGE1_START, val);
+		    rv =  readEEPROM( reg + VSCP_EEPROM_REGISTER + PAGE1_START);
+	    }
+	    
+	    else
+	    {
+		    rv=0xAC;
+	    }
+		
+	    case 2:
+	    // page 2
+	    #ifdef PRINT_VSCP_EVENTS
+	    uart_puts( "WRpage2\n" );
+	    #endif
+		rv=0xAC; // if not resolved
+		uint8_t i;
+		char buf[100];
+	    for (i=1;i<= NRofTimers; i++)
+	    {
+			sprintf(buf, "check row:%i", i);
+			uart_puts(buf);
+		    if (reg == i)
+			{	VSCP_USER_TIMER[i] = val;
+				rv = val;
+				#ifdef PRINT_TIMER_EVENTS
+				uart_puts( "reg timer value set\n" );
+				#endif
+			}
+			if (reg == REG_TIMER1_PRE-PAGE2_START+i+7)
+			{	
+				#ifdef PRINT_TIMER_EVENTS
+				uart_puts( "reg timer pre set\n" );
+				#endif
+				writeEEPROM( (VSCP_EEPROM_REGISTER + REG_TIMER1_PRE+i-1),val);
+				VSCP_USER_TIMER_PRESCALER[i] = readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_PRE+i-1);
+				rv =  VSCP_USER_TIMER_PRESCALER[i];
+			}
+	    }
+	
+		if ((reg >= REG_TIMER1_ZONE	-PAGE2_START+NRofTimers) & (reg <= PAGE2_END-PAGE2_START+NRofTimers))
+		{
+			uart_puts( "aux reg timer set\n" );
+			writeEEPROM( (reg + VSCP_EEPROM_REGISTER + PAGE2_START-NRofTimers),val);
+			rv =  readEEPROM(reg + VSCP_EEPROM_REGISTER + PAGE2_START-NRofTimers);
+		}
+		
+		else if (reg == 0) rv = val;
+		
+	    break;
+	    
+	    default:
+	    rv=0xAA;
+    }//switch
+    
     return rv;	
-
 }
 
 
@@ -533,8 +685,8 @@ static void doDM( void )
 		uart_puts(buf);
 		sprintf(buf, "DMflag: %02x", dmflags);
 		uart_puts(buf);
-
 		#endif
+
         // Is the DM row enabled?
         if ( dmflags & VSCP_DM_FLAG_ENABLED ) {
 			#ifdef PRINT_DM_EVENTS
@@ -596,6 +748,9 @@ static void doDM( void )
 					case ACTION_DM_OFF:			// DM row OFF
 						doActionOffDM( dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
 						break;
+					case ACTION_SET_TIMER:		// set timer
+						doActionSetTimer(1,readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ));
+						
 					} // case	
 
 	            } 

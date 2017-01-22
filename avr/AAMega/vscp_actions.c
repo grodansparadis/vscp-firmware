@@ -141,8 +141,6 @@ uart_puts( "debug doActionOffOut\n" );
 				continue;
 				}
 		}		
-	
-		outputport1 |= _BV(i);
 		if (port == 1) outputport1 |= _BV(i);
 		if (port == 2) outputport2 |= _BV(portflip(i));
 
@@ -242,7 +240,7 @@ void doActionOffDM( unsigned char dmflags, unsigned char arg )
 		// If the rely should not be handled just move on
 		if ( !( arg & ( 1 << i ) ) ) continue;
 		
-		// Check if subzone should match and if so if it match
+				// Check if subzone should match and if so if it match
 		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE )
 		{
 			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_SUBZONE) )
@@ -250,6 +248,7 @@ void doActionOffDM( unsigned char dmflags, unsigned char arg )
 				continue;
 			}
 		}
+		
 		dmToggleflags = readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START  + VSCP_DM_POS_FLAGS + ( VSCP_SIZE_STD_DM_ROW * i ) );
 		writeEEPROM(( VSCP_EEPROM_REGISTER + REG_DM_START  + VSCP_DM_POS_FLAGS + ( VSCP_SIZE_STD_DM_ROW * i )),dmToggleflags & ~(VSCP_DM_FLAG_ENABLED) );
 				
@@ -259,6 +258,46 @@ void doActionOffDM( unsigned char dmflags, unsigned char arg )
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// doActionSetTimer
+void doActionSetTimer(unsigned char dmflags, unsigned char arg)
+{
+	#ifdef PRINT_DM_EVENTS
+	uart_puts( "debug doActionSetTimer\n" );
+	#endif
+	//VSCP_USER_TIMER[select_timer] = arg;
+		unsigned char i;
+		
+		for ( i=1; i<2; i++ )
+		{
+			#ifdef PRINT_DM_EVENTS
+			uart_puts( "doActionSetTimer i" );
+			#endif
+			// If the rely should not be handled just move on
+			//if ( !( arg & ( 1 << i ) ) ) continue;
+			
+			// Check if zone should match and if so if it match
+			if ( dmflags & VSCP_DM_FLAG_CHECK_ZONE )
+			{
+				if ( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_TIMER1_ZONE) + i )
+				{
+					continue;
+				}
+			}
+
+			// Check if subzone should match and if so if it match
+			if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE )
+			{
+				if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_TIMER1_ZONE) + i )
+				{
+					continue;
+				}
+			}
+			
+			VSCP_USER_TIMER[i] = arg;
+
+		}
+}
 
 
 
@@ -303,6 +342,8 @@ void vscp_outputevent(unsigned int current,unsigned int previous)
 	}
 }
 
+//flip over portpin value --> 8 becomes 1, 7 becomes 2 ,...
+//only for 1 bit 
 unsigned char portflip(unsigned char old_val)
 {
 	unsigned char i,reverse =7;
@@ -314,6 +355,7 @@ unsigned char portflip(unsigned char old_val)
     return(reverse); 
 }
 
+// flip over complete byte (lsb becomes msb)
 unsigned char bitflip(unsigned char old_val) 
 { 
    unsigned char new_val = 0; 

@@ -35,6 +35,18 @@
 #define ACTION_DM_TOGGLE					7
 #define ACTION_DM_ON						8
 #define ACTION_DM_OFF						9
+//0x0A .. 0x0F spare
+#define ACTION_SET_TIMER					0x10
+#define ACTION_SET_TIMER2					0x11
+#define ACTION_SET_TIMER3					0x12
+#define ACTION_SET_TIMER4					0x13
+#define ACTION_SET_TIMER5					0x14
+#define ACTION_SET_TIMER6					0x15
+#define ACTION_SET_TIMER7					0x16
+#define ACTION_SET_TIMER8					0x17
+
+
+
 
 //#define ACTION_HELLO_WORLD					2
 
@@ -46,10 +58,12 @@ void doActionOffOut(unsigned char port, unsigned char dmflags, unsigned char arg
 void doActionToggleDM( unsigned char dmflags, unsigned char arg );
 void doActionOnDM( unsigned char dmflags, unsigned char arg );
 void doActionOffDM( unsigned char dmflags, unsigned char arg );
+void doActionSetTimer(unsigned char dmflags, unsigned char arg);
 void doActionHelloWorld( unsigned char dmflags, unsigned char arg );
 void vscp_outputevent(unsigned int current,unsigned int previous);
 unsigned char portflip(unsigned char old_val); //flip over portpin value --> 8 becomes 1, 7 becomes 2 ,...
 unsigned char bitflip(unsigned char old_val); // flip over complete byte (lsb becomes msb)
+
 
 
 
