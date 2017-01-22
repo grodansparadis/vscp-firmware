@@ -418,6 +418,16 @@ void vscp_handleSetNickname(void)
         // Yes, we are addressed
         vscp_nickname = vscp_imsg.data[ 1 ];
         vscp_writeNicknamePermanent(vscp_nickname);
+		
+		//return nickname accepted
+		vscp_omsg.flags = VSCP_VALID_MSG + 1; // one data byte
+		vscp_omsg.priority = VSCP_PRIORITY_HIGH;
+		vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+		vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
+		vscp_omsg.data[ 0 ] = vscp_nickname;
+
+		// send the event
+		vscp_sendEvent();
 
     }
 }
@@ -903,7 +913,7 @@ void vscp_handleProtocolEvent(void)
             break;
 
         case VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER:
-
+/*
             if ((vscp_nickname == vscp_imsg.data[ 0 ]) &&
                 // byte 1 contains algorithm. Handle in callback.
                 (vscp_getGUID(0) == vscp_imsg.data[ 2 ]) &&
@@ -912,8 +922,9 @@ void vscp_handleProtocolEvent(void)
                 (vscp_getGUID(7) == vscp_imsg.data[ 5 ]) &&
                 (((vscp_page_select >> 8) & 0xff) == vscp_imsg.data[ 6 ]) &&
                 ((vscp_page_select & 0xff) == vscp_imsg.data[ 7 ])) {
-
-                vscp_goBootloaderMode( vscp_imsg.data[ 1 ] );
+*/
+                if ((vscp_nickname == vscp_imsg.data[ 0 ])){
+				vscp_goBootloaderMode( vscp_imsg.data[ 1 ] );
             }
             break;
 
