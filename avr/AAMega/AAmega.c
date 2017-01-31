@@ -52,9 +52,8 @@ const uint8_t GUID[ 16 ] = {
 #endif
 #include "methods.c"
 
-
 // Device string is stored in ROM for this module (max 32 bytes)
-const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/DEVMega.xml";
+const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/Mega.xml";
 
 
 // Manufacturer id's is stored in ROM for this module
