@@ -952,27 +952,7 @@ void vscp_init_pstorage( void )
 	#ifdef PRINT_GENERAL_EVENTS
 	uart_puts( "cold start" );
 	#endif
-	// clear all eeprom registers to 0x00
-	uint8_t pos;
-	for (pos = VSCP_EEPROM_REGISTER ; pos <= (VSCP_EEPROM_REGISTER + PAGE1_END) ; pos++)
-	{
-		writeEEPROM(pos, 0x00 );
-	}
-	
-	//set default values
-	//writeEEPROM(VSCP_EEPROM_REGISTER + REG_INPUT_DEBOUNCE, time_debounce);
-	//writeEEPROM(VSCP_EEPROM_REGISTER + REG_INPUT_START, time_start);
-	for (pos=0; pos <=7 ;pos++)
-	{
-		writeEEPROM(VSCP_EEPROM_REGISTER + REG_SW1_SHORT_CLASS+(pos*5) ,VSCP_CLASS1_INFORMATION);
-		writeEEPROM(VSCP_EEPROM_REGISTER + REG_SW1_SHORT_TYPE+(pos*5) ,VSCP_TYPE_INFORMATION_BUTTON);
-		//only button values written
-		//writeEEPROM(VSCP_EEPROM_REGISTER + REG_SW1_LONG_CLASS+(pos*4) ,VSCP_CLASS1_INFORMATION);
-		//writeEEPROM(VSCP_EEPROM_REGISTER + REG_SW1_LONG_TYPE+(pos*4) ,VSCP_TYPE_INFORMATION_LONG_CLICK);
-	}
-	#ifdef PRINT_GENERAL_EVENTS
-	uart_puts( "default values written" );
-	#endif
+	no cold start should be implemented with firmware
 	*/
 }
 
