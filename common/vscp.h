@@ -4,7 +4,7 @@
 //
 // The MIT License (MIT)
 // 
-// Copyright (c) 2000-2016 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
+// Copyright (c) 2000-2017 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -416,7 +416,7 @@ struct myNode {
 
 // Bits for VSCP server 16-bit capability code
 // used by CLASS1.PROTOCOL, HIGH END SERVER RESPONSE
-// and low end 15-bits for
+// and low end 16-bits for
 // CLASS2.PROTOCOL, HIGH END SERVER HEART BEAT
 
 #define VSCP_SERVER_CAPABILITY_MULTICAST            (1<<16)
@@ -468,6 +468,121 @@ struct myNode {
 #define VSCP_ERROR_CONNECTION                   40      // Could not connect   
 #define VSCP_ERROR_INVALID_HANDLE               41      // The handle is not valid
 #define VSCP_ERROR_OPERATION_FAILED             42      // Operation failed for some reason
+#define VSCP_ERROR_BUFFER_TO_SMALL              43      // Supplied buffer is to small to fit content
+
+/*!
+    Template for VSCP XML event data
+ 
+    data: datetime,head,timestamp,obid,class,type,guid,sizedata,data,note
+  
+<event>
+    <time>2017-01-13T10:16:02</time>
+    <head>3</head>
+    <timestamp>50817</timestamp>
+    <obid>1234</obid>
+    <class>10</class>
+    <type>6</type>
+    <guid>00:00:00:00:00:00:00:00:00:00:00:00:00:01:00:02</guid>
+    <sizedata>7</sizedata>
+    <data>0x48,0x34,0x35,0x2E,0x34,0x36,0x34</data>
+    <note></note>
+</event>
+ */
+#define VSCP_XML_EVENT_TEMPLATE "<event>\n"\
+    "<time>%s</time>\n"\
+    "<head>%d</head>\n"\
+    "<timestamp>%lu</timestamp>\n"\
+    "<obid>%lu</obid>\n"\
+    "<class>%d</class>\n"\
+    "<type>%d</type>\n"\
+    "<guid>%s</guid>\n"\
+    "<sizedata>%d</sizedata>\n"\
+    "<data>%s</data>\n"\
+    "<note>%s</note>\n"\
+"</event>"
+
+
+/*
+  
+    Template for VSCP JSON event data
+    data: datetime,head,timestamp,obid,class,type,guid,data,note 
+  
+{
+    "time": "2017-01-13T10:16:02",
+    "head": 2,
+    "timestamp":50817,
+    "obid"; 123,
+    "class": 10,
+    "type": 8,
+    "guid": "00:00:00:00:00:00:00:00:00:00:00:00:00:01:00:02",
+    "data": [1,2,3,4,5,6,7],
+    "note": "This is some text"
+}
+*/
+#define VSCP_JSON_EVENT_TEMPLATE "{\n"\
+    "\"time\": \"%s\",\n"\
+    "\"head\": %d,\n"\
+    "\"timestamp\":%lu,\n"\
+    "\"obid\";  %lu,\n"\
+    "\"class\": %d,\n"\
+    "\"type\": %d,\n"\
+    "\"guid\": \"%s\",\n"\
+    "\"data\": [%s],\n"\
+    "\"note\": \"%s\"\n"\
+"}"
+
+/*!
+ 
+    Template for VSCP HTML event data  
+   
+    data: datetime,class,type,data-count,data,guid,head,timestamp,obid,note
+ 
+<h2>VSCP Event</h2>
+<p>
+Time: 2017-01-13T10:16:02 <br>
+</p>
+<p>
+Class: 10 <br>
+Type: 6 <br>
+</p>
+<p>
+Data count: 6<br>
+Data: 1,2,3,4,5,6,7<br>
+</p>
+<p>
+From GUID: 00:00:00:00:00:00:00:00:00:00:00:00:00:01:00:02<br>
+</p>
+<p>
+Head: 6 <br>
+Timestamp: 1234 <br>
+obid: 1234 <br>
+note: This is a note <br>
+</p>
+ 
+*/
+
+
+#define VSCP_HTML_EVENT_TEMPLATE "<h2>VSCP Event</h2> "\
+    "<p>"\
+    "Time: %s <br>"\
+    "</p>"\
+    "<p>"\
+    "Class: %d <br>"\
+    "Type: %d <br>"\
+    "</p>"\
+    "<p>"\
+    "Data count: %d<br>"\
+    "Data: %s<br>"\
+    "</p>"\
+    "<p>"\
+    "From GUID: %s<br>"\
+    "</p>"\
+    "<p>"\
+    "Head: %d <br>"\
+    "Timestamp: %lu <br>"\
+    "obid: %lu <br>"\
+    "note: %s <br>"\
+    "</p>"
 
 
 #ifdef __cplusplus

@@ -15,7 +15,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2016 Ake Hedman, 
+ * Copyright (c) 2000-2017 Ake Hedman, 
  * Grodans Paradis AB <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -70,17 +70,10 @@
 #define VSCP_CLASS1_WEATHER                             90
 #define VSCP_CLASS1_WEATHER_FORECAST                    95
 #define VSCP_CLASS1_PHONE                               100
-#define VSCP_CLASS1_LIN                                 101
 #define VSCP_CLASS1_DISPLAY                             102
 #define VSCP_CLASS1_REMOTE                              110
 
-// 200-205 has been deprecated
-#define VSCP_CLASS1_ONEWIRE                             200
-#define VSCP_CLASS1_X10                                 201
-#define VSCP_CLASS1_LON                                 202
-#define VSCP_CLASS1_EIB                                 203
-#define VSCP_CLASS1_SNAP                                204
-#define VSCP_CLASS1_MUMIN                               205
+// 200-205 has been deprecated & removed
 
 #define VSCP_CLASS1_GPS                                 206
 #define VSCP_CLASS1_WIRELESS                            212
@@ -108,7 +101,6 @@
 #define VSCP_CLASS2_LEVEL1_WEATHER                      ( 512 + 90 )
 #define VSCP_CLASS2_LEVEL1_WEATHER_FORECAST             ( 512 + 95 )
 #define VSCP_CLASS2_LEVEL1_PHONE                        ( 512 + 100 )
-#define VSCP_CLASS2_LEVEL1_LIN                          ( 512 + 101 )
 #define VSCP_CLASS2_LEVEL1_REMOTE                       ( 512 + 110 )
 #define VSCP_CLASS2_LEVEL1_GPS                          ( 512 + 206 )
 #define VSCP_CLASS2_LEVEL1_WIRELESS                     ( 512 + 212 )
