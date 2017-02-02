@@ -39,7 +39,7 @@
 #include "vscp_type.h"
 #include "vscp_registers.h"
 #include "vscp_actions.c"
-#include "../avr/AAboot/AAboot/AAboot/bootsupport.c"
+#include "../AAboot/bootsupport.c"
 
 
 

@@ -4,13 +4,13 @@
 # use then simply dont set this variable, it becomes default :)
 #==========================================================================
 ifndef VSCP_SOFTWARE
-   $(error > You must set environment variable VSCP_HOME in your system or shell)
+   $(error > You must set environment variable VSCP_SOFTWARE in your system or shell)
 endif
 ifndef VSCP_FIRMWARE
    $(info > VSCP_FIRMWARE was unset, forcing it to be set to $(VSCP_HOME)\firmware)
    export VSCP_FIRMWARE=$(VSCP_HOME)\firmware
 endif
-# $(info > VSCP Paths set to $(VSCP_HOME) and $(VSCP_FIRMWARE) respectivly)
+# $(info > VSCP Paths set to $(VSCP_SOFTWARE) and $(VSCP_FIRMWARE) respectivly)
 
 
 PRG = AAmega
@@ -25,7 +25,6 @@ OBJ += $(VSCP_FIRMWARE)/common/vscp_firmware.c
 MCU_TARGET	= at90can32
 
 OPTIMIZE	= -Os
-
 
 EXTRAINCDIRS   = $(VSCP_FIRMWARE)/common
 EXTRAINCDIRS  += $(VSCP_FIRMWARE)/avr/common

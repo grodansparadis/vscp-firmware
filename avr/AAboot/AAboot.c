@@ -18,6 +18,7 @@
 #include "vscp_registers.h"
 #include <avr/wdt.h>
 
+
 #ifndef GUID_IN_EEPROM
 // GUID is stored in ROM for this module
 //		IMPORTANT!!!
@@ -69,7 +70,7 @@ int main( void )
     UCSRB = MSK_UART_ENABLE_TX | MSK_UART_ENABLE_RX;
 
 	#ifdef PRINT_DEBUG_EVENTS
-	uart_puts( "AAboot 0.0\n" );
+	uart_puts( "AAboot 0.1 2016\n" );
 	#endif
 
    //checkout bootloader_flag
@@ -214,7 +215,7 @@ void mainbootloader()
 					switch( vscp_imsg.vscp_type ) 
 						{
 						case VSCP_TYPE_PROTOCOL_BLOCK_DATA:
-							#ifdef PRINT_DEBUG_EVENTS				
+							#ifdef PRINT_DEBUG_EVENTS_EACH_BLOCK				
 							uart_puts("BOOT_DATABLOCK");
 							#endif
 							if (BTL_BLOCK < 32) //prevent overflow
@@ -862,9 +863,9 @@ void vscp_setSegmentCRC( uint8_t crc )
 //  vscp_setControlByte
 //
 
-void vscp_setControlByte( uint8_t ctrl )
+void vscp_setControlByte( uint8_t idx, uint8_t ctrl )
 {
-    writeEEPROM( VSCP_EEPROM_CONTROL, ctrl );
+	writeEEPROM( VSCP_EEPROM_CONTROL+idx, ctrl );
 }
 
 
@@ -872,10 +873,11 @@ void vscp_setControlByte( uint8_t ctrl )
 //  vscp_getControlByte
 //
 
-uint8_t vscp_getControlByte( void )
+uint8_t vscp_getControlByte( uint8_t idx )
 {
-    return readEEPROM( VSCP_EEPROM_CONTROL );
+	return readEEPROM( VSCP_EEPROM_CONTROL + idx );
 }
+
 
 uint32_t vscp_getFamilyCode(void)
 {
@@ -942,6 +944,36 @@ void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId 
     vscp_omsg.data[ 2 ] = readEEPROM( VSCP_EEPROM_END + REG_ZONE + idx );
 
     vscp_sendEvent();	// Send data
+}
+
+void vscp_init_pstorage( void )
+{
+	/*
+	#ifdef PRINT_GENERAL_EVENTS
+	uart_puts( "cold start" );
+	#endif
+	// clear all eeprom registers to 0x00
+	uint8_t pos;
+	for (pos = VSCP_EEPROM_REGISTER ; pos <= (VSCP_EEPROM_REGISTER + PAGE1_END) ; pos++)
+	{
+		writeEEPROM(pos, 0x00 );
+	}
+	
+	//set default values
+	//writeEEPROM(VSCP_EEPROM_REGISTER + REG_INPUT_DEBOUNCE, time_debounce);
+	//writeEEPROM(VSCP_EEPROM_REGISTER + REG_INPUT_START, time_start);
+	for (pos=0; pos <=7 ;pos++)
+	{
+		writeEEPROM(VSCP_EEPROM_REGISTER + REG_SW1_SHORT_CLASS+(pos*5) ,VSCP_CLASS1_INFORMATION);
+		writeEEPROM(VSCP_EEPROM_REGISTER + REG_SW1_SHORT_TYPE+(pos*5) ,VSCP_TYPE_INFORMATION_BUTTON);
+		//only button values written
+		//writeEEPROM(VSCP_EEPROM_REGISTER + REG_SW1_LONG_CLASS+(pos*4) ,VSCP_CLASS1_INFORMATION);
+		//writeEEPROM(VSCP_EEPROM_REGISTER + REG_SW1_LONG_TYPE+(pos*4) ,VSCP_TYPE_INFORMATION_LONG_CLICK);
+	}
+	#ifdef PRINT_GENERAL_EVENTS
+	uart_puts( "default values written" );
+	#endif
+	*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////
