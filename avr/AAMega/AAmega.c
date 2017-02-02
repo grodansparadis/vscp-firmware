@@ -17,7 +17,6 @@
  *---------------------------------------------------------------------------
 */
 
-
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include "methods.h"
@@ -214,7 +213,7 @@ int main( void )
     }
 
 	#ifdef PRINT_GENERAL_EVENTS
-		uart_puts( "AAMEGA 0.1\n" );
+		uart_puts( "AAMEGA 2017\n" );
 	#endif
 
 

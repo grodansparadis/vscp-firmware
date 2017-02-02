@@ -913,7 +913,7 @@ void vscp_handleProtocolEvent(void)
             break;
 
         case VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER:
-/*
+
             if ((vscp_nickname == vscp_imsg.data[ 0 ]) &&
                 // byte 1 contains algorithm. Handle in callback.
                 (vscp_getGUID(0) == vscp_imsg.data[ 2 ]) &&
@@ -922,8 +922,8 @@ void vscp_handleProtocolEvent(void)
                 (vscp_getGUID(7) == vscp_imsg.data[ 5 ]) &&
                 (((vscp_page_select >> 8) & 0xff) == vscp_imsg.data[ 6 ]) &&
                 ((vscp_page_select & 0xff) == vscp_imsg.data[ 7 ])) {
-*/
-                if ((vscp_nickname == vscp_imsg.data[ 0 ])){
+/*
+                if ((vscp_nickname == vscp_imsg.data[ 0 ])){*/
 				vscp_goBootloaderMode( vscp_imsg.data[ 1 ] );
             }
             break;

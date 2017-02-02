@@ -8,3 +8,4 @@ set environment variable (system / advanced system settings / advanced / environ
 open project in atmelstudio
 
 
+add "mdfhost" to C:\Windows\System32\drivers\etc\hosts file on PC to link to ip/host name. 
