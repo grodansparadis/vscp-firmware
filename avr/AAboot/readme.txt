@@ -10,7 +10,7 @@ Tested with:
 -AAMega
 
 
-Currently used setup is AVRstudio 4.18 together with WINAVR 20090313
+Currently used setup is AVRstudio7
 
 
 Serial channel, 9600-8N1 is used for debug messages.

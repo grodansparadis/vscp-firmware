@@ -146,7 +146,7 @@ namespace VSCP
 
         private void ButtonUpload_Click(object sender, EventArgs e)
         {
-            char[] tempchar = new char[4];
+            char[] tempchar = new char[18];
             string tempstring;
             int succesfulblocks = 0;
             int expectedblocks = 0;
@@ -156,12 +156,34 @@ namespace VSCP
             tempstring = nodeIdBox.SelectedItem.ToString();
             tempchar[0] = Convert.ToChar(tempstring);
             tempchar[1] = ',';
-            tempchar[2] = '0';
-            tempchar[3] = '9';
+            tempstring = algorithm.SelectedItem.ToString();
+            tempchar[2] = Convert.ToChar(tempstring);
+            tempchar[3] = ',';
+            tempstring = GUID0.Value.ToString();
+            tempchar[4] = Convert.ToChar(tempstring);
+            tempchar[5] = ',';
+            tempstring = GUID3.Value.ToString();
+            tempchar[6] = Convert.ToChar(tempstring);
+            tempchar[7] = ',';
+            tempstring = GUID5.Value.ToString();
+            tempchar[8] = Convert.ToChar(tempstring);
+            tempchar[9] = ',';
+            tempstring = GUID7.Value.ToString();
+            tempchar[10] = Convert.ToChar(tempstring);
+            tempchar[11] = ',';
+            tempstring = REGx92.Value.ToString();
+            tempchar[12] = Convert.ToChar(tempstring);
+            tempchar[13] = ',';
+            tempstring = REGx93.Value.ToString();
+            tempchar[14] = Convert.ToChar(tempstring);
+            tempchar[15] = ',';
+            tempchar[16] = '0';
+            tempchar[17] = '9';
             tempstring = new string(tempchar);
             myDaemon.data = tempstring;
             myDaemon.EventSend();
             System.Threading.Thread.Sleep(1000);
+            listBox1.Items.Add("waiting");
 
             bool REC_ACK = false; //! set to true only to check file processing
             //wait for BOOT_ACK
@@ -169,8 +191,10 @@ namespace VSCP
             {
                 if (myDaemon.EventAvailable() != 0)
                 {
+                    listBox1.Items.Add("event");
                     string s;
                     s = (myDaemon.RecEvent());
+                    listBox1.Items.Add(s);
                     string[] sa = s.Split(',');
                     if ((sa[1].Equals("0")) & (sa[2].Equals("13")))
                     {
@@ -404,6 +428,15 @@ private void pagesender(string _page, string _buffer)
     }
     }
 
- }
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+    }
 
 }

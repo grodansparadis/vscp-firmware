@@ -99,6 +99,7 @@ namespace VSCP
             VSCPstream.Write(WriteBuffer, 0, WriteBuffer.Length);
             temp = Dreader.ReadLine();
             ReadBuffer = Dreader.ReadLine();
+            //listBox1.Items.Add(ReadBuffer);
             return temp; 
             //return ReadBuffer;
             //listBox1.Items.Add(ReadBuffer);
