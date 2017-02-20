@@ -1,0 +1,11 @@
+
+install atmelstudio7
+clone repositorys  (github)
+
+set environment variable (system / advanced system settings / advanced / environment variables)
+	VSCP_SOFTWARE & VSCP_FIRMWARE with path to vscp_firmware
+
+open project in atmelstudio
+
+
+add "mdfhost" to C:\Windows\System32\drivers\etc\hosts file on PC to link to ip/host name. 

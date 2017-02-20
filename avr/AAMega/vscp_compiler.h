@@ -26,6 +26,20 @@
 #ifndef CAN128_TEST_COMPILER_H
 #define CAN128_TEST_COMPILER_H
 
+//***************************debug options********************
+#define PRINT_GENERAL_EVENTS
+//#define PRINT_CAN_EVENTS
+//#define PRINT_IO_EVENTS
+//#define PRINT_VSCP_EVENTS
+//#define PRINT_DM_EVENTS
+//#define PRINT_TIMER_EVENTS
+//
+// Undefine one of the following suitable for the
+// platform you want to compile for
+//defined in makefile
+//#define ATMEL_STK501
+//#define OLIMEX_AT90CAN128
+//#define OLIMEX_AT90CAN32
 
 #endif
 

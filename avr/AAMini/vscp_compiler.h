@@ -29,9 +29,11 @@
 
 
 #endif
-
+//***************************hardware options*****************
 //#define OLIMEX_AT90CAN128
 #define AAmini00
+
+//***************************debug options********************
 #define PRINT_GENERAL_EVENTS
 //#define PRINT_CAN_EVENTS
 //#define PRINT_IO_EVENTS

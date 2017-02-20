@@ -48,3 +48,13 @@ Thumbs.db
 /avr/bootloader/standard/StandardVscpBoot/Debug/Makefile
 /avr/bootloader/standard/StandardVscpBoot/Debug/makedep.mk
 /avr/bootloader/standard/StandardVscpBoot/StandardVscpBoot.componentinfo.xml
+*.atsuo
+*.bin
+avr/AAMini/AAmini.componentinfo.xml
+avr/AAMini/AAmini.cproj
+*.hex
+avr/AAMega/AAmega.componentinfo.xml
+avr/AAboot/PCsoft/bootloader1/obj/x86/Debug/bootloader1.exe
+avr/AAboot/PCsoft/bootloader1/obj/x86/Debug/bootloader1.exe
+avr/AAboot/PCsoft/bootloader1/obj/x86/Debug/DesignTimeResolveAssemblyReferences.cache
+avr/AAboot/PCsoft/bootloader1/bin/Debug/bootloader1.exe

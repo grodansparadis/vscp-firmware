@@ -26,20 +26,6 @@
 
 #include <avr/io.h>
 
-
-// Undefine to print received and sent CAN events on serial channel
-//#define PRINT_CAN_EVENTS
-
-
-//
-// Undefine one of the following suitable for the
-// platform you want to compile for 
-//defined in makefile
-//#define ATMEL_STK501
-//#define OLIMEX_AT90CAN128
-//#define BOARD AAMINI00
-
-
 // System clock in kHz
 //defined in makefile
 //#define FOSC                16000  // Available value: 22118 16000 12000 11059 custom 

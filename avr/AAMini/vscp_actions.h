@@ -29,7 +29,9 @@
 #define ACTION_OUTP_TOGGLE					1
 #define ACTION_OUTP_ON						2
 #define ACTION_OUTP_OFF						3
-
+#define ACTION_DM_TOGGLE					4
+#define ACTION_DM_ON						5
+#define ACTION_DM_OFF						6
 //#define ACTION_HELLO_WORLD					2
 
 
@@ -37,6 +39,9 @@
 void doActionToggleOut( unsigned char dmflags, unsigned char arg );
 void doActionOnOut( unsigned char dmflags, unsigned char arg );
 void doActionOffOut( unsigned char dmflags, unsigned char arg );
+void doActionToggleDM( unsigned char dmflags, unsigned char arg );
+void doActionOnDM( unsigned char dmflags, unsigned char arg );
+void doActionOffDM( unsigned char dmflags, unsigned char arg );
 void doActionHelloWorld( unsigned char dmflags, unsigned char arg );
 void vscp_outputevent(unsigned char current,unsigned char previous);
 void doFollow();

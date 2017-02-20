@@ -10,7 +10,7 @@ Tested with:
 -AAMega
 
 
-Currently used setup is AVRstudio 4.18 together with WINAVR 20090313
+Currently used setup is AVRstudio7
 
 
 Serial channel, 9600-8N1 is used for debug messages.
@@ -68,6 +68,23 @@ A line with less than 16 words is handled correct.
 
 
 
+
+vscp_firmware.c to be modified to remain compatible with this old & deprecated bootloader:
+       case VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER:
+/*
+            if ((vscp_nickname == vscp_imsg.data[ 0 ]) &&
+                // byte 1 contains algorithm. Handle in callback.
+                (vscp_getGUID(0) == vscp_imsg.data[ 2 ]) &&
+                (vscp_getGUID(3) == vscp_imsg.data[ 3 ]) &&
+                (vscp_getGUID(5) == vscp_imsg.data[ 4 ]) &&
+                (vscp_getGUID(7) == vscp_imsg.data[ 5 ]) &&
+                (((vscp_page_select >> 8) & 0xff) == vscp_imsg.data[ 6 ]) &&
+                ((vscp_page_select & 0xff) == vscp_imsg.data[ 7 ])) {
+*/
+                if ((vscp_nickname == vscp_imsg.data[ 0 ])){
+				vscp_goBootloaderMode( vscp_imsg.data[ 1 ] );
+            }
+            break;
 --------------------------------------------------------------------------
  *This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages

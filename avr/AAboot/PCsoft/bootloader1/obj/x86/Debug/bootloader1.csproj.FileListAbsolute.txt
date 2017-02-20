@@ -1,0 +1,8 @@
+C:\Users\Sven\Documents\GitHub\vscp_firmware\avr\AAboot\PCsoft\bootloader1\bin\Debug\bootloader1.exe
+C:\Users\Sven\Documents\GitHub\vscp_firmware\avr\AAboot\PCsoft\bootloader1\bin\Debug\bootloader1.pdb
+C:\Users\Sven\Documents\GitHub\vscp_firmware\avr\AAboot\PCsoft\bootloader1\obj\x86\Debug\bootloader1.csprojResolveAssemblyReference.cache
+C:\Users\Sven\Documents\GitHub\vscp_firmware\avr\AAboot\PCsoft\bootloader1\obj\x86\Debug\VSCP.Form1.resources
+C:\Users\Sven\Documents\GitHub\vscp_firmware\avr\AAboot\PCsoft\bootloader1\obj\x86\Debug\VSCP.Properties.Resources.resources
+C:\Users\Sven\Documents\GitHub\vscp_firmware\avr\AAboot\PCsoft\bootloader1\obj\x86\Debug\bootloader1.csproj.GenerateResource.Cache
+C:\Users\Sven\Documents\GitHub\vscp_firmware\avr\AAboot\PCsoft\bootloader1\obj\x86\Debug\bootloader1.exe
+C:\Users\Sven\Documents\GitHub\vscp_firmware\avr\AAboot\PCsoft\bootloader1\obj\x86\Debug\bootloader1.pdb

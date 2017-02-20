@@ -10,6 +10,7 @@
 //#define AAmini00
 //#define PRINT_CAN_EVENTS 
 #define PRINT_DEBUG_EVENTS 
+//#define PRINT_DEBUG_EVENTS_EACH_BLOCK
 
 
 //#define can128

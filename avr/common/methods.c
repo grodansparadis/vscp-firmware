@@ -90,10 +90,10 @@ int8_t getVSCPFrame( uint16_t *pvscpclass,
 // readEEPROM
 //
 
-int readEEPROM( uint8_t addr )
+int readEEPROM( uint16_t addr )
 {
 	// we now use the avrlib-eeprom functions
-	uint8_t test = eeprom_read_byte( addr );
+	uint8_t test = eeprom_read_byte( (uint8_t*)addr );
 	return test;
 	//  while ( EECR & ( 1 << EEWE ) );
 	//  EEAR = addr;
@@ -105,10 +105,12 @@ int readEEPROM( uint8_t addr )
 // writeEEPROM
 //
 
-int writeEEPROM( uint8_t addr, uint8_t data )
+int writeEEPROM( uint16_t addr, uint8_t data )
 {
 	// we now use the avrlib-eeprom update functions, saves some write cycles
-	eeprom_update_byte(addr, data);
+	//eeprom_update_byte(addr, data);
+	eeprom_update_byte((uint8_t*)addr, data);
+	
 	return TRUE;
 	/*    while ( EECR & ( 1 << EEWE ) );
 	    EEAR = addr;
@@ -118,7 +120,6 @@ int writeEEPROM( uint8_t addr, uint8_t data )
 	    return TRUE;
 		*/
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 // vscp_readNicknamePermanent
@@ -364,9 +365,9 @@ void vscp_setSegmentCRC( uint8_t crc )
 //  vscp_setControlByte
 //
 
-void vscp_setControlByte( uint8_t ctrl )
+void vscp_setControlByte( uint8_t idx, uint8_t ctrl )
 {
-    writeEEPROM( VSCP_EEPROM_CONTROL, ctrl );
+	writeEEPROM( VSCP_EEPROM_CONTROL+idx, ctrl );
 }
 
 
@@ -374,9 +375,9 @@ void vscp_setControlByte( uint8_t ctrl )
 //  vscp_getControlByte
 //
 
-uint8_t vscp_getControlByte( void )
+uint8_t vscp_getControlByte( uint8_t idx )
 {
-    return readEEPROM( VSCP_EEPROM_CONTROL );
+	return readEEPROM( VSCP_EEPROM_CONTROL + idx );
 }
 
 ///////////////////////////////////////////////////////////////////////////////

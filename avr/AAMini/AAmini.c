@@ -1,18 +1,19 @@
 /* This is an modification of the demo_vscp_node_can128, credits to Akhe
  * see original header below this file
  * goal is to implement a small module for home automation including:
- * - 8 input (on/off)		done
- * - 8 output (on/off)		done
- * - IR capable receiver
- * - piezzo buzzer
- * - bootloader support
+ * - 8 input (on/off)
+ * - 8 output (on/off)
+ * - DM (change output, change DM-rows)
+ * - each input can be used as button or state based
+ * - each input can have own event
+ * - bootloader support		see bootloader project
  *
  * hardware supported:
  * olimex AVR-CAN board
- * custom board, AAmini 0.0, 0.1 will be published as openhardware
+ * custom board, AAmini 0.0, 0.1 available as openhardware
  *
- * version 0.0.1
- * 29/08/2011
+ * version 1.0.0
+ * 29/08/2016
  *
  * Sven Zwiers
  *
@@ -38,8 +39,10 @@
 #include "vscp_type.h"
 #include "vscp_registers.h"
 #include "vscp_actions.c"
-#include "bootsupport.c"
-//#include "bootloader.c"
+#include "../AAboot/bootsupport.c"
+
+
+
 #ifndef GUID_IN_EEPROM
 // GUID is stored in ROM for this module
 //		IMPORTANT!!!
@@ -57,8 +60,8 @@ const uint8_t GUID[ 16 ] = {
 
 // Device string is stored in ROM for this module (max 32 bytes)
 //const uint8_t vscp_deviceURL[]  = "127.0.0.1/mdf/aamini02.xml";
-const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/AAMini02.xml";
-// add mdfhost to hosts file on PC to link to ip/host name
+const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/AAMini03.xml";
+// add mdfhost to hosts file on PC to link to ip/host name.
 
 
 // Manufacturer id's is stored in ROM for this module
@@ -76,13 +79,12 @@ const uint8_t vscp_manufacturer_id[8] = {
 
 
 // Variables
-volatile uint16_t measurement_clock;	// 1 ms timer counter
-
-int16_t btncnt[ 9 ];    // Switch counters
+unsigned char btnstate[ 8 ] = {	0,0,0,0,0,0,0,0};    // Switch state
+unsigned char captureInput;
 
 // Prototypes
 static void initTimer();
-static void init_app_eeprom( void );
+//static void init_app_eeprom( void );
 static void doDM( void );
 static void doWork();
 
@@ -98,7 +100,7 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
 	// handle millisecond counter
 	vscp_timer++;
 	measurement_clock++;
-
+	io_timer++;
 	// Check for init button
 	if ( BTN_INIT_PRESSED ) {
 		// Active
@@ -107,47 +109,7 @@ SIGNAL( SIG_OUTPUT_COMPARE0 )
 	else {
 		vscp_initbtncnt = 0;
 	}
-    // Check for Switch 1
-	if ( BTN_SW1_PRESSED ) {
-		// Active
-		btncnt[1]++;
-	}
-    // Check for Switch 2
-	if ( BTN_SW2_PRESSED ) {
-		// Active
-		btncnt[2]++;
-	}
-    // Check for Switch 3
-	if ( BTN_SW3_PRESSED ) {
-		// Active
-		btncnt[3]++;
-	}
-    // Check for Switch 4
-	if ( BTN_SW4_PRESSED ) {
-		// Active
-		btncnt[4]++;
-	}
-    // Check for Switch 5
-	if ( BTN_SW5_PRESSED ) {
-		// Active
-		btncnt[5]++;
-	}
-    // Check for Switch 6
-	if ( BTN_SW6_PRESSED ) {
-		// Active
-		btncnt[6]++;
-	}
-    // Check for Switch 7
-	if ( BTN_SW7_PRESSED ) {
-		// Active
-		btncnt[7]++;
-	}
-    // Check for Switch 8
-	if ( BTN_SW8_PRESSED ) {
-		// Active
-		btncnt[8]++;
-	}
-
+	
 
 	// Status LED
 /*	vscp_statuscnt++;
@@ -175,7 +137,7 @@ static void initTimer()
     // Sets the compare value
 	// OCR0A = fclk/(2nf) - 1 = fclk/512000 - 1
 	#ifndef FOSC
-	#error You must define FOSC in yor makefile
+	#error You must define FOSC in your makefile
 	#elif FOSC == 8000
 	OCR0A = 32;
 	#elif FOSC == 16000
@@ -185,6 +147,7 @@ static void initTimer()
 	TCCR0A = ( 1 << WGM01 ) | ( 0 << WGM00 ) | ( 4 << CS00 );
 	// Enable timer0 compare interrupt
 	TIMSK0 = ( 1 << OCIE0A );
+	
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -192,7 +155,6 @@ static void initTimer()
 //
 
 int main( void )
-
 {
     uint8_t i;
 	unsigned char lastoutput, currentoutput; //detection change on output
@@ -207,14 +169,16 @@ int main( void )
     UCSRB = MSK_UART_ENABLE_TX | MSK_UART_ENABLE_RX;
 	
 	//read certain eeprom values into ram
-	unsigned char _debounce  = readEEPROM( VSCP_EEPROM_END + REG_INPUT_DEBOUNCE ) ;
-	unsigned char _start	 = readEEPROM( VSCP_EEPROM_END + REG_INPUT_START ) ;
-
-	
+	//unsigned char _debounce  = readEEPROM( VSCP_EEPROM_END + REG_INPUT_DEBOUNCE ) ;
+	//unsigned char _start	 = readEEPROM( VSCP_EEPROM_END + REG_INPUT_START ) ;
+	for ( i=0; i<8; i++ ) 
+	{
+	btnstate[ i ] = (readEEPROM(VSCP_EEPROM_END + REG_INPUTBEHAVIOUR ) & _BV(i));
+	btnstate[i] = !(btnstate[i]>>i);
+	}
 
     // Initialize the 1ms timer
     initTimer();
-
     sei(); // Enable interrupts
 
 
@@ -223,24 +187,43 @@ int main( void )
         uart_puts("Failed to open channel!!\n");
     }
 
-
 	#ifdef PRINT_GENERAL_EVENTS
 	#if BOARD == 0
 			uart_puts( "OLIMEX AT90CAN128\n" );
 	#elif BOARD == 1
-		uart_puts( "AAMINI 0.0a2015\n" );
+		uart_puts( "AAMINI 1.0xx\n" );
 	#endif
 	#endif
 	
-
 	// Check VSCP persistent storage and
 	// restore if needed
 	if ( !vscp_check_pstorage() ) 
 	{
 		// Spoiled or not initialized - reinitialize
-		init_app_eeprom();
+		#ifdef PRINT_GENERAL_EVENTS
+		uart_puts( "init_app_eeprom" );
+		#endif
+		//init_app_eeprom();
 	}
-
+	
+	
+	// blink leds x times. x= node id, 
+	if (readEEPROM ( VSCP_EEPROM_REGISTER + REG_GENERAL_CONFIG) & enable_blink_ID ) //we can disable this
+	{
+	if (readEEPROM ( VSCP_EEPROM_NICKNAME) !=0xFF) //no blinking if no id
+	{
+	for (i = readEEPROM ( VSCP_EEPROM_NICKNAME) ; (i > 0) ; i--)
+		{
+		io_timer = 0;
+		outputport =0xFF;	//off
+		while (io_timer < 1000) {};
+		io_timer = 0;
+		outputport = 0x00; //on
+		while (io_timer < 1500) {};
+		}
+	}
+	}
+	
 	// Initialize the VSCP functionality
 	vscp_init();
 
@@ -285,12 +268,19 @@ int main( void )
                 if ( VSCP_ADDRESS_FREE == vscp_nickname ) 
 				{
                     // new on segment need a nickname
-                    vscp_node_state = VSCP_STATE_INIT; 	
+					#ifdef PRINT_GENERAL_EVENTS
+					uart_puts( "need nickname" );
+					#endif
+					vscp_node_state = VSCP_STATE_INIT; 	
                 }
                 else 
 				{
                     // been here before - go on
                     vscp_node_state = VSCP_STATE_ACTIVE;
+					#ifdef PRINT_GENERAL_EVENTS
+					uart_puts( "go active" );
+					#endif
+					
                     vscp_goActiveState();
                 }
                 break;
@@ -329,7 +319,6 @@ int main( void )
 	                     doDM();
 						 doFollow();
                      }
-					//vscp_handleProtocolEvent();
 
                 }
                 break;
@@ -347,80 +336,156 @@ int main( void )
         } // switch 
 
 
-
-		// check inputs
-        for ( i=1; i<9; i++ ) 
+		// check i/o every 100ms
+		// TODO: on startup check actual input & set btnstate accordingly?
+		if ( io_timer > 100 )
 		{
-            if (( btncnt[ i ] > _debounce*10 )&( btncnt[ i ] < _start*10 ))
+			io_timer = 0;
+			captureInput = (read_input); //read input into memory
+
+			for ( i=0; i<8; i++ ) 
+			{
+				// input low
+				if (CheckInput (captureInput,i))
 				{
-					if (!(ReadSwitch (i)))
+					if (btnstate[i] >= inputButtonActive)
 					{
-						#ifdef PRINT_IO_EVENTS
-							uart_puts("Button Pressed!");
-						#endif
-						SendInformationEventExtended(VSCP_PRIORITY_MEDIUM, 
-							readEEPROM( VSCP_EEPROM_REGISTER + REG_ZONE ), 
-							readEEPROM( VSCP_EEPROM_REGISTER + REG_SUBZONE + i),
-							0x00, VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_BUTTON );
-						btncnt[ i ] = 0;
+						btnstate[i] +=1;
 					}
-				}
-			if ( btncnt[ i ] > _start*10 )
-				{
-					if (ReadSwitch (i))
-					{
-						if (btncnt[ i ] < 9000)
+					switch (btnstate[i])
 						{
-							//uart_puts("Button in");
-							SendInformationEventExtended(VSCP_PRIORITY_MEDIUM, 
-								readEEPROM( VSCP_EEPROM_END + REG_ZONE ), 
-								readEEPROM( VSCP_EEPROM_END + REG_SUBZONE + i),
-								0x02, VSCP_CLASS1_CONTROL, VSCP_TYPE_CONTROL_START );
+						case inputStateStart:
+							//on startup sent out current state + set state according
+						case inputStateLow:
+							// 1 event should be sent when a input changes
+							// here we check state (= input pulled down)
+							#ifdef PRINT_IO_EVENTS
+							uart_puts("s_l");
+							#endif
+							SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,
+							readEEPROM( VSCP_EEPROM_REGISTER + REG_ZONE ),
+							readEEPROM( VSCP_EEPROM_REGISTER + REG_SWITCH1_SUBZONE + i),
+							0x00, readEEPROM( VSCP_EEPROM_REGISTER + REG_SW1_SHORT_CLASS + (5*i)), readEEPROM( VSCP_EEPROM_REGISTER + REG_SW1_SHORT_TYPE + (5*i)));
+							btnstate[ i ] = inputStateHigh;	
+							break;
+						case inputButtonStart:
+							//button is pushed (input pulled down)
+							btnstate[i] = inputButtonActive;
+							#ifdef PRINT_IO_EVENTS
+							uart_puts("b_st");
+							#endif
+							break;
+						case inputButtonActive+15:
+							//button is pushed for a long time
+							#ifdef PRINT_IO_EVENTS
+							uart_puts("b_long");
+							#endif
+							SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,
+							readEEPROM( VSCP_EEPROM_REGISTER + REG_ZONE ),
+							readEEPROM( VSCP_EEPROM_REGISTER + REG_SWITCH1_SUBZONE + i),
+							0x00, readEEPROM( VSCP_EEPROM_REGISTER + REG_SW1_LONG_CLASS + (5*i)), readEEPROM( VSCP_EEPROM_REGISTER + REG_SW1_LONG_TYPE + (5*i)));
+							btnstate[i] =inputButtonActiveLongSent;
+							break;
 						}
-						btncnt[ i ] = 9001; //prevent overflow
-					}
-					if (!(ReadSwitch (i)))
-					{
-						//uart_puts("Button los");
-						SendInformationEventExtended(VSCP_PRIORITY_MEDIUM, 
-								readEEPROM( VSCP_EEPROM_END + REG_ZONE ), 
-								readEEPROM( VSCP_EEPROM_END + REG_SUBZONE + i),
-								0x02, VSCP_CLASS1_CONTROL, VSCP_TYPE_CONTROL_STOP );
-						btncnt[ i ] = 0;
-					}
-			
 				}
-        } //end input check
+			
+				//input high
+				else
+				{
+				if ((btnstate[i] >= inputButtonActive)& (btnstate[i] < inputButtonActive+7))  //short push?
+				{
+						#ifdef PRINT_IO_EVENTS
+						uart_puts("b_short");
+						#endif
+						SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,
+						readEEPROM( VSCP_EEPROM_REGISTER + REG_ZONE ),
+						readEEPROM( VSCP_EEPROM_REGISTER + REG_SWITCH1_SUBZONE + i),
+						0x00, readEEPROM( VSCP_EEPROM_REGISTER + REG_SW1_SHORT_CLASS + (5*i)), readEEPROM( VSCP_EEPROM_REGISTER + REG_SW1_SHORT_TYPE + (5*i)));
+					btnstate[i] =inputButtonStart;
+				}
+				if (btnstate[i] >= inputButtonActive+7)  // to long for short push, not yet long push
+				{
+					#ifdef PRINT_IO_EVENTS
+					uart_puts("b_mid");
+					#endif
+					//send NO events
+					btnstate[i] =inputButtonStart;
+				}	
+				switch (btnstate[i])
+					{
+					case inputStateStart:
+					//on startup sent out current state + set state according
+					case inputStateHigh:	
+					// 1 event should be sent when a input changes
+					// here we check state (=input high)
+						#ifdef PRINT_IO_EVENTS
+						uart_puts("s_h");
+						#endif
+						SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,
+						readEEPROM( VSCP_EEPROM_REGISTER + REG_ZONE ),
+						readEEPROM( VSCP_EEPROM_REGISTER + REG_SWITCH1_SUBZONE + i),
+						0x00, readEEPROM( VSCP_EEPROM_REGISTER + REG_SW1_LONG_CLASS + (5*i)), readEEPROM( VSCP_EEPROM_REGISTER + REG_SW1_LONG_TYPE + (5*i)));
+						btnstate[ i ] = inputStateLow;
+						break;
+					case inputButtonActiveLongSent:
+						#ifdef PRINT_IO_EVENTS
+						uart_puts("b_long_rel");
+						#endif
+						SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,
+							readEEPROM( VSCP_EEPROM_REGISTER + REG_ZONE ),
+							readEEPROM( VSCP_EEPROM_REGISTER + REG_SWITCH1_SUBZONE + i),
+							0x00, readEEPROM( VSCP_EEPROM_REGISTER + REG_SW1_LONG_CLASS + (5*i)), readEEPROM( VSCP_EEPROM_REGISTER + REG_SW1_LONG_TYPE_RELEASE + (5*i)));
+						btnstate[i] = inputButtonStart;
+						break;
+						
+					}
+				}
+			} //end input check
 
-		//check outputs and if change detected > send out event
-        currentoutput = read_output;
-		if (currentoutput != lastoutput) vscp_outputevent(currentoutput,lastoutput);
-		lastoutput = currentoutput;	    
-
+			//check outputs and if change detected > send out event
+			currentoutput = read_output;
+			if (currentoutput != lastoutput) vscp_outputevent(currentoutput,lastoutput);
+			lastoutput = currentoutput;	    
+		} //end io_timer
         doWork();
 
     } // while
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // init_app_eeprom
 // should  only be performed after first startup!
 // all registers cleared!
 
-static void init_app_eeprom( void )
+
+void vscp_init_pstorage( void )
 {
+	#ifdef PRINT_GENERAL_EVENTS
+	uart_puts( "cold start" );
+	#endif
+	// clear all eeprom registers to 0x00
     uint8_t pos;
-    for (pos = VSCP_EEPROM_REGISTER ; pos <= REG_END ; pos++)
+    for (pos = VSCP_EEPROM_REGISTER ; pos <= (VSCP_EEPROM_REGISTER + PAGE1_END) ; pos++)
 	{
 	    writeEEPROM(pos, 0x00 );
 	}
-	//set default values
-	writeEEPROM(VSCP_EEPROM_REGISTER + REG_INPUT_DEBOUNCE, time_debounce);
-	writeEEPROM(VSCP_EEPROM_REGISTER + REG_INPUT_START, time_start);
 	
+	//set default values
+	//writeEEPROM(VSCP_EEPROM_REGISTER + REG_INPUT_DEBOUNCE, time_debounce);
+	//writeEEPROM(VSCP_EEPROM_REGISTER + REG_INPUT_START, time_start);
+	for (pos=0; pos <=7 ;pos++)
+		{
+			writeEEPROM(VSCP_EEPROM_REGISTER + REG_SW1_SHORT_CLASS+(pos*5) ,VSCP_CLASS1_INFORMATION);
+			writeEEPROM(VSCP_EEPROM_REGISTER + REG_SW1_SHORT_TYPE+(pos*5) ,VSCP_TYPE_INFORMATION_BUTTON);
+			//only button values written
+			//writeEEPROM(VSCP_EEPROM_REGISTER + REG_SW1_LONG_CLASS+(pos*4) ,VSCP_CLASS1_INFORMATION);
+			//writeEEPROM(VSCP_EEPROM_REGISTER + REG_SW1_LONG_TYPE+(pos*4) ,VSCP_TYPE_INFORMATION_LONG_CLICK);
+		}
+	#ifdef PRINT_GENERAL_EVENTS
+	uart_puts( "default values written" );
+	#endif
+		
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //   						VSCP Functions
@@ -448,32 +513,59 @@ static void init_app_eeprom( void )
 
 uint8_t vscp_readAppReg( uint8_t reg )
 {
-    uint8_t rv;
-	#ifdef PRINT_VSCP_EVENTS
-	uart_puts( "vscp_readAppReg\n" );
-	#endif
-	
-	if ((reg >= REG_ZONE) & (reg <= REG_ZONE_END))
+    
+	uint8_t rv;	
+	//#ifdef PRINT_VSCP_EVENTS
+	//char buf[30];
+	//uart_puts( "vscp_rdAppReg\n" );
+	//sprintf(buf,"page: %02x",vscp_page_select);
+	//uart_puts(buf);
+	//#endif
+	// Assign the requested page, this variable is used in the implementation
+	// specific function 'vscp_readAppReg()' and 'vscp_writeAppReg()' to actually
+	// switch pages there
+	//vscp_page_select = ((vscp_imsg.data[1] << 8) | vscp_imsg.data[2]);
+	switch (vscp_page_select)
 	{
-		rv =  readEEPROM( reg + VSCP_EEPROM_REGISTER);
-	}
+		case 1:
+			#ifdef PRINT_VSCP_EVENTS
+			uart_puts( "page1\n" );
+			#endif
+			if ((reg >= REG_ZONE-PAGE1_START) & (reg <= REG_ZONE_END-PAGE1_START))
+			{
+				rv =  readEEPROM( VSCP_EEPROM_REGISTER + reg + PAGE1_START);
+			}
 	
-	
-    // DM register space    
-    else if ( ( reg >= REG_DM_START ) & ( reg <  REG_DM_START + (DESCION_MATRIX_ELEMENTS * 8) ) )
-	{
-        rv =  readEEPROM( VSCP_EEPROM_REGISTER +  reg  );
-    }
-
-
-    else {
-        rv = 0xff;
+			else 
+			{
+				rv = 0xAB;
+			}
+			
+		   // Read actual output state
+		   if ( REG_OUTPUT_STATE-PAGE1_START == reg ) rv =  ~read_output;
+			return rv;
+			break;
+			
 		
-    }
-
-   // Read actual output state
-   if ( REG_OUTPUT_STATE == reg ) rv =  ~read_output;
-    return rv;
+		case 0:
+			// page 0 contains DM
+			#ifdef PRINT_VSCP_EVENTS
+			uart_puts( "page0\n" );
+			#endif
+			// DM register space
+			if ( ( reg >= REG_DM_START ) & ( reg <  REG_DM_START + (DESCION_MATRIX_ELEMENTS * 8) ) )
+			{
+				rv =  readEEPROM( VSCP_EEPROM_REGISTER +  reg  );
+			}
+			else
+			{
+				rv = 0xAA;
+			}
+			return rv;
+			break;
+		default:
+			return 0xAA;		
+	} //end switch page select
 
 }
 
@@ -486,31 +578,68 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
     uint8_t rv;
 
     rv = ~val; // error return
-
-
-   	// write actual output state
-   	if ( REG_OUTPUT_STATE == reg )
-   	{
-	   	outputport = ~val;
-	   	__asm__ __volatile__ ("nop");
-	   	rv =  ~read_output;
-   	}
-
-	else if ((reg >= REG_ZONE) & (reg <= REG_ZONE_END))
+	switch (vscp_page_select)
 	{
-		writeEEPROM(VSCP_EEPROM_REGISTER + reg, val); 
-		rv =  readEEPROM( reg + VSCP_EEPROM_REGISTER);
-	}
+		case 0:
+		// DM register space
+		#ifdef PRINT_VSCP_EVENTS
+			uart_puts( "WRpage0\n" );
+			#endif
+		if ( ( reg >= REG_DM_START ) & ( reg <= REG_DM_START + (DESCION_MATRIX_ELEMENTS * 8) ) )
+		{
+			writeEEPROM(VSCP_EEPROM_REGISTER + reg, val);
+			rv =  readEEPROM( VSCP_EEPROM_REGISTER +  reg  );
+		}
 
-    // DM register space    
-    else if ( ( reg >= REG_DM_START ) & ( reg <= REG_DM_START + (DESCION_MATRIX_ELEMENTS * 8) ) )
-	{
-        writeEEPROM(VSCP_EEPROM_REGISTER + reg, val); 
-		rv =  readEEPROM( VSCP_EEPROM_REGISTER +  reg  );
-    }
+		return rv;
+		break;
+		
+		case 1:
+		// page 1
+			#ifdef PRINT_VSCP_EVENTS
+			uart_puts( "WRpage1\n" );
+			#endif
+   		// write actual output state
+   		if ( REG_OUTPUT_STATE-PAGE1_START == reg )
+   		{
+	   		outputport = ~val;
+	   		__asm__ __volatile__ ("nop");
+	   		rv =  ~read_output;
+   		}
 
-    return rv;	
-
+		else if ((reg >= REG_ZONE-PAGE1_START) & (reg <= REG_ZONE_END-PAGE1_START))
+		{
+			#ifdef PRINT_VSCP_EVENTS
+			uart_puts( "WRp1R\n" );
+			#endif
+			writeEEPROM(VSCP_EEPROM_REGISTER + reg + PAGE1_START, val); 
+			rv =  readEEPROM( reg + VSCP_EEPROM_REGISTER + PAGE1_START);
+		}
+		
+		else
+		{
+			 rv=0xAC;
+		}
+		
+		// set input behaviour
+		if ( REG_INPUTBEHAVIOUR-PAGE1_START == reg )
+		{
+			uint8_t i;
+			for ( i=0; i<8; i++ )
+			{
+				btnstate[ i ] = (readEEPROM(VSCP_EEPROM_END + REG_INPUTBEHAVIOUR ) & _BV(i));
+				btnstate[i] = !(btnstate[i]>>i);
+			}
+			
+		}
+		
+		break;
+		
+		default:
+			rv=0xAA;
+	}//switch
+    	
+return rv;
 }
 
 
@@ -558,12 +687,13 @@ static void doDM( void )
 			uart_puts( "debug  doDM row enabled\n" );
     		#endif
             // Should the originating id be checked and if so is it the same?
-            if ( !( dmflags & VSCP_DM_FLAG_CHECK_OADDR ) &&
+            if ( ( dmflags & VSCP_DM_FLAG_CHECK_OADDR ) &&
                     !(  vscp_imsg.oaddr == 
                         readEEPROM( VSCP_EEPROM_END + REG_DM_START + 
                                         ( VSCP_SIZE_STD_DM_ROW * i ) ) ) ) {
                 continue;					
             }	
+			
 			#ifdef PRINT_DM_EVENTS
 			uart_puts( "debug  doDM check zone\n" );
     		#endif
@@ -579,8 +709,9 @@ static void doDM( void )
 			#ifdef PRINT_DM_EVENTS
 			uart_puts( "zone match\n" );
 			#endif
-            // Check if subzone should match and if so if it match
-            if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE  ) {
+			// Check if subzone should match and if so if it match
+            /* checksubzone done in actions.c
+			if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE  ) {
                 if (readEEPROM( VSCP_EEPROM_REGISTER + REG_SUBZONE  ) == 0x00) 
 				{
 				uart_puts( "subzone 0x00\n" );
@@ -593,32 +724,16 @@ static void doDM( void )
 			#ifdef PRINT_DM_EVENTS
 			uart_puts( "subzone match\n" );
 			#endif
-
-            class_filter = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 
-                                                    ( VSCP_SIZE_STD_DM_ROW * i ) + 
-                                                    VSCP_DM_POS_CLASSFILTER  );
-
-
-/*            class_filter = ( ( dmflags & VSCP_DM_FLAG_CLASS_FILTER ) << 8 ) + 
-                                    readEEPROM( VSCP_EEPROM_END + 
-                                                    REG_DESCION_MATRIX + 
-                                                    ( VSCP_SIZE_STD_DM_ROW * i ) + 
-                                                    VSCP_DM_POS_CLASSFILTER  );
-*/
-             class_mask = ( ( dmflags & VSCP_DM_FLAG_CLASS_MASK ) << 8 ) + 
-                                    readEEPROM( VSCP_EEPROM_END + REG_DM_START + 
-                                                    ( VSCP_SIZE_STD_DM_ROW * i ) +
-                                                    VSCP_DM_POS_CLASSMASK  );
-            type_filter = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 
-                                        ( VSCP_SIZE_STD_DM_ROW * i ) + 
-                                        VSCP_DM_POS_TYPEFILTER );
-            type_mask = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 
-                                        ( VSCP_SIZE_STD_DM_ROW * i ) + 
-                                        VSCP_DM_POS_TYPEMASK  );
+*/ 
+			
+		
+            class_filter = readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_CLASSFILTER  );
+            class_mask = ( ( dmflags & VSCP_DM_FLAG_CLASS_MASK ) << 8 ) + readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_CLASSMASK  );
+            type_filter = readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_TYPEFILTER );
+            type_mask = readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_TYPEMASK  );
 
 
-            if ( !( ( class_filter ^ vscp_imsg.vscp_class ) & class_mask ) &&
-                    !( ( type_filter ^ vscp_imsg.vscp_type ) & type_mask )) {
+            if ( !( ( class_filter ^ vscp_imsg.vscp_class ) & class_mask ) && !( ( type_filter ^ vscp_imsg.vscp_type ) & type_mask )) {
 			
 			#ifdef PRINT_DM_EVENTS
 			uart_puts( "debug  doDMtrigger\n" );
@@ -639,6 +754,16 @@ static void doDM( void )
 				case ACTION_OUTP_OFF:			// Turn off relays
                         doActionOffOut( dmflags, readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
                         break;
+						
+				case ACTION_DM_TOGGLE:			// Toggle DM row
+						doActionToggleDM( dmflags, readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+						break;
+				case ACTION_DM_ON:			// DM row ON
+						doActionOnDM( dmflags, readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+						break;
+				case ACTION_DM_OFF:			// DM row OFF
+						doActionOffDM( dmflags, readEEPROM( VSCP_EEPROM_END + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+						break;
 
 				} // case	
             } 
@@ -662,9 +787,12 @@ uint32_t vscp_getFamilyType(void)
 
 void vscp_restoreDefaults(void)
 {
-// to do
+	vscp_init_pstorage();
+	//reboot using WD
+	cli();
+	wdt_enable(WDTO_1S);
+	while(1);
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // SendInformationEvent
@@ -696,16 +824,24 @@ void SendInformationEvent( uint8_t idx, uint8_t eventClass, uint8_t eventTypeId 
 
 void SendInformationEventExtended(uint8_t priority, uint8_t zone, uint8_t subzone, uint8_t idx, uint8_t eventClass, uint8_t eventTypeId )
 {
-    vscp_omsg.priority = priority;
-    vscp_omsg.flags = VSCP_VALID_MSG + 3;
-    vscp_omsg.vscp_class = eventClass;
-    vscp_omsg.vscp_type = eventTypeId;
+    if ((eventClass != 0)  & (eventTypeId !=0)  )
+	{
+		
+		vscp_omsg.priority = priority;
+		vscp_omsg.flags = VSCP_VALID_MSG + 3;
+		vscp_omsg.vscp_class = eventClass;
+		vscp_omsg.vscp_type = eventTypeId;
 
-    vscp_omsg.data[ 0 ] = idx;	// dummy Register
-    vscp_omsg.data[ 1 ] = zone;
-    vscp_omsg.data[ 2 ] = subzone;
+		vscp_omsg.data[ 0 ] = idx;	// dummy Register
+		vscp_omsg.data[ 1 ] = zone;
+		vscp_omsg.data[ 2 ] = subzone;
 
-    vscp_sendEvent();	// Send data
+		vscp_sendEvent();	// Send data
+	}
+	#ifdef PRINT_VSCP_EVENTS
+	else uart_puts( "FAULTY EVENT BLOCKED");
+	#endif
+	
 }
 
 ///////////////////////////////////////////////////////////////////////////////

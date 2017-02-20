@@ -14,10 +14,10 @@ endif
 
 BOOTSTART = 0x6000
 
-PRG = AABoot
+PRG = AAboot
 
 
-OBJ = AABoot.o
+OBJ = AAboot.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/can_at90can128.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/uart.o
 OBJ += $(VSCP_FIRMWARE)/common/vscp_firmware.c

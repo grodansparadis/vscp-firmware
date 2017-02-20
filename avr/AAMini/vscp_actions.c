@@ -66,13 +66,17 @@ uart_puts( "debug doActionToggleOut\n" );
 // doActionON
 void doActionOnOut( unsigned char dmflags, unsigned char arg )
 {
+#ifdef PRINT_DM_EVENTS
 uart_puts( "debug doActionOnOut\n" );
+#endif
 	unsigned char i;
 	//unsigned char val;
 	
 	for ( i=0; i<8; i++ ) 
 	{
+		#ifdef PRINT_DM_EVENTS
 		uart_puts( "debug doActionOnOut i" );
+		#endif
 		// If the rely should not be handled just move on
 		if ( !( arg & ( 1 << i ) ) ) continue;
 		
@@ -100,13 +104,17 @@ uart_puts( "debug doActionOnOut\n" );
 // doActionOFF
 void doActionOffOut( unsigned char dmflags, unsigned char arg )
 {
+#ifdef PRINT_DM_EVENTS
 uart_puts( "debug doActionOffOut\n" );
+#endif
 	unsigned char i;
 	//unsigned char val;
 	
 	for ( i=0; i<8; i++ ) 
 	{
+		#ifdef PRINT_DM_EVENTS
 		uart_puts( "debug doActionOffOut i" );
+		#endif
 		// If the rely should not be handled just move on
 		if ( !( arg & ( 1 << i ) ) ) continue;
 		
@@ -128,6 +136,114 @@ uart_puts( "debug doActionOffOut\n" );
 	}						
 }
 
+///////////////////////////////////////////////////////////////////////////////
+void doActionToggleDM( unsigned char dmflags, unsigned char arg )
+{
+	#ifdef PRINT_DM_EVENTS
+	uart_puts( "debug doActionToggleDM\n" );
+	#endif
+
+	unsigned char i;
+	uint8_t dmToggleflags;
+	//unsigned char val;
+	
+	for ( i=0; i<8; i++ )
+	{
+		// If the line should not be handled just move on
+		if ( !( arg & ( 1 << i ) ) ) continue;
+		
+		// Check if subzone should match and if so if it match
+		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE )
+		{
+			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_SUBZONE  ) )
+			{
+				continue;
+			}
+			#ifdef PRINT_DM_EVENTS
+			else uart_puts( "ToggleDM subzone match\n" );
+			#endif
+		}
+		
+		dmToggleflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
+		writeEEPROM(( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i )),dmToggleflags^VSCP_DM_FLAG_ENABLED );		
+
+
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// doActionON DM
+void doActionOnDM( unsigned char dmflags, unsigned char arg )
+{
+	#ifdef PRINT_DM_EVENTS
+	uart_puts( "debug doActionOnDM\n" );
+	#endif
+	unsigned char i;
+	uint8_t dmToggleflags;
+	
+	for ( i=0; i<8; i++ )
+	{
+		#ifdef PRINT_DM_EVENTS
+		uart_puts( "debug doActionOnDM i" );
+		#endif
+		// If the rely should not be handled just move on
+		if ( !( arg & ( 1 << i ) ) ) continue;
+		
+		// Check if subzone should match and if so if it match
+		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE )
+		{
+			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_END +
+			REG_SUBZONE ) )
+			{
+				continue;
+			}
+		}
+		
+		dmToggleflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
+		writeEEPROM(( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i )),dmToggleflags |VSCP_DM_FLAG_ENABLED );
+		
+		//outputport &= ~ _BV(i);
+
+
+	}
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// doActionOFF DM
+void doActionOffDM( unsigned char dmflags, unsigned char arg )
+{
+	#ifdef PRINT_DM_EVENTS
+	uart_puts( "debug doActionOffDM\n" );
+	#endif
+	unsigned char i;
+	uint8_t dmToggleflags;
+	
+	for ( i=0; i<8; i++ )
+	{
+		#ifdef PRINT_DM_EVENTS
+		uart_puts( "debug doActionOffDM i" );
+		#endif
+		// If the rely should not be handled just move on
+		if ( !( arg & ( 1 << i ) ) ) continue;
+		
+		// Check if subzone should match and if so if it match
+		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE )
+		{
+			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_END + REG_SUBZONE) )
+			{
+				continue;
+			}
+		}
+		dmToggleflags = readEEPROM( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i ) );
+		writeEEPROM(( VSCP_EEPROM_END + REG_DM_START + 1 + ( VSCP_SIZE_STD_DM_ROW * i )),dmToggleflags & ~(VSCP_DM_FLAG_ENABLED) );
+				
+		//outputport |= _BV(i);
+
+
+	}
+}
 
 
 
@@ -145,9 +261,10 @@ uart_puts( "HelloWorld!\n" );
 
 void vscp_outputevent(unsigned char current,unsigned char previous)
 {
-unsigned char change=0,i=0,j=1;
+unsigned char change=0,i=0,j=1,eventfilter=0;
 
-change = current^previous; //only changed bits are left!
+eventfilter = readEEPROM(VSCP_EEPROM_REGISTER + REG_OUTPUT_CHANGE_FILTER);
+change = (current^previous)&eventfilter; //only changed bits are left & only outputs that we care about
 #ifdef PRINT_IO_EVENTS
 uart_puts( "OUTPUT change detected!\n" );
 #endif

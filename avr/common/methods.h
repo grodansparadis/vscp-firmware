@@ -1,6 +1,7 @@
 #ifndef VSCP_METHODS_H
 #define VSCP_METHODS_H
 
+#include <avr/eeprom.h>
 // Prototypes
 int8_t sendVSCPFrame( uint16_t vscpclass,
                         uint8_t vscptype,
@@ -16,8 +17,8 @@ int8_t getVSCPFrame( uint16_t *pvscpclass,
                         uint8_t *pSize,
                         uint8_t *pData );
 
-int readEEPROM( uint8_t addr );
-int writeEEPROM( uint8_t addr, uint8_t data );
+int readEEPROM( uint16_t addr );
+int writeEEPROM( uint16_t addr, uint8_t data );
 
 uint8_t vscp_readNicknamePermanent( void );
 void vscp_writeNicknamePermanent( uint8_t nickname );
@@ -52,8 +53,8 @@ void vscp_setNickname( uint8_t nickname );
 uint8_t vscp_getSegmentCRC( void );
 void vscp_setSegmentCRC( uint8_t crc );
 
-void vscp_setControlByte( uint8_t ctrl );
-uint8_t vscp_getControlByte( void );
+//void vscp_setControlByte( uint8_t ctrl ); moved to common/vscp_firmware.h
+//uint8_t vscp_getControlByte( void );
 
 void vscp_getMatrixInfo( char *pData );
 

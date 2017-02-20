@@ -418,6 +418,16 @@ void vscp_handleSetNickname(void)
         // Yes, we are addressed
         vscp_nickname = vscp_imsg.data[ 1 ];
         vscp_writeNicknamePermanent(vscp_nickname);
+		
+		//return nickname accepted
+		vscp_omsg.flags = VSCP_VALID_MSG + 1; // one data byte
+		vscp_omsg.priority = VSCP_PRIORITY_HIGH;
+		vscp_omsg.vscp_class = VSCP_CLASS1_PROTOCOL;
+		vscp_omsg.vscp_type = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
+		vscp_omsg.data[ 0 ] = vscp_nickname;
+
+		// send the event
+		vscp_sendEvent();
 
     }
 }
@@ -912,8 +922,9 @@ void vscp_handleProtocolEvent(void)
                 (vscp_getGUID(7) == vscp_imsg.data[ 5 ]) &&
                 (((vscp_page_select >> 8) & 0xff) == vscp_imsg.data[ 6 ]) &&
                 ((vscp_page_select & 0xff) == vscp_imsg.data[ 7 ])) {
-
-                vscp_goBootloaderMode( vscp_imsg.data[ 1 ] );
+/*
+                if ((vscp_nickname == vscp_imsg.data[ 0 ])){*/
+				vscp_goBootloaderMode( vscp_imsg.data[ 1 ] );
             }
             break;
 
@@ -1155,6 +1166,7 @@ void vscp_handleProtocolEvent(void)
                 uint16_t page_save, bytes = 0;
                 uint8_t byte = 0;
                 uint8_t bytes_this_time, cb;
+				uint16_t vscp_sendtimer; // when was last event sent?
 
                 // if data byte 4 of the request is present probably more than 1 register should be
                 // read/written, therefore check lower 4 bits of the flags and decide
@@ -1206,9 +1218,16 @@ void vscp_handleProtocolEvent(void)
                         vscp_omsg.data[ (4 + cb) ] =
                         vscp_readRegister( ( vscp_imsg.data[3] + byte + cb ) );
                     }
-
-                    // send the event
+					// save when last event is sent out
+					vscp_sendtimer = vscp_timer; 
+                    
+					// send the event
                     vscp_sendEvent();
+					
+					//wait at least 1 msec for next message to be sent
+					//prevent overflow of bus or receiver
+					//100µsec should be sufficient, but requires separate timer
+					while (vscp_timer < vscp_sendtimer+2) ;
 
                     // increment byte by bytes_this_time and the event number by one
                     byte += bytes_this_time;
