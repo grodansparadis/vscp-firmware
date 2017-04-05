@@ -149,7 +149,7 @@ void uart_sendChar ( char data )
     if (SREG & 0x80)
     {
         // wait until the byte is sent or we count out
-        while ( !(UCSR0A&0x40) && (i<10000) )
+        while ( !(UCSRA&0x40) && (i<10000) )
         {
             asm ("nop");
             i++;

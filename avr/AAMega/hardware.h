@@ -1,5 +1,8 @@
 // all hardware related routines should be placed here
 
+#ifndef hardware_H
+#define hardware_H
+
 #include "hardware.c"
 
 void ini_hardware();
@@ -24,6 +27,15 @@ void ini_hardware();
 	#define outputport2			PORTC
 	#define outputpin2			PINC
 	#define read_output2		(PINC)
+	
+	#define outputport3			PORTE
+	#define outputpin3			PINE
+	#define read_output3		(PINE)
+
+	#define outputport4			PORTB
+	#define outputpin4			PINB
+	#define read_output4		(PINB)
 
 
 
+#endif

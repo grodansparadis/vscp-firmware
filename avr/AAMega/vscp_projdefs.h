@@ -31,12 +31,14 @@
 //#define FOSC                16000  // Available value: 22118 16000 12000 11059 custom 
 //#define FOSC                14300  // Available value: 22118 16000 12000 11059 custom 
 
-// UART channel to use 
-#define USE_UART1 
+// UART channel to use
+//defined in makefile 
+//#define USE_UART1 
 //#define USE_UART2
 
 // Baudrate
-#define BAUDRAT             9600 
+//defined in makefile 
+//#define BAUDRATE             9600 
  
 
 #ifndef FALSE

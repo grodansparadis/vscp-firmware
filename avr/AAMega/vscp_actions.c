@@ -61,6 +61,9 @@ uart_puts( "debug doActionToggleOut\n" );
 			
 		if (port == 1) outputport1 ^= _BV(i);
 		if (port == 2) outputport2 ^= _BV(portflip(i));
+		if (port == 3) outputport3 ^= _BV(i);
+		if (port == 4) outputport4 ^= _BV(i);
+
 		
 	}								
 }
@@ -101,6 +104,8 @@ uart_puts( "debug doActionOnOut\n" );
 		}			
 		if (port == 1) outputport1 &= ~ _BV(i);
 		if (port == 2) outputport2 &= ~ _BV(portflip(i));
+		if (port == 3) outputport3 &= ~ _BV(i);
+		if (port == 4) outputport4 &= ~ _BV(i);
 
 	}	
 }
@@ -143,8 +148,8 @@ uart_puts( "debug doActionOffOut\n" );
 		}		
 		if (port == 1) outputport1 |= _BV(i);
 		if (port == 2) outputport2 |= _BV(portflip(i));
-
-
+		if (port == 3) outputport3 |= _BV(i);
+		if (port == 4) outputport4 |= _BV(i);
 
 	}						
 }
@@ -270,7 +275,7 @@ void doActionSetTimer(unsigned char dmflags, unsigned char arg)
 		
 		for ( i=1; i<2; i++ )
 		{
-			#ifdef PRINT_DM_EVENTS
+			#ifdef PRINT_TIMER_EVENTS
 			uart_puts( "doActionSetTimer i" );
 			#endif
 			// If the rely should not be handled just move on
@@ -313,32 +318,55 @@ uart_puts( "HelloWorld!\n" );
 
 
 
-void vscp_outputevent(unsigned int current,unsigned int previous)
+void vscp_outputevent(unsigned char board,unsigned long int current,unsigned long int previous)
 {
 	unsigned int change=0,i=0,j=1;
 	change = current^previous; //only changed bits are left
 	#ifdef PRINT_IO_EVENTS
 		uart_puts( "OUTPUT change detected!\n" );
    		char buf[30];
-		sprintf(buf, "current/previous: %04x/%04x/", current, previous);
+		sprintf(buf, "board/current/previous: %04x/%04x/%04x/"board, current, previous);
 		uart_puts(buf);
 	#endif
-	for (i=0; i<16; i++)
+	if (board==0)
 	{
-		if ((change>>i)&0x01)
+		for (i=0; i<16; i++)
 		{
-			if ((j & current) == j)
-				SendInformationEventExtended
-					(7,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + i ))
-					,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + i ))
-					,0 , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_OFF );
-			if (!(j & current)) 
-				SendInformationEventExtended
-					(7,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + i ))
-					,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + i ))
-					,0 , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_ON );
+			if ((change>>i)&0x01)
+			{
+				if ((j & current) == j)
+					SendInformationEventExtended
+						(7,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + i ))
+						,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + i ))
+						,0 , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_OFF );
+				if (!(j & current)) 
+					SendInformationEventExtended
+						(7,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + i ))
+						,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + i ))
+						,0 , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_ON );
+			}
+			j = j*2;
 		}
-		j = j*2;
+	}
+	else if (board==1)
+	{
+		for (i=0; i<16; i++)
+		{
+			if ((change>>i)&0x01)
+			{
+				if ((j & current) == j)
+				SendInformationEventExtended
+				(7,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT17_ZONE + i ))
+				,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT17_SUBZONE + i ))
+				,0 , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_OFF );
+				if (!(j & current))
+				SendInformationEventExtended
+				(7,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT17_ZONE + i ))
+				,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT17_SUBZONE + i ))
+				,0 , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_ON );
+			}
+			j = j*2;
+		}
 	}
 }
 

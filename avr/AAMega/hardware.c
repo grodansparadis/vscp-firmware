@@ -6,8 +6,8 @@ void ini_hardware()
 	PORTA   = 0xFF;     // all off
 	DDRA    = 0xFF;     // all output
 
-	PORTB   = 0x00;		// not used
-	DDRB    = 0x00;		// not used
+	PORTB   = 0xFF;     // all off
+	DDRB    = 0xFF;     // all output
 
 	PORTC   = 0xFF;     // all off
 	DDRC    = 0xFF;     // all output
@@ -16,8 +16,8 @@ void ini_hardware()
 	PORTD   = 0x00;
 	DDRD    = 0x00;
 
-	PORTE   = 0x00;
-	DDRE    = 0x00;
+	PORTE   = 0xFF;     // all off
+	DDRE    = 0xFF;     // all output
 
 	PORTF   = 0x0C;		//0&1 LED / 2&3 BUTTON
 	DDRF    = 0x03;

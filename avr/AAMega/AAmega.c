@@ -52,7 +52,7 @@ const uint8_t GUID[ 16 ] = {
 #include "methods.c"
 
 // Device string is stored in ROM for this module (max 32 bytes)
-const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/Mega.xml";
+const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/DEVMega.xml";
 
 
 // Manufacturer id's is stored in ROM for this module
@@ -151,20 +151,21 @@ static void initTimer()
 int main( void )
 
 
+
 {
-	unsigned int lastoutput, currentoutput; //detection change on output
+	unsigned int lastoutputmain, currentoutputmain,lastoutputpiggy, currentoutputpiggy; //detection change on output
 
 	ini_hardware();
     
     // Initialize UART
     UCSRA = 0;
     UCSRC = MSK_UART_8BIT;	// 8N1
-    Uart_set_baudrate( 9600 );
+    Uart_set_baudrate( BAUDRATE );
      
     UCSRB = MSK_UART_ENABLE_TX | MSK_UART_ENABLE_RX;
 
 	//check button S1 --> selftest
-	if BTN_SW1_PRESSED
+	if (BTN_SW1_PRESSED)
 	{
 		#ifdef PRINT_GENERAL_EVENTS
 			uart_puts( "AAMEGA selftest\n" );
@@ -178,24 +179,74 @@ int main( void )
 			t=0;
 			LED_IND_TOGGLE;
 			LED_STATUS_TOGGLE;
-			while (t < 650000) 
+			while (t < 1650000) 
 			{
 				t++;
 				asm ("NOP");
 			}
 			outputport1 = (outputport1 <<1);
 		}
+		t=0;
+		while (t < 1650000)
+		{
+			t++;
+			asm ("NOP");
+		}
+		
 		outputport2 = 254;
 		while (outputport2 != 0)
 		{
 			t=0;
 			LED_IND_TOGGLE;
-			while (t < 650000) 
+			while (t < 1650000) 
 			{
 				t++;
 				asm ("NOP");
 			}
 			outputport2 = (outputport2 >>1);
+		}
+		t=0;
+		while (t < 1650000)
+		{
+			t++;
+			asm ("NOP");
+		}
+		
+		outputport3 = 254;
+		while (outputport3 != 0)
+		{
+			t=0;
+			LED_IND_TOGGLE;
+			while (t < 1650000)
+			{
+				t++;
+				asm ("NOP");
+			}
+			outputport3 = (outputport3 <<1);
+		}
+		t=0;
+		while (t < 1650000)
+		{
+			t++;
+			asm ("NOP");
+		}
+		outputport4 = 254;
+		while (outputport4 != 0)
+		{
+			t=0;
+			LED_IND_TOGGLE;
+			while (t < 1650000)
+			{
+				t++;
+				asm ("NOP");
+			}
+			outputport4 = (outputport4 <<1);
+		}
+		t=0;
+		while (t < 1650000)
+		{
+			t++;
+			asm ("NOP");
 		}
 		ini_hardware();
 	}	
@@ -226,16 +277,18 @@ int main( void )
 	}
 
 
-
 	// Initialize the VSCP functionality
 	vscp_init();
 
 	//initialize output change detection
-	lastoutput = (((bitflip(read_output2))<<8)&0xFF00) | read_output1 ;
-
+	lastoutputmain = (((bitflip(read_output2))<<8)&0xFF00) | read_output1 ;
+	lastoutputpiggy = (((read_output4)<<8)&0xFF00) | read_output3 ;
+	
 	//read default values for output ports
 	outputport1 = ~readEEPROM(VSCP_EEPROM_REGISTER + REG_OUTPUT_DEFAULT_STATE1);
 	outputport2 = ~bitflip(readEEPROM(VSCP_EEPROM_REGISTER + REG_OUTPUT_DEFAULT_STATE2));
+	outputport3 = ~readEEPROM(VSCP_EEPROM_REGISTER + REG_OUTPUT_DEFAULT_STATE3);
+	outputport4 = ~readEEPROM(VSCP_EEPROM_REGISTER + REG_OUTPUT_DEFAULT_STATE4);
 	
 	//read timer prescalers
 	unsigned int t ;
@@ -275,8 +328,10 @@ int main( void )
 				if (VSCP_USER_TIMER[t] != 0) // only active timers
 				{
 					VSCP_USER_TIMER_PRESCALER[t] -= 1; //decrease  prescaler
+					#ifdef PRINT_TIMER_EVENTS
 					sprintf(buf, "pre-:%i-%i", t,VSCP_USER_TIMER_PRESCALER[t]);
 					uart_puts(buf);
+					#endif
 					if (VSCP_USER_TIMER_PRESCALER[t] == 0)
 					{
 						VSCP_USER_TIMER[t] -= 1;
@@ -397,10 +452,13 @@ int main( void )
         } // switch 
 
 		//check outputs and if change detected > send out event
-        currentoutput = (((bitflip(read_output2))<<8)&0xFF00) | read_output1 ;
-		if (currentoutput != lastoutput) vscp_outputevent(currentoutput,lastoutput);
-		lastoutput = currentoutput;	    
+        currentoutputmain = (((bitflip(read_output2))<<8)&0xFF00) | read_output1 ;
+		if (currentoutputmain != lastoutputmain) vscp_outputevent(0,currentoutputmain,lastoutputmain);
+		lastoutputmain = currentoutputmain;	    
 
+		currentoutputpiggy = (((read_output4)<<8)&0xFF00) | read_output3 ;
+		if (currentoutputpiggy != lastoutputpiggy) vscp_outputevent(1,currentoutputpiggy,lastoutputpiggy);
+		lastoutputpiggy = currentoutputpiggy;	    
 
         doWork();
 
@@ -489,6 +547,8 @@ uint8_t vscp_readAppReg( uint8_t reg )
 			// Read actual output state
 			if ( REG_OUTPUT_STATE1-PAGE1_START == reg ) rv =  ~read_output1;
 			if ( REG_OUTPUT_STATE2-PAGE1_START == reg ) rv =  ~bitflip(read_output2);
+			if ( REG_OUTPUT_STATE3-PAGE1_START == reg ) rv =  ~read_output3;
+			if ( REG_OUTPUT_STATE4-PAGE1_START == reg ) rv =  ~read_output4;
 
 		    return rv;
 		    break;
@@ -576,6 +636,20 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
 	   		__asm__ __volatile__ ("nop");
 	   		rv =  ~bitflip(read_output2);
    		}
+		
+		if ( REG_OUTPUT_STATE3 -PAGE1_START== reg )
+		{
+			outputport3 = ~val;
+			__asm__ __volatile__ ("nop");
+			rv =  ~read_output3;
+		}
+		
+		if ( REG_OUTPUT_STATE4 -PAGE1_START== reg )
+		{
+			outputport4 = ~val;
+			__asm__ __volatile__ ("nop");
+			rv =  ~read_output4;
+		}   
 
 	    else if ((reg >= REG_ZONE-PAGE1_START) & (reg <= REG_ZONE_END-PAGE1_START))
 	    {
@@ -725,18 +799,60 @@ static void doDM( void )
 	                case ACTION_OUTP_TOGGLE2:			// Toggle relays
 	                    doActionToggleOut(2, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
 	                    break;
+					case ACTION_OUTP_TOGGLE3:			// Toggle relays
+	                    doActionToggleOut(3, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    break;
+					case ACTION_OUTP_TOGGLE4:			// Toggle relays
+	                    doActionToggleOut(4, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    break;
+					case ACTION_OUTP_TOGGLEALL:			// Toggle all outputs
+					    doActionToggleOut(1, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    doActionToggleOut(2, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    doActionToggleOut(3, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    doActionToggleOut(4, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    break;
+					//	
+					
 					case ACTION_OUTP_ON1:			// Turn on relays
 	                    doActionOnOut( 1, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
 	                    break;
 					case ACTION_OUTP_ON2:			// Turn on relays
 	                    doActionOnOut( 2, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
 	                    break;
+					case ACTION_OUTP_ON3:			// Turn on relays
+	                    doActionOnOut( 3, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    break;
+					case ACTION_OUTP_ON4:			// Turn on relays
+	                    doActionOnOut( 4, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    break;
+					case ACTION_OUTP_ONALL:			// Turn on relays
+	                    doActionOnOut( 1, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                	doActionOnOut( 2, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    doActionOnOut( 3, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    doActionOnOut( 4, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    break;
+					//
+					
 					case ACTION_OUTP_OFF1:			// Turn off relays
 	                    doActionOffOut( 1, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
 	                    break;
 					case ACTION_OUTP_OFF2:			// Turn off relays
 						doActionOffOut( 2, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
 	                    break;
+					case ACTION_OUTP_OFF3:			// Turn off relays
+	                    doActionOffOut( 3, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    break;
+					case ACTION_OUTP_OFF4:			// Turn off relays
+						doActionOffOut( 4, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    break;
+					case ACTION_OUTP_OFFALL:			// Turn off relays
+	                    doActionOffOut( 1, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+						doActionOffOut( 2, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    doActionOffOut( 3, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+						doActionOffOut( 4, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+	                    break;
+
+					
 					case ACTION_DM_TOGGLE:			// Toggle DM row
 						doActionToggleDM( dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
 						break;
@@ -866,13 +982,13 @@ void sendChar (char data)
 {	
 	int i = 0;
 	// to send data with the usart put the data in the usart data register
-	UDR0 = data;
+	UDR = data;
 	
 	// check to see if the global interrupts are enabled
 	if (SREG & 0x80) 
 	{
 		// wait until the byte is sent or we count out
-			while ( !(UCSR0A&0x40) && (i<10000) )
+			while ( !(UCSRA&0x40) && (i<10000) )
 			{
 				asm ("nop");
 				i++;
@@ -880,10 +996,10 @@ void sendChar (char data)
 	}
 	else
 		// wait until the byte is sent
-		while ( !(UCSR0A&0x40) );
+		while ( !(UCSRA&0x40) );
 		
 		// clear the TXCflag
-		UCSR0A=(UCSR0A|0x40);
+		UCSR0A=(UCSRA|0x40);
 }
 
 // original header

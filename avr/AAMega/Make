@@ -40,7 +40,7 @@ EXTRAINCDIRS  += .
 # Define 'USE_UART0' for uart0 'USE_UART1' for uart1
 # 'BAUDRATE' for the configred baudrate
 //DEFS			=
-DEFS           = -DFOSC=16000 -DUSE_UART0 -DBAUDRATE=38400 -DBOARD=AAMEGA00
+DEFS           = -DFOSC=16000 -DUSE_UART2 -DBAUDRATE=9600 -DBOARD=AAMEGA00
 LIBS            =
 
 

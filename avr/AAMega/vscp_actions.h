@@ -28,22 +28,31 @@
 #define ACTION_NOOP							0
 #define ACTION_OUTP_TOGGLE1					1
 #define ACTION_OUTP_TOGGLE2					2
-#define ACTION_OUTP_ON1						3
-#define ACTION_OUTP_ON2						4
-#define ACTION_OUTP_OFF1					5
-#define ACTION_OUTP_OFF2					6
-#define ACTION_DM_TOGGLE					7
-#define ACTION_DM_ON						8
-#define ACTION_DM_OFF						9
-//0x0A .. 0x0F spare
-#define ACTION_SET_TIMER					0x10
-#define ACTION_SET_TIMER2					0x11
-#define ACTION_SET_TIMER3					0x12
-#define ACTION_SET_TIMER4					0x13
-#define ACTION_SET_TIMER5					0x14
-#define ACTION_SET_TIMER6					0x15
-#define ACTION_SET_TIMER7					0x16
-#define ACTION_SET_TIMER8					0x17
+#define ACTION_OUTP_TOGGLE3					3
+#define ACTION_OUTP_TOGGLE4					4
+#define ACTION_OUTP_ON1						5
+#define ACTION_OUTP_ON2						6
+#define ACTION_OUTP_ON3						7
+#define ACTION_OUTP_ON4						8
+#define ACTION_OUTP_OFF1					9
+#define ACTION_OUTP_OFF2					10
+#define ACTION_OUTP_OFF3					11
+#define ACTION_OUTP_OFF4					12
+#define ACTION_OUTP_TOGGLEALL				13
+#define ACTION_OUTP_ONALL					14
+#define ACTION_OUTP_OFFALL					15
+
+#define ACTION_DM_TOGGLE					0x10
+#define ACTION_DM_ON						0x11
+#define ACTION_DM_OFF						0x12
+#define ACTION_SET_TIMER					0x20
+#define ACTION_SET_TIMER2					0x21
+#define ACTION_SET_TIMER3					0x22
+#define ACTION_SET_TIMER4					0x23
+#define ACTION_SET_TIMER5					0x24
+#define ACTION_SET_TIMER6					0x25
+#define ACTION_SET_TIMER7					0x26
+#define ACTION_SET_TIMER8					0x27
 
 
 
@@ -60,7 +69,7 @@ void doActionOnDM( unsigned char dmflags, unsigned char arg );
 void doActionOffDM( unsigned char dmflags, unsigned char arg );
 void doActionSetTimer(unsigned char dmflags, unsigned char arg);
 void doActionHelloWorld( unsigned char dmflags, unsigned char arg );
-void vscp_outputevent(unsigned int current,unsigned int previous);
+void vscp_outputevent(unsigned char,unsigned long int current,unsigned long int previous);
 unsigned char portflip(unsigned char old_val); //flip over portpin value --> 8 becomes 1, 7 becomes 2 ,...
 unsigned char bitflip(unsigned char old_val); // flip over complete byte (lsb becomes msb)
 

@@ -173,6 +173,12 @@
     <Compile Include="AAmega.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="hardware.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="hardware.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="vscp_actions.c">
       <SubType>compile</SubType>
     </Compile>
