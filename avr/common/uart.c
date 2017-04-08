@@ -143,7 +143,7 @@ void uart_sendChar ( char data )
 {
     int i = 0;
     // to send data with the usart put the data in the usart data register
-    UDR0 = data;
+    UDR = data;
     
     // check to see if the global interrupts are enabled
     if (SREG & 0x80)
@@ -157,10 +157,10 @@ void uart_sendChar ( char data )
     }
     else
     // wait until the byte is sent
-    while ( !(UCSR0A&0x40) );
+    while ( !(UCSRA&0x40) );
     
     // clear the TXCflag
-    UCSR0A=(UCSR0A|0x40);
+    UCSRA=(UCSRA|0x40);
 }
 
 /*************************************************************************

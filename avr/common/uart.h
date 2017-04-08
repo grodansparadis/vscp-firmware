@@ -46,6 +46,12 @@
 #define MSK_UART_TX_BIT9        0x01
 #define MSK_UART_RX_BIT9        0x02
 
+#ifndef USE_UART2 // added to keep older builds compatible
+#ifndef USE_UART1 // added to keep older builds compatible
+#define USE_UART1
+#endif
+#endif
+
 #ifdef USE_UART1
 #ifndef UCSRC
     #define UCSRC   (UCSR0C)
