@@ -26,7 +26,7 @@
 
 //            !!!!!!!!!!!!!!!!!!!!  W A R N I N G  !!!!!!!!!!!!!!!!!!!!
 // This file may be a copy of the original file. This is because the file is
-// copied to other projects as a convinience. Thus editing the copy will not make
+// copied to other projects as a convenience. Thus editing the copy will not make
 // it to the original and will be overwritten.
 // The original file can be found in the vscp_softare source tree under 
 // src/vscp/common 
@@ -41,26 +41,7 @@
 #include <inttypes.h>
 
 
-
-
-//
-// daemon
-//
-// Base values for queue or channel id's
-//
-//#define VSCP_CLIENT_ID_BASE                 0x00000000
-//#define VSCP_DEVICE_ID_BASE                 0x00010000
-
-
-// Candidate for removal
-/// Names of mutex's
-/*#define VSCPD_CLIENT_OBJ_MUTEX              _("____VSCPD_CLIENT_OBJ_MUTEX____")
-#define VSCPD_UDP_OBJ_MUTEX                 _("____VSCPD_UDP_OBJ_MUTEX____")
-#define VSCPD_SEND_OBJ_MUTEX                _("____VSCPD_SEND_OBJ_MUTEX____")
-#define VSCPD_RECEIVE_OBJ_MUTEX             _("____VSCPD_RECEIVE_OBJ_MUTEX____")
-#define VSCPD_CLIENT_MUTEX                  _("____VSCPD_CLIENT_MUTEX____")
-*/
-#define	VSCP_DEFAULT_UDP_PORT               44444
+#define	VSCP_DEFAULT_UDP_PORT               33333
 #define	VSCP_DEFAULT_TCP_PORT               9598
 
 #define VSCP_ADDRESS_SEGMENT_CONTROLLER	    0x00
@@ -308,8 +289,8 @@ typedef  VSCPChannelInfo	*PVSCPCHANNELINFO;
 
 #define VSCP_MULTICAST_IPV4_ADDRESS_STR         "224.0.23.158"
 
-#define VSCP_MULTICAST_ANNNOUNCE_PORT           9598
-#define VSCP_MULTICAST_DEFAULT_PORT             33333   
+#define VSCP_ANNNOUNCE_MULTICAST_PORT           9598
+#define VSCP_DEFAULT_MULTICAST_PORT             44444
 
 // Packet frame format type = 0
 //      without byte0 and CRC
@@ -338,6 +319,9 @@ typedef  VSCPChannelInfo	*PVSCPCHANNELINFO;
 #define VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_MSB        33
 #define VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_LSB        34
 #define VSCP_MULTICAST_PACKET0_POS_VSCP_DATA            35
+
+// Two byte CRC follow here and if the frame is encrypted
+// the initialization vector follows.
 
 // VSCP multicast packet types
 #define VSCP_MULTICAST_TYPE_EVENT                       0
