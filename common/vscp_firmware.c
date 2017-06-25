@@ -3,12 +3,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /* ******************************************************************************
- * 	VSCP (Very Simple Control Protocol) 
+ * 	VSCP (Very Simple Control Protocol)
  * 	http://www.vscp.org
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2016 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
+ * Copyright (c) 2000-2017 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,8 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- * 
- *	This file is part of VSCP - Very Simple Control Protocol 	
+ *
+ *	This file is part of VSCP - Very Simple Control Protocol
  *	http://www.vscp.org
  *
  * ******************************************************************************
@@ -54,7 +54,7 @@
 
 #ifndef OFF
 #define OFF    FALSE
-#endif 
+#endif
 
 
 // Globals
@@ -86,7 +86,7 @@ volatile uint16_t vscp_timer;       // 1 ms timer counter
 //  increase this value externally by one each millisecond
 //  the initbutton is pressed. Set to zero when button
 //  is released.
-volatile uint8_t vscp_initbtncnt;   
+volatile uint8_t vscp_initbtncnt;
 
 
 volatile uint8_t vscp_statuscnt;    // status LED counter
@@ -99,10 +99,10 @@ volatile uint16_t vscp_configtimer; // configuration timer
 uint16_t vscp_page_select;
 
 // The GUID reset is used when the VSCP_TYPE_PROTOCOL_RESET_DEVICE
-// is received. Bit 4,5,6,7 is set for each received frame with 
+// is received. Bit 4,5,6,7 is set for each received frame with
 // GUID data. Bit 4 is for index = 0, bit 5 is for index = 1 etc.
 // This means that a bit is set if a frame with correct GUID is
-// received.  
+// received.
 uint8_t vscp_guid_reset;
 
 // Timekeeping
@@ -124,7 +124,7 @@ void vscp_init(void)
 
     // if zero set to uninitialised
     if ( 0 == vscp_nickname) vscp_nickname = VSCP_ADDRESS_FREE;
-    
+
     // Start init. blink if no nodeid
     if ( VSCP_ADDRESS_FREE == vscp_nickname ) vscp_initledfunc = VSCP_LED_BLINK1;
 
@@ -170,27 +170,27 @@ void vscp_init(void)
 int8_t vscp_check_pstorage(void)
 {
     // Check if persistent storage is initialised.
-    if ( ( VSCP_INITIALIZED_BYTE0_VALUE == 
+    if ( ( VSCP_INITIALIZED_BYTE0_VALUE ==
                     vscp_getControlByte( VSCP_INITIALIZED_BYTE0_INDEX ) ) &&
-           ( VSCP_INITIALIZED_BYTE1_VALUE == 
+           ( VSCP_INITIALIZED_BYTE1_VALUE ==
                     vscp_getControlByte( VSCP_INITIALIZED_BYTE1_INDEX ) ) ) {
         return TRUE;
     }
 
     vscp_initledfunc = VSCP_LED_BLINK1;
-    
+
     // Initialise persistent storage
     vscp_init_pstorage();
 
     // No nickname yet.
     vscp_writeNicknamePermanent( VSCP_ADDRESS_FREE );
-    
+
     // Mark persistent storage as initialised
-    vscp_setControlByte( VSCP_INITIALIZED_BYTE0_INDEX, 
+    vscp_setControlByte( VSCP_INITIALIZED_BYTE0_INDEX,
                             VSCP_INITIALIZED_BYTE0_VALUE );
-    vscp_setControlByte( VSCP_INITIALIZED_BYTE1_INDEX, 
+    vscp_setControlByte( VSCP_INITIALIZED_BYTE1_INDEX,
                             VSCP_INITIALIZED_BYTE1_VALUE );
-    
+
     return FALSE;
 }
 
@@ -227,7 +227,7 @@ void vscp_handleProbeState(void)
                 vscp_node_substate = VSCP_SUBSTATE_INIT_PROBE_SENT;
                 vscp_timer = 0;
 
-            } 
+            }
             else {
 
                 // No free address -> error
@@ -262,7 +262,7 @@ void vscp_handleProbeState(void)
                         vscp_node_state = VSCP_STATE_PREACTIVE;
                         vscp_timer = 0; // reset timer
 
-                    } 
+                    }
                     else {
 
                         // node answered, try next address
@@ -272,7 +272,7 @@ void vscp_handleProbeState(void)
 
                     }
                 }
-            } 
+            }
             else {
 
                 if (vscp_timer > VSCP_PROBE_TIMEOUT) { // Check for time-out
@@ -290,7 +290,7 @@ void vscp_handleProbeState(void)
                             vscp_timer = 0;
                             vscp_probe_cnt = 0;
 
-                        } 
+                        }
                         else {
 
                             // We have found a free address - use it
@@ -304,7 +304,7 @@ void vscp_handleProbeState(void)
                             vscp_goActiveState();
 
                         }
-                    } 
+                    }
                     else {
                         vscp_node_substate = VSCP_SUBSTATE_NONE;
                     }
@@ -341,11 +341,11 @@ void vscp_handlePreActiveState(void)
             // Assign nickname
             vscp_nickname = vscp_imsg.data[ 1 ];
             vscp_writeNicknamePermanent(vscp_nickname);
-            
+
             // Go active state
             vscp_node_state = VSCP_STATE_ACTIVE;
         }
-    } 
+    }
     else {
         // Check for time out
         if (vscp_timer > VSCP_PROBE_TIMEOUT) {
@@ -418,7 +418,7 @@ void vscp_handleSetNickname(void)
         // Yes, we are addressed
         vscp_nickname = vscp_imsg.data[ 1 ];
         vscp_writeNicknamePermanent(vscp_nickname);
-		
+
 		//return nickname accepted
 		vscp_omsg.flags = VSCP_VALID_MSG + 1; // one data byte
 		vscp_omsg.priority = VSCP_PRIORITY_HIGH;
@@ -448,7 +448,7 @@ void vscp_handleDropNickname(void)
         // Yes, we are addressed
 
 #ifdef DROP_NICKNAME_EXTENDED_FEATURES
-        // Optional Byte 1: 
+        // Optional Byte 1:
         // bit7 - go idle do not start, bit6 - reset persistent storage
         // bit5 - reset device but keep nickname
         // bit5 and bit 7 are concurrent, here I give bit 5 higher priority
@@ -468,7 +468,7 @@ void vscp_handleDropNickname(void)
             }
 
             // bit 7 set: go idle, e.g. stay in an endless loop until re-power
-            if ((vscp_imsg.data[1] & (1<<7)) && (brake == 0)) { 
+            if ((vscp_imsg.data[1] & (1<<7)) && (brake == 0)) {
                 vscp_nickname = VSCP_ADDRESS_FREE;
                 vscp_writeNicknamePermanent(VSCP_ADDRESS_FREE);
                 for (;;) {}; // wait forever
@@ -487,7 +487,7 @@ void vscp_handleDropNickname(void)
         // now check if timing was passed in byte 2
         if (bytes > 2) {
             // and waiting for options that made sense
-            if ( (vscp_imsg.data[1] == 0) || 
+            if ( (vscp_imsg.data[1] == 0) ||
                     ( vscp_imsg.data[1] & (1<<6)) ||
                     ( vscp_imsg.data[1] & (1<<5)) ) {
                 // wait platform independently
@@ -565,7 +565,7 @@ uint8_t vscp_readRegister(uint8_t reg)
 {
     if (reg >= 0x80) {
         return vscp_readStdReg(reg);
-    } 
+    }
     else {
         return vscp_readAppReg(reg);
     }
@@ -705,7 +705,7 @@ uint8_t vscp_writeRegister(uint8_t reg, uint8_t value)
 {
     if (reg >= 0x80) {
         return vscp_writeStdReg(reg, value);
-    } 
+    }
     else {
         return vscp_writeAppReg(reg, value);
     }
@@ -752,7 +752,7 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value)
                 (0xff != (vscp_page_select & 0xff))) {
             // return complement to indicate error
             rv = ~value;
-        } 
+        }
         else {
             // Write
             vscp_setManufacturerId(reg - VSCP_REG_MANUFACTUR_ID0, value);
@@ -771,7 +771,7 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value)
             rv = vscp_getGUID(reg - VSCP_REG_GUID);
         }
     }
-#endif	
+#endif
     else if ( VSCP_REG_DEFAULT_CONFIG_RESTORE == reg ) {
         if ( 0x55 == value ) {
             vscp_configtimer = 0;
@@ -780,10 +780,10 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value)
         else if ( 0xaa == value ) {
             if ( vscp_configtimer < 1000 ) {
                 vscp_restoreDefaults();
-                rv = 0xaa;	
+                rv = 0xaa;
             }
             else {
-                rv = 0;	// false		
+                rv = 0;	// false
             }
         }
 
@@ -848,7 +848,7 @@ void vscp_handleProtocolEvent(void)
 
                     // Send reply data
                     vscp_sendEvent();
-                } 
+                }
                 else {
 
                     // Read VSCP register
@@ -891,7 +891,7 @@ void vscp_handleProtocolEvent(void)
                     // Send reply
                     vscp_sendEvent();
 
-                } 
+                }
                 else {
 
                     // Write VSCP register
@@ -1203,7 +1203,7 @@ void vscp_handleProtocolEvent(void)
                     // calculate bytes to transfer in this event
                     if ( ( bytes - byte ) >= 4 ) {
                         bytes_this_time = 4;
-                    } 
+                    }
                     else {
                         bytes_this_time = (bytes - byte);
                     }
@@ -1219,14 +1219,14 @@ void vscp_handleProtocolEvent(void)
                         vscp_readRegister( ( vscp_imsg.data[3] + byte + cb ) );
                     }
 					// save when last event is sent out
-					vscp_sendtimer = vscp_timer; 
-                    
+					vscp_sendtimer = vscp_timer;
+
 					// send the event
                     vscp_sendEvent();
-					
+
 					//wait at least 1 msec for next message to be sent
 					//prevent overflow of bus or receiver
-					//100µsec should be sufficient, but requires separate timer
+					//100ï¿½sec should be sufficient, but requires separate timer
 					while (vscp_timer < vscp_sendtimer+2) ;
 
                     // increment byte by bytes_this_time and the event number by one
@@ -1311,7 +1311,7 @@ int8_t vscp_sendEvent(void)
                                 (vscp_omsg.flags & 0x0f),
                                 vscp_omsg.data ) ) ) {
         // One would expect us sending an error event here but the most usual
-        // cause of this problem is that the bus is jammed with events so an 
+        // cause of this problem is that the bus is jammed with events so an
         // error event sent here would have mad things even worse (and probably
         // not being delivered anyway ).
         vscp_errorcnt++;
@@ -1373,10 +1373,10 @@ uint8_t vscp_sendErrorEvent( uint8_t type, uint8_t idx )
 //
 
 #ifdef VSCP_FIRMWARE_ENABLE_LOGGING
-uint8_t vscp_sendLogEvent( uint8_t type, 
-                            uint8_t id, 
-                            uint8_t level, 
-                            uint8_t idx, 
+uint8_t vscp_sendLogEvent( uint8_t type,
+                            uint8_t id,
+                            uint8_t level,
+                            uint8_t idx,
                             uint8_t *pdata )
 {
     vscp_omsg.data[ 0 ] = id;
@@ -1391,5 +1391,5 @@ uint8_t vscp_sendLogEvent( uint8_t type,
 
     // Write event
     return vscp_sendEvent();
-}        
+}
 #endif

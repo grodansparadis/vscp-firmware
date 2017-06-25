@@ -3,12 +3,12 @@
 //
 
 /* ******************************************************************************
- * VSCP (Very Simple Control Protocol) 
+ * VSCP (Very Simple Control Protocol)
  * http://www.vscp.org
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2016 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
+ * Copyright (c) 2000-2017 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,8 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- * 
- *	This file is part of VSCP - Very Simple Control Protocol 	
+ *
+ *	This file is part of VSCP - Very Simple Control Protocol
  *	http://www.vscp.org
  *
  * ******************************************************************************
@@ -42,7 +42,7 @@
         \file vscp_firmware.h
         \brief VSCP firmware stack
 
-This file contains the firmware needed to implement VSCP in a 
+This file contains the firmware needed to implement VSCP in a
 low end hardware device.
 
  Notes about defines
@@ -52,7 +52,7 @@ low end hardware device.
 
  ENABLE_WRITE_2PROTECTED_LOCATIONS
  =================================
- to make it possible to write GUID, 
+ to make it possible to write GUID,
                         manufacturer id,
                         manufacturer sub device id
  page_low (0x92) and page_high (0x93) should both contain 0xff
@@ -69,11 +69,11 @@ low end hardware device.
 
 // This macro construct a signed integer from two unsigned chars in a safe way
 #define construct_signed16( msb, lsb )  ((int16_t)( (((uint16_t)msb)<<8) + \
-                                                            (uint16_t)lsb) )  
+                                                            (uint16_t)lsb) )
 
 // This macro construct a unsigned integer from two unsigned chars in a safe way
 #define construct_unsigned16( msb, lsb )  ((uint16_t)( (((uint16_t)msb)<<8) + \
-                                                            (uint16_t)lsb) ) 
+                                                            (uint16_t)lsb) )
 
 // This macro construct a signed long from four unsigned chars in a safe way
 #define construct_signed32( b0, b1, b2, b3 )  ((int32_t)( (((uint32_t)b0)<<24) + \
@@ -118,19 +118,19 @@ low end hardware device.
 
 #define  VSCP_LEVEL1_COMMON_REGISTER_START 0x80
 
-// State machine states 
+// State machine states
 #define VSCP_STATE_STARTUP              0x00	// Cold/warm reset
 #define VSCP_STATE_INIT                 0x01	// Assigning nickname
 #define VSCP_STATE_PREACTIVE            0x02	// Waiting for host initialization
 #define VSCP_STATE_ACTIVE               0x03	// The normal state
 #define VSCP_STATE_ERROR                0x04	// error state. Big problems.
 
-// State machine sub states 
+// State machine sub states
 #define VSCP_SUBSTATE_NONE              0x00	// No state
 #define VSCP_SUBSTATE_INIT_PROBE_SENT   0x01	// probe sent
 #define VSCP_SUBSTATE_INIT_PROBE_ACK    0x02	// probe ACK received
 
-// Helper consts and 
+// Helper consts and
 #define VSCP_VALID_MSG                  0x80	// Bit 7 set in flags
 
 #define VSCP_PRIORITY7                  0x00
@@ -240,12 +240,12 @@ typedef struct  {
 
 //////////////////////////////////////////////////////////
 //                  Deprecated
-// imsg and omsg has been deprecated and is replaced by 
+// imsg and omsg has been deprecated and is replaced by
 // vscpevent from version 1.6.0
 //////////////////////////////////////////////////////////
 
-    
-    
+
+
 
 
 /*!
@@ -330,21 +330,21 @@ extern const uint8_t vscp_deviceURL[];      //  GUID
 /*!
     \fn vscp_init
     Init the VSCP firmware.
-	
+
     Call this before entering the main loop.
  */
 void vscp_init(void);
 
 
 /*!
-    Set VSCP error state. 
-    This is a unit that is sleeping. 
+    Set VSCP error state.
+    This is a unit that is sleeping.
  */
 void vscp_error(void);
 
 /*!
     Handle nickname probing
-	
+
     This routine should be called periodically while
     in state VSCP_STATE_INIT
  */
@@ -352,7 +352,7 @@ void vscp_handleProbeState(void);
 
 /*!
     Handle the pre active state
-	
+
     This state is entered if a nod with nickname=0 answers the
     probe.Zero is reserved for a segment controller and if it
     is available and acknowledge this way that it is the node should
@@ -365,14 +365,14 @@ void vscp_handlePreActiveState(void);
 
 /*!
     Handle incoming CLASS1.PROTOCOL event
-	
+
     The event should be in the vscp_imsg buffer on entry.
  */
 void vscp_handleProtocolEvent(void);
 
 /*!
     Go to the active state
-	
+
     This mean the node sends new node on-line and informs other nodes
     about its acquired nickname.
  */
@@ -440,7 +440,7 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value);
 
 /*!
     Do One second work
-	
+
     This routine should be called once a second by the
     application.
  */
@@ -464,9 +464,9 @@ int8_t vscp_sendEvent(void);
 int8_t vscp_getEvent(void);
 
 /*!
-    Send error event (CLASS=508). 
+    Send error event (CLASS=508).
     http://www.vscp.org/docs/vscpspec/doku.php?id=class1.error
-    idx can be used to identify the internal part ("submodule") that was the 
+    idx can be used to identify the internal part ("submodule") that was the
     origin of the error. Both zone and sub zone are always set to zero.
     @param type This is the VSCP type
     @param idx Index to identify possible sub module. Normally set to zero.
@@ -477,11 +477,11 @@ uint8_t vscp_sendErrorEvent( uint8_t type, uint8_t idx );
 #endif
 
 /*!
-    Send log event (CLASS=509). 
+    Send log event (CLASS=509).
     http://www.vscp.org/docs/vscpspec/doku.php?id=class1.log
-    For loging first send Type = 2(0x01) Log Start then logging events and when 
-    log is closed send Type = 3 (0x03) Log Stop. To log several things use a 
-    unique if for each and open/close each.  
+    For loging first send Type = 2(0x01) Log Start then logging events and when
+    log is closed send Type = 3 (0x03) Log Stop. To log several things use a
+    unique if for each and open/close each.
     @param type VSCP logevent type.
     @param id Identifier for the logging channel.
     @param level Loglevel for this log event.
@@ -490,10 +490,10 @@ uint8_t vscp_sendErrorEvent( uint8_t type, uint8_t idx );
     @return TRUE if event was sent.
  */
 #ifdef VSCP_FIRMWARE_ENABLE_LOGGING
-uint8_t vscp_sendLogEvent( uint8_t type, 
-                            uint8_t id, 
-                            uint8_t level, 
-                            uint8_t idx, 
+uint8_t vscp_sendLogEvent( uint8_t type,
+                            uint8_t id,
+                            uint8_t level,
+                            uint8_t idx,
                             uint8_t *pdata );
 #endif
 
@@ -522,7 +522,7 @@ int8_t getVSCPFrame( uint16_t *pvscpclass,
                         uint8_t *pData);
 
 /*!
-    Send a VSCP frame 
+    Send a VSCP frame
     @param vscpclass VSCP class for event.
     @param vscptype VSCP type for event.
     @param nodeid Node id for originating node.
@@ -546,7 +546,7 @@ uint8_t vscp_getMajorVersion( void );
 uint8_t vscp_getMinorVersion( void );
 uint8_t vscp_getSubMinorVersion( void );
 
-/*! 
+/*!
     Get GUID from permanent storage
  */
 uint8_t vscp_getGUID(uint8_t idx);
@@ -564,7 +564,7 @@ void vscp_setUserID(uint8_t idx, uint8_t data);
 
 /*!
     Handle manufacturer id.
-	
+
     Not that both main and sub id are fetched here
         Manufacturer device ID byte 0 - idx=0
         Manufacturer device ID byte 1 - idx=1
@@ -583,12 +583,12 @@ void vscp_setManufacturerId(uint8_t idx, uint8_t data);
  */
 uint8_t vscp_getBootLoaderAlgorithm( void );
 
-/*! 
+/*!
     Get buffer size
  */
 uint8_t vscp_getBufferSize(void);
 
-/*! 
+/*!
     Get number of register pages used by app.
  */
 uint8_t vscp_getRegisterPagesUsed(void);
@@ -605,7 +605,7 @@ uint8_t vscp_getMDF_URL(uint8_t idx);
  */
 uint8_t vscp_readNicknamePermanent(void);
 
-/*! 
+/*!
     Write nickname to permanent storage
     @param nickname to write
  */
@@ -616,7 +616,7 @@ void vscp_writeNicknamePermanent(uint8_t nickname);
  */
 uint8_t vscp_getControlByte( uint8_t idx );
 
-/*! 
+/*!
     Write control byte permanent storage (idx=0/1)
  */
 void vscp_setControlByte(uint8_t idx, uint8_t ctrl);
@@ -626,7 +626,7 @@ void vscp_setControlByte(uint8_t idx, uint8_t ctrl);
  */
 void vscp_init_pstorage( void );
 
-/*! 
+/*!
     Get page select bytes
         idx=0 - byte 0 MSB
         idx=1 - byte 1 LSB
@@ -692,7 +692,7 @@ uint8_t vscp_getZone(void);
 
 /*!
     Get Subzone for device
-    Just return zero if not used.    
+    Just return zero if not used.
  */
 uint8_t vscp_getSubzone(void);
 

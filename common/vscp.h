@@ -43,6 +43,8 @@
 
 #define	VSCP_DEFAULT_UDP_PORT               33333
 #define	VSCP_DEFAULT_TCP_PORT               9598
+#define VSCP_ANNNOUNCE_MULTICAST_PORT       9598
+#define VSCP_DEFAULT_MULTICAST_PORT         44444
 
 #define VSCP_ADDRESS_SEGMENT_CONTROLLER	    0x00
 #define VSCP_ADDRESS_NEW_NODE               0xff
@@ -88,9 +90,9 @@ extern "C" {
                                 //          Just checked when CRC is used. 
                                 //          If set the CRC should be set to 0xAA55 for
                                 //          the event to be accepted without a CRC check.
-                                // bit 2 = Reserved.
-                                // bit 1 = Reserved.
-                                // bit 0 = Reserved.
+                                // bit 2 = Rolling index.
+                                // bit 1 = Rolling index.
+                                // bit 0 = Rolling index.
         uint16_t vscp_class;    // VSCP class
         uint16_t vscp_type;     // VSCP type
         uint8_t GUID[ 16 ];     // Node globally unique id MSB(0) -> LSB(15)
@@ -134,9 +136,9 @@ typedef struct {
                                     //          Just checked when CRC is used.
                                     //          If set the CRC should be set to 0xAA55 for
                                     //          the event to be accepted without a CRC check.
-                                    // bit 2 = Reserved.
-                                    // bit 1 = Reserved.
-                                    // bit 0 = Reserved.
+                                    // bit 2 = Rolling index.
+                                    // bit 1 = Rolling index.
+                                    // bit 0 = Rolling index.
     uint16_t vscp_class;            // VSCP class
     uint16_t vscp_type;             // VSCP type
     uint8_t  GUID[ 16 ];            // Node globally unique id MSB(0) -> LSB(15)
@@ -289,9 +291,6 @@ typedef  VSCPChannelInfo	*PVSCPCHANNELINFO;
 
 #define VSCP_MULTICAST_IPV4_ADDRESS_STR         "224.0.23.158"
 
-#define VSCP_ANNNOUNCE_MULTICAST_PORT           9598
-#define VSCP_DEFAULT_MULTICAST_PORT             44444
-
 // Packet frame format type = 0
 //      without byte0 and CRC
 //      total frame size is 1 + 34 + 2 + data-length
@@ -328,7 +327,7 @@ typedef  VSCPChannelInfo	*PVSCPCHANNELINFO;
 // VSCP multicast packet types
 #define VSCP_MULTICAST_TYPE_EVENT                       0
 
-#define SET_VSCP_MULTICAST_TYPE( type, encryption )  ( (type<<4) + encryption )
+#define SET_VSCP_MULTICAST_TYPE( type, encryption )  ( (type<<4) | encryption )
 #define GET_VSCP_MULTICAST_PACKET_TYPE( type)        ( (type>>4) & 0x0f)
 #define GET_VSCP_MULTICAST_PACKET_ENCRYPTION( type)  ( (type) & 0x0f)
 
