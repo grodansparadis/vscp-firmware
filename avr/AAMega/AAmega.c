@@ -1,15 +1,14 @@
 /* This is an modification of the demo_vscp_node_can128, credits to Akhe
  * see original header below this file
  * goal is to implement a module for home automation including:
- * - 16 output (on/off)	
+ * - 32 output (on/off)	
  * - bootloader support
  *
  * hardware supported:
  * custom board, AAmega 0.0
  *  
  * 
- * version 0.0.1
- * 29/08/2011
+  * 9/2017
  *
  * Sven Zwiers
  *
@@ -320,7 +319,9 @@ int main( void )
             // Do VSCP one second jobs 
             vscp_doOneSecondWork();
 			LED_IND_TOGGLE; // toggle indicator LED every second (heartbeat signal)
+			#ifdef PRINT_TIMER_EVENTS
 			char buf[30];
+			#endif
 			//handle timers
 			for (t=1;t<=NRofTimers;t++)
 			{
@@ -335,9 +336,10 @@ int main( void )
 					{
 						VSCP_USER_TIMER[t] -= 1;
 						VSCP_USER_TIMER_PRESCALER[t] = readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_PRE+t-1);
-						//uart_puts( "pre0" ); 
+						#ifdef PRINT_TIMER_EVENTS
 						sprintf(buf, "pre0:%i-timer:%i", t,VSCP_USER_TIMER[t]);
 						uart_puts(buf);
+						#endif
 					}
 					if (VSCP_USER_TIMER[t] == 0)  // when timer reaches 0, perform actions & stop timer
 					{

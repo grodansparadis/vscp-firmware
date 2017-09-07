@@ -1,19 +1,5 @@
 /* This is an modification of the demo_vscp_node_can128, credits to Akhe
  * see original header below this file
- * goal is to implement a central module for home automation including:
- * - 16 output (on/off)	with own zone/subzone
- * - a number of analog output	
- * - bootloader support
- *
- * hardware supported:
- * olimex AVR-CAN board
- * custom board, AAmega
- *
- * version 0.0.1
- * 29/06/2011
- *
- * Sven Zwiers
- *
  * more information about VSCP: http://www.vscp.org
  *---------------------------------------------------------------------------
 */

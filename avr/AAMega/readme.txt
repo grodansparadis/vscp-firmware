@@ -1,11 +1,11 @@
-This project is aimed to act as a base for home-automation
+This project is a base for home-automation
 It was based on the work  by Ake Hedman, eurosource
 
 Hardware supported: custom hardware (AAmega) Schematics are available on VSCP wiki
 
 All hardware related routines are placed in hardware.h / .c
 
-Currently used setup is AVRstudio7
+Currently used setup is ATMELstudio7
 
 
 Serial channel, 9600-8N1 is used for debug messages.
