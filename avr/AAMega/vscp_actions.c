@@ -265,43 +265,41 @@ void doActionOffDM( unsigned char dmflags, unsigned char arg )
 
 ///////////////////////////////////////////////////////////////////////////////
 // doActionSetTimer
-void doActionSetTimer(unsigned char dmflags, unsigned char arg)
+void doActionSetTimer(unsigned char select_timer, unsigned char dmflags, unsigned char arg)
 {
 	#ifdef PRINT_DM_EVENTS
 	uart_puts( "debug doActionSetTimer\n" );
 	#endif
-	//VSCP_USER_TIMER[select_timer] = arg;
-		unsigned char i;
-		
-		for ( i=1; i<2; i++ )
-		{
+	unsigned char i;
+	i = select_timer-1;
+
+	#ifdef PRINT_TIMER_EVENTS
+	char buf[50];
+	sprintf(buf, "doActionSetTimer:%i",	select_timer);
+	uart_puts(buf);
+	uart_puts( "doActionSetTimer check zone" );
+	//sprintf(buf, "doActionSetTimer check zone in reg: %i, %i",vscp_imsg.data[ 1 ],readEEPROM( VSCP_EEPROM_REGISTER + REG_TIMER1_ZONE ));
+	//uart_puts(buf);
+	#endif
+			
+		// Check if zone should match and if so if it match
+			
+		if ((!( dmflags & VSCP_DM_FLAG_CHECK_ZONE ))|(( dmflags & VSCP_DM_FLAG_CHECK_ZONE ) &&(vscp_imsg.data[ 1 ] == readEEPROM( VSCP_EEPROM_REGISTER + REG_TIMER1_ZONE +i*12))))
+			{
 			#ifdef PRINT_TIMER_EVENTS
-			uart_puts( "doActionSetTimer i" );
+			uart_puts( "doActionSetTimer check zone OK" );
 			#endif
-			// If the rely should not be handled just move on
-			//if ( !( arg & ( 1 << i ) ) ) continue;
-			
-			// Check if zone should match and if so if it match
-			if ( dmflags & VSCP_DM_FLAG_CHECK_ZONE )
-			{
-				if ( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_TIMER1_ZONE) + i )
+			if((!( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE ))|(( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE ) &&(vscp_imsg.data[ 2 ] == readEEPROM( VSCP_EEPROM_REGISTER + REG_TIMER1_SUBZONE +i*12))))
 				{
-					continue;
-				}
-			}
+				#ifdef PRINT_TIMER_EVENTS
+				uart_puts( "doActionSetTimer check SUBzone MATCH or not necessary)" );
+				#endif
+				VSCP_USER_TIMER[select_timer] = arg;
 
-			// Check if subzone should match and if so if it match
-			if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE )
-			{
-				if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_TIMER1_ZONE) + i )
-				{
-					continue;
 				}
+				
 			}
-			
-			VSCP_USER_TIMER[i] = arg;
-
-		}
+				
 }
 
 
@@ -318,14 +316,17 @@ uart_puts( "HelloWorld!\n" );
 
 
 
-void vscp_outputevent(unsigned char board,unsigned long int current,unsigned long int previous)
+
+void vscp_outputevent(unsigned char board,unsigned int current,unsigned int previous)
 {
 	unsigned int change=0,i=0,j=1;
+	uint16_t vscp_sendtimer=vscp_timer; 
+	
 	change = current^previous; //only changed bits are left
 	#ifdef PRINT_IO_EVENTS
 		uart_puts( "OUTPUT change detected!\n" );
-   		char buf[30];
-		sprintf(buf, "board/current/previous: %04x/%04x/%04x/"board, current, previous);
+   		char buf[40];
+		sprintf(buf, "board/current/previous: %04x/%04x/%04x/",board, current, previous);
 		uart_puts(buf);
 	#endif
 	if (board==0)
@@ -334,16 +335,29 @@ void vscp_outputevent(unsigned char board,unsigned long int current,unsigned lon
 		{
 			if ((change>>i)&0x01)
 			{
+				//wait at least 1 msec for next message to be sent
+				//prevent overflow of bus or receiver
+				//100µsec should be sufficient, but requires separate timer
+				while (vscp_timer < vscp_sendtimer+2) ;
 				if ((j & current) == j)
-					SendInformationEventExtended
-						(7,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + i ))
-						,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + i ))
-						,0 , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_OFF );
+					{
+						SendInformationEventExtended
+							(7,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + i ))
+							,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + i ))
+							,0 , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_OFF );
+						// save when last event is sent out
+						vscp_sendtimer = vscp_timer;
+					}
+
 				if (!(j & current)) 
-					SendInformationEventExtended
-						(7,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + i ))
-						,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + i ))
-						,0 , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_ON );
+					{
+						SendInformationEventExtended
+							(7,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + i ))
+							,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + i ))
+							,0 , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_ON );
+						// save when last event is sent out
+						vscp_sendtimer = vscp_timer;
+					}
 			}
 			j = j*2;
 		}
@@ -352,18 +366,30 @@ void vscp_outputevent(unsigned char board,unsigned long int current,unsigned lon
 	{
 		for (i=0; i<16; i++)
 		{
+			//wait at least 1 msec for next message to be sent
+			//prevent overflow of bus or receiver
+			//100µsec should be sufficient, but requires separate timer
+			while (vscp_timer < vscp_sendtimer+2) ;
 			if ((change>>i)&0x01)
 			{
 				if ((j & current) == j)
-				SendInformationEventExtended
-				(7,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT17_ZONE + i ))
-				,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT17_SUBZONE + i ))
-				,0 , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_OFF );
+				{
+					SendInformationEventExtended
+					(7,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT17_ZONE + i ))
+					,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT17_SUBZONE + i ))
+					,0 , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_OFF );
+					// save when last event is sent out
+						vscp_sendtimer = vscp_timer;
+				}
 				if (!(j & current))
-				SendInformationEventExtended
-				(7,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT17_ZONE + i ))
-				,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT17_SUBZONE + i ))
-				,0 , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_ON );
+				{
+					SendInformationEventExtended
+					(7,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT17_ZONE + i ))
+					,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT17_SUBZONE + i ))
+					,0 , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_ON );
+					// save when last event is sent out
+						vscp_sendtimer = vscp_timer;
+				}
 			}
 			j = j*2;
 		}

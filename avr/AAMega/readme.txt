@@ -9,7 +9,7 @@ Currently used setup is AVRstudio7
 
 
 Serial channel, 9600-8N1 is used for debug messages.
-For activating this, define PRINT_CAN_EVENTS in vscp_compiler.h
+For activating this, define PRINT_CAN_EVENTS (or other) in vscp_compiler.h
 
 11 DM rows are available.
 
