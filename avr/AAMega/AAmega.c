@@ -1,15 +1,14 @@
 /* This is an modification of the demo_vscp_node_can128, credits to Akhe
  * see original header below this file
  * goal is to implement a module for home automation including:
- * - 16 output (on/off)	
+ * - 32 output (on/off)	
  * - bootloader support
  *
  * hardware supported:
  * custom board, AAmega 0.0
  *  
  * 
- * version 0.0.1
- * 29/08/2011
+  * 9/2017
  *
  * Sven Zwiers
  *
@@ -320,8 +319,9 @@ int main( void )
             // Do VSCP one second jobs 
             vscp_doOneSecondWork();
 			LED_IND_TOGGLE; // toggle indicator LED every second (heartbeat signal)
-			
+			#ifdef PRINT_TIMER_EVENTS
 			char buf[30];
+			#endif
 			//handle timers
 			for (t=1;t<=NRofTimers;t++)
 			{
@@ -336,9 +336,10 @@ int main( void )
 					{
 						VSCP_USER_TIMER[t] -= 1;
 						VSCP_USER_TIMER_PRESCALER[t] = readEEPROM(VSCP_EEPROM_REGISTER + REG_TIMER1_PRE+t-1);
-						//uart_puts( "pre0" ); 
+						#ifdef PRINT_TIMER_EVENTS
 						sprintf(buf, "pre0:%i-timer:%i", t,VSCP_USER_TIMER[t]);
 						uart_puts(buf);
+						#endif
 					}
 					if (VSCP_USER_TIMER[t] == 0)  // when timer reaches 0, perform actions & stop timer
 					{
@@ -346,7 +347,7 @@ int main( void )
 						sprintf(buf, "T0:%i", t);
 						uart_puts(buf);
 						#endif
-						
+		
 						//actions
 						
 						//send out event
@@ -439,7 +440,6 @@ int main( void )
 
                 }
                 break;
-
 
             case VSCP_STATE_ERROR:          // Everything is *very* *very* bad.
                 vscp_error();
@@ -672,11 +672,15 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
 	    #endif
 		rv=0xAC; // if not resolved
 		uint8_t i;
-		char buf[100];
-	    for (i=1;i<= NRofTimers; i++)
+		#ifdef PRINT_TIMER_EVENTS
+			char buf[100];
+	    #endif
+		for (i=1;i<= NRofTimers; i++)
 	    {
-			sprintf(buf, "check row:%i", i);
+			#ifdef PRINT_TIMER_EVENTS
+			sprintf(buf, "check timerrow:%i", i);
 			uart_puts(buf);
+		    #endif
 		    if (reg == i)
 			{	VSCP_USER_TIMER[i] = val;
 				rv = val;
@@ -697,7 +701,9 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
 	
 		if ((reg >= REG_TIMER1_ZONE	-PAGE2_START+NRofTimers) & (reg <= PAGE2_END-PAGE2_START+NRofTimers))
 		{
+			#ifdef PRINT_TIMER_EVENTS
 			uart_puts( "aux reg timer set\n" );
+			#endif
 			writeEEPROM( (reg + VSCP_EEPROM_REGISTER + PAGE2_START-NRofTimers),val);
 			rv =  readEEPROM(reg + VSCP_EEPROM_REGISTER + PAGE2_START-NRofTimers);
 		}
@@ -781,7 +787,11 @@ static void doDM( void )
 	            class_mask =  readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_CLASSMASK  );
 	            type_filter = readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_TYPEFILTER );
 	            type_mask = readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( VSCP_SIZE_STD_DM_ROW * i ) + VSCP_DM_POS_TYPEMASK  );
-
+				
+				#ifdef PRINT_DM_EVENTS
+				uart_puts( "debug  doDMcheck class & mask\n" );
+				#endif
+				
 				if (! ( ( class_filter ^ vscp_imsg.vscp_class ) & class_mask ) && !( ( type_filter ^ vscp_imsg.vscp_type ) & type_mask )) 
 				{
 			
@@ -862,9 +872,32 @@ static void doDM( void )
 					case ACTION_DM_OFF:			// DM row OFF
 						doActionOffDM( dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
 						break;
-					case ACTION_SET_TIMER:		// set timer
-						doActionSetTimer(1,readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ));
 						
+					case ACTION_SET_TIMER1:		// set timer
+						doActionSetTimer(1,dmflags,readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ));
+						break;
+					case ACTION_SET_TIMER2:		// set timer
+						doActionSetTimer(2,dmflags,readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ));
+						break;
+					case ACTION_SET_TIMER3:		// set timer
+						doActionSetTimer(3,dmflags,readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ));
+						break;
+					case ACTION_SET_TIMER4:		// set timer
+						doActionSetTimer(4,dmflags,readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ));
+						break;
+					case ACTION_SET_TIMER5:		// set timer
+						doActionSetTimer(5,dmflags,readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ));
+						break;
+					case ACTION_SET_TIMER6:		// set timer
+						doActionSetTimer(6,dmflags,readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ));
+						break;
+					case ACTION_SET_TIMER7:		// set timer
+						doActionSetTimer(7,dmflags,readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ));
+						break;
+					case ACTION_SET_TIMER8:		// set timer
+						doActionSetTimer(8,dmflags,readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ));
+						break;
+					
 					} // case	
 
 	            } 

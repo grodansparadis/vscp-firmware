@@ -1,23 +1,5 @@
 /* This is an modification of the demo_vscp_node_can128, credits to Akhe
  * see original header below this file
- * goal is to implement a small module for home automation including:
- * - 8 input (on/off)
- * - 8 output (on/off)
- * - IR capable receiver
- * - piezzo buzzer
- * - a number of analog input (temperature / light / ...)
- * - bootloader support
- *
- * none of these goals are implemented yet!
- * hardware supported:
- * olimex AVR-CAN board
- * custom board, AAmini 0.0, 0.1 will be published as openhardware
- *
- * version 0.0.1
- * 29/08/2010
- *
- * Sven Zwiers
- *
  * more information about VSCP: http://www.vscp.org
  *---------------------------------------------------------------------------
 */
