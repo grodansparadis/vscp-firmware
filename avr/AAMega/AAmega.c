@@ -2,6 +2,8 @@
  * see original header below this file
  * goal is to implement a module for home automation including:
  * - 32 output (on/off)	
+ * - timers
+ * - control shutters/blinds/...
  * - bootloader support
  *
  * hardware supported:
@@ -21,6 +23,7 @@
 #include "methods.h"
 #include <stdio.h>
 #include <string.h>
+#include <util/delay.h>
 #include "AAmega.h"
 #include "hardware.h"
 #include "vscp_projdefs.h"
@@ -51,7 +54,7 @@ const uint8_t GUID[ 16 ] = {
 #include "methods.c"
 
 // Device string is stored in ROM for this module (max 32 bytes)
-const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/DEVMega.xml";
+const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/SHUTMega.xml";
 
 
 // Manufacturer id's is stored in ROM for this module
@@ -72,6 +75,7 @@ const uint8_t vscp_manufacturer_id[8] = {
 volatile uint16_t measurement_clock;	// 1 ms timer counter
 //int16_t btncnt[ 1 ];    // Switch counters 
 
+	
 // Prototypes
 static void initTimer();
 //static void init_app_eeprom( void );
@@ -153,7 +157,8 @@ int main( void )
 
 {
 	unsigned int lastoutputmain, currentoutputmain,lastoutputpiggy, currentoutputpiggy; //detection change on output
-
+	unsigned char shutter_state[5] = {0};
+	
 	ini_hardware();
     
     // Initialize UART
@@ -316,12 +321,15 @@ int main( void )
         if ( measurement_clock > 1000 ) 
 		{
             measurement_clock = 0;
-            // Do VSCP one second jobs 
+            
+			
+			// Do VSCP one second jobs 
             vscp_doOneSecondWork();
 			LED_IND_TOGGLE; // toggle indicator LED every second (heartbeat signal)
 			#ifdef PRINT_TIMER_EVENTS
 			char buf[30];
 			#endif
+			
 			//handle timers
 			for (t=1;t<=NRofTimers;t++)
 			{
@@ -380,9 +388,269 @@ int main( void )
 				}
 			}
 			
-				
+			//handle shutters
 			
-        }
+			//check config how many shutters active by checking values wanted not 0
+			//for every active shutter check outputs and increase/decrease SHUTTER_ACTUAL_VALUE
+			//when wanted position is reached, the wanted register is set to zero
+			// actual 1 = fully close
+			// actual 100 = fully open
+			// actual 111 - 200 used to calibrate position
+			// actual 201 - 255 = stop anyway
+			// actual 0 = unknown position
+			// wanted 0 = no movement wanted
+			
+			//check if wanted = actual => stop + reset wanted to zero
+			// if actual < wanted raise shutter
+			// if actual > wanted lower shutter
+			// if actual = 0 always fully open before position is known
+			// actual = 111 start calibrate (up to 200, then set actual = 100)
+			#ifdef PRINT_SHUTTER_EVENTS
+			char shbuf[30];
+			#endif
+			
+				
+			uint8_t i;
+			for(i=1;i<=NRofShutters;i++)
+				{
+				// If the shutter should not be handled just move on
+				if ( !( readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER_CONFIG) & ( 1 << (i-1) ) ) ) continue;
+					
+				if (VSCP_USER_SHUTTER_WANTED[i] != 0) //only active shutters
+				{
+					#ifdef PRINT_SHUTTER_EVENTS
+					sprintf(shbuf, "shutter:%i", i);
+					uart_puts(shbuf);
+					#endif
+					
+					if (shutter_state[i] == shutter_ini)
+						{
+						//check output if moving up still active
+						if (CheckBit (read_output1,(i*2)-2))
+							{
+							VSCP_USER_SHUTTER_ACTUAL[i] += 1;
+							#ifdef PRINT_SHUTTER_EVENTS
+							uart_puts("moving ini up+1");
+							#endif
+							}
+							if (VSCP_USER_SHUTTER_ACTUAL[i] > 200) //max reached default 200 , debug faster with 115
+								{
+								VSCP_USER_SHUTTER_ACTUAL[i] = readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_MAX+i-1);	//set actual = fully open
+								outputport1 |= _BV((i*2)-2);		//turn off "up"
+								outputport1 |= _BV((i*2)-1);	//turn off "down"
+								#ifdef PRINT_SHUTTER_EVENTS
+								uart_puts("shutter init-end");
+								sprintf(shbuf, "shutter;wanted :%i : %i", i,VSCP_USER_SHUTTER_WANTED[i]);
+								uart_puts(shbuf);
+								sprintf(shbuf, "shutter;actual :%i : %i", i,VSCP_USER_SHUTTER_ACTUAL[i]);
+								uart_puts(shbuf);
+								#endif
+								shutter_state[i] = shutter_notmoving;
+								SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+									,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_RESET_COMPLETED );	
+								}
+						}
+						
+						if (shutter_state[i] == shutter_unknown) //VSCP_USER_SHUTTER_ACTUAL[i] == 0)
+							{
+							// position is unknown, calibrate position
+							#ifdef PRINT_SHUTTER_EVENTS
+							uart_puts("shutter ini start UP");
+							#endif
+							VSCP_USER_SHUTTER_ACTUAL[i] = 111;
+							shutter_state[i] = shutter_ini;
+							outputport1 |= _BV((i*2)-1);		//turn off "down"1
+							 _delay_ms (10);							
+							outputport1 &= ~ _BV((i*2)-2);	//turn on "up"0
+							// send info event shutter up
+							SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+							,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_UP );
+							}
+						
+						
+						//check if wanted != actual
+						if (VSCP_USER_SHUTTER_WANTED[i] != VSCP_USER_SHUTTER_ACTUAL[i])
+						{
+							if (shutter_state[i] ==  shutter_notmoving)
+							{
+								if (VSCP_USER_SHUTTER_ACTUAL[i] < VSCP_USER_SHUTTER_WANTED[i])
+								{
+									outputport1 |= _BV((i*2)-1);	//turn off "down"1 just to be safe
+									outputport1 &= ~ _BV((i*2)-2);	//turn on "up"0
+									//moving up
+									shutter_state[i] = shutter_moving_up;
+									#ifdef PRINT_SHUTTER_EVENTS
+									uart_puts("start moving up");
+									#endif
+									// send info event shutter up
+									SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+									,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_UP );
+									
+								}
+								else if (VSCP_USER_SHUTTER_ACTUAL[i] > VSCP_USER_SHUTTER_WANTED[i])
+								{
+									outputport1 |= _BV((i*2)-2);		//turn off "up"0 just to be safe
+									outputport1 &= ~ _BV((i*2)-1);	//turn on "down"1
+									//moving down
+									shutter_state[i] = shutter_moving_down;
+									#ifdef PRINT_SHUTTER_EVENTS
+									uart_puts("start moving down");
+									#endif
+									// send info event shutter down
+									SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+									,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_DOWN );
+								}
+							}
+	
+			
+	
+				
+							
+							if (shutter_state[i] == shutter_moving_up)
+							{
+								//check output if moving up still active
+								if (CheckBit (read_output1,(i*2)-2))
+								{
+									VSCP_USER_SHUTTER_ACTUAL[i] += 1;
+									#ifdef PRINT_SHUTTER_EVENTS
+									uart_puts("moving up+1");
+									#endif
+								}
+								else if (!(CheckBit (read_output1,(i*2)-2)))
+								{
+									VSCP_USER_SHUTTER_WANTED[i] = 0;
+									shutter_state[i] = shutter_notmoving;
+									#ifdef PRINT_SHUTTER_EVENTS
+									uart_puts("moving up stopped");
+									#endif
+									SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+									,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_STOP );	
+								}
+								//check if wanted position has changed, so need to change direction
+								if ((VSCP_USER_SHUTTER_ACTUAL[i] > VSCP_USER_SHUTTER_WANTED[i]) & (VSCP_USER_SHUTTER_WANTED[i] != 0))
+								{
+									outputport1 |= _BV((i*2)-2);		//turn off "up"0
+									_delay_ms (10);
+									_delay_ms (10);
+									outputport1 &= ~ _BV((i*2)-1);	//turn on "down"1
+									//moving down
+									shutter_state[i] = shutter_moving_down;
+									#ifdef PRINT_SHUTTER_EVENTS
+									sprintf(shbuf, "shutter reverse down. wanted %i",VSCP_USER_SHUTTER_WANTED[i]);
+									uart_puts(shbuf);
+									#endif
+									// send info event shutter down
+									SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+									,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_DOWN );
+								}
+							}
+	
+							if (shutter_state[i] == shutter_moving_down)
+							{
+								//check output if moving down still active
+								if (CheckBit (read_output1,(i*2)-1))
+								{
+									VSCP_USER_SHUTTER_ACTUAL[i] -= 1;
+									#ifdef PRINT_SHUTTER_EVENTS
+									uart_puts("moving down-1");
+									#endif
+								}
+								else if (!(CheckBit (read_output1,(i*2)-1)))
+								{
+									VSCP_USER_SHUTTER_WANTED[i] = 0;
+									shutter_state[i] = shutter_notmoving;
+									#ifdef PRINT_SHUTTER_EVENTS
+									
+									uart_puts("moving down stopped");
+									#endif
+									SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+									,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_STOP );	
+								}
+								if ((VSCP_USER_SHUTTER_ACTUAL[i] < VSCP_USER_SHUTTER_WANTED[i]) & (VSCP_USER_SHUTTER_WANTED[i] != 0))
+								{
+									//check if wanted position has changed, so need to change direction
+									outputport1 |= _BV((i*2)-1);		//turn off "down"1
+									_delay_ms (10);
+									_delay_ms (10);
+									outputport1 &= ~ _BV((i*2)-2);	//turn on "up"0
+									//moving up
+									shutter_state[i] = shutter_moving_up;
+									#ifdef PRINT_SHUTTER_EVENTS
+									sprintf(shbuf, "shutter reverse up. wanted %i",VSCP_USER_SHUTTER_WANTED[i]);
+									uart_puts(shbuf);
+									#endif	
+									// send info event shutter up
+									SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+									,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_UP );
+													
+								}
+							}
+						}
+						
+							
+						if (VSCP_USER_SHUTTER_WANTED[i] == VSCP_USER_SHUTTER_ACTUAL[i])
+						{
+							// stop moving
+							outputport1 |= _BV((i*2)-2);		//turn off "up"0
+							outputport1 |= _BV((i*2)-1);		//turn off "down"1
+							shutter_state[i] = shutter_notmoving;
+							#ifdef PRINT_SHUTTER_EVENTS
+							uart_puts("wanted reached");
+							#endif
+							VSCP_USER_SHUTTER_WANTED[i] = 0; //shutter no more active
+							//TODO send information event up or down
+							// if 1 bottom end
+							// if max top end
+							// preset 1...4 middle end ; preset end ; preset left ; preset right
+							if (VSCP_USER_SHUTTER_ACTUAL[i] == 1) SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+							,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_BOTTOM ); 
+							
+							if (VSCP_USER_SHUTTER_ACTUAL[i] == (readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_MAX+i-1))) SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+							,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_TOP );
+							
+							if (VSCP_USER_SHUTTER_ACTUAL[i] == (readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_PRESET1+i-1))) SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+							,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_MIDDLE );
+							
+							if (VSCP_USER_SHUTTER_ACTUAL[i] == (readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_PRESET2+i-1))) SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+							,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_PRESET );
+							
+							if (VSCP_USER_SHUTTER_ACTUAL[i] == (readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_PRESET3+i-1))) SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+							,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_LEFT );	
+							
+							if (VSCP_USER_SHUTTER_ACTUAL[i] == (readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_PRESET4+i-1))) SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+							,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_RIGHT );
+							
+						}
+		
+							
+						
+					}
+					if (VSCP_USER_SHUTTER_WANTED[i] == 0) //make sure these shutters are stopped
+						{
+							if ((shutter_state[i] == shutter_moving_up)|(shutter_state[i] == shutter_moving_down))
+							{
+								#ifdef PRINT_SHUTTER_EVENTS
+								uart_puts("shutter wanted = 0");
+								#endif	
+								// stop moving
+								outputport1 |= _BV((i*2)-2);		//turn off "up"0
+								outputport1 |= _BV((i*2)-1);		//turn off "down"1
+								shutter_state[i] = shutter_notmoving;
+								#ifdef PRINT_SHUTTER_EVENTS
+								uart_puts("shutter wanted = 0 stop");
+								#endif
+								SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+									,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_STOP );	
+							}
+						}
+					
+			}//i nr of shutters
+				
+	
+
+	
+			
+        } //measurement clock
 
         switch ( vscp_node_state ) 
 		{
@@ -522,7 +790,7 @@ void vscp_init_pstorage( void )
 
 uint8_t vscp_readAppReg( uint8_t reg )
 {
-	    
+	    uint8_t i;
 	    uint8_t rv;
 	    // Assign the requested page, this variable is used in the implementation
 	    // specific function 'vscp_readAppReg()' and 'vscp_writeAppReg()' to actually
@@ -558,7 +826,7 @@ uint8_t vscp_readAppReg( uint8_t reg )
 		    uart_puts( "page2\n" );
 		    #endif
 			rv = 0xA2; //in case reg not resolved
-			uint8_t i;
+			
 			for (i=1;i<= NRofTimers; i++)
 			{
 				if (reg == i)	rv = VSCP_USER_TIMER[i];
@@ -573,7 +841,36 @@ uint8_t vscp_readAppReg( uint8_t reg )
 			
 		    return rv;
 		    break;
-		    
+		
+		case 3:
+			#ifdef PRINT_VSCP_EVENTS
+			uart_puts( "page3\n" );
+			#endif
+			rv = 0xA3; //in case reg not resolved
+			//uint8_t i;
+			
+			if (reg == 0) rv = readEEPROM( VSCP_EEPROM_REGISTER +REG_SHUTTER_CONFIG);
+			
+			for (i=1;i<= NRofShutters; i++)
+			{
+				if (reg == i)	rv = VSCP_USER_SHUTTER_ACTUAL[i];
+			}
+			
+			for (i=NRofShutters+1;i<= NRofShutters*2; i++)
+			{
+				if (reg == i)	rv = VSCP_USER_SHUTTER_WANTED[i-NRofShutters];
+			}
+			
+			if ((reg >= (REG_SHUTTER1_MAX-PAGE3_START+(2*NRofShutters))) & (reg <= (PAGE3_END-PAGE3_START+(2*NRofShutters))))
+			{
+				rv =  readEEPROM( VSCP_EEPROM_REGISTER + reg + PAGE3_START-(2*NRofShutters));
+			}
+			
+			
+		
+			return rv;
+			break;		    
+		 
 		 case 0:
 		    // page 0 contains DM
 		    //uart_puts( "page0\n" );
@@ -599,6 +896,7 @@ uint8_t vscp_readAppReg( uint8_t reg )
 uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
 {
     uint8_t rv;
+	uint8_t i;
 
     rv = ~val; // error return
     switch (vscp_page_select)
@@ -671,7 +969,7 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
 	    uart_puts( "WRpage2\n" );
 	    #endif
 		rv=0xAC; // if not resolved
-		uint8_t i;
+		
 		#ifdef PRINT_TIMER_EVENTS
 			char buf[100];
 	    #endif
@@ -712,8 +1010,49 @@ uint8_t vscp_writeAppReg( uint8_t reg, uint8_t val )
 		
 	    break;
 	    
+	
+		case 3:
+	    // page 3 (shutters)
+	    #ifdef PRINT_VSCP_EVENTS
+	    uart_puts( "WRpage3\n" );
+	    #endif
+		rv=0xAD; // if not resolved
+		
+		for (i=1;i<= NRofShutters; i++)
+	    {
+			if (reg == i)
+			{	VSCP_USER_SHUTTER_ACTUAL[i] = val;
+				rv = val;
+			}
+	    }
+		for (i=NRofShutters+1;i<= NRofShutters*2; i++)
+	    {
+			if (reg == i)
+			{	VSCP_USER_SHUTTER_WANTED[i-NRofShutters] = val;
+				rv = val;
+			}
+		}
+		
+		if ((reg >= REG_SHUTTER1_MAX-PAGE3_START+(2*NRofShutters)) & (reg <= PAGE3_END-PAGE3_START+(2*NRofShutters)))
+		{
+			#ifdef PRINT_SHUTTER_EVENTS
+			uart_puts( "shutter max timer set\n" );
+			#endif
+			writeEEPROM( (reg + VSCP_EEPROM_REGISTER + PAGE3_START-(2*NRofShutters)),val);
+			rv =  readEEPROM(reg + VSCP_EEPROM_REGISTER + PAGE3_START-(2*NRofShutters));
+		}
+		
+		if (reg == 0)
+		 {
+			writeEEPROM(VSCP_EEPROM_REGISTER + REG_SHUTTER_CONFIG,val);
+			rv =  readEEPROM(VSCP_EEPROM_REGISTER + REG_SHUTTER_CONFIG);
+		 }
+		
+	    break;
+	    
 	    default:
 	    rv=0xAA;
+		
     }//switch
     
     return rv;	
@@ -862,7 +1201,7 @@ static void doDM( void )
 						doActionOffOut( 4, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
 	                    break;
 
-					
+					//DM actions
 					case ACTION_DM_TOGGLE:			// Toggle DM row
 						doActionToggleDM( dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
 						break;
@@ -872,7 +1211,7 @@ static void doDM( void )
 					case ACTION_DM_OFF:			// DM row OFF
 						doActionOffDM( dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
 						break;
-						
+					//TIMER actions	
 					case ACTION_SET_TIMER1:		// set timer
 						doActionSetTimer(1,dmflags,readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ));
 						break;
@@ -898,6 +1237,30 @@ static void doDM( void )
 						doActionSetTimer(8,dmflags,readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ));
 						break;
 					
+				
+					//Shutter actions
+					case ACTION_SHUTTER_MOVE:	// move shutter to position
+						doActionShutterMove( dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+						break;
+					case ACTION_SHUTTER_MOVE1:	// move shutter1 to position
+						doActionFixedShutterMove( 0, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+						break;
+					case ACTION_SHUTTER_MOVE2:	// move shutter2 to position
+						doActionFixedShutterMove( 1, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+						break;
+					case ACTION_SHUTTER_MOVE3:	// move shutter3 to position
+						doActionFixedShutterMove( 2, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+						break;
+					case ACTION_SHUTTER_MOVE4:	// move shutter4 to position
+						doActionFixedShutterMove( 3, dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+						break;
+					case ACTION_SHUTTER_1BUTTON:	// move shutter to position using 1 button
+						doActionShutter1BUTTON( dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+						break;
+					case ACTION_SHUTTER_PRESET:	// move shutter to preset position
+						doActionShutterPreset( dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
+						break;	
+									
 					} // case	
 
 	            } 
@@ -986,7 +1349,11 @@ void doWork( void )
 
 
 
-
+// check byte x if bit i is active
+unsigned char CheckBit (unsigned char x, unsigned char i)
+{
+	return (!(x & _BV(i)));
+}
 
 
 //debug routines
@@ -1034,6 +1401,8 @@ void sendChar (char data)
 		// clear the TXCflag
 		UCSR0A=(UCSRA|0x40);
 }
+
+
 
 // original header
 /* ******************************************************************************

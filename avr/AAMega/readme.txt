@@ -18,6 +18,8 @@ Actions
 Toggle output.
 Turn ON output.
 Turn OFF output.
-Start Timers
+Use Timers
 Enable / disable DM row
+Control shutters/blinds/...
+
 

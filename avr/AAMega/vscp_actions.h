@@ -36,6 +36,13 @@
 #define ACTION_SET_TIMER7					0x26
 #define ACTION_SET_TIMER8					0x27
 
+#define ACTION_SHUTTER_MOVE					0x30
+#define ACTION_SHUTTER_MOVE1				0x31
+#define ACTION_SHUTTER_MOVE2				0x32
+#define ACTION_SHUTTER_MOVE3				0x33
+#define ACTION_SHUTTER_MOVE4				0x34
+#define ACTION_SHUTTER_PRESET				0x35
+#define ACTION_SHUTTER_1BUTTON				0x36
 
 
 
@@ -50,6 +57,13 @@ void doActionToggleDM( unsigned char dmflags, unsigned char arg );
 void doActionOnDM( unsigned char dmflags, unsigned char arg );
 void doActionOffDM( unsigned char dmflags, unsigned char arg );
 void doActionSetTimer(unsigned char select_timer, unsigned char dmflags, unsigned char arg);
+void doActionShutterMove( unsigned char dmflags, unsigned char arg );
+void doActionShutterPreset( unsigned char dmflags, unsigned char arg );
+void doActionFixedShutterMove( unsigned char select_shutter,unsigned char dmflags, unsigned char arg );
+void doActionShutter1BUTTON( unsigned char dmflags, unsigned char arg );
+
+
+
 void doActionHelloWorld( unsigned char dmflags, unsigned char arg );
 void vscp_outputevent(unsigned char,unsigned int current,unsigned int previous);
 unsigned char portflip(unsigned char old_val); //flip over portpin value --> 8 becomes 1, 7 becomes 2 ,...
