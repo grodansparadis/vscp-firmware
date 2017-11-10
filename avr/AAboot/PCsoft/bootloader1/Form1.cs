@@ -206,6 +206,7 @@ namespace VSCP
                     }
                 } 
             }
+            System.Threading.Thread.Sleep(500); // value correct?
 
             //start sending pages, divided in blocks of 8bytes
             string page = "";
@@ -410,7 +411,7 @@ private void pagesender(string _page, string _buffer)
     string temppage = "";
     temppage = string.Concat("0x", _page.Substring(0, 2), ",0x", _page.Substring(2, 2));
     myDaemon.EventSender(VSCP.L1classes.CLASS1_PROTOCOL, VSCP.events.PROTOCOL_START_BLOCK, temppage);
-    System.Threading.Thread.Sleep(200); // value correct?
+    System.Threading.Thread.Sleep(250); // value correct?
     //page should be sent in blocks of 8 bytes
     for (int p = 0; (p+16) <= _buffer.Length; p += 16)
     {

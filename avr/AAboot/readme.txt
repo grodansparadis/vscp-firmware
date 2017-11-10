@@ -63,7 +63,7 @@ the PC-software assumes a "solid" hex file. This is not how it should be:
 :102878006E6720746F20626F6F746C6F616465722D
 ******************
 
-To overcome this, you can read the hex file into a HEX-editor (I use ponyprog for this) and save again. OR you can submit a solution :-)
+To overcome this, you can read the hex file into a HEX-editor (I use ponyprog 2.08d for this: open device file & save device file) and save again. OR you can submit a solution :-)
 A line with less than 16 words is handled correct.
 
 

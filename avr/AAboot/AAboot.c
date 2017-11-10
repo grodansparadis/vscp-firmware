@@ -70,7 +70,7 @@ int main( void )
     UCSRB = MSK_UART_ENABLE_TX | MSK_UART_ENABLE_RX;
 
 	#ifdef PRINT_DEBUG_EVENTS
-	uart_puts( "AAboot 0.1 2016\n" );
+	uart_puts( "AAboot 0.2 2017\n" );
 	#endif
 
    //checkout bootloader_flag
@@ -177,7 +177,7 @@ void mainbootloader()
 							#ifdef PRINT_DEBUG_EVENTS					
 							uart_puts("STARTBLOCK");
 							#endif
-						    sendChar(BTL_PAGE);
+						    //sendChar(BTL_PAGE);
 							break;
 						case VSCP_TYPE_PROTOCOL_ACTIVATE_NEW_IMAGE:
 							writeEEPROM(VSCP_EEPROM_BOOTLOADER_FLAG,BTL_RUN);

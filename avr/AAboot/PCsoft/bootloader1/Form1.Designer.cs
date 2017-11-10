@@ -268,9 +268,9 @@
             this.label3.Location = new System.Drawing.Point(435, 230);
             this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(49, 13);
+            this.label3.Size = new System.Drawing.Size(58, 13);
             this.label3.TabIndex = 19;
-            this.label3.Text = "algorithm";
+            this.label3.Text = "algorithm 0";
             this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // label4

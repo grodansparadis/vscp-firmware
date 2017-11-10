@@ -22,13 +22,13 @@ void vscp_goBootloaderMode( uint8_t algo )
 {
     //todo check algorithm
 	writeEEPROM( VSCP_EEPROM_BOOTLOADER_FLAG, BTL_LOAD );
-	#ifdef PRINT_GENERAL_EVENTS
+	//#ifdef PRINT_GENERAL_EVENTS
 	uart_puts( "\n #####jumping to bootloader!\n" );
-	#endif
+	//#endif
 	//reboot using WD
 	cli();
 	wdt_enable(WDTO_1S);
-	while(1);
+	while(1) uart_puts( "#" );;
 }
 
 
