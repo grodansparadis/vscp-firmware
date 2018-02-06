@@ -4,7 +4,7 @@
 //
 // The MIT License (MIT)
 // 
-// Copyright (c) 2000-2017 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
+// Copyright (c) 2000-2018 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@
 
 #define	VSCP_DEFAULT_UDP_PORT               33333
 #define	VSCP_DEFAULT_TCP_PORT               9598
-#define VSCP_ANNNOUNCE_MULTICAST_PORT       9598
+#define VSCP_ANNOUNCE_MULTICAST_PORT       9598
 #define VSCP_DEFAULT_MULTICAST_PORT         44444
 
 #define VSCP_ADDRESS_SEGMENT_CONTROLLER	    0x00
@@ -126,7 +126,7 @@ typedef struct {
     uint32_t timestamp;             // Relative time stamp for package in microseconds.
                                     // ~71 minutes before roll over
     
-    // CRC should be calculated from here to end + datablock
+    // CRC should be calculated from here to end + data block
     uint16_t head;                  // Bit 15   GUID is IP v.6 address.
                                     // Bit 8-14 = Reserved
                                     // bit 7,6,5 priority => Priority 0-7 where 0 is highest.
@@ -532,31 +532,29 @@ struct vscpMyNode {
  
     data: datetime,head,obid,datetime,timestamp,class,type,guid,sizedata,data,note
   
-<event>    
-    <head>3</head>
-    <obid>1234</obid>
-    <datetime>2017-01-13T10:16:02</datetime>
-    <timestamp>50817</timestamp>
-    <class>10</class>
-    <type>6</type>
-    <guid>00:00:00:00:00:00:00:00:00:00:00:00:00:01:00:02</guid>
-    <sizedata>7</sizedata>
-    <data>0x48,0x34,0x35,0x2E,0x34,0x36,0x34</data>
-    <note></note>
-</event>
+<event    
+     head="3"
+     obid="1234"
+     datetime="2017-01-13T10:16:02"
+     timestamp="50817"
+     class="10"
+     type="6"
+     guid="00:00:00:00:00:00:00:00:00:00:00:00:00:01:00:02"
+     sizedata="7"
+     data="0x48,0x34,0x35,0x2E,0x34,0x36,0x34" />
+
  */
-#define VSCP_XML_EVENT_TEMPLATE "<event>\n"\
-    "<head>%d</head>\n"\
-    "<obid>%lu</obid>\n"\
-    "<datetime>%s</datetime>\n"\
-    "<timestamp>%lu</timestamp>\n"\
-    "<class>%d</class>\n"\
-    "<type>%d</type>\n"\
-    "<guid>%s</guid>\n"\
-    "<sizedata>%d</sizedata>\n"\
-    "<data>%s</data>\n"\
-    "<note>%s</note>\n"\
-"</event>"
+#define VSCP_XML_EVENT_TEMPLATE "<event "\
+    "head=\"%d\" "\
+    "obid=\"%lu\" "\
+    "datetime=\"%s\" "\
+    "timestamp=\"%lu\" "\
+    "class=\"%d\" "\
+    "type=\"%d\" "\
+    "guid=\"%s\" "\
+    "sizedata=\"%d\" "\
+    "data=\"%s\" "\
+    "/>"
 
 
 /*
@@ -640,6 +638,26 @@ note: This is a note <br>
     "note: %s <br>"\
     "</p>"
 
+
+#define VSCP_XML_FILTER_TEMPLATE  "<filter mask_priority=\"%d\" \n"\
+"mask_class=\"%d\" \n"\
+    "mask_type=\"%d\" \n"\
+    "mask_guid=\"%s\" \n"\
+    "filter_priority=\"%d\" \n"\
+    "filter_class=\"%d\" \n"\
+    "filter_type=\"%d\" \n"\
+    "filter_guid=\"%s\" />"
+
+#define VSCP_JSON_FILTER_TEMPLATE "{\n"\
+    "\"mask_priority\": %d,\n"\
+    "\"mask_class\": %d,\n"\
+    "\"mask_type\": %d,\n"\
+    "\"mask_guid\": \"%s\",\n"\
+    "\"filter_priority\": %d,\n"\
+    "\"filter_class\": %d,\n"\
+    "\"filter_type\": %d,\n"\
+    "\"filter_guid\": \"%s\",\n"\
+    "}"
 
 #ifdef __cplusplus
 }

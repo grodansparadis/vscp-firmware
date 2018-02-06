@@ -16,7 +16,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2017 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
+ * Copyright (c) 2000-2018 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -284,6 +284,8 @@
 #define VSCP_TYPE_INFORMATION_DATE                          72
 #define VSCP_TYPE_INFORMATION_TIME                          73
 #define VSCP_TYPE_INFORMATION_WEEKDAY                       74
+#define VSCP_TYPE_INFORMATION_LOCK                          75
+#define VSCP_TYPE_INFORMATION_UNLOCK                        76
 
 // class 30 (0x1E) -- CONTROL
 #define VSCP_TYPE_CONTROL_GENERAL                           0
@@ -325,6 +327,8 @@
 #define VSCP_TYPE_CONTROL_SHUTTER_PRESET                    39
 #define VSCP_TYPE_CONTROL_ALL_LAMPS_ON                      40
 #define VSCP_TYPE_CONTROL_ALL_LAMPS_OFF                     41
+#define VSCP_TYPE_CONTROL_LOCK                              42
+#define VSCP_TYPE_CONTROL_UNLOCK                            43
 
 // class 40 (0x28) -- MULTIMEDIA
 #define VSCP_TYPE_MULTIMEDIA_GENERAL                        0
