@@ -43,7 +43,7 @@
 
 #define	VSCP_DEFAULT_UDP_PORT               33333
 #define	VSCP_DEFAULT_TCP_PORT               9598
-#define VSCP_ANNOUNCE_MULTICAST_PORT       9598
+#define VSCP_ANNOUNCE_MULTICAST_PORT        9598
 #define VSCP_DEFAULT_MULTICAST_PORT         44444
 
 #define VSCP_ADDRESS_SEGMENT_CONTROLLER	    0x00
@@ -82,7 +82,8 @@ extern "C" {
         // ----- CRC should be calculated from here to end + data block ----
         
         uint16_t head;          // Bit 15   GUID is IP v.6 address.
-                                // Bit 8-14 = Reserved
+				// Bit 14   This is a dumb node. No MDF, register, nothing.
+                                // Bit 8-13 = Reserved
                                 // bit 765  priority, Priority 0-7 where 0 is highest.
                                 // bit 4 = hard coded, true for a hard coded device.
                                 // bit 3 = Don't calculate CRC, false for CRC usage.
@@ -128,7 +129,8 @@ typedef struct {
     
     // CRC should be calculated from here to end + data block
     uint16_t head;                  // Bit 15   GUID is IP v.6 address.
-                                    // Bit 8-14 = Reserved
+                                    // Bit 14   This is a dumb node. No MDF, register, nothing.
+                                    // Bit 8-13 = Reserved
                                     // bit 7,6,5 priority => Priority 0-7 where 0 is highest.
                                     // bit 4 = hard coded, true for a hard coded device.
                                     // bit 3 = Don't calculate CRC, Set to zero to use CRC.
@@ -172,6 +174,9 @@ typedef vscpEventEx *PVSCPEVENTEX;
 #define VSCP_HEADER_NO_CRC                  0x08    // Don't calculate CRC
 
 #define VSCP_NO_CRC_CALC                    0x08    // If set no CRC is calculated
+
+#define VSCP_HEADER16_IPV6_GUID		    0x8000  // GUID is IPv6 address
+#define VSCP_HEADER16_DUMB                  0x4000  // This node is dumb
 
 #define VSCP_MASK_PRIORITY                  0xE0
 #define VSCP_MASK_HARDCODED                 0x10
