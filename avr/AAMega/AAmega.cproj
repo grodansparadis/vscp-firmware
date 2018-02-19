@@ -167,6 +167,10 @@
       <SubType>compile</SubType>
       <Link>vscp_firmware.c</Link>
     </Compile>
+    <Compile Include="..\common\uart.c">
+      <SubType>compile</SubType>
+      <Link>uart.c</Link>
+    </Compile>
     <Compile Include="AAmega.c">
       <SubType>compile</SubType>
     </Compile>

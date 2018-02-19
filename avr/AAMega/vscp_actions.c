@@ -30,7 +30,7 @@ uart_puts( "debug doActionToggleOut\n" );
 		// Check if zone should match and if so if it match
 		if ( dmflags & VSCP_DM_FLAG_CHECK_ZONE ) 
 		{
-			if ( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + i + ((port-1) * 8)) ) 
+			if (( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + i + ((port-1) * 8)) ) & (vscp_imsg.data[ 1 ] != 255))
 				{
 				continue;
 				}
@@ -39,7 +39,7 @@ uart_puts( "debug doActionToggleOut\n" );
 		// Check if subzone should match and if so if it match
 		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE ) 
 		{
-			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + i + ((port-1) * 8)) ) 
+			if (( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + i + ((port-1) * 8)) ) & (vscp_imsg.data[ 2 ] != 255))
 				{
 				continue;
 				}
@@ -74,7 +74,7 @@ uart_puts( "debug doActionOnOut\n" );
 		// Check if zone should match and if so if it match
 		if ( dmflags & VSCP_DM_FLAG_CHECK_ZONE ) 
 		{
-			if ( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + i + ((port-1) * 8) ) ) 
+			if (( vscp_imsg.data[ 1 ] != (readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + i + ((port-1) * 8) )) ) & (vscp_imsg.data[ 1 ] != 255))
 				{
 				continue;
 				}
@@ -83,7 +83,7 @@ uart_puts( "debug doActionOnOut\n" );
 		// Check if subzone should match and if so if it match
 		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE ) 
 		{
-			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + i  + ((port-1) * 8)) ) 
+			if (( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + i  + ((port-1) * 8)) ) & (vscp_imsg.data[ 2 ] != 255))
 				{
 				continue;
 				}
@@ -118,7 +118,7 @@ uart_puts( "debug doActionOffOut\n" );
 		// Check if zone should match and if so if it match
 		if ( dmflags & VSCP_DM_FLAG_CHECK_ZONE ) 
 		{
-			if ( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + i  + ((port-1) * 8)) ) 
+			if (( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + i  + ((port-1) * 8)) ) & (vscp_imsg.data[ 1 ] != 255))
 				{
 				continue;
 				}
@@ -127,7 +127,7 @@ uart_puts( "debug doActionOffOut\n" );
 		// Check if subzone should match and if so if it match
 		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE ) 
 		{
-			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + i  + ((port-1) * 8)) ) 
+			if (( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + i  + ((port-1) * 8)) ) & (vscp_imsg.data[ 2 ] != 255))
 				{
 				continue;
 				}
@@ -331,6 +331,95 @@ void doActionShutterMove( unsigned char dmflags, unsigned char arg )
 	}
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// doActionShutterMoveUp
+// move all shutters to complete UP-position
+// use of (sub)zone optional
+///////////////////////////////////////////////////////////////////////////////
+void doActionShutterMoveUp( unsigned char dmflags)
+{
+	#ifdef PRINT_SHUTTER_EVENTS
+	uart_puts( "debug doActionshutterMoveUp\n" );
+	#endif
+	unsigned char i;
+	
+	for ( i=1; i<=NRofShutters; i++ )
+	{
+		#ifdef PRINT_DM_EVENTS
+		uart_puts( "debug doActionshutterMoveUp i" );
+		#endif
+		
+		// Check if zone should match and if so if it match or 255
+		if ( dmflags & VSCP_DM_FLAG_CHECK_ZONE )
+		{
+			if (( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2) -1 )) && (vscp_imsg.data[ 1 ] != 255))
+			{
+				continue;
+			}
+		}
+
+		// Check if subzone should match and if so if it match or 255
+		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE )
+		{
+			if (( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)  -1 )) && (vscp_imsg.data[ 2 ] != 255))
+			{
+				continue;
+			}
+		}
+		// reset shutter_actual to 1 so we are certain that max is reached, even if position is changed externally, or some drift because of difference between timing UP or DOWN
+		VSCP_USER_SHUTTER_ACTUAL[i] = 1;
+		
+		VSCP_USER_SHUTTER_WANTED[i] = readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_MAX+i-1);
+		
+
+	}
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// doActionShutterMoveDown
+// move all shutters to complete Down-position
+// use of (sub)zone optional
+///////////////////////////////////////////////////////////////////////////////
+void doActionShutterMoveDown( unsigned char dmflags)
+{
+	#ifdef PRINT_SHUTTER_EVENTS
+	uart_puts( "debug doActionshutterMoveDown\n" );
+	#endif
+	unsigned char i;
+	
+	for ( i=1; i<=NRofShutters; i++ )
+	{
+		#ifdef PRINT_DM_EVENTS
+		uart_puts( "debug doActionshutterMoveDown i" );
+		#endif
+		
+		// Check if zone should match and if so if it match or 255
+		if ( dmflags & VSCP_DM_FLAG_CHECK_ZONE )
+		{
+			if (( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2) -1 )) && (vscp_imsg.data[ 1 ] != 255))
+			{
+				continue;
+			}
+		}
+
+		// Check if subzone should match and if so if it match or 255
+		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE )
+		{
+			if (( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)  -1 )) && (vscp_imsg.data[ 2 ] != 255))
+			{
+				continue;
+			}
+		}
+		// reset shutter_actual to max so we are certain that min is reached, even if position is changed externally, or some drift because of difference between timing UP or DOWN
+		VSCP_USER_SHUTTER_ACTUAL[i] = readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_MAX+i-1);
+		
+		VSCP_USER_SHUTTER_WANTED[i] = 1;
+		
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // doActionShutterPreset
 // move all shutters to position set in shutterpreset n-register
@@ -350,19 +439,19 @@ void doActionShutterPreset( unsigned char dmflags, unsigned char arg )
 		uart_puts( "debug doActionshutterPreset i" );
 		#endif
 		
-		// Check if zone should match and if so if it match
+		// Check if zone should match and if so if it match or 255
 		if ( dmflags & VSCP_DM_FLAG_CHECK_ZONE )
 		{
-			if ( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2) -2 ))
+			if (( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2) -2 )) && (vscp_imsg.data[ 1 ] != 255))
 			{
 				continue;
 			}
 		}
 
-		// Check if subzone should match and if so if it match
+		// Check if subzone should match and if so if it match or 255
 		if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE )
 		{
-			if ( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)  -2 ))
+			if (( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)  -2 )) && (vscp_imsg.data[ 2 ] != 255))
 			{
 				continue;
 			}
@@ -417,16 +506,12 @@ void doActionShutter1BUTTON( unsigned char dmflags, unsigned char arg )
 {
 	
 	unsigned char i,wanted_temp=0;
-		#define latest_unknown	0
-		#define latest_down		1
-		#define latest_up		2
-		#define latest_down_stopped	3
-		#define latest_up_stopped	4
+
 		#ifdef PRINT_SHUTTER_EVENTS
 		char shbuf[30];
 		#endif
 		
-	static unsigned char latest_direction=latest_unknown;
+	
 	#ifdef PRINT_SHUTTER_EVENTS
 	uart_puts( "debug doActionshutter1button\n" );
 	#endif
@@ -435,7 +520,7 @@ void doActionShutter1BUTTON( unsigned char dmflags, unsigned char arg )
 	for(i=NRofShutters;i>=1;i--)
 	{
 		
-		//TODO using shutter config determine if output is used by shutters
+		//TODO using shutter config determine if output is used by shutters, if not, continue
 		if (VSCP_USER_SHUTTER_WANTED[i] != 0) //if wanted != 0 it should be moving
 		{
 			#ifdef PRINT_SHUTTER_EVENTS
@@ -447,10 +532,9 @@ void doActionShutter1BUTTON( unsigned char dmflags, unsigned char arg )
 			if (CheckBit (read_output1,(i*2)-2))
 			{
 				//stop
-				//shutter_state[i] = shutter_forcestop;
 				outputport1 |= _BV((i*2)-2);		//turn off "up"
+				SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,vscp_imsg.data[ 1 ],vscp_imsg.data[ 2 ],i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_CONTROL, VSCP_TYPE_CONTROL_STOP );
 				latest_direction = latest_up_stopped;
-				//VSCP_USER_SHUTTER_WANTED[i] = 0;
 				#ifdef PRINT_SHUTTER_EVENTS
 				uart_puts( "debug 1button moving up" );
 				#endif
@@ -459,10 +543,9 @@ void doActionShutter1BUTTON( unsigned char dmflags, unsigned char arg )
 			else if (CheckBit (read_output1,(i*2)-1))
 			{
 				//stop
-				//shutter_state[i] = shutter_forcestop;
 				outputport1 |= _BV((i*2)-1);		//turn off "down"
+				SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,vscp_imsg.data[ 1 ],vscp_imsg.data[ 2 ],i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_CONTROL, VSCP_TYPE_CONTROL_STOP );
 				latest_direction = latest_down_stopped;
-				//VSCP_USER_SHUTTER_WANTED[i] = 0;
 				#ifdef PRINT_SHUTTER_EVENTS
 				uart_puts( "debug 1button moving down" );
 				#endif
@@ -490,13 +573,17 @@ void doActionShutter1BUTTON( unsigned char dmflags, unsigned char arg )
 			#endif
 
 			// Check if zone should match and if so if it match
-			if ((!(dmflags & VSCP_DM_FLAG_CHECK_ZONE))|((dmflags & VSCP_DM_FLAG_CHECK_ZONE) && (vscp_imsg.data[ 1 ] == readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2) -2 ))))
+			if ((!(dmflags & VSCP_DM_FLAG_CHECK_ZONE))
+			|((dmflags & VSCP_DM_FLAG_CHECK_ZONE) && (vscp_imsg.data[ 1 ] == readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2) -2 )))
+			|(vscp_imsg.data[1] == 255))
 			{
 				#ifdef PRINT_SHUTTER_EVENTS
 				uart_puts( "1button zone OK" );
 				#endif
 				// Check if subzone should match and if so if it match
-				if ((!( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE ))|(( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE ) && (vscp_imsg.data[ 2 ] == readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-2 ))))
+				if ((!( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE ))
+					|(( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE ) && (vscp_imsg.data[ 2 ] == readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-2 )))
+					| (vscp_imsg.data[ 2 ] == 255))
 				{
 					#ifdef PRINT_SHUTTER_EVENTS
 					uart_puts( "1button subzone OK" );
@@ -510,6 +597,8 @@ void doActionShutter1BUTTON( unsigned char dmflags, unsigned char arg )
 						#endif
 						latest_direction = latest_up;
 						i = NRofShutters;
+						// send event to sync other modules, but use subzone/zone information from incoming message
+						SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,vscp_imsg.data[ 1 ],vscp_imsg.data[ 2 ],i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_CONTROL, VSCP_TYPE_CONTROL_OPEN );
 						continue;
 					}
 					else if (latest_direction == latest_up)
@@ -522,17 +611,22 @@ void doActionShutter1BUTTON( unsigned char dmflags, unsigned char arg )
 						#endif
 						latest_direction = latest_down;
 						i = NRofShutters;
+						// send event to sync other modules, but use subzone/zone information from incoming message
+						SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,vscp_imsg.data[ 1 ],vscp_imsg.data[ 2 ],i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_CONTROL, VSCP_TYPE_CONTROL_CLOSE );
 						continue;
+						
 					}
 					else if (latest_direction == latest_unknown)
 					{
-						 wanted_temp = 100; //move down
+						 wanted_temp = 100; //move up is preferred
  						#ifdef PRINT_SHUTTER_EVENTS
 						sprintf(shbuf, "1button Latest unknown %i\n",i);
 						uart_puts(shbuf);
 						#endif
 						latest_direction = latest_up;
 						i = NRofShutters;
+						// send event to sync other modules
+						SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,vscp_imsg.data[ 1 ],vscp_imsg.data[ 2 ],i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_CONTROL, VSCP_TYPE_CONTROL_OPEN );
 						continue;
 					}
 				}
@@ -540,16 +634,43 @@ void doActionShutter1BUTTON( unsigned char dmflags, unsigned char arg )
 			}
 
 		}
-
+		#ifdef PRINT_SHUTTER_EVENTS
+			sprintf(shbuf, "write temp arg: %i",arg);
+			uart_puts(shbuf);
+			#endif
+		
 		//write temp to wanted registers
 		for(i=NRofShutters;i>=1;i--)
 		{	
 			// If the shutter should not be handled just move on
 			if ( !( arg & ( 1 << (i-1) ) ) ) continue;
-			#ifdef PRINT_SHUTTER_EVENTS
-			sprintf(shbuf, "%i wanted %i\n",i,wanted_temp);
-			uart_puts(shbuf);
-			#endif
+
+			// Check if zone should match and if so if it match
+			if ( dmflags & VSCP_DM_FLAG_CHECK_ZONE )
+			{
+				if (( vscp_imsg.data[ 1 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)  -2 )) && (vscp_imsg.data[ 1 ] != 255))
+				{
+					#ifdef PRINT_SHUTTER_EVENTS
+				sprintf(shbuf, "check zone fail");
+				uart_puts(shbuf);
+				#endif
+					continue;
+				}
+			}
+			
+			// Check if subzone should match and if so if it match or 255
+			if ( dmflags & VSCP_DM_FLAG_CHECK_SUBZONE )
+			{
+				if (( vscp_imsg.data[ 2 ] != readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)  -2 )) && (vscp_imsg.data[ 2 ] != 255))
+				{
+					#ifdef PRINT_SHUTTER_EVENTS
+				sprintf(shbuf, "check subzone fail");
+				uart_puts(shbuf);
+				#endif
+					continue;
+				}
+			}
+
 			if (readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_MAX+i-1) < wanted_temp){ wanted_temp = readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_MAX+i-1);} //if max value exceeds wanted, replace it
 			#ifdef PRINT_SHUTTER_EVENTS
 			sprintf(shbuf, "%i wanted %i corrected\n",i,wanted_temp);
@@ -557,6 +678,12 @@ void doActionShutter1BUTTON( unsigned char dmflags, unsigned char arg )
 			#endif
 			
 			VSCP_USER_SHUTTER_WANTED[i] = wanted_temp;
+			
+			// to make sure that top will be reached, reduce the actual value to 2
+			if (wanted_temp == readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_MAX+i-1)) {VSCP_USER_SHUTTER_ACTUAL[i-1] = 2;}
+			
+			// to make sure that bottom will be reached, set actual value to max
+			if (wanted_temp == 1) {VSCP_USER_SHUTTER_ACTUAL[i-1] = readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_MAX+i-1);}
 		}
 
 		
@@ -580,6 +707,101 @@ void doActionShutter1BUTTON( unsigned char dmflags, unsigned char arg )
 	
 }
 
+
+
+void doFixedActions()
+{
+	// process some pre-defined "FIXED" events:
+	#ifdef PRINT_FIX_EVENTS
+	uart_puts( "debug  doFixedActions\n" );
+	#endif
+	
+	//set DMFLAGS check subzone & zone
+	//CASE statement gebruiken?
+	// control - turn on
+	if ( vscp_imsg.vscp_class == VSCP_CLASS1_CONTROL )
+	{
+		uint8_t i;
+		switch (vscp_imsg.vscp_type)
+		{
+		case VSCP_TYPE_CONTROL_TURNON:	
+			#ifdef PRINT_FIX_EVENTS
+			uart_puts( "turn on\n" );
+			#endif
+			doActionOnOut( 1, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_TURNON1) );
+			doActionOnOut( 2, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_TURNON2) );
+			doActionOnOut( 3, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_TURNON3) );
+			doActionOnOut( 4, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_TURNON4) );
+			break;
+		
+		case VSCP_TYPE_CONTROL_TURNOFF:
+			#ifdef PRINT_FIX_EVENTS
+			uart_puts( "turn off\n" );
+			#endif
+			doActionOffOut( 1, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_TURNOFF1) );
+			doActionOffOut( 2, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_TURNOFF2) );
+			doActionOffOut( 3, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_TURNOFF3) );
+			doActionOffOut( 4, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_TURNOFF4) );
+			break;
+			
+		case VSCP_TYPE_CONTROL_TOGGLE_STATE:
+			#ifdef PRINT_FIX_EVENTS
+			uart_puts( "toggle\n" );
+			#endif
+			doActionToggleOut( 1, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_TOGGLE1) );
+			doActionToggleOut( 2, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_TOGGLE2) );
+			doActionToggleOut( 3, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_TOGGLE3) );
+			doActionToggleOut( 4, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_TOGGLE4) );
+			break;
+		
+		case VSCP_TYPE_CONTROL_ALL_LAMPS_ON:	
+			#ifdef PRINT_FIX_EVENTS
+			uart_puts( "lamp on\n" );
+			#endif
+			doActionOnOut( 1, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_LAMP1) );
+			doActionOnOut( 2, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_LAMP2) );
+			doActionOnOut( 3, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_LAMP3) );
+			doActionOnOut( 4, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_LAMP4) );
+			break;
+		
+		case VSCP_TYPE_CONTROL_ALL_LAMPS_OFF:
+			#ifdef PRINT_FIX_EVENTS
+			uart_puts( "lamp off\n" );
+			#endif
+			doActionOffOut( 1, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_LAMP1) );
+			doActionOffOut( 2, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_LAMP2) );
+			doActionOffOut( 3, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_LAMP3) );
+			doActionOffOut( 4, 255, readEEPROM( VSCP_EEPROM_REGISTER + REG_FIXED_LAMP4) );
+			break;
+		
+		case VSCP_TYPE_CONTROL_CLOSE:
+			#ifdef PRINT_FIX_EVENTS
+			uart_puts( "shutter 1down\n" );
+			#endif
+			doActionShutterMoveDown( 255 );
+			break;
+		
+		case VSCP_TYPE_CONTROL_OPEN:
+			#ifdef PRINT_FIX_EVENTS
+			uart_puts( "shutter 1up\n" );
+			#endif
+			doActionShutterMoveUp( 255 );
+			break;
+			
+		case VSCP_TYPE_CONTROL_STOP:
+			#ifdef PRINT_FIX_EVENTS
+			uart_puts( "shutter stop\n" );
+			#endif
+			
+			for(i=1;i<=NRofShutters;i++)
+			{
+				VSCP_USER_SHUTTER_WANTED[i] = 0;
+			}
+			break;
+		
+		}
+	}
+}
 
 #ifdef PRINT_CAN_EVENTS
 ///////////////////////////////////////////////////////////////////////////////

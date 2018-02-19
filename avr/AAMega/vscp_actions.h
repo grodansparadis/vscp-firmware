@@ -43,8 +43,27 @@
 #define ACTION_SHUTTER_MOVE4				0x34
 #define ACTION_SHUTTER_PRESET				0x35
 #define ACTION_SHUTTER_1BUTTON				0x36
+#define ACTION_SHUTTER_UP					0x37
+#define ACTION_SHUTTER_DOWN					0x38
 
 
+
+
+
+//shutter 1button states
+#define latest_unknown	0
+#define latest_down		1
+#define latest_up		2
+#define latest_down_stopped	3
+#define latest_up_stopped	4
+
+//shutter moving states
+#define shutter_unknown		0
+#define shutter_ini			1
+#define shutter_notmoving	2
+#define shutter_moving_up	3
+#define shutter_moving_down	4
+#define shutter_forcestop	5
 
 //#define ACTION_HELLO_WORLD					2
 
@@ -58,10 +77,12 @@ void doActionOnDM( unsigned char dmflags, unsigned char arg );
 void doActionOffDM( unsigned char dmflags, unsigned char arg );
 void doActionSetTimer(unsigned char select_timer, unsigned char dmflags, unsigned char arg);
 void doActionShutterMove( unsigned char dmflags, unsigned char arg );
+void doActionShutterMoveUp( unsigned char dmflags);
+void doActionShutterMoveDown( unsigned char dmflags);
 void doActionShutterPreset( unsigned char dmflags, unsigned char arg );
 void doActionFixedShutterMove( unsigned char select_shutter,unsigned char dmflags, unsigned char arg );
 void doActionShutter1BUTTON( unsigned char dmflags, unsigned char arg );
-
+void doFixedActions();
 
 
 void doActionHelloWorld( unsigned char dmflags, unsigned char arg );

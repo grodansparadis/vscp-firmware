@@ -151,7 +151,7 @@ void uart_sendChar ( char data )
         // wait until the byte is sent or we count out
         while ( !(UCSRA&0x40) && (i<10000) )
         {
-            asm ("nop");
+             __asm__ ("nop");
             i++;
         }
     }

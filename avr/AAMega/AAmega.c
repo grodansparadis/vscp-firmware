@@ -54,7 +54,7 @@ const uint8_t GUID[ 16 ] = {
 #include "methods.c"
 
 // Device string is stored in ROM for this module (max 32 bytes)
-const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/SHUTMega.xml";
+const uint8_t vscp_deviceURL[]  = "mdfhost/mdf/Mega.xml";
 
 
 // Manufacturer id's is stored in ROM for this module
@@ -158,6 +158,7 @@ int main( void )
 {
 	unsigned int lastoutputmain, currentoutputmain,lastoutputpiggy, currentoutputpiggy; //detection change on output
 	unsigned char shutter_state[5] = {0};
+	
 	
 	ini_hardware();
     
@@ -413,7 +414,7 @@ int main( void )
 			uint8_t i;
 			for(i=1;i<=NRofShutters;i++)
 				{
-				// If the shutter should not be handled just move on
+				// check if output is configured as shutter, if not move on
 				if ( !( readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER_CONFIG) & ( 1 << (i-1) ) ) ) continue;
 					
 				if (VSCP_USER_SHUTTER_WANTED[i] != 0) //only active shutters
@@ -422,6 +423,8 @@ int main( void )
 					sprintf(shbuf, "shutter:%i", i);
 					uart_puts(shbuf);
 					#endif
+
+
 					
 					if (shutter_state[i] == shutter_ini)
 						{
@@ -433,8 +436,24 @@ int main( void )
 							uart_puts("moving ini up+1");
 							#endif
 							}
-							if (VSCP_USER_SHUTTER_ACTUAL[i] > 200) //max reached default 200 , debug faster with 115
-								{
+							if (VSCP_USER_SHUTTER_ACTUAL[i] < 100) // during ini another wanted value has been written
+							{
+								// stop shutter
+								outputport1 |= _BV((i*2)-2);		//turn off "up"0
+								outputport1 |= _BV((i*2)-1);		//turn off "down"1
+								#ifdef PRINT_SHUTTER_EVENTS
+								uart_puts("INI moving up stopped");
+								#endif
+								SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+								,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_STOP );
+								// reset actual to 0 (unknown)
+								VSCP_USER_SHUTTER_ACTUAL[i] = 0;
+								VSCP_USER_SHUTTER_WANTED[i] = 0;
+								// set state to notmoving
+								shutter_state[i] = shutter_notmoving;
+							}
+							if (VSCP_USER_SHUTTER_ACTUAL[i] > 115) //max reached default 200 , debugvalue faster with 115
+							{
 								VSCP_USER_SHUTTER_ACTUAL[i] = readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_MAX+i-1);	//set actual = fully open
 								outputport1 |= _BV((i*2)-2);		//turn off "up"
 								outputport1 |= _BV((i*2)-1);	//turn off "down"
@@ -446,25 +465,47 @@ int main( void )
 								uart_puts(shbuf);
 								#endif
 								shutter_state[i] = shutter_notmoving;
-								SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
-									,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_RESET_COMPLETED );	
-								}
+								SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+									,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_RESET_COMPLETED );	
+							}
+							
 						}
+		
+		
 						
 						if (shutter_state[i] == shutter_unknown) //VSCP_USER_SHUTTER_ACTUAL[i] == 0)
 							{
 							// position is unknown, calibrate position
-							#ifdef PRINT_SHUTTER_EVENTS
-							uart_puts("shutter ini start UP");
-							#endif
-							VSCP_USER_SHUTTER_ACTUAL[i] = 111;
-							shutter_state[i] = shutter_ini;
-							outputport1 |= _BV((i*2)-1);		//turn off "down"1
-							 _delay_ms (10);							
-							outputport1 &= ~ _BV((i*2)-2);	//turn on "up"0
-							// send info event shutter up
-							SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
-							,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_UP );
+							if (VSCP_USER_SHUTTER_WANTED[i] >= 5)
+								{
+								#ifdef PRINT_SHUTTER_EVENTS
+								uart_puts("shutter ini start UP");
+								#endif
+								VSCP_USER_SHUTTER_ACTUAL[i] = 111;
+								shutter_state[i] = shutter_ini;
+								outputport1 |= _BV((i*2)-1);		//turn off "down"1
+								_delay_ms (10);							
+								_delay_ms (10);
+								outputport1 &= ~ _BV((i*2)-2);	//turn on "up"0
+								// send info event shutter up
+								SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+								,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_UP );
+								}
+							else
+								{
+								#ifdef PRINT_SHUTTER_EVENTS
+								uart_puts("shutter ini start DOWN");
+								#endif
+								VSCP_USER_SHUTTER_ACTUAL[i] = 99; //makes sure the bottom is reached 
+								shutter_state[i] = shutter_moving_down;
+								outputport1 |= _BV((i*2)-2);		//turn off "up"0 just to be safe
+								_delay_ms (10);
+								_delay_ms (10);
+								outputport1 &= ~ _BV((i*2)-1);	//turn on "down"1
+								// send info event shutter up
+								SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+								,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_DOWN );
+								}	
 							}
 						
 						
@@ -476,6 +517,8 @@ int main( void )
 								if (VSCP_USER_SHUTTER_ACTUAL[i] < VSCP_USER_SHUTTER_WANTED[i])
 								{
 									outputport1 |= _BV((i*2)-1);	//turn off "down"1 just to be safe
+									_delay_ms (10);
+									_delay_ms (10);
 									outputport1 &= ~ _BV((i*2)-2);	//turn on "up"0
 									//moving up
 									shutter_state[i] = shutter_moving_up;
@@ -483,13 +526,15 @@ int main( void )
 									uart_puts("start moving up");
 									#endif
 									// send info event shutter up
-									SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
-									,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_UP );
+									SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+									,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_UP );
 									
 								}
 								else if (VSCP_USER_SHUTTER_ACTUAL[i] > VSCP_USER_SHUTTER_WANTED[i])
 								{
 									outputport1 |= _BV((i*2)-2);		//turn off "up"0 just to be safe
+									_delay_ms (10);
+									_delay_ms (10);
 									outputport1 &= ~ _BV((i*2)-1);	//turn on "down"1
 									//moving down
 									shutter_state[i] = shutter_moving_down;
@@ -497,8 +542,8 @@ int main( void )
 									uart_puts("start moving down");
 									#endif
 									// send info event shutter down
-									SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
-									,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_DOWN );
+									SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+									,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_DOWN );
 								}
 							}
 	
@@ -523,8 +568,8 @@ int main( void )
 									#ifdef PRINT_SHUTTER_EVENTS
 									uart_puts("moving up stopped");
 									#endif
-									SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
-									,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_STOP );	
+									SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+									,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_STOP );	
 								}
 								//check if wanted position has changed, so need to change direction
 								if ((VSCP_USER_SHUTTER_ACTUAL[i] > VSCP_USER_SHUTTER_WANTED[i]) & (VSCP_USER_SHUTTER_WANTED[i] != 0))
@@ -540,8 +585,8 @@ int main( void )
 									uart_puts(shbuf);
 									#endif
 									// send info event shutter down
-									SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
-									,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_DOWN );
+									SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+									,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_DOWN );
 								}
 							}
 	
@@ -563,8 +608,8 @@ int main( void )
 									
 									uart_puts("moving down stopped");
 									#endif
-									SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
-									,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_STOP );	
+									SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+									,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_STOP );	
 								}
 								if ((VSCP_USER_SHUTTER_ACTUAL[i] < VSCP_USER_SHUTTER_WANTED[i]) & (VSCP_USER_SHUTTER_WANTED[i] != 0))
 								{
@@ -580,8 +625,8 @@ int main( void )
 									uart_puts(shbuf);
 									#endif	
 									// send info event shutter up
-									SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
-									,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_UP );
+									SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+									,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_UP );
 													
 								}
 							}
@@ -598,31 +643,30 @@ int main( void )
 							uart_puts("wanted reached");
 							#endif
 							VSCP_USER_SHUTTER_WANTED[i] = 0; //shutter no more active
-							//TODO send information event up or down
+							// send information event up or down
 							// if 1 bottom end
 							// if max top end
 							// preset 1...4 middle end ; preset end ; preset left ; preset right
-							if (VSCP_USER_SHUTTER_ACTUAL[i] == 1) SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
-							,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_BOTTOM ); 
+							if (VSCP_USER_SHUTTER_ACTUAL[i] == 1) SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+							,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_BOTTOM ); 
 							
-							if (VSCP_USER_SHUTTER_ACTUAL[i] == (readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_MAX+i-1))) SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
-							,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_TOP );
+							if (VSCP_USER_SHUTTER_ACTUAL[i] == (readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_MAX+i-1))) SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+							,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_TOP );
 							
-							if (VSCP_USER_SHUTTER_ACTUAL[i] == (readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_PRESET1+i-1))) SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
-							,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_MIDDLE );
+							if (VSCP_USER_SHUTTER_ACTUAL[i] == (readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_PRESET1+i-1))) SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+							,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_MIDDLE );
 							
-							if (VSCP_USER_SHUTTER_ACTUAL[i] == (readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_PRESET2+i-1))) SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
-							,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_PRESET );
+							if (VSCP_USER_SHUTTER_ACTUAL[i] == (readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_PRESET2+i-1))) SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+							,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_PRESET );
 							
-							if (VSCP_USER_SHUTTER_ACTUAL[i] == (readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_PRESET3+i-1))) SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
-							,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_LEFT );	
+							if (VSCP_USER_SHUTTER_ACTUAL[i] == (readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_PRESET3+i-1))) SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+							,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_LEFT );	
 							
-							if (VSCP_USER_SHUTTER_ACTUAL[i] == (readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_PRESET4+i-1))) SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
-							,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_RIGHT );
+							if (VSCP_USER_SHUTTER_ACTUAL[i] == (readEEPROM(VSCP_EEPROM_REGISTER+REG_SHUTTER1_PRESET4+i-1))) SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+							,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_SHUTTER_END_RIGHT );
 							
 						}
 		
-							
 						
 					}
 					if (VSCP_USER_SHUTTER_WANTED[i] == 0) //make sure these shutters are stopped
@@ -639,16 +683,15 @@ int main( void )
 								#ifdef PRINT_SHUTTER_EVENTS
 								uart_puts("shutter wanted = 0 stop");
 								#endif
-								SendInformationEventExtended(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
-									,i , VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_STOP );	
+								SendInformationEventExtendedData(VSCP_PRIORITY_MEDIUM,(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_ZONE + (i*2)-1 )),(readEEPROM( VSCP_EEPROM_REGISTER + REG_OUTPUT1_SUBZONE + (i*2)-1 ))
+									,i , VSCP_USER_SHUTTER_ACTUAL[i], VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_STOP );	
 							}
 						}
 					
 			}//i nr of shutters
-				
-	
 
-	
+
+					
 			
         } //measurement clock
 
@@ -703,7 +746,8 @@ int main( void )
                      }
                      else 
 					 {
-	                     doDM();						 
+	                     doDM();
+						 doFixedActions();
                      }
 
                 }
@@ -1260,8 +1304,14 @@ static void doDM( void )
 					case ACTION_SHUTTER_PRESET:	// move shutter to preset position
 						doActionShutterPreset( dmflags, readEEPROM( VSCP_EEPROM_REGISTER + REG_DM_START + ( 8 * i ) + VSCP_DM_POS_ACTIONPARAM  ) );
 						break;	
-									
+					case ACTION_SHUTTER_UP:	// move shutter UP
+						doActionShutterMoveUp( dmflags );
+						break;
+					case ACTION_SHUTTER_DOWN:	// move shutter DOWN
+						doActionShutterMoveDown( dmflags );
+						break;									
 					} // case	
+
 
 	            } 
 				#ifdef PRINT_DM_EVENTS
@@ -1335,6 +1385,26 @@ void SendInformationEventExtended(uint8_t priority, uint8_t zone, uint8_t subzon
     vscp_sendEvent();	// Send data
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// SendInformationEventExtendeddata same function as SendInformationEvent but
+// with more options & extra databyte to have more control over the events sent
+// SendInformationEvent is not altered to remain compatible with common routines
+
+void SendInformationEventExtendedData(uint8_t priority, uint8_t zone, uint8_t subzone, uint8_t idx, uint8_t data, uint8_t eventClass, uint8_t eventTypeId )
+{
+	vscp_omsg.priority = priority;
+	vscp_omsg.flags = VSCP_VALID_MSG + 4;
+	vscp_omsg.vscp_class = eventClass;
+	vscp_omsg.vscp_type = eventTypeId;
+
+	vscp_omsg.data[ 0 ] = idx;	// Register
+	vscp_omsg.data[ 1 ] = zone;
+	vscp_omsg.data[ 2 ] = subzone;
+	vscp_omsg.data[ 3 ] = data;
+
+	vscp_sendEvent();	// Send data
+}
 ///////////////////////////////////////////////////////////////////////////////
 
 // doWork

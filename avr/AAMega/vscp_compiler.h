@@ -16,6 +16,8 @@
 //#define PRINT_DM_EVENTS
 //#define PRINT_TIMER_EVENTS
 //#define PRINT_SHUTTER_EVENTS
+//#define PRINT_FIX_EVENTS
+
 //
 // Undefine one of the following suitable for the
 // platform you want to compile for

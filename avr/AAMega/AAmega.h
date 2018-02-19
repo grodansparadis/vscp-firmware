@@ -21,7 +21,7 @@ volatile unsigned int VSCP_USER_TIMER[9] = {0} ;				//actual timer
 volatile unsigned int VSCP_USER_TIMER_PRESCALER[9] = {1};	//prescaler. increases user_timer when 0
 volatile unsigned int VSCP_USER_SHUTTER_ACTUAL[5] = {0} ;				//actual position
 volatile unsigned int VSCP_USER_SHUTTER_WANTED[5] = {0} ;				//wanted position
-	
+volatile unsigned char latest_direction=0;	
 	
 
 // # of elements in decision matrix
@@ -72,13 +72,7 @@ volatile unsigned int VSCP_USER_SHUTTER_WANTED[5] = {0} ;				//wanted position
 
 
 
-//shutter moving states
-#define shutter_unknown		0
-#define shutter_ini			1
-#define shutter_notmoving	2
-#define shutter_moving_up	3
-#define shutter_moving_down	4
-#define shutter_forcestop	5
+
 
 
 
@@ -96,6 +90,8 @@ void SendInformationEventExtended
 (uint8_t priority, uint8_t zone, uint8_t subzone, uint8_t idx,
 uint8_t eventClass, uint8_t eventTypeId );
 
+void SendInformationEventExtendedData
+(uint8_t priority, uint8_t zone, uint8_t subzone, uint8_t idx, uint8_t data, uint8_t eventClass, uint8_t eventTypeId );
 
 unsigned char CheckBit (unsigned char x, unsigned char i);
 

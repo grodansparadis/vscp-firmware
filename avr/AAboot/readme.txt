@@ -42,8 +42,11 @@ only the "normal" firmware is possible to upgrade! The bootloader can only be pr
 
 -Start bootloader-software on PC
 -Connect to Daemon
--select node
+-select node-ID
 -select HEX file
+-GUID is default ok, unless firmware needs it
+-same for REG 0x92 & 0x93
+-algorithm = 0
 -press UPLOAD
 
 upload should start immediatly (unless you build in some extra precautions in your firmware)
