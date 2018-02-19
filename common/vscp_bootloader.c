@@ -11,7 +11,7 @@
  *  The MIT License (MIT)
  *
  *  Copyright (c) 2010-2016 Sven Zwiers
- *  Copyright (c) 2016 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
+ *  Copyright (c) 2016-2018 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal

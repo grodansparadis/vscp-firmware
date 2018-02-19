@@ -1,27 +1,14 @@
-/**
+/* ******************************************************************************
+ * 	VSCP (Very Simple Control Protocol) 
+ * 	http://www.vscp.org
+ * 
  * @brief           VSCP Level II common functionality
- * @file            vscp_firmware_level2.c
- * @author          Ake Hedman, eurosource,
- *                  www.vscp.org - VSCP Project
- * @dependencies    -
- * @ingroup         mod_vscp
- *
- *
- * @section description Description
- **********************************
- * This module contains the code that implements the common
- * VSCP level II functionality.
- *
- *********************************************************************/
-
-
-/* *****************************************************************************
- * VSCP (Very Simple Control Protocol) 
- * http://www.vscp.org
+ * @file            vscp_firmware_level2.h
+ * @author          Ake Hedman, Grodans Paradis AB 
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2015 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
+ * Copyright (c) 2000-2018 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,142 +27,99 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
- * This module defined general functions for a Level II low resource module. Many 
- * methods are must be implemented by the user application to make a full implemention.
+ * 
+ * This file is part of VSCP - Very Simple Control Protocol 	
+ * http://www.vscp.org
  *
  * ******************************************************************************
- */
+*/
 
 #include <vscp_compiler.h>
 #include <vscp_projdefs.h>
 #include "string.h"
 #include "inttypes.h"
+#include "vscp.h"
 #include "vscp_class.h"      
 #include "vscp_type.h"
 #include "vscp_firmware_level2.h"
 
-// Constants
+/* Macros */
 
-// Globals
+/* This macro construct a signed integer from two unsigned chars in a safe way */
+#define construct_signed16( msb, lsb )  ((int16_t)( (((uint16_t)msb)<<8) + \
+                                                            (uint16_t)lsb) )
 
-// VSCP Data
-//static vscpEvent inEvent;
+/* This macro construct a unsigned integer from two unsigned chars in a safe way */
+#define construct_unsigned16( msb, lsb )  ((uint16_t)( (((uint16_t)msb)<<8) + \
+                                                            (uint16_t)lsb) )
 
-// VSCP function flags deterine how the software behaves.
-//  bit 0: 0 == UDP interfase. 1 == TCP interface.
-//  bit 1: Set if Autodiscovery of server.
-//  bit 2: Set if Fallback to hard ip address to UDP
-//  bit 3: Set if Hard coded IP address.
-//  bit 4: Set if Probe has been sent
-//  bit 5: 
-//  bit 6: Set if incoming message object is in use.
-//  bit 7: Set if outgoing transmission is in progress.
-//  bit 8: Reserved. 
-//  bit 9: Reserved. 
-//  bit 10: Reserved. 
-//  bit 11: Reserved. 
-//  bit 12: Reserved. 
-//  bit 13: Reserved. 
-//  bit 14: Reserved. . 
-//  bit 15: Set if raw ethernet activated
-uint16_t vscp_function_flags;
+/* This macro construct a signed long from four unsigned chars in a safe way */
+#define construct_signed32( b0, b1, b2, b3 )  ((int32_t)( (((uint32_t)b0)<<24) + \
+                                                            (((uint32_t)b0)<<16) + \
+                                                            (((uint32_t)b0)<<8) + \
+                                                            (uint32_t)b0 ) )
 
-uint8_t vscp_alarmstatus; // VSCP Alarm Status
+/* This macro construct a unsigned long from four unsigned chars in a safe way */
+#define construct_unsigned32( b0, b1, b2, b3 )  ((uint32_t)( (((uint32_t)b0)<<24) + \
+                                                            (((uint32_t)b0)<<16) + \
+                                                            (((uint32_t)b0)<<8) + \
+                                                            (uint32_t)b0 ) )
 
-uint8_t vscp_node_state; // State machine state
-uint8_t vscp_node_substate; // State machine substate
+/* Constants */
 
-// page selector
-uint16_t vscp_page_select;
+/* Globals */
+uint8_t m_vscp2_heartbeat_interval = VSCP2_DEFAULT_HEARTBEAT_INTERVAL:
 
-// This is stored globally here to save memory
-vscpEvent wrkEvent;
+uint8_t m_vscp2_caps_interval = VSCP2_DEFAULT_CAPS_INTERVAL:
 
-///////////////////////////////////////////////////////////////////////////////
-// vscp_init
-//
+uint8_t m_vscp2_alarmstatus;    /* VSCP Alarm Status */
 
-void vscp_init(void) {
+uint8_t m_vscp2_node_state;     /* State machine state */
+uint8_t m_vscp2_node_substate;  /* State machine substate */
 
-    vscp_function_flags = 0;
+/* page selector */
+uint16_t m_vscp2_page_select;
 
-    // If server discovery is enabled we should
-    // always start out in UDP mode.
-#if defined( VSCP_DISCOVER_SERVER ) && defined( VSCP_USE_UDP )
-    vscp_function_flags |= VSCP_FUNCTION_AUTODISCOVER;
-#else
-#if defined( VSCP_USE_TCP )
-    vscp_function_flags |= VSCP_FUNCTION_USE_TCP;
-#endif
-#endif
+/* GUID for this node */
+uint8_t m_guid[16];
 
-    // Fallback from TCP to UDP if failure to connect to TCP server
-#if defined( VSCP_TCP_FALLBACK )
-    vscp_function_flags |= VSCP_FUNCTION_FLAG_FALLBACK;
-#endif
 
-    // Server IP address is hardcoded. If fallback and discovery is enables
-    // this address will be used after a failed TCP discovery. If it also fails
-    // UDP will be used.
-#if defined( VSCP_SERVERIP_HARDCODE_IPADDRD )
-    vscp_function_flags |= VSCP_FUNCTION_HARDCODED_IPADDR;
-#endif
+/******************************************************************************
+ * vscp_init
+ * 
+ */
 
-#if defined( VSCP_USE_UDP )
-    vscp_udpinit();
-#endif	
-
-#if defined( VSCP_ENABLE_BOOTLOADER )
-    bBootLoadMode = FALSE; // Not in bootload mode
-#endif
+void vscp_init( uint8_t *pGUID ) {
 
     vscp_page_select = 0; // Default page
 
+    // Send new node on-License
+
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// vscp_sendEvent
-//
+/******************************************************************************
+ * vscp2_sendEvent
+ */
 
-int8_t vscp_sendEvent() {
-    
-    // Fill in GUID
-    fillGUID();
-
-#if defined(VSCP_USE_RAW_ETHERNET)
-    vscp_sendRawPacket();
-#endif
-
-#if defined(VSCP_USE_UDP) && defined(VSCP_USE_TCP)	
-
-    if (vscp_function_flags & VSCP_FUNCTION_USE_TCP) {
-        return vscp_sendTCPEvent(pevent);
-    } else {
-        return vscp_sendUDPEvent(pevent);
-    }
-#else 
-
-#if defined(VSCP_USE_TCP)
-    return vscp_sendTCPEvent(pevent);
-#endif	
-
-#if defined(VSCP_USE_UDP)
-    return vscp_sendUDPEvent(pevent);
-#endif	
-
-#endif
-
-
+int8_t vscp2_sendEvent( vscpEvent *e ) {
 
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// vscp_getEvent
-//
+/******************************************************************************
+ * vscp2_sendEvent
+ */
 
-int8_t vscp_getEvent(void) {
+int8_t vscp2_sendEventEx( vscpEventEx *ex ) {
+
+}
+
+
+/******************************************************************************
+ * vscp2_getEvent
+ */
+
+int8_t vscp2_getEvent(void) {
 #if defined(VSCP_USE_RAW_ETHERNET)
     return vscp_getRawPacket();
 #endif
@@ -198,11 +142,11 @@ int8_t vscp_getEvent(void) {
 
 
 
-///////////////////////////////////////////////////////////////////////////////
-// vscp_readRegister
-//
+/******************************************************************************
+ * vscp2_readRegister
+ */
 
-void vscp_readRegister( void )
+void vscp2_readRegister( void )
 {
     uint32_t i;
     uint32_t reg = ((uint32_t) wrkEvent.data[ 16 ] << 24) +
@@ -220,11 +164,11 @@ void vscp_readRegister( void )
     for ( i = 0; i < cnt; i++ ) {
 
         if ( ( reg + i) > VSCP_LEVEL2_COMMON_REGISTER_START ) {
-            // Common register
+            /* Common register */
             wrkEvent.data[ 4 + i ] =
                     vscp_readStdReg( reg + i );
         } else {
-            // User register
+            /* User register */
             wrkEvent.data[ 4 + i ] = vscp_readAppReg( reg + i );
         }
 
@@ -243,11 +187,11 @@ void vscp_readRegister( void )
 
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// vscp_writeRegister
-//
+/******************************************************************************
+ * vscp2_writeRegister
+ */
 
-void vscp_writeRegister( void )
+void vscp2_writeRegister( void )
 {
     uint8_t saveData[ 4 ];
     uint32_t i;
@@ -256,7 +200,7 @@ void vscp_writeRegister( void )
             ((uint32_t) wrkEvent.data[ 2 ] << 8) +
             (uint32_t) wrkEvent.data[ 3 ];
 
-    uint16_t cnt = wrkEvent.sizeData - 16 - 4 - 4; // Take away GUID + addr + reserved
+    uint16_t cnt = wrkEvent.sizeData - 16 - 4 - 4; /* Take away GUID + addr + reserved */
 
     if (cnt > (LIMITED_DEVICE_DATASIZE - 24)) {
         cnt = (LIMITED_DEVICE_DATASIZE - 24);
@@ -264,13 +208,14 @@ void vscp_writeRegister( void )
 
     for (i = 0; i < cnt; i++) {
 
-        if ((idx + i) > VSCP_LEVEL2_COMMON_REGISTER_START) {
-            // Common register
+        if ( (idx + i) > VSCP_LEVEL2_COMMON_REGISTER_START ) {
+            /* Common register */
             wrkEvent.data[ 8 + i ] =
                     vscp_writeStdReg((idx & 0xff) + i,
                     wrkEvent.data[ 24 + i ]);
-        } else {
-            // User register
+        } 
+        else {
+            /* User register */
             wrkEvent.data[ 8 + i ] =
                     vscp_writeAppReg(idx + i,
                     wrkEvent.data[ 24 + i ]);
@@ -278,7 +223,7 @@ void vscp_writeRegister( void )
 
     }
 
-    // Save address
+    /* Save address */
     memcpy((void *) saveData, (void *) wrkEvent.data, 4);
 
     wrkEvent.sizeData = 8 + cnt;
@@ -298,99 +243,99 @@ void vscp_writeRegister( void )
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// vscp_readStdReg
-//
+/******************************************************************************
+ * vscp2_readStdReg 
+ */ 
 
-uint8_t vscp_readStdReg( uint32_t reg )
+uint8_t vscp2_readStdReg( uint32_t reg )
 {
 
     uint8_t rv;
 
     if ( VSCP_REG_ALARMSTATUS == reg ) {
 
-        // * * * Read alarm status register * * *
+        /* * * * Read alarm status register * * * */
         rv = vscp_alarmstatus;
         vscp_alarmstatus = 0x00; // Reset alarm status
 
     }
     else if ( VSCP_REG_VSCP_MAJOR_VERSION == reg ) {
 
-        // * * * VSCP Protocol Major Version * * *
+        /* * * * VSCP Protocol Major Version * * *  */
         rv = VSCP_MAJOR_VERSION;
 
     }
     else if ( VSCP_REG_VSCP_MINOR_VERSION == reg ) {
 
-        // * * * VSCP Protocol Minor Version * * *
+        /* * * * VSCP Protocol Minor Version * * *  */
         rv = VSCP_MINOR_VERSION;
 
     }
     else if ( VSCP_REG_NODE_CONTROL == reg ) {
 
-        // * * * Reserved * * *
+        /* * * * Reserved * * *  */
         rv = 0;
 
     }
     else if ( ( reg >= VSCP_REG_USERID0 ) &&
             ( reg < VSCP_REG_MANUFACTUR_ID0 ) )  {
 
-        // * * * Read from persitant locations * * *
+        /* * * * Read from persitant locations * * *  */
         rv = vscp_getUserID( reg - VSCP_REG_USERID0 );
 
     }
     else if ( ( reg >= VSCP_REG_MANUFACTUR_ID0  ) &&
             ( reg < VSCP_REG_NICKNAME_ID ) ) {
 
-        // * * * Manufacturer ID information * * *
+        /* * * * Manufacturer ID information * * *  */
         rv = vscp_getManufacturerId( reg - VSCP_REG_MANUFACTUR_ID0 );
 
     }
     else if ( VSCP_REG_NICKNAME_ID == reg ) {
 
-        // * * * nickname id * * *
+        /* * * * nickname id * * *  */
         rv = 0xff; // Always undefined  for Level II
 
     }
     else if ( VSCP_REG_PAGE_SELECT_MSB == reg ) {
 
-        // * * * Page select MSB * * *
+        /* * * * Page select MSB * * * */
         rv = ( vscp_page_select >> 8 ) & 0xff;
 
     }
     else if ( VSCP_REG_PAGE_SELECT_LSB == reg ) {
 
-        // * * * Page select LSB * * *
+        /* * * * Page select LSB * * *  */
         rv = ( vscp_page_select & 0xff );
 
     }
     else if ( VSCP_REG_FIRMWARE_MAJOR_VERSION == reg ) {
 
-        // * * * Get firmware Major version * * *
+        /* * * * Get firmware Major version * * *  */
         rv = vscp_getFirmwareMajorVersion();
 
     }
     else if ( VSCP_REG_FIRMWARE_MINOR_VERSION == reg ) {
 
-        // * * * Get firmware Minor version * * *
+        /* * * * Get firmware Minor version * * *  */
         rv = vscp_getFirmwareMinorVersion();
 
     }
     else if ( VSCP_REG_FIRMWARE_SUB_MINOR_VERSION == reg ) {
 
-        // * * * Get firmware Sub Minor version * * *
+        /* * * * Get firmware Sub Minor version * * *  */
         rv = vscp_getFirmwareSubMinorVersion();
 
     }
     else if ( VSCP_REG_BOOT_LOADER_ALGORITHM == reg ) {
 
-        // * * * Boot loader algorithm * * *
+        /* * * * Boot loader algorithm * * *  */
         rv = vscp_getBootLoaderAlgorithm();
 
     }
     else if ( VSCP_REG_BUFFER_SIZE == reg ) {
 
-        // * * * Buffer size * * *
+        /* * * * Buffer size * * *  */
         rv = vscp_getBufferSize();
 
     }
@@ -398,14 +343,14 @@ uint8_t vscp_readStdReg( uint32_t reg )
     else if ( ( reg >= VSCP_REG_GUID ) &&
             ( reg < VSCP_REG_DEVICE_URL  ) ) {
 
-        // * * * GUID * * *
+        /* * * * GUID * * *  */
         rv = vscp_getGUID( reg - VSCP_REG_GUID );
 
     }
 
     else if ( reg >= VSCP_REG_DEVICE_URL ) {
 
-        // * * * The device URL * * *
+        /*   * * * The device URL * * *  */
         rv = vscp_getMDF_URL( reg - VSCP_REG_DEVICE_URL );
 
     }
@@ -415,59 +360,61 @@ uint8_t vscp_readStdReg( uint32_t reg )
 
 
 
-///////////////////////////////////////////////////////////////////////////////
-// vscp_writeStdReg
-//
+/******************************************************************************
+ * vscp2_writeStdReg
+ */
 
-uint8_t vscp_writeStdReg(uint32_t reg, uint8_t data)
+uint8_t vscp2_writeStdReg(uint32_t reg, uint8_t data)
 {
     uint8_t rv = ~data;
 
     if ((reg > (VSCP_REG_VSCP_MINOR_VERSION + 1)) &&
             (reg < VSCP_REG_MANUFACTUR_ID0)) {
 
-        // * * * User Client ID * * *
+        /*  * * * User Client ID * * * */
         vscp_setUserID((reg - VSCP_REG_USERID0), data);
         rv = vscp_getUserID((reg - VSCP_REG_USERID0));
 
     }
     else if (VSCP_REG_PAGE_SELECT_MSB == reg) {
 
-        // * * * Page select register MSB * * *
+        /* * * * Page select register MSB * * *  */
         vscp_page_select = (vscp_page_select & 0x00ff) + ((uint16_t) data << 8);
         rv = (vscp_page_select >> 8) & 0xff;
     }
     else if (VSCP_REG_PAGE_SELECT_LSB == reg) {
 
-        // * * * Page select register LSB * * *
+        /* * * * Page select register LSB * * * */
         vscp_page_select = (vscp_page_select & 0xff00) + data;
         rv = (vscp_page_select & 0xff);
     }
 
 #ifdef ENABLE_WRITE_2PROTECTED_LOCATIONS
 
-        // Write manufacturer id configuration information
+        /* Write manufacturer id configuration information */
     else if ((vscp_readStdReg > VSCP_REG_USERID4) &&
             (vscp_readStdReg < VSCP_REG_NICKNAME_ID)) {
-        // page select must be 0xffff for writes to be possible
+        /* page select must be 0xffff for writes to be possible */
         if ((0xff != ((vscp_page_select >> 8) & 0xff)) ||
                 (0xff != (vscp_page_select & 0xff))) {
-            // return complement to indicate error
+            /* return complement to indicate error */
             rv = ~data;
-        } else {
-            // Write
+        } 
+        else {
+            /* Write */
             vscp_setManufacturerId(vscp_readStdReg - VSCP_REG_MANUFACTUR_ID0, data);
             rv = vscp_getManufacturerId(vscp_readStdReg - VSCP_REG_MANUFACTUR_ID0);
         }
-    }        // Write GUID configuration information
+    }        /* Write GUID configuration information */
     else if ((vscp_readStdReg > (VSCP_REG_GUIID - 1)) &&
             (vscp_readStdReg < VSCP_REG_DEVICE_URL)) {
-        // page must be 0xffff for writes to be possible
+        /* page must be 0xffff for writes to be possible */
         if ((0xff != ((vscp_page_select >> 8) & 0xff)) ||
                 (0xff != (vscp_page_select & 0xff))) {
-            // return complement to indicate error
+            /* return complement to indicate error */
             rv = ~data;
-        } else {
+        } 
+        else {
             vscp_setGUID(vscp_readStdReg - VSCP_REG_GUIID, data);
             rv = vscp_getGUID(vscp_readStdReg - VSCP_REG_GUIID);
         }
@@ -475,7 +422,7 @@ uint8_t vscp_writeStdReg(uint32_t reg, uint8_t data)
 #endif
 
     else {
-        // return complement to indicate error
+        /* return complement to indicate error */
         rv = ~data;
     }
 
@@ -483,20 +430,20 @@ uint8_t vscp_writeStdReg(uint32_t reg, uint8_t data)
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// sendServerProbe
-//
+/******************************************************************************
+ * vscp2_sendHighEndServerProbe
+ */
 
 #ifdef VSCP_DISCOVER_SERVER
 
-void sendHighEndServerProbe(void)
+void vscp2_sendHighEndServerProbe( void )
 {
     outEvent.head = (VSCP_PRIORITY_HIGH << 5);
     outEvent.sizeData = 5;
     outEvent.vscp_class = VSCP_CLASS1_PROTOCOL;
     outEvent.vscp_type = VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_PROBE;
-    // GUID is filled in by send routine
-    outEvent.data[0] = 0; // TCP interface
+    /* GUID is filled in by send routine */
+    outEvent.data[0] = 0; /* TCP interface */
     outEvent.data[1] = vscp_getIPsddress( 0 );
     outEvent.data[2] = vscp_getIPsddress( 1 );
     outEvent.data[3] = vscp_getIPsddress( 2 );
@@ -508,11 +455,11 @@ void sendHighEndServerProbe(void)
 #endif
 
 
-///////////////////////////////////////////////////////////////////////////////
-// fillGUID
-//
+/******************************************************************************
+ * vscp2_fillGUID
+ */
 
-void fillGUID(void)
+void vscp2_fillGUID(void)
 {
     uint8_t i;
 

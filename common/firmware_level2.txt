@@ -1,0 +1,43 @@
+
+Raw Ethernet
+------------
+- Driver fetch events to buffer.  Size of buffer.
+- Driver send events from buffer. Size of buffer.
+
+UDP
+---
+- Driver fetch events to buffer.  Size of buffer.
+- Driver send events from buffer. Size of buffer.
+
+Multicast
+---------
+- Driver fetch events to buffer.  Size of buffer.
+- Driver send events from buffer. Size of buffer.
+
+TCP/IP node is client
+---------------------
+
+a.) FreeRTOS 
+    Two connections to host
+        - One thread send events.
+        - One thread receives events.
+        - One thread do VSCP work.
+
+b.) Non FreeRTOS
+    One connection to host.
+        - Polling for events.
+        - Sending events.
+    Two connections to host.
+        - Recvloop continiously read.
+        - Sending events.    
+
+TCP/IP node is server
+---------------------
+
+a.) Allow one client
+        - Client poll for events.
+        - Client send events.
+
+b.) Allow two (or more) clients. Hub.
+        - Client enter Recvloop
+        - Clint send events.
