@@ -8,7 +8,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2017 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
+ * Copyright (c) 2000-2018 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -89,12 +89,12 @@ low end hardware device.
 
 
 // ******************************************************************************
-//  				VSCP Constants
+//  				             VSCP Constants
 // ******************************************************************************
 
-#define VSCP_MAJOR_VERSION		1       // VSCP Major version
-#define VSCP_MINOR_VERSION              6       // VSCP Minor Version
-#define VSCP_SUB_VERSION		1	// VSCP Sub version
+#define VSCP_MAJOR_VERSION      1       // VSCP Major version
+#define VSCP_MINOR_VERSION      6       // VSCP Minor Version
+#define VSCP_SUB_VERSION        1       // VSCP Sub version
 
 #define VSCP_ADDRESS_MASTER             0x00
 #define VSCP_ADDRESS_FREE               0xff
@@ -220,7 +220,8 @@ typedef struct  {
     /*!
         Input message flags\n
         ==================\n
-        Bit 7 - Set if message valid./Set if message should be sent (cleared when sent)\n
+        Bit 7 - Set if message valid./Set if message should be sent (
+                cleared when sent)\n
         Bit 6 - Reserved\n
         Bit 5 - Hard coded (will never be set)\n
         Bit 3 - Number of data bytes MSB\n
@@ -241,7 +242,7 @@ typedef struct  {
 //////////////////////////////////////////////////////////
 //                  Deprecated
 // imsg and omsg has been deprecated and is replaced by
-// vscpevent from version 1.6.0
+// vscpevent_t from version 1.6.0
 //////////////////////////////////////////////////////////
 
 

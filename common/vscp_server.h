@@ -8,7 +8,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2015 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
+ * Copyright (c) 2000-2018 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@
 #include <vscp_level2.h>
 
 
-#define MSG_COPYRIGHT                       "OK Copyright (c) 2000-2012, Grodans Paradis AB, http://www.grodansparadis.com\r\n"
+#define MSG_COPYRIGHT                       "OK Copyright (c) 2000-2018, Grodans Paradis AB, http://www.grodansparadis.com\r\n"
 #define MSG_WELCOME                         "OK Welcome to the embedded VSCP daemon.\r\n"
 #define MSG_OK                              "+OK - Success.\r\n"
 #define MSG_GOODBY                          "+OK - Connection closed by client.\r\n"
@@ -107,13 +107,13 @@ typedef struct _vscp_interface_info {
     http://www.koders.com/c/fid83F5660A86069B2E2D29B9D3FC9013F76A9BCEB7.aspx
     
     @param src NULL terminated string to convert.
-    @param srclen Öength of string, 0 means strlen( src )
+    @param srclen ï¿½ength of string, 0 means strlen( src )
     @param base The base for the comversion, 0 means figure it out.
     @param resultp Pointer that holds unsigned long result after conversion.
     @return  NULL for success, else string literal 
     
 */
-const char * a2ul( const char *src, uint8_t srclen, uint8_t base, uint32_t *resultp );
+const char *a2ul( const char *src, uint8_t srclen, uint8_t base, uint32_t *resultp );
 
 /*!
     Convert decimal byte to hex string
