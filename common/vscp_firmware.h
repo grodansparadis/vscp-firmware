@@ -4,7 +4,7 @@
 
 /* ******************************************************************************
  * VSCP (Very Simple Control Protocol)
- * http://www.vscp.org
+ * https://www.vscp.org
  *
  * The MIT License (MIT)
  *
@@ -29,7 +29,7 @@
  * SOFTWARE.
  *
  *	This file is part of VSCP - Very Simple Control Protocol
- *	http://www.vscp.org
+ *	https://www.vscp.org
  *
  * ******************************************************************************
  */

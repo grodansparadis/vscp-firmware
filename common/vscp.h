@@ -52,6 +52,7 @@
 #define VSCP_ADDRESS_NEW_NODE               0xff
 
 #define VSCP_MAX_DATA                       (512)       /* was 487 */
+#define VSCP_SIZE_GUID                      (16)        /* GUID array size */
 
 #define VSCP_LEVEL1                         0           /* Changed 151104  Was 1/2 */
 #define VSCP_LEVEL2                         1
@@ -545,6 +546,7 @@ struct vscpMyNode {
 #define VSCP_ERROR_ALREADY_DEFINED      45      /* The name is already in use. */
 #define VSCP_ERROR_WRITE_ERROR          46      /* Error when writing data */
 #define VSCP_ERROR_STOPPED              47      /* Operation stopped or aborted */
+#define VSCP_ERROR_INVALID_POINTER      48      /* Pointer with invalid value */
 
 /*
     Template for VSCP XML event data

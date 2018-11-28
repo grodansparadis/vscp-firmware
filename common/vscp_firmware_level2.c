@@ -1,11 +1,7 @@
 /* ******************************************************************************
  * 	VSCP (Very Simple Control Protocol) 
- * 	http://www.vscp.org
+ * 	https://www.vscp.org
  * 
- * @brief           VSCP Level II common functionality
- * @file            vscp_firmware_level2.h
- * @author          Ake Hedman, Grodans Paradis AB 
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2000-2018 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
@@ -29,7 +25,7 @@
  * SOFTWARE.
  * 
  * This file is part of VSCP - Very Simple Control Protocol 	
- * http://www.vscp.org
+ * https://www.vscp.org
  *
  * ******************************************************************************
 */
