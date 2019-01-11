@@ -8,7 +8,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2018 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
+ * Copyright (c) 2000-2019 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@
 #include <vscp_level2.h>
 
 
-#define MSG_COPYRIGHT                       "OK Copyright (c) 2000-2018, Grodans Paradis AB, http://www.grodansparadis.com\r\n"
+#define MSG_COPYRIGHT                       "OK Copyright (c) 2000-2019, Grodans Paradis AB, http://www.grodansparadis.com\r\n"
 #define MSG_WELCOME                         "OK Welcome to the embedded VSCP daemon.\r\n"
 #define MSG_OK                              "+OK - Success.\r\n"
 #define MSG_GOODBY                          "+OK - Connection closed by client.\r\n"
