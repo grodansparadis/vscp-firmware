@@ -47,7 +47,7 @@
             !!!!!!!!!!!!!!!!!!!!  W A R N I N G  !!!!!!!!!!!!!!!!!!!!
                            This file is auto-generated
                 see https://github.com/grodansparadis/vscp-classes
-                        Generated: 2018-11-27 23:35:56.843731
+                        Generated: 2019-01-11 18:16:52.055439
 */
  
 #ifndef VSCP_CLASS_H
