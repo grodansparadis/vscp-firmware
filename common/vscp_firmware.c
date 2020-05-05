@@ -86,7 +86,7 @@ volatile uint16_t vscp_timer;       // 1 ms timer counter
 //  increase this value externally by one each millisecond
 //  the initbutton is pressed. Set to zero when button
 //  is released.
-volatile uint8_t vscp_initbtncnt;
+volatile uint16_t vscp_initbtncnt;
 
 
 volatile uint8_t vscp_statuscnt;    // status LED counter
