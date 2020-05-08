@@ -319,7 +319,7 @@ extern vscpevent_t vscp_imsg;               // Current input event
 extern vscpevent_t vscp_omsg;               // Current outgoing event
 extern volatile uint16_t vscp_timer;        // 1 ms timer counter
 extern uint8_t vscp_probe_address;          // Probe address for nickname discovery
-extern volatile uint8_t vscp_initbtncnt;    // init. button counter
+extern volatile uint16_t vscp_initbtncnt;    // init. button counter
 extern volatile uint8_t vscp_statuscnt;     // status LED counter
 extern uint16_t vscp_page_select;           // Selected Register Page
 extern volatile uint16_t vscp_configtimer;  // configuration timer
