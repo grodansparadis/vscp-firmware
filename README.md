@@ -1,3 +1,7 @@
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+
+
 # VCSP Firmware
 
 <img src="http://vscp.org/images/logo.png" width="200px" alt="VSCP logo">
