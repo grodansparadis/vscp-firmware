@@ -1,12 +1,12 @@
 /*
  FILE: vscp.h
 
- This file is part of the VSCP (http://www.vscp.org)
+ This file is part of the VSCP (https://www.vscp.org)
 
  The MIT License (MIT)
 
- Copyright (c) 2000-2020 Ake Hedman, Grodans Paradis AB
- <info@grodansparadis.com>
+ Copyright © 2000-2022 Ake Hedman, the VSCP project
+ <info@vscp.org>
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -42,10 +42,10 @@
 #include <vscp_class.h>
 #include <vscp_type.h>
 
-#define VSCP_DEFAULT_UDP_PORT        33333
-#define VSCP_DEFAULT_TCP_PORT        9598
-#define VSCP_ANNOUNCE_MULTICAST_PORT 9598
-#define VSCP_DEFAULT_MULTICAST_PORT  44444
+#define VSCP_DEFAULT_UDP_PORT           33333
+#define VSCP_DEFAULT_TCP_PORT           9598
+#define VSCP_ANNOUNCE_MULTICAST_PORT    9598
+#define VSCP_DEFAULT_MULTICAST_PORT     44444
 
 #define VSCP_ADDRESS_SEGMENT_CONTROLLER 0x00
 #define VSCP_ADDRESS_NEW_NODE           0xff
@@ -195,7 +195,6 @@ extern "C"
 #define VSCP_HEADER16_DUMB      0x8000 /* This node is dumb */
 #define VSCP_HEADER16_IPV6_GUID 0x1000 /* GUID is IPv6 address */
 
-
 /* Bits 14/13/12 for GUID type */
 #define VSCP_HEADER16_GUID_TYPE_STANDARD 0x0000 /* VSCP standard GUID */
 #define VSCP_HEADER16_GUID_TYPE_IPV6     0x1000 /* GUID is IPv6 address */
@@ -206,6 +205,7 @@ extern "C"
     0x3000 /* GUID is RFC 4122 Version 4 */
 
 #define VSCP_MASK_PRIORITY  0xE0
+#define VSCP_MASK_GUID_TYPE 0x8000 
 #define VSCP_MASK_HARDCODED 0x10
 #define VSCP_MASK_NOCRCCALC 0x08
 
@@ -229,7 +229,6 @@ extern "C"
 
     typedef struct
     {
-
         uint8_t filter_priority; /* Priority  */
         uint8_t mask_priority;
 
@@ -306,10 +305,11 @@ extern "C"
     typedef VSCPChannelInfo* PVSCPCHANNELINFO;
 
 /* VSCP Encryption types */
-#define VSCP_ENCRYPTION_NONE   0
-#define VSCP_ENCRYPTION_AES128 1
-#define VSCP_ENCRYPTION_AES192 2
-#define VSCP_ENCRYPTION_AES256 3
+#define VSCP_ENCRYPTION_NONE           0
+#define VSCP_ENCRYPTION_AES128         1
+#define VSCP_ENCRYPTION_AES192         2
+#define VSCP_ENCRYPTION_AES256         3
+#define VSCP_ENCRYPTION_FROM_TYPE_BYTE 15
 
 /* VSCP Encryption tokens */
 #define VSCP_ENCRYPTION_TOKEN_0 ""
@@ -324,7 +324,7 @@ extern "C"
 /* Packet frame format type = 0                         */
 /*      without byte0 and CRC                           */
 /*      total frame size is 1 + 34 + 2 + data-length    */
-#define VSCP_MULTICAST_PACKET0_HEADER_LENGTH 35
+#define VSCP_MULTICAST_PACKET0_HEADER_LENGTH      35
 
 /* Multicast packet ordinals */
 #define VSCP_MULTICAST_PACKET0_POS_PKTTYPE        0
@@ -355,6 +355,9 @@ extern "C"
 /* Two byte CRC follow here and if the frame is encrypted */
 /* the initialization vector follows. */
 
+// Maximum packet size (for buffer allocation)
+#define VSCP_MULTICAST_PACKET0_MAX  (1 + VSCP_MULTICAST_PACKET0_HEADER_LENGTH + 2 + VSCP_LEVEL2_MAXDATA + 16)
+
 /* VSCP multicast packet types */
 #define VSCP_MULTICAST_TYPE_EVENT 0
 
@@ -363,7 +366,7 @@ extern "C"
 #define GET_VSCP_MULTICAST_PACKET_ENCRYPTION(type) ((type)&0x0f)
 
 /* Multicast proxy CLASS=1026, TYPE=3  */
-/* http://www.vscp.org/docs/vscpspec/doku.php?id=class2.information#type_3_0x0003_level_ii_proxy_node_heartbeat
+/* https://www.vscp.org/docs/vscpspec/doku.php?id=class2.information#type_3_0x0003_level_ii_proxy_node_heartbeat
  */
 #define VSCP_MULTICAST_PROXY_HEARTBEAT_DATA_SIZE 192
 #define VSCP_MULTICAST_PROXY_HEARTBEAT_POS_REALGUID                            \
@@ -387,10 +390,25 @@ extern "C"
 #define VSCP_BOOTLOADER_PIC1      0x01 /* PIC algorithm 0 */
 #define VSCP_BOOTLOADER_AVR1      0x10 /* AVR algorithm 0 */
 #define VSCP_BOOTLOADER_LPC1      0x20 /* NXP/Philips/Freescale algorithm 0 */
-#define VSPP_BOORLOADER_NXP1      0x20 /* NXP/Philips/Freescale algorithm 0 */
+#define VSPP_BOOTLOADER_NXP1      0x20 /* NXP/Philips/Freescale algorithm 0 */
 #define VSCP_BOOTLOADER_ST        0x30 /* ST STR algorithm 0 */
 #define VSCP_BOOTLOADER_FREESCALE 0x40 /* Freescale Kinetics algorithm 0 */
-#define VSCP_BOOTLOADER_NONE      0xff
+#define VSCP_BOOTLOADER_USER0     0xf0 /* Used defined bootloader 0 */
+#define VSCP_BOOTLOADER_NONE1     0xf1 /* Used defined bootloader 1 */
+#define VSCP_BOOTLOADER_NONE2     0xf2 /* Used defined bootloader 2 */
+#define VSCP_BOOTLOADER_NONE3     0xf3 /* Used defined bootloader 3 */
+#define VSCP_BOOTLOADER_NONE4     0xf4 /* Used defined bootloader 4 */
+#define VSCP_BOOTLOADER_NONE5     0xf5 /* Used defined bootloader 5 */
+#define VSCP_BOOTLOADER_NONE6     0xf6 /* Used defined bootloader 6 */
+#define VSCP_BOOTLOADER_NONE7     0xf7 /* Used defined bootloader 7 */
+#define VSCP_BOOTLOADER_NONE8     0xf8 /* Used defined bootloader 8 */
+#define VSCP_BOOTLOADER_NONE9     0xf9 /* Used defined bootloader 9 */
+#define VSCP_BOOTLOADER_NONE10    0xfa /* Used defined bootloader 10 */
+#define VSCP_BOOTLOADER_NONE11    0xfb /* Used defined bootloader 11 */
+#define VSCP_BOOTLOADER_NONE12    0xfc /* Used defined bootloader 12 */
+#define VSCP_BOOTLOADER_NONE13    0xfd /* Used defined bootloader 13 */
+#define VSCP_BOOTLOADER_NONE14    0xfe /* Used defined bootloader 14 */
+#define VSCP_BOOTLOADER_NONE15    0xff /* No bootloader available */
 
 /*          * * * Data Coding for VSCP packets * * *   */
 
@@ -399,15 +417,15 @@ extern "C"
 #define VSCP_MASK_DATACODING_UNIT  0x18 /* Bits 3,4   */
 #define VSCP_MASK_DATACODING_INDEX 0x07 /* Bits 0,1,2 */
 
-/* These bits are coded in the three MSB bytes of the first data byte   */
-/* in a packet and tells the type of the data that follows.             */
+/* These bits are coded in the three MSB bits of the first data byte   */
+/* of measurement data and tells the type of the data that follows.    */
 #define VSCP_DATACODING_BIT        0x00
 #define VSCP_DATACODING_BYTE       0x20
 #define VSCP_DATACODING_STRING     0x40
 #define VSCP_DATACODING_INTEGER    0x60
 #define VSCP_DATACODING_NORMALIZED 0x80
 #define VSCP_DATACODING_SINGLE     0xA0 /* single precision float */
-#define VSCP_DATACODING_RESERVED1  0xC0
+#define VSCP_DATACODING_DOUBLE     0xC0 /* double precision float */
 #define VSCP_DATACODING_RESERVED2  0xE0
 
 /*
@@ -482,6 +500,16 @@ extern "C"
 #define VSCP_STD_REGISTER_BUFFER_SIZE 0x98
 #define VSCP_STD_REGISTER_PAGES_COUNT 0x99
 
+/* Unsigned 32-bit integer for family code */
+#define VSCP_STD_REGISTER_PAGES_FAMILY_CODE 0x9A
+
+/* Unsigned 32-bit integer for device type */
+#define VSCP_STD_REGISTER_PAGES_DEVICE_TYPE 0x9E
+
+/* Firmware code for device. */
+#define VSCP_STD_REGISTER_PAGES_FIRMWARE_CODE_MSB 0xA3 
+#define VSCP_STD_REGISTER_PAGES_FIRMWARE_CODE_LSB 0xA4
+
 /* 0xd0 - 0xdf  - GUID                      */
 #define VSCP_STD_REGISTER_GUID 0xD0
 
@@ -501,9 +529,9 @@ extern "C"
 #define VSCP_LEVEL1_DM_OFFSET_ACTION_PARAM 7
 
     /*
-        Bits for VSCP server 64/16-bit capability code
-        used by CLASS1.PROTOCOL, HIGH END SERVER RESPONSE
-        and low end 16-bits for
+        Bits for VSCP server 64/16-bit capability code 
+        (WCYD - What Can You Do) used by CLASS1.PROTOCOL, 
+        HIGH END SERVER RESPONSE and low end 16-bits for
         CLASS2.PROTOCOL, HIGH END SERVER HEART BEAT
     */
 
@@ -526,6 +554,7 @@ extern "C"
 #define VSCP_SERVER_CAPABILITY_AES256             (1 << 2)  // 4
 #define VSCP_SERVER_CAPABILITY_AES192             (1 << 1)  // 2
 #define VSCP_SERVER_CAPABILITY_AES128             1         // 1
+#define VSCP_SERVER_CAPABILITY_NONE               0         // No capabilities
 
 /*
     Offsets into the data of the capabilities event
@@ -542,7 +571,7 @@ extern "C"
 #define VSCP_ERROR_ERROR             -1 /* Error */
 #define VSCP_ERROR_CHANNEL           7  /* Invalid channel */
 #define VSCP_ERROR_FIFO_EMPTY        8  /* FIFO is empty */
-#define VSCP_ERROR_FIFO_FULL         9  /* FIFI is full */
+#define VSCP_ERROR_FIFO_FULL         9  /* FIFO is full */
 #define VSCP_ERROR_FIFO_SIZE         10 /* FIFO size error */
 #define VSCP_ERROR_FIFO_WAIT         11 /* FIFO wait failed */
 #define VSCP_ERROR_GENERIC           12 /* Generic error */
@@ -574,77 +603,109 @@ extern "C"
     43 /* Supplied buffer is to small to fit content */
 #define VSCP_ERROR_UNKNOWN_ITEM                                                \
     44 /* Requested item (remote variable) is unknown */
-#define VSCP_ERROR_ALREADY_DEFINED 45 /* The name is already in use. */
-#define VSCP_ERROR_WRITE_ERROR     46 /* Error when writing data */
-#define VSCP_ERROR_STOPPED         47 /* Operation stopped or aborted */
-#define VSCP_ERROR_INVALID_POINTER 48 /* Pointer with invalid value */
+#define VSCP_ERROR_ALREADY_DEFINED      45 /* The name is already in use. */
+#define VSCP_ERROR_WRITE_ERROR          46 /* Error when writing data */
+#define VSCP_ERROR_WRITE                46 /* Error when writing data */
+#define VSCP_ERROR_STOPPED              47 /* Operation stopped or aborted */
+#define VSCP_ERROR_INVALID_POINTER      48 /* Pointer with invalid value */
+#define VSCP_ERROR_INVALID_PERMISSION   49 /* Not allowed to do that */
+#define VSCP_ERROR_INVALID_PATH         50 /* Invalid path (permissions) */
+#define VSCP_ERROR_ERRNO                51 /* General error, errno variable holds error */
+#define VSCP_ERROR_INTERRUPTED          52 /* Interrupted by signal or other cause */
+#define VSCP_ERROR_MISSING              53 /* Value, paramter or something else is missing */ 
+#define VSCP_ERROR_NOT_CONNECTED        54 /* There is no connection */
+#define VSCP_ERROR_READ_ONLY            55 /* Item (variable) is read only */  
+#define VSCP_ERROR_INVALID_TYPE         56 /* Item (variable) is of wrong type */
+#define VSCP_ERROR_PERMISSION           57 /* Does hot have permission to do that */
+#define VSCP_ERROR_INVALID_SYNTAX       58 /* Syntax is invalid */
+#define VSCP_ERROR_INDEX_OOB            59 /* Index is out of bounds */  
+#define VSCP_ERROR_MTU                  60 /* Frame does not fit */
+#define VSCP_ERROR_SOCKET               61 /* Unable to create socket or other socket error*/
+#define VSCP_ERROR_PARSING              62 /* Failed to parse input */
+
+/*!
+    HLO (High Level Object) type (bits 7,6,5,4)
+*/
+
+#define VSCP_HLO_TYPE_UTF8                   0
+#define VSCP_HLO_TYPE_XML                    1
+#define VSCP_HLO_TYPE_JSON                   2
+#define VSCP_HLO_TYPE_BASE64                 3
+#define VSCP_HLO_TYPE_USER_DEFINED           15
+
+/*!
+    HLO (High Level Object) encryption (bits 3,2,1,0)
+*/
+
+#define VSCP_HLO_ENCRYPTION_NONE             0
+#define VSCP_HLO_ENCRYPTION_AES128           1
+#define VSCP_HLO_ENCRYPTION_AES192           2
+#define VSCP_HLO_ENCRYPTION_AES256           3
 
 /*
     Template for VSCP XML event data
 
     data:
-datetime,head,obid,datetime,timestamp,class,type,guid,sizedata,data,note
+datetime,vscpHead,vscpObId,vscpDateTime,vscpTimeStamp,vscpClass,vscpType,vscpGuid,vscpData,note
 
 <event
-     head="3"
-     obid="1234"
-     datetime="2017-01-13T10:16:02"
-     timestamp="50817"
-     class="10"
-     type="6"
-     guid="00:00:00:00:00:00:00:00:00:00:00:00:00:01:00:02"
-     sizedata="7"
-     data="0x48,0x34,0x35,0x2E,0x34,0x36,0x34" />
+     vscpHead="3"
+     vscpObId="1234"
+     vscpDateTime="2017-01-13T10:16:02"
+     vscpTimeStamp="50817"
+     vscpClass="10"
+     vscpType="6"
+     vscpGuid="00:00:00:00:00:00:00:00:00:00:00:00:00:01:00:02"
+     vscpData="0x48,0x34,0x35,0x2E,0x34,0x36,0x34" />
 
  */
-#define VSCP_XML_EVENT_TEMPLATE                                                \
-    "<event "                                                                  \
-    "head=\"%d\" "                                                             \
-    "obid=\"%lu\" "                                                            \
-    "datetime=\"%s\" "                                                         \
-    "timestamp=\"%lu\" "                                                       \
-    "class=\"%d\" "                                                            \
-    "type=\"%d\" "                                                             \
-    "guid=\"%s\" "                                                             \
-    "sizedata=\"%d\" "                                                         \
-    "data=\"%s\" "                                                             \
+#define VSCP_XML_EVENT_TEMPLATE                                                    \
+    "<event "                                                                      \
+    "vscpHead=\"%d\" "                                                             \
+    "vscpObId=\"%lu\" "                                                            \
+    "vscpDateTime=\"%s\" "                                                         \
+    "vscpTimeStamp=\"%lu\" "                                                       \
+    "vscpClass=\"%d\" "                                                            \
+    "vscpType=\"%d\" "                                                             \
+    "vscpGuid=\"%s\" "                                                             \
+    "vscpData=\"%s\" "                                                             \
     "/>"
 
 /*
 
     Template for VSCP JSON event data
-    data: datetime,head,obid,datetime,timestamp,class,type,guid,data,note
+    data: datetime,vscpHead,vscpObId,datetime,timestamp,class,type,guid,data,note
 
 {
-    "head": 2,
-    "obid": 123,
-    "datetime": "2017-01-13T10:16:02",
-    "timestamp":50817,
-    "class": 10,
-    "type": 8,
-    "guid": "00:00:00:00:00:00:00:00:00:00:00:00:00:01:00:02",
-    "data": [1,2,3,4,5,6,7],
-    "note": "This is some text"
+    "vscpHead": 2,
+    "vscpObId": 123,
+    "vscpDateTime": "2017-01-13T10:16:02Z",
+    "vscpTimeStamp":50817,
+    "vscpClass": 10,
+    "vscpType": 8,
+    "vscpGuid": "00:00:00:00:00:00:00:00:00:00:00:00:00:01:00:02",
+    "vscpData": [1,2,3,4,5,6,7],
+    "vscpNote": "This is some text"
 }
 */
-#define VSCP_JSON_EVENT_TEMPLATE                                               \
-    "{\n"                                                                      \
-    "\"head\": %d,\n"                                                          \
-    "\"obid\":  %lu,\n"                                                        \
-    "\"datetime\": \"%s\",\n"                                                  \
-    "\"timestamp\": %lu,\n"                                                    \
-    "\"class\": %d,\n"                                                         \
-    "\"type\": %d,\n"                                                          \
-    "\"guid\": \"%s\",\n"                                                      \
-    "\"data\": [%s],\n"                                                        \
-    "\"note\": \"%s\"\n"                                                       \
+#define VSCP_JSON_EVENT_TEMPLATE                                                   \
+    "{\n"                                                                          \
+    "\"vscpHead\": %d,\n"                                                          \
+    "\"vscpObId\":  %lu,\n"                                                        \
+    "\"vscpDateTime\": \"%s\",\n"                                                  \
+    "\"vscpTimeStamp\": %lu,\n"                                                    \
+    "\"vscpClass\": %d,\n"                                                         \
+    "\"vscpType\": %d,\n"                                                          \
+    "\"vscpGuid\": \"%s\",\n"                                                      \
+    "\"vscpData\": [%s],\n"                                                        \
+    "\"vscpNote\": \"%s\"\n"                                                       \
     "}"
 
 /*!
 
     Template for VSCP HTML event data
 
-    data: datetime,class,type,data-count,data,guid,head,timestamp,obid,note
+    data: vscpDateTime,vscpClass,type,data-count,data,guid,vscpHead,vscpTimeStamp,vscpObId,note
 
 <h2>VSCP Event</h2>
 <p>
@@ -662,10 +723,10 @@ Data: 1,2,3,4,5,6,7<br>
 From GUID: 00:00:00:00:00:00:00:00:00:00:00:00:00:01:00:02<br>
 </p>
 <p>
-Head: 6 <br>
+vscpHead: 6 <br>
 DateTime: 2013-11-02T12:34:22Z
 Timestamp: 1234 <br>
-obid: 1234 <br>
+ObId: 1234 <br>
 note: This is a note <br>
 </p>
 
@@ -684,12 +745,12 @@ note: This is a note <br>
     "From GUID: %s<br>"                                                        \
     "</p>"                                                                     \
     "<p>"                                                                      \
-    "Head: %d <br>"                                                            \
+    "vscpHead: %d <br>"                                                        \
     "<p>"                                                                      \
     "DateTime: %s <br>"                                                        \
     "</p>"                                                                     \
     "Timestamp: %lu <br>"                                                      \
-    "obid: %lu <br>"                                                           \
+    "ObId: %lu <br>"                                                           \
     "note: %s <br>"                                                            \
     "</p>"
 
@@ -714,6 +775,9 @@ note: This is a note <br>
     "\"filter_type\": %d,\n"                                                   \
     "\"filter_guid\": \"%s\",\n"                                               \
     "}"
+
+// MQTT message formats
+enum enumMqttMsgFormat {jsonfmt,xmlfmt,strfmt,binfmt,autofmt};
 
 #ifdef __cplusplus
 }

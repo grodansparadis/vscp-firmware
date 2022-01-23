@@ -38,7 +38,7 @@
 #include <stdlib.h>
 #include <vscp_class.h>
 #include <vscp_type.h>
-#include <vscp_firmware.h>
+#include <vscp-firmware.h>
 
 #ifndef FALSE
 #define FALSE  0
@@ -117,6 +117,9 @@ uint8_t vscp_hour;
 
 void vscp_init(void)
 {
+    // Start over init- btn count
+    vscp_initbtncnt = 0;
+    
     vscp_initledfunc = VSCP_LED_ON;
 
     // read the nickname id
@@ -152,7 +155,7 @@ void vscp_init(void)
     vscp_probe_cnt = 0;
     vscp_page_select = 0;
 
-    // Initialise time keeping
+    // initialize time keeping
     vscp_timer = 0;
     vscp_configtimer = 0;
     vscp_second = 0;
@@ -169,7 +172,7 @@ void vscp_init(void)
 
 int8_t vscp_check_pstorage(void)
 {
-    // Check if persistent storage is initialised.
+    // Check if persistent storage is initialized.
     if ( ( VSCP_INITIALIZED_BYTE0_VALUE ==
                     vscp_getControlByte( VSCP_INITIALIZED_BYTE0_INDEX ) ) &&
            ( VSCP_INITIALIZED_BYTE1_VALUE ==
@@ -179,13 +182,13 @@ int8_t vscp_check_pstorage(void)
 
     vscp_initledfunc = VSCP_LED_BLINK1;
 
-    // Initialise persistent storage
+    // Initialize persistent storage
     vscp_init_pstorage();
 
     // No nickname yet.
     vscp_writeNicknamePermanent( VSCP_ADDRESS_FREE );
 
-    // Mark persistent storage as initialised
+    // Mark persistent storage as initialized
     vscp_setControlByte( VSCP_INITIALIZED_BYTE0_INDEX,
                             VSCP_INITIALIZED_BYTE0_VALUE );
     vscp_setControlByte( VSCP_INITIALIZED_BYTE1_INDEX,
@@ -680,13 +683,6 @@ uint8_t vscp_readStdReg(uint8_t reg)
         uint8_t idx = reg - VSCP_REG_STANDARD_DEVICE_TYPE_CODE;
         rv = code >> ( ( ( 3 - idx ) * 8 ) & 0xff );
     }
-    else if ( ( reg >= VSCP_REG_FIRMWARE_CODE ) &&
-              ( reg < ( VSCP_REG_FIRMWARE_CODE + 2 ) ) ) {
-
-        uint16_t code = vscp_getFirmwareCode();
-        uint8_t idx = reg - VSCP_REG_FIRMWARE_CODE;
-        rv = code >> ( ( ( idx ) * 8 ) & 0xff );
-    }
     else if ((reg > (VSCP_REG_GUID - 1)) &&
             (reg < VSCP_REG_DEVICE_URL)) {
 
@@ -804,7 +800,7 @@ uint8_t vscp_writeStdReg(uint8_t reg, uint8_t value)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscp_handleProtocolEvent
+// vscp_writeStdReg
 //
 
 void vscp_handleProtocolEvent(void)

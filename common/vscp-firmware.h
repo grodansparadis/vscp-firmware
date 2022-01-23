@@ -207,6 +207,9 @@ low end hardware device.
 
 #define VSCP_REG_DEFAULT_CONFIG_RESTORE     0xA2
 
+// 16-bit
+#define VSCP_REG_FIRMWARE_CODE              0xA3
+
 #define VSCP_REG_GUID                       0xD0
 #define VSCP_REG_DEVICE_URL                 0xE0
 
@@ -708,6 +711,11 @@ uint32_t vscp_getFamilyCode(void);
     return zero for not known.
 */
 uint32_t vscp_getFamilyType(void);
+
+/*!
+  Get device firmware code
+*/
+uint16_t vscp_getFirmwareCode(void);
 
 /*!
     Restore defaults
