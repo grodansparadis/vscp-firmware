@@ -38,7 +38,7 @@
 #include <stdio.h>
 
 #include "vscp.h"
-#include "vscp_link.h"
+#include "vscp-link.h"
 
 int vscp_link_parser( const char *cmd ) 
 {

@@ -1,4 +1,4 @@
 
-2016-03-23 AKHE - VSCP Frimware 1.6.1 released
+2016-03-23 AKHE - VSCP Firmware 1.6.1 released
 2016-03-23 AKHE - vscp_sendLogEvent parameter error fixed
 2016-03-23 AKHE - VSCP Firmware 1.6.0 released.

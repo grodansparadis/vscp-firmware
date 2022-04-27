@@ -39,14 +39,12 @@
 
 #include <stdio.h>
 #include <inttypes.h>
-#include <vscp_firmware.h>
+#include <vscp-firmware.h>
 #include <vscp_class.h>
 #include <vscp_type.h>
 #include <crc.h>
-
 #include "hardware.h"
-
-#include "vscp_bootloader.h"
+#include "vscp-bootloader.h"
 
 // Globals
 volatile uint16_t vscpboot_timer = 0;

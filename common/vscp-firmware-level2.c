@@ -30,14 +30,14 @@
  * ******************************************************************************
 */
 
-#include <vscp_compiler.h>
-#include <vscp_projdefs.h>
+#include <vscp-compiler.h>
+#include <vscp-projdefs.h>
 #include "string.h"
 #include "inttypes.h"
 #include "vscp.h"
 #include "vscp_class.h"      
 #include "vscp_type.h"
-#include "vscp_firmware_level2.h"
+#include "vscp-firmware-level2.h"
 
 /* Macros */
 
