@@ -41,10 +41,10 @@
 #ifndef VSCP_SERVER_H
 #define VSCP_SERVER_H
 
-#include <vscp_level2.h>
+#include <vscp.h>
 
 
-#define MSG_COPYRIGHT                       "OK Copyright (c) 2000-2019, Grodans Paradis AB, http://www.grodansparadis.com\r\n"
+#define MSG_COPYRIGHT                       "OK Copyright (c) 2000-2022, Ake Hedman, Grodans Paradis AB, http://www.grodansparadis.com\r\n"
 #define MSG_WELCOME                         "OK Welcome to the embedded VSCP daemon.\r\n"
 #define MSG_OK                              "+OK - Success.\r\n"
 #define MSG_GOODBY                          "+OK - Connection closed by client.\r\n"

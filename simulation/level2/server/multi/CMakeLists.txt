@@ -9,4 +9,5 @@ include_directories( PUBLIC .
 # add the executable ../../../../common/vscp_server.c
 #add_executable(multi multi-server.c)
 add_executable(multi multi-server.c
-                  ../../../../common/vscp_server.c)
+                  ../../../../common/vscp-server.c
+                  ../../../../common/vscp-link-protocol.c)

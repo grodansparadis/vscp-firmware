@@ -1,4 +1,4 @@
-// FILE: vscp_link.h
+// FILE: vscp-link-protocol.h
 
 /* ******************************************************************************
  * 	VSCP (Very Simple Control Protocol)
@@ -92,7 +92,7 @@
 // @param cmd  Command to parse.
 // 
 
-int vscp_link_parser( const char *cmd );
+int vscp_link_parser(const void *pdata, const char *cmd);
 
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_link_parser
@@ -100,7 +100,7 @@ int vscp_link_parser( const char *cmd );
 // @param msg  Nessage to reply.
 //
 
-int vscp_link_reply( const char *msg );
+int vscp_link_reply(const void *pdata, const char *msg);
 
 
 int parseGuid( const char *strguid, char **endptr, uint8_t *guid );
@@ -125,38 +125,32 @@ int eventToString( const vscpEvent *ev, char *strevent, size_t len );
 // Command handlers
 ///////////////////////////////////////////////////////////////////////////////
 
-int vscp_link_doCmdNoop( const char *cmd );
-int vscp_link_doCmdHelp( const char *cmd );
-int vscp_link_doCmdQuit( const char *cmd );
-int vscp_link_doCmdUser( const char *cmd );
-int vscp_link_doCmdPassword( const char *cmd );
-int vscp_link_doCmdChallenge( const char *cmd );
-int vscp_link_doCmdSend( const char *cmd );;
-int vscp_link_doCmdRetrive( const char *cmd );
-int vscp_link_doCmdRcvLoop( const char *cmd );
-int vscp_link_doCmdQuitLoop( const char *cmd );
-int vscp_link_doCmdCmdCheckData( const char *cmd );
-int vscp_link_doCmdCheckData( const char *cmd );
-int vscp_link_doCmdClearAll( const char *cmd );
-int vscp_link_doCmdClearAll( const char *cmd );
-int vscp_link_doCmdStatistics( const char *cmd );
-int vscp_link_doCmdInfo( const char *cmd );
-int vscp_link_doCmdGetChannelId( const char *cmd );
-int vscp_link_doCmdSetChannelId( const char *cmd );
-int vscp_link_doCmdSetChannelId( const char *cmd );
-int vscp_link_doCmdGetGUID( const char *cmd );
-int vscp_link_doCmdGetVersion( const char *cmd );
-int vscp_link_doCmdSetFilter( const char *cmd );
-int vscp_link_doCmdSetMask( const char *cmd );
-int vscp_link_doCmdWhatCanYouDo( const char *cmd );
-int vscp_link_doCmdCommandAgain( const char *cmd );
-int vscp_link_doCmdDM( const char *cmd );
-#ifdef VSCP_LINK_ENABLE_CMD_VAR
-int vscp_link_doCmdVariable( const char *cmd );
-#endif
-#ifdef VSCP_LINK_ENABLE_CMD_INTERFACE
-int vscp_link_doCmdInterface( const char *cmd );
-#endif        
+int vscp_link_doCmdNoop(const void *pdata, const char *cmd);
+int vscp_link_doCmdHelp(const void *pdata, const char *cmd);
+int vscp_link_doCmdQuit(const void *pdata, const char *cmd);
+int vscp_link_doCmdUser(const void *pdata, const char *cmd);
+int vscp_link_doCmdPassword(const void *pdata, const char *cmd);
+int vscp_link_doCmdChallenge(const void *pdata, const char *cmd);
+int vscp_link_doCmdSend(const void *pdata, const char *cmd);
+int vscp_link_doCmdRetrive(const void *pdata, const char *cmd);
+int vscp_link_doCmdRcvLoop(const void *pdata, const char *cmd);
+int vscp_link_doCmdQuitLoop(const void *pdata, const char *cmd);
+int vscp_link_doCmdCmdCheckData(const void *pdata, const char *cmd);
+int vscp_link_doCmdCheckData(const void *pdata, const char *cmd);
+int vscp_link_doCmdClearAll(const void *pdata, const char *cmd);
+int vscp_link_doCmdClearAll(const void *pdata, const char *cmd);
+int vscp_link_doCmdStatistics(const void *pdata, const char *cmd);
+int vscp_link_doCmdInfo(const void *pdata, const char *cmd);
+int vscp_link_doCmdGetChannelId(const void *pdata, const char *cmd);
+int vscp_link_doCmdSetChannelId(const void *pdata, const char *cmd);
+int vscp_link_doCmdSetChannelId(const void *pdata, const char *cmd);
+int vscp_link_doCmdGetGUID(const void *pdata, const char *cmd);
+int vscp_link_doCmdGetVersion(const void *pdata, const char *cmd);
+int vscp_link_doCmdSetFilter(const void *pdata, const char *cmd);
+int vscp_link_doCmdSetMask(const void *pdata, const char *cmd);
+int vscp_link_doCmdWhatCanYouDo(const void *pdata, const char *cmd);
+int vscp_link_doCmdCommandAgain(const void *pdata, const char *cmd);
+int vscp_link_doCmdInterface(const void *pdata, const char *cmd);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Callbacks
@@ -164,30 +158,30 @@ int vscp_link_doCmdInterface( const char *cmd );
 
 // Send welcome message for new connection. This can be a multiline reponse and
 // the last line should be "+OK\r\n" 
-int vscp_link_callback_welcome( const char *msg );
+int vscp_link_callback_welcome(const void *pdata, const char *msg);
 
 // Send null terminated data to client
-int vscp_link_callback_writeClient( const char *msg );
+int vscp_link_callback_writeClient(const void *pdata, const char *msg);
 
 // Read a command line form client. Can get max len chars.
-int vscp_link_callback_readClient( const char *msg, size_t len );
+int vscp_link_callback_readClient(const void *pdata, const char *msg, size_t len);
 
 // Disconnect client
-int vscp_link_callback_DisconnetClient( void );
+int vscp_link_callback_DisconnetClient(const void *pdata);
 
 // Print command help. This can be a multiline reponse and
 // the last line should be "+OK\r\n"
 // @param cmd command after "help " or NULL if just "help"
 //          Can be used to give command specific help.   
-int vscp_link_callback_Help( const char *cmd );
+int vscp_link_callback_Help(const void *pdata, const char *cmd);
 
-int vscp_link_callback_checkUser( const char *user );
+int vscp_link_callback_checkUser(const void *pdata, const char *user);
 
-int vscp_link_callback_checkPassword( const char *user );
+int vscp_link_callback_checkPassword(const void *pdata, const char *user);
 
 // Event has ben received from client.
-int vscp_link_callback_eventReceived( const vscpEvent *ev );
+int vscp_link_callback_eventReceived(const void *pdata, const vscpEvent *ev);
 
 // Fetch one event from output queue (if any)
-int vscp_link_callback_eventGet( const vscpEvent *ev );
+int vscp_link_callback_eventGet(const void *pdata, const vscpEvent *ev);
 

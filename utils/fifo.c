@@ -85,7 +85,7 @@ uint16_t fifo_write(fifo_t *f, const void *buf, uint32_t nbytes)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// fifo_write
+// fifo_getFree
 //
 // Get the size of the FIFO
 //

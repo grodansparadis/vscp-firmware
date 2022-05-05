@@ -39,9 +39,9 @@
 #include <limits.h>
 #include <ctype.h>
 #include <inttypes.h>
-#include "vscp_compiler.h"
-#include "vscp_projdefs.h"
-#include "vscp_server.h"
+#include "vscp-compiler.h"
+#include "vscp-projdefs.h"
+#include "vscp-server.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // vscpServerParser

@@ -37,6 +37,7 @@
  * Multicast - Encrypted and unencrypted.
  * TCP/IP - Node connect to server.
  * TCP/IP - Node is connected to by server.
+ * MQTT
  *
  */
 
@@ -62,8 +63,7 @@
     THIS_FIRMWARE_ENABLE_ERROR_REPORTING    1
 */
 
-#include <vscp_projdefs.h>
-
+#include <vscp-projdefs.h>
 #include <inttypes.h>
 
 /*******************************************************************************
@@ -95,22 +95,24 @@ extern uint8_t vscp_node_substate;
  ******************************************************************************/
 
 /*!
-    Init VSCP subsystem. The transport layer should be up and
-    running as the New node on line is sent here when everything is
-    initialized.
+  Init VSCP subsystem. The transport layer should be up and
+  running as the New node on line is sent here when everything is
+  initialized.
 */
 void
 vscp2_init(void);
 
 /*!
-    Set heartbeat interval. By default it is set to 60 seconds. Set to
-    zero to turn off.
-    @param interval Interval for heartbeat event. 0 is off.
+  Set heartbeat interval. By default it is set to 60 seconds. Set to
+  zero to turn off.
+  @param interval Interval for heartbeat event. 0 is off.
 */
 void
 vscp2_setHeartBeatInterval(uint8_t interval);
+
 void
 vscp2_error(void);
+
 void
 vscp2_rcv_new_node_online(void);
 
@@ -127,38 +129,38 @@ void
 vscp2_sendHighEndServerProbe(void);
 
 /*!
-    Do One second work
+  Do One second work
 
-    This routine should be called once a second by the
-    application.
+  This routine should be called once a second by the
+  application.
  */
 void
 vscp2_doOneSecondWork(void);
 
 /*!
-    Get page select bytes
-        idx=0 - byte 0 MSB
-        idx=1 - byte 1 LSB
+  Get page select bytes
+      idx=0 - byte 0 MSB
+      idx=1 - byte 1 LSB
  */
 uint8_t
 vscp_getPageSelect(uint8_t idx);
 
 /*!
-    Set page select registers
-    @param idx 0 for LSB, 1 for MSB
-    @param data Byte to set of page select registers
+  Set page select registers
+  @param idx 0 for LSB, 1 for MSB
+  @param data Byte to set of page select registers
  */
 void
 vscp_setPageSelect(uint8_t idx, uint8_t data);
 
 /*!
-    Send error event (CLASS=508).
-    http://www.vscp.org/docs/vscpspec/doku.php?id=class1.error
-    idx can be used to identify the internal part ("submodule") that was the
-    origin of the error. Both zone and sub zone are always set to zero.
-    @param type This is the VSCP type
-    @param idx Index to identify possible sub module. Normally set to zero.
-    @return True if event was sent.
+  Send error event (CLASS=508).
+  http://www.vscp.org/docs/vscpspec/doku.php?id=class1.error
+  idx can be used to identify the internal part ("submodule") that was the
+  origin of the error. Both zone and sub zone are always set to zero.
+  @param type This is the VSCP type
+  @param idx Index to identify possible sub module. Normally set to zero.
+  @return True if event was sent.
  */
 #ifdef THIS_FIRMWARE_ENABLE_ERROR_REPORTING
 uint8_t
@@ -166,17 +168,17 @@ vscp2_sendErrorEvent(uint8_t type, uint8_t idx);
 #endif
 
 /*!
-    Send log event (CLASS=509).
-    http://www.vscp.org/docs/vscpspec/doku.php?id=class1.log
-    For loging first send Type = 2(0x01) Log Start then logging events and when
-    log is closed send Type = 3 (0x03) Log Stop. To log several things use a
-    unique if for each and open/close each.
-    @param type VSCP logevent type.
-    @param id Identifier for the logging channel.
-    @param level Loglevel for this log event.
-    @param idx index for multiframe log event starting at zero.
-    @param pData Log data (Allways 5 bytes).
-    @return TRUE if event was sent.
+  Send log event (CLASS=509).
+  http://www.vscp.org/docs/vscpspec/doku.php?id=class1.log
+  For loging first send Type = 2(0x01) Log Start then logging events and when
+  log is closed send Type = 3 (0x03) Log Stop. To log several things use a
+  unique if for each and open/close each.
+  @param type VSCP logevent type.
+  @param id Identifier for the logging channel.
+  @param level Loglevel for this log event.
+  @param idx index for multiframe log event starting at zero.
+  @param pData Log data (Allways 5 bytes).
+  @return TRUE if event was sent.
  */
 #ifdef THIS_FIRMWARE_ENABLE_LOGGING
 uint8_t
@@ -189,89 +191,89 @@ vscp2_sendLogEvent(
  ******************************************************************************/
 
 /*!
-    Get major firmware version number.
-    @return Major version mumber.
+  Get major firmware version number.
+  @return Major version mumber.
 */
 uint8_t
 vscp2_getFirmwareMajorVersion(void);
 
 /*!
-    Get minor version number.
-    @return Minor version number.
+  Get minor version number.
+  @return Minor version number.
 */
 uint8_t
 vscp2_getFirmwareMinorVersion(void);
 
 /*!
-    Get sub minor (release) version number.
-    @return subminor version number.
+  Get sub minor (release) version number.
+  @return subminor version number.
 */
 uint8_t
 vscp2_getFirmwareSubMinorVersion(void);
 
 /*!
-    Send event to transport sublayer.
-    @param e Pointer to Event to send.
-    @return VSCP_ERROR_SUCCESS on sucess, or error code.
+  Send event to transport sublayer.
+  @param e Pointer to Event to send.
+  @return VSCP_ERROR_SUCCESS on sucess, or error code.
 */
 int8_t
 vscp2_sendEvent(vscpEvent *e);
 
 /*!
-    Send eventex to transport sublayer.
-    @param ex Pointer to EventEx to send.
-    @return VSCP_ERROR_SUCCESS on sucess, or error code.
+  Send eventex to transport sublayer.
+  @param ex Pointer to EventEx to send.
+  @return VSCP_ERROR_SUCCESS on sucess, or error code.
 */
 int8_t
 vscp2_sendEventEx(vscpEventEx *ex);
 
 /*!
-    Get event from transport sublayer.
-    @param e Pointer to Event to fill data in.
-    @return VSCP_ERROR_SUCCESS on sucess, VSCP_ERROR_RCV_EMPTY if
-    there is no data else error code.
+  Get event from transport sublayer.
+  @param e Pointer to Event to fill data in.
+  @return VSCP_ERROR_SUCCESS on sucess, VSCP_ERROR_RCV_EMPTY if
+  there is no data else error code.
 */
 int8_t
 vscp2_getEvent(vscpEvent *e);
 
 /*!
-    Get eventex from transport sublayer.
-    @param ex Pointer to EventEx to fill data in.
-    @return VSCP_ERROR_SUCCESS on sucess, VSCP_ERROR_RCV_EMPTY if
-    there is no data else error code.
+  Get eventex from transport sublayer.
+  @param ex Pointer to EventEx to fill data in.
+  @return VSCP_ERROR_SUCCESS on sucess, VSCP_ERROR_RCV_EMPTY if
+  there is no data else error code.
 */
 int8_t
 vscp2_getEventEx(vscpEventEx *e);
 
 /*!
-    Fill in capabilities information
-    @param pCaps Pointer to capabilities array
+  Fill in capabilities information
+  @param pCaps Pointer to capabilities array
 */
 void
 vscp2_setCaps(uit8_t *pCaps);
 
 /*!
-    Get bootloader algorithm used to bootload this
-    device.
-    @return bootloader algorithm (see vscp.h)
+  Get bootloader algorithm used to bootload this
+  device.
+  @return bootloader algorithm (see vscp.h)
 */
 uint8_t
 vscp2_getBootLoaderAlgorithm(void);
 
 /*!
-    Read data from application register.
-    @param reg Register to write.
-    @return content of application regsister or -1
-    if the application register is not defined.
+  Read data from application register.
+  @param reg Register to write.
+  @return content of application regsister or -1
+  if the application register is not defined.
 */
 int16_t
 vscp2_readAppReg(uint32_t reg);
 
 /*!
-    Write data to application register.
-    @param reg Register to write.
-    @return content of application regsister or -1
-    if the application register is not defined.
+  Write data to application register.
+  @param reg Register to write.
+  @return content of application regsister or -1
+  if the application register is not defined.
 */
 int
 vscp2_writeAppReg(uint32_t reg, uint8_t data);
@@ -282,139 +284,139 @@ void
 vscp2_setControlByte(uint8_t ctrl);
 
 /*!
-    Get user id byte
-    @param idx Index into user id array  (0-4).
-    @return user id byte
+  Get user id byte
+  @param idx Index into user id array  (0-4).
+  @return user id byte
 */
 uint8_t
 vscp2_getUserID(uint8_t idx);
 
 /*!
-    Write user id byte
-    @param idx Index into user id array  (0-4).
-    @param data Data for position.
+  Write user id byte
+  @param idx Index into user id array  (0-4).
+  @param data Data for position.
 */
 void
 vscp2_setUserID(uint8_t idx, uint8_t data);
 
 /*!
-    Get manufacturer id byte
-    @param idx Index into manufacturer id array  (0-4).
-    @return manufacturer id byte.
+  Get manufacturer id byte
+  @param idx Index into manufacturer id array  (0-4).
+  @return manufacturer id byte.
 */
 uint8_t
 vscp2_getManufacturerId(uint8_t idx);
 
 /*!
-    Set manufacturer id byte
-    @param idx Index into manufacturer id array  (0-4).
-    @param data Data for position.
+  Set manufacturer id byte
+  @param idx Index into manufacturer id array  (0-4).
+  @param data Data for position.
 */
 void
 vscp2_setManufacturerId(uint8_t idx, uint8_t data);
 
 /*!
-    Buffer size is a way to determine how much data a Level II
-    device can handle. A constraint device can handle Level II events
-    but maybe not the full data size (VSCP_MAX_DATA in vscp.h).
-    @return the buffer size (<= 487 bytes) that can be handled.
+  Buffer size is a way to determine how much data a Level II
+  device can handle. A constraint device can handle Level II events
+  but maybe not the full data size (VSCP_MAX_DATA in vscp.h).
+  @return the buffer size (<= 487 bytes) that can be handled.
 */
 uint16_t
 vscp2_getBufferSize(void);
 
 /*!
-    Get GUID for this device.
-    @param idx Index into GUID 0=MSB, 15LSB
-    @return GUID byte.
+  Get GUID for this device.
+  @param idx Index into GUID 0=MSB, 15LSB
+  @return GUID byte.
 */
 uint8_t
 vscp2_getGUID(uint8_t idx);
 
 /*!
-    Get MDF URL for this device.
-    @param idx Index into MDF 0-31
-    @return MDF URL byte.
+  Get MDF URL for this device.
+  @param idx Index into MDF 0-31
+  @return MDF URL byte.
 */
 uint8_t
 vscp2_getMDF_URL(uint8_t idx);
 
 /*!
-    Fetch control byte from permanent storage (idx=0/1)
+  Fetch control byte from permanent storage (idx=0/1)
  */
 uint8_t
 vscp_getControlByte(uint8_t idx);
 
 /*!
-    Write control byte permanent storage (idx=0/1)
+  Write control byte permanent storage (idx=0/1)
  */
 void
 vscp_setControlByte(uint8_t idx, uint8_t ctrl);
 
 /*!
-    Initialize persistent storage
+  Initialize persistent storage
  */
 void
 vscp_init_pstorage(void);
 
 /*!
-    Fedd the decision matrix with one Event
-    @param e Event to feed the DM with.
+  Fedd the decision matrix with one Event
+  @param e Event to feed the DM with.
 */
 void
 vscp2_feedDM(vscpEvent *e);
 
 /*!
-    Fedd the decision matrix with one EventEx
-    @param xz EventEz to feed the DM with.
+  Fedd the decision matrix with one EventEx
+  @param xz EventEz to feed the DM with.
 */
 void
 vscp2_feedDM(vscpEventEx *ex);
 
 /*!
-    Read application register (lower part)
-    @param reg Register to read (<0x80)
-    @return Register content or 0x00 for non valid register
+  Read application register (lower part)
+  @param reg Register to read (<0x80)
+  @return Register content or 0x00 for non valid register
  */
 uint8_t
 vscp_readAppReg(uint8_t reg);
 
 /*!
-    Write application register (lower part)
-    @param reg Register to read (<0x80)
-    @param value Value to write to register.
-    @return Register content or 0xff for non valid register
+  Write application register (lower part)
+  @param reg Register to read (<0x80)
+  @param value Value to write to register.
+  @return Register content or 0xff for non valid register
  */
 uint8_t
 vscp_writeAppReg(uint8_t reg, uint8_t value);
 
 /*!
-    Get DM matrix info
-    The output message data structure should be filled with
-    the following data by this routine.
-        byte 0 - Number of DM rows. 0 if none.
-        byte 1 - offset in register space.
-        byte 2 - start page MSB
-        byte 3 - start page LSB
-        byte 4 - End page MSB
-        byte 5 - End page LSB
-        byte 6 - Level II size of DM row (Just for Level II nodes).
+  Get DM matrix info
+  The output message data structure should be filled with
+  the following data by this routine.
+      byte 0 - Number of DM rows. 0 if none.
+      byte 1 - offset in register space.
+      byte 2 - start page MSB
+      byte 3 - start page LSB
+      byte 4 - End page MSB
+      byte 5 - End page LSB
+      byte 6 - Level II size of DM row (Just for Level II nodes).
  */
 void
 vscp_getMatrixInfo(char *pData);
 
 /*!
-    Get embedded MDF info
-    If available this routine sends an embedded MDF file
-    in several events. See specification CLASS1.PROTOCOL
-    Type=35/36
+  Get embedded MDF info
+  If available this routine sends an embedded MDF file
+  in several events. See specification CLASS1.PROTOCOL
+  Type=35/36
  */
 void
 vscp_getEmbeddedMdfInfo(void);
 
 /*!
-    Go boot loader mode
-    This routine force the system into boot loader mode according
-    to the selected protocol.
+  Go boot loader mode
+  This routine force the system into boot loader mode according
+  to the selected protocol.
  */
 void
 vscp_goBootloaderMode(uint8_t algorithm);
