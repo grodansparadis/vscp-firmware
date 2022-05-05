@@ -86,40 +86,104 @@
 #define VSCP_LINK_REMALLOC(s)   remalloc(s)
 #define VSCP_LINK_FREE(x)       free(x)
 
-///////////////////////////////////////////////////////////////////////////////
-// vscp_link_parser
-// 
-// @param cmd  Command to parse.
-// 
+/*!
+  @brief Parse a command from the client
+  @param pdata  Pointer to user data
+  @param cmd    Pointer to string that holds command to parse.
+  @return VSCP_ERROR_SUCCESS if command was executed correctly, 
+    VSCP_ERROR_MISSING if command is not recognized, possible other error
+    return if command was not executed correctly.
+*/
 
 int vscp_link_parser(const void *pdata, const char *cmd);
 
-///////////////////////////////////////////////////////////////////////////////
-// vscp_link_parser
-//
-// @param msg  Nessage to reply.
-//
+
+/*!
+  @brief Send a (reply) message to the client
+  @param pdata  Pointer to user data
+  @param msg    Pointer to null terminated string that holds message to send.
+  @return VSCP_ERROR_SUCCESS if message was sent correctly,
+*/
 
 int vscp_link_reply(const void *pdata, const char *msg);
 
+/*!
+  @brief Parse GUID string into GUID array
+  @param guid     Pointer to GUID array of 16 bytes to fill.
+  @param strguid  Pointer to string that holds GUID to parse.
+  @param endptr   Pointer to character after last parsed character. 
+                    Can be NULL.
+  @return VSCP_ERROR_SUCCESS if GUID was parsed correctly,
+*/
 
-int parseGuid( const char *strguid, char **endptr, uint8_t *guid );
+int parseGuid(uint8_t *guid, const char *strguid, char **endptr );
 
-int writeGuidToString( const uint8_t *guid, char *strguid );
+/*!
+  @brief Write GUID to string
+  @param strguid Buffer that the GUID string will be written to. This buffer 
+    must be at least 48 bytes long to hold GIOF string on the form
+    "FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF" including a terminating
+    null character.
+  @param guid    Pointer to GUID array of 16 bytes to write.
+  @return VSCP_ERROR_SUCCESS if GUID was parsed correctly,
+*/
+int writeGuidToString(char *strguid, const uint8_t *guid);
 
-vscpEvent *newEvent( void );
+/*!
+  @brief Parse a filter string and write data to a filter structure
+  @param pfilter Pointer to filter structure to fill. 
+  @param strfilter Pointer to string that holds filter to parse.
+  @return VSCP_ERROR_SUCCESS if filter was parsed correctly.
+*/
+int parseFilter(vscpEventFilter *pfilter, const char *strfilter);
 
+/*!
+  @brief Parse a filter mask and write data to a filter structure
+  @param pfilter Pointer to filter structure to fill. 
+  @param strmask Pointer to string that holds mask to parse.
+  @return VSCP_ERROR_SUCCESS if mask was parsed correctly.
+*/
+int parseMask(vscpEventFilter *pfilter, const char *strmask);
+
+/*!
+  @brief Parse an event on string form and write data to an event structure
+  @param pev Pointer to event structure to fill. 
+  @param buf Pointer to string that holds event to parse.
+  @return VSCP_ERROR_SUCCESS if event was parsed correctly.
+*/
+int parseEvent(vscpEvent *pev, const char *buf);
+
+/*!
+  @brief Parse an event on string form and write data to an event ex structure
+  @param pev Pointer to event ex structure to fill. 
+  @param buf Pointer to string that holds event to parse.
+  @return VSCP_ERROR_SUCCESS if event was parsed correctly.
+*/
+int parseEventEx(vscpEventEx *pex, const char *streventex);
+
+/*!
+  @brief Write event to string
+  @param buf String buffer that will get event on string form
+  @param size Size of string buffer
+  @param pev Pointer to event
+  @return VSCP_ERROR_SUCCESS if event was written correctly.
+*/
+int eventToString(char *buf, size_t len, const vscpEvent *pev);
+
+/*!
+  @brief Allocate a new event with zero data.
+  @return Pointer to the new event if successful, NULL if not.
+*/
+vscpEvent *newEvent(void);
+
+/*!
+  @brief Delete an event and it's data.
+  @param pev Address of event to delete.
+  @return VSCP_ERROR_SUCCESS if event was deleted correctly,
+*/
 int deleteEvent( vscpEvent **pev );
 
-int parseFilter( const char *strfilter, vscpEventFilter *evfilter );
 
-int parseMask( const char *strmask, vscpEventFilter *evfilter );
-
-int parseEvent( const char *strevent, vscpEvent *ev );
-
-int parseEventEx( const char *streventex, vscpEventEx *evex );
-
-int eventToString( const vscpEvent *ev, char *strevent, size_t len );
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command handlers
