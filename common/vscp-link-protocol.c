@@ -45,13 +45,15 @@
 // vscp_link_parser
 //
 
-int vscp_link_parser(const void *pdata, const char *cmd) {
+int vscp_link_parser(const void *pdata, const char *cmd) 
+{
   const char *p = cmd;
   const char *pcmd;
 
   // Check pointer
-  if (NULL == cmd)
+  if (NULL == cmd) {
     return VSCP_ERROR_INVALID_POINTER;
+  }
 
   // Remove whitespace from command
   while (*p && (*p == ' ')) {
@@ -63,10 +65,12 @@ int vscp_link_parser(const void *pdata, const char *cmd) {
   if (NULL != (p = strstr(pcmd, "noop"))) {
     p += 4;
     return vscp_link_doCmdNoop(pdata, p);
-  } else if (NULL != (p = strstr(pcmd, "help"))) {
+  } 
+  else if (NULL != (p = strstr(pcmd, "help"))) {
     p += 4;
     return vscp_link_doCmdHelp(pdata, p);
-  } else if (NULL != (p = strstr(pcmd, "quit"))) {
+  } 
+  else if (NULL != (p = strstr(pcmd, "quit"))) {
     p += 4;
     return vscp_link_doCmdQuit(pdata, p);
   } else if (NULL != (p = strstr(pcmd, "user"))) {
@@ -712,8 +716,9 @@ int parseEvent(vscpEvent *pev, const char *buf)
   // Copy in data (if any)
   if (pev->sizeData) {
     pev->pdata = VSCP_LINK_MALLOC(pev->sizeData);
-    if (NULL == pev->pdata)
+    if (NULL == pev->pdata) {
       return VSCP_ERROR_ERROR;
+    }
     memcpy(pev->pdata, wrkbuf, pev->sizeData);
   }
 
@@ -825,13 +830,15 @@ int eventToString(char *buf, size_t size, const vscpEvent *pev)
     if (size < (strlen(buf) + 1 + 1)) {
       return VSCP_ERROR_BUFFER_TO_SMALL;
     }
+
     strcat(buf, ",");
 
     for (int i = 0; i < pev->sizeData; i++) {
 
       if (i < (pev->sizeData - 1)) {
         sprintf(wrkbuf, "%d,", (int)pev->pdata[i]);
-      } else {
+      } 
+      else {
         sprintf(wrkbuf, "%d", (int)pev->pdata[i]);
       }
 
