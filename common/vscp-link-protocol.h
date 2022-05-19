@@ -83,9 +83,8 @@
   "pass 'password'   - Password for login.  \r\n"                               \
   "challenge 'token' - Get session id.  \r\n"                                   \
   "send 'event'      - Send an event.   \r\n"                                   \
-  "retr 'count'      - Retrieve n events from input queue.   \r\n"               \
-  "rcvloop           - Will Retrieve events in an endless loop until "          \
-  "the connection is closed by the client or 'quitloop' is sent.\r\n"           \
+  "retr 'count'      - Retrieve n events from input queue.   \r\n"              \
+  "rcvloop           - Start receive loop. \r\n"                                \
   "quitloop          - Terminate 'rcvloop'.\r\n"                                \
   "cdat/chkdata      - Check if there is data in the input queue.\r\n"          \
   "clra/clrall       - Clear input queue.\r\n"                                  \
@@ -100,6 +99,8 @@
   "help [command]    - This command.\r\n"                                       \
   "test              - Do test sequence. Only used for debugging.\r\n"          \
   "wcyd/whatcanyoudo - Check server capabilities. \r\n"                         \
+  "shutdown          - Shutdown the device. \r\n"                               \
+  "restart           - Restart the device. \r\n"                                \
   "+OK\r\n"
 
 // Command specific help
@@ -111,8 +112,8 @@
 #define VSCP_LINK_STD_HELP_SEND "'send head,class,type,obid,datetime,timestamp,GUID,data1,data2,data3,....,' Send an event.\r\n+OK\r\n"
 #define VSCP_LINK_STD_HELP_RETR "'retr count' Retrieve n events from input queue. Defult is one event.\r\n+OK\r\n"
 #define VSCP_LINK_STD_HELP_RCVLOOP "'rcvloop' Will retrieve events in an endless loop until " \
-                                    "the connection is closed by the client or QUITLOOP is sent.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_QUITLOOP "'quitloop' Terminate RCVLOOP.\r\n+OK\r\n"
+                                    "the connection is closed by the client or 'quit' or 'quitloop' is received.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_QUITLOOP "'quitloop' Terminate receive loop.\r\n+OK\r\n"
 #define VSCP_LINK_STD_HELP_CDTA "'cdta / chkdata' Check if there is data in the input queue.\r\n+OK\r\n"
 #define VSCP_LINK_STD_HELP_CLRA "'clra / clrall' Clear input queue.\r\n+OK\r\n"
 #define VSCP_LINK_STD_HELP_STAT "'stat' Get statistical information.\r\n+OK\r\n"
@@ -126,10 +127,23 @@
 #define VSCP_LINK_STD_HELP_TEST "'test' Do test sequence. Only used for debugging.\r\n+OK\r\n"
 #define VSCP_LINK_STD_HELP_WCYD "'wcyd / whatcanyoudo' Get server capabilities.\r\n+OK\r\n"
 #define VSCP_LINK_STD_HELP_HELP "'help <operation>' This command.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_RESTART "'restart' Restart the device.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_SHUTDOWN "'shutdown' Shutdown the device.\r\n+OK\r\n"
 
 #define VSCP_LINK_MALLOC(s)   malloc(s)
 #define VSCP_LINK_REMALLOC(s) remalloc(s)
 #define VSCP_LINK_FREE(x)     free(x)
+
+/**
+ * @brief VSCP TCP/IP link interface description
+ * Describes one interface
+ */
+struct vscp_interface_info {
+  uint16_t idx;
+  uint16_t type;
+  uint8_t guid[16];
+  char description[64];
+};
 
 /**
     Convert ASCII substring to unsigned long number
@@ -220,9 +234,11 @@ int
 vscp_link_connect(const void* pdata);
 
 /**
-    Called by the system when a connection is closed.
+    \brief Called by the system when a connection is closed.
     \param pdata  Pointer to user data
     \return VSCP_ERROR_SUCCESS if command was executed correctly,
+
+    Can be used to clean up any resources used by the connection.
 */
 
 int
@@ -561,8 +577,32 @@ int
 vscp_link_doCmdInterface(const void* pdata, const char* cmd);
 
 
+/**
+  \brief Shutdown the device into a safe state
+  \param pdata Pointer to user data
+  \param cmd Command string after actual command (arguments)
+  \return VSCP_ERROR_SUCCESS if all was OK.
 
+  The command can do nothing and return '+OK\r\n' if the
+  command is not implemented.
+*/
 
+int
+vscp_link_doCmdShutdown(const void* pdata, const char* cmd);
+
+/**
+ * @brief Restart the device
+ * 
+ * @param pdata Pointer to user data
+ * @param cmd Command string after actual command (arguments)
+ * @return VSCP_ERROR_SUCCESS if all was OK. 
+ * 
+ * The command can do nothing and return '+OK\r\n' if the
+  command is not implemented.
+ */
+
+int
+vscp_link_doCmdRestart(const void* pdata, const char* cmd);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -625,14 +665,13 @@ uint16_t vscp_link_callback_get_interface_count(const void* pdata);
   \brief Get one interface GUID. 
   \param pdata Pointer to user data.
   \param index Index of interface to get.
-  \param piface Pinter to 16-byte buffer that will get interface GUID.
-                MSB first.
+  \param pif Pointer to interface information structure that wil get data for the interface.
   \return VSCP_ERROR_SUCCESS if an interface is returned. If not VSCP_ERROR_UNKNOWN_ITEM
           is returned.
 */
 
 int
-vscp_link_callback_get_interface(const void* pdata, uint16_t index, const uint8_t* piface);
+vscp_link_callback_get_interface(const void* pdata, uint16_t index, struct vscp_interface_info *pif);
 
 /**
   \brief Check username
@@ -860,3 +899,36 @@ vscp_link_callback_info(const void* pdata, VSCPStatus *pstatus);
 */
 int
 vscp_link_callback_rcvloop(const void* pdata, vscpEvent *pev);
+
+/**
+ * @brief Get what can you do info
+ * 
+ * @param pdata Pointer to user data
+ * @param pwcyd Pointer to capabilities integer
+ * @return Return VSCP_ERROR_SUCCESS on success, else error code.
+ */
+
+int
+vscp_link_callback_wcyd(const void* pdata, uint64_t *pwcyd);
+
+/**
+ * @brief Shutdown the system to a safe state
+ * @param pdata Pointer to context
+ * \return Return VSCP_ERROR_SUCCESS on success, else error code.
+ * 
+ * If not implemented just return VSCP_ERROR_SUCCESS
+ */
+
+int
+vscp_link_callback_shutdown(const void* pdata);
+
+/**
+ * @brief Restart the system
+ * @param pdata Pointer to context
+ * \return Return VSCP_ERROR_SUCCESS on success, else error code.
+ * 
+ * If not implemented just return VSCP_ERROR_SUCCESS
+ */
+
+int
+vscp_link_callback_restart(const void* pdata);

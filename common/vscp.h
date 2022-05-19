@@ -303,8 +303,19 @@ extern "C"
     } VSCPChannelInfo;
 
     typedef VSCPChannelInfo* PVSCPCHANNELINFO;
+    
+/* Interface types */
+#define VSCP_INTERFACE_TYPE_UNKNOWN        0
+#define VSCP_INTERFACE_TYPE_INTERNAL       1
+#define VSCP_INTERFACE_TYPE_LEVEL1DRV      2
+#define VSCP_INTERFACE_TYPE_LEVEL2DRV      3
+#define VSCP_INTERFACE_TYPE_CLIENT_TCPIP   4
+#define VSCP_INTERFACE_TYPE_CLIENT_UDP     5
+#define VSCP_INTERFACE_TYPE_CLIENT_WEB     6
+#define VSCP_INTERFACE_TYPE_CLIENT_WEBSOCK 7
+#define VSCP_INTERFACE_TYPE_CLIENT_REST    8
 
-/* VSCP Encryption types */
+    /* VSCP Encryption types */
 #define VSCP_ENCRYPTION_NONE           0
 #define VSCP_ENCRYPTION_AES128         1
 #define VSCP_ENCRYPTION_AES192         2
@@ -528,6 +539,15 @@ extern "C"
 #define VSCP_LEVEL1_DM_OFFSET_ACTION       6
 #define VSCP_LEVEL1_DM_OFFSET_ACTION_PARAM 7
 
+/* Flag bits for level 1 DM flags */
+#define VSCP_LEVEL1_DM_FLAG_ENABLED           0x80
+#define VSCP_LEVEL1_DM_FLAG_ORIGIN_MATCH      0x40
+#define VSCP_LEVEL1_DM_FLAG_ORIGIN_HARDCODED  0x20
+#define VSCP_LEVEL1_DM_FLAG_MATCH_ZONE        0x10
+#define VSCP_LEVEL1_DM_FLAG_MATCH_SUBZONE     0x08
+#define VSCP_LEVEL1_DM_FLAG_CLASS_MASK_BIT8   0x02
+#define VSCP_LEVEL1_DM_FLAG_CLASS_FILTER_BIT8 0x01
+
     /*
         Bits for VSCP server 64/16-bit capability code 
         (WCYD - What Can You Do) used by CLASS1.PROTOCOL, 
@@ -535,25 +555,25 @@ extern "C"
         CLASS2.PROTOCOL, HIGH END SERVER HEART BEAT
     */
 
-#define VSCP_SERVER_CAPABILITY_REMOTE_VARIABLE    (1 << 63) //
-#define VSCP_SERVER_CAPABILITY_DECISION_MATRIX    (1 << 62) //
-#define VSCP_SERVER_CAPABILITY_INTERFACE          (1 << 61) //
-#define VSCP_SERVER_CAPABILITY_TCPIP              (1 << 15) // 32768
-#define VSCP_SERVER_CAPABILITY_UDP                (1 << 14) // 16384
-#define VSCP_SERVER_CAPABILITY_MULTICAST_ANNOUNCE (1 << 13) // 8192
-#define VSCP_SERVER_CAPABILITY_RAWETH             (1 << 12) // 4196
-#define VSCP_SERVER_CAPABILITY_WEB                (1 << 11) // 2048
-#define VSCP_SERVER_CAPABILITY_WEBSOCKET          (1 << 10) // 1024
-#define VSCP_SERVER_CAPABILITY_REST               (1 << 9)  // 512
-#define VSCP_SERVER_CAPABILITY_MULTICAST_CHANNEL  (1 << 8)  // 256
-#define VSCP_SERVER_CAPABILITY_RESERVED           (1 << 7)  // 128
-#define VSCP_SERVER_CAPABILITY_IP6                (1 << 6)  // 64
-#define VSCP_SERVER_CAPABILITY_IP4                (1 << 5)  // 32
-#define VSCP_SERVER_CAPABILITY_SSL                (1 << 4)  // 16
-#define VSCP_SERVER_CAPABILITY_TWO_CONNECTIONS    (1 << 3)  // 8
-#define VSCP_SERVER_CAPABILITY_AES256             (1 << 2)  // 4
-#define VSCP_SERVER_CAPABILITY_AES192             (1 << 1)  // 2
-#define VSCP_SERVER_CAPABILITY_AES128             1         // 1
+#define VSCP_SERVER_CAPABILITY_REMOTE_VARIABLE    (1ll << 63) //
+#define VSCP_SERVER_CAPABILITY_DECISION_MATRIX    (1ll << 62) //
+#define VSCP_SERVER_CAPABILITY_INTERFACE          (1ll << 61) //
+#define VSCP_SERVER_CAPABILITY_TCPIP              (1ll << 15) // 32768
+#define VSCP_SERVER_CAPABILITY_UDP                (1ll << 14) // 16384
+#define VSCP_SERVER_CAPABILITY_MULTICAST_ANNOUNCE (1ll << 13) // 8192
+#define VSCP_SERVER_CAPABILITY_RAWETH             (1ll << 12) // 4196
+#define VSCP_SERVER_CAPABILITY_WEB                (1ll << 11) // 2048
+#define VSCP_SERVER_CAPABILITY_WEBSOCKET          (1ll << 10) // 1024
+#define VSCP_SERVER_CAPABILITY_REST               (1ll << 9)  // 512
+#define VSCP_SERVER_CAPABILITY_MULTICAST_CHANNEL  (1ll << 8)  // 256
+#define VSCP_SERVER_CAPABILITY_RESERVED           (1ll << 7)  // 128
+#define VSCP_SERVER_CAPABILITY_IP6                (1ll << 6)  // 64
+#define VSCP_SERVER_CAPABILITY_IP4                (1ll << 5)  // 32
+#define VSCP_SERVER_CAPABILITY_SSL                (1ll << 4)  // 16
+#define VSCP_SERVER_CAPABILITY_TWO_CONNECTIONS    (1ll << 3)  // 8
+#define VSCP_SERVER_CAPABILITY_AES256             (1ll << 2)  // 4
+#define VSCP_SERVER_CAPABILITY_AES192             (1ll << 1)  // 2
+#define VSCP_SERVER_CAPABILITY_AES128             1ll         // 1
 #define VSCP_SERVER_CAPABILITY_NONE               0         // No capabilities
 
 /*
