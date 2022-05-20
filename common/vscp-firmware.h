@@ -61,8 +61,8 @@ low end hardware device.
  */
 
 
-#include <vscp_compiler.h> 	// This file should be in your project folder
-#include <vscp_projdefs.h>	// This file should be in your project folder
+#include "vscp_compiler.h" 	// This file should be in your project folder
+#include "vscp_projdefs.h"	// This file should be in your project folder
 #include <inttypes.h>
 
 // Macros

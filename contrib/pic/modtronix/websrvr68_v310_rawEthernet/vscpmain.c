@@ -586,7 +586,7 @@ uint8_t vscp_getBootLoaderAlgorithm( void )
 
 uint8_t vscp_getBufferSize( void ) 
 {
-    return LIMITED_DEVICE_DATASIZE;
+    return 0;   // default size == 512
 }
 
 ///////////////////////////////////////////////////////////////////////////////

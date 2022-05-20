@@ -190,10 +190,6 @@ int8_t vscp_getRawPacket( void  )
     // Size
     wrkEvent.sizeData =   ( ( (uint16_t)buf[ 19 ] ) << 8 ) + buf[ 20 ];
 
-    // Check that size is correct and adjust if not.
-    if ( wrkEvent.sizeData > LIMITED_DEVICE_DATASIZE ) {
-        wrkEvent.sizeData = LIMITED_DEVICE_DATASIZE;
-    }
 
     // Copy in data
     MACGetArray( wrkEvent.data, wrkEvent.sizeData );
