@@ -79,8 +79,8 @@ uint8_t error_count;    /* Error counter */
 */
 uint16_t page_select;   
 
-uint8_t node_state;     /* State machine state */
-uint8_t node_substate;  /* State machine substate */
+uint8_t state;     /* State machine state */
+uint8_t substate;  /* State machine substate */
 
 /* GUID for this node */
 extern uint8_t device_guid[16];
@@ -91,6 +91,8 @@ extern uint8_t device_version[4];
 /* Input fifo containing events to handle*/
 extern vscp_fifo_t fifoEventsIn;
 
+// Timer used for config restore 
+uint32_t config_timer;
 
 /**
  * \fn vscp2_init
@@ -98,27 +100,101 @@ extern vscp_fifo_t fifoEventsIn;
 
 int vscp2_init(const void* pdata) 
 {
-  // Send new node on-License
+  state = VSCP2_STATE_STARTUP;
+
+  vscpEventEx ex;
+  memset(&ex, 0, sizeof(vscpEventEx));
+
+  ex.head = VSCP_PRIORITY_NORMAL;
+  ex.vscp_class = VSCP_CLASS1_PROTOCOL;
+  ex.vscp_type = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
+  // GUID is zero => our own GUID will be used
+
+  // Send new node online
+  if (VSCP_ERROR_SUCCESS != vscp2_callback_send_eventex(pdata, &ex)) {
+    return VSCP_ERROR_ERROR;
+  }
+
+  state = VSCP2_STATE_UNCONNECTED;
+
   return VSCP_ERROR_SUCCESS;
 }
-
 
 /**
- * \fn vscp2_sendEvent
+ * \fn vscp2_periodic_work
  */
-
-int vscp2_send_event(const void* pdata, vscpEvent *ev) 
+int vscp2_do_periodic_work(const void* pdata) 
 {
-  return VSCP_ERROR_SUCCESS;
-}
+  vscpEvent *pev;
+  int rv;
 
+  // Check for events
+  if (VSCP_ERROR_SUCCESS == (rv = vscp2_callback_get_event(pdata, &pev))) {
 
-/** 
- * \fn vscp2_sendEvent
- */
+    // Check pointers
+    if (NULL == pdata) {
+      return VSCP_ERROR_INVALID_POINTER;
+    }
+    if (NULL == pev) {
+      return VSCP_ERROR_INVALID_POINTER;
+    }
 
-int vscp2_send_eventex(const void* pdata, vscpEventEx *ex) 
-{
+    if (VSCP_CLASS1_PROTOCOL == pev->vscp_class) {
+
+      switch (pev->vscp_type) {
+        
+        case VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER:
+          vscp2_callback_bootloader(pdata);
+          break;
+        
+        case VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO:
+          vscp2_callback_report_matrix(pdata);
+          break;  
+
+        case VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF:
+          vscp2_callback_report_mdf(pdata);
+          break;  
+
+        case VSCP_TYPE_PROTOCOL_GET_EVENT_INTEREST:
+          vscp2_callback_report_events_of_interest(pdata);
+          break;  
+
+      }
+    }
+    if (VSCP_CLASS2_LEVEL1_PROTOCOL == pev->vscp_class) {
+
+      switch (pev->vscp_type) {
+        
+        case VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER:
+          break;
+        
+        case VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO:
+          break;  
+
+        case VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF:
+          break;  
+
+        case VSCP_TYPE_PROTOCOL_GET_EVENT_INTEREST:
+          break;  
+
+      }
+    }
+    // Level II
+    else if (VSCP_CLASS2_PROTOCOL == pev->vscp_class) {
+     
+      switch (pev->vscp_type) {
+        
+        case VSCP2_TYPE_PROTOCOL_READ_REGISTER:
+          break;          
+
+        case VSCP2_TYPE_PROTOCOL_WRITE_REGISTER:
+          break; 
+
+      }
+    }  
+  }
+  
+
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -161,7 +237,7 @@ int vscp2_read_reg(const void* pdata, uint32_t reg, uint8_t* pval)
     }
     else if (VSCP2_STD_REG_NODE_ERROR_COUNTER == reg) {
       // Writing/reading error counter resets it regardless of value
-      *pval = error_count;;          
+      *pval = error_count;  
       error_count = 0;    
     }
     else if ((VSCP2_STD_REG_USERID0 >= reg) && (VSCP2_STD_REG_USERID4 <= reg)) {
@@ -281,15 +357,7 @@ int vscp2_write_reg(const void* pdata, uint32_t reg, uint8_t val)
     vscp2_callback_read_reg(pdata, reg, &val);
   } 
   else {
-    if (reg == VSCP2_STD_REG_ALARMSTATUS) {
-      // Writing/reading alarm resets it regardless of value
-      alarm_status = 0;
-    }
-    else if (reg == VSCP2_STD_REG_NODE_ERROR_COUNTER) {
-      // Writing/reading error counter resets it regardless of value
-      alarm_status = 0;
-    }
-    else if ( ( reg >= VSCP2_STD_REG_USERID0 ) && ( reg <= VSCP2_STD_REG_USERID4 ) )  {
+    if ( ( reg >= VSCP2_STD_REG_USERID0 ) && ( reg <= VSCP2_STD_REG_USERID4 ) )  {
       return vscp2_callback_write_user_id(pdata, reg-VSCP2_STD_REG_USERID0, val);
     }
 #ifdef THIS_FIRMWARE_ENABLE_WRITE_2PROTECTED_LOCATIONS
@@ -313,9 +381,30 @@ int vscp2_write_reg(const void* pdata, uint32_t reg, uint8_t val)
       }
     }
 #endif
+    else if (reg == VSCP2_STD_REG_DEFAULT_CONFIG_RESTORE)  {
+      
+      uint32_t timer;
+      if (VSCP_ERROR_SUCCESS != vscp2_callback_get_ms(pdata, &timer)) {
+        return VSCP_ERROR_ERROR;
+      }
+
+      if (0x55 == val) {        
+        config_timer = timer;           
+      }
+      else if (0xaa == val) {
+        if ((timer - config_timer) < 1000) {
+          config_timer = 0;
+          return vscp_callback_restore_defaults(pdata);
+        }
+        else {
+          return VSCP_ERROR_ERROR; 
+        }
+      }  
+    }
   }
 
-  return VSCP_ERROR_SUCCESS;
+  // Register does not exist or is not writeable
+  return VSCP_ERROR_ERROR;
 }
 
 

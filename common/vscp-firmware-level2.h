@@ -129,9 +129,10 @@
 // -----------------------------------------------------------------------------
 
 /* States */
-#define VSCP2_STATE_UNCONNECTED 0
-#define VSCP2_STATE_CONNECTED   1
-#define VSCP2_STATE_ERROR       2
+#define VSCP2_STATE_STARTUP                       0x00
+#define VSCP2_STATE_UNCONNECTED                   0x01
+#define VSCP2_STATE_CONNECTED                     0x02
+#define VSCP2_STATE_ERROR                         0x03
 
 /******************************************************************************
                                    Globals
@@ -159,6 +160,19 @@ int
 vscp2_init(const void* pdata);
 
 /**
+ * @fn vscp2_periodic_work
+ * @brief Do periodic VSCP protocol work
+ * 
+ * @param pdata Pointer to user data (typical context)
+ * @return VSCP_ERROR_SUCCESS on success, else error code. 
+ * 
+ * This call is the same for different 
+ */
+
+int 
+vscp2_do_periodic_work(const void* pdata);
+
+/**
  * \fn vscp2_readRegister
  * \brief Read register
  * \param pdata Pointer to user data (typical context)
@@ -168,6 +182,7 @@ vscp2_init(const void* pdata);
  * 
  * This function is called from the main loop.
  */
+
 int
 vscp2_read_reg(const void* pdata, uint32_t reg, uint8_t* pval);
 
@@ -181,6 +196,7 @@ vscp2_read_reg(const void* pdata, uint32_t reg, uint8_t* pval);
  * 
  * This function is called from the main loop.
  */
+
 int
 vscp2_write_reg(const void* pdata, uint32_t reg, uint8_t val);
 
@@ -191,12 +207,14 @@ vscp2_write_reg(const void* pdata, uint32_t reg, uint8_t val);
  * 
  * This function is called from the main loop.
  */
+
 int
 vscp2_send_heartbeat(const void* pdata);
 
 /**
  * \fn vscp2_tick
  * \brief Tick
+ * \param pdata Pointer to user data (typical context)
  * \return VSCP_ERROR_SUCCESS on success, else error code.
  * 
  * This function is called from the main loop.
@@ -208,6 +226,7 @@ vscp2_send_caps(const void* pdata);
 /**
  * \fn vscp2_tick
  * \brief Tick
+ * \param pdata Pointer to user data (typical context)
  * \return VSCP_ERROR_SUCCESS on success, else error code.
  * 
  * This function is called from the main loop.
@@ -219,6 +238,7 @@ vscp2_send_high_end_server_probe(const void* pdata);
 /**
   Do One second work
 
+  \param pdata Pointer to user data (typical context)
   This routine should be called once a second by the
   application.
  */
@@ -232,6 +252,7 @@ vscp2_do_one_second_work(const void* pdata);
   http://www.vscp.org/docs/vscpspec/doku.php?id=class1.error
   idx can be used to identify the internal part ("submodule") that was the
   origin of the error. Both zone and sub zone are always set to zero.
+  \param pdata Pointer to user data (typical context)
   @param type This is the VSCP type
   @param idx Index to identify possible sub module. Normally set to zero.
   @return True if event was sent.
@@ -247,6 +268,7 @@ vscp2_send_error_event(const void* pdata, uint8_t type, uint8_t idx);
   For loging first send Type = 2(0x01) Log Start then logging events and when
   log is closed send Type = 3 (0x03) Log Stop. To log several things use a
   unique if for each and open/close each.
+  \param pdata Pointer to user data (typical context)
   @param type VSCP logevent type.
   @param id Identifier for the logging channel.
   @param level Loglevel for this log event.
@@ -265,6 +287,17 @@ vscp2_send_log_event(const void* pdata, uint8_t type, uint8_t id, uint8_t level,
                                     Callbacks
  *****************************************************************************
  */
+
+/**
+ * \fn vscp2_callback_get_ms
+ * \brief On receive
+ * \param pdata Pointer to user data (typical context)
+ * \param ptime Pointer to millisecond counter
+ * \return VSCP_ERROR_SUCCESS on success, else error code.
+ * 
+ * This function is called from the main loop.
+ */
+int vscp2_callback_get_ms(const void* pdata, uint32_t *ptime);
 
 
 /**
@@ -290,60 +323,113 @@ vscp2_callback_read_reg(const void* pdata, uint32_t reg, uint8_t* pval);
  * 
  * This function is called from the main loop.
  */
+
 int
 vscp2_callback_write_reg(const void* pdata, uint32_t reg, uint8_t val);
 
 /**
   Send event to transport sublayer.
-  @param e Pointer to Event to send.
-  @return VSCP_ERROR_SUCCESS on sucess, or error code.
+  @param ev Pointer to Event to send.
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+
+  - ev is taken over in the callback and it is responsible for releasing it.
+  - if GUID is all zero then the GUID is set to the GUID of the node.
 */
+
 int
 vscp2_callback_send_event(const void* pdata, vscpEvent* ev);
 
 /**
   Send eventex to transport sublayer.
   @param ex Pointer to EventEx to send.
-  @return VSCP_ERROR_SUCCESS on sucess, or error code.
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+
+  - ex is copied in the callback.
+  - if GUID is all zero then the GUID is set to the GUID of the node.
 */
+
 int
 vscp2_callback_send_eventex(const void* pdata, vscpEventEx* ex);
 
 /**
+ * \fn vscp2_callback_bootloader
+ * \brief Enter bootloader.
+ * \param pdata Pointer to user data (typical context).
+ * \return VSCP_ERROR_SUCCESS on success, or error code.
+ */
+
+int
+vscp2_callback_bootloader(const void* pdata);
+
+/**
+ * \fn vscp2_callback_report_dmatrix
+ * \brief Reply with DM content.
+ * \param pdata Pointer to user data (typical context).
+ * \return VSCP_ERROR_SUCCESS on success, or error code.
+ * 
+ * Report full content of DM back.
+ */
+
+int
+vscp2_callback_report_dmatrix(const void* pdata);
+
+/**
+ * \fn vscp2_callback_report_mdf
+ * \brief Reply with embedded DM.
+ * \param pdata Pointer to user data (typical context).
+ * \return VSCP_ERROR_SUCCESS on success, or error code.
+ * 
+ * Report embedded mdf back.
+ */
+
+int vscp2_callback_report_mdf(const void* pdata);
+
+/**
+ * @brief Report back events that this node is interested in
+ * @param pdata Pointer to user data (typical context)
+ * @return VSCP_ERROR_SUCCESS on success, else error code.
+ */
+
+int
+vscp2_callback_report_events_of_interest(const void* pdata);
+
+/**
   Get event from transport sublayer.
-  @param e Pointer to Event to fill data in.
-  @return VSCP_ERROR_SUCCESS on sucess, VSCP_ERROR_RCV_EMPTY if
+  @param pev Pointer to pointer to Event to fill data in.
+  @return VSCP_ERROR_SUCCESS on success, VSCP_ERROR_RCV_EMPTY if
   there is no data else error code.
 */
+
 int
-vscp2_callback_get_event(const void* pdata, vscpEvent* ev);
+vscp2_callback_get_event(const void* pdata, vscpEvent** pev);
 
 /**
-  Get eventex from transport sublayer.
-  @param ex Pointer to EventEx to fill data in.
-  @return VSCP_ERROR_SUCCESS on sucess, VSCP_ERROR_RCV_EMPTY if
+  \brief Get eventex from transport sublayer.
+  \param ex Pointer to EventEx to fill data in.
+  \return VSCP_ERROR_SUCCESS on success, VSCP_ERROR_RCV_EMPTY if
   there is no data else error code.
 */
+
 int
-vscp2_callback_get_eventex(const void* pdata, vscpEventEx* e);
+vscp2_callback_get_eventex(const void* pdata, vscpEventEx** pex);
 
 /**
-  Get user id
-  @param pdata Pointer to context
-  @param pos Position 0-4 of user id to read
-  @param pval Pointer to variable that will get user id
-  @return VSCP_ERROR_SUCCESS on sucess, or error code.
+  \brief Get user id
+  \param pdata Pointer to context
+  \param pos Position 0-4 of user id to read
+  \param pval Pointer to variable that will get user id
+  \return VSCP_ERROR_SUCCESS on success, or error code.
 */
 
 int
 vscp2_callback_get_user_id(const void *pdata, uint8_t pos, uint8_t *pval);
 
 /**
-  Write user id
-  @param pdata Pointer to context
-  @param pos Position 0-8 of manufacturer id to write
-  @param val Value to write
-  @return VSCP_ERROR_SUCCESS on sucess, or error code.
+  \brief Write user id
+  \param pdata Pointer to context
+  \param pos Position 0-8 of manufacturer id to write
+  \param val Value to write
+  \return VSCP_ERROR_SUCCESS on success, or error code.
 */
 
 int
@@ -356,7 +442,7 @@ vscp2_callback_write_user_id(const void *pdata, uint8_t pos, uint8_t val);
   @param pdata Pointer to context
   @param pos Position 0-7 of manufacturer id to read
   @param pval Pointer to variable that will get manufacturer id
-  @return VSCP_ERROR_SUCCESS on sucess, or error code.
+  @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 
 int
@@ -368,7 +454,7 @@ vscp2_callback_get_manufacturer_id(const void *pdata, uint8_t pos, uint8_t *pval
   @param pdata Pointer to context
   @param pos Position 0-7 of user id to write
   @param val Value to write
-  @return VSCP_ERROR_SUCCESS on sucess, or error code.
+  @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 
 int
@@ -379,19 +465,18 @@ vscp2_callback_write_manufacturer_id(const void *pdata, uint8_t pos, uint8_t val
   @param pdata Pointer to context
   @param pos Position 0-15 of GUID byte to read
   @param pval Pointer to variable that will get GUID byte
-  @return VSCP_ERROR_SUCCESS on sucess, or error code.
+  @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 
 int
 vscp2_callback_get_guid(const void *pdata, uint8_t pos, uint8_t *pval);
-
 
 /**
   Write guid byte
   @param pdata Pointer to context
   @param pos Position 0-15 of GUID byte to write
   @param val Value to write
-  @return VSCP_ERROR_SUCCESS on sucess, or error code.
+  @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 
 int
@@ -425,18 +510,25 @@ vscp_callback_init_persistent_storage(const void *pdata);
 
 /**
   Fedd the decision matrix with one Event
-  @param e Event to feed the DM with.
+  @param ev Event to feed the DM with.
 */
 int
-vscp2_callback_feed_dm(const void *pdata, vscpEvent* e);
+vscp2_callback_feed_dm(const void *pdata, vscpEvent* ev);
 
 /**
-  Fedd the decision matrix with one EventEx
+  Feed the decision matrix with one EventEx
   @param xz EventEz to feed the DM with.
 */
 int
 vscp2_callback_feed_dmex(const void *pdata, vscpEventEx* ex);
 
+/**
+  All events except level I/II protocol events is sent to the
+  application for handling.
+  @param ev Event to feed the DM with.
+*/
+int
+vscp2_callback_feed_app(const void *pdata, vscpEvent* ev);
 
 /**
   Get DM matrix info
@@ -493,6 +585,10 @@ vscp_callback_get_subzone(const void *pdata);
 int
 vscp_callback_restore_defaults(const void *pdata);
 
+/**
+ * @brief 
+ * 
+ */
 #ifdef THIS_FIRMWARE_VSCP_DISCOVER_SERVER
 int vscp2_send_high_end_server_probe(const void *pdata);
 #endif
