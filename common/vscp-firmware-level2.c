@@ -37,32 +37,12 @@
 #include <vscp_class.h>      
 #include <vscp_type.h>
 #include <vscp-fifo.h>
+#include <vscp-firmware-helper.h>
+
 #include "vscp-firmware-level2.h"
 
 #include "vscp-compiler.h"
 #include "vscp-projdefs.h"
-
-/* Macros */
-
-/* This macro construct a signed integer from two unsigned chars in a safe way */
-#define construct_signed16(msb, lsb) ((int16_t)((((uint16_t)msb) << 8) + \
-                                                (uint16_t)lsb))
-
-/* This macro construct a unsigned integer from two unsigned chars in a safe way */
-#define construct_unsigned16(msb, lsb) ((uint16_t)((((uint16_t)msb) << 8) + \
-                                                   (uint16_t)lsb))
-
-/* This macro construct a signed long from four unsigned chars in a safe way */
-#define construct_signed32(b0, b1, b2, b3) ((int32_t)((((uint32_t)b0) << 24) + \
-                                                      (((uint32_t)b0) << 16) + \
-                                                      (((uint32_t)b0) << 8) +  \
-                                                      (uint32_t)b0))
-
-/* This macro construct a unsigned long from four unsigned chars in a safe way */
-#define construct_unsigned32(b0, b1, b2, b3) ((uint32_t)((((uint32_t)b0) << 24) + \
-                                                         (((uint32_t)b0) << 16) + \
-                                                         (((uint32_t)b0) << 8) +  \
-                                                         (uint32_t)b0))
 
 /* Constants */
 
@@ -77,30 +57,38 @@ uint8_t error_count;    /* Error counter */
   See: THIS_FIRMWARE_ENABLE_WRITE_PROTECTED_LOCATIONS
   in projdefs.h
 */
-uint16_t page_select;   
 
-uint8_t state;     /* State machine state */
-uint8_t substate;  /* State machine substate */
+/* 
+  User supplied data that will be provided to
+  all callbacks.
+*/ 
+static const void *pUserData = NULL;
 
-/* GUID for this node */
-extern uint8_t device_guid[16];
+static uint16_t page_select;   
 
-/* Device version */
-extern uint8_t device_version[4];
+static uint8_t state;     // State machine state 
+static uint8_t substate;  // State machine substate 
 
-/* Input fifo containing events to handle*/
-extern vscp_fifo_t fifoEventsIn;
 
 // Timer used for config restore 
-uint32_t config_timer;
+static uint32_t config_timer;
 
-/**
- * \fn vscp2_init
- */
+///////////////////////////////////////////////////////////////////////////////
+// vscp2_init
+//
 
-int vscp2_init(const void* pdata) 
+int vscp2_init(const void *pdata) 
 {
+  // Save user provided data pointer
+  pUserData = pdata;
+
+  // Strat up state
   state = VSCP2_STATE_STARTUP;
+
+  // Init variables
+  page_select = 0;
+  alarm_status= 0;
+  error_count = 0;
 
   vscpEventEx ex;
   memset(&ex, 0, sizeof(vscpEventEx));
@@ -111,7 +99,7 @@ int vscp2_init(const void* pdata)
   // GUID is zero => our own GUID will be used
 
   // Send new node online
-  if (VSCP_ERROR_SUCCESS != vscp2_callback_send_eventex(pdata, &ex)) {
+  if (VSCP_ERROR_SUCCESS != vscp2_callback_send_eventex(pUserData, &ex)) {
     return VSCP_ERROR_ERROR;
   }
 
@@ -120,63 +108,46 @@ int vscp2_init(const void* pdata)
   return VSCP_ERROR_SUCCESS;
 }
 
-/**
- * \fn vscp2_periodic_work
- */
-int vscp2_do_periodic_work(const void* pdata) 
+///////////////////////////////////////////////////////////////////////////////
+// vscp2_do_work
+//
+
+int vscp2_do_work(vscpEvent *pev) 
 {
-  vscpEvent *pev;
   int rv;
+  uint8_t offset = 0;
+  uint16_t vscp_class;
 
-  // Check for events
-  if (VSCP_ERROR_SUCCESS == (rv = vscp2_callback_get_event(pdata, &pev))) {
+  // If there is an event we should check if we should react
+  // on it
+  if (NULL != pev) {
 
-    // Check pointers
-    if (NULL == pdata) {
-      return VSCP_ERROR_INVALID_POINTER;
+    vscp_class = pev->vscp_class;
+
+    if (VSCP_CLASS2_LEVEL1_PROTOCOL == vscp_class) {
+      offset = 16;  // Data is at offset 16
+      vscp_class -= 512;
     }
-    if (NULL == pev) {
-      return VSCP_ERROR_INVALID_POINTER;
-    }
 
-    if (VSCP_CLASS1_PROTOCOL == pev->vscp_class) {
+    if (VSCP_CLASS1_PROTOCOL == vscp_class) {
 
       switch (pev->vscp_type) {
         
         case VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER:
-          vscp2_callback_bootloader(pdata);
+          vscp2_callback_enter_bootloader(pUserData);
           break;
         
         case VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO:
-          vscp2_callback_report_matrix(pdata);
-          break;  
-
-        case VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF:
-          vscp2_callback_report_mdf(pdata);
-          break;  
-
-        case VSCP_TYPE_PROTOCOL_GET_EVENT_INTEREST:
-          vscp2_callback_report_events_of_interest(pdata);
-          break;  
-
-      }
-    }
-    if (VSCP_CLASS2_LEVEL1_PROTOCOL == pev->vscp_class) {
-
-      switch (pev->vscp_type) {
-        
-        case VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER:
+          vscp2_callback_report_dmatrix(pUserData);
           break;
-        
-        case VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO:
-          break;  
 
         case VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF:
-          break;  
+          vscp2_callback_report_mdf(pUserData);
+          break;
 
         case VSCP_TYPE_PROTOCOL_GET_EVENT_INTEREST:
-          break;  
-
+          vscp2_callback_report_events_of_interest(pUserData);
+          break;
       }
     }
     // Level II
@@ -185,45 +156,188 @@ int vscp2_do_periodic_work(const void* pdata)
       switch (pev->vscp_type) {
         
         case VSCP2_TYPE_PROTOCOL_READ_REGISTER:
+          vscp2_do_register_read(pev);
           break;          
 
         case VSCP2_TYPE_PROTOCOL_WRITE_REGISTER:
+          vscp2_do_register_write(pev);
           break; 
 
       }
-    }  
+    } 
+
+    vscp_fwhlp_deleteEvent(pev); 
+
+  } // NULL event
+  
+  return VSCP_ERROR_SUCCESS;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp2_do_register_read
+//
+
+int 
+vscp2_do_register_read(vscpEvent* pev) 
+{
+  int rv;
+  uint8_t regs[512];  
+  uint16_t cnt = 1;
+  uint32_t startpos;
+
+  if (NULL == pev) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  // Must be at least GUID + start reg
+  if (pev->sizeData < 20) {
+    vscp_fwhlp_deleteEvent(&pev);
+    return VSCP_ERROR_PARAMETER;
+  }  
+
+  // Get start position
+  startpos = construct_unsigned32(pev->pdata[16],
+                                  pev->pdata[17],
+                                  pev->pdata[18],
+                                  pev->pdata[19]);
+
+  // If size is given get it
+  if (pev->sizeData >= 22) {
+    cnt = construct_unsigned16(pev->pdata[20],
+                               pev->pdata[21]);
+  }
+
+  for (uint32_t pos; pos < (startpos + cnt); pos++) {
+    if (VSCP_ERROR_SUCCESS != (rv = vscp2_read_reg(pos, &regs[pos]))) {
+      vscp_fwhlp_deleteEvent(&pev);
+      return rv;
+    }
+  }
+
+  // Original event is not needed anymore
+  vscp_fwhlp_deleteEvent(&pev);
+
+  // Create new event
+  if (NULL == (pev = vscp_fwhlp_newEvent())) {
+    return VSCP_ERROR_MEMORY;
+  }
+
+  // Construct reply event
+  pev->head = VSCP_PRIORITY_NORMAL;
+  memcpy(pev->GUID, vscp2_callback_get_guid(pUserData), 16);
+  pev->vscp_class = VSCP_CLASS2_LEVEL1_PROTOCOL;
+  pev->vscp_type = VSCP2_TYPE_PROTOCOL_READ_WRITE_RESPONSE;
+  pev->timestamp = vscp2_callback_get_timestamp(pUserData);
+  vscp2_callback_get_time(pUserData, pev);
+  // Data
+  pev->sizeData = cnt + 4;
+  pev->pdata = VSCP_MALLOC(pev->sizeData);
+  if (NULL == pev->pdata) {
+    vscp_fwhlp_deleteEvent(&pev);
+    return VSCP_ERROR_MEMORY;
   }
   
+  pev->pdata[0] = (uint8_t)((startpos >> 24) & 0xff);
+  pev->pdata[1] = (uint8_t)((startpos >> 16) & 0xff);
+  pev->pdata[2] = (uint8_t)((startpos >> 8) & 0xff);
+  pev->pdata[3] = (uint8_t)(startpos & 0xff);
+  
+  // copy in values
+  memcpy(&pev->pdata + 4, regs, cnt);
 
-  return VSCP_ERROR_SUCCESS;
+  // Send event
+  return vscp2_callback_send_event(pUserData, pev);  // TODO free on error 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// vscp2_do_register_write
+//
 
-/**
- * \fn vscp2_getEvent
- */
-
-int vscp2_get_event(const void* pdata, vscpEvent** pev) 
+int 
+vscp2_do_register_write(vscpEvent* pev)
 {
-  return VSCP_ERROR_SUCCESS;
+  int rv;
+  uint8_t regs[512];  
+  uint16_t cnt = 1;
+  uint32_t startpos;
+  
+  if (NULL == pev) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  // Must be at least GUID + start reg
+  if (pev->sizeData < 20) {
+    vscp_fwhlp_deleteEvent(&pev);
+    return VSCP_ERROR_PARAMETER;
+  }  
+
+  // Get start position
+  startpos = construct_unsigned32(pev->pdata[16],
+                                  pev->pdata[17],
+                                  pev->pdata[18],
+                                  pev->pdata[19]);
+
+  // Size bytes in frame minus GUID and startpos
+  cnt = pev->sizeData - 16 - 4;
+
+  for (uint32_t pos; pos < (startpos + cnt); pos++) {
+    if (VSCP_ERROR_SUCCESS != (rv = vscp2_callback_write_user_reg(pUserData, pos, regs[pos]))) {
+      vscp_fwhlp_deleteEvent(&pev);
+      return rv;
+    }
+  }
+
+  // Original event is not needed anymore
+  vscp_fwhlp_deleteEvent(&pev);
+
+  // Create new event
+  if (NULL == (pev = vscp_fwhlp_newEvent())) {
+    return VSCP_ERROR_MEMORY;
+  }
+
+  // Construct reply event
+  pev->head = VSCP_PRIORITY_NORMAL;
+  memcpy(pev->GUID, vscp2_callback_get_guid(pUserData), 16);
+  pev->vscp_class = VSCP_CLASS2_LEVEL1_PROTOCOL;
+  pev->vscp_type = VSCP2_TYPE_PROTOCOL_READ_WRITE_RESPONSE;
+  pev->timestamp = vscp2_callback_get_timestamp(pUserData);
+  vscp2_callback_get_time(pUserData, pev);
+  // Data
+  pev->sizeData = cnt + 4;
+  pev->pdata = VSCP_MALLOC(pev->sizeData);
+  if (NULL == pev->pdata) {
+    vscp_fwhlp_deleteEvent(&pev);
+    return VSCP_ERROR_MEMORY;
+  }
+
+  pev->pdata[0] = (uint8_t)((startpos >> 24) & 0xff);
+  pev->pdata[1] = (uint8_t)((startpos >> 16) & 0xff);
+  pev->pdata[2] = (uint8_t)((startpos >> 8) & 0xff);
+  pev->pdata[3] = (uint8_t)(startpos & 0xff);
+  
+  // copy in values
+  memcpy(&pev->pdata + 4, regs, cnt);
+
+  // Send event
+  return vscp2_callback_send_event(pUserData, pev);
 }
 
 
-/**
- * \fn vscp2_readRegister
- */
+///////////////////////////////////////////////////////////////////////////////
+// vscp2_read_reg
+//
 
-int vscp2_read_reg(const void* pdata, uint32_t reg, uint8_t* pval)
+int vscp2_read_reg(uint32_t reg, uint8_t* pval)
 {
   int rv;
   int i;
 
   if (reg < VSCP2_STANDARD_REGISTER_START ) {
-    /* User register */
-    vscp2_callback_read_reg(pdata, reg, pval);
+    // User register 
+    return vscp2_callback_read_user_reg(pUserData, reg, pval);
   } 
   else {
-    /* standard register */
+    // standard register 
     if (VSCP2_STD_REG_ALARMSTATUS == reg) {
       // Writing/reading alarm resets it regardless of value
       *pval = alarm_status;          
@@ -241,7 +355,7 @@ int vscp2_read_reg(const void* pdata, uint32_t reg, uint8_t* pval)
       error_count = 0;    
     }
     else if ((VSCP2_STD_REG_USERID0 >= reg) && (VSCP2_STD_REG_USERID4 <= reg)) {
-      if (VSCP_ERROR_SUCCESS != (rv = vscp2_callback_get_user_id(pdata, reg-VSCP2_STD_REG_USERID0, pval))) {
+      if (VSCP_ERROR_SUCCESS != (rv = vscp2_callback_get_user_id(pUserData, reg-VSCP2_STD_REG_USERID0, pval))) {
         return rv;
       }    
     }
@@ -333,7 +447,7 @@ int vscp2_read_reg(const void* pdata, uint32_t reg, uint8_t* pval)
       *pval = THIS_FIRMWARE_CODE & 0xff;
     }
     else if ((reg >= VSCP2_STD_REG_GUID) && (reg < (VSCP2_STD_REG_GUID + 16))) {
-      *pval = device_guid[reg - VSCP2_STD_REG_GUID];
+      *pval = vscp2_callback_get_guid(pUserData)[reg - VSCP2_STD_REG_GUID];
     }
     else if ((reg >= VSCP2_STD_REG_DEVICE_URL) && (reg < (VSCP2_STD_REG_DEVICE_URL + 16))) {
       char mdf_url[] = "THIS_FIRMWARE_MDF_URL";
@@ -346,19 +460,20 @@ int vscp2_read_reg(const void* pdata, uint32_t reg, uint8_t* pval)
   return VSCP_ERROR_SUCCESS;
 }
 
-/**
- * \fn vscp2_writeRegister
- */
+///////////////////////////////////////////////////////////////////////////////
+// vscp2_write_reg
+//
 
-int vscp2_write_reg(const void* pdata, uint32_t reg, uint8_t val)
+int 
+vscp2_write_reg(uint32_t reg, uint8_t val)
 {
   if (reg < VSCP2_STANDARD_REGISTER_START ) {
-    /* User register */
-    vscp2_callback_read_reg(pdata, reg, &val);
+    // User register 
+    return vscp2_callback_write_user_reg(pUserData, reg, val);
   } 
   else {
     if ( ( reg >= VSCP2_STD_REG_USERID0 ) && ( reg <= VSCP2_STD_REG_USERID4 ) )  {
-      return vscp2_callback_write_user_id(pdata, reg-VSCP2_STD_REG_USERID0, val);
+      return vscp2_callback_write_user_id(pUserData, reg-VSCP2_STD_REG_USERID0, val);
     }
 #ifdef THIS_FIRMWARE_ENABLE_WRITE_2PROTECTED_LOCATIONS
     /* Write manufacturer id configuration information */
@@ -368,7 +483,7 @@ int vscp2_write_reg(const void* pdata, uint32_t reg, uint8_t val)
     } 
     else {
       /* Write */
-      return vscp2_write_manufacturer_id(pdata, reg-VSCP2_STD_REG_MANUFACTURER_ID0, val);     
+      return vscp2_write_manufacturer_id(reg-VSCP2_STD_REG_MANUFACTURER_ID0, val);     
     }        
     else if ((reg >= (VSCP2_STD_REG_GUID0)) && (reg <= VSCP2_STD_REG_GUID15)) {
       /* page must be 0xffff for writes to be possible */
@@ -377,14 +492,14 @@ int vscp2_write_reg(const void* pdata, uint32_t reg, uint8_t val)
         return VSCP_ERROR_ERROR;
       } 
       else {
-        return vscp2_callback_write_guid(pdata, reg-VSCP2_STD_REG_GUID0, data);
+        return vscp2_callback_write_guid(reg-VSCP2_STD_REG_GUID0, data);
       }
     }
 #endif
     else if (reg == VSCP2_STD_REG_DEFAULT_CONFIG_RESTORE)  {
       
       uint32_t timer;
-      if (VSCP_ERROR_SUCCESS != vscp2_callback_get_ms(pdata, &timer)) {
+      if (VSCP_ERROR_SUCCESS != vscp2_callback_get_ms(pUserData, &timer)) {
         return VSCP_ERROR_ERROR;
       }
 
@@ -394,7 +509,7 @@ int vscp2_write_reg(const void* pdata, uint32_t reg, uint8_t val)
       else if (0xaa == val) {
         if ((timer - config_timer) < 1000) {
           config_timer = 0;
-          return vscp_callback_restore_defaults(pdata);
+          return vscp2_callback_restore_defaults(pUserData);
         }
         else {
           return VSCP_ERROR_ERROR; 
@@ -407,20 +522,51 @@ int vscp2_write_reg(const void* pdata, uint32_t reg, uint8_t val)
   return VSCP_ERROR_ERROR;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// vscp2_send_heartbeat
+//
 
+int
+vscp2_send_heartbeat(void)
+{
+  vscpEvent* pev;
+  // Create new event
+  if (NULL == (pev = vscp_fwhlp_newEvent())) {
+    return VSCP_ERROR_MEMORY;
+  }
 
+  // Construct reply event
+  pev->head = VSCP_PRIORITY_NORMAL;
+  memcpy(pev->GUID, vscp2_callback_get_guid(pUserData), 16);
+  pev->vscp_class = VSCP_CLASS2_INFORMATION;
+  pev->vscp_type = VSCP2_TYPE_INFORMATION_HEART_BEAT;
+  pev->timestamp = vscp2_callback_get_timestamp(pUserData);
+  vscp2_callback_get_time(pUserData, pev);
+  // Data
+  pev->sizeData = 0;
+  pev->pdata = NULL;
+  
+  // Send event
+  return vscp2_callback_send_event(pUserData, pev);
+}
 
+///////////////////////////////////////////////////////////////////////////////
+// vscp2_send_caps
+//
 
+int
+vscp2_send_caps(void)
+{
+  return VSCP_ERROR_SUCCESS;
+}
 
-
-
-/**
- * \fn vscp2_sendHighEndServerProbe
- */
+///////////////////////////////////////////////////////////////////////////////
+// vscp2_send_high_end_server_probe
+//
 
 #ifdef THIS_FIRMWARE_VSCP_DISCOVER_SERVER
 
-int vscp2_send_highend_server_probe(const void *pdata)
+int vscp2_send_high_end_server_probe(void)
 {
   // outEvent.head = (VSCP_PRIORITY_HIGH << 5);
   // outEvent.sizeData = 5;
@@ -433,7 +579,7 @@ int vscp2_send_highend_server_probe(const void *pdata)
   // outEvent.data[3] = vscp2_getIPsddress( 2 );
   // outEvent.data[4] = vscp2_getIPsddress( 3 );
 
-  // return vscp2_sendEvent(pdata, &outEvent);
+  // return vscp2_sendEvent(puserdata, &outEvent);
 }
 
 #endif
