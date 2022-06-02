@@ -120,25 +120,49 @@ vscp_link_idle_worker(const void* pdata)
 //
 
 int
-vscp_link_parser(const void* pdata, const char* cmd)
+vscp_link_parser(const void* pdata, char *pbuf, size_t *psize)
 {
-  const char* p = cmd;
-  const char* pcmd;  
+  char cmd[2048];
+  char* p;
+  char* pcmd;  
 
   // Check pointers
   if ((NULL == pdata) || (NULL == cmd)) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
+  // If buf contains a carriage return, we have a command to handle 
+  
+  if (NULL == (p = strstr(pbuf, "\r\n"))) {
+    return VSCP_ERROR_SUCCESS;
+  }
+
+  memset(cmd, 0, sizeof(cmd));
+
+  *p             = '\0';  // Terminate string at \r\n
+  size_t cmdSize = strlen(pbuf);
+  strncpy(cmd, pbuf, sizeof(cmd) - 1);
+
+  p += 2; // Point beyond the \r\n
+
+  // Save remainder of buffer
+  if (*p) {
+    strncpy(pbuf, p, *psize - cmdSize - 2);
+    *psize -= (cmdSize + 2);
+  }
+  else {
+    pbuf[0] = '\0';
+    *psize   = 0;
+  }
+
   // Get receive loop status
   int bRcvLoop = vscp_link_callback_get_rcvloop_status(pdata);
   
-  // Remove whitespace from command
-  while (*p && (*p == ' ')) {
-    p++;
+  // Remove leading whitespace from command
+  pcmd = cmd;
+  while (*pcmd && (*pcmd == ' ')) {
+    pcmd++;
   }
-
-  pcmd = p;
 
   /*
   * VSCP_LINK_ENABLE_RCVLOOP_CMD   bRcvLoop   =   VSCP_LINK_ENABLE_RCVLOOP_CMD | !bRcvLoop
