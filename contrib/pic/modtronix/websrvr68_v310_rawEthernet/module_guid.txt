@@ -1,5 +1,0 @@
-FF:FF:FF:FF:FF:FF:FF:FE:00:04:A3:00:00:50:AA:55
-
-Read interface 3 node 1 reg 0
-=============================
-send 0,512,9,0,0,FF:FF:FF:FF:FF:FF:FF:FE:00:26:55:CA:00:01:00:01,0,0

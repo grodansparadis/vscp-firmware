@@ -1,5 +1,0 @@
-This is a very simple interface to connect the 8devices USB2CAN interface to a CAN bus via a dual RJ45 connector.
-
-On one side is a four pin connector to solder a cable terminted with a DB9 connector, the other side has the dual RJ45 connector to connect to the CAN bus.
-
-CAN bus terminator is not included, this interface can be placed anywhere on the bus.
