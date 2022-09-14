@@ -32,38 +32,45 @@
  *	https://www.vscp.org
  *
  * ******************************************************************************
+ * 
  */
 
 #ifndef VSCP_FIRMWARE_H
 #define VSCP_FIRMWARE_H
 
-
-/*!
-        \file vscp_firmware.h
-        \brief VSCP firmware stack
-
-This file contains the firmware needed to implement VSCP in a
-low end hardware device.
-
- Notes about defines
- -------------------
-
- Normally make the following defines in the vscp_projdefs.h file
-
- ENABLE_WRITE_2PROTECTED_LOCATIONS
- =================================
- to make it possible to write GUID,
-                        manufacturer id,
-                        manufacturer sub device id
- page_low (0x92) and page_high (0x93) should both contain 0xff
- NOTE the storage must be in EEPROM also for it to work.
-
- */
-
-
 #include "vscp_compiler.h" 	// This file should be in your project folder
 #include "vscp_projdefs.h"	// This file should be in your project folder
 #include <inttypes.h>
+
+#ifdef __cplusplus
+}
+#endif
+
+/*!
+  @file vscp_firmware.h
+  @brief VSCP firmware stack
+  @defgroup vscp-level1-firmware VSCP level I firmware
+
+  This file contains the firmware needed to implement VSCP in a
+  low end hardware device.
+
+  Notes about defines
+  -------------------
+
+  Normally make the following defines in the vscp_projdefs.h file
+
+  ENABLE_WRITE_2PROTECTED_LOCATIONS
+  =================================
+  to make it possible to write GUID,
+                          manufacturer id,
+                          manufacturer sub device id
+  page_low (0x92) and page_high (0x93) should both contain 0xff
+  NOTE that the storage must be in EEPROM (or other persistent storage) 
+  also for this to work.
+
+  @{
+ */
+
 
 // Macros
 
@@ -729,6 +736,14 @@ void vscp_restoreDefaults(void);
 	void vscp_hardreset(void);              // Do a hard reset of the device
 	void vscp_wait_ms(uint16_t ms);         // Wait for milliseconds
 	void vscp_wait_s(uint16_t sec);         // Wait for seconds
+#endif
+
+/**
+@}
+*/
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

@@ -38,18 +38,16 @@
 #include "vscp.h"
 
 #ifdef __cplusplus
-}
+{
 #endif
 
 /**
  * @file vscp-link-protocol.h
- * @defgroup vscp_firmware vscp_firmware
+ * @defgroup vscp-link-protocol VSCP Link Protocol
  * 
  * VSCP firmware link protocol API
  * 
- * @subsection VSCP link protocol Example
- * @addtogroup vscp_firmware_i2c
- * 
+ * @{
  */
 
 #define MAX_INQUEUE  10 // Max # events in in-queue
@@ -91,7 +89,11 @@
 #define VSCP_LINK_MSG_FAILED_TO_GENERATE_SID    "-OK - Failed to generate sid.\r\n"
 
 /* Standard help text (edit projedefs to change to custom)*/
-#define VSCP_LINK_STD_HELP                                                      \
+
+/*!
+ * @brief Standard help text
+ */
+#define VSCP_LINK_STD_HELP_TEXT \
   "Help for the VSCP tcp/ip link interface\r\n"                                 \
   "====================================================================\r\n"    \
   "To get more information about a specific command issue 'help <command>'\r\n" \
@@ -149,7 +151,6 @@
 #define VSCP_LINK_STD_HELP_SHUTDOWN "'shutdown' Shutdown the device.\r\n+OK\r\n"
 
 /*!
- * @fn  vscp_link_connect
  * @brief Connect link
  * 
  * @param pdata Pointer to context
@@ -160,7 +161,6 @@ int
 vscp_link_connect(const void* pdata);
 
 /*!
- * @fn  vscp_link_disconnect
  * @brief Disconnect link
  * 
  * @param pdata Pointer to context
@@ -171,7 +171,6 @@ int
 vscp_link_disconnect(const void* pdata);
 
 /*!
- * @fn  vscp_link_idle_worker
  * @brief Do idle work
  * 
  * @param pdata Pointer to context
@@ -182,7 +181,6 @@ int
 vscp_link_idle_worker(const void* pdata);
 
 /*!
- * @fn  vscp_link_parser
  * @brief Parse command lines
  * 
  * @param pdata Pointer to context
@@ -205,7 +203,6 @@ vscp_link_parser(const void* pdata, char *pbuf, size_t *psize);
 
 
 /*!
-  @fn  vscp_link_doCmdNoop
   @brief noop command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -217,7 +214,6 @@ int
 vscp_link_doCmdNoop(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdHelp
   @brief noop command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -230,7 +226,6 @@ int
 vscp_link_doCmdHelp(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdQuit
   @brief noop command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -242,7 +237,6 @@ int
 vscp_link_doCmdQuit(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdUser
   @brief user command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -254,7 +248,6 @@ int
 vscp_link_doCmdUser(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdPassword
   @brief password command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -266,7 +259,6 @@ int
 vscp_link_doCmdPassword(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdChallenge
   @brief challenge command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -278,7 +270,6 @@ int
 vscp_link_doCmdChallenge(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdSend
   @brief send command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -290,7 +281,6 @@ int
 vscp_link_doCmdSend(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdRetrieve
   @brief retr command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -302,7 +292,6 @@ int
 vscp_link_doCmdRetrieve(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdRcvLoop
   @brief rcvloop command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -314,7 +303,6 @@ int
 vscp_link_doCmdRcvLoop(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdQuitLoop
   @brief quitloop command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -327,7 +315,6 @@ vscp_link_doCmdQuitLoop(const void* pdata, const char* cmd);
 
 
 /*!
-  @fn  vscp_link_doCmdCheckData
   @brief chkdata command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -339,7 +326,6 @@ int
 vscp_link_doCmdCheckData(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdClearAll
   @brief clrall command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -351,7 +337,6 @@ int
 vscp_link_doCmdClearAll(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdStatistics
   @brief stat command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -363,7 +348,6 @@ int
 vscp_link_doCmdStatistics(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdInfo
   @brief info command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -375,7 +359,6 @@ int
 vscp_link_doCmdInfo(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdGetChannelId
   @brief getid command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -387,7 +370,6 @@ int
 vscp_link_doCmdGetChannelId(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdGetGUID
   @brief getguid command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -399,7 +381,6 @@ int
 vscp_link_doCmdGetGUID(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdSetGUID
   @brief setguid command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -411,7 +392,6 @@ int
 vscp_link_doCmdSetGUID(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdGetVersion
   @brief vers command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -423,7 +403,6 @@ int
 vscp_link_doCmdGetVersion(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdSetFilter
   @brief filter command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -435,7 +414,6 @@ int
 vscp_link_doCmdSetFilter(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdSetMask
   @brief mask command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -447,7 +425,6 @@ int
 vscp_link_doCmdSetMask(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdTest
   @brief test command - Do test and return result. The command
           is optional and if not implemented return "+OK\r\n"
 
@@ -460,7 +437,6 @@ int
 vscp_link_doCmdTest(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdWhatCanYouDo
   @brief wcyd command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -472,7 +448,6 @@ int
 vscp_link_doCmdWhatCanYouDo(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdCommandAgain
   @brief + command - Just return +OK\r\n
 
   @param pdata Pointer to user data
@@ -484,7 +459,6 @@ int
 vscp_link_doCmdCommandAgain(const void* pdata, const char* cmd);
 
 /*!
-  @fn  vscp_link_doCmdInterface
   @brief interface command - Just return +OK\r\n
       Old versions accepter 'list' and 'close' as argument.
       These arguments has been deprecated.
@@ -500,7 +474,6 @@ vscp_link_doCmdInterface(const void* pdata, const char* cmd);
 
 
 /*!
-  @fn  vscp_link_doCmdShutdown
   @brief Shutdown the device into a safe state
 
   @param pdata Pointer to user data
@@ -515,7 +488,6 @@ int
 vscp_link_doCmdShutdown(const void* pdata, const char* cmd);
 
 /*!
-   @fn  vscp_link_doCmdRestart
    @brief Restart the device
    
    @param pdata Pointer to user data
@@ -538,12 +510,10 @@ vscp_link_doCmdRestart(const void* pdata, const char* cmd);
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
-{@
   @name Callbacks for a VSCP link protocol implementation
 */
 
 /*!
-  @fn  vscp_link_callback_welcome
   @brief This callback is executed after a new connection is made to welcome a user.
 
   @param pdata Pointer to user data
@@ -558,7 +528,6 @@ int
 vscp_link_callback_welcome(const void* pdata);
 
 /*!
-  @fn  vscp_link_callback_quit  
   @brief This callback is executed when the 'quit' command is received.
 
   @param pdata Pointer to user data
@@ -573,7 +542,6 @@ int
 vscp_link_callback_quit(const void* pdata);
 
 /*!
-  @fn  vscp_link_callback_write_client
   @brief Send message to client.
 
   @param pdata Pointer to user data
@@ -590,7 +558,6 @@ vscp_link_callback_write_client(const void* pdata, const char* msg);
 
 
 /*!
-  @fn  vscp_link_callback_disconnect_client
   @brief Disconnect client
 
   @param pdata Pointer to user data.
@@ -601,7 +568,6 @@ int
 vscp_link_callback_disconnect_client(const void* pdata);
 
 /*!
-  @fn  vscp_link_callback_help
   @brief This callback is executed when the 'help' command is received.
 
   Print command help. This can be a multiline reponse and
@@ -617,7 +583,6 @@ int
 vscp_link_callback_help(const void* pdata, const char* arg);
 
 /*!
-  @fn  vscp_link_callback_event_received
   @brief Event has ben received from client.
 
   @param pdata Pointer to user data.
@@ -629,7 +594,6 @@ int
 vscp_link_callback_event_received(const void* pdata, const vscpEvent* pev);
 
 /*!
-  @fn  vscp_link_callback_get_interface_count
   @brief Get number of defined interfaces.
 
   @param pdata Pointer to user data.
@@ -640,7 +604,6 @@ vscp_link_callback_event_received(const void* pdata, const vscpEvent* pev);
 uint16_t vscp_link_callback_get_interface_count(const void* pdata);
 
 /*!
-  @fn  vscp_link_callback_get_interface
   @brief Get one interface GUID. 
 
   @param pdata Pointer to user data.
@@ -654,7 +617,6 @@ int
 vscp_link_callback_get_interface(const void* pdata, uint16_t index, struct vscp_interface_info *pif);
 
 /*!
-  @fn  vscp_link_callback_check_user
   @brief Check username
 
   @param pdata Pointer to user data
@@ -675,7 +637,6 @@ int
 vscp_link_callback_check_user(const void* pdata, const char* user);
 
 /*!
-  @fn  vscp_link_callback_check_password
   @brief Check password
 
   @param pdata Pointer to user data
@@ -693,7 +654,6 @@ int
 vscp_link_callback_check_password(const void* pdata, const char* user);
 
 /*!
-  @fn  vscp_link_callback_challenge
   @brief Dop challenge sequency
 
   @param pdata Pointer to user data
@@ -705,7 +665,6 @@ int
 vscp_link_callback_challenge(const void* pdata, const char* password);
 
 /*!
-  @fn  vscp_link_callback_check_authenticated
   @brief Check if client is authenticated
 
   @param pdata Pointer to user data
@@ -716,7 +675,6 @@ int
 vscp_link_callback_check_authenticated(const void* pdata);
 
 /*!
-  @fn  vscp_link_callback_check_privilege
   @brief Check if client has enough rights to use command
 
   @param pdata Pointer to user data
@@ -728,7 +686,6 @@ int
 vscp_link_callback_check_privilege(const void* pdata, uint8_t priv);
 
 /*!
-  @fn  vscp_link_callback_test
   @brief Do test command
 
   @param pdata Pointer to user data
@@ -740,7 +697,6 @@ int
 vscp_link_callback_test(const void* pdata, const char* arg);
 
 /*!
-  @fn  vscp_link_callback_send
   @brief Send event
 
   @param pdata Pointer to user data
@@ -758,7 +714,6 @@ int
 vscp_link_callback_send(const void* pdata, vscpEvent *pev);
 
 /*!
-  @fn  vscp_link_callback_retr
   @brief Get event ('retr').
 
   @param pdata Pointer to user data
@@ -774,7 +729,6 @@ int
 vscp_link_callback_retr(const void* pdata, vscpEvent **pev);
 
 /*!
-  @fn  vscp_link_callback_enable_rcvloop
   @brief Enable/disable rcvloop functionality
 
   @param pdata Pointer to user data
@@ -786,7 +740,6 @@ int
 vscp_link_callback_enable_rcvloop(const void* pdata, int bEnable);
 
 /*!
-  @fn  vscp_link_callback_get_rcvloop_status
   @brief Get rcvloop status
 
   @param pdata Pointer to user data
@@ -797,7 +750,6 @@ int
 vscp_link_callback_get_rcvloop_status(const void* pdata);
 
 /*!
-  @fn  vscp_link_callback_chkData
   @brief Check # events in the output queue
 
   @param pdata Pointer to user data
@@ -810,7 +762,6 @@ vscp_link_callback_chkData(const void* pdata, uint16_t* pcount);
 
 
 /*!
-  @fn  vscp_link_callback_clrAll
   @brief Clear the output queue
 
   @param pdata Pointer to user data
@@ -821,7 +772,6 @@ int
 vscp_link_callback_clrAll(const void* pdata);
 
 /*!
-  @fn  vscp_link_callback_get_channel_id
   @brief Get channel id
 
   @param pdata Pointer to user data
@@ -833,7 +783,6 @@ int
 vscp_link_callback_get_channel_id(const void* pdata, uint16_t *pchid);
 
 /*!
-  @fn  vscp_link_callback_set_guid
   @brief Set device GUID
 
   @param pdata Pointer to user data
@@ -845,7 +794,6 @@ int
 vscp_link_callback_set_guid(const void* pdata, uint8_t *pguid);
 
 /*!
-  @fn  vscp_link_callback_get_guid
   @brief Get device GUID
 
   @param pdata Pointer to user data
@@ -857,7 +805,6 @@ int
 vscp_link_callback_get_guid(const void* pdata, uint8_t *pguid);
 
 /*!
-  @fn  vscp_link_callback_get_version
   @brief Get device version
 
   @param pdata Pointer to user data
@@ -869,7 +816,6 @@ int
 vscp_link_callback_get_version(const void* pdata, uint8_t *pversion);
 
 /*!
-  @fn  vscp_link_callback_setFilter
   @brief Set filter part of filter
 
   @param pdata Pointer to user data
@@ -881,7 +827,6 @@ int
 vscp_link_callback_setFilter(const void* pdata, vscpEventFilter *pfilter);
 
 /*!
-  @fn  vscp_link_callback_setMask
   @brief Set mask part of filter
 
   @param pdata Pointer to user data
@@ -893,7 +838,6 @@ int
 vscp_link_callback_setMask(const void* pdata, vscpEventFilter *pfilter);
 
 /*!
-  @fn  vscp_link_callback_statistics
   @brief Get statistics info
 
   @param pdata Pointer to user data
@@ -905,7 +849,6 @@ int
 vscp_link_callback_statistics(const void* pdata, VSCPStatistics *pStatistics);
 
 /*!
-  @fn  vscp_link_callback_info
   @brief Set mask part of filter
 
   @param pdata Pointer to user data
@@ -917,7 +860,6 @@ int
 vscp_link_callback_info(const void* pdata, VSCPStatus *pstatus);
 
 /*!
-  @fn  vscp_link_callback_rcvloop
   @brief Callback for active rcvloop
 
   @param pdata Pointer to user data
@@ -937,7 +879,6 @@ int
 vscp_link_callback_rcvloop(const void* pdata, vscpEvent **pev);
 
 /*!
- * @fn  vscp_link_callback_('wcyd').
  * @brief Get what can you do info
  * 
  * @param pdata Pointer to user data
@@ -949,7 +890,6 @@ int
 vscp_link_callback_wcyd(const void* pdata, uint64_t *pwcyd);
 
 /*!
- * @fn  vscp_link_callback_shutdown
  * @brief Shutdown the system to a safe state
  * 
  * @param pdata Pointer to context
@@ -962,7 +902,6 @@ int
 vscp_link_callback_shutdown(const void* pdata);
 
 /*!
- * @fn  vscp_link_callback_restart
  * @brief Restart the system
  * 
  * @param pdata Pointer to context

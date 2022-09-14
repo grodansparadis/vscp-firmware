@@ -65,7 +65,9 @@ vscp_link_connect(const void* pdata)
 int
 vscp_link_disconnect(const void* pdata)
 {
-  // We currently do nothing here
+  // We handle this the same way as a disconnect
+  // from a user
+  vscp_link_callback_quit(pdata);
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -408,7 +410,7 @@ vscp_link_doCmdHelp(const void* pdata, const char* cmd)
     return vscp_link_callback_write_client(pdata, VSCP_LINK_STD_HELP_WCYD);
   }
   else {
-    return vscp_link_callback_write_client(pdata, VSCP_LINK_STD_HELP);
+    return vscp_link_callback_write_client(pdata, VSCP_LINK_STD_HELP_TEXT);
   }
 #endif
 }
@@ -922,7 +924,7 @@ vscp_link_doCmdTest(const void* pdata, const char* cmd)
 int
 vscp_link_doCmdInterface(const void* pdata, const char* cmd)
 {
-  char buf[120], wbuf[50];
+  char buf[130], wbuf[50];
   struct vscp_interface_info ifinfo;
 
   if (VSCP_ERROR_SUCCESS != vscp_link_callback_check_authenticated(pdata)) {

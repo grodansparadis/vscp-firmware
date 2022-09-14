@@ -53,15 +53,16 @@
 #ifndef VSCP_CLASS_H
 #define VSCP_CLASS_H
  
-#define VSCP_CLASS1_PROTOCOL                 0         /* VSCP Protocol Functionality */
-#define VSCP_CLASS1_ALARM                    1         /* Alarm functionality */
-#define VSCP_CLASS1_SECURITY                 2         /* Security */
-#define VSCP_CLASS1_MEASUREMENT              10        /* Measurement */
-#define VSCP_CLASS1_MEASUREMENTX1            11        /* Measurement */
-#define VSCP_CLASS1_MEASUREMENTX2            12        /* Measurement */
-#define VSCP_CLASS1_MEASUREMENTX3            13        /* Measurement */
-#define VSCP_CLASS1_MEASUREMENTX4            14        /* Measurement */
-#define VSCP_CLASS1_DATA                     15        /* Data */
+#define VSCP_CLASS1_PROTOCOL                 0         /*! VSCP Protocol Functionality */
+/*! Alarm functionality */
+#define VSCP_CLASS1_ALARM                    1         
+#define VSCP_CLASS1_SECURITY                 2         /*! Security */
+#define VSCP_CLASS1_MEASUREMENT              10        /*! Measurement */
+#define VSCP_CLASS1_MEASUREMENTX1            11        /*! Measurement */
+#define VSCP_CLASS1_MEASUREMENTX2            12        /*! Measurement */
+#define VSCP_CLASS1_MEASUREMENTX3            13        /*! Measurement */
+#define VSCP_CLASS1_MEASUREMENTX4            14        /*! Measurement */
+#define VSCP_CLASS1_DATA                     15        /*! Data */
 #define VSCP_CLASS1_INFORMATION              20        /* Information */
 #define VSCP_CLASS1_CONTROL                  30        /* Control */
 #define VSCP_CLASS1_MULTIMEDIA               40        /* Multimedia */
