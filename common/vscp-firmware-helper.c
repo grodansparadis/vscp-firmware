@@ -15,7 +15,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (C) 2000-2022 Ake Hedman, 
+ * Copyright (C) 2000-2022 Ake Hedman,
  * The VSCP Project <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -52,9 +52,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <vscp.h>
 #include "vscp-firmware-helper.h"
-
+#include <vscp.h>
 
 // case-independent ASCII character equality comparison
 #define CIEQ(c1, c2) (((c1) & ~040) == ((c2) & ~040))
@@ -172,7 +171,6 @@ vscp_fwhlp_dec2hex(uint8_t dec, char* pBuf, uint16_t len)
   }
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_hex2dec
 //
@@ -268,18 +266,31 @@ vscp_fwhlp_stristr(const char* haystack, const char* needle)
 // vscp_fwhlp_getEventPriority
 
 unsigned char
-vscp_fwhlp_getEventPriority(const vscpEvent *pEvent)
+vscp_fwhlp_getEventPriority(const vscpEvent* pev)
 {
   // Must be a valid message pointer
-  if (NULL == pEvent) {
+  if (NULL == pev) {
     return 0;
   }
 
-  return ((pEvent->head >> 5) & 0x07);
+  return ((pev->head >> 5) & 0x07);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getEventPriorityEx
+
+unsigned char
+vscp_fwhlp_getEventPriorityEx(const vscpEventEx* pex)
+{
+  // Must be a valid message pointer
+  if (NULL == pex) {
+    return 0;
+  }
+
+  return ((pex->head >> 5) & 0x07);
 }
 
 // ----------------------------------------------------------------------------
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_newEvent
@@ -302,7 +313,8 @@ vscp_fwhlp_newEvent(void)
 // vscp_fwhlp_mkEventCopy
 //
 
-vscpEvent* vscp_fwhlp_mkEventCopy(vscpEvent* pev) 
+vscpEvent*
+vscp_fwhlp_mkEventCopy(vscpEvent* pev)
 {
   // Must have event to work on
   if (NULL == pev) {
@@ -743,6 +755,7 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
 int
 vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
 {
+  uint8_t wrkbuf[512];
   char* p = (char*)buf;
 
   // Check pointers
@@ -756,35 +769,149 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
 
   memset(pex, 0, sizeof(vscpEventEx));
 
-  vscpEvent* pev = vscp_fwhlp_newEvent();
-  if (NULL == pev) {
-    return VSCP_ERROR_MEMORY;
+  // head
+  pex->head = (uint16_t)strtol(p, &p, 0);
+  if (',' != *p) {
+    return VSCP_ERROR_PARAMETER;
   }
-
-  if (VSCP_ERROR_SUCCESS != vscp_fwhlp_parseEvent(pev, buf)) {
-    vscp_fwhlp_deleteEvent(&pev);
+  p++; // point beyond comma
+  if (p > (buf + strlen(buf))) {
     return VSCP_ERROR_PARAMETER;
   }
 
-  // Copy in data
-  pex->head       = pev->head;
-  pex->obid       = pev->obid;
-  pex->year       = pev->year;
-  pex->month      = pev->month;
-  pex->day        = pev->day;
-  pex->hour       = pev->hour;
-  pex->minute     = pev->minute;
-  pex->second     = pev->second;
-  pex->timestamp  = pev->timestamp;
-  pex->vscp_class = pev->vscp_class;
-  pex->vscp_type  = pev->vscp_type;
-  memcpy(pex->GUID, pev->GUID, 16);
-  pex->sizeData = pev->sizeData;
-  if (pex->sizeData) {
-    memcpy(pex->data, pev->pdata, pev->sizeData);
+  // VSCP class
+  pex->vscp_class = (uint16_t)strtol(p, &p, 0);
+  if (',' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+  p++; // point beyond comma
+  if (p > (buf + strlen(buf))) {
+    return VSCP_ERROR_PARAMETER;
   }
 
-  vscp_fwhlp_deleteEvent(&pev);
+  // VSCP type
+  pex->vscp_type = (uint16_t)strtol(p, &p, 0);
+  if (',' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+  p++;
+  if (p > (buf + strlen(buf))) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // obid
+  pex->obid = (uint32_t)strtol(p, &p, 0);
+  if (',' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+  p++; // point beyond comma
+  if (p > (buf + strlen(buf))) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // datetime YYYY-MM-DDTHH:MM:SS
+
+  // Date may not be given (left blank) and in
+  // this case it should be set to all nulls for
+  // the interface to set it instead.
+
+  if (',' == *p) {
+    p++; // point beyond comma
+  }
+  else {
+    // year
+    pex->year = (uint16_t)strtol(p, &p, 0);
+    if ('-' != *p) {
+      return VSCP_ERROR_PARAMETER;
+    }
+    p++; // point beyond dash
+    if (p > (buf + strlen(buf))) {
+      return VSCP_ERROR_PARAMETER;
+    }
+
+    // month
+    pex->month = (uint16_t)strtol(p, &p, 0);
+    if ('-' != *p) {
+      return VSCP_ERROR_PARAMETER;
+    }
+    p++; // point beyond dash
+    if (p > (buf + strlen(buf))) {
+      return VSCP_ERROR_PARAMETER;
+    }
+
+    // day
+    pex->day = (uint16_t)strtol(p, &p, 0);
+    if ('T' != *p) {
+      return VSCP_ERROR_PARAMETER;
+    }
+    p++; // point beyond dash
+    if (p > (buf + strlen(buf))) {
+      return VSCP_ERROR_PARAMETER;
+    }
+
+    // hour
+    pex->hour = (uint16_t)strtol(p, &p, 0);
+    if (':' != *p) {
+      return VSCP_ERROR_PARAMETER;
+    }
+    p++; // point beyond colon
+    if (p > (buf + strlen(buf))) {
+      return VSCP_ERROR_PARAMETER;
+    }
+
+    // minute
+    pex->minute = (uint16_t)strtol(p, &p, 0);
+    if (':' != *p) {
+      return VSCP_ERROR_PARAMETER;
+    }
+    p++; // point beyond colon
+    if (p > (buf + strlen(buf))) {
+      return VSCP_ERROR_PARAMETER;
+    }
+
+    // second
+    pex->second = (uint16_t)strtol(p, &p, 0);
+    if (',' != *p) {
+      return VSCP_ERROR_PARAMETER;
+    }
+    p++; // point beyond comma
+    if (p > (buf + strlen(buf))) {
+      return VSCP_ERROR_PARAMETER;
+    }
+  }
+
+  // timestamp
+  pex->timestamp = (uint32_t)strtol(p, &p, 0);
+  if (',' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+  p++; // point beyond comma
+  if (p > (buf + strlen(buf))) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // Get GUID
+  if (VSCP_ERROR_SUCCESS != vscp_fwhlp_parseGuid(pex->GUID, p, &p)) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  if (',' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+  p++; // point beyond comma
+  pex->sizeData = 0;
+
+  // Get data (if any )
+  while ((p <= (buf + strlen(buf))) && (pex->sizeData < 512)) {
+    wrkbuf[pex->sizeData] = (uint8_t)strtol(p, &p, 0);
+    pex->sizeData++;
+    p++; // point beyond comma
+  }
+
+  // Copy in data (if any)
+  if (pex->sizeData) {
+    memcpy(pex->data, wrkbuf, pex->sizeData);
+  }
 
   return VSCP_ERROR_SUCCESS;
 }
@@ -868,6 +995,102 @@ vscp_fwhlp_eventToString(char* buf, size_t size, const vscpEvent* pev)
   return VSCP_ERROR_SUCCESS;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_eventToStringEx
+//
+// head       6  - 0xffff or 255
+// class      6  - 0xFFFF or 65535
+// type       6  - 0xFFFF or 65535
+// obid       10 - 0xFFFFFFFF
+// time       20 - YYYY-MM-DDTHH:MM:SSZ
+// timestamp  10 - 0xFFFFFFFF
+// GUID       47 - 00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF
+// 7 x comma
+// ---------------------------------------------------------------
+// Total:     103 + 7 (commas) + data = 110 + data 
+// data: ",255" => 4 * 512 = 2048
+
+int
+vscp_fwhlp_eventToStringEx(char* buf, size_t size, const vscpEventEx* pex)
+{
+  char wrkbuf[48]; // Can hold full GUID
+
+  // Check pointers
+  if (NULL == pex) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+  if (NULL == buf) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  memset(buf, 0, size);
+
+  // Len must be able to hold content
+  // data size for each byte is 5 as worst '0xff,'
+  if (size < ((pex->sizeData * 5) + 110 + 1)) {
+    return VSCP_ERROR_BUFFER_TO_SMALL;
+  }
+
+  if (pex->year || pex->month || pex->day || pex->hour || pex->minute || pex->second) {
+    sprintf(buf, 
+              "%u,%u,%u,%lu,%4d-%02d-%02dT%02d:%02d:%02dZ,%lu,", 
+              (unsigned)pex->head, 
+              (unsigned)pex->vscp_class, 
+              (unsigned)pex->vscp_type, 
+              (unsigned long)pex->obid, 
+              (int)pex->year, 
+              (int)pex->month, 
+              (int)pex->day, 
+              (int)pex->hour, 
+              (int)pex->minute, 
+              (int)pex->second, 
+              (unsigned long)pex->timestamp);
+  }
+  else {
+    sprintf(buf, 
+              "%d,%u,%u,%lu,,%lu,", 
+              (unsigned)pex->head, 
+              (unsigned)pex->vscp_class, 
+              (unsigned)pex->vscp_type, 
+              (unsigned long)pex->obid, 
+              (unsigned long)pex->timestamp);
+  }
+
+  // GUID
+  memset(wrkbuf, 0, sizeof(wrkbuf));
+  vscp_fwhlp_writeGuidToString(wrkbuf, pex->GUID);
+  strcat(buf, wrkbuf);
+
+  // Data
+  if (pex->sizeData) {
+
+    if (size < (strlen(buf) + 1 + 1)) {
+      return VSCP_ERROR_BUFFER_TO_SMALL;
+    }
+
+    strcat(buf, ",");
+
+    for (int i = 0; i < pex->sizeData; i++) {
+
+      if (i < (pex->sizeData - 1)) {
+        sprintf(wrkbuf, "%d,", (int)pex->data[i]);
+      }
+      else {
+        sprintf(wrkbuf, "%d", (int)pex->data[i]);
+      }
+
+      // Check that data fits
+      if (size < (strlen(buf) + 1 + strlen(wrkbuf))) {
+        return VSCP_ERROR_BUFFER_TO_SMALL;
+      }
+
+      // Copy in the data
+      strcat(buf, wrkbuf);
+    }
+  }
+
+  return VSCP_ERROR_SUCCESS;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_doLevel2Filter
@@ -889,7 +1112,7 @@ vscp_fwhlp_eventToString(char* buf, size_t size, const vscpEvent* pev)
 //
 
 int
-vscp_fwhlp_doLevel2Filter(const vscpEvent *pEvent, const vscpEventFilter *pFilter)
+vscp_fwhlp_doLevel2Filter(const vscpEvent* pev, const vscpEventFilter* pFilter)
 {
   // A nullptr filter is wildcard
   if (NULL == pFilter) {
@@ -897,28 +1120,84 @@ vscp_fwhlp_doLevel2Filter(const vscpEvent *pEvent, const vscpEventFilter *pFilte
   }
 
   // Must be a valid message
-  if (NULL == pEvent) {
+  if (NULL == pev) {
     return 0;
   }
 
   // Test vscp_class
-  if (0xffff != (uint16_t) (~(pFilter->filter_class ^ pEvent->vscp_class) | ~pFilter->mask_class)) {
+  if (0xffff != (uint16_t)(~(pFilter->filter_class ^ pev->vscp_class) | ~pFilter->mask_class)) {
     return 0;
   }
 
   // Test vscp_type
-  if (0xffff != (uint16_t) (~(pFilter->filter_type ^ pEvent->vscp_type) | ~pFilter->mask_type)) {
+  if (0xffff != (uint16_t)(~(pFilter->filter_type ^ pev->vscp_type) | ~pFilter->mask_type)) {
     return 0;
   }
 
   // GUID
   for (int i = 0; i < 16; i++) {
-    if (0xff != (uint8_t) (~(pFilter->filter_GUID[i] ^ pEvent->GUID[i]) | ~pFilter->mask_GUID[i]))
+    if (0xff != (uint8_t)(~(pFilter->filter_GUID[i] ^ pev->GUID[i]) | ~pFilter->mask_GUID[i]))
       return 0;
   }
 
   // Test priority
-  if (0xff != (uint8_t) (~(pFilter->filter_priority ^ vscp_fwhlp_getEventPriority(pEvent)) | ~pFilter->mask_priority)) {
+  if (0xff != (uint8_t)(~(pFilter->filter_priority ^ vscp_fwhlp_getEventPriority(pev)) | ~pFilter->mask_priority)) {
+    return 0;
+  }
+
+  return 1;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_doLevel2Filter
+//
+//  filter ^ bit    mask    out
+//  ============================
+//        0          0       1    filter == bit, mask=don't care result = true
+//        0          1       1    filter == bit, mask=valid, result = true
+//        1          0       1    filter != bit, makse=don't care, result = true
+//        1          1       0    filter != bit, mask=valid, result = false
+//
+// Mask tells *which* bits that are of interest means
+// it always returns true if bit set to zero (0=don't care).
+//
+// Filter tells the value for valid bits. If filter bit is == 1 the bits
+// must be equal to get a true filter return.
+//
+// So a nill mask will let everything through
+//
+
+int
+vscp_fwhlp_doLevel2FilterEx(const vscpEventEx* pex, const vscpEventFilter* pFilter)
+{
+  // A nullptr filter is wildcard
+  if (NULL == pFilter) {
+    return 1;
+  }
+
+  // Must be a valid message
+  if (NULL == pex) {
+    return 0;
+  }
+
+  // Test vscp_class
+  if (0xffff != (uint16_t)(~(pFilter->filter_class ^ pex->vscp_class) | ~pFilter->mask_class)) {
+    return 0;
+  }
+
+  // Test vscp_type
+  if (0xffff != (uint16_t)(~(pFilter->filter_type ^ pex->vscp_type) | ~pFilter->mask_type)) {
+    return 0;
+  }
+
+  // GUID
+  for (int i = 0; i < 16; i++) {
+    if (0xff != (uint8_t)(~(pFilter->filter_GUID[i] ^ pex->GUID[i]) | ~pFilter->mask_GUID[i]))
+      return 0;
+  }
+
+  // Test priority
+  if (0xff != (uint8_t)(~(pFilter->filter_priority ^ vscp_fwhlp_getEventPriorityEx(pex)) | ~pFilter->mask_priority)) {
     return 0;
   }
 

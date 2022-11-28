@@ -99,7 +99,7 @@ int vscp2_init(const void *pdata)
   // GUID is zero => our own GUID will be used
 
   // Send new node online
-  if (VSCP_ERROR_SUCCESS != vscp2_callback_send_eventex(pUserData, &ex)) {
+  if (VSCP_ERROR_SUCCESS != vscp2_callback_send_eventEx(pUserData, &ex)) {
     return VSCP_ERROR_ERROR;
   }
 
@@ -112,26 +112,26 @@ int vscp2_init(const void *pdata)
 // vscp2_do_work
 //
 
-int vscp2_do_work(vscpEvent *pev) 
+int vscp2_do_work(vscpEventEx *pex) 
 {
-  int rv;
+  //int rv;
   uint8_t offset = 0;
   uint16_t vscp_class;
 
   // If there is an event we should check if we should react
   // on it
-  if (NULL != pev) {
+  if (NULL != pex) {
 
-    vscp_class = pev->vscp_class;
+    vscp_class = pex->vscp_class;
 
     if (VSCP_CLASS2_LEVEL1_PROTOCOL == vscp_class) {
-      offset = 16;  // Data is at offset 16
+      offset = 16;        // Data is at offset 16
       vscp_class -= 512;
     }
 
     if (VSCP_CLASS1_PROTOCOL == vscp_class) {
 
-      switch (pev->vscp_type) {
+      switch (pex->vscp_type) {
         
         case VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER:
           vscp2_callback_enter_bootloader(pUserData);
@@ -157,22 +157,22 @@ int vscp2_do_work(vscpEvent *pev)
       }
     }
     // Level II
-    else if (VSCP_CLASS2_PROTOCOL == pev->vscp_class) {
+    else if (VSCP_CLASS2_PROTOCOL == pex->vscp_class) {
      
-      switch (pev->vscp_type) {
+      switch (pex->vscp_type) {
         
         case VSCP2_TYPE_PROTOCOL_READ_REGISTER:
-          vscp2_do_register_read(pev);
+          vscp2_do_register_read(pex);
           break;          
 
         case VSCP2_TYPE_PROTOCOL_WRITE_REGISTER:
-          vscp2_do_register_write(pev);
+          vscp2_do_register_write(pex);
           break; 
 
       }
     } 
 
-    vscp_fwhlp_deleteEvent(&pev); 
+    //vscp_fwhlp_deleteEvent(&pex); 
 
   } // NULL event
   
@@ -184,32 +184,32 @@ int vscp2_do_work(vscpEvent *pev)
 //
 
 int 
-vscp2_do_register_read(vscpEvent* pev) 
+vscp2_do_register_read(vscpEventEx* pex) 
 {
   int rv;
   uint8_t regs[512];  
   uint16_t cnt = 1;
   uint32_t startreg;
 
-  if (NULL == pev) {
+  if (NULL == pex) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
   // Must be at least GUID + start reg
-  if (pev->sizeData < 20) {
-    vscp_fwhlp_deleteEvent(&pev);
+  if (pex->sizeData < 20) {
+    //vscp_fwhlp_deleteEvent(&pex);
     return VSCP_ERROR_PARAMETER;
   }  
 
   // Get start position
-  startreg = construct_unsigned32(pev->pdata[16],
-                                  pev->pdata[17],
-                                  pev->pdata[18],
-                                  pev->pdata[19]);
+  startreg = construct_unsigned32(pex->data[16],
+                                  pex->data[17],
+                                  pex->data[18],
+                                  pex->data[19]);
 
   // If size is given get it
-  if (pev->sizeData >= 22) {
-    cnt = construct_unsigned16(pev->pdata[20], pev->pdata[21]);
+  if (pex->sizeData >= 22) {
+    cnt = construct_unsigned16(pex->data[20], pex->data[21]);
     if (cnt > (512-4)) {
      cnt = (512-4);
     }
@@ -218,44 +218,39 @@ vscp2_do_register_read(vscpEvent* pev)
   // Read the registers
   for (uint32_t pos=startreg; pos < (startreg + cnt); pos++) {
     if (VSCP_ERROR_SUCCESS != (rv = vscp2_read_reg(pos, &regs[pos-startreg]))) {
-      vscp_fwhlp_deleteEvent(&pev);
+      //vscp_fwhlp_deleteEvent(&pex);
       return rv;
     }
   }
 
   // Original event is not needed anymore
-  vscp_fwhlp_deleteEvent(&pev);
+  //vscp_fwhlp_deleteEvent(&pex);
 
   // Create new event
-  if (NULL == (pev = vscp_fwhlp_newEvent())) {
-    return VSCP_ERROR_MEMORY;
-  }
+  // if (NULL == (pex = vscp_fwhlp_newEvent())) {
+  //   return VSCP_ERROR_MEMORY;
+  // }
+  vscpEventEx respex; // Response event
 
   // Construct reply event
-  pev->head = VSCP_PRIORITY_NORMAL;
-  memcpy(pev->GUID, vscp2_callback_get_guid(pUserData), 16);
-  pev->vscp_class = VSCP_CLASS2_LEVEL1_PROTOCOL;
-  pev->vscp_type = VSCP2_TYPE_PROTOCOL_READ_WRITE_RESPONSE;
-  pev->timestamp = vscp2_callback_get_timestamp(pUserData);
-  vscp2_callback_get_time(pUserData, pev);
+  respex.head = VSCP_PRIORITY_NORMAL;
+  memcpy(respex.GUID, vscp2_callback_get_guid(pUserData), 16);
+  respex.vscp_class = VSCP_CLASS2_LEVEL1_PROTOCOL;
+  respex.vscp_type = VSCP2_TYPE_PROTOCOL_READ_WRITE_RESPONSE;
+  respex.timestamp = vscp2_callback_get_timestamp(pUserData);
+  vscp2_callback_get_time(pUserData, pex);
   // Data
-  pev->sizeData = cnt + 4;
-  pev->pdata = VSCP_MALLOC(pev->sizeData);
-  if (NULL == pev->pdata) {
-    vscp_fwhlp_deleteEvent(&pev);
-    return VSCP_ERROR_MEMORY;
-  }
-  
-  pev->pdata[0] = (uint8_t)((startreg >> 24) & 0xff);
-  pev->pdata[1] = (uint8_t)((startreg >> 16) & 0xff);
-  pev->pdata[2] = (uint8_t)((startreg >> 8) & 0xff);
-  pev->pdata[3] = (uint8_t)(startreg & 0xff);
+  respex.sizeData = cnt + 4;
+  respex.data[0] = (uint8_t)((startreg >> 24) & 0xff);
+  respex.data[1] = (uint8_t)((startreg >> 16) & 0xff);
+  respex.data[2] = (uint8_t)((startreg >> 8) & 0xff);
+  respex.data[3] = (uint8_t)(startreg & 0xff);
   
   // copy in values
-  memcpy(&pev->pdata + 4, regs, cnt);
+  memcpy(respex.data + 4, regs, cnt);
 
   // Send event
-  return vscp2_callback_send_event(pUserData, pev);  // TODO free on error 
+  return vscp2_callback_send_eventEx(pUserData, &respex);   
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -263,72 +258,73 @@ vscp2_do_register_read(vscpEvent* pev)
 //
 
 int 
-vscp2_do_register_write(vscpEvent* pev)
+vscp2_do_register_write(vscpEventEx* pex)
 {
   int rv;
   uint8_t regs[512];  
   uint16_t cnt = 1;
   uint32_t startpos;
   
-  if (NULL == pev) {
+  if (NULL == pex) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
   // Must be at least GUID + start reg
-  if (pev->sizeData < 20) {
-    vscp_fwhlp_deleteEvent(&pev);
-    return VSCP_ERROR_PARAMETER;
-  }  
+  // if (pex->sizeData < 20) {
+  //   vscp_fwhlp_deleteEvent(&pex);
+  //   return VSCP_ERROR_PARAMETER;
+  // }  
 
   // Get start position
-  startpos = construct_unsigned32(pev->pdata[16],
-                                  pev->pdata[17],
-                                  pev->pdata[18],
-                                  pev->pdata[19]);
+  startpos = construct_unsigned32(pex->data[16],
+                                  pex->data[17],
+                                  pex->data[18],
+                                  pex->data[19]);
 
   // Size bytes in frame minus GUID and startpos
-  cnt = pev->sizeData - 16 - 4;
+  cnt = pex->sizeData - 16 - 4;
 
-  for (uint32_t pos; pos < (startpos + cnt); pos++) {
+  for (uint32_t pos = startpos; pos < (startpos + cnt); pos++) {
     if (VSCP_ERROR_SUCCESS != (rv = vscp2_callback_write_user_reg(pUserData, pos, regs[pos]))) {
-      vscp_fwhlp_deleteEvent(&pev);
+      //vscp_fwhlp_deleteEvent(&pex);
       return rv;
     }
   }
 
   // Original event is not needed anymore
-  vscp_fwhlp_deleteEvent(&pev);
+  //vscp_fwhlp_deleteEvent(&pex);
 
   // Create new event
-  if (NULL == (pev = vscp_fwhlp_newEvent())) {
-    return VSCP_ERROR_MEMORY;
-  }
+  // if (NULL == (pex = vscp_fwhlp_newEvent())) {
+  //   return VSCP_ERROR_MEMORY;
+  // }
 
   // Construct reply event
-  pev->head = VSCP_PRIORITY_NORMAL;
-  memcpy(pev->GUID, vscp2_callback_get_guid(pUserData), 16);
-  pev->vscp_class = VSCP_CLASS2_LEVEL1_PROTOCOL;
-  pev->vscp_type = VSCP2_TYPE_PROTOCOL_READ_WRITE_RESPONSE;
-  pev->timestamp = vscp2_callback_get_timestamp(pUserData);
-  vscp2_callback_get_time(pUserData, pev);
+  vscpEventEx respex;
+  respex.head = VSCP_PRIORITY_NORMAL;
+  memcpy(respex.GUID, vscp2_callback_get_guid(pUserData), 16);
+  respex.vscp_class = VSCP_CLASS2_LEVEL1_PROTOCOL;
+  respex.vscp_type = VSCP2_TYPE_PROTOCOL_READ_WRITE_RESPONSE;
+  respex.timestamp = vscp2_callback_get_timestamp(pUserData);
+  vscp2_callback_get_time(pUserData, pex);
   // Data
-  pev->sizeData = cnt + 4;
-  pev->pdata = VSCP_MALLOC(pev->sizeData);
-  if (NULL == pev->pdata) {
-    vscp_fwhlp_deleteEvent(&pev);
-    return VSCP_ERROR_MEMORY;
-  }
+  respex.sizeData = cnt + 4;
+  // respex.pdata = VSCP_MALLOC(respex.sizeData);
+  // if (NULL == respex.pdata) {
+  //   vscp_fwhlp_deleteEvent(&pex);
+  //   return VSCP_ERROR_MEMORY;
+  // }
 
-  pev->pdata[0] = (uint8_t)((startpos >> 24) & 0xff);
-  pev->pdata[1] = (uint8_t)((startpos >> 16) & 0xff);
-  pev->pdata[2] = (uint8_t)((startpos >> 8) & 0xff);
-  pev->pdata[3] = (uint8_t)(startpos & 0xff);
+  respex.data[0] = (uint8_t)((startpos >> 24) & 0xff);
+  respex.data[1] = (uint8_t)((startpos >> 16) & 0xff);
+  respex.data[2] = (uint8_t)((startpos >> 8) & 0xff);
+  respex.data[3] = (uint8_t)(startpos & 0xff);
   
   // copy in values
-  memcpy(&pev->pdata + 4, regs, cnt);
+  memcpy(respex.data + 4, regs, cnt);
 
   // Send event
-  return vscp2_callback_send_event(pUserData, pev);
+  return vscp2_callback_send_eventEx(pUserData, &respex);
 }
 
 
@@ -339,7 +335,7 @@ vscp2_do_register_write(vscpEvent* pev)
 int vscp2_read_reg(uint32_t reg, uint8_t* pval)
 {
   int rv;
-  int i;
+  //int i;
 
   if (reg < VSCP2_STANDARD_REGISTER_START ) {
     // User register 
@@ -536,26 +532,25 @@ vscp2_write_reg(uint32_t reg, uint8_t val)
 int
 vscp2_send_heartbeat(void)
 {
-  vscpEvent* pev;
+  vscpEventEx ex;
   // Create new event
-  if (NULL == (pev = vscp_fwhlp_newEvent())) {
-    return VSCP_ERROR_MEMORY;
-  }
+  // if (NULL == (pex = vscp_fwhlp_newEvent())) {
+  //   return VSCP_ERROR_MEMORY;
+  // }
 
   // Construct reply event
-  pev->head = VSCP_PRIORITY_NORMAL;
-  memcpy(pev->GUID, vscp2_callback_get_guid(pUserData), 16);
-  pev->vscp_class = VSCP_CLASS2_INFORMATION;
-  pev->vscp_type = VSCP2_TYPE_INFORMATION_HEART_BEAT;
-  pev->timestamp = vscp2_callback_get_timestamp(pUserData);
-  vscp2_callback_get_time(pUserData, pev);
+  ex.head = VSCP_PRIORITY_NORMAL;
+  memcpy(ex.GUID, vscp2_callback_get_guid(pUserData), 16);
+  ex.vscp_class = VSCP_CLASS2_INFORMATION;
+  ex.vscp_type = VSCP2_TYPE_INFORMATION_HEART_BEAT;
+  ex.timestamp = vscp2_callback_get_timestamp(pUserData);
+  vscp2_callback_get_time(pUserData, &ex);
 
   // Data
-  pev->sizeData = 0;
-  pev->pdata = NULL;
+  ex.sizeData = 0;
   
   // Send event
-  return vscp2_callback_send_event(pUserData, pev);
+  return vscp2_callback_send_eventEx(pUserData, &ex);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -566,57 +561,52 @@ int
 vscp2_send_caps(void)
 {
   uint8_t guid[16] = THIS_FIRMWARE_GUID;
-  vscpEvent* pev;
+  vscpEventEx ex;
   // Create new event
-  if (NULL == (pev = vscp_fwhlp_newEvent())) {
-    return VSCP_ERROR_MEMORY;
-  }
+  // if (NULL == (pex = vscp_fwhlp_newEvent())) {
+  //   return VSCP_ERROR_MEMORY;
+  // }
 
   // Construct reply event
-  pev->head = VSCP_PRIORITY_NORMAL;
-  memcpy(pev->GUID, vscp2_callback_get_guid(pUserData), 16);
-  pev->vscp_class = VSCP_CLASS2_PROTOCOL;
-  pev->vscp_type = VSCP2_TYPE_PROTOCOL_HIGH_END_SERVER_CAPS;
-  pev->timestamp = vscp2_callback_get_timestamp(pUserData);
-  vscp2_callback_get_time(pUserData, pev);
+  ex.head = VSCP_PRIORITY_NORMAL;
+  memcpy(ex.GUID, vscp2_callback_get_guid(pUserData), 16);
+  ex.vscp_class = VSCP_CLASS2_PROTOCOL;
+  ex.vscp_type = VSCP2_TYPE_PROTOCOL_HIGH_END_SERVER_CAPS;
+  ex.timestamp = vscp2_callback_get_timestamp(pUserData);
+  vscp2_callback_get_time(pUserData, &ex);
   
   // Data
-  pev->sizeData = 104;
-  pev->pdata = VSCP_MALLOC(pev->sizeData);
-  if (NULL == pev->pdata) {
-    vscp_fwhlp_deleteEvent(&pev);
-    return VSCP_ERROR_MEMORY;
-  }
-
-  memset(pev->pdata, 0, pev->sizeData);
+  ex.sizeData = 104;
+  memset(ex.data, 0, ex.sizeData);
 
   // Capabilities
-  pev->pdata[0] = 0x40;   // Node have a standard decision matrix.
-  pev->pdata[1] = 0x00;
-  pev->pdata[2] = 0x00;
-  pev->pdata[3] = 0x00;
-  pev->pdata[4] = 0x00;
-  pev->pdata[5] = 0x00;
-  pev->pdata[6] = 0x80;   // Have VSCP TCP server with VCSP link interface.
-  pev->pdata[7] = 0x38;   // IP4 support, SLL support
-                          // Accepts two or more simultaneous connections on TCP/IP interface.
+  ex.data[0] = 0x40;   // Node have a standard decision matrix.
+  ex.data[1] = 0x00;
+  ex.data[2] = 0x00;
+  ex.data[3] = 0x00;
+  ex.data[4] = 0x00;
+  ex.data[5] = 0x00;
+  ex.data[6] = 0x80;   // Have VSCP TCP server with VCSP link interface.
+  ex.data[7] = 0x38;   // IP4 support, SLL support
+                       // Accepts two or more simultaneous connections on TCP/IP interface.
 
   // GUID
-  memcpy(&pev->pdata[8], guid, 16);
+  memcpy(ex.data + 8, guid, 16);
 
   // Get ipv6/ipv4 address (Always 16-byte or NULL)
   uint8_t ipaddr[16];
   
   if (VSCP_ERROR_SUCCESS == vscp2_callback_get_ip_addr(pUserData, ipaddr) ) {
     // IP address
-    memcpy(&pev->pdata[24], ipaddr, 16);
+    memcpy((ex.data + 24), ipaddr, 16);
   }
 
   // Device name
-  strncpy((char *)&pev->pdata[40], THIS_FIRMWARE_DEVICE_NAME, 63);
+  strncpy((char *)(ex.data + 40), THIS_FIRMWARE_DEVICE_NAME, 63);
+  
   
   // Send event
-  return vscp2_callback_send_event(pUserData, pev);
+  return vscp2_callback_send_eventEx(pUserData, &ex);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -628,26 +618,25 @@ vscp2_send_caps(void)
 int vscp2_send_high_end_server_probe(void)
 {
   uint8_t guid[16] = THIS_FIRMWARE_GUID;
-  vscpEvent* pev;
+  vscpEventEx ex;
   // Create new event
-  if (NULL == (pev = vscp_fwhlp_newEvent())) {
-    return VSCP_ERROR_MEMORY;
-  }
+  // if (NULL == (pex = vscp_fwhlp_newEvent())) {
+  //   return VSCP_ERROR_MEMORY;
+  // }
 
   // Construct reply event
-  pev->head = VSCP_PRIORITY_NORMAL;
-  memcpy(pev->GUID, vscp2_callback_get_guid(pUserData), 16);
-  pev->vscp_class = VSCP_CLASS2_PROTOCOL;
-  pev->vscp_type = VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_PROBE;
-  pev->timestamp = vscp2_callback_get_timestamp(pUserData);
-  vscp2_callback_get_time(pUserData, pev);
+  ex.head = VSCP_PRIORITY_NORMAL;
+  memcpy(&ex.GUID, vscp2_callback_get_guid(pUserData), 16);
+  ex.vscp_class = VSCP_CLASS2_PROTOCOL;
+  ex.vscp_type = VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_PROBE;
+  ex.timestamp = vscp2_callback_get_timestamp(pUserData);
+  vscp2_callback_get_time(pUserData, &ex);
   
   // Data
-  pev->sizeData = 0;
-  pev->pdata = NULL;
+  ex.sizeData = 0;
 
   // Send event
-  return vscp2_callback_send_event(pUserData, pev);
+  return vscp2_callback_send_eventEx(pUserData, &ex);
 }
 
 #endif

@@ -90,15 +90,14 @@ vscp_link_idle_worker(const void* pdata)
 
     int rv;
     char buf[VSCP_LINK_MAX_BUF];
-    vscpEvent *pev = NULL;
+    vscpEventEx ex;
 
-    rv = vscp_link_callback_rcvloop(pdata, &pev);
+    rv = vscp_link_callback_rcvloop(pdata, &ex);
     if (VSCP_ERROR_SUCCESS == rv) {
       // We own the event from now on and must
       // delete it and it's data when we are done
       // with it
-      int rv = vscp_fwhlp_eventToString(buf, sizeof(buf), pev);
-      vscp_fwhlp_deleteEvent(&pev);
+      int rv = vscp_fwhlp_eventToStringEx(buf, sizeof(buf), &ex);
       if (VSCP_ERROR_SUCCESS == rv) {
         // Write out the event
         strcat(buf, "\r\n+OK\r\n");
@@ -463,7 +462,7 @@ int
 vscp_link_doCmdSend(const void* pdata, const char* cmd)
 {
   int rv;
-  vscpEvent *pev;
+  vscpEventEx ex;
 
   if (VSCP_ERROR_SUCCESS != vscp_link_callback_check_authenticated(pdata)) {
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_NOT_ACCREDITED);
@@ -473,40 +472,40 @@ vscp_link_doCmdSend(const void* pdata, const char* cmd)
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_LOW_PRIVILEGE_ERROR);
   }
 
-  pev = vscp_fwhlp_newEvent();
-  if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseEvent(pev, cmd))) {
+  //pex = vscp_fwhlp_newEvent();
+  if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseEventEx(&ex, cmd))) {
     if (VSCP_ERROR_INVALID_POINTER == rv) {
-      vscp_fwhlp_deleteEvent(&pev);
+      //vscp_fwhlp_deleteEvent(&pex);
       return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_ERROR);
     }
     else if (VSCP_ERROR_MEMORY == rv) {
-      vscp_fwhlp_deleteEvent(&pev);
+      //vscp_fwhlp_deleteEvent(&pex);
       return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_ERROR);
     }
     else {
-      vscp_fwhlp_deleteEvent(&pev);
+      //vscp_fwhlp_deleteEvent(&pex);
       return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_PARAMETER_ERROR);
     }
   }
 
-  rv = vscp_link_callback_send(pdata, pev);
+  rv = vscp_link_callback_send(pdata, &ex);
   if (VSCP_ERROR_SUCCESS == rv) {
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_OK);
   }
   else if (VSCP_ERROR_INVALID_HANDLE == rv) {
-    vscp_fwhlp_deleteEvent(&pev);
+    //vscp_fwhlp_deleteEvent(&pex);
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_NOT_ACCREDITED);
   }
   else if (VSCP_ERROR_INVALID_PERMISSION == rv) {
-    vscp_fwhlp_deleteEvent(&pev);
+    //vscp_fwhlp_deleteEvent(&pex);
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_LOW_PRIVILEGE_ERROR);
   }
   else if (VSCP_ERROR_TRM_FULL == rv) {
-    vscp_fwhlp_deleteEvent(&pev);
+    //vscp_fwhlp_deleteEvent(&pex);
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_BUFFER_FULL);
   }
   else {
-    vscp_fwhlp_deleteEvent(&pev);
+    //vscp_fwhlp_deleteEvent(&pex);
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_ERROR);
   }
 }
@@ -520,7 +519,8 @@ vscp_link_doCmdRetrieve(const void* pdata, const char* cmd)
 {
   int rv;
   char buf[VSCP_LINK_MAX_BUF];
-  vscpEvent *pev = vscp_fwhlp_newEvent();
+  vscpEventEx ex;
+  //vscpEventEx *pex = vscp_fwhlp_newEvent();
 
   if (VSCP_ERROR_SUCCESS != vscp_link_callback_check_authenticated(pdata)) {
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_NOT_ACCREDITED);
@@ -532,13 +532,12 @@ vscp_link_doCmdRetrieve(const void* pdata, const char* cmd)
 
   int cnt = vscp_fwhlp_readStringValue(cmd);
 
-  while (VSCP_ERROR_SUCCESS == (rv = vscp_link_callback_retr(pdata, &pev))) {
+  while (VSCP_ERROR_SUCCESS == (rv = vscp_link_callback_retr(pdata, &ex))) {
     
     // We own the event from now on and must
     // delete it and it's data when we are done
     // with it
-    rv = vscp_fwhlp_eventToString(buf, sizeof(buf), pev);
-    vscp_fwhlp_deleteEvent(&pev);
+    rv = vscp_fwhlp_eventToStringEx(buf, sizeof(buf), &ex);
     if (VSCP_ERROR_SUCCESS == rv) {
       strcat(buf,"\r\n");
       vscp_link_callback_write_client(pdata, buf);

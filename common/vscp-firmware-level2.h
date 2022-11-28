@@ -220,39 +220,36 @@ vscp2_init(const void* pdata);
  * @brief Do periodic VSCP protocol work
  *
  * @param pdata Pointer to user data (typical points to context)
- * @param pev Pointer to event to handle. NULL if no event to handle.
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  *
  * Do periodic VSCP protocol work. This function should be called from the
  * main loop on periodic intervals.
  *
  * If there is incoming events to handle a pointer to the event should be
- * sent as a parameter  in **pev**. * Once the function has bern called
+ * sent as a parameter  in **pex**. * Once the function has bern called
  * ownership of the event is left over to the protocol stack and it is up to the
  * function to release the event. This is true also if the function returns an error.
  *
- * If there is no event to handle for the protocol stack pev should be set to NULL.
+ * If there is no event to handle for the protocol stack pex should be set to NULL.
  *
  */
 
 int
-vscp2_do_work(vscpEvent* pev);
+vscp2_do_work(vscpEventEx* pex);
 
 /*!
- * @brief Read register
+ * @brief Read VSCP Level II register
  *
  * @param reg Register to write
  * @param pval Pointer to read value
  * @return VSCP_ERROR_SUCCESS on success, else error code.
- *
- * This function should be called periodically from the main loop.
  */
 
 int
 vscp2_read_reg(uint32_t reg, uint8_t* pval);
 
 /*!
- * @brief Write register
+ * @brief Write VSCL level II register
  *
  * @param reg Register to write
  * @param val Value to write
@@ -297,25 +294,28 @@ int
 vscp2_send_high_end_server_probe(void);
 #endif
 
+
 /*!
  * @brief Do register reads
  *
- * @param pev Pointer to event containing register read data
+ * @param pex Pointer to event containing register read data
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  */
 
 int
-vscp2_do_register_read(vscpEvent* pev);
+vscp2_do_register_read(vscpEventEx* pex);
+
 
 /*!
  * @brief Do register writes
  *
- * @param pev Pointer to event containing register write data
+ * @param pex Pointer to event containing register write data
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  */
 
 int
-vscp2_do_register_write(vscpEvent* pev);
+vscp2_do_register_write(vscpEventEx* pex);
+
 
 #ifdef THIS_FIRMWARE_ENABLE_ERROR_REPORTING
 /*!
@@ -450,7 +450,7 @@ vscp2_callback_write_user_reg(const void* pdata, uint32_t reg, uint8_t val);
   @brief Send event to transport sublayer.
 
   @param pdata Pointer to user data (typical points to context)
-  @param pev Pointer to Event to send.
+  @param pex Pointer to Event to send.
   @return VSCP_ERROR_SUCCESS on success, or error code.
 
   - ev is taken over in the callback and it is responsible for releasing it.
@@ -458,7 +458,7 @@ vscp2_callback_write_user_reg(const void* pdata, uint32_t reg, uint8_t val);
 */
 
 int
-vscp2_callback_send_event(const void* pdata, vscpEvent* pev);
+vscp2_callback_send_event(const void* pdata, vscpEventEx* pex);
 
 /*!
   @brief Send eventex to transport sublayer.
@@ -472,7 +472,7 @@ vscp2_callback_send_event(const void* pdata, vscpEvent* pev);
 */
 
 int
-vscp2_callback_send_eventex(const void* pdata, vscpEventEx* ex);
+vscp2_callback_send_eventEx(const void* pdata, vscpEventEx* pex);
 
 /*!
  * @brief Enter bootloader.
@@ -532,7 +532,7 @@ vscp2_callback_get_timestamp(const void* pdata);
  * @brief  Fill in event time information
  *
  * @param pdata
- * @param pev Event to get info
+ * @param pex Event to get info
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  *
  * Set all to zero or do nothing if not time information is available
@@ -540,7 +540,7 @@ vscp2_callback_get_timestamp(const void* pdata);
  */
 
 int
-vscp2_callback_get_time(const void* pdata, const vscpEvent* pev);
+vscp2_callback_get_time(const void* pdata, const vscpEventEx* pex);
 
 /*!
   @brief Get user id
@@ -655,19 +655,19 @@ vscp2_callback_init_persistent_storage(const void* pdata);
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 int
-vscp2_callback_feed_dm(const void* pdata, vscpEvent* ev);
+vscp2_callback_feed_dm(const void* pdata, vscpEventEx* ev);
 
 /*!
   @brief All events except level I/II protocol events is sent to the
   application for handling.
 
   @param pdata Pointer to user data (typical points to context)
-  @param ev Event to feed the DM with.
+  @param pex Event to feed the DM with.
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 
 int
-vscp2_callback_feed_app(const void* pdata, vscpEvent* ev);
+vscp2_callback_feed_app(const void* pdata, vscpEventEx* pex);
 
 /*!
   @brief Get DM matrix info

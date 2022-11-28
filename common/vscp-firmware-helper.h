@@ -44,6 +44,9 @@
 
 #include "vscp.h"
 
+#ifndef __VSCP_FIRMWARE_HELPER_H__
+#define __VSCP_FIRMWARE_HELPER_H__
+
 /* Macros */
 
 /* This macro construct a signed integer from two unsigned chars in a safe way */
@@ -75,7 +78,7 @@ struct vscp_interface_info {
   uint16_t type;
   uint8_t guid[16];
   char description[64];
-};
+} vscp_interface_info_t;
 
 /**
     Convert ASCII substring to unsigned long number
@@ -129,7 +132,16 @@ char *vscp_fwhlp_stristr(const char *haystack, const char *needle);
     @return Priority (0-7) for event.
 */
 unsigned char
-vscp_fwhlp_getEventPriority(const vscpEvent *pEvent);
+vscp_fwhlp_getEventPriority(const vscpEvent *pev);
+
+/**
+    Get VSCP EventEx priority
+    @param pEvent Pointer to VSCP event ex to set priority for.
+    @return Priority (0-7) for event.
+*/
+unsigned char
+vscp_fwhlp_getEventPriorityEx(const vscpEventEx *pex);
+
 
 /**
     Check filter/mask to check if filter should be delivered
@@ -154,7 +166,32 @@ vscp_fwhlp_getEventPriority(const vscpEvent *pEvent);
     @return true if message should be delivered false if not.
     */
 int
-vscp_fwhlp_doLevel2Filter(const vscpEvent *pEvent, const vscpEventFilter *pFilter);
+vscp_fwhlp_doLevel2Filter(const vscpEvent *pev, const vscpEventFilter *pFilter);
+
+/**
+    Check filter/mask to check if filter should be delivered
+
+    filter ^ bit    mask    out
+    ============================
+        0           0       1    filter == bit, mask = don't care result = true
+        0           1       1    filter == bit, mask = valid, result = true
+        1           0       1    filter != bit, mask = don't care, result = true
+        1           1       0    filter != bit, mask = valid, result = false
+
+    Mask tells *which* bits that are of interest means
+    it always returns true if bit set to zero (0=don't care).
+
+    Filter tells the value for valid bits. If filter bit is == 1 the bits
+    must be equal to get a true filter return.
+
+    So a nill mask will let everything through
+
+    A filter pointer set to NULL will let every event through.
+
+    @return true if message should be delivered false if not.
+    */
+int
+vscp_fwhlp_doLevel2FilterEx(const vscpEventEx *pex, const vscpEventFilter *pFilter);
 
 /**
     Called by the system when a new connection is made.
@@ -268,6 +305,16 @@ int
 vscp_fwhlp_eventToString(char* buf, size_t len, const vscpEvent* pev);
 
 /**
+  @brief Write event ex to string
+  @param buf String buffer that will get event on string form
+  @param size Size of string buffer
+  @param pev Pointer to event
+  @return VSCP_ERROR_SUCCESS if event was written correctly.
+*/
+int
+vscp_fwhlp_eventToStringEx(char* buf, size_t len, const vscpEventEx* pex);
+
+/**
   @brief Allocate a new event with zero data.
   @return Pointer to the new event if successful, NULL if not.
 */
@@ -290,3 +337,4 @@ vscpEvent* vscp_fwhlp_mkEventCopy(vscpEvent* pev);
 int
 vscp_fwhlp_deleteEvent(vscpEvent** pev);
 
+#endif

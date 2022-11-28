@@ -642,6 +642,7 @@ extern "C"
 #define VSCP_ERROR_MTU                  60 /* Frame does not fit */
 #define VSCP_ERROR_SOCKET               61 /* Unable to create socket or other socket error*/
 #define VSCP_ERROR_PARSING              62 /* Failed to parse input */
+#define VSCP_ERROR_NOT_IMPLEMENTED      63 /* Operation is not available by design */
 
 /*!
     HLO (High Level Object) type (bits 7,6,5,4)
