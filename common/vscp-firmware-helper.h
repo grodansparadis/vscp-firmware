@@ -73,7 +73,7 @@
  * @brief VSCP TCP/IP link interface description
  * Describes one interface
  */
-struct vscp_interface_info {
+typedef struct vscp_interface_info {
   uint16_t idx;
   uint16_t type;
   uint8_t guid[16];
@@ -89,8 +89,7 @@ struct vscp_interface_info {
     @param srclen length of string, 0 means strlen( src )
     @param base The base for the conversion, 0 means figure it out.
     @param resultp Pointer that holds unsigned long result after conversion.
-    @return  VSCP_ERROR_SUCCESS for success, else VSCP_ERROR_ERROR.
-    
+    @return  VSCP_ERROR_SUCCESS for success, else VSCP_ERROR_ERROR.    
 */
 int vscp_fwhlp_a2ul(const char *src, uint8_t srclen, uint8_t base, uint32_t *resultp);
 
@@ -336,5 +335,68 @@ vscpEvent* vscp_fwhlp_mkEventCopy(vscpEvent* pev);
 */
 int
 vscp_fwhlp_deleteEvent(vscpEvent** pev);
+
+
+/*!
+ * Encrypt VSCP frame using the selected encryption algorithm. The iv
+ * initialization vector) is appended to the end of the encrypted data.
+ *
+ * @param output Buffer that will receive the encrypted result. The buffer
+ *          should be at least 16 bytes larger than the frame.
+ * @param input This is the frame that should be encrypted. The first
+ *          byte in the frame is the packet type which is not encrypted.
+ * @param len This is the length of the frame to be encrypted. This
+ *          length includes the packet tye in the first byte.
+ * @param key This is a pointer to the secret encryption key. This key
+ *          should be 128 bits for AES128, 192 bits for AES192, 256 bits
+ *          for AES256.
+ * @param iv Pointer to the initialization vector. Should always point to a
+ *           128 bit content. If NULL the iv will be created from random
+ *            system data. In both cases the end result will have the iv
+ *            appended to the encrypted block.
+ * @param nAlgorithm The VSCP defined algorithm (0-15) to encrypt the frame
+ * with. If set to 15 (VSCP_ENCRYPTION_FROM_TYPE_BYTE) the algorithm will be
+ * set from the four lower bits of the buffer to decrypt.
+ * @return Packet length on success, zero on failure.
+ *
+ */
+size_t
+vscp_encryptFrame(uint8_t *output,
+                  uint8_t *input,
+                  size_t len,
+                  const uint8_t *key,
+                  const uint8_t *iv,
+                  uint8_t nAlgorithm);
+
+/*!
+ * Decrypt VSCP frame using the selected encryption algorithm. The iv
+ * initialization vector) is appended to the end of the encrypted data.
+ *
+ * @param output Buffer that will receive the decrypted result. The buffer
+ *          should have a size of at lest equal to the encrypted block.
+ * @param input This is the frame that should be decrypted.
+ * @param len This is the length of the frame to be decrypted.
+ * @param key This is a pointer to the secret encryption key. This key
+ *            should be 128 bits for AES128, 192 bits for AES192,
+ *            256 bits for AES256.
+ * @param iv Pointer to the initialization vector. Should always point to a
+ *           128 bit content. If NULL the iv is expected to be the last
+ *           16 bytes of the encrypted data.
+ * @param nAlgorithm The VSCP defined algorithm (0-15) to decrypt the frame
+ * with. (vscp.h) If set to 15 (VSCP_ENCRYPTION_FROM_TYPE_BYTE) the algorithm
+ * will be set from the four lower bits of the buffer to decrypt.
+ * @return True on success, false on failure.
+ *
+ * NOTE: Note that VSCP packet type (first byte in UDP frame) is not
+ * recognised here.
+ *
+ */
+int
+vscp_decryptFrame(uint8_t *output,
+                  uint8_t *input,
+                  size_t len,
+                  const uint8_t *key,
+                  const uint8_t *iv,
+                  uint8_t nAlgorithm);
 
 #endif

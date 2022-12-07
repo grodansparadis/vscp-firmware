@@ -52,8 +52,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "vscp-firmware-helper.h"
+#include <vscp_aes.h>
 #include <vscp.h>
+#include "vscp-firmware-helper.h"
+
 
 // case-independent ASCII character equality comparison
 #define CIEQ(c1, c2) (((c1) & ~040) == ((c2) & ~040))
@@ -1202,4 +1204,193 @@ vscp_fwhlp_doLevel2FilterEx(const vscpEventEx* pex, const vscpEventFilter* pFilt
   }
 
   return 1;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_encryptFrame
+//
+
+size_t
+vscp_encryptFrame(uint8_t *output,
+                  uint8_t *input,
+                  size_t len,
+                  const uint8_t *key,
+                  const uint8_t *iv,
+                  uint8_t nAlgorithm)
+{
+  uint8_t generated_iv[16];
+
+  // Check pointers
+  if (NULL == output) {
+    return 0;
+  }
+
+  if (NULL == input) {
+    return 0;
+  }
+
+  if (NULL == key) {
+    return 0;
+  }
+
+  // If no encryption needed - return
+  if (VSCP_ENCRYPTION_NONE == nAlgorithm) {
+    memcpy(output, input, len);
+    return len;
+  }
+
+  // Must pad if needed
+  size_t padlen = len - 1; // Without packet type
+  padlen        = len + (16 - (len % 16));
+
+  // The packet type s always un encrypted
+  output[0] = input[0];
+
+  // Should decryption algorithm be set by package
+  if (VSCP_ENCRYPTION_FROM_TYPE_BYTE == (nAlgorithm & 0x0f)) {
+    nAlgorithm = input[0] & 0x0f;
+  }
+
+  // If iv is not give it should be generated
+  if (NULL == iv) {
+    if (16 != getRandomIV(generated_iv, 16)) {
+      return 0;
+    }
+  }
+  else {
+    memcpy(generated_iv, iv, 16);
+  }
+
+  switch (nAlgorithm) {
+
+    case VSCP_ENCRYPTION_AES192:
+      AES_CBC_encrypt_buffer(AES192,
+                             output + 1,
+                             input + 1, // Not Packet type byte
+                             (uint32_t) padlen,
+                             key,
+                             (const uint8_t *) generated_iv);
+      // Append iv
+      memcpy(output + 1 + padlen, generated_iv, 16);
+      padlen += 16;
+      break;
+
+    case VSCP_ENCRYPTION_AES256:
+      AES_CBC_encrypt_buffer(AES256,
+                             output + 1,
+                             input + 1, // Not Packet type byte
+                             (uint32_t) padlen,
+                             key,
+                             (const uint8_t *) generated_iv);
+      // Append iv
+      memcpy(output + 1 + padlen, generated_iv, 16);
+      padlen += 16;
+      break;
+
+    case VSCP_ENCRYPTION_AES128:
+      AES_CBC_encrypt_buffer(AES128,
+                             output + 1,
+                             input + 1, // Not Packet type byte
+                             (uint32_t) padlen,
+                             key,
+                             (const uint8_t *) generated_iv);
+      // Append iv
+      memcpy(output + 1 + padlen, generated_iv, 16);
+      padlen += 16;
+      break;
+
+    default:
+    case VSCP_ENCRYPTION_NONE:
+      memcpy(output + 1, input + 1, padlen);
+      break;
+  }
+
+  padlen++; // Count packet type byte
+
+  return padlen;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_encryptFrame
+//
+
+int
+vscp_decryptFrame(uint8_t *output,
+                  uint8_t *input,
+                  size_t len,
+                  const uint8_t *key,
+                  const uint8_t *iv,
+                  uint8_t nAlgorithm)
+{
+  uint8_t appended_iv[16];
+  size_t real_len = len;
+
+  // Check pointers
+  if (NULL == output) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if (NULL == input) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if (NULL == key) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if (VSCP_ENCRYPTION_NONE == GET_VSCP_MULTICAST_PACKET_ENCRYPTION(nAlgorithm)) {
+    memcpy(output, input, len);
+    return VSCP_ERROR_SUCCESS;
+  }
+
+  // If iv is not given it should be fetched from the end of input (last 16
+  // bytes)
+  if (NULL == iv) {
+    memcpy(appended_iv, (input + len - 16), 16);
+    real_len -= 16; // Adjust frame length accordingly
+  }
+  else {
+    memcpy(appended_iv, iv, 16);
+  }
+
+  // Preserve packet type which always is un-encrypted
+  output[0] = input[0];
+
+  // Should decryption algorithm be set by package
+  if (VSCP_ENCRYPTION_FROM_TYPE_BYTE == (nAlgorithm & 0x0f)) {
+    nAlgorithm = input[0] & 0x0f;
+  }
+
+  switch (nAlgorithm) {
+
+    case VSCP_ENCRYPTION_AES256:
+      AES_CBC_decrypt_buffer(AES256,
+                             output + 1,
+                             input + 1,
+                             (uint32_t) real_len - 1,
+                             key,
+                             (const uint8_t *) appended_iv);
+      break;
+
+    case VSCP_ENCRYPTION_AES192:
+      AES_CBC_decrypt_buffer(AES192,
+                             output + 1,
+                             input + 1,
+                             (uint32_t) real_len - 1,
+                             key,
+                             (const uint8_t *) appended_iv);
+      break;
+
+    default:
+    case VSCP_ENCRYPTION_AES128:
+      AES_CBC_decrypt_buffer(AES128,
+                             output + 1,
+                             input + 1,
+                             (uint32_t) real_len - 1,
+                             key,
+                             (const uint8_t *) appended_iv);
+      break;
+  }
+
+  return VSCP_ERROR_SUCCESS;
 }
