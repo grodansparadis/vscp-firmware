@@ -43,6 +43,7 @@
  */
 
 #include "vscp.h"
+#include "vscp_aes.h"
 
 #ifndef __VSCP_FIRMWARE_HELPER_H__
 #define __VSCP_FIRMWARE_HELPER_H__
@@ -118,7 +119,7 @@ uint32_t vscp_fwhlp_hex2dec(const char *pHex);
 uint32_t vscp_fwhlp_readStringValue(const char *pString);
 
 /**
-  Find substring other string and rteturn pointer to it
+  Find substring other string and return pointer to it
   @param haystack String to search in.
   @param needle String to search for.
   @return Pointer to substring or NULL if not found.
@@ -342,11 +343,18 @@ vscp_fwhlp_deleteEvent(vscpEvent** pev);
  * initialization vector) is appended to the end of the encrypted data.
  *
  * @param output Buffer that will receive the encrypted result. The buffer
- *          should be at least 16 bytes larger than the frame.
+ *          should be at least 16 bytes larger than the frame. This means
+ *          the size must be original size adjusted to 16 upper byte block and one
+ *          added to this (encryption code). So if the data that should be encrypted 
+ *          is 13 byte in size and the first byte is the encryption code byte 
+ *          (which should not be encrypted) then 16 is the encryption block and 16 + 1
+ *          bytes will be the minimum needed output buffer size.
  * @param input This is the frame that should be encrypted. The first
  *          byte in the frame is the packet type which is not encrypted.
  * @param len This is the length of the frame to be encrypted. This
- *          length includes the packet tye in the first byte.
+ *          length includes the frame encryption type in the first byte.
+ *          NOTE:   Length must be evenly divisible by 16 bytes (len % 16 == 0)
+            You should pad the end of the string with zeros if this is not the case.
  * @param key This is a pointer to the secret encryption key. This key
  *          should be 128 bits for AES128, 192 bits for AES192, 256 bits
  *          for AES256.
@@ -361,21 +369,21 @@ vscp_fwhlp_deleteEvent(vscpEvent** pev);
  *
  */
 size_t
-vscp_encryptFrame(uint8_t *output,
-                  uint8_t *input,
-                  size_t len,
-                  const uint8_t *key,
-                  const uint8_t *iv,
-                  uint8_t nAlgorithm);
+vscp_fwhlp_encryptFrame(uint8_t *output,
+                          uint8_t *input,
+                          size_t len,
+                          const uint8_t *key,
+                          const uint8_t *iv,
+                          uint8_t nAlgorithm);
 
 /*!
  * Decrypt VSCP frame using the selected encryption algorithm. The iv
  * initialization vector) is appended to the end of the encrypted data.
  *
  * @param output Buffer that will receive the decrypted result. The buffer
- *          should have a size of at lest equal to the encrypted block.
+ *          should have a size of at lest equal to the encrypted block. 
  * @param input This is the frame that should be decrypted.
- * @param len This is the length of the frame to be decrypted.
+ * @param len This is the length of the frame to be decrypted. 
  * @param key This is a pointer to the secret encryption key. This key
  *            should be 128 bits for AES128, 192 bits for AES192,
  *            256 bits for AES256.
@@ -392,11 +400,11 @@ vscp_encryptFrame(uint8_t *output,
  *
  */
 int
-vscp_decryptFrame(uint8_t *output,
-                  uint8_t *input,
-                  size_t len,
-                  const uint8_t *key,
-                  const uint8_t *iv,
-                  uint8_t nAlgorithm);
+vscp_fwhlp_decryptFrame(uint8_t *output,
+                          uint8_t *input,
+                          size_t len,
+                          const uint8_t *key,
+                          const uint8_t *iv,
+                          uint8_t nAlgorithm);
 
 #endif

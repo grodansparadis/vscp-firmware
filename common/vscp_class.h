@@ -47,22 +47,21 @@
             !!!!!!!!!!!!!!!!!!!!  W A R N I N G  !!!!!!!!!!!!!!!!!!!!
                            This file is auto-generated
                 see https://github.com/grodansparadis/vscp-classes
-                        Generated: 2022-06-02 12:23:44.801378
+                        Generated: 2022-12-29 13:58:01.761838
 */
  
 #ifndef VSCP_CLASS_H
 #define VSCP_CLASS_H
  
-#define VSCP_CLASS1_PROTOCOL                 0         /*! VSCP Protocol Functionality */
-/*! Alarm functionality */
-#define VSCP_CLASS1_ALARM                    1         
-#define VSCP_CLASS1_SECURITY                 2         /*! Security */
-#define VSCP_CLASS1_MEASUREMENT              10        /*! Measurement */
-#define VSCP_CLASS1_MEASUREMENTX1            11        /*! Measurement */
-#define VSCP_CLASS1_MEASUREMENTX2            12        /*! Measurement */
-#define VSCP_CLASS1_MEASUREMENTX3            13        /*! Measurement */
-#define VSCP_CLASS1_MEASUREMENTX4            14        /*! Measurement */
-#define VSCP_CLASS1_DATA                     15        /*! Data */
+#define VSCP_CLASS1_PROTOCOL                 0         /* VSCP Protocol Functionality */
+#define VSCP_CLASS1_ALARM                    1         /* Alarm functionality */
+#define VSCP_CLASS1_SECURITY                 2         /* Security */
+#define VSCP_CLASS1_MEASUREMENT              10        /* Measurement */
+#define VSCP_CLASS1_MEASUREMENTX1            11        /* Measurement */
+#define VSCP_CLASS1_MEASUREMENTX2            12        /* Measurement */
+#define VSCP_CLASS1_MEASUREMENTX3            13        /* Measurement */
+#define VSCP_CLASS1_MEASUREMENTX4            14        /* Measurement */
+#define VSCP_CLASS1_DATA                     15        /* Data */
 #define VSCP_CLASS1_INFORMATION              20        /* Information */
 #define VSCP_CLASS1_CONTROL                  30        /* Control */
 #define VSCP_CLASS1_MULTIMEDIA               40        /* Multimedia */

@@ -1207,11 +1207,11 @@ vscp_fwhlp_doLevel2FilterEx(const vscpEventEx* pex, const vscpEventFilter* pFilt
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscp_encryptFrame
+// vscp_fwhlp_encryptFrame
 //
 
 size_t
-vscp_encryptFrame(uint8_t *output,
+vscp_fwhlp_encryptFrame(uint8_t *output,
                   uint8_t *input,
                   size_t len,
                   const uint8_t *key,
@@ -1239,11 +1239,12 @@ vscp_encryptFrame(uint8_t *output,
     return len;
   }
 
-  // Must pad if needed
-  size_t padlen = len - 1; // Without packet type
-  padlen        = len + (16 - (len % 16));
+  // Must be padded if needed (should have length 16). 
+  // Encrypted len is len-1 because of leading encryption byte
+  size_t padlen = len -1;
+  padlen  = padlen + (16 - (padlen % 16));
 
-  // The packet type s always un encrypted
+  // The packet type is always unencrypted
   output[0] = input[0];
 
   // Should decryption algorithm be set by package
@@ -1272,7 +1273,7 @@ vscp_encryptFrame(uint8_t *output,
                              (const uint8_t *) generated_iv);
       // Append iv
       memcpy(output + 1 + padlen, generated_iv, 16);
-      padlen += 16;
+      padlen += 16; // length of iv
       break;
 
     case VSCP_ENCRYPTION_AES256:
@@ -1284,7 +1285,7 @@ vscp_encryptFrame(uint8_t *output,
                              (const uint8_t *) generated_iv);
       // Append iv
       memcpy(output + 1 + padlen, generated_iv, 16);
-      padlen += 16;
+      padlen += 16; // length of iv
       break;
 
     case VSCP_ENCRYPTION_AES128:
@@ -1296,7 +1297,7 @@ vscp_encryptFrame(uint8_t *output,
                              (const uint8_t *) generated_iv);
       // Append iv
       memcpy(output + 1 + padlen, generated_iv, 16);
-      padlen += 16;
+      padlen += 16; // length of iv
       break;
 
     default:
@@ -1305,17 +1306,19 @@ vscp_encryptFrame(uint8_t *output,
       break;
   }
 
-  padlen++; // Count packet type byte
+  // This is needed as byte 0 is not counted and the encrypted data should be
+  // a multiple of 16
+  padlen++; 
 
   return padlen;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscp_encryptFrame
+// vscp_fwhlp_decryptFrame
 //
 
 int
-vscp_decryptFrame(uint8_t *output,
+vscp_fwhlp_decryptFrame(uint8_t *output,
                   uint8_t *input,
                   size_t len,
                   const uint8_t *key,
