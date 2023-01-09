@@ -6,7 +6,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2022 Ake Hedman, Grodans Paradis AB
+ * Copyright (c) 2000-2023 Ake Hedman, Grodans Paradis AB
  *<info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
