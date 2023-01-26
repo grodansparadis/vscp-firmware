@@ -52,10 +52,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <vscp_aes.h>
-#include <vscp.h>
 #include "vscp-firmware-helper.h"
-
+#include <vscp.h>
+#include <vscp_aes.h>
 
 // case-independent ASCII character equality comparison
 #define CIEQ(c1, c2) (((c1) & ~040) == ((c2) & ~040))
@@ -262,6 +261,90 @@ vscp_fwhlp_stristr(const char* haystack, const char* needle)
     }
   }
   return NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_hexChar
+//
+
+unsigned char
+vscp_fwhlp_hexchar(char c)
+{
+  if ('0' <= c && c <= '9') {
+    return (unsigned char)(c - '0');
+  }
+  if ('A' <= c && c <= 'F') {
+    return (unsigned char)(c - 'A' + 10);
+  }
+  if ('a' <= c && c <= 'f') {
+    return (unsigned char)(c - 'a' + 10);
+  }
+  return 0xFF;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_hex2bin
+//
+
+int
+vscp_fwhlp_hex2bin(unsigned char* buf, size_t length, const char* s)
+{
+  int result;
+  if (!s || !buf || length <= 0) {
+    return -1;
+  }
+
+  for (result = 0; *s; ++result) {
+    unsigned char msn = vscp_fwhlp_hexchar(*s++);
+    if (msn == 0xFF) {
+      return -1;
+    }
+    unsigned char lsn = vscp_fwhlp_hexchar(*s++);
+    if (lsn == 0xFF) {
+      return -1;
+    }
+    unsigned char bin = (msn << 4) + lsn;
+
+    if (length-- <= 0) {
+      return -1;
+    }
+    *buf++ = bin;
+  }
+
+  return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_bin2hex
+//
+
+void
+vscp_fwhlp_bin2hex(char* output, size_t outLength, const unsigned char* buf, size_t length)
+{
+  char binHex[] = "0123456789ABCDEF";
+
+  if (!output || outLength < 4) {
+    return;
+  }
+  *output = '\0';
+
+  if (!buf || length <= 0 || outLength <= 2 * length) {
+    memcpy(output, "ERR", 4);
+    return;
+  }
+
+  for (; length > 0; --length, outLength -= 2) {
+    unsigned char byte = *buf++;
+
+    *output++ = binHex[(byte >> 4) & 0x0F];
+    *output++ = binHex[byte & 0x0F];
+  }
+
+  if (outLength-- <= 0) {
+    return;
+  }
+
+  *output++ = '\0';
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1009,7 +1092,7 @@ vscp_fwhlp_eventToString(char* buf, size_t size, const vscpEvent* pev)
 // GUID       47 - 00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF
 // 7 x comma
 // ---------------------------------------------------------------
-// Total:     103 + 7 (commas) + data = 110 + data 
+// Total:     103 + 7 (commas) + data = 110 + data
 // data: ",255" => 4 * 512 = 2048
 
 int
@@ -1034,28 +1117,28 @@ vscp_fwhlp_eventToStringEx(char* buf, size_t size, const vscpEventEx* pex)
   }
 
   if (pex->year || pex->month || pex->day || pex->hour || pex->minute || pex->second) {
-    sprintf(buf, 
-              "%u,%u,%u,%lu,%4d-%02d-%02dT%02d:%02d:%02dZ,%lu,", 
-              (unsigned)pex->head, 
-              (unsigned)pex->vscp_class, 
-              (unsigned)pex->vscp_type, 
-              (unsigned long)pex->obid, 
-              (int)pex->year, 
-              (int)pex->month, 
-              (int)pex->day, 
-              (int)pex->hour, 
-              (int)pex->minute, 
-              (int)pex->second, 
-              (unsigned long)pex->timestamp);
+    sprintf(buf,
+            "%u,%u,%u,%lu,%4d-%02d-%02dT%02d:%02d:%02dZ,%lu,",
+            (unsigned)pex->head,
+            (unsigned)pex->vscp_class,
+            (unsigned)pex->vscp_type,
+            (unsigned long)pex->obid,
+            (int)pex->year,
+            (int)pex->month,
+            (int)pex->day,
+            (int)pex->hour,
+            (int)pex->minute,
+            (int)pex->second,
+            (unsigned long)pex->timestamp);
   }
   else {
-    sprintf(buf, 
-              "%d,%u,%u,%lu,,%lu,", 
-              (unsigned)pex->head, 
-              (unsigned)pex->vscp_class, 
-              (unsigned)pex->vscp_type, 
-              (unsigned long)pex->obid, 
-              (unsigned long)pex->timestamp);
+    sprintf(buf,
+            "%d,%u,%u,%lu,,%lu,",
+            (unsigned)pex->head,
+            (unsigned)pex->vscp_class,
+            (unsigned)pex->vscp_type,
+            (unsigned long)pex->obid,
+            (unsigned long)pex->timestamp);
   }
 
   // GUID
@@ -1211,12 +1294,12 @@ vscp_fwhlp_doLevel2FilterEx(const vscpEventEx* pex, const vscpEventFilter* pFilt
 //
 
 size_t
-vscp_fwhlp_encryptFrame(uint8_t *output,
-                  uint8_t *input,
-                  size_t len,
-                  const uint8_t *key,
-                  const uint8_t *iv,
-                  uint8_t nAlgorithm)
+vscp_fwhlp_encryptFrame(uint8_t* output,
+                        uint8_t* input,
+                        size_t len,
+                        const uint8_t* key,
+                        const uint8_t* iv,
+                        uint8_t nAlgorithm)
 {
   uint8_t generated_iv[16];
 
@@ -1239,10 +1322,10 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
     return len;
   }
 
-  // Must be padded if needed (should have length 16). 
+  // Must be padded if needed (should have length 16).
   // Encrypted len is len-1 because of leading encryption byte
-  size_t padlen = len -1;
-  padlen  = padlen + (16 - (padlen % 16));
+  size_t padlen = len - 1;
+  padlen        = padlen + (16 - (padlen % 16));
 
   // The packet type is always unencrypted
   output[0] = input[0];
@@ -1268,9 +1351,9 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
       AES_CBC_encrypt_buffer(AES192,
                              output + 1,
                              input + 1, // Not Packet type byte
-                             (uint32_t) padlen,
+                             (uint32_t)padlen,
                              key,
-                             (const uint8_t *) generated_iv);
+                             (const uint8_t*)generated_iv);
       // Append iv
       memcpy(output + 1 + padlen, generated_iv, 16);
       padlen += 16; // length of iv
@@ -1280,9 +1363,9 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
       AES_CBC_encrypt_buffer(AES256,
                              output + 1,
                              input + 1, // Not Packet type byte
-                             (uint32_t) padlen,
+                             (uint32_t)padlen,
                              key,
-                             (const uint8_t *) generated_iv);
+                             (const uint8_t*)generated_iv);
       // Append iv
       memcpy(output + 1 + padlen, generated_iv, 16);
       padlen += 16; // length of iv
@@ -1292,9 +1375,9 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
       AES_CBC_encrypt_buffer(AES128,
                              output + 1,
                              input + 1, // Not Packet type byte
-                             (uint32_t) padlen,
+                             (uint32_t)padlen,
                              key,
-                             (const uint8_t *) generated_iv);
+                             (const uint8_t*)generated_iv);
       // Append iv
       memcpy(output + 1 + padlen, generated_iv, 16);
       padlen += 16; // length of iv
@@ -1308,7 +1391,7 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
 
   // This is needed as byte 0 is not counted and the encrypted data should be
   // a multiple of 16
-  padlen++; 
+  padlen++;
 
   return padlen;
 }
@@ -1318,12 +1401,12 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
 //
 
 int
-vscp_fwhlp_decryptFrame(uint8_t *output,
-                  uint8_t *input,
-                  size_t len,
-                  const uint8_t *key,
-                  const uint8_t *iv,
-                  uint8_t nAlgorithm)
+vscp_fwhlp_decryptFrame(uint8_t* output,
+                        uint8_t* input,
+                        size_t len,
+                        const uint8_t* key,
+                        const uint8_t* iv,
+                        uint8_t nAlgorithm)
 {
   uint8_t appended_iv[16];
   size_t real_len = len;
@@ -1370,18 +1453,18 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
       AES_CBC_decrypt_buffer(AES256,
                              output + 1,
                              input + 1,
-                             (uint32_t) real_len - 1,
+                             (uint32_t)real_len - 1,
                              key,
-                             (const uint8_t *) appended_iv);
+                             (const uint8_t*)appended_iv);
       break;
 
     case VSCP_ENCRYPTION_AES192:
       AES_CBC_decrypt_buffer(AES192,
                              output + 1,
                              input + 1,
-                             (uint32_t) real_len - 1,
+                             (uint32_t)real_len - 1,
                              key,
-                             (const uint8_t *) appended_iv);
+                             (const uint8_t*)appended_iv);
       break;
 
     default:
@@ -1389,9 +1472,9 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
       AES_CBC_decrypt_buffer(AES128,
                              output + 1,
                              input + 1,
-                             (uint32_t) real_len - 1,
+                             (uint32_t)real_len - 1,
                              key,
-                             (const uint8_t *) appended_iv);
+                             (const uint8_t*)appended_iv);
       break;
   }
 

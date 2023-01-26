@@ -15,7 +15,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2023 Ake Hedman, 
+ * Copyright (c) 2000-2023 Ake Hedman,
  * The VSCP Project <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -85,14 +85,15 @@ typedef struct vscp_interface_info {
     Convert ASCII substring to unsigned long number
     Copyright (C) 1998, 1999  Henry Spencer.
     http://www.koders.com/c/fid83F5660A86069B2E2D29B9D3FC9013F76A9BCEB7.aspx
-    
+
     @param src NULL terminated string to convert.
     @param srclen length of string, 0 means strlen( src )
     @param base The base for the conversion, 0 means figure it out.
     @param resultp Pointer that holds unsigned long result after conversion.
-    @return  VSCP_ERROR_SUCCESS for success, else VSCP_ERROR_ERROR.    
+    @return  VSCP_ERROR_SUCCESS for success, else VSCP_ERROR_ERROR.
 */
-int vscp_fwhlp_a2ul(const char *src, uint8_t srclen, uint8_t base, uint32_t *resultp);
+int
+vscp_fwhlp_a2ul(const char* src, uint8_t srclen, uint8_t base, uint32_t* resultp);
 
 /**
     Convert decimal byte to hex string
@@ -100,23 +101,60 @@ int vscp_fwhlp_a2ul(const char *src, uint8_t srclen, uint8_t base, uint32_t *res
     @param pBuf Pointer to string buffer that will hold the result.
     @param len Number of digits to convert.
 */
-void vscp_fwhlp_dec2hex(uint8_t d, char * pBuf, uint16_t len);
-
+void
+vscp_fwhlp_dec2hex(uint8_t d, char* pBuf, uint16_t len);
 
 /**
     Convert hexadecimal integer to a decimal value
     @param pHex Pointer to hexadecimal string.
     @return Converted value in decimal form.
 */
-uint32_t vscp_fwhlp_hex2dec(const char *pHex);
+uint32_t
+vscp_fwhlp_hex2dec(const char* pHex);
+
+/**
+ * @brief Convert one hex character
+ *
+ * @param c Hex character to convert (0-f)
+ * @return unsigned char Hex value for character (0-15)
+ */
+unsigned char
+vscp_fwhlp_hexchar(char c);
+
+/**
+ * @brief Create string with hex values from binary values in buffer
+ *
+ * @param output Result buffer for output string
+ * @param outLength Size of result buffer
+ * @param buf Buf with binary values
+ * @param length Size of buffer
+ */
+
+void
+vscp_fwhlp_bin2hex(char* output, size_t outLength, const unsigned char* buf, size_t length);
+
+
+/**
+ * @brief Convert a string of hex values to binary values in buffer
+ *
+ * @param buf Buffer to fill
+ * @param length Size of buffer
+ * @param s String to convert
+ * @return int Resulting length
+ */
+
+int
+ vscp_fwhlp_hex2bin(unsigned char* buf, size_t length, const char* s);
+
 
 /**
     Read a value (hex or decimal)
     @param pString Pointe to value. A hex value should be
     be preceded by "0x" or "0X"
-    @return Converted value in decimal form.  
+    @return Converted value in decimal form.
 */
-uint32_t vscp_fwhlp_readStringValue(const char *pString);
+uint32_t
+vscp_fwhlp_readStringValue(const char* pString);
 
 /**
   Find substring other string and return pointer to it
@@ -124,7 +162,8 @@ uint32_t vscp_fwhlp_readStringValue(const char *pString);
   @param needle String to search for.
   @return Pointer to substring or NULL if not found.
 */
-char *vscp_fwhlp_stristr(const char *haystack, const char *needle);
+char*
+vscp_fwhlp_stristr(const char* haystack, const char* needle);
 
 /**
     Get VSCP priority
@@ -132,7 +171,7 @@ char *vscp_fwhlp_stristr(const char *haystack, const char *needle);
     @return Priority (0-7) for event.
 */
 unsigned char
-vscp_fwhlp_getEventPriority(const vscpEvent *pev);
+vscp_fwhlp_getEventPriority(const vscpEvent* pev);
 
 /**
     Get VSCP EventEx priority
@@ -140,33 +179,7 @@ vscp_fwhlp_getEventPriority(const vscpEvent *pev);
     @return Priority (0-7) for event.
 */
 unsigned char
-vscp_fwhlp_getEventPriorityEx(const vscpEventEx *pex);
-
-
-/**
-    Check filter/mask to check if filter should be delivered
-
-    filter ^ bit    mask    out
-    ============================
-        0           0       1    filter == bit, mask = don't care result = true
-        0           1       1    filter == bit, mask = valid, result = true
-        1           0       1    filter != bit, mask = don't care, result = true
-        1           1       0    filter != bit, mask = valid, result = false
-
-    Mask tells *which* bits that are of interest means
-    it always returns true if bit set to zero (0=don't care).
-
-    Filter tells the value for valid bits. If filter bit is == 1 the bits
-    must be equal to get a true filter return.
-
-    So a nill mask will let everything through
-
-    A filter pointer set to NULL will let every event through.
-
-    @return true if message should be delivered false if not.
-    */
-int
-vscp_fwhlp_doLevel2Filter(const vscpEvent *pev, const vscpEventFilter *pFilter);
+vscp_fwhlp_getEventPriorityEx(const vscpEventEx* pex);
 
 /**
     Check filter/mask to check if filter should be delivered
@@ -191,7 +204,32 @@ vscp_fwhlp_doLevel2Filter(const vscpEvent *pev, const vscpEventFilter *pFilter);
     @return true if message should be delivered false if not.
     */
 int
-vscp_fwhlp_doLevel2FilterEx(const vscpEventEx *pex, const vscpEventFilter *pFilter);
+vscp_fwhlp_doLevel2Filter(const vscpEvent* pev, const vscpEventFilter* pFilter);
+
+/**
+    Check filter/mask to check if filter should be delivered
+
+    filter ^ bit    mask    out
+    ============================
+        0           0       1    filter == bit, mask = don't care result = true
+        0           1       1    filter == bit, mask = valid, result = true
+        1           0       1    filter != bit, mask = don't care, result = true
+        1           1       0    filter != bit, mask = valid, result = false
+
+    Mask tells *which* bits that are of interest means
+    it always returns true if bit set to zero (0=don't care).
+
+    Filter tells the value for valid bits. If filter bit is == 1 the bits
+    must be equal to get a true filter return.
+
+    So a nill mask will let everything through
+
+    A filter pointer set to NULL will let every event through.
+
+    @return true if message should be delivered false if not.
+    */
+int
+vscp_fwhlp_doLevel2FilterEx(const vscpEventEx* pex, const vscpEventFilter* pFilter);
 
 /**
     Called by the system when a new connection is made.
@@ -218,7 +256,7 @@ vscp_fwhlp_disconnect(const void* pdata);
     @param pdata  Pointer to user data
     @return VSCP_ERROR_SUCCESS if command was executed correctly,
 */
-int 
+int
 vscp_fwhlp_idle_worker(const void* pdata);
 
 /**
@@ -327,7 +365,8 @@ vscp_fwhlp_newEvent(void);
     @return Pointer to the new event if successful, NULL if not.
 */
 
-vscpEvent* vscp_fwhlp_mkEventCopy(vscpEvent* pev);
+vscpEvent*
+vscp_fwhlp_mkEventCopy(vscpEvent* pev);
 
 /**
   @brief Delete an event and it's data.
@@ -337,7 +376,6 @@ vscpEvent* vscp_fwhlp_mkEventCopy(vscpEvent* pev);
 int
 vscp_fwhlp_deleteEvent(vscpEvent** pev);
 
-
 /*!
  * Encrypt VSCP frame using the selected encryption algorithm. The iv
  * initialization vector) is appended to the end of the encrypted data.
@@ -345,8 +383,8 @@ vscp_fwhlp_deleteEvent(vscpEvent** pev);
  * @param output Buffer that will receive the encrypted result. The buffer
  *          should be at least 16 bytes larger than the frame. This means
  *          the size must be original size adjusted to 16 upper byte block and one
- *          added to this (encryption code). So if the data that should be encrypted 
- *          is 13 byte in size and the first byte is the encryption code byte 
+ *          added to this (encryption code). So if the data that should be encrypted
+ *          is 13 byte in size and the first byte is the encryption code byte
  *          (which should not be encrypted) then 16 is the encryption block and 16 + 1
  *          bytes will be the minimum needed output buffer size.
  * @param input This is the frame that should be encrypted. The first
@@ -369,21 +407,21 @@ vscp_fwhlp_deleteEvent(vscpEvent** pev);
  *
  */
 size_t
-vscp_fwhlp_encryptFrame(uint8_t *output,
-                          uint8_t *input,
-                          size_t len,
-                          const uint8_t *key,
-                          const uint8_t *iv,
-                          uint8_t nAlgorithm);
+vscp_fwhlp_encryptFrame(uint8_t* output,
+                        uint8_t* input,
+                        size_t len,
+                        const uint8_t* key,
+                        const uint8_t* iv,
+                        uint8_t nAlgorithm);
 
 /*!
  * Decrypt VSCP frame using the selected encryption algorithm. The iv
  * initialization vector) is appended to the end of the encrypted data.
  *
  * @param output Buffer that will receive the decrypted result. The buffer
- *          should have a size of at lest equal to the encrypted block. 
+ *          should have a size of at lest equal to the encrypted block.
  * @param input This is the frame that should be decrypted.
- * @param len This is the length of the frame to be decrypted. 
+ * @param len This is the length of the frame to be decrypted.
  * @param key This is a pointer to the secret encryption key. This key
  *            should be 128 bits for AES128, 192 bits for AES192,
  *            256 bits for AES256.
@@ -400,11 +438,11 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
  *
  */
 int
-vscp_fwhlp_decryptFrame(uint8_t *output,
-                          uint8_t *input,
-                          size_t len,
-                          const uint8_t *key,
-                          const uint8_t *iv,
-                          uint8_t nAlgorithm);
+vscp_fwhlp_decryptFrame(uint8_t* output,
+                        uint8_t* input,
+                        size_t len,
+                        const uint8_t* key,
+                        const uint8_t* iv,
+                        uint8_t nAlgorithm);
 
 #endif

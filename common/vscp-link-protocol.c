@@ -133,13 +133,13 @@ vscp_link_parser(const void* pdata, char *pbuf, size_t *psize)
   }
 
   // If buf contains a carriage return, we have a command to handle 
-  
+  // If not we are done and need to read more input data 
+
   if (NULL == (p = strstr(pbuf, "\r\n"))) {
     return VSCP_ERROR_SUCCESS;
   }
 
   memset(cmd, 0, sizeof(cmd));
-
   *p             = '\0';  // Terminate string at \r\n
   size_t cmdSize = strlen(pbuf);
   strncpy(cmd, pbuf, sizeof(cmd) - 1);
@@ -179,6 +179,7 @@ vscp_link_parser(const void* pdata, char *pbuf, size_t *psize)
   }
   else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "noop")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
+    printf("->noop");
     return vscp_link_doCmdNoop(pdata, p);
   }  
   else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "user")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
@@ -339,10 +340,12 @@ vscp_link_doCmdNoop(const void* pdata, const char* cmd)
 int
 vscp_link_doCmdHelp(const void* pdata, const char* cmd)
 {
+  printf("Olllllllaaaaalllaa");
 #ifdef VSCP_LINK_CUSTOM_HELP_TEXT 
   return vscp_link_callback_help(pdata, cmd);
 #else
   if (NULL != vscp_fwhlp_stristr(cmd, "noop")) {
+    printf("----->");
     return vscp_link_callback_write_client(pdata, VSCP_LINK_STD_HELP_NOOP);
   }
   else if (NULL != vscp_fwhlp_stristr(cmd, "help")) {
