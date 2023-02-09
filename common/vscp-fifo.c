@@ -69,8 +69,6 @@ vscp_fifo_read(vscp_fifo_t* f, vscpEvent** pev)
 size_t
 vscp_fifo_write(vscp_fifo_t* f, vscpEvent* pev)
 {
-  //uint32_t i;
-
   // first check to see if there is space in the fifo
   if (((f->head + 1) % f->size) == f->tail) {
     return 0; // no space levt in the fifo

@@ -51,13 +51,57 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "vscp-firmware-helper.h"
 #include <vscp.h>
+
+#ifdef VSCP_FWHLP_CRYPTO_SUPPORT
 #include <vscp_aes.h>
+#endif
+
+#ifdef VSCP_FWHLP_JSON_SUPPORT
+#include <cJSON.h>
+#endif
+
+#define UNUSED(expr)                                                                                                   \
+  do {                                                                                                                 \
+    (void) (expr);                                                                                                     \
+  } while (0)
+
+#ifndef TRUE
+#define TRUE  -1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
 
 // case-independent ASCII character equality comparison
 #define CIEQ(c1, c2) (((c1) & ~040) == ((c2) & ~040))
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_isLittleEndian
+//
+
+int
+vscp_fwhlp_isLittleEndian(void)
+{
+  int x = 1;
+  return (*(char *) &x);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_isBigEndian
+//
+//
+
+int
+vscp_fwhlp_isBigEndian(void)
+{
+  return ~vscp_fwhlp_isLittleEndian();
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_a2ul
@@ -394,6 +438,95 @@ vscp_fwhlp_newEvent(void)
   return pev;
 }
 
+////////////////////////////////////////////////////////////////////////////////////
+// vscp_convertEventToEventEx
+
+int
+vscp_convertEventToEventEx(vscpEventEx *pEventEx, const vscpEvent *pEvent)
+{
+  // Check pointers
+  if (NULL == pEvent) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if (NULL == pEventEx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if (pEvent->sizeData > VSCP_LEVEL2_MAXDATA) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // Convert
+  pEventEx->crc        = pEvent->crc;
+  pEventEx->obid       = pEvent->obid;
+  pEventEx->year       = pEvent->year;
+  pEventEx->month      = pEvent->month;
+  pEventEx->day        = pEvent->day;
+  pEventEx->hour       = pEvent->hour;
+  pEventEx->minute     = pEvent->minute;
+  pEventEx->second     = pEvent->second;
+  pEventEx->timestamp  = pEvent->timestamp;
+  pEventEx->head       = pEvent->head;
+  pEventEx->obid       = pEvent->obid;
+  pEventEx->vscp_class = pEvent->vscp_class;
+  pEventEx->vscp_type  = pEvent->vscp_type;
+  pEventEx->sizeData   = pEvent->sizeData;
+
+  memcpy(pEventEx->GUID, pEvent->GUID, 16);
+  memcpy(pEventEx->data, pEvent->pdata, pEvent->sizeData);
+
+  return VSCP_ERROR_SUCCESS;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// vscp_convertEventExToEvent
+//
+
+int
+vscp_convertEventExToEvent(vscpEvent *pEvent, const vscpEventEx *pEventEx)
+{
+  // Check pointers
+  if (NULL == pEvent) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if (NULL == pEventEx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if (pEventEx->sizeData) {
+    // Allocate memory for data
+    if (NULL == (pEvent->pdata = VSCP_MALLOC(pEventEx->sizeData))) {
+      return VSCP_ERROR_MEMORY;
+    }
+    memcpy(pEvent->pdata, pEventEx->data, pEventEx->sizeData);
+  }
+  else {
+    // No data
+    pEvent->pdata = NULL;
+  }
+
+  // Convert
+  pEvent->crc        = pEventEx->crc;
+  pEvent->obid       = pEventEx->obid;
+  pEvent->year       = pEventEx->year;
+  pEvent->month      = pEventEx->month;
+  pEvent->day        = pEventEx->day;
+  pEvent->hour       = pEventEx->hour;
+  pEvent->minute     = pEventEx->minute;
+  pEvent->second     = pEventEx->second;
+  pEvent->timestamp  = pEventEx->timestamp;
+  pEvent->head       = pEventEx->head;
+  pEvent->obid       = pEventEx->obid;
+  pEvent->vscp_class = pEventEx->vscp_class;
+  pEvent->vscp_type  = pEventEx->vscp_type;
+  pEvent->sizeData   = pEventEx->sizeData;
+  memcpy(pEvent->GUID, pEventEx->GUID, 16);
+
+  return VSCP_ERROR_SUCCESS;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_mkEventCopy
 //
@@ -427,6 +560,29 @@ vscp_fwhlp_mkEventCopy(vscpEvent* pev)
   }
 
   return pnewEvent;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_mkEventExCopy
+//
+
+vscpEventEx*
+vscp_fwhlp_mkEventExCopy(vscpEventEx* pex)
+{
+  // Must have event to work on
+  if (NULL == pex) {
+    return NULL;
+  }
+
+  vscpEventEx* pnewEventEx = (vscpEventEx*)VSCP_MALLOC(sizeof(vscpEventEx));;
+  if (NULL == pnewEventEx) {
+    return NULL;
+  }
+
+  // Copy the event
+  memcpy(pnewEventEx, pex, sizeof(vscpEventEx));
+
+  return pnewEventEx;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1199,7 +1355,7 @@ vscp_fwhlp_eventToStringEx(char* buf, size_t size, const vscpEventEx* pex)
 int
 vscp_fwhlp_doLevel2Filter(const vscpEvent* pev, const vscpEventFilter* pFilter)
 {
-  // A nullptr filter is wildcard
+  // A NULL filter is wildcard
   if (NULL == pFilter) {
     return 1;
   }
@@ -1255,7 +1411,7 @@ vscp_fwhlp_doLevel2Filter(const vscpEvent* pev, const vscpEventFilter* pFilter)
 int
 vscp_fwhlp_doLevel2FilterEx(const vscpEventEx* pex, const vscpEventFilter* pFilter)
 {
-  // A nullptr filter is wildcard
+  // A NULL filter is wildcard
   if (NULL == pFilter) {
     return 1;
   }
@@ -1288,6 +1444,11 @@ vscp_fwhlp_doLevel2FilterEx(const vscpEventEx* pex, const vscpEventFilter* pFilt
 
   return 1;
 }
+
+/*!
+  Add AES CBC crypto support
+*/
+#ifdef VSCP_FWHLP_CRYPTO_SUPPORT
 
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_encryptFrame
@@ -1479,4 +1640,786 @@ vscp_fwhlp_decryptFrame(uint8_t* output,
   }
 
   return VSCP_ERROR_SUCCESS;
+}
+
+#endif // VSCP_FWHLP_CRYPTO_SUPPORT
+
+/*
+  JSON support needs VSCP_FWHLP_JSON_SUPPORT to be defined
+  in the projdef file and cJSON support linked in (can be found
+  in vscp-firmware/third-party or at https://github.com/nopnop2002/esp-idf-json 
+*/
+
+#ifdef VSCP_FWHLP_JSON_SUPPORT
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_parse_json
+//
+// // https://github.com/nopnop2002/esp-idf-json
+/*
+{
+  "vscpHead":3,
+  "vscpClass":10,
+  "vscpType":6,
+  "vscpGuid":"FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:CF:3A:15:00:01",
+  "vscpObId":11,
+  "vscpTimeStamp":467530633,
+  "vscpDateTime":"2022-12-16T16:41:02.000Z",
+  "vscpData":[72,51,57,46,55,48,52],
+  "measurement": {
+    "value":39.704,
+    "unit":1,
+    "sensorindex":0,
+    "index":0,
+    "zone":0,
+    "subzone":0
+  }
+}
+*/
+
+int
+vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj)
+{
+  int rv;
+  cJSON *root = cJSON_Parse(jsonVscpEventObj);
+
+  if (cJSON_GetObjectItem(root, "vscpHead")) {
+    pev->head = (uint16_t) cJSON_GetObjectItem(root, "vscpHead")->valueint;
+  }
+
+  if (cJSON_GetObjectItem(root, "vscpObId")) {
+    pev->obid = (uint32_t) cJSON_GetObjectItem(root, "vscpObId")->valuedouble;
+  }
+
+  // "2017-01-13T10:16:02",
+  if (cJSON_GetObjectItem(root, "vscpDateTime")) {
+    int year, month, day, hour, minute, second;
+    const char *str = cJSON_GetObjectItem(root, "vscpDateTime")->valuestring;
+    sscanf(str, "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second);
+    pev->year   = year;
+    pev->month  = month;
+    pev->day    = day;
+    pev->hour   = hour;
+    pev->minute = minute;
+    pev->second = second;
+  }
+
+  if (cJSON_GetObjectItem(root, "vscpTimeStamp")) {
+    pev->timestamp = (uint32_t) cJSON_GetObjectItem(root, "vscpTimeStamp")->valuedouble;
+  }
+
+  if (cJSON_GetObjectItem(root, "vscpClass")) {
+    pev->vscp_class = (uint16_t) cJSON_GetObjectItem(root, "vscpClass")->valueint;;
+  }
+
+  if (cJSON_GetObjectItem(root, "vscpType")) {
+    pev->vscp_type = (uint16_t) cJSON_GetObjectItem(root, "vscpType")->valueint;
+  }
+
+  if (cJSON_GetObjectItem(root, "vscpGuid")) {
+    const char *str = cJSON_GetObjectItem(root, "vscpGuid")->valuestring;
+    if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseGuid(pev->GUID, str, NULL))) {
+      return rv;
+    }
+  }
+
+  if (cJSON_GetObjectItem(root, "vscpData")) {
+
+    cJSON *pdata  = cJSON_GetObjectItem(root, "vscpData");
+    pev->sizeData = cJSON_GetArraySize(pdata);
+
+    for (int i = 0; i < pev->sizeData; i++) {
+      cJSON *pitem = cJSON_GetArrayItem(pdata, i);
+      if (pitem->type == cJSON_Number && i < 512) {
+        pev->pdata[i] = pitem->valueint;
+      }
+    }
+  }
+
+  cJSON_Delete(root);
+  return VSCP_ERROR_SUCCESS;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_create_json
+//
+// https://github.com/nopnop2002/esp-idf-json
+//
+
+int
+vscp_fwhlp_create_json(char *strObj, size_t len, vscpEvent *pev)
+{
+  char str[80];
+  cJSON *root = cJSON_CreateObject();
+
+  cJSON_AddNumberToObject(root, "vscpHead", pev->head);
+  cJSON_AddNumberToObject(root, "vscpClass", pev->vscp_class);
+  cJSON_AddNumberToObject(root, "vscpType", pev->vscp_type);
+  cJSON_AddNumberToObject(root, "vscpObid", pev->obid);
+  cJSON_AddNumberToObject(root, "vscpTimeStamp", pev->timestamp);
+  vscp_fwhlp_writeGuidToString(str, pev->GUID);
+  cJSON_AddStringToObject(root, "vscpGUID", str);
+  sprintf(str, "%04d-%02d-%02dT%02d:%02d:%02d", pev->year, pev->month, pev->day, pev->hour, pev->minute, pev->second);
+  cJSON_AddStringToObject(root, "vscpDateTime", str);
+  cJSON *array;
+  array = cJSON_AddArrayToObject(root, "vscpData");
+  cJSON *element;
+  for (int i = 0; i < pev->sizeData; i++) {
+    element = cJSON_CreateNumber(pev->pdata[i]);
+    cJSON_AddItemToArray(array, element);
+  }
+  char *json_string = cJSON_Print(root);
+  if (NULL == json_string) {
+    cJSON_Delete(root);
+    return VSCP_ERROR_PARSING;
+  }
+
+  if (strlen(json_string) > (len-1)) {
+    cJSON_free(json_string);
+    cJSON_Delete(root);
+    return VSCP_ERROR_BUFFER_TO_SMALL;
+  }
+
+  strcpy(strObj, json_string);
+      
+  cJSON_free(json_string);
+  cJSON_Delete(root);
+
+  return VSCP_ERROR_SUCCESS;
+}
+
+#endif  // JSON support
+
+
+
+
+
+// ----------------------------------------------------------------------------
+
+
+
+// ***************************************************************************
+//                              Data Coding Helpers
+// ***************************************************************************
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getMeasurementDataCoding
+//
+
+uint8_t
+vscp_fwhlp_getMeasurementDataCoding(const vscpEvent *pEvent)
+{
+  uint8_t datacoding_byte = -1;
+
+  // Check pointers
+  if (NULL == pEvent) {
+    return -1;
+  }
+
+  if (NULL == pEvent->pdata) {
+    return -1;
+  }
+
+  // Check datasize
+  if (pEvent->sizeData < 1) {
+    return -1;
+  }
+
+  if (VSCP_CLASS1_MEASUREMENT == pEvent->vscp_class) {
+    datacoding_byte = pEvent->pdata[0];
+  }
+  else if (VSCP_CLASS2_LEVEL1_MEASUREMENT == pEvent->vscp_class) {
+    if (pEvent->sizeData >= 16) {
+      datacoding_byte = pEvent->pdata[16];
+    }
+  }
+  else if (VSCP_CLASS2_MEASUREMENT_STR == pEvent->vscp_class) {
+    datacoding_byte = 0x40; // string
+  }
+  else if (VSCP_CLASS2_MEASUREMENT_FLOAT == pEvent->vscp_class) {
+    datacoding_byte = 0xC0; // float
+  }
+
+  return datacoding_byte;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getDataCodingBitArray
+//
+
+uint64_t
+vscp_fwhlp_getDataCodingBitArray(const uint8_t *pCode, const uint8_t length)
+{
+  uint64_t bitArray = 0;
+
+  // Check pointer
+  if (NULL == pCode) {
+    return 0;
+  }
+
+  if ((length > 7) || (length <= 1)) {
+    return 0;
+  }
+
+  for (int i = 0; i < length - 1; i++) {
+    bitArray = bitArray << 8;
+    bitArray |= *(pCode + 1 + i);
+  }
+
+  return bitArray;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getDataCodingInteger
+//
+
+int64_t
+vscp_fwhlp_getDataCodingInteger(const uint8_t *pCode, uint8_t length)
+{
+  int64_t value64 = 0;
+
+  // Check pointer
+  if (NULL == pCode) {
+    return 0;
+  }
+
+  if (length < 2) {
+    return 0;
+  }
+
+  // Check if this is a negative number
+  if ((*(pCode + 1)) & 0x80) {
+    memset((uint8_t *) &value64, 0xff, 8);
+  }
+  else {
+    memset((uint8_t *) &value64, 0, 8);
+  }
+
+  for (int i = 1; i < length; i++) {
+    value64 = (value64 << 8) + pCode[i];
+  }
+
+  return value64;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getDataCodingNormalizedInteger
+//
+
+double
+vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t *pCode, uint8_t length)
+{
+  uint8_t valarray[8];
+  uint8_t normbyte;
+  uint8_t decibyte;
+#ifndef __BIG_ENDIAN__
+  int64_t value64;
+#endif
+  double value   = 0;
+  int bNegative = FALSE; // set for negative number
+
+  // Check pointer
+  if (NULL == pCode) {
+    return 0;
+  }
+
+  // Check character count
+  if ((length > 8) || (length < 2)) {
+    return 0;
+  }
+
+  memset(valarray, 0, sizeof(valarray));
+  normbyte = *pCode;
+  UNUSED(normbyte);
+  decibyte = *(pCode + 1);
+
+  // Check if this is a negative number
+  if ((*(pCode + 2)) & 0x80) {
+    bNegative = TRUE;
+  }
+
+  switch (length - 2) {
+
+    case 1: // 8-bit
+      memcpy((char *) &valarray, (pCode + 2), (length - 2));
+      value = *((int8_t *) valarray);
+      break;
+
+    case 2: // 16-bit
+      memcpy((char *) &valarray, (pCode + 2), (length - 2));
+      value = VSCP_INT16_SWAP_ON_LE(*((uint16_t *) valarray));
+      break;
+
+    case 3: // 24-bit
+      memcpy(((char *) &valarray + 1), (pCode + 2), (length - 2));
+      if (bNegative)
+        *valarray = 0xff; // First byte must be 0xff
+      value = VSCP_INT32_SWAP_ON_LE(*((int32_t *) valarray));
+      break;
+
+    case 4: // 32-bit
+      memcpy((char *) &valarray, (pCode + 2), (length - 2));
+      value = VSCP_INT32_SWAP_ON_LE(*((int32_t *) valarray));
+      break;
+
+    case 5: // 40-bit
+      memcpy(((char *) &valarray + 3), (pCode + 2), (length - 2));
+      if (bNegative) {
+        *valarray       = 0xff; // First byte must be 0xff
+        *(valarray + 1) = 0xff;
+        *(valarray + 2) = 0xff;
+      }
+
+#ifdef __BIG_ENDIAN__
+      value = *((int64_t *) valarray);
+#else
+      value64 = Swap8Bytes(*((int64_t *) valarray));
+      value   = (double) value64;
+#endif
+      break;
+
+    case 6: // 48-bit
+      memcpy(((char *) &valarray + 2), (pCode + 2), (length - 2));
+      if (bNegative) {
+        *valarray       = 0xff; // First byte must be 0xff
+        *(valarray + 1) = 0xff;
+      }
+
+#ifdef __BIG_ENDIAN__
+      value = *((int64_t *) valarray);
+#else
+      value64 = Swap8Bytes(*((int64_t *) valarray));
+      value   = (double) value64;
+#endif
+      break;
+  }
+
+    // Bring back decimal points
+#ifdef WIN32
+  if (decibyte & 0x80) {
+    decibyte &= 0x7f;
+    value = value / (pow(10.0, decibyte));
+  }
+  else {
+    decibyte &= 0x7f;
+    value = value * (pow(10.0, decibyte));
+  }
+#else
+  if (decibyte & 0x80) {
+    decibyte &= 0x7f;
+    value = value / (pow(10, decibyte));
+  }
+  else {
+    decibyte &= 0x7f;
+    value = value * (pow(10, decibyte));
+  }
+#endif
+  return value;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getEventPriority
+
+// unsigned char
+// vscp_fwhlp_getEventPriority(const vscpEvent *pEvent)
+// {
+//   // Must be a valid message pointer
+//   if (NULL == pEvent) {
+//     return 0;
+//   }
+
+//   return ((pEvent->head >> 5) & 0x07);
+// }
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_setEventPriority
+
+void
+vscp_fwhlp_setEventPriority(vscpEvent *pEvent, unsigned char priority)
+{
+  // Must be a valid message pointer
+  if (NULL == pEvent) {
+    return;
+  }
+
+  pEvent->head &= ~VSCP_HEADER_PRIORITY_MASK;
+  pEvent->head |= (priority << 5);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getMeasurementUnit
+//
+
+int
+vscp_fwhlp_getMeasurementUnit(const vscpEvent *pEvent)
+{
+  int offset = 0;
+
+  // If class >= 512 and class < 1024 we
+  // have GUID in front of data.
+  if ((pEvent->vscp_class >= VSCP_CLASS2_LEVEL1_PROTOCOL) && (pEvent->vscp_class < VSCP_CLASS2_PROTOCOL)) {
+    offset = 16;
+  }
+
+  if ((VSCP_CLASS1_MEASUREMENT == pEvent->vscp_class) || (VSCP_CLASS2_LEVEL1_MEASUREMENT == pEvent->vscp_class) ||
+      (VSCP_CLASS1_DATA == pEvent->vscp_class) || (VSCP_CLASS1_MEASUREZONE == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREZONE == pEvent->vscp_class) || (VSCP_CLASS1_SETVALUEZONE == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_SETVALUEZONE == pEvent->vscp_class)) {
+
+    if ((NULL == pEvent->pdata) || (pEvent->sizeData < (offset + 1))) {
+      return VSCP_ERROR_ERROR;
+    }
+
+    return VSCP_DATACODING_UNIT(pEvent->pdata[offset + 0]);
+  }
+  else if ((VSCP_CLASS1_MEASUREMENT32 == pEvent->vscp_class) ||
+           (VSCP_CLASS2_LEVEL1_MEASUREMENT32 == pEvent->vscp_class)) {
+    return 0; // Always default unit
+  }
+  else if ((VSCP_CLASS1_MEASUREMENT64 == pEvent->vscp_class) ||
+           (VSCP_CLASS2_LEVEL1_MEASUREMENT64 == pEvent->vscp_class)) {
+    return 0; // Always default unit
+  }
+  else if ((VSCP_CLASS2_MEASUREMENT_STR == pEvent->vscp_class)) {
+
+    // Check if data length is valid
+    if ((NULL == pEvent->pdata) || (pEvent->sizeData < 4)) {
+      return VSCP_ERROR_ERROR;
+    }
+
+    return pEvent->pdata[3];
+  }
+  else if ((VSCP_CLASS2_MEASUREMENT_FLOAT == pEvent->vscp_class)) {
+
+    // Check if data length is valid
+    if ((NULL == pEvent->pdata) || (12 != pEvent->sizeData)) {
+      return VSCP_ERROR_ERROR;
+    }
+
+    return pEvent->pdata[3];
+  }
+
+  return VSCP_ERROR_ERROR;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getMeasurementSensorIndex
+//
+
+int
+vscp_fwhlp_getMeasurementSensorIndex(const vscpEvent *pEvent)
+{
+  int offset = 0;
+
+  // Must have valid event and data
+  if ((NULL == pEvent) || (NULL == pEvent->pdata) || !pEvent->sizeData) {
+    return -1;
+  }
+
+  // If class >= 512 and class < 1024 we
+  // have GUID in front of data.
+  if ((pEvent->vscp_class >= VSCP_CLASS2_LEVEL1_PROTOCOL) && (pEvent->vscp_class < VSCP_CLASS2_PROTOCOL)) {
+    offset = 16;
+  }
+
+  if ((VSCP_CLASS1_MEASUREMENT == pEvent->vscp_class) || (VSCP_CLASS1_DATA == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENT == pEvent->vscp_class)) {
+
+    return VSCP_DATACODING_INDEX(pEvent->pdata[offset + 0]);
+  }
+  else if ((VSCP_CLASS1_MEASUREZONE == pEvent->vscp_class) || (VSCP_CLASS2_LEVEL1_MEASUREZONE == pEvent->vscp_class) ||
+           (VSCP_CLASS1_SETVALUEZONE == pEvent->vscp_class) ||
+           (VSCP_CLASS2_LEVEL1_SETVALUEZONE == pEvent->vscp_class)) {
+
+    if ((NULL == pEvent->pdata) || (pEvent->sizeData >= (offset + 3))) {
+      return -1;
+    }
+
+    return pEvent->pdata[offset + 0];
+  }
+  else if ((VSCP_CLASS1_MEASUREMENT32 == pEvent->vscp_class) ||
+           (VSCP_CLASS2_LEVEL1_MEASUREMENT32 == pEvent->vscp_class)) {
+    return 0; // Sensor index is always zero
+  }
+  else if ((VSCP_CLASS1_MEASUREMENT64 == pEvent->vscp_class) ||
+           (VSCP_CLASS2_LEVEL1_MEASUREMENT64 == pEvent->vscp_class)) {
+    return 0; // Sensor index is always zero
+  }
+  else if ((VSCP_CLASS2_MEASUREMENT_STR == pEvent->vscp_class)) {
+
+    // Check if data length is valid
+    if ((NULL == pEvent->pdata) || (pEvent->sizeData < 4)) {
+      return VSCP_ERROR_ERROR;
+    }
+
+    return pEvent->pdata[0];
+  }
+  else if ((VSCP_CLASS2_MEASUREMENT_FLOAT == pEvent->vscp_class)) {
+
+    // Check if data length is valid
+    if ((NULL == pEvent->pdata) || (12 != pEvent->sizeData)) {
+      return VSCP_ERROR_ERROR;
+    }
+
+    return pEvent->pdata[0];
+  }
+
+  return VSCP_ERROR_ERROR;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getMeasurementZone
+//
+
+int
+vscp_fwhlp_getMeasurementZone(const vscpEvent *pEvent)
+{
+  int offset = 0;
+
+  // Must have valid event and data
+  if ((NULL == pEvent) || (NULL == pEvent->pdata) || !pEvent->sizeData) {
+    return -1;
+  }
+
+  // If class >= 512 and class < 1024 we
+  // have GUID in front of data.
+  if ((pEvent->vscp_class >= VSCP_CLASS2_LEVEL1_PROTOCOL) && (pEvent->vscp_class < VSCP_CLASS2_PROTOCOL)) {
+    offset = 16;
+  }
+
+  if ((VSCP_CLASS1_MEASUREMENT == pEvent->vscp_class) || (VSCP_CLASS1_DATA == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENT == pEvent->vscp_class)) {
+
+    return 0; // Always zero
+  }
+  else if ((VSCP_CLASS1_MEASUREZONE == pEvent->vscp_class) || (VSCP_CLASS2_LEVEL1_MEASUREZONE == pEvent->vscp_class) ||
+           (VSCP_CLASS1_SETVALUEZONE == pEvent->vscp_class) ||
+           (VSCP_CLASS2_LEVEL1_SETVALUEZONE == pEvent->vscp_class)) {
+
+    if ((NULL == pEvent->pdata) || (pEvent->sizeData >= (offset + 3))) {
+      return 0;
+    }
+
+    return pEvent->pdata[offset + 1];
+  }
+  else if ((VSCP_CLASS1_MEASUREMENT32 == pEvent->vscp_class) ||
+           (VSCP_CLASS2_LEVEL1_MEASUREMENT32 == pEvent->vscp_class)) {
+    return 0; // Sensor index is always zero
+  }
+  else if ((VSCP_CLASS1_MEASUREMENT64 == pEvent->vscp_class) ||
+           (VSCP_CLASS2_LEVEL1_MEASUREMENT64 == pEvent->vscp_class)) {
+    return 0; // Sensor index is always zero
+  }
+  else if ((VSCP_CLASS2_MEASUREMENT_STR == pEvent->vscp_class)) {
+
+    // Check if data length is valid
+    if ((NULL == pEvent->pdata) || (pEvent->sizeData < 4)) {
+      return VSCP_ERROR_ERROR;
+    }
+
+    return pEvent->pdata[2];
+  }
+  else if ((VSCP_CLASS2_MEASUREMENT_FLOAT == pEvent->vscp_class)) {
+
+    // Check if data length is valid
+    if ((NULL == pEvent->pdata) || (12 != pEvent->sizeData)) {
+      return VSCP_ERROR_ERROR;
+    }
+
+    return pEvent->pdata[2];
+  }
+
+  return VSCP_ERROR_ERROR;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getMeasurementSubZone
+//
+
+int
+vscp_fwhlp_getMeasurementSubZone(const vscpEvent *pEvent)
+{
+  int offset = 0;
+
+  // Must have valid event and data
+  if ((NULL == pEvent) || (NULL == pEvent->pdata) || !pEvent->sizeData) {
+    return -1;
+  }
+
+  // If class >= 512 and class < 1024 we
+  // have GUID in front of data.
+  if ((pEvent->vscp_class >= VSCP_CLASS2_LEVEL1_PROTOCOL) && (pEvent->vscp_class < VSCP_CLASS2_PROTOCOL)) {
+    offset = 16;
+  }
+
+  if ((VSCP_CLASS1_MEASUREMENT == pEvent->vscp_class) || (VSCP_CLASS1_DATA == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENT == pEvent->vscp_class) || (VSCP_CLASS1_MEASUREZONE == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREZONE == pEvent->vscp_class) || (VSCP_CLASS1_SETVALUEZONE == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_SETVALUEZONE == pEvent->vscp_class)) {
+
+    if ((NULL == pEvent->pdata) || (pEvent->sizeData >= (offset + 1))) {
+      return 0;
+    }
+
+    return 0; // Always zero
+  }
+  else if ((VSCP_CLASS1_MEASUREMENT32 == pEvent->vscp_class) ||
+           (VSCP_CLASS2_LEVEL1_MEASUREMENT32 == pEvent->vscp_class)) {
+    return 0; // Sensor index is always zero
+  }
+  else if ((VSCP_CLASS1_MEASUREMENT64 == pEvent->vscp_class) ||
+           (VSCP_CLASS2_LEVEL1_MEASUREMENT64 == pEvent->vscp_class)) {
+    return 0; // Sensor index is always zero
+  }
+  else if ((VSCP_CLASS2_MEASUREMENT_STR == pEvent->vscp_class)) {
+
+    // Check if data length is valid
+    if ((NULL == pEvent->pdata) || (pEvent->sizeData < 4)) {
+      return VSCP_ERROR_ERROR;
+    }
+
+    return pEvent->pdata[offset + 2];
+  }
+  else if ((VSCP_CLASS2_MEASUREMENT_FLOAT == pEvent->vscp_class)) {
+
+    // Check if data length is valid
+    if ((NULL == pEvent->pdata) || (12 != pEvent->sizeData)) {
+      return VSCP_ERROR_ERROR;
+    }
+
+    return pEvent->pdata[2];
+  }
+
+  return VSCP_ERROR_ERROR;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_isMeasurement
+//
+
+int
+vscp_fwhlp_isMeasurement(const vscpEvent *pEvent)
+{
+  if ( NULL == pEvent) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if ((VSCP_CLASS1_MEASUREMENT == pEvent->vscp_class) || (VSCP_CLASS1_MEASUREMENTX1 == pEvent->vscp_class) ||
+      (VSCP_CLASS1_MEASUREMENTX2 == pEvent->vscp_class) || (VSCP_CLASS1_MEASUREMENTX3 == pEvent->vscp_class) ||
+      (VSCP_CLASS1_MEASUREMENTX4 == pEvent->vscp_class) || (VSCP_CLASS1_DATA == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENT == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENTX1 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENTX2 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENTX3 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENTX4 == pEvent->vscp_class) || (VSCP_CLASS1_MEASUREZONE == pEvent->vscp_class) ||
+      (VSCP_CLASS1_MEASUREZONEX1 == pEvent->vscp_class) || (VSCP_CLASS1_MEASUREZONEX2 == pEvent->vscp_class) ||
+      (VSCP_CLASS1_MEASUREZONEX3 == pEvent->vscp_class) || (VSCP_CLASS1_MEASUREZONEX4 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREZONE == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREZONEX1 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREZONEX2 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREZONEX3 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREZONEX4 == pEvent->vscp_class) || (VSCP_CLASS1_SETVALUEZONE == pEvent->vscp_class) ||
+      (VSCP_CLASS1_SETVALUEZONEX1 == pEvent->vscp_class) || (VSCP_CLASS1_SETVALUEZONEX2 == pEvent->vscp_class) ||
+      (VSCP_CLASS1_SETVALUEZONEX3 == pEvent->vscp_class) || (VSCP_CLASS1_SETVALUEZONEX4 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_SETVALUEZONE == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_SETVALUEZONEX1 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_SETVALUEZONEX2 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_SETVALUEZONEX3 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_SETVALUEZONEX4 == pEvent->vscp_class) || (VSCP_CLASS1_MEASUREMENT32 == pEvent->vscp_class) ||
+      (VSCP_CLASS1_MEASUREMENT32X1 == pEvent->vscp_class) || (VSCP_CLASS1_MEASUREMENT32X2 == pEvent->vscp_class) ||
+      (VSCP_CLASS1_MEASUREMENT32X3 == pEvent->vscp_class) || (VSCP_CLASS1_MEASUREMENT32X4 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENT32 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENT32X1 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENT32X2 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENT32X3 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENT32X4 == pEvent->vscp_class) || (VSCP_CLASS1_MEASUREMENT64 == pEvent->vscp_class) ||
+      (VSCP_CLASS1_MEASUREMENT64X1 == pEvent->vscp_class) || (VSCP_CLASS1_MEASUREMENT64X2 == pEvent->vscp_class) ||
+      (VSCP_CLASS1_MEASUREMENT64X3 == pEvent->vscp_class) || (VSCP_CLASS1_MEASUREMENT64X4 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENT64 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENT64X1 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENT64X2 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENT64X3 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENT64X4 == pEvent->vscp_class) ||
+      (VSCP_CLASS2_MEASUREMENT_STR == pEvent->vscp_class) || (VSCP_CLASS2_MEASUREMENT_FLOAT == pEvent->vscp_class)) {
+    return VSCP_ERROR_SUCCESS;
+  }
+
+  return VSCP_ERROR_ERROR;
+}
+
+// ****************************
+//            CANAL
+// ****************************
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getHeadFromCANALid
+//
+
+unsigned char
+vscp_fwhlp_getHeadFromCANALid(uint32_t id)
+{
+  uint8_t hardcoded = 0;
+  uint8_t priority  = (0x07 & (id >> 26));
+  if (id & (1 << 25)) {
+    hardcoded = VSCP_HEADER_HARD_CODED;
+  }
+
+  return ((priority << 5) | hardcoded);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getVscpClassFromCANALid
+//
+
+uint16_t
+vscp_fwhlp_getVscpClassFromCANALid(uint32_t id)
+{
+  return (uint16_t) (0x1ff & (id >> 16));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getVscpTypeFromCANALid
+//
+
+uint16_t
+vscp_fwhlp_getVscpTypeFromCANALid(uint32_t id)
+{
+  return (uint16_t) (0xff & (id >> 8));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlpgetNicknameFromCANALid
+//
+
+uint8_t
+vscp_fwhlp_getNicknameFromCANALid(uint32_t id)
+{
+  return (id & 0xff);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getCANALidFromData
+//
+
+uint32_t
+vscp_fwhlp_getCANALidFromData(unsigned char priority, const uint16_t vscp_class, const uint16_t vscp_type)
+{
+  // unsigned long t1 = (unsigned long)priority << 20;
+  // unsigned long t2 = (unsigned long)pvscpMsg->vscp_class << 16;
+  // unsigned long t3 = (unsigned long)pvscpMsg->vscp_type << 8;
+  return (((unsigned long) priority << 26) | ((unsigned long) vscp_class << 16) | ((unsigned long) vscp_type << 8) | 0);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getCANALidFromEvent
+//
+
+uint32_t
+vscp_fwhlp_getCANALidFromEvent(const vscpEvent *pEvent)
+{
+  return (((unsigned long) vscp_fwhlp_getEventPriority(pEvent) << 26) | ((unsigned long) pEvent->vscp_class << 16) |
+          ((unsigned long) pEvent->vscp_type << 8) | 0);
 }

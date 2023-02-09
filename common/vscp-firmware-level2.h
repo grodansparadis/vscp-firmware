@@ -235,7 +235,7 @@ vscp2_init(const void* pdata);
  */
 
 int
-vscp2_do_work(vscpEventEx* pex);
+vscp2_do_work(vscpEvent* pev);
 
 /*!
  * @brief Read VSCP Level II register
@@ -303,7 +303,7 @@ vscp2_send_high_end_server_probe(void);
  */
 
 int
-vscp2_do_register_read(vscpEventEx* pex);
+vscp2_do_register_read(vscpEvent* pev);
 
 
 /*!
@@ -314,7 +314,7 @@ vscp2_do_register_read(vscpEventEx* pex);
  */
 
 int
-vscp2_do_register_write(vscpEventEx* pex);
+vscp2_do_register_write(vscpEvent* pev);
 
 
 #ifdef THIS_FIRMWARE_ENABLE_ERROR_REPORTING
@@ -399,7 +399,7 @@ vscp2_send_high_end_server_probe(void);
  */
 
 int
-vscp2_callback_get_ms(const void* pdata, uint32_t* ptime);
+vscp2_protocol_callback_get_ms(const void* pdata, uint32_t* ptime);
 
 /*!
  * @brief Get pointer to GUID
@@ -412,7 +412,7 @@ vscp2_callback_get_ms(const void* pdata, uint32_t* ptime);
  */
 
 const uint8_t*
-vscp2_callback_get_guid(const void* pdata);
+vscp2_protocol_callback_get_guid(const void* pdata);
 
 /*!
  * @brief Read user register
@@ -428,7 +428,7 @@ vscp2_callback_get_guid(const void* pdata);
  *
  */
 int
-vscp2_callback_read_user_reg(const void* pdata, uint32_t reg, uint8_t* pval);
+vscp2_protocol_callback_read_user_reg(const void* pdata, uint32_t reg, uint8_t* pval);
 
 /*!
  * @brief Write user register
@@ -444,7 +444,7 @@ vscp2_callback_read_user_reg(const void* pdata, uint32_t reg, uint8_t* pval);
  */
 
 int
-vscp2_callback_write_user_reg(const void* pdata, uint32_t reg, uint8_t val);
+vscp2_protocol_callback_write_user_reg(const void* pdata, uint32_t reg, uint8_t val);
 
 /*!
   @brief Send event to transport sublayer.
@@ -458,7 +458,7 @@ vscp2_callback_write_user_reg(const void* pdata, uint32_t reg, uint8_t val);
 */
 
 int
-vscp2_callback_send_event(const void* pdata, vscpEventEx* pex);
+vscp2_protocol_callback_send_event(const void* pdata, vscpEvent* pev);
 
 /*!
   @brief Send eventex to transport sublayer.
@@ -472,7 +472,7 @@ vscp2_callback_send_event(const void* pdata, vscpEventEx* pex);
 */
 
 int
-vscp2_callback_send_eventEx(const void* pdata, vscpEventEx* pex);
+vscp2_protocol_callback_send_eventEx(const void* pdata, vscpEvent* pev);
 
 /*!
  * @brief Enter bootloader.
@@ -482,7 +482,7 @@ vscp2_callback_send_eventEx(const void* pdata, vscpEventEx* pex);
  */
 
 int
-vscp2_callback_enter_bootloader(const void* pdata);
+vscp2_protocol_callback_enter_bootloader(const void* pdata);
 
 /*!
  * @brief Reply with DM content.
@@ -494,7 +494,7 @@ vscp2_callback_enter_bootloader(const void* pdata);
  */
 
 int
-vscp2_callback_report_dmatrix(const void* pdata);
+vscp2_protocol_callback_report_dmatrix(const void* pdata);
 
 /*!
  * @brief Reply with embedded DM.
@@ -506,7 +506,7 @@ vscp2_callback_report_dmatrix(const void* pdata);
  */
 
 int
-vscp2_callback_report_mdf(const void* pdata);
+vscp2_protocol_callback_report_mdf(const void* pdata);
 
 /*!
  * @brief Report back events that this node is interested in
@@ -516,7 +516,7 @@ vscp2_callback_report_mdf(const void* pdata);
  */
 
 int
-vscp2_callback_report_events_of_interest(const void* pdata);
+vscp2_protocol_callback_report_events_of_interest(const void* pdata);
 
 /*!
  * @brief Get timestamp
@@ -526,7 +526,7 @@ vscp2_callback_report_events_of_interest(const void* pdata);
  */
 
 uint32_t
-vscp2_callback_get_timestamp(const void* pdata);
+vscp2_protocol_callback_get_timestamp(const void* pdata);
 
 /*!
  * @brief  Fill in event time information
@@ -540,7 +540,7 @@ vscp2_callback_get_timestamp(const void* pdata);
  */
 
 int
-vscp2_callback_get_time(const void* pdata, const vscpEventEx* pex);
+vscp2_protocol_callback_get_time(const void* pdata, const vscpEvent* pev);
 
 /*!
   @brief Get user id
@@ -552,7 +552,7 @@ vscp2_callback_get_time(const void* pdata, const vscpEventEx* pex);
 */
 
 int
-vscp2_callback_get_user_id(const void* pdata, uint8_t pos, uint8_t* pval);
+vscp2_protocol_callback_get_user_id(const void* pdata, uint8_t pos, uint8_t* pval);
 
 /*!
   @brief Write user id
@@ -564,7 +564,7 @@ vscp2_callback_get_user_id(const void* pdata, uint8_t pos, uint8_t* pval);
 */
 
 int
-vscp2_callback_write_user_id(const void* pdata, uint8_t pos, uint8_t val);
+vscp2_protocol_callback_write_user_id(const void* pdata, uint8_t pos, uint8_t val);
 
 #ifdef THIS_FIRMWARE_ENABLE_WRITE_2PROTECTED_LOCATIONS
 
@@ -578,7 +578,7 @@ vscp2_callback_write_user_id(const void* pdata, uint8_t pos, uint8_t val);
 */
 
 int
-vscp2_callback_get_manufacturer_id(const void* pdata, uint8_t pos, uint8_t* pval);
+vscp2_protocol_callback_get_manufacturer_id(const void* pdata, uint8_t pos, uint8_t* pval);
 
 /*!
   @brief Write manufacturer id
@@ -590,7 +590,7 @@ vscp2_callback_get_manufacturer_id(const void* pdata, uint8_t pos, uint8_t* pval
 */
 
 int
-vscp2_callback_write_manufacturer_id(const void* pdata, uint8_t pos, uint8_t val);
+vscp2_protocol_callback_write_manufacturer_id(const void* pdata, uint8_t pos, uint8_t val);
 
 /*!
   @brief Write guid byte
@@ -602,7 +602,7 @@ vscp2_callback_write_manufacturer_id(const void* pdata, uint8_t pos, uint8_t val
 */
 
 int
-vscp2_callback_write_guid(const void* pdata, uint8_t pos, uint8_t val);
+vscp2_protocol_callback_write_guid(const void* pdata, uint8_t pos, uint8_t val);
 
 #endif
 
@@ -615,7 +615,7 @@ vscp2_callback_write_guid(const void* pdata, uint8_t pos, uint8_t val);
 */
 
 int
-vscp2_callback_get_bootloader_algorithm(const void* pdata);
+vscp2_protocol_callback_get_bootloader_algorithm(const void* pdata);
 
 /*!
   @brief Get persistent storage control byte
@@ -626,7 +626,7 @@ vscp2_callback_get_bootloader_algorithm(const void* pdata);
 */
 
 int
-vscp2_callback_get_control_byte(const void* pdata);
+vscp2_protocol_callback_get_control_byte(const void* pdata);
 
 /*!
   @brief Set persistent storage control byte
@@ -637,7 +637,7 @@ vscp2_callback_get_control_byte(const void* pdata);
 */
 
 int
-vscp2_callback_set_control_byte(const void* pdata, uint8_t ctrl);
+vscp2_protocol_callback_set_control_byte(const void* pdata, uint8_t ctrl);
 
 /*!
   @brief Initialize persistent storage
@@ -645,7 +645,7 @@ vscp2_callback_set_control_byte(const void* pdata, uint8_t ctrl);
   @param pdata Pointer to user data (typical points to context)
  */
 int
-vscp2_callback_init_persistent_storage(const void* pdata);
+vscp2_protocol_callback_init_persistent_storage(const void* pdata);
 
 /*!
   @brief Feed the decision matrix with one Event
@@ -655,7 +655,7 @@ vscp2_callback_init_persistent_storage(const void* pdata);
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 int
-vscp2_callback_feed_dm(const void* pdata, vscpEventEx* ev);
+vscp2_protocol_callback_feed_dm(const void* pdata, vscpEventEx* ev);
 
 /*!
   @brief All events except level I/II protocol events is sent to the
@@ -667,7 +667,7 @@ vscp2_callback_feed_dm(const void* pdata, vscpEventEx* ev);
 */
 
 int
-vscp2_callback_feed_app(const void* pdata, vscpEventEx* pex);
+vscp2_protocol_callback_feed_app(const void* pdata, vscpEvent* pev);
 
 /*!
   @brief Get DM matrix info
@@ -688,7 +688,7 @@ vscp2_callback_feed_app(const void* pdata, vscpEventEx* pex);
  */
 
 int
-vscp2_callback_send_dm_info(const void* pdata, char* pDM);
+vscp2_protocol_callback_send_dm_info(const void* pdata, char* pDM);
 
 /*!
   @brief Get embedded MDF info
@@ -701,7 +701,7 @@ vscp2_callback_send_dm_info(const void* pdata, char* pDM);
   @return VSCP_ERROR_SUCCESS on success, or error code.
  */
 int
-vscp2_callback_send_embedded_mdf(const void* pdata);
+vscp2_protocol_callback_send_embedded_mdf(const void* pdata);
 
 /*!
   @brief Go boot loader mode
@@ -715,7 +715,7 @@ vscp2_callback_send_embedded_mdf(const void* pdata);
  */
 
 int
-vscp2_callback_go_bootloader(const void* pdata, uint8_t* palgorithm);
+vscp2_protocol_callback_go_bootloader(const void* pdata, uint8_t* palgorithm);
 
 /*!
   @brief Get Zone for device
@@ -727,7 +727,7 @@ vscp2_callback_go_bootloader(const void* pdata, uint8_t* palgorithm);
  */
 
 int
-vscp2_callback_get_zone(const void* pdata);
+vscp2_protocol_callback_get_zone(const void* pdata);
 
 /*!
   @brief Get Subzone for device
@@ -739,7 +739,7 @@ vscp2_callback_get_zone(const void* pdata);
  */
 
 int
-vscp2_callback_get_subzone(const void* pdata);
+vscp2_protocol_callback_get_subzone(const void* pdata);
 
 /*!
   @brief Restore defaults
@@ -753,7 +753,7 @@ vscp2_callback_get_subzone(const void* pdata);
  */
 
 int
-vscp2_callback_restore_defaults(const void* pdata);
+vscp2_protocol_callback_restore_defaults(const void* pdata);
 
 /**
  * @brief Return ipv6 or ipv4 address
@@ -771,7 +771,7 @@ vscp2_callback_restore_defaults(const void* pdata);
  */
 
 int
-vscp2_callback_get_ip_addr(const void* pUserData, uint8_t* pipaddr);
+vscp2_protocol_callback_get_ip_addr(const void* pUserData, uint8_t* pipaddr);
 
 #ifdef THIS_FIRMWARE_VSCP_DISCOVER_SERVER
 
@@ -783,7 +783,7 @@ vscp2_callback_get_ip_addr(const void* pUserData, uint8_t* pipaddr);
 */
 
 int
-vscp2_callback_high_end_server_response(const void* pUserData);
+vscp2_protocol_callback_high_end_server_response(const void* pUserData);
 
 #endif
 

@@ -56,14 +56,14 @@
 #define VSCP_LINK_MAX_USER_NAME_LENGTH 32 // Max length of user name
 #define VSCP_LINK_MAX_PASSWORD_LENGTH  80 // Max length of password
 
-#define VSCP_LINK_MSG_WELCOME         "Welcome to the VSCP Link Protocol Interface.\r\n"
-#define VSCP_LINK_MSG_OK              "+OK - Success.\r\n"
-#define VSCP_LINK_MSG_GOODBY          "+OK - Goodby. Connection closed.\r\n"
-#define VSCP_LINK_MSG_USENAME_OK      "+OK - User name accepted, password please\r\n"
-#define VSCP_LINK_MSG_PASSWORD_OK     "+OK - Ready to work.\r\n"
-#define VSCP_LINK_MSG_QUEUE_CLEARED   "+OK - All events cleared.\r\n"
-#define VSCP_LINK_MSG_RECEIVE_LOOP    "+OK - Receive loop entered. QUITLOOP to terminate.\r\n"
-#define VSCP_LINK_MSG_QUIT_LOOP       "+OK - Quit receive loop.\r\n"
+#define VSCP_LINK_MSG_WELCOME       "Welcome to the VSCP Link Protocol Interface.\r\n"
+#define VSCP_LINK_MSG_OK            "+OK - Success.\r\n"
+#define VSCP_LINK_MSG_GOODBY        "+OK - Goodby. Connection closed.\r\n"
+#define VSCP_LINK_MSG_USENAME_OK    "+OK - User name accepted, password please\r\n"
+#define VSCP_LINK_MSG_PASSWORD_OK   "+OK - Ready to work.\r\n"
+#define VSCP_LINK_MSG_QUEUE_CLEARED "+OK - All events cleared.\r\n"
+#define VSCP_LINK_MSG_RECEIVE_LOOP  "+OK - Receive loop entered. QUITLOOP to terminate.\r\n"
+#define VSCP_LINK_MSG_QUIT_LOOP     "+OK - Quit receive loop.\r\n"
 
 #define VSCP_LINK_MSG_ERROR           "-OK - Error\r\n"
 #define VSCP_LINK_MSG_UNKNOWN_COMMAND "-OK - Unknown command\r\n"
@@ -151,6 +151,7 @@
 #define VSCP_LINK_STD_HELP_SHUTDOWN "'shutdown' Shutdown the device.\r\n+OK\r\n"
 
   /*!
+   * @fn vscp_link_connect
    * @brief Connect link
    *
    * @param pdata Pointer to context
@@ -161,7 +162,7 @@
   vscp_link_connect(const void* pdata);
 
   /**
-   * @fn
+   * @fn vscp_link_disconnect
    * @brief Disconnect link
    *
    * @param pdata Pointer to context
@@ -172,7 +173,7 @@
   vscp_link_disconnect(const void* pdata);
 
   /**
-   * @fn
+   * @fn vscp_link_idle_worker
    * @brief Do idle work
    *
    * @param pdata Pointer to context
@@ -183,24 +184,24 @@
   vscp_link_idle_worker(const void* pdata);
 
   /**
-   * @fn
+   * @fn vscp_link_parser
    * @brief Parse command lines
    *
    * @param pdata Pointer to context
    * @param pbuf Pointer to command buffer holding part or hole incoming command.
-   * @param psize Pointer to size of command buffer in chars.
+   * @param pnext Pointer to pointer that is set to character after command (after CRLF).
    * @return VSCP_ERROR_TRUE on success, VSCP error code on failure
    */
 
   int
-  vscp_link_parser(const void* pdata, char* pbuf, size_t* psize);
+  vscp_link_parser(const void* pdata, char* pbuf, char** pnext);
 
   ///////////////////////////////////////////////////////////////////////////////
   //                          Command handlers
   ///////////////////////////////////////////////////////////////////////////////
 
   /**
-    @fn
+    @fn vscp_link_doCmdNoop
     @brief noop command - Just return +OK\r\n
 
     @param pdata Pointer to user data
@@ -212,21 +213,24 @@
   vscp_link_doCmdNoop(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief noop command - Just return +OK\r\n
+   * @fn vscp_link_doCmdHelp
+   * @brief Provide user help
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
    *             Can give specific help on argument
    * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
+   *
+   * Can give help about all commands if no argument is given or
+   * just one command if a command name is given as parameter.
    */
 
   int
   vscp_link_doCmdHelp(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief noop command - Just return +OK\r\n
+   * @fn vscp_link_doCmdQuit
+   * @brief Quit client session
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -237,8 +241,8 @@
   vscp_link_doCmdQuit(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief user command - Just return +OK\r\n
+   * @fn vscp_link_doCmdUser
+   * @brief user name for login
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -249,8 +253,8 @@
   vscp_link_doCmdUser(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief password command - Just return +OK\r\n
+   * @fn vscp_link_doCmdPassword
+   * @brief password for login
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -261,8 +265,8 @@
   vscp_link_doCmdPassword(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief challenge command - Just return +OK\r\n
+   * @fn vscp_link_doCmdChallenge
+   * @brief challenge for login
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -273,8 +277,8 @@
   vscp_link_doCmdChallenge(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief send command - Just return +OK\r\n
+   * @fn vscp_link_doCmdSend
+   * @brief Send a VSCP event
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -285,8 +289,8 @@
   vscp_link_doCmdSend(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief retr command - Just return +OK\r\n
+   * @fn vscp_link_doCmdRetrieve
+   * @brief Retrieve a VSCP events if any.
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -297,8 +301,8 @@
   vscp_link_doCmdRetrieve(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief rcvloop command - Just return +OK\r\n
+   * @fn vscp_link_doCmdRcvLoop
+   * @brief Enter receive loop
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -309,8 +313,8 @@
   vscp_link_doCmdRcvLoop(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief quitloop command - Just return +OK\r\n
+   * @fn vscp_link_doCmdQuitLoop
+   * @brief Quit receive loop
    *
    *  @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -321,8 +325,8 @@
   vscp_link_doCmdQuitLoop(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief chkdata command - Just return +OK\r\n
+   * @fn vscp_link_doCmdCheckData
+   * @brief Check if there are events ready to be received
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -333,8 +337,8 @@
   vscp_link_doCmdCheckData(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief clrall command - Just return +OK\r\n
+   * @fn vscp_link_doCmdClearAll
+   * @brief Clear all events in input queue
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -345,8 +349,8 @@
   vscp_link_doCmdClearAll(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief stat command - Just return +OK\r\n
+   * @fn vscp_link_doCmdStatistics
+   * @brief Get VSCP_link_statistics
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -357,8 +361,8 @@
   vscp_link_doCmdStatistics(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief info command - Just return +OK\r\n
+   * @fn vscp_link_doCmdInfo
+   * @brief Get status information
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -369,8 +373,8 @@
   vscp_link_doCmdInfo(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief getid command - Just return +OK\r\n
+   * @fn vscp_link_doCmdGetChannelId
+   * @brief Get channel id
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -381,8 +385,8 @@
   vscp_link_doCmdGetChannelId(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief getguid command - Just return +OK\r\n
+   * @fn vscp_link_doCmdGetGUID
+   * @brief Get channel GUID
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -393,8 +397,8 @@
   vscp_link_doCmdGetGUID(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief setguid command - Just return +OK\r\n
+   * @fn vscp_link_doCmdSetGUID
+   * @brief Set channel GUID
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -405,8 +409,8 @@
   vscp_link_doCmdSetGUID(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief vers command - Just return +OK\r\n
+   * @fn vscp_link_doCmdGetVersion
+   * @brief Get version
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -417,8 +421,8 @@
   vscp_link_doCmdGetVersion(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief filter command - Just return +OK\r\n
+   * @fn vscp_link_doCmdSetFilter
+   * @brief Set receive event filter
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -429,8 +433,8 @@
   vscp_link_doCmdSetFilter(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief
+   * @fn vscp_link_doCmdSetMask
+   * @brief Set receive event mask
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -441,7 +445,7 @@
   vscp_link_doCmdSetMask(const void* pdata, const char* cmd);
 
   /**
-   * @fn
+   * @fn vscp_link_doCmdTest
    * @brief test command - Do test and return result. The command
    *         is optional and if not implemented return "+OK\r\n"
    *
@@ -454,8 +458,8 @@
   vscp_link_doCmdTest(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief wcyd command - Just return +OK\r\n
+   * @fn vscp_link_doCmdWhatCanYouDo
+   * @brief What can you do dommand. Return info about what this node can do.
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -466,8 +470,8 @@
   vscp_link_doCmdWhatCanYouDo(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief + command - Just return +OK\r\n
+   * @fn vscp_link_doCmdCommandAgain
+   * @brief + command - Do last command again
    *
    * @param pdata Pointer to user data
    * @param cmd Command string after actual command (arguments)
@@ -478,8 +482,8 @@
   vscp_link_doCmdCommandAgain(const void* pdata, const char* cmd);
 
   /**
-   * @fn
-   * @brief interface command - Just return +OK\r\n
+   * @fn vscp_link_doCmdInterface
+   * @brief interface command
    *     Old versions accepter 'list' and 'close' as argument.
    *     These arguments has been deprecated.
    *
@@ -493,7 +497,7 @@
   vscp_link_doCmdInterface(const void* pdata, const char* cmd);
 
   /**
-   * @fn
+   * @fn vscp_link_doCmdShutdown
    * @brief Shutdown the device into a safe state
    *
    * @param pdata Pointer to user data
@@ -508,7 +512,7 @@
   vscp_link_doCmdShutdown(const void* pdata, const char* cmd);
 
   /**
-   * @fn
+   * @fn vscp_link_doCmdRestart
    * @brief Restart the device
    *
    *  @param pdata Pointer to user data
@@ -521,6 +525,54 @@
 
   int
   vscp_link_doCmdRestart(const void* pdata, const char* cmd);
+
+  // --------------------------------------------------------------------------
+  //                                  Binary
+  // --------------------------------------------------------------------------
+
+  /**
+   * @fn vscp_link_doCmdbRetr
+   * @brief Binary retreive
+   *
+   * @param pdata Pointer to user data
+   *  @param cmd Command string after actual command (arguments)
+   *  @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
+   */
+  int
+  vscp_link_doCmdbRetr(const void* pdata, const char* cmd);
+
+  /**
+   * @fn vscp_link_doCmdbSend
+   * @brief Binary send
+   *
+   * @param pdata Pointer to user data
+   *  @param cmd Command string after actual command (arguments)
+   *  @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
+   */
+  int
+  vscp_link_doCmdbSend(const void* pdata, const char* cmd);
+
+  /**
+   * @fn vscp_link_doCmdbRcvLoop
+   * @brief Enter binary receive loop
+   *
+   * @param pdata Pointer to user data
+   *  @param cmd Command string after actual command (arguments)
+   *  @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
+   */
+  int
+  vscp_link_doCmdbRcvLoop(const void* pdata, const char* cmd);
+
+  /**
+   * @fn vscp_link_doCmdSec
+   * @brief Set security level
+   *
+   * @param pdata Pointer to user data
+   *  @param cmd Command string after actual command (arguments)
+   *  @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
+   */
+  int
+  vscp_link_doCmdSec(const void* pdata, const char* cmd);
 
   ///////////////////////////////////////////////////////////////////////////////
   //                             Callbacks
@@ -613,7 +665,7 @@
    */
 
   int
-  vscp_link_callback_event_received(const void* pdata, const vscpEventEx* pex);
+  vscp_link_callback_event_received(const void* pdata, const vscpEvent* pev);
 
   /**
    * @fn vscp_link_callback_get_interface_count
@@ -742,14 +794,14 @@
    */
 
   int
-  vscp_link_callback_send(const void* pdata, vscpEventEx* pex);
+  vscp_link_callback_send(const void* pdata, vscpEvent* pev);
 
   /**
    * @fn vscp_link_callback_retr
    * @brief Get event ('retr').
    *
    * @param pdata Pointer to user data
-   * @param pex Pointer to event ex that will get event data
+   * @param pex Pointer to pointer of event that will get event data
    * @return Return VSCP_ERROR_SUCCESS if logged in error code else.
    *
    * VSCP_ERROR_INVALID_HANDLE - (msg=VSCP_LINK_MSG_NOT_ACCREDITED) is not logged in.
@@ -759,7 +811,7 @@
    */
 
   int
-  vscp_link_callback_retr(const void* pdata, vscpEventEx* pex);
+  vscp_link_callback_retr(const void* pdata, vscpEvent** pev);
 
   /**
    * @fn vscp_link_callback_enable_rcvloop
@@ -778,11 +830,12 @@
    *  @brief Get rcvloop status
    *
    *  @param pdata Pointer to user data
+   *  @param pRcvLoop Pointer to integer that get rcvloop status (non zero if active).
    *  @return Return none zero if rcvloop is active
    */
 
   int
-  vscp_link_callback_get_rcvloop_status(const void* pdata);
+  vscp_link_callback_get_rcvloop_status(const void* pdata, int* pRcvLoop);
 
   /**
    * @fn vscp_link_callback_chkData
@@ -909,7 +962,7 @@
    * @brief Callback for active rcvloop
    *
    * @param pdata Pointer to user data
-   * @param pex Pointer to event ex that will get data if available
+   * @param pex Pointer to pointer of event that will get data if available
    * @return Return VSCP_ERROR_SUCCESS on success, else error code.
    *
    * VSCP_ERROR_SUCCESS - Event is available
@@ -922,7 +975,7 @@
    */
 
   int
-  vscp_link_callback_rcvloop(const void* pdata, vscpEventEx* pex);
+  vscp_link_callback_rcvloop(const void* pdata, vscpEvent** pev);
 
   /**
    * @fn vscp_link_callback_wcyd
@@ -963,6 +1016,57 @@
 
   int
   vscp_link_callback_restart(const void* pdata);
+
+  // --------------------------------------------------------------------------
+  //                                 Binary
+  // --------------------------------------------------------------------------
+
+  /**
+   * @fn vscp_link_callback_bretr
+   * @brief Get binary encoded frame
+   *
+   * @param pdata Pointer to context
+   * @return Return VSCP_ERROR_SUCCESS on success, else error code.
+   */
+  int
+  vscp_link_callback_bretr(const void* pdata);
+
+  /**
+   * @fn vscp_link_callback_bsend
+   * @brief Send binary encoded frame
+   *
+   * @param pdata Pointer to context
+   * @return Return VSCP_ERROR_SUCCESS on success, else error code.
+   */
+  int
+  vscp_link_callback_bsend(const void* pdata);
+
+  /**
+   * @fn vscp_link_callback_brcvloop
+   * @brief Enter binary receive loop
+   *
+   * @param pdata Pointer to context
+   * @return Return VSCP_ERROR_SUCCESS on success, else error code.
+   */
+
+  int
+  vscp_link_callback_brcvloop(const void* pdata);
+
+  /**
+   * @fn vscp_link_callback_sec
+   * @brief Set security level.
+   * Argument is
+   * 0 - No security
+   * 1 - Encrypt with AES-128
+   * 2 - Encrypt with AES-192
+   * 3 - Encrypt with AES-256
+   *
+   * @param pdata Pointer to context
+   * @return Return VSCP_ERROR_SUCCESS on success, else error code.
+   */
+
+  int
+  vscp_link_callback_sec(const void* pdata);
 
   /**
   @}

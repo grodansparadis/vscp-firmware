@@ -42,11 +42,14 @@
  * ******************************************************************************
  */
 
-#include "vscp.h"
-#include "vscp_aes.h"
-
 #ifndef __VSCP_FIRMWARE_HELPER_H__
 #define __VSCP_FIRMWARE_HELPER_H__
+
+#include "vscp-projdefs.h"
+#include "vscp-compiler.h"
+
+#include "vscp.h"
+#include "vscp_aes.h"
 
 /* Macros */
 
@@ -70,6 +73,81 @@
                                                          (((uint32_t)b0) << 8) +  \
                                                          (uint32_t)b0))
 
+/*  byte swapping */
+
+#define VSCP_UINT16_SWAP_ALWAYS(val)                                                                                   \
+  ((uint16_t) ((((uint16_t) (val) & (uint16_t) 0x00ffU) << 8) | (((uint16_t) (val) & (uint16_t) 0xff00U) >> 8)))
+
+#define VSCP_INT16_SWAP_ALWAYS(val)                                                                                    \
+  ((int16_t) ((((uint16_t) (val) & (uint16_t) 0x00ffU) << 8) | (((uint16_t) (val) & (uint16_t) 0xff00U) >> 8)))
+
+#define VSCP_UINT32_SWAP_ALWAYS(val)                                                                                   \
+  ((uint32_t) ((((uint32_t) (val) & (uint32_t) 0x000000ffU) << 24) |                                                   \
+               (((uint32_t) (val) & (uint32_t) 0x0000ff00U) << 8) |                                                    \
+               (((uint32_t) (val) & (uint32_t) 0x00ff0000U) >> 8) |                                                    \
+               (((uint32_t) (val) & (uint32_t) 0xff000000U) >> 24)))
+
+#define VSCP_INT32_SWAP_ALWAYS(val)                                                                                    \
+  ((int32_t) ((((uint32_t) (val) & (uint32_t) 0x000000ffU) << 24) |                                                    \
+              (((uint32_t) (val) & (uint32_t) 0x0000ff00U) << 8) |                                                     \
+              (((uint32_t) (val) & (uint32_t) 0x00ff0000U) >> 8) |                                                     \
+              (((uint32_t) (val) & (uint32_t) 0xff000000U) >> 24)))
+/*  machine specific byte swapping */
+
+#define VSCP_UINT64_SWAP_ALWAYS(val)                                                                                   \
+  ((uint64_t) ((((uint64_t) (val) & (uint64_t) (0x00000000000000ff)) << 56) |                                          \
+               (((uint64_t) (val) & (uint64_t) (0x000000000000ff00)) << 40) |                                          \
+               (((uint64_t) (val) & (uint64_t) (0x0000000000ff0000)) << 24) |                                          \
+               (((uint64_t) (val) & (uint64_t) (0x00000000ff000000)) << 8) |                                           \
+               (((uint64_t) (val) & (uint64_t) (0x000000ff00000000)) >> 8) |                                           \
+               (((uint64_t) (val) & (uint64_t) (0x0000ff0000000000)) >> 24) |                                          \
+               (((uint64_t) (val) & (uint64_t) (0x00ff000000000000)) >> 40) |                                          \
+               (((uint64_t) (val) & (uint64_t) (0xff00000000000000)) >> 56)))
+
+#define VSCP_INT64_SWAP_ALWAYS(val)                                                                                    \
+  ((int64_t) ((((uint64_t) (val) & (uint64_t) (0x00000000000000ff)) << 56) |                                           \
+              (((uint64_t) (val) & (uint64_t) (0x000000000000ff00)) << 40) |                                           \
+              (((uint64_t) (val) & (uint64_t) (0x0000000000ff0000)) << 24) |                                           \
+              (((uint64_t) (val) & (uint64_t) (0x00000000ff000000)) << 8) |                                            \
+              (((uint64_t) (val) & (uint64_t) (0x000000ff00000000)) >> 8) |                                            \
+              (((uint64_t) (val) & (uint64_t) (0x0000ff0000000000)) >> 24) |                                           \
+              (((uint64_t) (val) & (uint64_t) (0x00ff000000000000)) >> 40) |                                           \
+              (((uint64_t) (val) & (uint64_t) (0xff00000000000000)) >> 56)))
+
+#ifdef __BIG_ENDIAN__
+#define VSCP_UINT16_SWAP_ON_BE(val) VSCP_UINT16_SWAP_ALWAYS(val)
+#define VSCP_INT16_SWAP_ON_BE(val)  VSCP_INT16_SWAP_ALWAYS(val)
+#define VSCP_UINT16_SWAP_ON_LE(val) (val)
+#define VSCP_INT16_SWAP_ON_LE(val)  (val)
+#define VSCP_UINT32_SWAP_ON_BE(val) VSCP_UINT32_SWAP_ALWAYS(val)
+#define VSCP_INT32_SWAP_ON_BE(val)  VSCP_INT32_SWAP_ALWAYS(val)
+#define VSCP_UINT32_SWAP_ON_LE(val) (val)
+#define VSCP_INT32_SWAP_ON_LE(val)  (val)
+#define VSCP_UINT64_SWAP_ON_BE(val) VSCP_UINT64_SWAP_ALWAYS(val)
+#define VSCP_UINT64_SWAP_ON_LE(val) (val)
+#define VSCP_INT64_SWAP_ON_BE(val)  VSCP_INT64_SWAP_ALWAYS(val)
+#define VSCP_INT64_SWAP_ON_LE(val)  (val)
+#else
+#define VSCP_UINT16_SWAP_ON_LE(val) VSCP_UINT16_SWAP_ALWAYS(val)
+#define VSCP_INT16_SWAP_ON_LE(val)  VSCP_INT16_SWAP_ALWAYS(val)
+#define VSCP_UINT16_SWAP_ON_BE(val) (val)
+#define VSCP_INT16_SWAP_ON_BE(val)  (val)
+#define VSCP_UINT32_SWAP_ON_LE(val) VSCP_UINT32_SWAP_ALWAYS(val)
+#define VSCP_INT32_SWAP_ON_LE(val)  VSCP_INT32_SWAP_ALWAYS(val)
+#define VSCP_UINT32_SWAP_ON_BE(val) (val)
+#define VSCP_INT32_SWAP_ON_BE(val)  (val)
+#define VSCP_UINT64_SWAP_ON_LE(val) VSCP_UINT64_SWAP_ALWAYS(val)
+#define VSCP_UINT64_SWAP_ON_BE(val) (val)
+#define VSCP_INT64_SWAP_ON_LE(val)  VSCP_INT64_SWAP_ALWAYS(val)
+#define VSCP_INT64_SWAP_ON_BE(val)  (val)
+#endif
+
+#define Swap8Bytes(val)                                                                                                \
+  ((((val) >> 56) & 0x00000000000000FF) | (((val) >> 40) & 0x000000000000FF00) |                                       \
+   (((val) >> 24) & 0x0000000000FF0000) | (((val) >> 8) & 0x00000000FF000000) | (((val) << 8) & 0x000000FF00000000) |  \
+   (((val) << 24) & 0x0000FF0000000000) | (((val) << 40) & 0x00FF000000000000) | (((val) << 56) & 0xFF00000000000000))
+
+
 /**
  * @brief VSCP TCP/IP link interface description
  * Describes one interface
@@ -80,6 +158,23 @@ typedef struct vscp_interface_info {
   uint8_t guid[16];
   char description[64];
 } vscp_interface_info_t;
+
+
+/**
+ * @fn vscp_fwhlp_isLittleEndian
+ * @brief Check if little endian system
+ * @return Non zero fo rlittle endian system.
+ */
+int
+vscp_fwhlp_isLittleEndian(void);
+
+/**
+ * @fn vscp_fwhlp_isBigEndian
+ * @brief Check if big endian system
+ * @return int Return Non zero for big endian system.
+ */
+int
+vscp_fwhlp_isBigEndian(void);
 
 /**
     Convert ASCII substring to unsigned long number
@@ -157,7 +252,7 @@ uint32_t
 vscp_fwhlp_readStringValue(const char* pString);
 
 /**
-  Find substring other string and return pointer to it
+  Find substring of other string and return pointer to it
   @param haystack String to search in.
   @param needle String to search for.
   @return Pointer to substring or NULL if not found.
@@ -359,6 +454,28 @@ vscp_fwhlp_eventToStringEx(char* buf, size_t len, const vscpEventEx* pex);
 vscpEvent*
 vscp_fwhlp_newEvent(void);
 
+/**
+ * @brief Convert event to eventex
+ *
+ * @param pEventEx Pointer to eventex that will get result of conversion. 
+ * @param pEvent Pointer to event that should be converted
+ * @return int VSCP_ERROR_SUCCESS is returned on success, otherwise an error code is returned.
+ */
+
+int
+vscp_convertEventToEventEx(vscpEventEx *pEventEx, const vscpEvent *pEvent);
+
+/**
+ * @brief Convert eventex to event
+ * 
+ * @param pEvent  Pointer to event that will get result of conversion.
+ * @param pEventEx  Pointer to eventex that should be converted
+ * @return int VSCP_ERROR_SUCCESS is returned on success, otherwise an error code is returned. 
+ */
+
+int
+vscp_convertEventExToEvent(vscpEvent *pEvent, const vscpEventEx *pEventEx);
+
 /*!
     @brief Make a copy of an event
     @param pev Pointer to event structure to make copy of.
@@ -368,6 +485,15 @@ vscp_fwhlp_newEvent(void);
 vscpEvent*
 vscp_fwhlp_mkEventCopy(vscpEvent* pev);
 
+/*!
+    @brief Make a copy of an eventex
+    @param pex Pointer to event structure to make copy of.
+    @return Pointer to the new event if successful, NULL if not.
+*/
+
+vscpEventEx*
+vscp_fwhlp_mkEventExCopy(vscpEventEx* pex);
+
 /**
   @brief Delete an event and it's data.
   @param pev Address of event to delete.
@@ -375,6 +501,15 @@ vscp_fwhlp_mkEventCopy(vscpEvent* pev);
 */
 int
 vscp_fwhlp_deleteEvent(vscpEvent** pev);
+
+/*
+  AES crypto support  requires the vscp-aes.c lib to be
+  linked in (from the vscp-firmware common folder). 
+
+  Define VSCP_FWHLP_CRYPTO_SUPPORT in vscp-projefs.h to 
+  compile.
+*/
+#ifdef VSCP_FWHLP_CRYPTO_SUPPORT
 
 /*!
  * Encrypt VSCP frame using the selected encryption algorithm. The iv
@@ -444,5 +579,100 @@ vscp_fwhlp_decryptFrame(uint8_t* output,
                         const uint8_t* key,
                         const uint8_t* iv,
                         uint8_t nAlgorithm);
+
+#endif                        
+
+/*
+  JSON support needs VSCP_FWHLP_JSON_SUPPORT to be defined
+  in the projdef file and cJSON support linked in (can be found
+  in vscp-firmware/third-party or at https://github.com/nopnop2002/esp-idf-json 
+*/
+
+#ifdef VSCP_FWHLP_JSON_SUPPORT
+
+
+/**
+ * @fn droplet_parse_vscp_json
+ * @brief Convert JSON string to VSCP event
+ *
+ * @param jsonVscpEventObj1
+ * @param pev
+ * @return int
+ */
+
+int
+vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj);
+
+/**
+ * @fn vscp_fwhlp_create_json
+ * @brief Convert pointer to VSCP event to VSCP JSON string
+ *
+ * @param strObj String buffer that will get result
+ * @param len Size of string buffer
+ * @param pev Pointer to event
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ */
+int
+vscp_fwhlp_create_json(char *strObj, size_t len, vscpEvent *pev);
+
+#endif // JSON support
+
+// ----------------------------------------------------------------------------
+
+uint8_t
+vscp_fwhlp_getMeasurementDataCoding(const vscpEvent *pEvent);
+
+uint64_t
+vscp_fwhlp_getDataCodingBitArray(const uint8_t *pCode, const uint8_t length);
+
+int64_t
+vscp_fwhlp_getDataCodingInteger(const uint8_t *pCode, uint8_t length);
+
+double
+vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t *pCode, uint8_t length);
+
+//unsigned char
+//vscp_fwhlp_getEventPriority(const vscpEvent *pEvent);
+
+void
+vscp_fwhlp_setEventPriority(vscpEvent *pEvent, unsigned char priority);
+
+int
+vscp_fwhlp_getMeasurementUnit(const vscpEvent *pEvent);
+
+int
+vscp_fwhlp_getMeasurementSensorIndex(const vscpEvent *pEvent);
+
+int
+vscp_fwhlp_getMeasurementZone(const vscpEvent *pEvent);
+
+int
+vscp_fwhlp_getMeasurementSubZone(const vscpEvent *pEvent);
+
+int
+vscp_fwhlp_isMeasurement(const vscpEvent *pEvent);
+
+
+// ****************************
+//            CANAL
+// ****************************
+
+unsigned char
+vscp_fwhlp__getHeadFromCANALid(uint32_t id);
+
+uint16_t
+vscp_fwhlp__getVscpClassFromCANALid(uint32_t id);
+
+uint16_t
+vscp_fwhlp__getVscpTypeFromCANALid(uint32_t id);
+
+uint8_t
+vscp_fwhlp__getNicknameFromCANALid(uint32_t id);
+
+uint32_t
+vscp_fwhlp__getCANALidFromData(unsigned char priority, const uint16_t vscp_class, const uint16_t vscp_type);
+
+uint32_t
+vscp_fwhlp__getCANALidFromEvent(const vscpEvent *pEvent);
 
 #endif
