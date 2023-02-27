@@ -93,7 +93,7 @@ vscp_link_idle_worker(const void* pdata)
   if (bRcvLoop) {
 
     int rv;
-    char buf[VSCP_LINK_MAX_BUF];
+    char buf[PRJDEF_VSCP_LINK_MAX_BUF];
     vscpEvent* pev = NULL;
 
     rv = vscp_link_callback_rcvloop(pdata, &pev);
@@ -165,42 +165,42 @@ vscp_link_parser(const void* pdata, char* pbuf, char** pnext)
   const char* pcmd = pbuf;
 
   /*
-   * VSCP_LINK_ENABLE_RCVLOOP_CMD   bRcvLoop   =   VSCP_LINK_ENABLE_RCVLOOP_CMD | !bRcvLoop
+   * PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD   bRcvLoop   =   PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD | !bRcvLoop
    *        0                 0      =   0 | 1 = 1
    *        0                 1      =   0 | 0 = 0
    *        1                 0      =   1 | 1 = 1
    *        1                 1      =   1 | 0 = 1
    */
 
-  if (NULL != (p = vscp_fwhlp_stristr(pcmd, "help")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  if (NULL != (p = vscp_fwhlp_stristr(pcmd, "help")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdHelp(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "noop")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "noop")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdNoop(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "user")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "user")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdUser(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "pass")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "pass")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdPassword(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "challenge")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "challenge")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 9;
     return vscp_link_doCmdChallenge(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "send")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "send")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdSend(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "retr")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "retr")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdRetrieve(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "rcvloop")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "rcvloop")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdRcvLoop(pdata, p);
   }
@@ -212,122 +212,122 @@ vscp_link_parser(const void* pdata, char* pbuf, char** pnext)
     p += 4;
     return vscp_link_doCmdQuit(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "cdta")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "cdta")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdCheckData(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "chkdata")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "chkdata")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdCheckData(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "clra")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "clra")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdClearAll(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "clrall")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "clrall")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 6;
     return vscp_link_doCmdClearAll(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "stat")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "stat")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdStatistics(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "info")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "info")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdInfo(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "chid")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "chid")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdGetChannelId(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "getchid")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "getchid")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdGetChannelId(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "sgid")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "sgid")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdSetGUID(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "setguid")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "setguid")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdSetGUID(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "ggid")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "ggid")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdGetGUID(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "getguid")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "getguid")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdGetGUID(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "vers")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "vers")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdGetVersion(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "version")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "version")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdGetVersion(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "sflt")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "sflt")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdSetFilter(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "setfilter")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "setfilter")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 9;
     return vscp_link_doCmdSetFilter(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "smsk")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "smsk")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdSetMask(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "setmask")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "setmask")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdSetMask(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "test")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "test")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdTest(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "wcyd")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "wcyd")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdWhatCanYouDo(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "whatcanyoudo")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "whatcanyoudo")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 12;
     return vscp_link_doCmdWhatCanYouDo(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "+")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "+")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 1;
     return vscp_link_doCmdCommandAgain(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "interface")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "interface")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 9;
     return vscp_link_doCmdInterface(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "shutdown")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "shutdown")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 8;
     return vscp_link_doCmdShutdown(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "restart")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "restart")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdRestart(pdata, p);
   }
 
   // Binary commands
 
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "bretr")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "bretr")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdbRetr(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "bsend")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "bsend")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdbSend(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "brcvloop")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "brcvloop")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdbRcvLoop(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "sec")) && (VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "sec")) && (PRJDEF_VSCP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdSec(pdata, p);
   }
@@ -531,7 +531,7 @@ int
 vscp_link_doCmdRetrieve(const void* pdata, const char* cmd)
 {
   int rv;
-  char buf[VSCP_LINK_MAX_BUF];
+  char buf[PRJDEF_VSCP_LINK_MAX_BUF];
   vscpEvent* pev = NULL;
 
   if (VSCP_ERROR_SUCCESS != vscp_link_callback_check_authenticated(pdata)) {

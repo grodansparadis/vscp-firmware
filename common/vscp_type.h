@@ -16,7 +16,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2023 Ake Hedman, The VSCP Project <info@grodansparadis.com>
+ * Copyright (C) 2000-2022 Ake Hedman, The VSCP Project <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@
             !!!!!!!!!!!!!!!!!!!!  W A R N I N G  !!!!!!!!!!!!!!!!!!!!
                            This file is auto-generated
                 see https://github.com/grodansparadis/vscp-classes
-                        Generated: 2022-12-29 14:18:00.886578
+                        Generated: 2023-02-26 22:28:51.437260
 */
  
 #ifndef VSCP_TYPE_H
@@ -944,6 +944,10 @@
     
 /*  CLASS2.DISPLAY = 1030  -  Level II Display */
 #define VSCP2_TYPE_DISPLAY_GENERAL                  0   /* General event */
+    
+/*  CLASS2.SECURITY = 1034  -  Level II Security */
+#define VSCP2_TYPE_SECURITY_GENERAL                 0   /* General event */
+#define VSCP2_TYPE_SECURITY_SETKEY                  1   /* Set key */
     
 /*  CLASS2.MEASUREMENT_STR = 1040  -  Level II Measurement string */
 /* 	Event types is the same as  CLASS1.MEASUREMENT = 10  -  Measurement */

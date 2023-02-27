@@ -57,7 +57,7 @@
 #include <vscp.h>
 
 #ifdef VSCP_FWHLP_CRYPTO_SUPPORT
-#include <vscp_aes.h>
+#include <vscp-aes.h>
 #endif
 
 #ifdef VSCP_FWHLP_JSON_SUPPORT
@@ -240,6 +240,50 @@ vscp_fwhlp_hex2dec(const char* pHex)
   return val;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_strsubst
+//
+// Substitute string occurrences in string
+//
+
+char *
+vscp_fwhlp_strsubst(char *pNewStr, size_t len, const char *pStr, const char *pTarget, const char *pReplace)
+{
+  char *p     = (char *)pStr;
+  char *pLast = (char *)pStr;
+
+  // Check pointers
+  if ((NULL == pNewStr) || (NULL == pStr) || (NULL == pTarget) || (NULL == pReplace)) {
+    return NULL;
+  }
+
+  memset(pNewStr, 0, len);
+  while (*p && (NULL != (p = strstr(p, pTarget)))) {
+
+    // Copy first part to string
+    strncat(pNewStr, pLast, p - pLast);
+
+    // Point beyond taget
+    p += strlen(pTarget);
+
+    // Target has to fit
+    if (strlen(pNewStr) + strlen(pTarget) > (len - 1)) {
+      return NULL;
+    }
+    // Copy in target
+    strcat(pNewStr, pReplace);
+
+    // Save last p
+    pLast = p;
+  }
+
+  if (*pLast && (strlen(pLast) <= (len - 1))) {
+    strcat(pNewStr, pLast);
+  }
+
+  return pNewStr;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_readStringValue
 //
@@ -389,6 +433,67 @@ vscp_fwhlp_bin2hex(char* output, size_t outLength, const unsigned char* buf, siz
   }
 
   *output++ = '\0';
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_parseMac
+//
+
+int
+vscp_fwhlp_parseMac(uint8_t* pmac, const char* strmac, char** endptr)
+{
+  int i;
+  char* p = (char*)strmac;
+
+  // Check pointers
+  if (NULL == strmac) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if (NULL == pmac) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  memset(pmac, 0, 6);
+
+  // remove initial white space
+  while (' ' == *p) {
+    p++;
+  }
+
+  // Empty MAC or MAC  set to '-' means all nulls
+  if (!*p || ('-' == *p)) {
+    if (NULL != endptr) {
+      p++;
+      *endptr = p;
+    }
+    return VSCP_ERROR_SUCCESS;
+  }
+
+  for (i = 0; i < 6; i++) {
+    pmac[i] = (uint8_t)strtol(p, &p, 16);
+    if (!*p) {
+      break; // at end?
+    }
+    if (i != 15) {
+      if (':' != *p) {
+        return VSCP_ERROR_ERROR;
+      }
+      p++; // Move beyond ':'
+      if (p > (strmac + strlen(strmac))) {
+        if (NULL != endptr) {
+          *endptr = p;
+        }
+        return VSCP_ERROR_ERROR;
+      }
+    }
+  }
+
+  if (NULL != endptr) {
+    *endptr = p;
+  }
+
+  return VSCP_ERROR_SUCCESS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
