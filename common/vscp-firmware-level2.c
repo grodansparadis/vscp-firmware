@@ -602,7 +602,7 @@ vscp2_send_caps(void)
   }
 
   // Device name
-  strncpy((char *)(ev.pdata + 40), THIS_FIRMWARE_DEVICE_NAME, 63);
+  strncpy((char *)(ev.pdata + 40), VSCP_PROJDEF_DEVICE_NAME, 63);
   
   
   // Send event

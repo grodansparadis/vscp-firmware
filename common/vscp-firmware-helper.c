@@ -47,11 +47,11 @@
 
 #include <ctype.h>
 #include <limits.h>
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
 #include "vscp-firmware-helper.h"
 #include <vscp.h>
@@ -64,13 +64,13 @@
 #include <cJSON.h>
 #endif
 
-#define UNUSED(expr)                                                                                                   \
-  do {                                                                                                                 \
-    (void) (expr);                                                                                                     \
+#define UNUSED(expr) \
+  do {               \
+    (void)(expr);    \
   } while (0)
 
 #ifndef TRUE
-#define TRUE  -1
+#define TRUE -1
 #endif
 
 #ifndef FALSE
@@ -88,7 +88,7 @@ int
 vscp_fwhlp_isLittleEndian(void)
 {
   int x = 1;
-  return (*(char *) &x);
+  return (*(char*)&x);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,7 +101,6 @@ vscp_fwhlp_isBigEndian(void)
 {
   return ~vscp_fwhlp_isLittleEndian();
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_a2ul
@@ -246,11 +245,11 @@ vscp_fwhlp_hex2dec(const char* pHex)
 // Substitute string occurrences in string
 //
 
-char *
-vscp_fwhlp_strsubst(char *pNewStr, size_t len, const char *pStr, const char *pTarget, const char *pReplace)
+char*
+vscp_fwhlp_strsubst(char* pNewStr, size_t len, const char* pStr, const char* pTarget, const char* pReplace)
 {
-  char *p     = (char *)pStr;
-  char *pLast = (char *)pStr;
+  char* p     = (char*)pStr;
+  char* pLast = (char*)pStr;
 
   // Check pointers
   if ((NULL == pNewStr) || (NULL == pStr) || (NULL == pTarget) || (NULL == pReplace)) {
@@ -533,7 +532,7 @@ vscp_fwhlp_getEventPriorityEx(const vscpEventEx* pex)
 vscpEvent*
 vscp_fwhlp_newEvent(void)
 {
-  vscpEvent* pev = NULL;
+  static vscpEvent* pev = NULL;
 
   pev = (vscpEvent*)VSCP_MALLOC(sizeof(vscpEvent));
   if (NULL != pev) {
@@ -547,7 +546,7 @@ vscp_fwhlp_newEvent(void)
 // vscp_convertEventToEventEx
 
 int
-vscp_convertEventToEventEx(vscpEventEx *pEventEx, const vscpEvent *pEvent)
+vscp_convertEventToEventEx(vscpEventEx* pEventEx, const vscpEvent* pEvent)
 {
   // Check pointers
   if (NULL == pEvent) {
@@ -589,7 +588,7 @@ vscp_convertEventToEventEx(vscpEventEx *pEventEx, const vscpEvent *pEvent)
 //
 
 int
-vscp_convertEventExToEvent(vscpEvent *pEvent, const vscpEventEx *pEventEx)
+vscp_convertEventExToEvent(vscpEvent* pEvent, const vscpEventEx* pEventEx)
 {
   // Check pointers
   if (NULL == pEvent) {
@@ -637,7 +636,7 @@ vscp_convertEventExToEvent(vscpEvent *pEvent, const vscpEventEx *pEventEx)
 //
 
 vscpEvent*
-vscp_fwhlp_mkEventCopy(vscpEvent* pev)
+vscp_fwhlp_mkEventCopy(const vscpEvent* pev)
 {
   // Must have event to work on
   if (NULL == pev) {
@@ -672,14 +671,15 @@ vscp_fwhlp_mkEventCopy(vscpEvent* pev)
 //
 
 vscpEventEx*
-vscp_fwhlp_mkEventExCopy(vscpEventEx* pex)
+vscp_fwhlp_mkEventExCopy(const vscpEventEx* pex)
 {
   // Must have event to work on
   if (NULL == pex) {
     return NULL;
   }
 
-  vscpEventEx* pnewEventEx = (vscpEventEx*)VSCP_MALLOC(sizeof(vscpEventEx));;
+  vscpEventEx* pnewEventEx = (vscpEventEx*)VSCP_MALLOC(sizeof(vscpEventEx));
+  ;
   if (NULL == pnewEventEx) {
     return NULL;
   }
@@ -1752,7 +1752,7 @@ vscp_fwhlp_decryptFrame(uint8_t* output,
 /*
   JSON support needs VSCP_FWHLP_JSON_SUPPORT to be defined
   in the projdef file and cJSON support linked in (can be found
-  in vscp-firmware/third-party or at https://github.com/nopnop2002/esp-idf-json 
+  in vscp-firmware/third-party or at https://github.com/nopnop2002/esp-idf-json
 */
 
 #ifdef VSCP_FWHLP_JSON_SUPPORT
@@ -1783,23 +1783,23 @@ vscp_fwhlp_decryptFrame(uint8_t* output,
 */
 
 int
-vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj)
+vscp_fwhlp_parse_json(vscpEvent* pev, const char* jsonVscpEventObj)
 {
   int rv;
-  cJSON *root = cJSON_Parse(jsonVscpEventObj);
+  cJSON* root = cJSON_Parse(jsonVscpEventObj);
 
   if (cJSON_GetObjectItem(root, "vscpHead")) {
-    pev->head = (uint16_t) cJSON_GetObjectItem(root, "vscpHead")->valueint;
+    pev->head = (uint16_t)cJSON_GetObjectItem(root, "vscpHead")->valueint;
   }
 
   if (cJSON_GetObjectItem(root, "vscpObId")) {
-    pev->obid = (uint32_t) cJSON_GetObjectItem(root, "vscpObId")->valuedouble;
+    pev->obid = (uint32_t)cJSON_GetObjectItem(root, "vscpObId")->valuedouble;
   }
 
   // "2017-01-13T10:16:02",
   if (cJSON_GetObjectItem(root, "vscpDateTime")) {
     int year, month, day, hour, minute, second;
-    const char *str = cJSON_GetObjectItem(root, "vscpDateTime")->valuestring;
+    const char* str = cJSON_GetObjectItem(root, "vscpDateTime")->valuestring;
     sscanf(str, "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second);
     pev->year   = year;
     pev->month  = month;
@@ -1810,19 +1810,20 @@ vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj)
   }
 
   if (cJSON_GetObjectItem(root, "vscpTimeStamp")) {
-    pev->timestamp = (uint32_t) cJSON_GetObjectItem(root, "vscpTimeStamp")->valuedouble;
+    pev->timestamp = (uint32_t)cJSON_GetObjectItem(root, "vscpTimeStamp")->valuedouble;
   }
 
   if (cJSON_GetObjectItem(root, "vscpClass")) {
-    pev->vscp_class = (uint16_t) cJSON_GetObjectItem(root, "vscpClass")->valueint;;
+    pev->vscp_class = (uint16_t)cJSON_GetObjectItem(root, "vscpClass")->valueint;
+    ;
   }
 
   if (cJSON_GetObjectItem(root, "vscpType")) {
-    pev->vscp_type = (uint16_t) cJSON_GetObjectItem(root, "vscpType")->valueint;
+    pev->vscp_type = (uint16_t)cJSON_GetObjectItem(root, "vscpType")->valueint;
   }
 
   if (cJSON_GetObjectItem(root, "vscpGuid")) {
-    const char *str = cJSON_GetObjectItem(root, "vscpGuid")->valuestring;
+    const char* str = cJSON_GetObjectItem(root, "vscpGuid")->valuestring;
     if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseGuid(pev->GUID, str, NULL))) {
       return rv;
     }
@@ -1830,11 +1831,11 @@ vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj)
 
   if (cJSON_GetObjectItem(root, "vscpData")) {
 
-    cJSON *pdata  = cJSON_GetObjectItem(root, "vscpData");
+    cJSON* pdata  = cJSON_GetObjectItem(root, "vscpData");
     pev->sizeData = cJSON_GetArraySize(pdata);
 
     for (int i = 0; i < pev->sizeData; i++) {
-      cJSON *pitem = cJSON_GetArrayItem(pdata, i);
+      cJSON* pitem = cJSON_GetArrayItem(pdata, i);
       if (pitem->type == cJSON_Number && i < 512) {
         pev->pdata[i] = pitem->valueint;
       }
@@ -1852,10 +1853,10 @@ vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj)
 //
 
 int
-vscp_fwhlp_create_json(char *strObj, size_t len, vscpEvent *pev)
+vscp_fwhlp_create_json(char* strObj, size_t len, const vscpEvent* pev)
 {
   char str[80];
-  cJSON *root = cJSON_CreateObject();
+  cJSON* root = cJSON_CreateObject();
 
   cJSON_AddNumberToObject(root, "vscpHead", pev->head);
   cJSON_AddNumberToObject(root, "vscpClass", pev->vscp_class);
@@ -1866,55 +1867,47 @@ vscp_fwhlp_create_json(char *strObj, size_t len, vscpEvent *pev)
   cJSON_AddStringToObject(root, "vscpGUID", str);
   sprintf(str, "%04d-%02d-%02dT%02d:%02d:%02d", pev->year, pev->month, pev->day, pev->hour, pev->minute, pev->second);
   cJSON_AddStringToObject(root, "vscpDateTime", str);
-  cJSON *array;
+  cJSON* array;
   array = cJSON_AddArrayToObject(root, "vscpData");
-  cJSON *element;
+  cJSON* element;
   for (int i = 0; i < pev->sizeData; i++) {
     element = cJSON_CreateNumber(pev->pdata[i]);
     cJSON_AddItemToArray(array, element);
   }
-  char *json_string = cJSON_Print(root);
+  char* json_string = cJSON_Print(root);
   if (NULL == json_string) {
     cJSON_Delete(root);
     return VSCP_ERROR_PARSING;
   }
 
-  if (strlen(json_string) > (len-1)) {
+  if (strlen(json_string) > (len - 1)) {
     cJSON_free(json_string);
     cJSON_Delete(root);
     return VSCP_ERROR_BUFFER_TO_SMALL;
   }
 
   strcpy(strObj, json_string);
-      
+
   cJSON_free(json_string);
   cJSON_Delete(root);
 
   return VSCP_ERROR_SUCCESS;
 }
 
-#endif  // JSON support
-
-
-
-
+#endif // JSON support
 
 // ----------------------------------------------------------------------------
-
-
 
 // ***************************************************************************
 //                              Data Coding Helpers
 // ***************************************************************************
-
-
 
 //////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_getMeasurementDataCoding
 //
 
 uint8_t
-vscp_fwhlp_getMeasurementDataCoding(const vscpEvent *pEvent)
+vscp_fwhlp_getMeasurementDataCoding(const vscpEvent* pEvent)
 {
   uint8_t datacoding_byte = -1;
 
@@ -1955,7 +1948,7 @@ vscp_fwhlp_getMeasurementDataCoding(const vscpEvent *pEvent)
 //
 
 uint64_t
-vscp_fwhlp_getDataCodingBitArray(const uint8_t *pCode, const uint8_t length)
+vscp_fwhlp_getDataCodingBitArray(const uint8_t* pCode, const uint8_t length)
 {
   uint64_t bitArray = 0;
 
@@ -1981,7 +1974,7 @@ vscp_fwhlp_getDataCodingBitArray(const uint8_t *pCode, const uint8_t length)
 //
 
 int64_t
-vscp_fwhlp_getDataCodingInteger(const uint8_t *pCode, uint8_t length)
+vscp_fwhlp_getDataCodingInteger(const uint8_t* pCode, uint8_t length)
 {
   int64_t value64 = 0;
 
@@ -1996,10 +1989,10 @@ vscp_fwhlp_getDataCodingInteger(const uint8_t *pCode, uint8_t length)
 
   // Check if this is a negative number
   if ((*(pCode + 1)) & 0x80) {
-    memset((uint8_t *) &value64, 0xff, 8);
+    memset((uint8_t*)&value64, 0xff, 8);
   }
   else {
-    memset((uint8_t *) &value64, 0, 8);
+    memset((uint8_t*)&value64, 0, 8);
   }
 
   for (int i = 1; i < length; i++) {
@@ -2014,7 +2007,7 @@ vscp_fwhlp_getDataCodingInteger(const uint8_t *pCode, uint8_t length)
 //
 
 double
-vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t *pCode, uint8_t length)
+vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t* pCode, uint8_t length)
 {
   uint8_t valarray[8];
   uint8_t normbyte;
@@ -2022,7 +2015,7 @@ vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t *pCode, uint8_t length)
 #ifndef __BIG_ENDIAN__
   int64_t value64;
 #endif
-  double value   = 0;
+  double value  = 0;
   int bNegative = FALSE; // set for negative number
 
   // Check pointer
@@ -2048,29 +2041,29 @@ vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t *pCode, uint8_t length)
   switch (length - 2) {
 
     case 1: // 8-bit
-      memcpy((char *) &valarray, (pCode + 2), (length - 2));
-      value = *((int8_t *) valarray);
+      memcpy((char*)&valarray, (pCode + 2), (length - 2));
+      value = *((int8_t*)valarray);
       break;
 
     case 2: // 16-bit
-      memcpy((char *) &valarray, (pCode + 2), (length - 2));
-      value = VSCP_INT16_SWAP_ON_LE(*((uint16_t *) valarray));
+      memcpy((char*)&valarray, (pCode + 2), (length - 2));
+      value = VSCP_INT16_SWAP_ON_LE(*((uint16_t*)valarray));
       break;
 
     case 3: // 24-bit
-      memcpy(((char *) &valarray + 1), (pCode + 2), (length - 2));
+      memcpy(((char*)&valarray + 1), (pCode + 2), (length - 2));
       if (bNegative)
         *valarray = 0xff; // First byte must be 0xff
-      value = VSCP_INT32_SWAP_ON_LE(*((int32_t *) valarray));
+      value = VSCP_INT32_SWAP_ON_LE(*((int32_t*)valarray));
       break;
 
     case 4: // 32-bit
-      memcpy((char *) &valarray, (pCode + 2), (length - 2));
-      value = VSCP_INT32_SWAP_ON_LE(*((int32_t *) valarray));
+      memcpy((char*)&valarray, (pCode + 2), (length - 2));
+      value = VSCP_INT32_SWAP_ON_LE(*((int32_t*)valarray));
       break;
 
     case 5: // 40-bit
-      memcpy(((char *) &valarray + 3), (pCode + 2), (length - 2));
+      memcpy(((char*)&valarray + 3), (pCode + 2), (length - 2));
       if (bNegative) {
         *valarray       = 0xff; // First byte must be 0xff
         *(valarray + 1) = 0xff;
@@ -2078,25 +2071,25 @@ vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t *pCode, uint8_t length)
       }
 
 #ifdef __BIG_ENDIAN__
-      value = *((int64_t *) valarray);
+      value = *((int64_t*)valarray);
 #else
-      value64 = Swap8Bytes(*((int64_t *) valarray));
-      value   = (double) value64;
+      value64 = Swap8Bytes(*((int64_t*)valarray));
+      value   = (double)value64;
 #endif
       break;
 
     case 6: // 48-bit
-      memcpy(((char *) &valarray + 2), (pCode + 2), (length - 2));
+      memcpy(((char*)&valarray + 2), (pCode + 2), (length - 2));
       if (bNegative) {
         *valarray       = 0xff; // First byte must be 0xff
         *(valarray + 1) = 0xff;
       }
 
 #ifdef __BIG_ENDIAN__
-      value = *((int64_t *) valarray);
+      value = *((int64_t*)valarray);
 #else
-      value64 = Swap8Bytes(*((int64_t *) valarray));
-      value   = (double) value64;
+      value64 = Swap8Bytes(*((int64_t*)valarray));
+      value   = (double)value64;
 #endif
       break;
   }
@@ -2124,7 +2117,6 @@ vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t *pCode, uint8_t length)
   return value;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_getEventPriority
 
@@ -2143,7 +2135,7 @@ vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t *pCode, uint8_t length)
 // vscp_fwhlp_setEventPriority
 
 void
-vscp_fwhlp_setEventPriority(vscpEvent *pEvent, unsigned char priority)
+vscp_fwhlp_setEventPriority(vscpEvent* pEvent, unsigned char priority)
 {
   // Must be a valid message pointer
   if (NULL == pEvent) {
@@ -2159,7 +2151,7 @@ vscp_fwhlp_setEventPriority(vscpEvent *pEvent, unsigned char priority)
 //
 
 int
-vscp_fwhlp_getMeasurementUnit(const vscpEvent *pEvent)
+vscp_fwhlp_getMeasurementUnit(const vscpEvent* pEvent)
 {
   int offset = 0;
 
@@ -2215,7 +2207,7 @@ vscp_fwhlp_getMeasurementUnit(const vscpEvent *pEvent)
 //
 
 int
-vscp_fwhlp_getMeasurementSensorIndex(const vscpEvent *pEvent)
+vscp_fwhlp_getMeasurementSensorIndex(const vscpEvent* pEvent)
 {
   int offset = 0;
 
@@ -2280,7 +2272,7 @@ vscp_fwhlp_getMeasurementSensorIndex(const vscpEvent *pEvent)
 //
 
 int
-vscp_fwhlp_getMeasurementZone(const vscpEvent *pEvent)
+vscp_fwhlp_getMeasurementZone(const vscpEvent* pEvent)
 {
   int offset = 0;
 
@@ -2345,7 +2337,7 @@ vscp_fwhlp_getMeasurementZone(const vscpEvent *pEvent)
 //
 
 int
-vscp_fwhlp_getMeasurementSubZone(const vscpEvent *pEvent)
+vscp_fwhlp_getMeasurementSubZone(const vscpEvent* pEvent)
 {
   int offset = 0;
 
@@ -2406,9 +2398,9 @@ vscp_fwhlp_getMeasurementSubZone(const vscpEvent *pEvent)
 //
 
 int
-vscp_fwhlp_isMeasurement(const vscpEvent *pEvent)
+vscp_fwhlp_isMeasurement(const vscpEvent* pEvent)
 {
-  if ( NULL == pEvent) {
+  if (NULL == pEvent) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
@@ -2482,7 +2474,7 @@ vscp_fwhlp_getHeadFromCANALid(uint32_t id)
 uint16_t
 vscp_fwhlp_getVscpClassFromCANALid(uint32_t id)
 {
-  return (uint16_t) (0x1ff & (id >> 16));
+  return (uint16_t)(0x1ff & (id >> 16));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2492,7 +2484,7 @@ vscp_fwhlp_getVscpClassFromCANALid(uint32_t id)
 uint16_t
 vscp_fwhlp_getVscpTypeFromCANALid(uint32_t id)
 {
-  return (uint16_t) (0xff & (id >> 8));
+  return (uint16_t)(0xff & (id >> 8));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2515,7 +2507,7 @@ vscp_fwhlp_getCANALidFromData(unsigned char priority, const uint16_t vscp_class,
   // unsigned long t1 = (unsigned long)priority << 20;
   // unsigned long t2 = (unsigned long)pvscpMsg->vscp_class << 16;
   // unsigned long t3 = (unsigned long)pvscpMsg->vscp_type << 8;
-  return (((unsigned long) priority << 26) | ((unsigned long) vscp_class << 16) | ((unsigned long) vscp_type << 8) | 0);
+  return (((unsigned long)priority << 26) | ((unsigned long)vscp_class << 16) | ((unsigned long)vscp_type << 8) | 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2523,8 +2515,8 @@ vscp_fwhlp_getCANALidFromData(unsigned char priority, const uint16_t vscp_class,
 //
 
 uint32_t
-vscp_fwhlp_getCANALidFromEvent(const vscpEvent *pEvent)
+vscp_fwhlp_getCANALidFromEvent(const vscpEvent* pEvent)
 {
-  return (((unsigned long) vscp_fwhlp_getEventPriority(pEvent) << 26) | ((unsigned long) pEvent->vscp_class << 16) |
-          ((unsigned long) pEvent->vscp_type << 8) | 0);
+  return (((unsigned long)vscp_fwhlp_getEventPriority(pEvent) << 26) | ((unsigned long)pEvent->vscp_class << 16) |
+          ((unsigned long)pEvent->vscp_type << 8) | 0);
 }

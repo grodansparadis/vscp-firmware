@@ -505,7 +505,7 @@ vscp_convertEventExToEvent(vscpEvent* pEvent, const vscpEventEx* pEventEx);
 */
 
 vscpEvent*
-vscp_fwhlp_mkEventCopy(vscpEvent* pev);
+vscp_fwhlp_mkEventCopy(const vscpEvent* pev);
 
 /*!
     @brief Make a copy of an eventex
@@ -514,7 +514,7 @@ vscp_fwhlp_mkEventCopy(vscpEvent* pev);
 */
 
 vscpEventEx*
-vscp_fwhlp_mkEventExCopy(vscpEventEx* pex);
+vscp_fwhlp_mkEventExCopy(const vscpEventEx* pex);
 
 /**
   @brief Delete an event and it's data.
@@ -634,7 +634,7 @@ vscp_fwhlp_parse_json(vscpEvent* pev, const char* jsonVscpEventObj);
  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
  */
 int
-vscp_fwhlp_create_json(char* strObj, size_t len, vscpEvent* pev);
+vscp_fwhlp_create_json(char* strObj, size_t len, const vscpEvent* pev);
 
 #endif // JSON support
 

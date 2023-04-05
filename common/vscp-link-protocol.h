@@ -35,7 +35,8 @@
 #ifndef _VSCP_LINK_PROTOCOL_H_
 #define _VSCP_LINK_PROTOCOL_H_
 
-#include "vscp.h"
+#include <vscp.h>
+#include <vscp-firmware-helper.h>
 
 #ifdef __cplusplus
 {
@@ -690,7 +691,7 @@
    */
 
   int
-  vscp_link_callback_get_interface(const void* pdata, uint16_t index, struct vscp_interface_info* pif);
+  vscp_link_callback_get_interface(const void* pdata, uint16_t index, vscp_interface_info_t* pif);
 
   /**
    * @fn vscp_link_callback_check_user
