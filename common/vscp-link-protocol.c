@@ -531,7 +531,7 @@ int
 vscp_link_doCmdRetrieve(const void* pdata, const char* cmd)
 {
   int rv;
-  char buf[PRJDEF_VSCP_LINK_MAX_BUF];
+  char buf[THIS_FIRMWARE_TCPIP_LINK_MAX_BUFFER];
   vscpEvent* pev = NULL;
 
   if (VSCP_ERROR_SUCCESS != vscp_link_callback_check_authenticated(pdata)) {
