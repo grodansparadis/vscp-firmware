@@ -93,7 +93,7 @@ vscp_link_idle_worker(const void* pdata)
   if (bRcvLoop) {
 
     int rv;
-    char buf[PRJDEF_VSCP_LINK_MAX_BUF];
+    char buf[VSCP_LINK_MAX_BUFFER];
     vscpEvent* pev = NULL;
 
     rv = vscp_link_callback_rcvloop(pdata, &pev);
