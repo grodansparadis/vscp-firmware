@@ -560,7 +560,7 @@ vscp2_send_heartbeat(void)
 int
 vscp2_send_caps(void)
 {
-  uint8_t guid[16] = THIS_FIRMWARE_GUID;
+  uint8_t guid[16] = {0}; // THIS_FIRMWARE_GUID;    TODO
   vscpEvent ev;
   // Create new event
   // if (NULL == (pev = vscp_fwhlp_newEvent())) {
@@ -617,12 +617,12 @@ vscp2_send_caps(void)
 
 int vscp2_send_high_end_server_probe(void)
 {
-  uint8_t guid[16] = THIS_FIRMWARE_GUID;
   vscpEvent ev;
   // Create new event
   // if (NULL == (pev = vscp_fwhlp_newEvent())) {
   //   return VSCP_ERROR_MEMORY;
   // }
+
 
   // Construct reply event
   ev.head = VSCP_PRIORITY_NORMAL;
