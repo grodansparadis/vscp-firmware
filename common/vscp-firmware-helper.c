@@ -534,7 +534,7 @@ vscp_fwhlp_newEvent(void)
 {
   static vscpEvent* pev = NULL;
 
-  pev = (vscpEvent*)VSCP_MALLOC(sizeof(vscpEvent));
+  pev = (vscpEvent*)malloc(sizeof(vscpEvent));
   if (NULL != pev) {
     memset(pev, 0, sizeof(vscpEvent));
   }
@@ -601,7 +601,7 @@ vscp_convertEventExToEvent(vscpEvent* pEvent, const vscpEventEx* pEventEx)
 
   if (pEventEx->sizeData) {
     // Allocate memory for data
-    if (NULL == (pEvent->pdata = VSCP_MALLOC(pEventEx->sizeData))) {
+    if (NULL == (pEvent->pdata = malloc(pEventEx->sizeData))) {
       return VSCP_ERROR_MEMORY;
     }
     memcpy(pEvent->pdata, pEventEx->data, pEventEx->sizeData);
@@ -652,9 +652,9 @@ vscp_fwhlp_mkEventCopy(const vscpEvent* pev)
   memcpy(pnewEvent, pev, sizeof(vscpEvent));
 
   if (pev->sizeData) {
-    pnewEvent->pdata = (uint8_t*)VSCP_MALLOC(pev->sizeData);
+    pnewEvent->pdata = (uint8_t*)malloc(pev->sizeData);
     if (NULL == pnewEvent->pdata) {
-      VSCP_FREE(pnewEvent);
+      free(pnewEvent);
       return NULL;
     }
     memcpy(pnewEvent->pdata, pev->pdata, pev->sizeData);
@@ -678,7 +678,7 @@ vscp_fwhlp_mkEventExCopy(const vscpEventEx* pex)
     return NULL;
   }
 
-  vscpEventEx* pnewEventEx = (vscpEventEx*)VSCP_MALLOC(sizeof(vscpEventEx));
+  vscpEventEx* pnewEventEx = (vscpEventEx*)malloc(sizeof(vscpEventEx));
   ;
   if (NULL == pnewEventEx) {
     return NULL;
@@ -701,10 +701,10 @@ vscp_fwhlp_deleteEvent(vscpEvent** pev)
     return VSCP_ERROR_INVALID_POINTER;
 
   if (NULL != (*pev)->pdata) {
-    VSCP_FREE((*pev)->pdata);
+    free((*pev)->pdata);
   }
 
-  VSCP_FREE(*pev);
+  free(*pev);
   *pev = NULL;
 
   return VSCP_ERROR_SUCCESS;
@@ -1084,7 +1084,7 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
 
   // Copy in data (if any)
   if (pev->sizeData) {
-    pev->pdata = VSCP_MALLOC(pev->sizeData);
+    pev->pdata = malloc(pev->sizeData);
     if (NULL == pev->pdata) {
       return VSCP_ERROR_MEMORY;
     }
