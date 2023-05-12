@@ -309,7 +309,7 @@ vscp2_do_register_write(vscpEvent* pev)
   vscp2_protocol_callback_get_time(pUserData, pev);
   // Data
   respev.sizeData = cnt + 4;
-  // respev.pdata = VSCP_MALLOC(respev.sizeData);
+  // respev.pdata = malloc(respev.sizeData);
   // if (NULL == respev.pdata) {
   //   vscp_fwhlp_deleteEvent(&pev);
   //   return VSCP_ERROR_MEMORY;
