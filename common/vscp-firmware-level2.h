@@ -4,7 +4,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2023 Ake Hedman, Grodans Paradis AB
+ * Copyright (c) 2000-2024 Ake Hedman, Grodans Paradis AB
  * <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,19 +31,6 @@
  * ******************************************************************************
  */
 
-#ifndef VSCP_FIRMWARE_LEVEL2_H
-#define VSCP_FIRMWARE_LEVEL2_H
-
-/*
-    vscp_compiler and project defines
-*/
-#include "vscp-compiler.h"
-#include "vscp-projdefs.h"
-
-#ifdef __cplusplus
-}
-#endif
-
 /*!
   @file vscp_firmware_level2.h
   @defgroup vscp-level2-firmware VSCP level II firmware
@@ -51,20 +38,142 @@
   Projdefs defines project specific definitions and
   define the following variables.
 
-  THIS_FIRMWARE_MAJOR_VERSION             x
-  THIS_FIRMWARE_MINOR_VERSION             y
-  THIS_FIRMWARE_RELEASE_VERSION           z
-  THIS_FIRMWARE_INTERVAL_HEARTBEATS       60
-  THIS_FIRMWARE_INTERVAL_CAPS             60
-  THIS_FIRMWARE_BUFFER_SIZE               VSCP_MAX (vscp.h)
-  THIS_FIRMWARE_ENABLE_LOGGING            1
-  THIS_FIRMWARE_ENABLE_ERROR_REPORTING    1
+
 
   @{
 */
 
+#ifndef __VSCP_FIRMWARE_LEVEL2_H
+#define __VSCP_FIRMWARE_LEVEL2_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*
+    vscp_compiler and project defines
+*/
+#include "vscp-compiler.h"
+#include "vscp-projdefs.h"
+
 #include <inttypes.h>
 #include <vscp-projdefs.h>
+
+/*!
+  Global structure for protocol functionality
+
+   Used internally
+*/
+typedef struct frmw2_firmware_configt_t {
+  int m_state;             // State machine state
+  int m_substate;          // state machine substate
+  uint32_t m_config_timer; // Timer used for config restore
+
+  uint8_t m_level;   // 0=Level I, 1 = Level II
+  void* m_puserdata; // Points to user supplied data
+
+  /*!
+    Holders for proxy event information. Set when received.
+  */
+  uint8_t m_offset;
+  uint8_t m_ifguid[16];
+
+  uint8_t m_interval_heartbeat; // Interval for hearytbeats in seconds (0=off)
+  uint32_t m_last_heartbeat;    // Time for last heartbeat send
+  uint8_t m_interval_caps;      // Interval for capabilities events in secons (0=off)
+  uint32_t m_last_caps;         // Time for last caps send
+
+  // Functionality switches
+  int m_bEnableErrorReporting;
+  int m_bEnableLogging;
+  int m_bSendHighEndServerProbe;
+  int m_bHighEndServerResponse;
+  int m_bEnableWriteProtectedLocations; // GUID/manufacturer id
+
+  // Standard registers (persistent storage)
+  uint8_t m_alarm_status;                   // Alarm. Read only for clients.
+  uint8_t m_vscp_major_version;             // VSCP protocol major version.
+  uint8_t m_vscp_minor_version;             // VSCP protocol minor version.
+  uint8_t m_errorCounter;                   // Error counter. Clear on read. Read only for clients.
+  uint8_t m_userId[4];                      // User id.
+  uint8_t m_manufacturerId[4];              // Manufacturer id.Read only for clients.
+  uint8_t m_manufacturerSubId[4];           // Manufacturer sub id.Read only for clients.
+  uint16_t m_nickname;                      // Device nickname
+  uint16_t m_page_select;                   // Page select register.
+  uint8_t m_firmware_major_version;         // This software version. Read only for clients.
+  uint8_t m_firmware_minor_version;         // This software version. Read only for clients.
+  uint8_t m_firmware_sub_minor_version;     // This software version. Read only for clients.
+  uint8_t m_bootloader_algorithm;           // Boot oader algorithm we use.
+  uint8_t m_standard_device_family_code[4]; // Family code. Read only for clients.
+  uint8_t m_standard_device_type_code[4];   // Family type. Read only for clients.
+  uint8_t m_firmware_device_code;           // Identifier for hardware so correct firmware can be loaded
+  uint8_t m_guid[16];                       // GUID for device. Read only for clients
+  uint8_t m_mdfurl[32];                     // URL for MDF. Read only for clients. Make 33 bytes and nill
+                                            // all unused byte so it is null terminated even if it has
+                                            // the maximum length of 32 bytes.
+
+} frmw2_firmware_configt_t;
+
+// /*!
+//   Protocol configuration.
+
+//   This structure is used by client to initiate the
+//   protocol framework and functionality.
+// */
+// typedef struct frmw2_firmware_config_t {
+
+//   uint8_t m_level;   // 0=Level I, 1 = Level II
+//   void* m_puserdata; // Points to user supplied data
+//                      // This pointer follows all callback code
+//   // uint8_t m_errorcnt; // Counter for errors
+
+//   uint8_t m_interval_heartbeat; // Interval for hearytbeats in seconds (0=off)
+//   uint8_t m_interval_caps;      // Interval for capabilities events in secons (0=off)
+
+//   int m_bEnableErrorReporting;   // Enable error reporting
+//   int m_bEnableLogging;          // Enable logging
+//   int m_bSendHighEndServerProbe; // enable server probe
+//   int m_bHighEndServerResponse;
+//   int m_bEnableWriteProtectedLocations; // GUID/manufacturer id
+
+//   // Standard registers (persistent storage)
+//   uint8_t m_vscp_major_version;             // VSCP protocol major version.
+//   uint8_t m_vscp_minor_version;             // VSCP protocol minor version.
+//   uint8_t m_userId[4];                      // User id.
+//   uint8_t m_manufacturerId[4];              // Manufacturer id.Read only for clients.
+//   uint8_t m_manufacturerSubId[4];           // Manufacturer sub id.Read only for clients.
+//   uint16_t m_nickname;                      // Device nickname
+//   uint8_t m_firmware_major_version;         // This software version. Read only for clients.
+//   uint8_t m_firmware_minor_version;         // This software version. Read only for clients.
+//   uint8_t m_firmware_sub_minor_version;     // This software version. Read only for clients.
+//   uint8_t m_bootloader_algorithm;           // Boot oader algorithm we use.
+//   uint8_t m_standard_device_family_code[4]; // Family code. Read only for clients.
+//   uint8_t m_standard_device_type_code[4];   // Family type. Read only for clients.
+//   uint8_t m_guid[16];                       // GUID for device. Read only for clients
+//   uint8_t m_mdfurl[32];                     // URL for MDF. Read only for clients
+
+// } frmw2_firmware_config_t;
+
+/*!
+  Used to adjust standard registers for Level I/ Level II
+  Level I standard registers are at 0x80 - 0xff on page = 0
+  Level II standard registers are at 0xffffff00 - 0xffffffff
+*/
+#define ADJSTDREG ((VSCP_LEVEL1 == g_pconfig->m_level) ? 0 : 0xffffff00)
+
+/*!
+  Adjusted data for offset
+  vscpEvent and vscpEventEx versions
+*/
+#define EVDTA(x) (pev->data[(x) + g_pconfig->m_offset])
+#define EXDTA(x) (pex->data[(x) + g_pconfig->m_offset])
+
+/*!
+ * Ajust size for offset
+ * vscpEvent and vscpEventEx versions
+ */
+#define ADJSIZEV (pex->sizeData - g_pconfig->m_offset)
+#define ADJSIZEX (pex->sizeData - g_pconfig->m_offset)
 
 /*****************************************************************************
                                     Constants
@@ -73,128 +182,31 @@
 /*!
   @brief Major version.
 
-  This is the major version of the vscp link protocol code.
+  This is the major version of this vscp  level 2 protocol code..
 */
-#define VSCP2_MAJOR_VERSION 1
+#define FRMW2_MAJOR_VERSION 1
 
 /*!
-  @brief Minor Version.
+  @brief Minor Version-
 
-  This is the minor version of the vscp link protocol code.
+  This is the minor version of this vscp  level 2 protocol code.
 */
-#define VSCP2_MINOR_VERSION 6
-
-/*!
-  @brief Sub version.
-
-  This is the sub version of the vscp link protocol code.
-*/
-#define VSCP2_SUB_VERSION 1
+#define FRMW2_MINOR_VERSION 6
 
 /*!
   @brief Standard register address start.
 
   VSCP level II protocol standard register abstraction start address.
 */
-#define VSCP2_STANDARD_REGISTER_START 0xffff0000
-
-
-// -----------------------------------------------------------------------------
-//  			     VSCP standard register - Logical positions
-// -----------------------------------------------------------------------------
-
-
-/*!
-  @brief Level II alarm standard abstraction register address.
-
-  VSCP standard register abstraction register for alarms.
-*/
-#define VSCP2_STD_REG_ALARMSTATUS 0xFFFFFF80
-
-/*!
-  @brief Level II VSCP Major version standard abstraction register address.
-
-  Protocol conformance major version. This register holds minor version of the VSCP
-  specification version the firmware of the device conforms to.
-
-  Described [here](https://grodansparadis.github.io/vscp-doc-spec/#/./vscp_register_abstraction_model?id=level-ii-register-abstraction-model)
-  in the VSCP specification.
-*/
-#define VSCP2_STD_REG_VSCP_MAJOR_VERSION 0xFFFFFF81
-
-/*!
-  @brief Level II VSCP Minor Version standard abstraction register address.
-
-  Protocol conformance minor version. This register holds minor version of the VSCP
-  specification version the firmware of the device conforms to.
-
-  Described [here](https://grodansparadis.github.io/vscp-doc-spec/#/./vscp_register_abstraction_model?id=level-ii-register-abstraction-model)
-  in the VSCP specification.
-*/
-#define VSCP2_STD_REG_VSCP_MINOR_VERSION 0xFFFFFF82
-
-
-#define VSCP2_STD_REG_NODE_ERROR_COUNTER 0xFFFFFF83
-
-#define VSCP2_STD_REG_USERID0 0xFFFFFF84
-#define VSCP2_STD_REG_USERID1 0xFFFFFF85
-#define VSCP2_STD_REG_USERID2 0xFFFFFF86
-#define VSCP2_STD_REG_USERID3 0xFFFFFF87
-#define VSCP2_STD_REG_USERID4 0xFFFFFF88
-
-#define VSCP2_STD_REG_MANUFACTURER_ID0 0xFFFFFF89
-#define VSCP2_STD_REG_MANUFACTURER_ID1 0xFFFFFF8A
-#define VSCP2_STD_REG_MANUFACTURER_ID2 0xFFFFFF8B
-#define VSCP2_STD_REG_MANUFACTURER_ID3 0xFFFFFF8C
-
-#define VSCP2_STD_REG_MANUFACTURER_SUBID0 0xFFFFFF8D
-#define VSCP2_STD_REG_MANUFACTURER_SUBID1 0xFFFFFF8E
-#define VSCP2_STD_REG_MANUFACTURER_SUBID2 0xFFFFFF8F
-#define VSCP2_STD_REG_MANUFACTURER_SUBID3 0xFFFFFF90
-
-#define VSCP2_STD_REG_NICKNAME_ID 0xFFFFFF91
-
-#define VSCP2_STD_REG_PAGE_SELECT_MSB 0xFFFFFF92
-#define VSCP2_STD_REG_PAGE_SELECT_LSB 0xFFFFFF93
-
-#define VSCP2_STD_REG_FIRMWARE_MAJOR_VERSION   0xFFFFFF94
-#define VSCP2_STD_REG_FIRMWARE_MINOR_VERSION   0xFFFFFF95
-#define VSCP2_STD_REG_FIRMWARE_RELEASE_VERSION 0xFFFFFF96
-
-#define VSCP2_STD_REG_BOOT_LOADER_ALGORITHM 0xFFFFFF97
-#define VSCP2_STD_REG_BUFFER_SIZE           0xFFFFFF98
-#define VSCP2_STD_REG_PAGES_USED            0xFFFFFF99
-
-// 32-bit
-#define VSCP2_STD_REG_STANDARD_DEVICE_FAMILY_CODE 0xFFFFFF9A
-
-// 32-bit
-#define VSCP2_STD_REG_STANDARD_DEVICE_TYPE_CODE 0xFFFFFF9E
-
-#define VSCP2_STD_REG_DEFAULT_CONFIG_RESTORE 0xFFFFFFA2
-
-// 16-bit
-#define VSCP2_STD_REG_FIRMWARE_CODE 0xFFFFFFA3
-
-#define VSCP2_STD_REG_GUID       0xFFFFFFD0
-#define VSCP2_STD_REG_DEVICE_URL 0xFFFFFFE0
+// #define FRMW2_STANDARD_REGISTER_START 0xffff0000
 
 // -----------------------------------------------------------------------------
 
 /* States */
-#define VSCP2_STATE_STARTUP     0x00
-#define VSCP2_STATE_UNCONNECTED 0x01
-#define VSCP2_STATE_CONNECTED   0x02
-#define VSCP2_STATE_ERROR       0x03
-
-  /*!
-  ****************************************************************************
-                                     Globals
-  *****************************************************************************
-   */
-
-  extern uint8_t vscp_node_state;
-extern uint8_t vscp_node_substate;
+#define FRMW2_STATE_STARTUP     0x00
+#define FRMW2_STATE_UNCONNECTED 0x01
+#define FRMW2_STATE_CONNECTED   0x02
+#define FRMW2_STATE_ERROR       0x03
 
 /*!
 ****************************************************************************
@@ -205,7 +217,7 @@ extern uint8_t vscp_node_substate;
 /*!
  * @brief Init subsystem
  *
- * @param pdata Pointer to user data (typical points to context)
+ * @param pcfg Structure with configuration data
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  *
  * Init VSCP subsystem. The transport layer should be up and
@@ -214,7 +226,47 @@ extern uint8_t vscp_node_substate;
  */
 
 int
-vscp2_init(const void* pdata);
+frmw2_init(frmw2_firmware_configt_t* const pcfg);
+
+/*!
+  @brief Initialize persistent storage
+
+  @param pdata Pointer to user data (typical points to context)
+ */
+int
+frmw2_init_persistent_storage(void);
+
+/*!
+ * @brief Init VSCP ex event with standard data
+ *
+ * @param pex Pointer to ex event
+ */
+
+void
+frmw2_init_event_ex(vscpEventEx* pex);
+
+/*!
+ * @brief Get nickname for node
+ *
+ * @return nickname
+ */
+
+uint16_t
+frmw2_get_nickname(void);
+
+/*!
+ * @brief Do periodic VSCP protocol work when nickname is 0xffff
+ *
+ * This is the code that is executed during
+ * the init process when a nickjname device
+ * has not yet got a valid nickname.
+ *
+ * Never used in a LEVEL II system
+ *
+ * */
+
+int
+frmw2_do_nickname_discovery_work(vscpEventEx* pex);
 
 /*!
  * @brief Do periodic VSCP protocol work
@@ -235,10 +287,14 @@ vscp2_init(const void* pdata);
  */
 
 int
-vscp2_do_work(vscpEvent* pev);
+frmw2_do_live_work(vscpEventEx* pex);
 
 /*!
  * @brief Read VSCP Level II register
+ *
+ * If the device is a pure level I device
+ * the three high bytes of reg should be masked
+ * before a register read.
  *
  * @param reg Register to write
  * @param pval Pointer to read value
@@ -246,10 +302,14 @@ vscp2_do_work(vscpEvent* pev);
  */
 
 int
-vscp2_read_reg(uint32_t reg, uint8_t* pval);
+frmw2_read_reg(uint32_t reg, uint8_t* pval);
 
 /*!
- * @brief Write VSCL level II register
+ * @brief Write VSCP level II register
+ *
+ * If the device is a pure level I device
+ * the three high bytes of reg should be masked
+ * before a register write.
  *
  * @param reg Register to write
  * @param val Value to write
@@ -259,7 +319,7 @@ vscp2_read_reg(uint32_t reg, uint8_t* pval);
  */
 
 int
-vscp2_write_reg(uint32_t reg, uint8_t val);
+frmw2_write_reg(uint32_t reg, uint8_t val);
 
 /*!
  * @brief Send periodic heartbeat
@@ -270,7 +330,7 @@ vscp2_write_reg(uint32_t reg, uint8_t val);
  */
 
 int
-vscp2_send_heartbeat(void);
+frmw2_send_heartbeat(void);
 
 /*!
  * @brief Send periodic capability heartbeat
@@ -281,43 +341,31 @@ vscp2_send_heartbeat(void);
  */
 
 int
-vscp2_send_caps(void);
-
-/*!
- * @brief Send high end server probe
- *
- * @return VSCP_ERROR_SUCCESS on success, else error code.
- */
-
-#ifdef THIS_FIRMWARE_VSCP_DISCOVER_SERVER
-int
-vscp2_send_high_end_server_probe(void);
-#endif
-
+frmw2_send_caps(void);
 
 /*!
  * @brief Do register reads
  *
- * @param pex Pointer to event containing register read data
+ * @param reg First register position to write to.
+ * @param cnt Number of positions to write to.
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  */
 
 int
-vscp2_do_register_read(vscpEvent* pev);
-
+frmw2_do_vscp2_register_read(uint32_t startreg, uint16_t cnt);
 
 /*!
  * @brief Do register writes
  *
- * @param pex Pointer to event containing register write data
+ * @param reg First register position to write to.
+ * @param cnt Number of positions to write to.
+ * @param pdata Pointer to data to write.
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  */
 
 int
-vscp2_do_register_write(vscpEvent* pev);
+frmw2_do_vscp2_register_write(uint32_t startreg, uint16_t cnt, uint8_t* pdata);
 
-
-#ifdef THIS_FIRMWARE_ENABLE_ERROR_REPORTING
 /*!
   @brief Send error event (CLASS=508).
 
@@ -325,7 +373,7 @@ vscp2_do_register_write(vscpEvent* pev);
   @param idx Index to identify possible sub module. Normally set to zero.
   @return VSCP_ERROR_SUCCESS on success, else error code.
 
-  __THIS_FIRMWARE_ENABLE_ERROR_REPORTING__ should be defined (in projdefs.h) for this function to be compiled in.
+  Enable by setting bEnableErroReporting to true in config.
 
   See specification [here](https://grodansparadis.github.io/vscp-doc-spec/#/./class1.error)
 
@@ -334,11 +382,8 @@ vscp2_do_register_write(vscpEvent* pev);
  */
 
 uint8_t
-vscp2_send_error_event(uint8_t type, uint8_t idx);
+frmw2_send_error_event(uint8_t type, uint8_t idx);
 
-#endif
-
-#ifdef THIS_FIRMWARE_ENABLE_LOGGING
 /*!
   @brief Send log event (CLASS=509).
 
@@ -349,7 +394,7 @@ vscp2_send_error_event(uint8_t type, uint8_t idx);
   @param pData Log data (Always 5 bytes).
   @return VSCP_ERROR_SUCCESS on success, else error code.
 
-  __THIS_FIRMWARE_ENABLE_LOGGING__ should be defined (in projdefs.h) for this function to be compiled in.
+  Enable by setting bEnableLogging to true in config.
 
   See specification [here](https://grodansparadis.github.io/vscp-doc-spec/#/./class1.log)
 
@@ -359,26 +404,80 @@ vscp2_send_error_event(uint8_t type, uint8_t idx);
  */
 
 uint8_t
-vscp2_send_log_event(uint8_t type, uint8_t id, uint8_t level, uint8_t idx, uint8_t* pLogdata);
-
-#endif
-
-#ifdef THIS_FIRMWARE_VSCP_DISCOVER_SERVER
+frmw2_send_log_event(uint8_t type, uint8_t id, uint8_t level, uint8_t idx, uint8_t* pLogdata);
 
 /*!
    @brief Send high end server probe
-  
+
+  Enable by setting bSendHighEndServerProbe to true in config
+
    @return VSCP_ERROR_SUCCESS on success, else error code.
-  
-   __THIS_FIRMWARE_VSCP_DISCOVER_SERVER__ should be defined (in projdefs.h) for this function to be compiled in.
-   
+
    Inform possible high end servers of our existence.
  */
 
 int
-vscp2_send_high_end_server_probe(void);
+frmw2_send_high_end_server_probe(void);
 
-#endif
+/*!
+  @brief Do a level I page read
+
+  @param offset Offset into register page
+  @param count Number of registers to read
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+*/
+int
+frmw2_page_read(uint32_t offset, uint8_t count);
+
+/*!
+  @brief Do a level I page write
+
+  @param offset Offset into register page
+  @param count Number of registers to write
+  @param buf Pointer to buffer of
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+*/
+
+int
+frmw2_page_write(uint32_t offset, uint8_t count, const uint8_t* const pbuf);
+
+/*!
+  @brief Send whois response
+
+  Send whois response. If level II device a level II response
+  will be sent.
+
+  @param nodeid Offset into register page
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+*/
+
+int
+frmw2_whois_response(uint16_t nodeid);
+
+/*!
+  @brief Read a full page or part of memory
+
+  @param nodeid Node id from node to read page from
+  @param page Page to read.
+  @param offset Offset on page to read from.
+  @param cnt Number of bytes from offset to read. A zero value should be treated as 256.
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+*/
+int
+frmw2_extended_page_read(uint16_t nodeid, uint16_t page, uint8_t offset, uint16_t cnt);
+
+/*!
+  @brief Write multiple bytes to memory
+
+  @param page Page to read.
+  @param offset Offset on page to read from.
+  @param cnt Number of bytes from offset to read. A zero value should be treated as 256.
+  @param pbuf Pointer to buffer with data
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+*/
+
+int
+frmw2_extended_page_write(uint16_t nodeid, uint16_t page, uint8_t offset, uint16_t cnt, const uint8_t* const pbuf);
 
 /*
  ****************************************************************************
@@ -391,6 +490,16 @@ vscp2_send_high_end_server_probe(void);
 */
 
 /*!
+ * @brief Check if this is a level I device
+ *
+ * @param pdata Pointer to user data (typical points to context)
+ * @return Non zero is returned if this is a level I device.
+ */
+
+int
+frmw2_callback_is_level1(void* const puserdata);
+
+/*!
  * @brief Get the time in milliseconds.
  *
  * @param pdata Pointer to user data (typical points to context)
@@ -399,90 +508,16 @@ vscp2_send_high_end_server_probe(void);
  */
 
 int
-vscp2_protocol_callback_get_ms(const void* pdata, uint32_t* ptime);
+frmw2_callback_get_ms(void* const puserdata, uint32_t* ptime);
 
 /*!
- * @brief Get pointer to GUID
- *
- * Get a pointer to the 16-byte GUID byte array.
- *
- * @param pdata Pointer to user data (typical points to context)
- * @return Pointer to the device GUID.
- *
- */
-
-const uint8_t*
-vscp2_protocol_callback_get_guid(const void* pdata);
-
-/*!
- * @brief Read user register
- *
- * Read value of one of the user registers. Valid register range
- * is 0x00000000 - 0xffff0000
+ * @brief Enter bootloader.  SHOULD NEVER RETURN
  *
  * @param pdata Pointer to user data (typical points to context).
- * @param reg Register to read.
- * @param pval Pointer to variable that will get read value.
- * @return VSCP_ERROR_SUCCESS on success, else error code. VSCP_ERROR_PARAMETER is
- * returned if the register is invalid.
- *
- */
-int
-vscp2_protocol_callback_read_user_reg(const void* pdata, uint32_t reg, uint8_t* pval);
-
-/*!
- * @brief Write user register
- *
- * Write value of one of the user registers. Valid register range
- * is 0x00000000 - 0xffff0000
- *
- * @param pdata Pointer to user data (typical points to context)
- * @param reg Register to write
- * @param val Value to write
- * @return VSCP_ERROR_SUCCESS on success, else error code. VSCP_ERROR_PARAMETER is
- * returned if the register is invalid.
  */
 
-int
-vscp2_protocol_callback_write_user_reg(const void* pdata, uint32_t reg, uint8_t val);
-
-/*!
-  @brief Send event to transport sublayer.
-
-  @param pdata Pointer to user data (typical points to context)
-  @param pex Pointer to Event to send.
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-
-  - ev is taken over in the callback and it is responsible for releasing it.
-  - if GUID is all zero then the GUID is set to the GUID of the node.
-*/
-
-int
-vscp2_protocol_callback_send_event(const void* pdata, vscpEvent* pev);
-
-/*!
-  @brief Send eventex to transport sublayer.
-
-  @param pdata Pointer to user data (typical points to context)
-  @param ex Pointer to EventEx to send.
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-
-  - ex is copied in the callback.
-  - if GUID is all zero then the GUID is set to the GUID of the node.
-*/
-
-int
-vscp2_protocol_callback_send_eventEx(const void* pdata, vscpEvent* pev);
-
-/*!
- * @brief Enter bootloader.
- *
- * @param pdata Pointer to user data (typical points to context).
- * @return VSCP_ERROR_SUCCESS on success, or error code.
- */
-
-int
-vscp2_protocol_callback_enter_bootloader(const void* pdata);
+void
+frmw2_callback_enter_bootloader(void* const puserdata);
 
 /*!
  * @brief Reply with DM content.
@@ -494,29 +529,51 @@ vscp2_protocol_callback_enter_bootloader(const void* pdata);
  */
 
 int
-vscp2_protocol_callback_report_dmatrix(const void* pdata);
+frmw2_callback_report_dmatrix(void* const puserdata);
 
 /*!
- * @brief Reply with embedded DM.
+ * @brief Segment controler heartbeat received
  *
  * @param pdata Pointer to user data (typical points to context).
  * @return VSCP_ERROR_SUCCESS on success, or error code.
+ */
+int
+frmw2_callback_segment_ctrl_heartbeat(void* const puserdata, uint16_t segcrc, uint32_t time);
+
+/*!
+ * @brief New level I node online
  *
- * Report embedded mdf back.
+ * @param pdata Pointer to user data (typical points to context).
+ * @param nickname nickname id of the new node.
+ * @return VSCP_ERROR_SUCCESS on success, or error code.
  */
 
 int
-vscp2_protocol_callback_report_mdf(const void* pdata);
+frmw2_callback_new_node_online_level1(void* const puserdata, uint16_t nickname);
+
+/*!
+ * @brief New leve II node online
+ *
+ * The framework sends the required response if the nodeid is the same as the preobe.
+ *
+ * @param pdata Pointer to user data (typical points to context).
+ * @param pguid Pointer to GUID of the new node.
+ * @return VSCP_ERROR_SUCCESS on success, or error code.
+ */
+int
+frmw2_callback_new_node_online_level2(void* const puserdata, const uint8_t* const pguid);
 
 /*!
  * @brief Report back events that this node is interested in
+ *
+ * The framework sends the required response if the GUID is the same as the probe.
  *
  * @param pdata Pointer to user data (typical points to context)
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  */
 
 int
-vscp2_protocol_callback_report_events_of_interest(const void* pdata);
+frmw2_callback_report_events_of_interest(void* const puserdata);
 
 /*!
  * @brief Get timestamp
@@ -526,10 +583,10 @@ vscp2_protocol_callback_report_events_of_interest(const void* pdata);
  */
 
 uint32_t
-vscp2_protocol_callback_get_timestamp(const void* pdata);
+frmw2_callback_get_timestamp(void* const puserdata);
 
 /*!
- * @brief  Fill in event time information
+ * @brief  Fill in event date/time information
  *
  * @param pdata
  * @param pex Event to get info
@@ -540,122 +597,17 @@ vscp2_protocol_callback_get_timestamp(const void* pdata);
  */
 
 int
-vscp2_protocol_callback_get_time(const void* pdata, const vscpEvent* pev);
-
-/*!
-  @brief Get user id
-
-  @param pdata Pointer to context
-  @param pos Position 0-4 of user id to read
-  @param pval Pointer to variable that will get user id
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-*/
-
-int
-vscp2_protocol_callback_get_user_id(const void* pdata, uint8_t pos, uint8_t* pval);
-
-/*!
-  @brief Write user id
-
-  @param pdata Pointer to context
-  @param pos Position 0-8 of manufacturer id to write
-  @param val Value to write
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-*/
-
-int
-vscp2_protocol_callback_write_user_id(const void* pdata, uint8_t pos, uint8_t val);
-
-#ifdef THIS_FIRMWARE_ENABLE_WRITE_2PROTECTED_LOCATIONS
-
-/*!
-  @brief Get manufacturer id
-
-  @param pdata Pointer to context
-  @param pos Position 0-7 of manufacturer id to read
-  @param pval Pointer to variable that will get manufacturer id
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-*/
-
-int
-vscp2_protocol_callback_get_manufacturer_id(const void* pdata, uint8_t pos, uint8_t* pval);
-
-/*!
-  @brief Write manufacturer id
-
-  @param pdata Pointer to context
-  @param pos Position 0-7 of user id to write
-  @param val Value to write
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-*/
-
-int
-vscp2_protocol_callback_write_manufacturer_id(const void* pdata, uint8_t pos, uint8_t val);
-
-/*!
-  @brief Write guid byte
-
-  @param pdata Pointer to user data (typical points to context)
-  @param pos Position 0-15 of GUID byte to write
-  @param val Value to write
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-*/
-
-int
-vscp2_protocol_callback_write_guid(const void* pdata, uint8_t pos, uint8_t val);
-
-#endif
-
-/*!
-  @brief Get bootloader algorithm used to bootload this
-  device.
-
-  @param pdata Pointer to user data (typical points to context)
-  @return bootloader algorithm (see vscp.h)
-*/
-
-int
-vscp2_protocol_callback_get_bootloader_algorithm(const void* pdata);
-
-/*!
-  @brief Get persistent storage control byte
-
-  @param pdata Pointer to user data (typical points to context)
-  @param pval Pointer to variable that will get bootloader version
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-*/
-
-int
-vscp2_protocol_callback_get_control_byte(const void* pdata);
-
-/*!
-  @brief Set persistent storage control byte
-
-  @param pdata Pointer to user data (typical points to context)
-  @param pval Pointer to variable that will get bootloader version
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-*/
-
-int
-vscp2_protocol_callback_set_control_byte(const void* pdata, uint8_t ctrl);
-
-/*!
-  @brief Initialize persistent storage
-
-  @param pdata Pointer to user data (typical points to context)
- */
-int
-vscp2_protocol_callback_init_persistent_storage(const void* pdata);
+frmw2_callback_get_time(void* const puserdata, vscpEventEx* pex);
 
 /*!
   @brief Feed the decision matrix with one Event
 
   @param pdata Pointer to user data (typical points to context)
-  @param ev Event to feed the DM with.
+  @param pex Event to feed the DM with.
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 int
-vscp2_protocol_callback_feed_dm(const void* pdata, vscpEventEx* ev);
+frmw2_callback_feed_dm(void* const puserdata, vscpEventEx* pev);
 
 /*!
   @brief All events except level I/II protocol events is sent to the
@@ -667,7 +619,7 @@ vscp2_protocol_callback_feed_dm(const void* pdata, vscpEventEx* ev);
 */
 
 int
-vscp2_protocol_callback_feed_app(const void* pdata, vscpEvent* pev);
+frmw2_callback_feed_app(void* const puserdata, vscpEventEx* pex);
 
 /*!
   @brief Get DM matrix info
@@ -688,7 +640,18 @@ vscp2_protocol_callback_feed_app(const void* pdata, vscpEvent* pev);
  */
 
 int
-vscp2_protocol_callback_send_dm_info(const void* pdata, char* pDM);
+frmw2_callback_send_dm_info(void* const puserdata, char* pDM);
+
+/*!
+  @brief Get MDF URL
+
+  @param pdata Pointer to user data (typical points to context)
+  @param purl Pointer to MDF URL.
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+*/
+
+int
+frmw2_callback_get_mdf_url(void* const puserdata, uint8_t* const purl);
 
 /*!
   @brief Get embedded MDF info
@@ -701,45 +664,7 @@ vscp2_protocol_callback_send_dm_info(const void* pdata, char* pDM);
   @return VSCP_ERROR_SUCCESS on success, or error code.
  */
 int
-vscp2_protocol_callback_send_embedded_mdf(const void* pdata);
-
-/*!
-  @brief Go boot loader mode
-
-  This routine force the system into boot loader mode according
-  to the selected protocol.
-
-  @param pdata Pointer to user data (typical points to context)
-  @param[out] palgorithm Pointer to bootloader algorithm to use.
-  @return VSCP_ERROR_SUCCESS on success, or error code.
- */
-
-int
-vscp2_protocol_callback_go_bootloader(const void* pdata, uint8_t* palgorithm);
-
-/*!
-  @brief Get Zone for device
-
-  Just return zero if not used.
-
-  @param pdata Pointer to user data (typical points to context)
-  @return Zone number.
- */
-
-int
-vscp2_protocol_callback_get_zone(const void* pdata);
-
-/*!
-  @brief Get Subzone for device
-
-  Just return zero if not used.
-
-  @param pdata Pointer to user data (typical points to context)
-  @return Subzone number.
- */
-
-int
-vscp2_protocol_callback_get_subzone(const void* pdata);
+frmw2_callback_send_embedded_mdf(void* const puserdata);
 
 /*!
   @brief Restore defaults
@@ -753,7 +678,7 @@ vscp2_protocol_callback_get_subzone(const void* pdata);
  */
 
 int
-vscp2_protocol_callback_restore_defaults(const void* pdata);
+frmw2_callback_restore_defaults(void* const puserdata);
 
 /**
  * @brief Return ipv6 or ipv4 address
@@ -771,9 +696,7 @@ vscp2_protocol_callback_restore_defaults(const void* pdata);
  */
 
 int
-vscp2_protocol_callback_get_ip_addr(const void* pUserData, uint8_t* pipaddr);
-
-#ifdef THIS_FIRMWARE_VSCP_DISCOVER_SERVER
+frmw2_callback_get_ip_addr(void* const puserdata, uint8_t* pipaddr);
 
 /*!
   @brief Handle high end server response
@@ -783,9 +706,112 @@ vscp2_protocol_callback_get_ip_addr(const void* pUserData, uint8_t* pipaddr);
 */
 
 int
-vscp2_protocol_callback_high_end_server_response(const void* pUserData);
+frmw2_callback_high_end_server_response(void* const puserdata);
 
-#endif
+/*!
+  @brief Get name of the device.  Used by the device capabilities report.
+
+  @param pdata Pointer to user data (typical points to context)
+  @param pname Pointer to device name. The name should be no more than 64
+  characters including terminating zero.
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+*/
+int
+frmw2_callback_get_device_name(void* const puserdata, const char* pname);
+
+/*!
+ * @brief Read register
+ *
+ * Read value of one of the user registers. Valid register range
+ * is 0x00000000 - 0xffff0000
+ *
+ * @param pdata Pointer to user data (typical points to context).
+ * @param page Register page used at level I
+ * @param reg Register to read.
+ * @param pval Pointer to variable that will get read value.
+ * @return VSCP_ERROR_SUCCESS on success, else error code. VSCP_ERROR_PARAMETER is
+ * returned if the register is invalid.
+ *
+ */
+int
+frmw2_callback_read_reg(void* const puserdata, uint16_t page, uint32_t reg, uint8_t* pval);
+
+/*!
+ * @brief Write register
+ *
+ * Write value of one of the user registers. Valid register range
+ * is 0x00000000 - 0xffff0000
+ *
+ * @param pdata Pointer to user data (typical points to context)
+ * @param page Register page used at level I
+ * @param reg Register to write
+ * @param val Value to write
+ * @return VSCP_ERROR_SUCCESS on success, else error code. VSCP_ERROR_PARAMETER is
+ * returned if the register is invalid.
+ */
+
+int
+frmw2_callback_write_reg(void* const puserdata, uint16_t page, uint32_t reg, uint8_t val);
+
+/*!
+  @brief Send event to transport sublayer.
+
+    ev is copied in the callback.
+  - if GUID is all zero then the GUID should be set to the GUID of the node.
+  - if requestted to send a Level II event and we are a Level I node skip the
+    event and return VSCP_ERROR_ERROR
+
+  @param pdata Pointer to user data (typical points to context)
+  @param pex Pointer to Event to send.
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+
+*/
+
+int
+frmw2_callback_send_event(void* const puserdata, vscpEvent* pev);
+
+/*!
+  @brief Send eventex to transport sublayer.
+  - ex is copied in the callback.
+  - if GUID is all zero then the GUID should be set to the GUID of the node.
+  - if requestted to send a Level II event and we are a Level I node skip the
+    event and return VSCP_ERROR_ERROR
+  @param pdata Pointer to user data (typical points to context)
+  @param pex Pointer to EventEx to send.
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+
+  -
+*/
+
+int
+frmw2_callback_send_event_ex(void* const puserdata, vscpEventEx* pex);
+
+/*!
+  @brief Information callback to app that standard register has been changed.
+
+  @param pdata Pointer to user data (typical points to context)
+  @param stdreg Standard register that has been changed. Level I register address
+    should be used for all common registers.
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+*/
+int
+frmw2_callback_stdreg_change(void* const puserdata, uint32_t stdreg);
+
+/*!
+  @brief Feed the watchdog
+
+  Feed the watchdog on systems that need to do
+  that during lengthy operations to prevent restarts.
+*/
+
+void
+frmw2_callback_feed_watchdog(void* const puserdata);
+
+/*!
+  @brief Reset the device and do a warm start
+*/
+void
+frmw2_callback_reset(void* const puserdata);
 
 // ============ END OF CALLBACKS ============
 
@@ -797,4 +823,4 @@ vscp2_protocol_callback_high_end_server_response(const void* pUserData);
 }
 #endif
 
-#endif
+#endif // __VSCP_FIRMWARE_LEVEL2_H

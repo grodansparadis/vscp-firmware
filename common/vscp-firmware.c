@@ -37,8 +37,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vscp-firmware.h>
-#include <vscp_class.h>
-#include <vscp_type.h>
+#include <vscp-class.h>
+#include <vscp-type.h>
 
 
 #ifndef FALSE

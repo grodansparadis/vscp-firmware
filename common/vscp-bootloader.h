@@ -56,8 +56,8 @@
  * this.
  */
 
-#ifndef _bootloader_h
-#define _bootloader_h
+#ifndef __vscp_bootloader_h
+#define __vscp_bootloader_h
 
 #ifdef __cplusplus
 extern "C" {
@@ -271,11 +271,17 @@ vscpboot_sendEvent(vscpEventEx* pex);
   Get VSCP event
   -----------------------------------------------------------
   IMPORTANT!
+  
   This routine should translate all VSCP_CLASS2_LEVEL1_PROTOCOL
-  events to VSCP_CLASS1_PROTOCOL events.
+  events to VSCP_CLASS1_PROTOCOL events. That means dropping
+  the interface that is stored in the first 16-bytes of data.
+
+  It should block while waiting for event
   -----------------------------------------------------------
   @param Pointer to VSCP event structure.
-   @return VSCP_ERROR_SUCCESS on success
+   @return VSCP_ERROR_SUCCESS on success 
+           VSCP_ERROR_FIFO_EMPTY if empty.
+           VSCP_ERRROR_ERROR on other error.
 */
 int
 vscpboot_getEvent(vscpEventEx* pex);

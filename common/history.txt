@@ -1,4 +1,5 @@
 
+2022-05-14 AKHE - vscp_class and vscp_type etc is now vscp-class and vscp-type etc
 2022-05-24 AKHE - Link protocol and vscp level II protocol files added
 2016-03-23 AKHE - VSCP Firmware 1.6.1 released
 2016-03-23 AKHE - vscp_sendLogEvent parameter error fixed

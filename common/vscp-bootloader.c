@@ -48,8 +48,8 @@
 #include <vscp_class.h>
 #include <vscp_type.h>
 
-#include "vscp_compiler.h"
-#include "vscp_projdefs.h"
+#include "vscp-compiler.h"
+#include "vscp-projdefs.h"
 
 #include "vscp-bootloader.h"
 
@@ -127,7 +127,9 @@ ENTER_BOOT_MODE:
   while (vscpboot_run()) { // not only diamonds are forever...
 
     // Block until VSCP event is received
-    if (VSCP_ERROR_SUCCESS != (rv == vscpboot_getEvent(&ex))) {
+    if (VSCP_ERROR_SUCCESS != (rv = vscpboot_getEvent(&ex))) {
+      // VSCP_ERROR_FIFO_EMPTY if empty
+      // VSCP_ERRROR_ERROR on other error
       continue;
     }
 

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// File: vscp_firmware.h
+// File: vscp-firmware.h
 //
 
 /* ******************************************************************************
@@ -8,7 +8,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2023 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
+ * Copyright (c) 2000-2024 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,8 +38,8 @@
 #ifndef VSCP_FIRMWARE_H
 #define VSCP_FIRMWARE_H
 
-#include "vscp_compiler.h" 	// This file should be in your project folder
-#include "vscp_projdefs.h"	// This file should be in your project folder
+#include "vscp-compiler.h" 	// This file should be in your project folder
+#include "vscp-projdefs.h"	// This file should be in your project folder
 #include <inttypes.h>
 
 #ifdef __cplusplus
@@ -47,7 +47,7 @@
 #endif
 
 /*!
-  @file vscp_firmware.h
+  @file vscp-firmware.h
   @brief VSCP firmware stack
   @defgroup vscp-level1-firmware VSCP level I firmware
 
