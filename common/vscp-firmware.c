@@ -8,7 +8,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2023 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
+ * Copyright (c) 2000-2024 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,10 +36,9 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <vscp-firmware.h>
 #include <vscp-class.h>
+#include <vscp-firmware.h>
 #include <vscp-type.h>
-
 
 #ifndef FALSE
 #define FALSE 0
@@ -262,7 +261,7 @@ vscp_handleProbeState(void)
           // Yes it was an ack from the segment master or a node
           if (0 == vscp_probe_address) {
 
-            // Master controller answered
+            // Master controler answered
             // wait for address
             vscp_node_state = VSCP_STATE_PREACTIVE;
             vscp_timer      = 0; // reset timer
@@ -285,7 +284,7 @@ vscp_handleProbeState(void)
           if (vscp_probe_cnt >= VSCP_PROBE_TIMEOUT_COUNT) {
 
             // Yes we have a time-out
-            if (0 == vscp_probe_address) { // master controller probe?
+            if (0 == vscp_probe_address) { // master controler probe?
 
               // No master controller on segment, try next node
               vscp_probe_address++;

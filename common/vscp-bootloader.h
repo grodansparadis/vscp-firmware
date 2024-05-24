@@ -205,7 +205,7 @@ void
 vscpboot_reboot(void);
 
 /*!
-  Get configuration
+  Get bootloader configuration (# blocks. blocksize)
 */
 vscpboot_config_t*
 vscpboot_getConfig(void);
@@ -222,7 +222,7 @@ uint8_t*
 vscpboot_getGUID(void);
 
 /*!
-  Check if memtype is valid. type == 0 is always valid
+  Check if memory type is valid. type == 0 is always valid
   Return true if the memory type is valid on your hardware and
   can be programmed. See CLASS1.PROTOCOL, VSCP_TYPE_PROTOCOL_START_BLOCK for a list
   of types.
@@ -232,7 +232,7 @@ int
 vscpboot_isMemTypeValid(uint8_t type);
 
 /*!
-  Check if membank is valid. type == 0 is always valid
+  Check if memory bank is valid. type == 0 is always valid
   Return true if the bank is valid on your hardware.
   @return non zero, TRUE, if valid
 */
@@ -265,7 +265,7 @@ vscpboot_calcPrgCrc(void);
   @return VSCP_ERROR_SUCCESS on success
 */
 int
-vscpboot_sendEvent(vscpEventEx* pex);
+vscpboot_sendEventEx(vscpEventEx* pex);
 
 /*!
   Get VSCP event
@@ -274,7 +274,8 @@ vscpboot_sendEvent(vscpEventEx* pex);
   
   This routine should translate all VSCP_CLASS2_LEVEL1_PROTOCOL
   events to VSCP_CLASS1_PROTOCOL events. That means dropping
-  the interface that is stored in the first 16-bytes of data.
+  the interface that is stored in the first 16-bytes of data, and
+  shifting data after it to base zero and decrease the event size by 16.
 
   It should block while waiting for event
   -----------------------------------------------------------
@@ -284,7 +285,7 @@ vscpboot_sendEvent(vscpEventEx* pex);
            VSCP_ERRROR_ERROR on other error.
 */
 int
-vscpboot_getEvent(vscpEventEx* pex);
+vscpboot_getEventEx(vscpEventEx* pex);
 
 #ifdef __cplusplus
 }

@@ -120,14 +120,14 @@ ENTER_BOOT_MODE:
   ex.data[5]    = ((vscpboot_getConfig()->blockCount) >> 16) & 0xFF;
   ex.data[6]    = ((vscpboot_getConfig()->blockCount) >> 8) & 0xFF;
   ex.data[7]    = ((vscpboot_getConfig()->blockCount) & 0xFF);
-  if (VSCP_ERROR_SUCCESS != (rv = vscpboot_sendEvent(&ex))) { 
+  if (VSCP_ERROR_SUCCESS != (rv = vscpboot_sendEventEx(&ex))) { 
     printf("Send error: rv=%d\n", rv);
   }
 
   while (vscpboot_run()) { // not only diamonds are forever...
 
     // Block until VSCP event is received
-    if (VSCP_ERROR_SUCCESS != (rv = vscpboot_getEvent(&ex))) {
+    if (VSCP_ERROR_SUCCESS != (rv = vscpboot_getEventEx(&ex))) {
       // VSCP_ERROR_FIFO_EMPTY if empty
       // VSCP_ERRROR_ERROR on other error
       continue;
@@ -169,7 +169,7 @@ ENTER_BOOT_MODE:
             ex.sizeData   = 0;
             ex.vscp_class = VSCP_CLASS1_PROTOCOL;
             ex.vscp_type  = VSCP_TYPE_PROTOCOL_START_BLOCK_NACK;
-            vscpboot_sendEvent(&ex);
+            vscpboot_sendEventEx(&ex);
             goto ENTER_BOOT_MODE;
           }
 
@@ -178,7 +178,7 @@ ENTER_BOOT_MODE:
           ex.sizeData   = 0;
           ex.vscp_class = VSCP_CLASS1_PROTOCOL;
           ex.vscp_type  = VSCP_TYPE_PROTOCOL_START_BLOCK_ACK;
-          if (VSCP_ERROR_SUCCESS == vscpboot_sendEvent(&ex)) {
+          if (VSCP_ERROR_SUCCESS == vscpboot_sendEventEx(&ex)) {
             goto ENTER_BOOT_MODE;
           }
 
@@ -197,7 +197,7 @@ ENTER_BOOT_MODE:
             ex.vscp_class = VSCP_CLASS1_PROTOCOL;
             ex.vscp_type  = VSCP_TYPE_PROTOCOL_ACTIVATE_NEW_IMAGE_ACK;
 
-            if (VSCP_ERROR_SUCCESS != vscpboot_sendEvent(&ex)) {
+            if (VSCP_ERROR_SUCCESS != vscpboot_sendEventEx(&ex)) {
               goto ENTER_BOOT_MODE;
             }
           }
@@ -208,7 +208,7 @@ ENTER_BOOT_MODE:
             ex.vscp_class = VSCP_CLASS1_PROTOCOL;
             ex.vscp_type  = VSCP_TYPE_PROTOCOL_ACTIVATE_NEW_IMAGE_NACK;
 
-            if (VSCP_ERROR_SUCCESS != vscpboot_sendEvent(&ex)) {
+            if (VSCP_ERROR_SUCCESS != vscpboot_sendEventEx(&ex)) {
               goto ENTER_BOOT_MODE;
             }
           }
@@ -240,7 +240,7 @@ ENTER_BOOT_MODE:
             ex.sizeData   = 0;
             ex.vscp_class = VSCP_CLASS1_PROTOCOL;
             ex.vscp_type  = VSCP_TYPE_PROTOCOL_BLOCK_DATA_ACK;
-            vscpboot_sendEvent(&ex);
+            vscpboot_sendEventEx(&ex);
 
             // ACK the data block
             ex.head       = VSCP_PRIORITY_HIGH;
@@ -248,7 +248,7 @@ ENTER_BOOT_MODE:
             ex.vscp_class = VSCP_CLASS1_PROTOCOL;
             ex.vscp_type  = VSCP_TYPE_PROTOCOL_BLOCK_DATA_ACK;
 
-            if (vscpboot_sendEvent(&ex)) { // ACK program block request
+            if (vscpboot_sendEventEx(&ex)) { // ACK program block request
               goto ENTER_BOOT_MODE;
             }
           }
@@ -259,7 +259,7 @@ ENTER_BOOT_MODE:
             ex.vscp_class = VSCP_CLASS1_PROTOCOL;
             ex.vscp_type  = VSCP_TYPE_PROTOCOL_BLOCK_DATA_NACK;
 
-            if (VSCP_ERROR_SUCCESS != vscpboot_sendEvent(&ex)) {
+            if (VSCP_ERROR_SUCCESS != vscpboot_sendEventEx(&ex)) {
               goto ENTER_BOOT_MODE;
             }
           }
@@ -282,7 +282,7 @@ ENTER_BOOT_MODE:
             ex.vscp_class = VSCP_CLASS1_PROTOCOL;
             ex.vscp_type  = VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA_ACK;
 
-            if (VSCP_ERROR_SUCCESS != vscpboot_sendEvent(&ex)) {
+            if (VSCP_ERROR_SUCCESS != vscpboot_sendEventEx(&ex)) {
               goto ENTER_BOOT_MODE;
             }
           }
@@ -294,7 +294,7 @@ ENTER_BOOT_MODE:
             ex.vscp_class = VSCP_CLASS1_PROTOCOL;
             ex.vscp_type  = VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA_NACK;
 
-            if (VSCP_ERROR_SUCCESS != vscpboot_sendEvent(&ex)) {
+            if (VSCP_ERROR_SUCCESS != vscpboot_sendEventEx(&ex)) {
               goto ENTER_BOOT_MODE;
             }
           }
