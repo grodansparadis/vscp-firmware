@@ -95,16 +95,85 @@ extern "C" {
 /* States */
 typedef enum probe_state_t {
   FRMW2_STATE_NONE,      // No state
-  FRMW2_STATE_PROBE,     // A node that is waiting for a nickname
+  FRMW2_STATE_PROBE,     // A node that is searching for a nickname
   FRMW2_STATE_PREACTIVE, // Happens when segment controller take probe. Wait for nickname
   FRMW2_STATE_ACTIVE,    // Node that in it's working state
-  FRMW2_STATE_ERROR,     // This node has failed. Waitng for a reset
+  FRMW2_STATE_ERROR,     // This node has failed (probing). Waiting for a reset
 } probe_state_t;
 
 /* Sub states */
 typedef enum probe_substate_t {
-  FRMW2_SUBSTATE_NONE
+  FRMW2_SUBSTATE_NONE,
+  FRMW2_SUBSTATE_SEGCTRL_PROBE_WAITING, // Probe sent for segment controler
+  FRMW2_SUBSTATE_PROBE_WAITING,         // Waiting for response after probe has been sent
 } probe_substate_t;
+
+// Defines for probe message
+#define OPT_NEW_NODE_ONLINE 1
+#define OPT_PROBE           0
+
+// Level I decision matrix
+
+#define VSCP_LEVEL1_DM_POS_OADDR       0
+#define VSCP_LEVEL1_DM_POS_FLAGS       1
+#define VSCP_LEVEL1_DM_POS_CLASSMASK   2
+#define VSCP_LEVEL1_DM_POS_CLASSFILTER 3
+#define VSCP_LEVEL1_DM_POS_TYPEMASK    4
+#define VSCP_LEVEL1_DM_POS_TYPEFILTER  5
+#define VSCP_LEVEL1_DM_POS_ACTION      6
+#define VSCP_LEVEL1_DM_POS_ACTIONPARAM 7
+
+#define VSCP_LEVEL1_DM_FLAG_ENABLED       0x80
+#define VSCP_LEVEL1_DM_FLAG_CHECK_OADDR   0x40
+#define VSCP_LEVEL1_DM_FLAG_HARDCODED     0x20
+#define VSCP_LEVEL1_DM_FLAG_CHECK_ZONE    0x10
+#define VSCP_LEVEL1_DM_FLAG_CHECK_SUBZONE 0x08
+#define VSCP_LEVEL1_DM_FLAG_CLASS_MASK    0x02
+#define VSCP_LEVEL1_DM_FLAG_CLASS_FILTER  0x01
+
+#define LEVEL1_DM_OADDR(row)        (g_pconfig->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_OADDR])
+#define LEVEL1_DM_FLAGS(row)        (g_pconfig->m_pDm[(8 * row) + VSCP_LEVEL2_DM_POS_FLAGS])
+#define LEVEL1_DM_CLASS_MASK(row)   (g_pconfig->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSMASK] + (((g_pconfig->m_pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & 0x02) << 9))
+#define LEVEL1_DM_CLASS_FILTER(row) (g_pconfig->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSFILTER] + (((g_pconfig->m_pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & 0x01) << 9))
+#define LEVEL1_DM_TYPE_MASK(row)    (g_pconfig->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_TYPEMASK])
+#define LEVEL1_DM_TYPE_FILTER(row)  (g_pconfig->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_TYPEFILTER])
+#define LEVEL1_DM_ACTION(row)       (g_pconfig->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_ACTION])
+#define LEVEL1_DM_ACTION_PARAM(row) (g_pconfig->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_ACTIONPARAM])
+
+// Level II decision matrix
+
+#define VSCP_LEVEL2_DM_POS_FLAGS       0
+#define VSCP_LEVEL2_DM_POS_CLASS       4
+#define VSCP_LEVEL2_DM_POS_TYPE        6
+#define VSCP_LEVEL2_DM_POS_OADDR       8
+#define VSCP_LEVEL2_DM_POS_ACTION      24
+#define VSCP_LEVEL2_DM_POS_ACTIONPARAM 26
+
+#define VSCP_LEVEL2_DM_FLAG_ENABLED       0x80000000
+#define VSCP_LEVEL2_DM_FLAG_CHECK_OADDR   0x40000000
+#define VSCP_LEVEL2_DM_FLAG_END_MARK      0x20000000
+#define VSCP_LEVEL2_DM_FLAG_CHECK_INDEX   0x00000020 // index in first data byte
+#define VSCP_LEVEL2_DM_FLAG_CHECK_ZONE    0x00000010 // zone in second data byte
+#define VSCP_LEVEL2_DM_FLAG_CHECK_SUBZONE 0x00000008 // subzone in third data byte
+
+#define LEVEL2_DM_FLAGS(row) construct_unsigned32(                                 \
+  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS],     \
+  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 1], \
+  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 2], \
+  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 3])
+#define LEVEL2_DM_OADDR(row, pos) (g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + \
+                                                    VSCP_LEVEL2_DM_POS_OADDR + pos])
+#define LEVEL2_DM_CLASS(row) construct_unsigned16(                             \
+  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_CLASS], \
+  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_CLASS + 1])
+#define LEVEL2_DM_TYPE(row) construct_unsigned16(                             \
+  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_TYPE], \
+  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_TYPE + 1])
+#define LEVEL2_DM_ACTION(row) construct_unsigned16(                             \
+  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_ACTION], \
+  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_ACTION + 1])
+#define LEVEL2_DM_ACTION_PARAM(row) (g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + \
+                                                      VSCP_LEVEL2_DM_POS_ACTIONPARAM])
 
 /*
   Default nickname discovery settings
@@ -114,8 +183,11 @@ typedef enum probe_substate_t {
       If no response is received after this amount of tries the the nickname
       will be assigned to the node.
 */
-#define VSCP_PROBE_TIMEOUT       1000 // ms - one second
-#define VSCP_PROBE_TIMEOUT_COUNT 3    // Max # probe time-outs allowed
+#define VSCP_PROBE_TIMEOUT 1000         // ms - Time after probe has been sent and a no response
+                                        // is considered as a free nickname discovery
+#define VSCP_PROBE_TIMEOUT_COUNT   3    // # probe timed out probe evenst before assigning a nickname
+#define VSCP_SEGCTRL_PROBE_TIMEOUT 5000 // ms time to wait for segment controller to assign nickname
+                                        // to us
 
 /*!
   Global structure for protocol functionality
@@ -139,13 +211,29 @@ typedef struct vscp_frmw2_firmware_configt_t {
   /*!
     Holders for proxy event information. Set when received.
   */
-  uint8_t m_offset;
-  uint8_t m_ifguid[16];
+  uint8_t m_offset;      // offset in data 0 or 16
+  uint16_t m_vscp_class; // real VSCP class (vscp_class - 512 if proxy event)
+  uint8_t m_ifguid[16];  // interface GUID
 
-  uint8_t m_interval_heartbeat; // Interval for hearytbeats in seconds (0=off)
-  uint32_t m_last_heartbeat;    // Time for last heartbeat send
-  uint8_t m_interval_caps;      // Interval for capabilities events in secons (0=off)
-  uint32_t m_last_caps;         // Time for last caps send
+  uint32_t m_interval_heartbeat; // Interval for hearytbeats in milli-seconds (0=off)
+  uint32_t m_last_heartbeat;     // Time for last heartbeat send
+  uint32_t m_interval_caps;      // Interval for capabilities events in milli-seconds (0=off)
+  uint32_t m_last_caps;          // Time for last caps send
+
+  // Decision matrix
+  uint8_t* m_pDm;         // Pointer to decision matrix storage (NULL if no DM).
+  uint8_t m_nDmRows;      // Number of DM rows (0 if no DM).
+  uint8_t m_sizeDmRow;    // Size for one DM row.
+  uint32_t m_regOffsetDm; // Register offset for DM (normally zero)
+  uint16_t m_pageDm;      // Register page where DM definition starts
+
+  /*
+    This may be register positions on a device
+    Set to zero if not used.
+  */
+  uint8_t m_index;   // index for device
+  uint8_t m_zone;    // zone for device
+  uint8_t m_subzone; // subzone for device
 
   /////////////////////////////////////////////////////////////////////////////
   //                Configuration settings below this point
@@ -209,14 +297,14 @@ typedef struct vscp_frmw2_firmware_configt_t {
   Adjusted data for offset
   vscpEvent and vscpEventEx versions
 */
-#define EVDTA(x) (pev->data[(x) + g_pconfig->m_offset])
+#define EVDTA(x) (pev->pdata[(x) + g_pconfig->m_offset])
 #define EXDTA(x) (pex->data[(x) + g_pconfig->m_offset])
 
 /*!
  * Ajust size for offset
  * vscpEvent and vscpEventEx versions
  */
-#define ADJSIZEV (pex->sizeData - g_pconfig->m_offset)
+#define ADJSIZEV (pev->sizeData - g_pconfig->m_offset)
 #define ADJSIZEX (pex->sizeData - g_pconfig->m_offset)
 
 /*!
@@ -243,6 +331,7 @@ vscp_frmw2_init(vscp_frmw2_firmware_configt_t* const pcfg);
   @brief Initialize persistent storage
 
   @param pdata Pointer to user data (typical points to context)
+  @return VSCP_ERROR_SUCCESS on success, else error code.
  */
 int
 vscp_frmw2_init_persistent_storage(void);
@@ -251,10 +340,21 @@ vscp_frmw2_init_persistent_storage(void);
  * @brief Init VSCP ex event with standard data
 
    @param pex Pointer to ex event
+   @return VSCP_ERROR_SUCCESS on success, else error code.
  */
 
 void
-vscp_frmw2_init_event_ex(vscpEventEx* pex);
+vscp_frmw2_setup_event_ex(vscpEventEx* const pex);
+
+/*!
+ * @brief Send nickname probe
+ *
+ * @param bNewNodeOnLine If nonzero dataSize will be set to zero (new node on-line)
+ * @return VSCP_ERROR_SUCCESS on success, else error code.
+ */
+
+int
+vscp_frmw2_send_probe(int bNewNodeOnLine);
 
 /*!
  * @brief Do periodic VSCP protocol work when nickname is 0xffff
@@ -266,22 +366,34 @@ vscp_frmw2_init_event_ex(vscpEventEx* pex);
  *
  * Never used in a LEVEL II system
  *
- * */
+ * @param pex Received event ex or NULL if no event received.
+ * @return VSCP_ERROR_SUCCESS on success, else error code.
+ *
+ */
 
 int
-vscp_frmw2_do_nickname_discovery_work(vscpEventEx* pex);
+vscp_frmw2_nickname_discovery(const vscpEventEx* const pex);
+
+/*!
+  Waiting for segment controler to give us a nickname
+
+  @param pex Received event or NULL if no event received.
+  @return VSCP_ERROR_SUCCESS on success, else error code.
+*/
+int
+vscp_frmw2_nickname_wait(const vscpEventEx* const pex);
 
 /*!
  * @brief Do periodic VSCP protocol work
  *
- * @param pdata Pointer to user data (typical points to context)
+ * @param pex Pointer to event ex or a null pointer if no event has been received
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  *
  * Do periodic VSCP protocol work. This function should be called from the
  * main loop on periodic intervals.
  *
  * If there is incoming events to handle a pointer to the event should be
- * sent as a parameter  in **pex**. * Once the function has bern called
+ * sent as a parameter  in **pex**. * Once the function has been called
  * ownership of the event is left over to the protocol stack and it is up to the
  * function to release the event. This is true also if the function returns an error.
  *
@@ -290,7 +402,16 @@ vscp_frmw2_do_nickname_discovery_work(vscpEventEx* pex);
  */
 
 int
-vscp_frmw2_do_live_work(vscpEventEx* pex);
+vscp_frmw2_work(const vscpEventEx* const pex);
+
+/*!
+  Handle protocol events
+
+  @param pex Incoming event
+  @return VSCP_ERROR_SUCCESS on success, else error code.
+*/
+int
+vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex);
 
 /*!
  * @brief Read VSCP Level II register
@@ -355,7 +476,7 @@ vscp_frmw2_send_caps(void);
  */
 
 int
-vscp_frmw2_do_vscp2_register_read(uint32_t startreg, uint16_t cnt);
+vscp_frmw2_vscp2_register_read(uint32_t startreg, uint16_t cnt);
 
 /*!
  * @brief Do register writes
@@ -367,7 +488,7 @@ vscp_frmw2_do_vscp2_register_read(uint32_t startreg, uint16_t cnt);
  */
 
 int
-vscp_frmw2_do_vscp2_register_write(uint32_t startreg, uint16_t cnt, uint8_t* pdata);
+vscp_frmw2_vscp2_register_write(uint32_t startreg, uint16_t cnt, const uint8_t* const pdata);
 
 /*!
   @brief Send error event (CLASS=508).
@@ -482,6 +603,44 @@ vscp_frmw2_extended_page_read(uint16_t nodeid, uint16_t page, uint8_t offset, ui
 int
 vscp_frmw2_extended_page_write(uint16_t nodeid, uint16_t page, uint8_t offset, uint16_t cnt, const uint8_t* const pbuf);
 
+/*!
+  @brief Feed the level I decision matrix with one Event
+
+  @param pex Event to feed the DM with.
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+*/
+
+int
+vscp_frmw2_feed_level1_dm(const vscpEventEx* const pex);
+
+/*!
+  @brief Feed the level II decision matrix with one Event
+
+  @param pex Event to feed the DM with.
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+*/
+
+int
+vscp_frmw2_feed_leve2_dm(const vscpEventEx* const pex);
+
+/*!
+  @brief Feed the decision matrix with one Event
+
+  @param pex Event to feed the DM with.
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+*/
+int
+vscp_frmw2_feed_dm(const vscpEventEx* const pex);
+
+/*!
+  @brief Send DM info on request
+
+  Response to CLASS1_PROTOCOL, VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+*/
+int
+vscp_frmw2_report_dmatrix(void);
+
 /*
  ****************************************************************************
                                     Callbacks
@@ -493,15 +652,14 @@ vscp_frmw2_extended_page_write(uint16_t nodeid, uint16_t page, uint8_t offset, u
 */
 
 /*!
- * @brief Get the time in milliseconds.
+ * @brief Get timestamp
  *
- * @param pdata Pointer to user data (typical points to context)
- * @param ptime Pointer to unsigned integer that will get the time in milliseconds.
- * @return VSCP_ERROR_SUCCESS on success, else error code.
+ * @param pdata Pointer to context.
+ * @return Timestamp in microseconds.
  */
 
-int
-vscp_frmw2_callback_get_ms(void* const puserdata, uint32_t* ptime);
+uint32_t
+vscp_frmw2_callback_get_timestamp(void* const puserdata);
 
 /*!
  * @brief Enter bootloader.  SHOULD NEVER RETURN
@@ -513,16 +671,23 @@ void
 vscp_frmw2_callback_enter_bootloader(void* const puserdata);
 
 /*!
- * @brief Reply with DM content.
+ * @brief Handle DM action
  *
- * @param pdata Pointer to user data (typical points to context).
+ * @param puserdata Pointer to user data (typical points to context).
+ * @param pex Pointer to event that trggered the action
+ * @param action Code for action
+ * @param pparam Pointer to action parameter data.
+ *    On level II devices size for this data is always (DM-rowsize - 7)
  * @return VSCP_ERROR_SUCCESS on success, or error code.
- *
- * Report full content of DM back.
  */
 
 int
-vscp_frmw2_callback_report_dmatrix(void* const puserdata);
+vscp_frmw2_callback_dm_action(void* const puserdata,
+                              const vscpEventEx* const pex,
+                              uint8_t action,
+                              const uint8_t* const pparam);
+
+
 
 /*!
  * @brief Segment controler heartbeat received
@@ -546,17 +711,7 @@ int
 vscp_frmw2_callback_report_events_of_interest(void* const puserdata);
 
 /*!
- * @brief Get timestamp
- *
- * @param pdata Pointer to context.
- * @return Timestamp in microseconds.
- */
-
-uint32_t
-vscp_frmw2_callback_get_timestamp(void* const puserdata);
-
-/*!
- * @brief  Fill in event date/time information
+ * @brief  Fill in event date/time/timestamp information
  *
  * @param pdata
  * @param pex Event to get info
@@ -567,68 +722,20 @@ vscp_frmw2_callback_get_timestamp(void* const puserdata);
  */
 
 int
-vscp_frmw2_callback_get_time(void* const puserdata, vscpEventEx* pex);
-
-/*!
-  @brief Feed the decision matrix with one Event
-
-  @param pdata Pointer to user data (typical points to context)
-  @param pex Event to feed the DM with.
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-*/
-int
-vscp_frmw2_callback_feed_dm(void* const puserdata, vscpEventEx* pev);
-
-/*!
-  @brief All events except level I/II protocol events is sent to the
-  application for handling.
-
-  @param pdata Pointer to user data (typical points to context)
-  @param pex Event to feed the DM with.
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-*/
-
-int
-vscp_frmw2_callback_feed_app(void* const puserdata, vscpEventEx* pex);
-
-/*!
-  @brief Get DM matrix info
-
-  The output message data structure should be filled with
-  the following data by this routine.
-      byte 0 - Number of DM rows. 0 if none.
-      byte 1 - offset in register space.
-      byte 2 - start page MSB
-      byte 3 - start page LSB
-      byte 4 - End page MSB
-      byte 5 - End page LSB
-      byte 6 - Level II size of DM row (Just for Level II nodes).
-
-  @param pdata Pointer to user data (typical points to context)
-  @param pDM Pointer to DM info structure.
-  @return VSCP_ERROR_SUCCESS on success, or error code.
- */
-
-int
-vscp_frmw2_callback_send_dm_info(void* const puserdata, char* pDM);
-
-/*!
-  @brief Get MDF URL
-
-  @param pdata Pointer to user data (typical points to context)
-  @param purl Pointer to MDF URL.
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-*/
-
-int
-vscp_frmw2_callback_get_mdf_url(void* const puserdata, uint8_t* const purl);
+vscp_frmw2_callback_set_event_time(void* const puserdata, vscpEventEx* const pex);
 
 /*!
   @brief Get embedded MDF info
 
-  If available this routine sends an embedded MDF file
-  in several events. See specification CLASS1.PROTOCOL
-  Type=35/36
+  If there is an embedded MDF this routine sends an embedded MDF file
+  in several events. If no embedded MDF is available an event with size
+  set to 3 and holding three bytes of zero should be sent.
+
+  See specification CLASS1.PROTOCOL, VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF (Type=35),
+  VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE (Type=36) for Level I
+  and
+  CLASS2.PROTOCOL, VSCP2_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE (36)
+  for Level II
 
   @param pdata Pointer to user data (typical points to context)
   @return VSCP_ERROR_SUCCESS on success, or error code.
@@ -651,22 +758,21 @@ int
 vscp_frmw2_callback_restore_defaults(void* const puserdata);
 
 /**
- * @brief Return ipv6 or ipv4 address
+ * @brief Get ipv6 or ipv4 address
  *
  * Return the ipv6 or ipv4 address of the interface. If the
  * interface is not tcp/ip based just return a positive
  * response or a valid address for the underlying transport protocol.
  *
- * The address is always sixteen bytes long.
- *
  * @param pdata Pointer to context.
  * @param pipaddr Pointer to 16 byte address space for (ipv6 or ipv4) address
  *                return value.
+ * @param size This is the size of the addreess, 4 or 16 bytes.
  * @return VSCP_ERROR_SUCCESS on success, error code on failure
  */
 
 int
-vscp_frmw2_callback_get_ip_addr(void* const puserdata, uint8_t* pipaddr);
+vscp_frmw2_callback_get_ip_addr(void* const puserdata, uint8_t* pipaddr, uint8_t size);
 
 /*!
   @brief Handle high end server response
@@ -677,17 +783,6 @@ vscp_frmw2_callback_get_ip_addr(void* const puserdata, uint8_t* pipaddr);
 
 int
 vscp_frmw2_callback_high_end_server_response(void* const puserdata);
-
-/*!
-  @brief Get name of the device.  Used by the device capabilities report.
-
-  @param pdata Pointer to user data (typical points to context)
-  @param pname Pointer to device name. The name should be no more than 64
-  characters including terminating zero.
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-*/
-int
-vscp_frmw2_callback_get_device_name(void* const puserdata, const char* pname);
 
 /*!
  * @brief Read register
@@ -724,32 +819,15 @@ int
 vscp_frmw2_callback_write_reg(void* const puserdata, uint16_t page, uint32_t reg, uint8_t val);
 
 /*!
-  @brief Send event to transport sublayer.
-
-    ev is copied in the callback.
-  - if GUID is all zero then the GUID should be set to the GUID of the node.
-  - if requestted to send a Level II event and we are a Level I node skip the
-    event and return VSCP_ERROR_ERROR
-
-  @param pdata Pointer to user data (typical points to context)
-  @param pex Pointer to Event to send.
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-
-*/
-
-int
-vscp_frmw2_callback_send_event(void* const puserdata, vscpEvent* pev);
-
-/*!
   @brief Send eventex to transport sublayer.
-  - 
+  -
     ex is copied in the callback.
-  
+
   - if GUID is all zero then the GUID (if Level II) should be set to the GUID of the node.
-  - 
+  -
     if requested to send a full Level II event and we are a Level I node skip the
     event and return VSCP_ERROR_ERROR
-    
+
     GUID is not used for LEVEL I nodes. Instead 8-bit nickname is stored
     in the lowest LSB and 16-bit nickname in the two lower LSB's.
 
