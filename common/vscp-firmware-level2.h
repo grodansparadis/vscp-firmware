@@ -104,7 +104,7 @@ typedef enum probe_state_t {
 /* Sub states */
 typedef enum probe_substate_t {
   FRMW2_SUBSTATE_NONE,
-  FRMW2_SUBSTATE_SEGCTRL_PROBE_WAITING, // Probe sent for segment controler
+  FRMW2_SUBSTATE_SEGCTRL_PROBE_WAITING, // Probe sent for segment controller
   FRMW2_SUBSTATE_PROBE_WAITING,         // Waiting for response after probe has been sent
 } probe_substate_t;
 
@@ -183,11 +183,15 @@ typedef enum probe_substate_t {
       If no response is received after this amount of tries the the nickname
       will be assigned to the node.
 */
-#define VSCP_PROBE_TIMEOUT 1000         // ms - Time after probe has been sent and a no response
-                                        // is considered as a free nickname discovery
-#define VSCP_PROBE_TIMEOUT_COUNT   3    // # probe timed out probe evenst before assigning a nickname
-#define VSCP_SEGCTRL_PROBE_TIMEOUT 5000 // ms time to wait for segment controller to assign nickname
-                                        // to us
+#define VSCP_PROBE_TIMEOUT 1000              // ms - Time after probe has been sent and a no response
+                                             // is considered as a free nickname discovery
+#define VSCP_PROBE_TIMEOUT_COUNT   3         // # probe timed out probe events before assigning a nickname
+#define VSCP_SEGCTRL_PROBE_TIMEOUT 5000      // ms time to wait for segment controller to assign nickname
+                                             // to us
+#define VSCP_SEGCTRL_RESPONSE_TIMEOUT 300000 // ms time afte a segment ctrl response has been received
+                                             // and when nickname discovery process will be taken up again.
+#define VSCP_INIT_BUTTON_TIMEOUT 2000        // Press timeout for init button.
+#define VSCP_GUID_RESET_TIMEOUT  1000        // All four GUID reset event must be received withing this time
 
 /*!
   Global structure for protocol functionality
@@ -198,7 +202,7 @@ typedef struct vscp_frmw2_firmware_configt_t {
   probe_state_t m_state;       // State machine state
   probe_substate_t m_substate; // state machine substate
   uint32_t m_timer1;           // Timer used for probe/config restore and other timing tasks
-  uint16_t nickname;           // Probe nickname (init with persistent value)
+  uint16_t nickname;           // Nickname (init with persistent value)
 
   // Level I nickname discovery
   uint16_t m_probe_nickname; // 0-253
@@ -220,12 +224,26 @@ typedef struct vscp_frmw2_firmware_configt_t {
   uint32_t m_interval_caps;      // Interval for capabilities events in milli-seconds (0=off)
   uint32_t m_last_caps;          // Time for last caps send
 
+  // See CLASS1.PROTOCOL, VSCP_TYPE_PROTOCOL_RESET_DEVICE
+  uint8_t m_reset_device_flags;
+
   // Decision matrix
   uint8_t* m_pDm;         // Pointer to decision matrix storage (NULL if no DM).
   uint8_t m_nDmRows;      // Number of DM rows (0 if no DM).
   uint8_t m_sizeDmRow;    // Size for one DM row.
   uint32_t m_regOffsetDm; // Register offset for DM (normally zero)
   uint16_t m_pageDm;      // Register page where DM definition starts
+
+  // MDF
+  const char* m_pInternalMdf; // If the device use internal MDF point to it here (NULL)
+                              // If no internal MDF set to NULL
+                              // !!! The MDF pointed to MUST be NULL terminated.
+
+  // Events of interest
+  const uint32_t* m_pEventsOfInterest; // List with events of interest or NULL
+                                     // if all events are of interest set to null.
+                                     // array = (int*) malloc(n * sizeof(int));
+                                     // Last event should be 0
 
   /*
     This may be register positions on a device
@@ -247,10 +265,17 @@ typedef struct vscp_frmw2_firmware_configt_t {
   int m_bEnableLogging;                 // Enabel logging events (FALSE)
   uint8_t m_log_id;                     // Identifies log channel
   uint8_t m_log_level;                  // Level for logs
-  int m_bSendHighEndServerProbe;        // We send high end server probe. (FALSE)
   int m_bHighEndServerResponse;         // React on high end server probe. Only level II (FALSE)
   int m_bEnableWriteProtectedLocations; // GUID/manufacturer id (FALSE)
   int m_bUse16BitNickname;              // Default is false. Only for level I (FALSE)
+  int m_bInterestedInAllEvents;         // TRUE if interested in all events. If FALSE
+                                        // the callback vscp_frmw2_callback_report_events_of_interest
+                                        // will be called (TRUE)
+
+  // For high end server response
+  uint16_t m_high_end_srv_caps;   // High end server capabilities
+  uint32_t m_high_end_ip_address; // High end server ip-address
+  uint16_t m_high_end_srv_port;   // High end server port
 
   // Standard registers (persistent storage)
   // standard register change callback is called for registers marked with
@@ -316,7 +341,8 @@ typedef struct vscp_frmw2_firmware_configt_t {
 /*!
  * @brief Init subsystem
  *
- * @param pcfg Structure with configuration data
+ * @param pcfg Structure with configuration data. If set to NULL first initializarion values
+ *              are used.
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  *
  * Init VSCP subsystem. The transport layer should be up and
@@ -375,7 +401,7 @@ int
 vscp_frmw2_nickname_discovery(const vscpEventEx* const pex);
 
 /*!
-  Waiting for segment controler to give us a nickname
+  Waiting for segment controller to give us a nickname
 
   @param pex Received event or NULL if no event received.
   @return VSCP_ERROR_SUCCESS on success, else error code.
@@ -571,12 +597,11 @@ vscp_frmw2_page_write(uint32_t offset, uint8_t count, const uint8_t* const pbuf)
   Send whois response. If level II device a level II response
   will be sent.
 
-  @param nodeid Offset into register page
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 
 int
-vscp_frmw2_whois_response(uint16_t nodeid);
+vscp_frmw2_whois_response(void);
 
 /*!
   @brief Read a full page or part of memory
@@ -687,10 +712,8 @@ vscp_frmw2_callback_dm_action(void* const puserdata,
                               uint8_t action,
                               const uint8_t* const pparam);
 
-
-
 /*!
- * @brief Segment controler heartbeat received
+ * @brief Segment controller heartbeat received
  *
  * @param pdata Pointer to user data (typical points to context).
  * @return VSCP_ERROR_SUCCESS on success, or error code.
@@ -725,25 +748,6 @@ int
 vscp_frmw2_callback_set_event_time(void* const puserdata, vscpEventEx* const pex);
 
 /*!
-  @brief Get embedded MDF info
-
-  If there is an embedded MDF this routine sends an embedded MDF file
-  in several events. If no embedded MDF is available an event with size
-  set to 3 and holding three bytes of zero should be sent.
-
-  See specification CLASS1.PROTOCOL, VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF (Type=35),
-  VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE (Type=36) for Level I
-  and
-  CLASS2.PROTOCOL, VSCP2_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE (36)
-  for Level II
-
-  @param pdata Pointer to user data (typical points to context)
-  @return VSCP_ERROR_SUCCESS on success, or error code.
- */
-int
-vscp_frmw2_callback_send_embedded_mdf(void* const puserdata);
-
-/*!
   @brief Restore defaults
 
   If 0x55/0xaa is written to register location
@@ -756,6 +760,12 @@ vscp_frmw2_callback_send_embedded_mdf(void* const puserdata);
 
 int
 vscp_frmw2_callback_restore_defaults(void* const puserdata);
+
+/*!
+  @brief Reset the device and do a warm start
+*/
+void
+vscp_frmw2_callback_reset(void* const puserdata);
 
 /**
  * @brief Get ipv6 or ipv4 address
@@ -773,16 +783,6 @@ vscp_frmw2_callback_restore_defaults(void* const puserdata);
 
 int
 vscp_frmw2_callback_get_ip_addr(void* const puserdata, uint8_t* pipaddr, uint8_t size);
-
-/*!
-  @brief Handle high end server response
-
-  @param pdata Pointer to user data (typical points to context)
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-*/
-
-int
-vscp_frmw2_callback_high_end_server_response(void* const puserdata);
 
 /*!
  * @brief Read register
@@ -864,12 +864,6 @@ vscp_frmw2_callback_stdreg_change(void* const puserdata, uint32_t stdreg);
 
 void
 vscp_frmw2_callback_feed_watchdog(void* const puserdata);
-
-/*!
-  @brief Reset the device and do a warm start
-*/
-void
-vscp_frmw2_callback_reset(void* const puserdata);
 
 // ============ END OF CALLBACKS ============
 

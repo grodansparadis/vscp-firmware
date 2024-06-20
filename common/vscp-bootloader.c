@@ -318,5 +318,4 @@ ENTER_BOOT_MODE:
     simulated hardware may come here
   */
   vscpboot_release_hardware();
-  printf("VSCP Bootloader state machine ended");
 }
