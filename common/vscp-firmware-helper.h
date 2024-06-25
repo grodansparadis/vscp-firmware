@@ -68,17 +68,17 @@
 /* This macro construct a signed long from four unsigned chars in a safe way */
 #if !defined(construct_signed32)
 #define construct_signed32(b0, b1, b2, b3) ((int32_t)((((uint32_t)b0) << 24) + \
-                                                      (((uint32_t)b0) << 16) + \
-                                                      (((uint32_t)b0) << 8) +  \
-                                                      (uint32_t)b0))
+                                                      (((uint32_t)b1) << 16) + \
+                                                      (((uint32_t)b2) << 8) +  \
+                                                      (uint32_t)b3))
 #endif
 
 /* This macro construct a unsigned long from four unsigned chars in a safe way */
 #if !defined(construct_unsigned32)
 #define construct_unsigned32(b0, b1, b2, b3) ((uint32_t)((((uint32_t)b0) << 24) + \
-                                                         (((uint32_t)b0) << 16) + \
-                                                         (((uint32_t)b0) << 8) +  \
-                                                         (uint32_t)b0))
+                                                         (((uint32_t)b1) << 16) + \
+                                                         (((uint32_t)b2) << 8) +  \
+                                                         (uint32_t)b3))
 #endif
 
 /*  byte swapping */
