@@ -34,8 +34,8 @@
 #include <string.h>
 #include <vscp-firmware-helper.h>
 #include <vscp.h>
-#include <vscp_class.h>
-#include <vscp_type.h>
+#include <vscp-class.h>
+#include <vscp-type.h>
 
 #include "vscp-firmware-level2.h"
 
