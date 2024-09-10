@@ -47,14 +47,14 @@
 /* Globals */
 
 // Pointer to configuration data.
-static vscp_frmw2_firmware_configt_t* g_pconfig;
+static vscp_frmw2_firmware_config_t* g_pconfig;
 
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_frmw2_init
 //
 
 int
-vscp_frmw2_init(vscp_frmw2_firmware_configt_t* const pcfg)
+vscp_frmw2_init(vscp_frmw2_firmware_config_t* const pcfg)
 {
   int rv;
 
@@ -1344,7 +1344,7 @@ vscp_frmw2_read_reg(uint32_t reg, uint8_t* pval)
     else if ((reg >= (VSCP_STD_REGISTER_GUID + ADJSTDREG)) && (reg < (VSCP_STD_REGISTER_GUID + ADJSTDREG + 16))) {
       *pval = g_pconfig->m_guid[reg - VSCP_STD_REGISTER_GUID + ADJSTDREG];
     }
-    else if ((reg >= (VSCP_STD_REGISTER_DEVICE_URL + ADJSTDREG)) && (reg < (VSCP_STD_REGISTER_DEVICE_URL + ADJSTDREG + 16))) {
+    else if ((reg >= (VSCP_STD_REGISTER_DEVICE_URL + ADJSTDREG)) && (reg < (VSCP_STD_REGISTER_DEVICE_URL + ADJSTDREG + 32))) {
       *pval = g_pconfig->m_mdfurl[reg - VSCP_STD_REGISTER_DEVICE_URL + ADJSTDREG];
     }
     else {

@@ -198,11 +198,11 @@ typedef enum probe_substate_t {
 
    Used internally
 */
-typedef struct vscp_frmw2_firmware_configt_t {
+typedef struct vscp_frmw2_firmware_config_t {
   probe_state_t m_state;       // State machine state
   probe_substate_t m_substate; // state machine substate
   uint32_t m_timer1;           // Timer used for probe/config restore and other timing tasks
-  uint16_t nickname;           // Nickname (init with persistent value)
+  //uint16_t m_nickname;         // Nickname (init with persistent value)
 
   // Level I nickname discovery
   uint16_t m_probe_nickname; // 0-253
@@ -241,9 +241,9 @@ typedef struct vscp_frmw2_firmware_configt_t {
 
   // Events of interest
   const uint32_t* m_pEventsOfInterest; // List with events of interest or NULL
-                                     // if all events are of interest set to null.
-                                     // array = (int*) malloc(n * sizeof(int));
-                                     // Last event should be 0
+                                       // if all events are of interest set to null.
+                                       // array = (int*) malloc(n * sizeof(int));
+                                       // Last event should be 0
 
   /*
     This may be register positions on a device
@@ -309,7 +309,7 @@ typedef struct vscp_frmw2_firmware_configt_t {
   uint8_t m_ipaddr[16];     // IP address (ipv4/ipv6)
   uint8_t m_deviceName[64]; // Name of the device
 
-} vscp_frmw2_firmware_configt_t;
+} vscp_frmw2_firmware_config_t;
 
 /*!
   Used to adjust standard registers for Level I/ Level II
@@ -351,7 +351,7 @@ typedef struct vscp_frmw2_firmware_configt_t {
  */
 
 int
-vscp_frmw2_init(vscp_frmw2_firmware_configt_t* const pcfg);
+vscp_frmw2_init(vscp_frmw2_firmware_config_t* const pcfg);
 
 /*!
   @brief Initialize persistent storage
