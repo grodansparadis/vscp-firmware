@@ -198,7 +198,7 @@ typedef enum probe_substate_t {
 
    Used internally
 */
-typedef struct vscp_frmw2_firmware_config_t {
+typedef struct vscp_frmw2_firmware_config {
   probe_state_t m_state;       // State machine state
   probe_substate_t m_substate; // state machine substate
   uint32_t m_timer1;           // Timer used for probe/config restore and other timing tasks
@@ -448,7 +448,8 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex);
  *
  * @param reg Register to write
  * @param pval Pointer to read value
- * @return VSCP_ERROR_SUCCESS on success, else error code.
+ * @return VSCP_ERROR_SUCCESS on success, else error code. VSCP_ERROR_INDEX_OOB is returned when trying
+    to read a register that does not exist. This error is actually a warning.
  */
 
 int
@@ -463,7 +464,8 @@ vscp_frmw2_read_reg(uint32_t reg, uint8_t* pval);
  *
  * @param reg Register to write
  * @param val Value to write
- * @return VSCP_ERROR_SUCCESS on success, else error code.
+ * @return VSCP_ERROR_SUCCESS on success, else error code. VSCP_ERROR_INDEX_OOB is returned when trying
+    to read a register that does not exist. This error is actually a warning.
  *
  * Write a value to a standard or a user register.
  */
@@ -795,7 +797,8 @@ vscp_frmw2_callback_get_ip_addr(void* const puserdata, uint8_t* pipaddr, uint8_t
  * @param reg Register to read.
  * @param pval Pointer to variable that will get read value.
  * @return VSCP_ERROR_SUCCESS on success, else error code. VSCP_ERROR_PARAMETER is
- * returned if the register is invalid.
+ * returned if the register is invalid. VSCP_ERROR_INDEX_OOB is returned when trying
+    to read a register that does not exist. This error is actually a warning.
  *
  */
 int
@@ -812,7 +815,8 @@ vscp_frmw2_callback_read_reg(void* const puserdata, uint16_t page, uint32_t reg,
  * @param reg Register to write
  * @param val Value to write
  * @return VSCP_ERROR_SUCCESS on success, else error code. VSCP_ERROR_PARAMETER is
- * returned if the register is invalid.
+ * returned if the register is invalid. VSCP_ERROR_INDEX_OOB is returned when trying
+    to read a register that does not exist. This error is actually a warning.
  */
 
 int

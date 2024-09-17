@@ -5,7 +5,7 @@
 
  The MIT License (MIT)
 
- Copyright © 2000-2023 Ake Hedman, the VSCP project <info@vscp.org>
+ Copyright (C) 2000-2024 Ake Hedman, the VSCP project <info@vscp.org>
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -38,8 +38,8 @@
 
 #include <canal.h>
 #include <inttypes.h>
-#include <vscp_class.h>
-#include <vscp_type.h>
+#include <vscp-class.h>
+#include <vscp-type.h>
 
 #define VSCP_DEFAULT_UDP_PORT        33333
 #define VSCP_DEFAULT_TCP_PORT        9598
@@ -292,14 +292,14 @@ typedef VSCPChannelInfo *PVSCPCHANNELINFO;
 
 /* Interface types */
 #define VSCP_INTERFACE_TYPE_UNKNOWN        0
-#define VSCP_INTERFACE_TYPE_INTERNAL       1
-#define VSCP_INTERFACE_TYPE_LEVEL1DRV      2
-#define VSCP_INTERFACE_TYPE_LEVEL2DRV      3
-#define VSCP_INTERFACE_TYPE_CLIENT_TCPIP   4
-#define VSCP_INTERFACE_TYPE_CLIENT_UDP     5
-#define VSCP_INTERFACE_TYPE_CLIENT_WEB     6
-#define VSCP_INTERFACE_TYPE_CLIENT_WEBSOCK 7
-#define VSCP_INTERFACE_TYPE_CLIENT_REST    8
+#define VSCP_INTERFACE_TYPE_INTERNAL       1 // Internal to daemon/server
+#define VSCP_INTERFACE_TYPE_LEVEL1DRV      2 // Level I driver
+#define VSCP_INTERFACE_TYPE_LEVEL2DRV      3 // Level II driver
+#define VSCP_INTERFACE_TYPE_CLIENT_TCPIP   4 // TCP/IP client
+#define VSCP_INTERFACE_TYPE_CLIENT_UDP     5 // UDP client
+#define VSCP_INTERFACE_TYPE_CLIENT_WEB     6 // Web server
+#define VSCP_INTERFACE_TYPE_CLIENT_WEBSOCK 7 // Websocket client
+#define VSCP_INTERFACE_TYPE_CLIENT_REST    8 // REST client
 
 /* VSCP Encryption types */
 #define VSCP_ENCRYPTION_NONE           0
@@ -384,26 +384,42 @@ typedef VSCPChannelInfo *PVSCPCHANNELINFO;
 #define VSCP_BOOTLOADER_PIC1      0x01 /* PIC algorithm 0 */
 #define VSCP_BOOTLOADER_AVR1      0x10 /* AVR algorithm 0 */
 #define VSCP_BOOTLOADER_LPC1      0x20 /* NXP/Philips/Freescale algorithm 0 */
-#define VSPP_BOOTLOADER_NXP1      0x20 /* NXP/Philips/Freescale algorithm 0 */
+#define VSCP_BOOTLOADER_NXP1      0x20 /* NXP/Philips/Freescale algorithm 0 */
 #define VSCP_BOOTLOADER_ST        0x30 /* ST STR algorithm 0 */
 #define VSCP_BOOTLOADER_FREESCALE 0x40 /* Freescale Kinetics algorithm 0 */
 #define VSCP_BOOTLOADER_ESP       0x50 /* Espressif algorithm 0 */
 #define VSCP_BOOTLOADER_NONE0     0xf0 /* Used defined bootloader 0 */
+#define VSCP_BOOTLOADER_USER0     0xf0
 #define VSCP_BOOTLOADER_NONE1     0xf1 /* Used defined bootloader 1 */
+#define VSCP_BOOTLOADER_USER1     0xf1
 #define VSCP_BOOTLOADER_NONE2     0xf2 /* Used defined bootloader 2 */
+#define VSCP_BOOTLOADER_USER2     0xf2
 #define VSCP_BOOTLOADER_NONE3     0xf3 /* Used defined bootloader 3 */
+#define VSCP_BOOTLOADER_USER3     0xf3
 #define VSCP_BOOTLOADER_NONE4     0xf4 /* Used defined bootloader 4 */
+#define VSCP_BOOTLOADER_USER4     0xf4
 #define VSCP_BOOTLOADER_NONE5     0xf5 /* Used defined bootloader 5 */
+#define VSCP_BOOTLOADER_USER5     0xf5
 #define VSCP_BOOTLOADER_NONE6     0xf6 /* Used defined bootloader 6 */
+#define VSCP_BOOTLOADER_USER6     0xf6
 #define VSCP_BOOTLOADER_NONE7     0xf7 /* Used defined bootloader 7 */
+#define VSCP_BOOTLOADER_USER7     0xf7
 #define VSCP_BOOTLOADER_NONE8     0xf8 /* Used defined bootloader 8 */
+#define VSCP_BOOTLOADER_USER8     0xf8
 #define VSCP_BOOTLOADER_NONE9     0xf9 /* Used defined bootloader 9 */
+#define VSCP_BOOTLOADER_USER9     0xf9
 #define VSCP_BOOTLOADER_NONE10    0xfa /* Used defined bootloader 10 */
+#define VSCP_BOOTLOADER_USER10    0xfa
 #define VSCP_BOOTLOADER_NONE11    0xfb /* Used defined bootloader 11 */
+#define VSCP_BOOTLOADER_USER11    0xfb
 #define VSCP_BOOTLOADER_NONE12    0xfc /* Used defined bootloader 12 */
+#define VSCP_BOOTLOADER_USER12    0xfc
 #define VSCP_BOOTLOADER_NONE13    0xfd /* Used defined bootloader 13 */
+#define VSCP_BOOTLOADER_USER13    0xfd
 #define VSCP_BOOTLOADER_NONE14    0xfe /* Used defined bootloader 14 */
+#define VSCP_BOOTLOADER_USER14    0xfe
 #define VSCP_BOOTLOADER_NONE15    0xff /* No bootloader available */
+#define VSCP_BOOTLOADER_USER15    0xff
 
 /*          * * * Data Coding for VSCP packets * * *   */
 
@@ -463,11 +479,16 @@ struct vscpMyNode {
 /* * * * Standard VSCP registers * * *  */
 
 /* Register defines above 0x7f (Level I) / 0xffffff7f (Level II)  */
+#define VSCP_STD_REGISTER_START 0x80
+
+// Alarm status (Read only)
 #define VSCP_STD_REGISTER_ALARM_STATUS 0x80
 
 #define VSCP_STD_REGISTER_MAJOR_VERSION 0x81
 #define VSCP_STD_REGISTER_MINOR_VERSION 0x82
-#define VSCP_STD_REGISTER_SUB_VERSION   0x83
+
+// Counts errors
+#define VSCP_STD_REGISTER_ERROR_COUNTER 0x83
 
 /* 0x84 - 0x88  -   User id space           */
 #define VSCP_STD_REGISTER_USER_ID 0x84
@@ -490,10 +511,11 @@ struct vscpMyNode {
 #define VSCP_STD_REGISTER_FIRMWARE_MAJOR    0x94
 #define VSCP_STD_REGISTER_FIRMWARE_MINOR    0x95
 #define VSCP_STD_REGISTER_FIRMWARE_SUBMINOR 0x96
+#define VSCP_STD_REGISTER_FIRMWARE_RELEASE  0x96
 
 #define VSCP_STD_REGISTER_BOOT_LOADER 0x97
-#define VSCP_STD_REGISTER_BUFFER_SIZE 0x98
-#define VSCP_STD_REGISTER_PAGES_COUNT 0x99
+#define VSCP_STD_REGISTER_BUFFER_SIZE 0x98 // Deprecated
+#define VSCP_STD_REGISTER_PAGES_COUNT 0x99 // Deprecated
 
 /* Unsigned 32-bit integer for family code */
 #define VSCP_STD_REGISTER_FAMILY_CODE 0x9A
@@ -631,6 +653,10 @@ struct vscpMyNode {
 #define VSCP_ERROR_SOCKET             61 /* Unable to create socket or other socket error*/
 #define VSCP_ERROR_PARSING            62 /* Failed to parse input */
 #define VSCP_ERROR_INVALID_FRAME      63 /* A protocol has wrong format */
+#define VSCP_ERROR_SIZE               64 /* The size is wring */
+#define VSCP_ERROR_NACK               65 /* NACK received */
+#define VSCP_ERROR_READ_ERROR         66 /* Error when reading data */
+#define VSCP_ERROR_READ               66 /* Error when reading data */
 
 /*!
     HLO (High Level Object) type (bits 7,6,5,4)

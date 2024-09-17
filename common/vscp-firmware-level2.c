@@ -1259,7 +1259,13 @@ vscp_frmw2_read_reg(uint32_t reg, uint8_t* pval)
 
   if (reg < (VSCP_STD_REGISTER_START + ADJSTDREG)) {
     // User register
-    return vscp_frmw2_callback_read_reg(g_pconfig->m_puserdata, g_pconfig->m_page_select, reg, pval);
+    rv = vscp_frmw2_callback_read_reg(g_pconfig->m_puserdata, g_pconfig->m_page_select, reg, pval);
+    // OOB error is OK but always read as zero
+    if (VSCP_ERROR_INDEX_OOB == rv) {
+      *pval = 0;
+      return VSCP_ERROR_SUCCESS;
+    }
+    return rv;
   }
   else {
     // * * * standard registers * * *
@@ -1367,6 +1373,11 @@ vscp_frmw2_write_reg(uint32_t reg, uint8_t val)
   if (reg < VSCP_STD_REGISTER_START + ADJSTDREG) {
     // User register - Let usr code handle
     rv = vscp_frmw2_callback_write_reg(g_pconfig->m_puserdata, 0, reg, val);
+    // OOB error is OK but always read as zero
+    if (VSCP_ERROR_INDEX_OOB == rv) {
+      val = ~val;
+      rv = VSCP_ERROR_SUCCESS;
+    }
   }
   // * * * Standard registers * * *
   else if ((VSCP_STD_REGISTER_ALARM_STATUS + ADJSTDREG) == reg) {

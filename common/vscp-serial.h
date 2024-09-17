@@ -2,8 +2,8 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2000-2023 Ake Hedman, Grodans Paradis AB
-// <info@grodansparadis.com>
+// Copyright (C) 2000-2024 Ake Hedman, the VSCP project
+// <info@vscp.org>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 //
 // This file contains defines for the VSCP Serial protocol which
 // is described here
-// http://www.vscp.org/docs/vscpspec/doku.php?id=physical_level_lower_level_protocols#vscp_over_a_serial_channel_rs-232
+// https://www.vscp.org/docs/vscpspec/doku.php?id=physical_level_lower_level_protocols#vscp_over_a_serial_channel_rs-232
 //
 
 //            !!!!!!!!!!!!!!!!!!!!  W A R N I N G  !!!!!!!!!!!!!!!!!!!!
@@ -48,48 +48,48 @@
 
 // VSCP Driver states
 #define STATE_VSCP_SERIAL_DRIVER_WAIT_FOR_FRAME_START 0
-#define STATE_VSCP_SERIAL_DRIVER_WAIT_FOR_FRAME_END   1
-#define STATE_VSCP_SERIAL_DRIVER_FRAME_RECEIVED       2
+#define STATE_VSCP_SERIAL_DRIVER_WAIT_FOR_FRAME_END 1
+#define STATE_VSCP_SERIAL_DRIVER_FRAME_RECEIVED 2
 
 // VSCP Driver positions in frame
-#define VSCP_SERIAL_DRIVER_POS_FRAME_TYPE             0
-#define VSCP_SERIAL_DRIVER_POS_FRAME_CHANNEL          1
-#define VSCP_SERIAL_DRIVER_POS_FRAME_SEQUENCY         2
+#define VSCP_SERIAL_DRIVER_POS_FRAME_TYPE 0
+#define VSCP_SERIAL_DRIVER_POS_FRAME_CHANNEL 1
+#define VSCP_SERIAL_DRIVER_POS_FRAME_SEQUENCY 2
 #define VSCP_SERIAL_DRIVER_POS_FRAME_SIZE_PAYLOAD_MSB 3
 #define VSCP_SERIAL_DRIVER_POS_FRAME_SIZE_PAYLOAD_LSB 4
-#define VSCP_SERIAL_DRIVER_POS_FRAME_PAYLOAD          5
+#define VSCP_SERIAL_DRIVER_POS_FRAME_PAYLOAD 5
 
 // // Frame types
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_NOOP                        0
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_VSCP_EVENT                  1
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_CANAL                       2
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_CONFIGURE                   3
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_POLL                        4
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_NO_EVENT                    5
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_MULTI_FRAME_CANAL           6
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_MULTI_FRAME_VSCP            7
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_CAPS_REQUEST                8
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_CAPS_RESPONSE               9
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_VSCP_EVENT_TIMESTAMP        10
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_CANAL_TIMESTAMP             11
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_NOOP 0
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_VSCP_EVENT 1
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_CANAL 2
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_CONFIGURE 3
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_POLL 4
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_NO_EVENT 5
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_MULTI_FRAME_CANAL 6
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_MULTI_FRAME_VSCP 7
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_CAPS_REQUEST 8
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_CAPS_RESPONSE 9
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_VSCP_EVENT_TIMESTAMP 10
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_CANAL_TIMESTAMP 11
 #define VSCP_SERIAL_DRIVER_FRAME_TYPE_MULTI_FRAME_CANAL_TIMESTAMP 12
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_MULTI_FRAME_VSCP_TIMESTAMP  13
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_SENT_ACK                    249
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_SENT_NACK                   250
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_ACK                         251
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_NACK                        252
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_ERROR                       253
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_COMMAND_REPLY               254
-#define VSCP_SERIAL_DRIVER_FRAME_TYPE_COMMAND                     255
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_MULTI_FRAME_VSCP_TIMESTAMP 13
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_SENT_ACK 249
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_SENT_NACK 250
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_ACK 251
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_NACK 252
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_ERROR 253
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_COMMAND_REPLY 254
+#define VSCP_SERIAL_DRIVER_FRAME_TYPE_COMMAND 255
 
 // VSCP Driver errors
-#define VSCP_SERIAL_DRIVER_ERROR_CHECKSUM          1
+#define VSCP_SERIAL_DRIVER_ERROR_CHECKSUM 1
 #define VSCP_SERIAL_DRIVER_ERROR_UNKNOWN_OPERATION 2
 
 // VSCP driver commands
-#define VSCP_SERIAL_DRIVER_COMMAND_NOOP \
-  0 // Should always be at zero.
-    // The rest of the commands are user defined.
+#define VSCP_SERIAL_DRIVER_COMMAND_NOOP                                        \
+    0 // Should always be at zero.
+      // The rest of the commands are user defined.
 
 // Packed size for capabilities structure
 #define VSCP_SERIAL_DRIVER_CAPS_SIZE 4
@@ -98,17 +98,17 @@
 typedef struct
 {
 
-  /*!
-      Max number of VSCP frames in
-      multifram payload
-  */
-  uint8_t maxVscpFrames;
+    /*!
+        Max number of VSCP frames in
+        multifram payload
+    */
+    uint8_t maxVscpFrames;
 
-  /*!
-      Max number of CANAL frames in
-      multiframe payload.
-  */
-  uint8_t maxCanalFrames;
+    /*!
+        Max number of CANAL frames in
+        multiframe payload.
+    */
+    uint8_t maxCanalFrames;
 
 } vscp_serial_caps;
 
