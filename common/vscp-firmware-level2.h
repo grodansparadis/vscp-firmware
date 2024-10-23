@@ -297,7 +297,7 @@ typedef struct vscp_frmw2_firmware_config {
   uint8_t m_firmware_major_version;       // [*] This software version. Read only for clients.
   uint8_t m_firmware_minor_version;       // [*] This software version. Read only for clients.
   uint8_t m_firmware_sub_minor_version;   // [*] This software version. Read only for clients.
-  uint8_t m_bootloader_algorithm;         // [*] Boot oader algorithm we use.
+  uint8_t m_bootloader_algorithm;         // [*] Boot loader algorithm we use.
   uint32_t m_standard_device_family_code; // [*] Family code. Read only for clients.
   uint32_t m_standard_device_type_code;   // [*] Family type. Read only for clients.
   uint16_t m_firmware_device_code;        // [*] Identifier for hardware so correct firmware can be loaded

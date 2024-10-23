@@ -455,7 +455,7 @@ vscp_frmw2_work(const vscpEventEx* const pex)
     vscp_frmw2_feed_dm(pex);
   }
 
-  return VSCP_ERROR_SUCCESS;
+  return rv;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1751,7 +1751,7 @@ vscp_frmw2_extended_page_read(uint16_t nodeid, uint16_t page, uint8_t startoffse
 
   // set temporary page
   g_pconfig->m_page_select = page;
-
+  
   // Construct response event
   vscp_frmw2_setup_event_ex(&ex);
   ex.vscp_class = VSCP_CLASS1_PROTOCOL;
@@ -1988,7 +1988,7 @@ vscp_frmw2_feed_level2_dm(const vscpEventEx* const pex)
 
     // Should the originating id be checked and if so is it the same?
     if ((LEVEL2_DM_FLAGS(row) & VSCP_LEVEL1_DM_FLAG_CHECK_OADDR) &&
-          (pex->GUID[0] != LEVEL2_DM_OADDR(row, 0)) ||
+          ((pex->GUID[0] != LEVEL2_DM_OADDR(row, 0)) ||
         (pex->GUID[1] != LEVEL2_DM_OADDR(row, 1)) ||
         (pex->GUID[2] != LEVEL2_DM_OADDR(row, 2)) ||
         (pex->GUID[3] != LEVEL2_DM_OADDR(row, 3)) ||
@@ -2003,7 +2003,7 @@ vscp_frmw2_feed_level2_dm(const vscpEventEx* const pex)
         (pex->GUID[12] != LEVEL2_DM_OADDR(row, 12)) ||
         (pex->GUID[13] != LEVEL2_DM_OADDR(row, 13)) ||
         (pex->GUID[14] != LEVEL2_DM_OADDR(row, 14)) ||
-        (pex->GUID[15] != LEVEL2_DM_OADDR(row, 15))) {
+        (pex->GUID[15] != LEVEL2_DM_OADDR(row, 15)))) {
       continue;
     }
 
