@@ -685,7 +685,7 @@ vscp_frmw2_report_dmatrix(void);
  * @return Timestamp in microseconds.
  */
 
-uint32_t
+uint64_t
 vscp_frmw2_callback_get_timestamp(void* const puserdata);
 
 /*!
