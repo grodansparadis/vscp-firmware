@@ -28,7 +28,7 @@ b.) Non FreeRTOS
         - Polling for events.
         - Sending events.
     Two connections to host.
-        - Recvloop continiously read.
+        - Recvloop continuously read.
         - Sending events.    
 
 TCP/IP node is server

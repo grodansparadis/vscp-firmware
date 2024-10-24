@@ -654,16 +654,28 @@ vscp_fwhlp_decryptFrame(uint8_t* output,
 #ifdef VSCP_FWHLP_JSON_SUPPORT
 
 /**
- * @fn droplet_parse_vscp_json
+ * @fn vscp_fwhlp_parse_json
  * @brief Convert JSON string to VSCP event
  *
  * @param jsonVscpEventObj1
- * @param pev
- * @return int
+ * @param pev Pointer to event that will get data
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
  */
 
 int
 vscp_fwhlp_parse_json(vscpEvent* pev, const char* jsonVscpEventObj);
+
+/**
+ * @fn vscp_fwhlp_parse_json_ex
+ * @brief Convert JSON string to VSCP event ex
+ *
+ * @param jsonVscpEventObj1
+ * @param pex Pointer to event ex that will get data
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ */
+
+int
+vscp_fwhlp_parse_json_ex(vscpEventEx* pex, const char* jsonVscpEventObj);
 
 /**
  * @fn vscp_fwhlp_create_json
@@ -676,6 +688,18 @@ vscp_fwhlp_parse_json(vscpEvent* pev, const char* jsonVscpEventObj);
  */
 int
 vscp_fwhlp_create_json(char* strObj, size_t len, const vscpEvent* pev);
+
+/**
+ * @fn vscp_fwhlp_create_json_ex
+ * @brief Convert pointer to VSCP event to VSCP JSON string
+ *
+ * @param strObj String buffer that will get result
+ * @param len Size of string buffer
+ * @param pex Pointer to event ex
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ */
+int
+vscp_fwhlp_create_json_ex(char* strObj, size_t len, const vscpEventEx* pex);
 
 #endif // JSON support
 

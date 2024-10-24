@@ -59,7 +59,7 @@ vscp_frmw2_init(vscp_frmw2_firmware_config_t* const pcfg)
   int rv;
 
   if (NULL != pcfg) {
-    // Save configuration
+    // Save pointer to configuration
     g_pconfig = pcfg;
   }
 

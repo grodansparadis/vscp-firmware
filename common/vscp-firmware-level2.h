@@ -177,9 +177,9 @@ typedef enum probe_substate_t {
 
 /*
   Default nickname discovery settings
-  - Probe timeout is the time to wait for a reponse from another node
-  - Probe timout count is the number of times a probe is sent when no
-      response is recived from node whenm probing with a specific nickname.
+  - Probe timeout is the time to wait for a response from another node
+  - Probe timeout count is the number of times a probe is sent when no
+      response is received from node when probing with a specific nickname.
       If no response is received after this amount of tries the the nickname
       will be assigned to the node.
 */
@@ -188,7 +188,7 @@ typedef enum probe_substate_t {
 #define VSCP_PROBE_TIMEOUT_COUNT   3         // # probe timed out probe events before assigning a nickname
 #define VSCP_SEGCTRL_PROBE_TIMEOUT 5000      // ms time to wait for segment controller to assign nickname
                                              // to us
-#define VSCP_SEGCTRL_RESPONSE_TIMEOUT 300000 // ms time afte a segment ctrl response has been received
+#define VSCP_SEGCTRL_RESPONSE_TIMEOUT 300000 // ms time after a segment ctrl response has been received
                                              // and when nickname discovery process will be taken up again.
 #define VSCP_INIT_BUTTON_TIMEOUT 2000        // Press timeout for init button.
 #define VSCP_GUID_RESET_TIMEOUT  1000        // All four GUID reset event must be received withing this time
@@ -199,18 +199,19 @@ typedef enum probe_substate_t {
    Used internally
 */
 typedef struct vscp_frmw2_firmware_config {
+
+  uint8_t m_level;   // 0=Level I, 1 = Level II
+  void* m_puserdata; // Points to user supplied data
+
   probe_state_t m_state;       // State machine state
   probe_substate_t m_substate; // state machine substate
   uint32_t m_timer1;           // Timer used for probe/config restore and other timing tasks
-  //uint16_t m_nickname;         // Nickname (init with persistent value)
+  // uint16_t m_nickname;         // Nickname (init with persistent value)
 
   // Level I nickname discovery
   uint16_t m_probe_nickname; // 0-253
   int m_probe_timeout;       // If set to -1 on init will be set to VSCP_PROBE_TIMEOUT
   int m_probe_timeout_count; // If set to -1 on init will be set to VSCP_PROBE_TIMEOUT_COUNT
-
-  uint8_t m_level;   // 0=Level I, 1 = Level II
-  void* m_puserdata; // Points to user supplied data
 
   /*!
     Holders for proxy event information. Set when received.
@@ -219,7 +220,7 @@ typedef struct vscp_frmw2_firmware_config {
   uint16_t m_vscp_class; // real VSCP class (vscp_class - 512 if proxy event)
   uint8_t m_ifguid[16];  // interface GUID
 
-  uint32_t m_interval_heartbeat; // Interval for hearytbeats in milli-seconds (0=off)
+  uint32_t m_interval_heartbeat; // Interval for heartbeats in milli-seconds (0=off)
   uint32_t m_last_heartbeat;     // Time for last heartbeat send
   uint32_t m_interval_caps;      // Interval for capabilities events in milli-seconds (0=off)
   uint32_t m_last_caps;          // Time for last caps send
@@ -262,12 +263,12 @@ typedef struct vscp_frmw2_firmware_config {
 
   // Functionality switches
   int m_bEnableErrorReporting;          // Send error reporting events (FALSE)
-  int m_bEnableLogging;                 // Enabel logging events (FALSE)
+  int m_bEnableLogging;                 // Enable logging events (FALSE)
   uint8_t m_log_id;                     // Identifies log channel
   uint8_t m_log_level;                  // Level for logs
   int m_bHighEndServerResponse;         // React on high end server probe. Only level II (FALSE)
   int m_bEnableWriteProtectedLocations; // GUID/manufacturer id (FALSE)
-  int m_bUse16BitNickname;              // Default is false. Only for level I (FALSE)
+  int m_bUse16BitNickname;              // 16-bit nickname. Default is false. Only for level I (FALSE)
   int m_bInterestedInAllEvents;         // TRUE if interested in all events. If FALSE
                                         // the callback vscp_frmw2_callback_report_events_of_interest
                                         // will be called (TRUE)
@@ -282,7 +283,7 @@ typedef struct vscp_frmw2_firmware_config {
   // [P] and [*/P]
   // [*] = Set in init routine
   // [C] = Set from define (constant)
-  // [P] = Persitent (Write to persistent storage
+  // [P] = Persistent (Write to persistent storage
   // [I] = Init to value on startup. May be constant or may change.
   // [*/P] = Persistent if m_bEnableWriteProtectedLocations is true.
   uint8_t m_alarm_status;                 // [I] Alarm. Read only for clients. (init=0)
@@ -341,7 +342,7 @@ typedef struct vscp_frmw2_firmware_config {
 /*!
  * @brief Init subsystem
  *
- * @param pcfg Structure with configuration data. If set to NULL first initializarion values
+ * @param pcfg Structure with configuration data. If set to NULL first initialization values
  *              are used.
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  *
@@ -386,7 +387,7 @@ vscp_frmw2_send_probe(int bNewNodeOnLine);
  * @brief Do periodic VSCP protocol work when nickname is 0xffff
  *
  * This is the code that is executed during
- * the init process when a nickjname device
+ * the init process when a nickname device
  * has not yet got a valid nickname.
  * https://grodansparadis.github.io/vscp-doc-spec/#/./vscp_level_i_specifics?id=address-or-nickname-assignment-for-level-i-nodes
  *
@@ -542,7 +543,7 @@ vscp_frmw2_send_error_event(uint8_t type, uint8_t idx);
   @param type VSCP logevent type.
   @param id Identifier for the logging channel.
   @param level Loglevel for this log event.
-  @param idx index for multiframe log event starting at zero.
+  @param idx index for multi-frame log event starting at zero.
   @param pData Log data (Always 5 bytes).
   @return VSCP_ERROR_SUCCESS on success, else error code.
 
@@ -689,7 +690,7 @@ uint64_t
 vscp_frmw2_callback_get_timestamp(void* const puserdata);
 
 /*!
- * @brief Enter bootloader.  SHOULD NEVER RETURN
+ * @brief Enter bootloader.  !!!SHOULD NEVER RETURN!!!
  *
  * @param pdata Pointer to user data (typical points to context).
  */
@@ -701,7 +702,7 @@ vscp_frmw2_callback_enter_bootloader(void* const puserdata);
  * @brief Handle DM action
  *
  * @param puserdata Pointer to user data (typical points to context).
- * @param pex Pointer to event that trggered the action
+ * @param pex Pointer to event that triggered the action
  * @param action Code for action
  * @param pparam Pointer to action parameter data.
  *    On level II devices size for this data is always (DM-rowsize - 7)
@@ -779,7 +780,7 @@ vscp_frmw2_callback_reset(void* const puserdata);
  * @param pdata Pointer to context.
  * @param pipaddr Pointer to 16 byte address space for (ipv6 or ipv4) address
  *                return value.
- * @param size This is the size of the addreess, 4 or 16 bytes.
+ * @param size This is the size of the address, 4 or 16 bytes.
  * @return VSCP_ERROR_SUCCESS on success, error code on failure
  */
 
