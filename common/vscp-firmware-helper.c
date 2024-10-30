@@ -1788,6 +1788,14 @@ vscp_fwhlp_parse_json(vscpEvent* pev, const char* jsonVscpEventObj)
   int rv;
   cJSON* root = cJSON_Parse(jsonVscpEventObj);
 
+  // Check pointers
+  if ((NULL == pev) || (NULL == jsonVscpEventObj)) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  // Set unused path to known value
+  memset(pev, 0, sizeof(vscpEventEx));
+
   if (cJSON_GetObjectItem(root, "vscpHead")) {
     pev->head = (uint16_t)cJSON_GetObjectItem(root, "vscpHead")->valueint;
   }
@@ -1837,7 +1845,7 @@ vscp_fwhlp_parse_json(vscpEvent* pev, const char* jsonVscpEventObj)
     for (int i = 0; i < pev->sizeData; i++) {
       cJSON* pitem = cJSON_GetArrayItem(pdata, i);
       if (pitem->type == cJSON_Number && i < 512) {
-        pev->pdata[i] = pitem->valueint; 
+        pev->pdata[i] = pitem->valueint;
       }
     }
   }
@@ -1876,6 +1884,14 @@ vscp_fwhlp_parse_json_ex(vscpEventEx* pex, const char* jsonVscpEventObj)
 {
   int rv;
   cJSON* root = cJSON_Parse(jsonVscpEventObj);
+
+  // Check pointers
+  if ((NULL == pex) || (NULL == jsonVscpEventObj)) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  // Set unused path to known value
+  memset(pex, 0, sizeof(vscpEventEx));
 
   if (cJSON_GetObjectItem(root, "vscpHead")) {
     pex->head = (uint16_t)cJSON_GetObjectItem(root, "vscpHead")->valueint;
@@ -1945,7 +1961,14 @@ int
 vscp_fwhlp_create_json(char* strObj, size_t len, const vscpEvent* pev)
 {
   char str[80];
-  cJSON* root = cJSON_CreateObject();
+  cJSON* root;
+
+  // Check pointers
+  if ((NULL == strObj) || (NULL == pev)) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  root = cJSON_CreateObject();
 
   cJSON_AddNumberToObject(root, "vscpHead", pev->head);
   cJSON_AddNumberToObject(root, "vscpClass", pev->vscp_class);
@@ -1993,7 +2016,14 @@ int
 vscp_fwhlp_create_json_ex(char* strObj, size_t len, const vscpEventEx* pex)
 {
   char str[80];
-  cJSON* root = cJSON_CreateObject();
+  cJSON* root;
+
+  // Check pointers
+  if ((NULL == strObj) || (NULL == pex)) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  root = cJSON_CreateObject();
 
   cJSON_AddNumberToObject(root, "vscpHead", pex->head);
   cJSON_AddNumberToObject(root, "vscpClass", pex->vscp_class);
