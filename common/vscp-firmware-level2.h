@@ -680,6 +680,16 @@ vscp_frmw2_report_dmatrix(void);
 */
 
 /*!
+ * @brief Get milliseconds
+ *
+ * @param pdata Pointer to context.
+ * @return Time in milliseconds.
+ */
+
+uint32_t
+vscp_frmw2_callback_get_milliseconds(void *const puserdata);
+
+/*!
  * @brief Get timestamp
  *
  * @param pdata Pointer to context.
@@ -780,7 +790,7 @@ vscp_frmw2_callback_reset(void* const puserdata);
  * @param pdata Pointer to context.
  * @param pipaddr Pointer to 16 byte address space for (ipv6 or ipv4) address
  *                return value.
- * @param size This is the size of the address, 4 or 16 bytes.
+ * @param size This is the requested size of the address, 4 or 16 bytes.
  * @return VSCP_ERROR_SUCCESS on success, error code on failure
  */
 

@@ -32,10 +32,10 @@
 
 #include <inttypes.h>
 #include <string.h>
-#include <vscp-firmware-helper.h>
-#include <vscp.h>
 #include <vscp-class.h>
+#include <vscp-firmware-helper.h>
 #include <vscp-type.h>
+#include <vscp.h>
 
 #include "vscp-firmware-level2.h"
 
@@ -63,6 +63,11 @@ vscp_frmw2_init(vscp_frmw2_firmware_config_t* const pcfg)
     g_pconfig = pcfg;
   }
 
+  g_pconfig->m_alarm_status       = 0; // No alarms yet
+  g_pconfig->m_errorCounter       = 0; // No errors yet
+  g_pconfig->m_page_select        = 0;
+  g_pconfig->m_reset_device_flags = 0; // VSCP_TYPE_PROTOCOL_RESET_DEVICE
+
   vscpEventEx exrply;
   vscp_frmw2_setup_event_ex(&exrply);
 
@@ -73,72 +78,70 @@ vscp_frmw2_init(vscp_frmw2_firmware_config_t* const pcfg)
     */
     // g_pconfig->m_guid[14] = (g_pconfig->m_nickname >> 8) & 0xff;
     // g_pconfig->m_guid[15] = g_pconfig->m_nickname & 0xff;
+
+    // We are in limbo still
+    g_pconfig->m_state = FRMW2_STATE_NONE;
+
+    if (VSCP_FRMW2_UNASSIGNED == g_pconfig->m_probe_timeout) {
+      // Set default
+      g_pconfig->m_probe_timeout = VSCP_PROBE_TIMEOUT;
+    }
+
+    if (VSCP_FRMW2_UNASSIGNED == g_pconfig->m_probe_timeout_count) {
+      // Set default
+      g_pconfig->m_probe_timeout_count = VSCP_PROBE_TIMEOUT_COUNT;
+    }
+
+    if (0xffff == g_pconfig->m_nickname) {
+
+      g_pconfig->m_probe_nickname = 0; // First check for a segment controller
+
+      // Get a starttime
+      g_pconfig->m_timer1 = vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata);
+
+      // Send probe
+      vscp_frmw2_setup_event_ex(&exrply);
+      exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+      exrply.vscp_type  = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
+      if (g_pconfig->m_bUse16BitNickname) {
+        exrply.sizeData = 2;
+        exrply.data[0]  = 0; // We probe segment controller
+        exrply.data[1]  = 0;
+      }
+      else {
+        exrply.sizeData = 1;
+        exrply.data[0]  = 0; // We probe segment controller
+      }
+
+      // Send new node online
+      if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_callback_send_event_ex(g_pconfig->m_puserdata, &exrply))) {
+        return rv;
+      }
+
+      // We are now in probe state (waiting for segment controller probe)
+      g_pconfig->m_state    = FRMW2_STATE_PROBE;
+      g_pconfig->m_substate = FRMW2_SUBSTATE_SEGCTRL_PROBE_WAITING;
+    }
+    else {
+      vscp_frmw2_send_probe(OPT_NEW_NODE_ONLINE);
+
+      // Send heartbeat
+      g_pconfig->m_last_heartbeat = vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata);
+      vscp_frmw2_send_heartbeat();
+
+      // Send caps
+      if ((VSCP_LEVEL2 == g_pconfig->m_level)) {
+        g_pconfig->m_last_caps = vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata);
+        vscp_frmw2_send_caps();
+      }
+
+      g_pconfig->m_state = FRMW2_STATE_ACTIVE;
+    }
   }
   else {
     // In level 2 we use the set GUID
-  }
 
-  // We are in limbo still
-  g_pconfig->m_state = FRMW2_STATE_NONE;
-
-  g_pconfig->m_alarm_status       = 0; // No alarms yet
-  g_pconfig->m_errorCounter       = 0; // No errors yet
-  g_pconfig->m_page_select        = 0;
-  g_pconfig->m_reset_device_flags = 0; // VSCP_TYPE_PROTOCOL_RESET_DEVICE
-
-  if (VSCP_FRMW2_UNASSIGNED == g_pconfig->m_probe_timeout) {
-    // Set default
-    g_pconfig->m_probe_timeout = VSCP_PROBE_TIMEOUT;
-  }
-
-  if (VSCP_FRMW2_UNASSIGNED == g_pconfig->m_probe_timeout_count) {
-    // Set default
-    g_pconfig->m_probe_timeout_count = VSCP_PROBE_TIMEOUT_COUNT;
-  }
-
-  if (0xffff == g_pconfig->m_nickname) {
-
-    g_pconfig->m_probe_nickname = 0; // First check for a segment controller
-
-    // Get a starttime
-    g_pconfig->m_timer1 = vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata);
-
-    // Send probe
-    vscp_frmw2_setup_event_ex(&exrply);
-    exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-    exrply.vscp_type  = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
-    if (g_pconfig->m_bUse16BitNickname) {
-      exrply.sizeData = 2;
-      exrply.data[0]  = 0; // We probe segment controller
-      exrply.data[1]  = 0;
-    }
-    else {
-      exrply.sizeData = 1;
-      exrply.data[0]  = 0; // We probe segment controller
-    }
-
-    // Send new node online
-    if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_callback_send_event_ex(g_pconfig->m_puserdata, &exrply))) {
-      return rv;
-    }
-
-    // We are now in probe state (waiting for segment controller probe)
-    g_pconfig->m_state    = FRMW2_STATE_PROBE;
-    g_pconfig->m_substate = FRMW2_SUBSTATE_SEGCTRL_PROBE_WAITING;
-  }
-  else {
-    vscp_frmw2_send_probe(OPT_NEW_NODE_ONLINE);
-
-    // Send heartbeat
-    g_pconfig->m_last_heartbeat = vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata);
-    vscp_frmw2_send_heartbeat();
-
-    // Send caps
-    if ((VSCP_LEVEL2 == g_pconfig->m_level)) {
-      g_pconfig->m_last_caps = vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata);
-      vscp_frmw2_send_caps();
-    }
-
+    // We go to active right away if level II
     g_pconfig->m_state = FRMW2_STATE_ACTIVE;
   }
 
@@ -219,7 +222,7 @@ vscp_frmw2_nickname_discovery(const vscpEventEx* const pex)
         else if (FRMW2_SUBSTATE_SEGCTRL_PROBE_WAITING == g_pconfig->m_substate) {
           // Segment controller responded
           g_pconfig->m_state  = FRMW2_STATE_PREACTIVE;
-          g_pconfig->m_timer1 = vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata);
+          g_pconfig->m_timer1 = vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata);
         }
         else if (FRMW2_SUBSTATE_PROBE_WAITING == g_pconfig->m_substate) {
 
@@ -228,7 +231,7 @@ vscp_frmw2_nickname_discovery(const vscpEventEx* const pex)
 
           // reset test time and count
           g_pconfig->m_probe_timeout_count = 0;
-          g_pconfig->m_timer1              = vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata);
+          g_pconfig->m_timer1              = vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata);
 
           // Check to see if we have tested all nicknames
           if ((g_pconfig->m_bUse16BitNickname && (0xffff == g_pconfig->m_nickname)) ||
@@ -246,7 +249,7 @@ vscp_frmw2_nickname_discovery(const vscpEventEx* const pex)
       if (FRMW2_SUBSTATE_NONE == g_pconfig->m_substate) {
         g_pconfig->m_probe_timeout_count = 0;
       SEND_PROBE:
-        g_pconfig->m_timer1 = vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata);
+        g_pconfig->m_timer1 = vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata);
 
         // Send probe
         if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_send_probe(OPT_PROBE))) {
@@ -263,18 +266,18 @@ vscp_frmw2_nickname_discovery(const vscpEventEx* const pex)
       }
       else if (FRMW2_SUBSTATE_SEGCTRL_PROBE_WAITING == g_pconfig->m_substate) {
         // Timeout
-        if ((vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata) - g_pconfig->m_timer1) > VSCP_SEGCTRL_PROBE_TIMEOUT) {
+        if ((vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata) - g_pconfig->m_timer1) > VSCP_SEGCTRL_PROBE_TIMEOUT) {
           // revert to normal probe
           g_pconfig->m_probe_nickname      = 1; // Start with first non segment ctrl node
           g_pconfig->m_substate            = FRMW2_SUBSTATE_PROBE_WAITING;
           g_pconfig->m_probe_timeout_count = 0;
-          g_pconfig->m_timer1              = vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata);
+          g_pconfig->m_timer1              = vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata);
           goto SEND_PROBE;
         }
       }
       else if (FRMW2_SUBSTATE_PROBE_WAITING == g_pconfig->m_substate) {
         // Timeout
-        if ((vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata) - g_pconfig->m_timer1) > VSCP_PROBE_TIMEOUT) {
+        if ((vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata) - g_pconfig->m_timer1) > VSCP_PROBE_TIMEOUT) {
           // If we have probed three times we are done
           if (g_pconfig->m_probe_timeout_count >= VSCP_PROBE_TIMEOUT_COUNT) {
 
@@ -290,7 +293,7 @@ vscp_frmw2_nickname_discovery(const vscpEventEx* const pex)
           }
           else {
             g_pconfig->m_probe_timeout_count++;
-            g_pconfig->m_timer1 = vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata);
+            g_pconfig->m_timer1 = vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata);
             goto SEND_PROBE;
           }
         }
@@ -312,7 +315,7 @@ vscp_frmw2_nickname_wait(const vscpEventEx* const pex)
 
   // If segment controller does not respond withing set timeout period
   // go back to probe state
-  if ((vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata) - g_pconfig->m_timer1) > VSCP_SEGCTRL_RESPONSE_TIMEOUT) {
+  if ((vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata) - g_pconfig->m_timer1) > VSCP_SEGCTRL_RESPONSE_TIMEOUT) {
     g_pconfig->m_nickname = 1; // Skip probing of segment controller this time
     g_pconfig->m_state    = FRMW2_STATE_NONE;
     g_pconfig->m_substate = FRMW2_SUBSTATE_NONE;
@@ -436,17 +439,17 @@ vscp_frmw2_work(const vscpEventEx* const pex)
   }
 
   if (g_pconfig->m_interval_heartbeat &&
-      (vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata) - g_pconfig->m_last_heartbeat) > g_pconfig->m_interval_heartbeat) {
+      (vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata) - g_pconfig->m_last_heartbeat) > g_pconfig->m_interval_heartbeat) {
     // Send heartbeat
-    g_pconfig->m_last_heartbeat = vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata);
+    g_pconfig->m_last_heartbeat = vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata);
     vscp_frmw2_send_heartbeat();
   }
 
   if ((VSCP_LEVEL2 == g_pconfig->m_level) &&
       g_pconfig->m_interval_caps &&
-      (vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata) - g_pconfig->m_last_caps) > g_pconfig->m_interval_caps) {
+      (vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata) - g_pconfig->m_last_caps) > g_pconfig->m_interval_caps) {
     // Send caps
-    g_pconfig->m_last_caps = vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata);
+    g_pconfig->m_last_caps = vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata);
     vscp_frmw2_send_caps();
   }
 
@@ -614,8 +617,8 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
 
           // If we should delay before restart
           if (tm) {
-            g_pconfig->m_timer1 = vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata);
-            while ((vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata) - g_pconfig->m_timer1) < tm) {
+            g_pconfig->m_timer1 = vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata);
+            while ((vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata) - g_pconfig->m_timer1) < tm) {
               // Feed watchdog
               vscp_frmw2_callback_feed_watchdog(g_pconfig->m_puserdata);
             }
@@ -747,7 +750,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
                   (EXDTA(4) == g_pconfig->m_guid[12])) {
                 g_pconfig->m_reset_device_flags |= 0b0001;
                 // One second to receive the rest of the events
-                g_pconfig->m_timer1 = vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata);
+                g_pconfig->m_timer1 = vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata);
               }
               break;
 
@@ -791,7 +794,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
           }
           else {
             // all events must be received within the specified time
-            if ((vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata) - g_pconfig->m_timer1) > VSCP_GUID_RESET_TIMEOUT) {
+            if ((vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata) - g_pconfig->m_timer1) > VSCP_GUID_RESET_TIMEOUT) {
               // Timeout Start over
               g_pconfig->m_reset_device_flags = 0;
             }
@@ -1260,7 +1263,7 @@ vscp_frmw2_read_reg(uint32_t reg, uint8_t* pval)
   if (reg < (VSCP_STD_REGISTER_START + ADJSTDREG)) {
     // User register
     rv = vscp_frmw2_callback_read_reg(g_pconfig->m_puserdata, g_pconfig->m_page_select, reg, pval);
-    // OOB error is OK but always read as zero
+    // OOB register error is OK but always read as zero
     if (VSCP_ERROR_INDEX_OOB == rv) {
       *pval = 0;
       return VSCP_ERROR_SUCCESS;
@@ -1376,7 +1379,7 @@ vscp_frmw2_write_reg(uint32_t reg, uint8_t val)
     // OOB error is OK but always read as zero
     if (VSCP_ERROR_INDEX_OOB == rv) {
       val = ~val;
-      rv = VSCP_ERROR_SUCCESS;
+      rv  = VSCP_ERROR_SUCCESS;
     }
   }
   // * * * Standard registers * * *
@@ -1440,7 +1443,7 @@ vscp_frmw2_write_reg(uint32_t reg, uint8_t val)
   else if (reg == (VSCP_STD_REGISTER_NODE_RESET + ADJSTDREG)) {
 
     uint32_t timer;
-    timer = vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata);
+    timer = vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata);
 
     if (0x55 == val) {
       g_pconfig->m_timer1 = timer;
@@ -1556,7 +1559,7 @@ vscp_frmw2_send_high_end_server_probe(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscp_frmw2_send_high_end_server_probe
+// vscp_frmw2_page_read
 //
 
 int
@@ -1751,7 +1754,7 @@ vscp_frmw2_extended_page_read(uint16_t nodeid, uint16_t page, uint8_t startoffse
 
   // set temporary page
   g_pconfig->m_page_select = page;
-  
+
   // Construct response event
   vscp_frmw2_setup_event_ex(&ex);
   ex.vscp_class = VSCP_CLASS1_PROTOCOL;
@@ -1784,8 +1787,8 @@ vscp_frmw2_extended_page_read(uint16_t nodeid, uint16_t page, uint8_t startoffse
       ex.data[(4 + cb)] = val;
     }
 
-    // Location is important as sending use microseconds to
-    uint32_t tm = vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata);
+    // Microseconds is used for a short delay
+    uint64_t tm = vscp_frmw2_callback_get_timestamp(g_pconfig->m_puserdata);
 
     // send the event
     if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_callback_send_event_ex(g_pconfig->m_puserdata, &ex))) {
@@ -1988,22 +1991,22 @@ vscp_frmw2_feed_level2_dm(const vscpEventEx* const pex)
 
     // Should the originating id be checked and if so is it the same?
     if ((LEVEL2_DM_FLAGS(row) & VSCP_LEVEL1_DM_FLAG_CHECK_OADDR) &&
-          ((pex->GUID[0] != LEVEL2_DM_OADDR(row, 0)) ||
-        (pex->GUID[1] != LEVEL2_DM_OADDR(row, 1)) ||
-        (pex->GUID[2] != LEVEL2_DM_OADDR(row, 2)) ||
-        (pex->GUID[3] != LEVEL2_DM_OADDR(row, 3)) ||
-        (pex->GUID[4] != LEVEL2_DM_OADDR(row, 4)) ||
-        (pex->GUID[5] != LEVEL2_DM_OADDR(row, 5)) ||
-        (pex->GUID[6] != LEVEL2_DM_OADDR(row, 6)) ||
-        (pex->GUID[7] != LEVEL2_DM_OADDR(row, 7)) ||
-        (pex->GUID[8] != LEVEL2_DM_OADDR(row, 8)) ||
-        (pex->GUID[9] != LEVEL2_DM_OADDR(row, 9)) ||
-        (pex->GUID[10] != LEVEL2_DM_OADDR(row, 10)) ||
-        (pex->GUID[11] != LEVEL2_DM_OADDR(row, 11)) ||
-        (pex->GUID[12] != LEVEL2_DM_OADDR(row, 12)) ||
-        (pex->GUID[13] != LEVEL2_DM_OADDR(row, 13)) ||
-        (pex->GUID[14] != LEVEL2_DM_OADDR(row, 14)) ||
-        (pex->GUID[15] != LEVEL2_DM_OADDR(row, 15)))) {
+        ((pex->GUID[0] != LEVEL2_DM_OADDR(row, 0)) ||
+         (pex->GUID[1] != LEVEL2_DM_OADDR(row, 1)) ||
+         (pex->GUID[2] != LEVEL2_DM_OADDR(row, 2)) ||
+         (pex->GUID[3] != LEVEL2_DM_OADDR(row, 3)) ||
+         (pex->GUID[4] != LEVEL2_DM_OADDR(row, 4)) ||
+         (pex->GUID[5] != LEVEL2_DM_OADDR(row, 5)) ||
+         (pex->GUID[6] != LEVEL2_DM_OADDR(row, 6)) ||
+         (pex->GUID[7] != LEVEL2_DM_OADDR(row, 7)) ||
+         (pex->GUID[8] != LEVEL2_DM_OADDR(row, 8)) ||
+         (pex->GUID[9] != LEVEL2_DM_OADDR(row, 9)) ||
+         (pex->GUID[10] != LEVEL2_DM_OADDR(row, 10)) ||
+         (pex->GUID[11] != LEVEL2_DM_OADDR(row, 11)) ||
+         (pex->GUID[12] != LEVEL2_DM_OADDR(row, 12)) ||
+         (pex->GUID[13] != LEVEL2_DM_OADDR(row, 13)) ||
+         (pex->GUID[14] != LEVEL2_DM_OADDR(row, 14)) ||
+         (pex->GUID[15] != LEVEL2_DM_OADDR(row, 15)))) {
       continue;
     }
 
