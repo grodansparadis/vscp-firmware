@@ -725,17 +725,29 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
         break;
 
       case VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER: {
-        // Get boot algorithm
+
         if ((8 == ADJSIZEX) &&
             (EXDTA(0) == (g_pconfig->m_nickname & 0xff)) &&
             (EXDTA(1) == g_pconfig->m_bootloader_algorithm) &&
             (EXDTA(2) == g_pconfig->m_guid[0]) &&
             (EXDTA(3) == g_pconfig->m_guid[3]) &&
-            (EXDTA(4) == g_pconfig->m_guid[4]) &&
-            (EXDTA(5) == g_pconfig->m_guid[5]) &&
+            (EXDTA(4) == g_pconfig->m_guid[5]) &&
+            (EXDTA(5) == g_pconfig->m_guid[7]) &&
             (EXDTA(6) == ((g_pconfig->m_page_select >> 8) & 0xff)) &&
             (EXDTA(7) == ((g_pconfig->m_page_select) & 0xff))) {
+
+          // Positive response is sent by bootloader
+
           vscp_frmw2_callback_enter_bootloader(g_pconfig->m_puserdata);
+        }
+        else {
+          // Send negative response
+          vscpEventEx exrply;
+          vscp_frmw2_setup_event_ex(&exrply);
+          exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+          exrply.vscp_type  = VSCP_TYPE_PROTOCOL_NACK_BOOT_LOADER;
+          exrply.sizeData   = 0;
+          rv                = vscp_frmw2_callback_send_event_ex(g_pconfig->m_puserdata, &exrply);
         }
       } break;
 
