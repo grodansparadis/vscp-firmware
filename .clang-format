@@ -18,5 +18,6 @@ AlignTrailingComments: true
 AllowAllArgumentsOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
 BreakBeforeBraces: Stroustrup
+SortIncludes: false
 
 # google-readability-braces-around-statements

@@ -736,9 +736,14 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
             (EXDTA(6) == ((g_pconfig->m_page_select >> 8) & 0xff)) &&
             (EXDTA(7) == ((g_pconfig->m_page_select) & 0xff))) {
 
-          // Positive response is sent by bootloader
+          // Positive response is sent by bootloader firmware
 
+          /*
+            This call start up the bootloader on real hardware and normally never return,
+            if it do rv should be set to VSCP_ERROR_STOPPED
+          */
           vscp_frmw2_callback_enter_bootloader(g_pconfig->m_puserdata);
+          rv = VSCP_ERROR_STOPPED;
         }
         else {
           // Send negative response
@@ -760,7 +765,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
                   (EXDTA(2) == g_pconfig->m_guid[14]) &&
                   (EXDTA(3) == g_pconfig->m_guid[13]) &&
                   (EXDTA(4) == g_pconfig->m_guid[12])) {
-                g_pconfig->m_reset_device_flags |= 0b0001;
+                g_pconfig->m_reset_device_flags |= 0x01;
                 // One second to receive the rest of the events
                 g_pconfig->m_timer1 = vscp_frmw2_callback_get_milliseconds(g_pconfig->m_puserdata);
               }
@@ -771,7 +776,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
                   (EXDTA(2) == g_pconfig->m_guid[10]) &&
                   (EXDTA(3) == g_pconfig->m_guid[9]) &&
                   (EXDTA(4) == g_pconfig->m_guid[8])) {
-                g_pconfig->m_reset_device_flags |= 0b0010;
+                g_pconfig->m_reset_device_flags |= 0x02;
               }
               break;
 
@@ -780,7 +785,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
                   (EXDTA(2) == g_pconfig->m_guid[6]) &&
                   (EXDTA(3) == g_pconfig->m_guid[5]) &&
                   (EXDTA(4) == g_pconfig->m_guid[4])) {
-                g_pconfig->m_reset_device_flags |= 0b0100;
+                g_pconfig->m_reset_device_flags |= 0x04;
               }
               break;
 
@@ -789,7 +794,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
                   (EXDTA(2) == g_pconfig->m_guid[2]) &&
                   (EXDTA(3) == g_pconfig->m_guid[1]) &&
                   (EXDTA(4) == g_pconfig->m_guid[0])) {
-                g_pconfig->m_reset_device_flags |= 0b1000;
+                g_pconfig->m_reset_device_flags |= 0x08;
               }
               break;
 
@@ -798,7 +803,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
               break;
           }
 
-          if (0b1111 == g_pconfig->m_reset_device_flags) {
+          if (0x0f == g_pconfig->m_reset_device_flags) {
             g_pconfig->m_reset_device_flags = 0;
             vscp_frmw2_callback_restore_defaults(g_pconfig->m_puserdata);
             vscp_frmw2_init(NULL);
@@ -1167,8 +1172,8 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
       } break;
 
       case VSCP2_TYPE_PROTOCOL_WHO_IS_THERE_RESPONSE: {
-        char devname[64];
-        char url[32];
+        //char devname[64];
+        //char url[32];
 
         vscpEventEx exrply;
         vscp_frmw2_setup_event_ex(&exrply);
@@ -1481,8 +1486,6 @@ vscp_frmw2_write_reg(uint32_t reg, uint8_t val)
 int
 vscp_frmw2_send_heartbeat(void)
 {
-  int rv;
-
   vscpEventEx exrply;
   vscp_frmw2_setup_event_ex(&exrply);
 
