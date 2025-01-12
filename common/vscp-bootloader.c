@@ -191,9 +191,11 @@ vscpboot_loader(void)
       continue;
     }
 
-    // if (NULL == pex) {
-    //   continue;
-    // }
+    if ((VSCP_CLASS1_PROTOCOL == ex.vscp_class) && (VSCP_TYPE_PROTOCOL_BOOT_LOADER_CHECK == ex.vscp_class)) {
+      // Confirm bootmode - Send bootmode ACK
+      send_bootload_ack();
+      continue;
+    }
 
 #ifdef VSCP_BOOTLOADER_DEBUG
     printf("Bootevent class=%02X type=%02X\n", ex.vscp_class, ex.vscp_type);
@@ -448,7 +450,7 @@ vscpboot_loader(void)
 #ifdef VSCP_BOOTLOADER_DEBUG
             printf("Sent ACK for program block\n");
 #endif
-            state = STATE_BLOCKSTART; 
+            state = STATE_BLOCKSTART;
           }
           else {
 

@@ -42,6 +42,8 @@
 #include "vscp-compiler.h"
 #include "vscp-projdefs.h"
 
+#define unused(x) ((void)x)
+
 /* Constants */
 
 /* Globals */
@@ -1760,6 +1762,8 @@ vscp_frmw2_extended_page_read(uint16_t nodeid, uint16_t page, uint8_t startoffse
   uint16_t page_save;
   uint8_t byte = 0;
   uint8_t bytes_this_time, cb;
+
+  unused(nodeid); 
 
   vscpEventEx ex;
   vscp_frmw2_setup_event_ex(&ex);
