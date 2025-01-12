@@ -738,14 +738,9 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
             (EXDTA(6) == ((g_pconfig->m_page_select >> 8) & 0xff)) &&
             (EXDTA(7) == ((g_pconfig->m_page_select) & 0xff))) {
 
-          // Positive response is sent by bootloader firmware
+          // Positive response is sent by bootloader
 
-          /*
-            This call start up the bootloader on real hardware and normally never return,
-            if it do rv should be set to VSCP_ERROR_STOPPED
-          */
           vscp_frmw2_callback_enter_bootloader(g_pconfig->m_puserdata);
-          rv = VSCP_ERROR_STOPPED;
         }
         else {
           // Send negative response
@@ -1488,6 +1483,8 @@ vscp_frmw2_write_reg(uint32_t reg, uint8_t val)
 int
 vscp_frmw2_send_heartbeat(void)
 {
+  //int rv;
+
   vscpEventEx exrply;
   vscp_frmw2_setup_event_ex(&exrply);
 
@@ -1763,7 +1760,7 @@ vscp_frmw2_extended_page_read(uint16_t nodeid, uint16_t page, uint8_t startoffse
   uint8_t byte = 0;
   uint8_t bytes_this_time, cb;
 
-  unused(nodeid); 
+  unused(nodeid);
 
   vscpEventEx ex;
   vscp_frmw2_setup_event_ex(&ex);

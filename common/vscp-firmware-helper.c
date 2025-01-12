@@ -1294,7 +1294,7 @@ vscp_fwhlp_eventToString(char* buf, size_t size, const vscpEvent* pev)
 
   // Len must be able to hold content
   // data size for each byte is 5 as worst '0xff,'
-  if (size < (size_t)((pev->sizeData * 5) + 110 + 1)) {
+  if (size < ((size_t)((size_t)((size_t)((pev->sizeData * 5) + 110 + 1))))) {
     return VSCP_ERROR_BUFFER_TO_SMALL;
   }
 
@@ -1373,7 +1373,7 @@ vscp_fwhlp_eventToStringEx(char* buf, size_t size, const vscpEventEx* pex)
 
   // Len must be able to hold content
   // data size for each byte is 5 as worst '0xff,'
-  if (size < (size_t)((pex->sizeData * 5) + 110 + 1)) {
+  if (size < ((size_t)((pex->sizeData * 5) + 110 + 1))) {
     return VSCP_ERROR_BUFFER_TO_SMALL;
   }
 
