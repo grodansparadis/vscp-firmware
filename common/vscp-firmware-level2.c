@@ -643,6 +643,10 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
               ;
             }
           }
+          else {
+            // Not to us
+            return VSCP_ERROR_SUCCESS;
+          }
         }
         // 16-bit id
         else if (3 == ADJSIZEX) {
@@ -653,9 +657,13 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
               ;
             }
           }
+          else {
+            // Not to us
+            return VSCP_ERROR_SUCCESS;
+          }
         }
         else {
-          rv = VSCP_ERROR_INVALID_FRAME;
+          return VSCP_ERROR_INVALID_FRAME;
         }
 
         // Send response
@@ -970,6 +978,10 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
           exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
           exrply.vscp_type  = VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE;
           uppermax          = 7;
+          nframes           = strlen(g_pconfig->m_pInternalMdf) / 6;
+          if (strlen(g_pconfig->m_pInternalMdf) % 6) {
+            nframes++;
+          }
         }
         else {
           exrply.vscp_class = VSCP_CLASS2_PROTOCOL;
