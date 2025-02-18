@@ -836,7 +836,7 @@ void vscp_outputevent(unsigned char board,unsigned int current,unsigned int prev
 			{
 				//wait at least 1 msec for next message to be sent
 				//prevent overflow of bus or receiver
-				//100µsec should be sufficient, but requires separate timer
+				//100ï¿½sec should be sufficient, but requires separate timer
 				while (vscp_timer < vscp_sendtimer+2) ;
 				if ((j & current) == j)
 					{
@@ -867,7 +867,7 @@ void vscp_outputevent(unsigned char board,unsigned int current,unsigned int prev
 		{
 			//wait at least 1 msec for next message to be sent
 			//prevent overflow of bus or receiver
-			//100µsec should be sufficient, but requires separate timer
+			//100ï¿½sec should be sufficient, but requires separate timer
 			while (vscp_timer < vscp_sendtimer+2) ;
 			if ((change>>i)&0x01)
 			{
@@ -935,7 +935,7 @@ unsigned char bitflip(unsigned char old_val)
  * 	2006-04-21
  * 	akhe@eurosource.se
  *
- *  Copyright (C) 2006-2009 Ake Hedman, eurosource
+ *  Copyright (C) 2006-2025 Ake Hedman, Grodans Paradis AB
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages

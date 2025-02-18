@@ -14,7 +14,7 @@
 // 
 // This file is part of the VSCP (http://can.sourceforge.net) 
 //
-// Copyright (C) 2000-2008 Ake Hedman, D Of Scandinavia, <ake@dofscandinavia.com>
+// Copyright (C) 2000-2025 Ake Hedman, D Of Scandinavia, <ake@dofscandinavia.com>
 // 
 // This file is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -342,7 +342,7 @@ void *UPDATEWorkerThread::Entry()
 								{
 									i = (VSCP_TYPE_PROTOCOL_NACK_BOOT_LOADER << 16) | pSendEvent->pdata[0]; 
 									eventMessage.SetInt(i);
-									eventMessage.SetExtraLong(0);	// l' errore è gestito nell' handler dell' evento di risposta
+									eventMessage.SetExtraLong(0);	// l' errore ï¿½ gestito nell' handler dell' evento di risposta
 									wxPostEvent(m_pCtrlObject->m_pVSCPSessionWnd, eventMessage );
 									deleteVSCPevent( pReceiveEvent );
 									deleteVSCPevent( pSendEvent );
@@ -394,7 +394,7 @@ void *UPDATEWorkerThread::Entry()
 								{
 									i = (((VSCP_TYPE_PROTOCOL_START_BLOCK_NACK) << 16) | pSendEvent->pdata[2]); 
 									eventMessage.SetInt(i);
-									eventMessage.SetExtraLong(0);	// l' errore è gestito nell' handler dell' evento di risposta
+									eventMessage.SetExtraLong(0);	// l' errore ï¿½ gestito nell' handler dell' evento di risposta
 									wxPostEvent(m_pCtrlObject->m_pVSCPSessionWnd, eventMessage );
 									deleteVSCPevent( pReceiveEvent );
 									deleteVSCPevent( pSendEvent );
@@ -446,7 +446,7 @@ void *UPDATEWorkerThread::Entry()
 								{
 									i = (VSCP_TYPE_PROTOCOL_BLOCK_DATA_NACK << 16) | pSendEvent->GUID[12]; 
 									eventMessage.SetInt(i);
-									eventMessage.SetExtraLong(0);	// l' errore è gestito nell' handler dell' evento di risposta
+									eventMessage.SetExtraLong(0);	// l' errore ï¿½ gestito nell' handler dell' evento di risposta
 									wxPostEvent(m_pCtrlObject->m_pVSCPSessionWnd, eventMessage );
 									deleteVSCPevent( pReceiveEvent );
 									deleteVSCPevent( pSendEvent );
@@ -498,7 +498,7 @@ void *UPDATEWorkerThread::Entry()
 								{
 									i = (VSCP_TYPE_PROTOCOL_PROGRAM_BLOCK_DATA_NACK << 16) | pSendEvent->GUID[12]; 
 									eventMessage.SetInt(i);
-									eventMessage.SetExtraLong(0);	// l' errore è gestito nell' handler dell' evento di risposta
+									eventMessage.SetExtraLong(0);	// l' errore ï¿½ gestito nell' handler dell' evento di risposta
 									wxPostEvent(m_pCtrlObject->m_pVSCPSessionWnd, eventMessage );
 									deleteVSCPevent( pReceiveEvent );
 									deleteVSCPevent( pSendEvent );
@@ -548,7 +548,7 @@ void *UPDATEWorkerThread::Entry()
 								{
 									i = (((VSCP_TYPE_PROTOCOL_ACTIVATENEWIMAGE_NACK) << 16) | (pSendEvent->GUID[12])); 
 									eventMessage.SetInt(i);
-									eventMessage.SetExtraLong(0);	// l' errore è gestito nell' handler dell' evento di risposta
+									eventMessage.SetExtraLong(0);	// l' errore ï¿½ gestito nell' handler dell' evento di risposta
 									wxPostEvent(m_pCtrlObject->m_pVSCPSessionWnd, eventMessage );
 									deleteVSCPevent( pReceiveEvent );
 									deleteVSCPevent( pSendEvent );

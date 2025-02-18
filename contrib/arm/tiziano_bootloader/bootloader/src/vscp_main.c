@@ -6,7 +6,7 @@
  * 	Version information in version.h
  * 	akhe@dofscandinavia.com   
  *
- * Copyright (C) 1995-2008 Ake Hedman, 
+ * Copyright (C) 1995-2025 Ake Hedman, 
  * D of Scandinavia, <akhe@dofscandinavia.com>
  *
  * This software is provided 'as-is', without any express or implied
@@ -635,8 +635,8 @@ void vscp_resetBootLoaderMode( void )
 	// firma in flash
 	write_flash_signature();
 	
-	// rovinare il magic in eeprom è necessario per fare il memory puff
-	// dopo ogni update del firmware perchè le strutture dati possono
+	// rovinare il magic in eeprom ï¿½ necessario per fare il memory puff
+	// dopo ogni update del firmware perchï¿½ le strutture dati possono
 	// essere cambiate, questo comporta la cancellazione del nickname e
 	// quindi l' invocazione del nickname discovery alla fine della procedura
 	// di update

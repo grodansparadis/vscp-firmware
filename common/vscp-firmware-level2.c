@@ -697,6 +697,10 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
               ;
             }
           }
+          else {
+            // Not to us
+            return VSCP_ERROR_SUCCESS;
+          }
         }
         // 16-bit id
         else if (4 == ADJSIZEX) {
@@ -710,6 +714,10 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
             if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_read_reg(reg, &val))) {
               ;
             }
+          }
+          else {
+            // Not to us
+            return VSCP_ERROR_SUCCESS;
           }
         }
         else {

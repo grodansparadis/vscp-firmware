@@ -1,7 +1,7 @@
 Readme for the Arduino VSCP CAN Library
 ========================================
 Version 0.0.1 2012-08-29
-Copyright (C) Åke Hedman, Grodans Paradis AB
+Copyright (C) Ã…ke Hedman, Grodans Paradis AB
 akhe@grodansparadis.com, http://www.vscp.org
 
 This is a simple implementation of VSCP on an Arduino Duemilanove board

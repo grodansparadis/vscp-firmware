@@ -102,7 +102,7 @@ unsigned char bitflip(unsigned char old_val); // flip over complete byte (lsb be
  * 	2006-04-21
  * 	akhe@eurosource.se
  *
- *  Copyright (C) 2006-2009 Ake Hedman, eurosource
+ *  Copyright (c) 2006-2025 Ake Hedmanm Grodans Paradis AB
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages

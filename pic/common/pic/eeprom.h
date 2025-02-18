@@ -4,7 +4,7 @@
 // Code collected from the Microchip C18 forum
 // Copyright (C) 2003 JasonK
 //
-// Copyright (C) 2005-2011 Ake Hedman, eurosource, <akhe@eurosource.se>
+// Copyright (C) 2005-2025 Ake Hedman, eurosource, <akhe@eurosource.se>
 //
 
 #ifndef EEPROM_H

@@ -6,7 +6,7 @@
  * 	akhe@eurosource.se
  *
  *  Copyright (C) 2006-2011 Ake Hedman, eurosource
- *  Copyright (C) 2011-2015 Ake Hedman, Grodans Paradis AB
+ *  Copyright (C) 2011-2025 Ake Hedman, Grodans Paradis AB
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages

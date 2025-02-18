@@ -8,7 +8,7 @@
  *
  * 	akhe@eurosource.se
  *
- * Copyright (C) 1995-2006 Ake Hedman, eurosource, <akhe@eurosource.se>
+ * Copyright (C) 1995-2025 Ake Hedman, eurosource, <akhe@eurosource.se>
  *
  * 060508 Cleaned up
  * 060323 Added DM struct. 

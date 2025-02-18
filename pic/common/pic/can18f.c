@@ -12,7 +12,7 @@
  *  Original Software License Agreement
  *
  * The software supplied herewith by Microchip Technology Incorporated
- * (the ?Company?) for its PICmicro® Microcontroller is intended and
+ * (the ?Company?) for its PICmicroï¿½ Microcontroller is intended and
  * supplied to you, the Company?s customer, for use solely and
  * exclusively on Microchip PICmicro Microcontroller products. The
  * software is owned by the Company and/or its supplier, and is
@@ -30,7 +30,7 @@
  * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
  *  
  * ============================================================================
- *          Changes Copyright (C) 2004-3012 Ake Hedman,Grodans Paradis AB
+ *          Changes Copyright (C) 2004-2025 Ake Hedman,Grodans Paradis AB
  * ============================================================================
  *
  * This software is provided 'as-is', without any express or implied

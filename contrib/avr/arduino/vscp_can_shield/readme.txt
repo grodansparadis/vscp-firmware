@@ -1,7 +1,7 @@
 Readme for the Arduino VSCP CAN sample 1
 =========================================
 Version 0.0.1 2012-08-29
-Copyright (C) Åke Hedman, Grodans Paradis AB
+Copyright (C) Ã…ke Hedman, Grodans Paradis AB
 akhe@grodansparadis.com, http://www.vscp.org
 
 This is a simple implementation of VSCP on an Arduino Duemilanove board
@@ -103,7 +103,7 @@ Action = 1. CLASS1.INFORMATION(20), Type = 18 (0x12) Good day event
 Action = 2.	Open serial port.
 Action = 3. Close serial port. 
 Action = 4. Send data on serial port. Index into data by action parameter.
-Action = 5. CLASS1.DATA(15), Type = 1 (0x01) I/O – value event
+Action = 5. CLASS1.DATA(15), Type = 1 (0x01) I/O ï¿½ value event
 				is sent. Se description in events section below.
 Action = 6. CLASS1.DATA(15), Type = 2 (0x02) A/D value event
 				is sent. Se description in events section below.				
@@ -181,7 +181,7 @@ byte 0: Always set to 0.
 byte 1: Zone for module.
 byte 2: Subzone for module.
 
-CLASS1.DATA(15), Type = 1 (0x01) I/O – value
+CLASS1.DATA(15), Type = 1 (0x01) I/O ï¿½ value
 --------------------------------------------
 This event is sent as a result of Action=5 and/or is sent
 on regular intervals specified in register 16.
@@ -194,7 +194,7 @@ byte 1: Representing state of I/O pins
 			bit 3: D6
 		The rest of the pins are set to zero.	
 
-CLASS1.DATA(15), Type = 2 (0x02) A/D value – value
+CLASS1.DATA(15), Type = 2 (0x02) A/D value ï¿½ value
 --------------------------------------------------
 This event is sent as a result of Action=6 and/or is sent
 on regular intervals specyfied in register 17.

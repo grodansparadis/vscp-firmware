@@ -1,7 +1,7 @@
 //
 // sja1000.c
 //
-// Copyright (C) 2002-2004 Ake Hedman, eurosource, akhe@eurosource.se
+// Copyright (C) 2002-2025 Ake Hedman, eurosource, akhe@eurosource.se
 //
 // This software is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

@@ -14,7 +14,7 @@
  * 	VSCP (Very Simple Control Protocol) 
  * 	http://www.vscp.org
  *
- *  Copyright (C) 1995-2008 Ake Hedman, 
+ *  Copyright (C) 1995-2025 Ake Hedman, 
  #  D of Scandinavia, <akhe@dofscandinavia.com>
  *
  * This software is provided 'as-is', without any express or implied
