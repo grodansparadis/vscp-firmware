@@ -96,15 +96,14 @@ vscp_link_idle_worker(const void* pdata)
     char buf[THIS_FIRMWARE_TCPIP_LINK_MAX_BUFFER];
     vscpEvent* pev = NULL;
 
-    rv = vscp_link_callback_rcvloop(pdata, &pev);
-    if (VSCP_ERROR_SUCCESS == rv) {
+    if (VSCP_ERROR_SUCCESS == (rv = vscp_link_callback_rcvloop(pdata, &pev))) {
       // We own the event from now on and must
       // delete it and it's data when we are done
       // with it
       int rv = vscp_fwhlp_eventToString(buf, sizeof(buf), pev);
       if (VSCP_ERROR_SUCCESS == rv) {
         // Write out the event
-        strcat(buf, "\r\n+OK\r\n");
+        //strcat(buf, "\r\n+OK\r\n");
         vscp_link_callback_write_client(pdata, buf);
       }
       // Free event

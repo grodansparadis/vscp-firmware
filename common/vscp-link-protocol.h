@@ -802,7 +802,10 @@
    * @brief Get event ('retr').
    *
    * @param pdata Pointer to user data
-   * @param pex Pointer to pointer of event that will get event data
+   * @param pev Pointer to pointer of event that will get new allocated event. If 
+   *            VSCP_ERROR_SUCCESS is returned this will point to a newly allocated
+                event and it is up to the calling routine to release the memory. 
+                If no event is available the pointer will be NULL.
    * @return Return VSCP_ERROR_SUCCESS if logged in error code else.
    *
    * VSCP_ERROR_INVALID_HANDLE - (msg=VSCP_LINK_MSG_NOT_ACCREDITED) is not logged in.
