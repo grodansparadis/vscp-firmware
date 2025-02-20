@@ -325,7 +325,7 @@ vscp_link_parser(const void* pdata, char* pbuf, char** pnext)
     p += 8;
     return vscp_link_doCmdShutdown(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "restart")) && && (7 == cmdlen) (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "restart")) && (7 == cmdlen) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdRestart(pdata, p);
   }
@@ -344,7 +344,7 @@ vscp_link_parser(const void* pdata, char* pbuf, char** pnext)
     p += 7;
     return vscp_link_doCmdbRcvLoop(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "sec")) && && (3 == cmdlen) (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "sec")) && (3 == cmdlen) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdSec(pdata, p);
   }
@@ -376,7 +376,6 @@ vscp_link_doCmdHelp(const void* pdata, const char* cmd)
   return vscp_link_callback_help(pdata, cmd);
 #else
   if (NULL != vscp_fwhlp_stristr(cmd, "noop")) {
-    printf("----->");
     return vscp_link_callback_write_client(pdata, VSCP_LINK_STD_HELP_NOOP);
   }
   else if (NULL != vscp_fwhlp_stristr(cmd, "help")) {
@@ -441,6 +440,9 @@ vscp_link_doCmdHelp(const void* pdata, const char* cmd)
   }
   else if (NULL != vscp_fwhlp_stristr(cmd, "wcyd") || NULL != strstr(cmd, "whatcanyoudo")) {
     return vscp_link_callback_write_client(pdata, VSCP_LINK_STD_HELP_WCYD);
+  }
+  else if (NULL != vscp_fwhlp_stristr(cmd, "interface")) {
+    return vscp_link_callback_write_client(pdata, VSCP_LINK_STD_HELP_INTERFACE);
   }
   else {
     return vscp_link_callback_write_client(pdata, VSCP_LINK_STD_HELP_TEXT);

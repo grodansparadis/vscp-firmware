@@ -117,6 +117,7 @@
   "vers/version      - Get VSCP device version.\r\n"                            \
   "sflt/setfilter    - Set incoming event filter.\r\n"                          \
   "smsk/setmask      - Set incoming event mask.\r\n"                            \
+  "interface         - List interfaces on device.\r\n"                         \
   "help [command]    - This command.\r\n"                                       \
   "test              - Do test sequence. Only used for debugging.\r\n"          \
   "wcyd/whatcanyoudo - Check server capabilities. \r\n"                         \
@@ -134,22 +135,23 @@
 #define VSCP_LINK_STD_HELP_RETR      "'retr count' Retrieve n events from input queue. Defult is one event.\r\n+OK\r\n"
 #define VSCP_LINK_STD_HELP_RCVLOOP   "'rcvloop' Will retrieve events in an endless loop until " \
                                    "the connection is closed by the client or 'quit' or 'quitloop' is received.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_QUITLOOP "'quitloop' Terminate receive loop.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_CDTA     "'cdta / chkdata' Check if there is data in the input queue.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_CLRA     "'clra / clrall' Clear input queue.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_STAT     "'stat' Get statistical information.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_INFO     "'info' Get status info.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_CHID     "'chid' Get channel id.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_SGID     "'sgid / setguid' Set GUID for channel.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_GGID     "'ggid / getguid' Get GUID for channel.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_VERS     "'vers / version' Get VSCP device version.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_SFLT     "'sflt / setfilter' Set incoming event filter.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_SMSK     "'smsk / setmask' Set incoming event mask.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_TEST     "'test' Do test sequence. Only used for debugging.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_WCYD     "'wcyd / whatcanyoudo' Get server capabilities.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_HELP     "'help <operation>' This command.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_RESTART  "'restart' Restart the device.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_SHUTDOWN "'shutdown' Shutdown the device.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_QUITLOOP  "'quitloop' Terminate receive loop.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_CDTA      "'cdta / chkdata' Check if there is data in the input queue.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_CLRA      "'clra / clrall' Clear input queue.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_STAT      "'stat' Get statistical information.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_INFO      "'info' Get status info.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_CHID      "'chid' Get channel id.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_SGID      "'sgid / setguid' Set GUID for channel.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_GGID      "'ggid / getguid' Get GUID for channel.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_VERS      "'vers / version' Get VSCP device version.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_SFLT      "'sflt / setfilter' Set incoming event filter.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_SMSK      "'smsk / setmask' Set incoming event mask.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_TEST      "'test' Do test sequence. Only used for debugging.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_INTERFACE "'interface' List interfaces on device.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_WCYD      "'wcyd / whatcanyoudo' Get server capabilities.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_HELP      "'help <operation>' This command.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_RESTART   "'restart' Restart the device.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_SHUTDOWN  "'shutdown' Shutdown the device.\r\n+OK\r\n"
 
   /*!
    * @fn vscp_link_connect
@@ -802,9 +804,9 @@
    * @brief Get event ('retr').
    *
    * @param pdata Pointer to user data
-   * @param pev Pointer to pointer of event that will get new allocated event. If 
+   * @param pev Pointer to pointer of event that will get new allocated event. If
    *            VSCP_ERROR_SUCCESS is returned this will point to a newly allocated
-                event and it is up to the calling routine to release the memory. 
+                event and it is up to the calling routine to release the memory.
                 If no event is available the pointer will be NULL.
    * @return Return VSCP_ERROR_SUCCESS if logged in error code else.
    *
