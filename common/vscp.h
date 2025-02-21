@@ -360,7 +360,7 @@ typedef VSCPChannelInfo *PVSCPCHANNELINFO;
 
 #define SET_VSCP_MULTICAST_TYPE(type, encryption)  ((type << 4) | encryption)
 #define GET_VSCP_MULTICAST_PACKET_TYPE(type)       ((type >> 4) & 0x0f)
-#define GET_VSCP_MULTICAST_PACKET_ENCRYPTION(type) ((type) &0x0f)
+#define GET_VSCP_MULTICAST_PACKET_ENCRYPTION(type) ((type) & 0x0f)
 
 /* Multicast proxy CLASS=1026, TYPE=3  */
 /* https://www.vscp.org/docs/vscpspec/doku.php?id=class2.information#type_3_0x0003_level_ii_proxy_node_heartbeat
@@ -656,7 +656,10 @@ struct vscpMyNode {
 #define VSCP_ERROR_SIZE               64 /* The size is wring */
 #define VSCP_ERROR_NACK               65 /* NACK received */
 #define VSCP_ERROR_READ_ERROR         66 /* Error when reading data */
-#define VSCP_ERROR_READ               66 /* Error when reading data */
+#define VSCP_ERROR_READ               66 /* DUPLICATE FOR CONVENIENCE! Error when reading data */
+#define VSCP_ERROR_INVALID_CHECKSUM   67 /* Checksum is not correct */
+#define VSCP_ERROR_INTERFACE          68 /* Interface error (not defined etc) */
+#define VSCP_ERROR_CONVERSION         69 /* Error in conversion */
 
 /*!
     HLO (High Level Object) type (bits 7,6,5,4)
