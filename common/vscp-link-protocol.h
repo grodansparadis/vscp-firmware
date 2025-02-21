@@ -69,6 +69,7 @@
 #define VSCP_LINK_MSG_ERROR           "-OK - Error\r\n"
 #define VSCP_LINK_MSG_UNKNOWN_COMMAND "-OK - Unknown command\r\n"
 #define VSCP_LINK_MSG_PARAMETER_ERROR "-OK - Invalid parameter or format\r\n"
+#define VSCP_LINK_MSG_NOT_SUPPORTED   "-OK - Not supported\r\n"
 #define VSCP_LINK_MSG_BUFFER_FULL     "-OK - Buffer Full\r\n"
 #define VSCP_LINK_MSG_NO_MSG          "-OK - No event(s) available\r\n"
 
@@ -117,7 +118,9 @@
   "vers/version      - Get VSCP device version.\r\n"                            \
   "sflt/setfilter    - Set incoming event filter.\r\n"                          \
   "smsk/setmask      - Set incoming event mask.\r\n"                            \
-  "interface         - List interfaces on device.\r\n"                         \
+  "interface         - List interfaces on device.\r\n"                          \
+  "interface list    - List interfaces on device.\r\n"                          \
+  "interface close <guid> - Close interface <guid>.\r\n"                        \
   "help [command]    - This command.\r\n"                                       \
   "test              - Do test sequence. Only used for debugging.\r\n"          \
   "wcyd/whatcanyoudo - Check server capabilities. \r\n"                         \
@@ -147,7 +150,7 @@
 #define VSCP_LINK_STD_HELP_SFLT      "'sflt / setfilter' Set incoming event filter.\r\n+OK\r\n"
 #define VSCP_LINK_STD_HELP_SMSK      "'smsk / setmask' Set incoming event mask.\r\n+OK\r\n"
 #define VSCP_LINK_STD_HELP_TEST      "'test' Do test sequence. Only used for debugging.\r\n+OK\r\n"
-#define VSCP_LINK_STD_HELP_INTERFACE "'interface' List interfaces on device.\r\n+OK\r\n"
+#define VSCP_LINK_STD_HELP_INTERFACE "'interface' or 'interface list' List interfaces on device. 'interface close <guid> Close interface <guid>'\r\n+OK\r\n"
 #define VSCP_LINK_STD_HELP_WCYD      "'wcyd / whatcanyoudo' Get server capabilities.\r\n+OK\r\n"
 #define VSCP_LINK_STD_HELP_HELP      "'help <operation>' This command.\r\n+OK\r\n"
 #define VSCP_LINK_STD_HELP_RESTART   "'restart' Restart the device.\r\n+OK\r\n"
@@ -213,7 +216,7 @@
   */
 
   int
-  vscp_link_doCmdNoop(const void* pdata, const char* cmd);
+  vscp_link_doCmdNoop(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdHelp
@@ -229,7 +232,7 @@
    */
 
   int
-  vscp_link_doCmdHelp(const void* pdata, const char* cmd);
+  vscp_link_doCmdHelp(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdQuit
@@ -241,7 +244,7 @@
    */
 
   int
-  vscp_link_doCmdQuit(const void* pdata, const char* cmd);
+  vscp_link_doCmdQuit(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdUser
@@ -253,7 +256,7 @@
    */
 
   int
-  vscp_link_doCmdUser(const void* pdata, const char* cmd);
+  vscp_link_doCmdUser(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdPassword
@@ -265,7 +268,7 @@
    */
 
   int
-  vscp_link_doCmdPassword(const void* pdata, const char* cmd);
+  vscp_link_doCmdPassword(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdChallenge
@@ -277,7 +280,7 @@
    */
 
   int
-  vscp_link_doCmdChallenge(const void* pdata, const char* cmd);
+  vscp_link_doCmdChallenge(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdSend
@@ -289,7 +292,7 @@
    */
 
   int
-  vscp_link_doCmdSend(const void* pdata, const char* cmd);
+  vscp_link_doCmdSend(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdRetrieve
@@ -301,7 +304,7 @@
    */
 
   int
-  vscp_link_doCmdRetrieve(const void* pdata, const char* cmd);
+  vscp_link_doCmdRetrieve(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdRcvLoop
@@ -313,7 +316,7 @@
    */
 
   int
-  vscp_link_doCmdRcvLoop(const void* pdata, const char* cmd);
+  vscp_link_doCmdRcvLoop(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdQuitLoop
@@ -325,7 +328,7 @@
    */
 
   int
-  vscp_link_doCmdQuitLoop(const void* pdata, const char* cmd);
+  vscp_link_doCmdQuitLoop(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdCheckData
@@ -337,7 +340,7 @@
    */
 
   int
-  vscp_link_doCmdCheckData(const void* pdata, const char* cmd);
+  vscp_link_doCmdCheckData(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdClearAll
@@ -349,7 +352,7 @@
    */
 
   int
-  vscp_link_doCmdClearAll(const void* pdata, const char* cmd);
+  vscp_link_doCmdClearAll(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdStatistics
@@ -361,7 +364,7 @@
    */
 
   int
-  vscp_link_doCmdStatistics(const void* pdata, const char* cmd);
+  vscp_link_doCmdStatistics(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdInfo
@@ -373,7 +376,7 @@
    */
 
   int
-  vscp_link_doCmdInfo(const void* pdata, const char* cmd);
+  vscp_link_doCmdInfo(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdGetChannelId
@@ -385,7 +388,7 @@
    */
 
   int
-  vscp_link_doCmdGetChannelId(const void* pdata, const char* cmd);
+  vscp_link_doCmdGetChannelId(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdGetGUID
@@ -397,7 +400,7 @@
    */
 
   int
-  vscp_link_doCmdGetGUID(const void* pdata, const char* cmd);
+  vscp_link_doCmdGetGUID(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdSetGUID
@@ -409,7 +412,7 @@
    */
 
   int
-  vscp_link_doCmdSetGUID(const void* pdata, const char* cmd);
+  vscp_link_doCmdSetGUID(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdGetVersion
@@ -421,7 +424,7 @@
    */
 
   int
-  vscp_link_doCmdGetVersion(const void* pdata, const char* cmd);
+  vscp_link_doCmdGetVersion(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdSetFilter
@@ -433,7 +436,7 @@
    */
 
   int
-  vscp_link_doCmdSetFilter(const void* pdata, const char* cmd);
+  vscp_link_doCmdSetFilter(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdSetMask
@@ -445,7 +448,7 @@
    */
 
   int
-  vscp_link_doCmdSetMask(const void* pdata, const char* cmd);
+  vscp_link_doCmdSetMask(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdTest
@@ -458,7 +461,7 @@
    */
 
   int
-  vscp_link_doCmdTest(const void* pdata, const char* cmd);
+  vscp_link_doCmdTest(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdWhatCanYouDo
@@ -470,7 +473,7 @@
    */
 
   int
-  vscp_link_doCmdWhatCanYouDo(const void* pdata, const char* cmd);
+  vscp_link_doCmdWhatCanYouDo(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdCommandAgain
@@ -482,7 +485,7 @@
    */
 
   int
-  vscp_link_doCmdCommandAgain(const void* pdata, const char* cmd);
+  vscp_link_doCmdCommandAgain(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdInterface
@@ -497,7 +500,7 @@
    */
 
   int
-  vscp_link_doCmdInterface(const void* pdata, const char* cmd);
+  vscp_link_doCmdInterface(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdShutdown
@@ -512,7 +515,7 @@
    */
 
   int
-  vscp_link_doCmdShutdown(const void* pdata, const char* cmd);
+  vscp_link_doCmdShutdown(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdRestart
@@ -527,7 +530,7 @@
    */
 
   int
-  vscp_link_doCmdRestart(const void* pdata, const char* cmd);
+  vscp_link_doCmdRestart(const void* pdata, const char* pcmd);
 
   // --------------------------------------------------------------------------
   //                                  Binary
@@ -542,7 +545,7 @@
    *  @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
    */
   int
-  vscp_link_doCmdbRetr(const void* pdata, const char* cmd);
+  vscp_link_doCmdbRetr(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdbSend
@@ -553,7 +556,7 @@
    *  @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
    */
   int
-  vscp_link_doCmdbSend(const void* pdata, const char* cmd);
+  vscp_link_doCmdbSend(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdbRcvLoop
@@ -564,7 +567,7 @@
    *  @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
    */
   int
-  vscp_link_doCmdbRcvLoop(const void* pdata, const char* cmd);
+  vscp_link_doCmdbRcvLoop(const void* pdata, const char* pcmd);
 
   /**
    * @fn vscp_link_doCmdSec
@@ -575,7 +578,7 @@
    *  @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
    */
   int
-  vscp_link_doCmdSec(const void* pdata, const char* cmd);
+  vscp_link_doCmdSec(const void* pdata, const char* pcmd);
 
   ///////////////////////////////////////////////////////////////////////////////
   //                             Callbacks
@@ -694,6 +697,19 @@
 
   int
   vscp_link_callback_get_interface(const void* pdata, uint16_t index, vscp_interface_info_t* pif);
+
+  /**
+   * @brief Close interface
+   * 
+   * @param pdata Pointer to user data
+   * @param user pguid Pointer to GUID for interface to close.
+   * 
+   * @return VSCP_ERROR_SUCCESS if the interface gest closed. 
+   *  VSCP_ERROR_NOT_SUPPORTED if not supported. Other error 
+   *  codes if an error occurs.
+   */
+  int
+  vscp_link_callback_close_interface(const void* pdata, uint8_t *pguid);
 
   /**
    * @fn vscp_link_callback_check_user
