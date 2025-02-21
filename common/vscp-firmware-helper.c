@@ -309,7 +309,7 @@ vscp_fwhlp_readStringValue(const char* pString)
     vscp_fwhlp_a2ul(buf, 0, 16, &ul);
     return ul;
   }
-  if (NULL != (p = strstr(buf, "0"))) {
+  if (NULL != (p = strstr(buf, "0o"))) {
     p += 2; // Point at the data
     vscp_fwhlp_a2ul(buf, 0, 8, &ul);
     return ul;

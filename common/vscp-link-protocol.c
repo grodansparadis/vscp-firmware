@@ -213,7 +213,7 @@ vscp_link_parser(const void* pdata, char* pbuf, char** pnext)
     p += 5;
     return vscp_link_doCmdSend(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "retr")) && (4 == cmdlen) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "retr")) /*&& (4 == cmdlen)*/ && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdRetrieve(pdata, p);
   }
@@ -261,12 +261,12 @@ vscp_link_parser(const void* pdata, char* pbuf, char** pnext)
     p += 7;
     return vscp_link_doCmdGetChannelId(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "sgid ")) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
-    p += 5;
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "sgid")) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+    p += 4;
     return vscp_link_doCmdSetGUID(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "setguid ")) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
-    p += 8;
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "setguid")) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+    p += 7;
     return vscp_link_doCmdSetGUID(pdata, p);
   }
   else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "ggid")) && (4 == cmdlen) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
@@ -562,7 +562,7 @@ vscp_link_doCmdRetrieve(const void* pdata, const char* pcmd)
   }
 
   int cnt = vscp_fwhlp_readStringValue(pcmd);
-  if (cnt <= 0) {
+sf  if (cnt <= 0) {
     cnt = 1;
   }
 
@@ -802,6 +802,7 @@ vscp_link_doCmdGetChannelId(const void* pdata, const char* pcmd)
 int
 vscp_link_doCmdSetGUID(const void* pdata, const char* pcmd)
 {
+  int rv;
   char* endptr;
   uint8_t guid[16];
 
@@ -813,12 +814,20 @@ vscp_link_doCmdSetGUID(const void* pdata, const char* pcmd)
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_LOW_PRIVILEGE_ERROR);
   }
 
+  // Must be a parameter (guid)
+  if (0 == *pcmd) {
+    return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_PARAMETER_ERROR);
+  }
+
   if (VSCP_ERROR_SUCCESS != vscp_fwhlp_parseGuid(guid, pcmd, &endptr)) {
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_ERROR);
   }
 
-  if (VSCP_ERROR_SUCCESS == vscp_link_callback_set_guid(pdata, guid)) {
-    return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_OK);
+  if (VSCP_ERROR_SUCCESS == (rv = vscp_link_callback_set_guid(pdata, guid))) {
+    return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_PARAMETER_ERROR);
+  }
+  else if (VSCP_ERROR_NOT_SUPPORTED== rv) {
+    return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_NOT_SUPPORTED);
   }
   else {
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_ERROR);
@@ -894,8 +903,13 @@ vscp_link_doCmdSetFilter(const void* pdata, const char* pcmd)
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_LOW_PRIVILEGE_ERROR);
   }
 
+  // Must be a parameter (guid)
+  if (NULL == pcmd) {
+    return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_PARAMETER_ERROR);
+  }
+
   if (VSCP_ERROR_SUCCESS != vscp_fwhlp_parseFilter(&filter, pcmd)) {
-    return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_ERROR);
+    return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_PARAMETER_ERROR);
   }
 
   if (VSCP_ERROR_SUCCESS != vscp_link_callback_setFilter(pdata, &filter)) {
@@ -922,8 +936,13 @@ vscp_link_doCmdSetMask(const void* pdata, const char* pcmd)
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_LOW_PRIVILEGE_ERROR);
   }
 
+  // Must be a parameter (guid)
+  if (NULL == pcmd) {
+    return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_PARAMETER_ERROR);
+  }
+
   if (VSCP_ERROR_SUCCESS != vscp_fwhlp_parseMask(&filter, pcmd)) {
-    return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_ERROR);
+    return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_PARAMETER_ERROR);
   }
 
   if (VSCP_ERROR_SUCCESS != vscp_link_callback_setMask(pdata, &filter)) {
@@ -1042,14 +1061,26 @@ int
 vscp_link_doCmdWhatCanYouDo(const void* pdata, const char* pcmd)
 {
   uint64_t wcyd;
-  char buf[20];
+  char buf[60];
 
   if (VSCP_ERROR_SUCCESS != vscp_link_callback_wcyd(pdata, &wcyd)) {
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_ERROR);
   }
 
   memset(buf, '\0', sizeof(buf));
-  sprintf(buf, "%llu\r\n", wcyd);
+  //sprintf(buf, "%llu\r\n", wcyd);
+  snprintf(buf, 
+            sizeof(buf), 
+            "%02X-%02X-%02X-%02X-%02X-%02X-%02X-%02X %llu\r\n", 
+            (uint8_t)((wcyd >> 56) & 0xff),
+            (uint8_t)((wcyd >> 48) & 0xff),
+            (uint8_t)((wcyd >> 40) & 0xff),
+            (uint8_t)((wcyd >> 32) & 0xff),
+            (uint8_t)((wcyd >> 24) & 0xff),
+            (uint8_t)((wcyd >> 16) & 0xff),
+            (uint8_t)((wcyd >> 8) & 0xff),
+            (uint8_t)(wcyd & 0xff),
+            wcyd);
   vscp_link_callback_write_client(pdata, buf);
 
   return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_OK);
@@ -1076,7 +1107,7 @@ vscp_link_doCmdShutdown(const void* pdata, const char* pcmd)
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_ERROR);
   }
 
-  return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_OK);
+  return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_NOT_SUPPORTED);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
