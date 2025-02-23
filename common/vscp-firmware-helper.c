@@ -15,7 +15,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2025 Ake Hedman,
+ * Copyright (c) 2000-2024 Ake Hedman,
  * The VSCP Project <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -309,7 +309,7 @@ vscp_fwhlp_readStringValue(const char* pString)
     vscp_fwhlp_a2ul(buf, 0, 16, &ul);
     return ul;
   }
-  if (NULL != (p = strstr(buf, "0o"))) {
+  if (NULL != (p = strstr(buf, "0"))) {
     p += 2; // Point at the data
     vscp_fwhlp_a2ul(buf, 0, 8, &ul);
     return ul;
@@ -543,10 +543,10 @@ vscp_fwhlp_newEvent(void)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-// vscp_convertEventToEventEx
+// vscp_fwhlp_convertEventToEventEx
 
 int
-vscp_convertEventToEventEx(vscpEventEx* pEventEx, const vscpEvent* pEvent)
+vscp_fwhlp_convertEventToEventEx(vscpEventEx* pEventEx, const vscpEvent* pEvent)
 {
   // Check pointers
   if (NULL == pEvent) {
@@ -584,11 +584,11 @@ vscp_convertEventToEventEx(vscpEventEx* pEventEx, const vscpEvent* pEvent)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-// vscp_convertEventExToEvent
+// vscp_fwhlp_convertEventExToEvent
 //
 
 int
-vscp_convertEventExToEvent(vscpEvent* pEvent, const vscpEventEx* pEventEx)
+vscp_fwhlp_convertEventExToEvent(vscpEvent* pEvent, const vscpEventEx* pEventEx)
 {
   // Check pointers
   if (NULL == pEvent) {

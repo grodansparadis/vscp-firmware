@@ -526,7 +526,7 @@ vscp_fwhlp_newEvent(void);
  */
 
 int
-vscp_convertEventToEventEx(vscpEventEx* pEventEx, const vscpEvent* pEvent);
+vscp_fwhlp_convertEventToEventEx(vscpEventEx* pEventEx, const vscpEvent* pEvent);
 
 /**
  * @brief Convert eventex to event
@@ -537,7 +537,7 @@ vscp_convertEventToEventEx(vscpEventEx* pEventEx, const vscpEvent* pEvent);
  */
 
 int
-vscp_convertEventExToEvent(vscpEvent* pEvent, const vscpEventEx* pEventEx);
+vscp_fwhlp_convertEventExToEvent(vscpEvent* pEvent, const vscpEventEx* pEventEx);
 
 /*!
     @brief Make a copy of an event
