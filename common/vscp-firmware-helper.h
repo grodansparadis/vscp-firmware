@@ -629,10 +629,7 @@ vscp_fwhlp_encryptFrame(uint8_t* output,
  * @param nAlgorithm The VSCP defined algorithm (0-15) to decrypt the frame
  * with. (vscp.h) If set to 15 (VSCP_ENCRYPTION_FROM_TYPE_BYTE) the algorithm
  * will be set from the four lower bits of the buffer to decrypt.
- * @return True on success, false on failure.
- *
- * NOTE: Note that VSCP packet type (first byte in UDP frame) is not
- * recognised here.
+ * @return VSCP_ERROR_SUCCESS, errorcode on failure on failure.
  *
  */
 int
