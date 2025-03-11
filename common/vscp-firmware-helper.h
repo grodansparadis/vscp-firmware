@@ -630,7 +630,6 @@ vscp_fwhlp_encryptFrame(uint8_t* output,
  * with. (vscp.h) If set to 15 (VSCP_ENCRYPTION_FROM_TYPE_BYTE) the algorithm
  * will be set from the four lower bits of the buffer to decrypt.
  * @return VSCP_ERROR_SUCCESS, errorcode on failure on failure.
- *
  */
 int
 vscp_fwhlp_decryptFrame(uint8_t* output,

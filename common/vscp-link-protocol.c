@@ -562,7 +562,7 @@ vscp_link_doCmdRetrieve(const void* pdata, const char* pcmd)
   }
 
   int cnt = vscp_fwhlp_readStringValue(pcmd);
-sf  if (cnt <= 0) {
+  if (cnt <= 0) {
     cnt = 1;
   }
 
