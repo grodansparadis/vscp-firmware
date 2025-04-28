@@ -973,14 +973,20 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
     return VSCP_ERROR_PARAMETER;
   }
 
-  // obid
-  pev->obid = (uint32_t)strtol(p, &p, 0);
-  if (',' != *p) {
-    return VSCP_ERROR_PARAMETER;
+  // obid (may be left blank)
+  if (',' == *p) {
+    pev->obid = 0;
+    p++; // point beyond comma
   }
-  p++; // point beyond comma
-  if (p > (buf + strlen(buf))) {
-    return VSCP_ERROR_PARAMETER;
+  else {
+    pev->obid = (uint32_t)strtol(p, &p, 0);
+    if (',' != *p) {
+      return VSCP_ERROR_PARAMETER;
+    }
+    p++; // point beyond comma
+    if (p > (buf + strlen(buf))) {
+      return VSCP_ERROR_PARAMETER;
+    }
   }
 
   // datetime YYYY-MM-DDTHH:MM:SS
@@ -991,6 +997,12 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
 
   if (',' == *p) {
     p++; // point beyond comma
+    pev->second = 0;
+    pev->minute = 0;
+    pev->hour   = 0;
+    pev->day    = 0;
+    pev->month  = 0;
+    pev->year   = 0;
   }
   else {
     // year
@@ -1054,14 +1066,20 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
     }
   }
 
-  // timestamp
-  pev->timestamp = (uint32_t)strtol(p, &p, 0);
-  if (',' != *p) {
-    return VSCP_ERROR_PARAMETER;
+  // timestamp (may be left blank)
+  if (',' == *p) {
+    pev->timestamp = 0;
+    p++; // point beyond comma
   }
-  p++; // point beyond comma
-  if (p > (buf + strlen(buf))) {
-    return VSCP_ERROR_PARAMETER;
+  else {
+    pev->timestamp = (uint32_t)strtol(p, &p, 0);
+    if (',' != *p) {
+      return VSCP_ERROR_PARAMETER;
+    }
+    p++; // point beyond comma
+    if (p > (buf + strlen(buf))) {
+      return VSCP_ERROR_PARAMETER;
+    }
   }
 
   // Get GUID
@@ -1145,14 +1163,20 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
     return VSCP_ERROR_PARAMETER;
   }
 
-  // obid
-  pex->obid = (uint32_t)strtol(p, &p, 0);
-  if (',' != *p) {
-    return VSCP_ERROR_PARAMETER;
+  // obid (may be left blank)
+  if (',' == *p) {
+    pex->obid = 0;
+    p++; // point beyond comma
   }
-  p++; // point beyond comma
-  if (p > (buf + strlen(buf))) {
-    return VSCP_ERROR_PARAMETER;
+  else {
+    pex->obid = (uint32_t)strtol(p, &p, 0);
+    if (',' != *p) {
+      return VSCP_ERROR_PARAMETER;
+    }
+    p++; // point beyond comma
+    if (p > (buf + strlen(buf))) {
+      return VSCP_ERROR_PARAMETER;
+    }
   }
 
   // datetime YYYY-MM-DDTHH:MM:SS
@@ -1163,6 +1187,12 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
 
   if (',' == *p) {
     p++; // point beyond comma
+    pex->second = 0;
+    pex->minute = 0;
+    pex->hour   = 0;
+    pex->day    = 0;
+    pex->month  = 0;
+    pex->year   = 0;
   }
   else {
     // year
@@ -1226,14 +1256,20 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
     }
   }
 
-  // timestamp
-  pex->timestamp = (uint32_t)strtol(p, &p, 0);
-  if (',' != *p) {
-    return VSCP_ERROR_PARAMETER;
+  // timestamp (may be left blank)
+  if (',' == *p) {
+    pex->timestamp = 0;
+    p++; // point beyond comma
   }
-  p++; // point beyond comma
-  if (p > (buf + strlen(buf))) {
-    return VSCP_ERROR_PARAMETER;
+  else {
+    pex->timestamp = (uint32_t)strtol(p, &p, 0);
+    if (',' != *p) {
+      return VSCP_ERROR_PARAMETER;
+    }
+    p++; // point beyond comma
+    if (p > (buf + strlen(buf))) {
+      return VSCP_ERROR_PARAMETER;
+    }
   }
 
   // Get GUID
@@ -1549,6 +1585,420 @@ vscp_fwhlp_doLevel2FilterEx(const vscpEventEx* pex, const vscpEventFilter* pFilt
 
   return 1;
 }
+
+/*!
+  UDP frame handling support
+*/
+#ifdef VSCP_FWHLP_UDP_FRAME_SUPPORT
+
+////////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getEncryptionCodeFromToken
+//
+
+uint8_t
+vvscp_fwhlp_getEncryptionCodeFromToken(std::string& token)
+{
+  uint8_t code    = 0;
+  std::string str = token;
+  vscp_makeUpper(str);
+  vscp_trim(str);
+
+  if (0 == vscp_strcasecmp(str.c_str(), VSCP_ENCRYPTION_TOKEN_1)) {
+    code = VSCP_ENCRYPTION_AES128;
+  }
+  else if (0 == vscp_strcasecmp(str.c_str(), VSCP_ENCRYPTION_TOKEN_2)) {
+    code = VSCP_ENCRYPTION_AES192;
+  }
+  else if (0 == vscp_strcasecmp(str.c_str(), VSCP_ENCRYPTION_TOKEN_3)) {
+    code = VSCP_ENCRYPTION_AES256;
+  }
+  else {
+    code = 0;
+  }
+
+  return code;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getEncryptionTokenFromCode
+//
+
+void
+vscp_fwhlp_getEncryptionTokenFromCode(uint8_t code, std::string& token)
+{
+  switch (code) {
+
+    case VSCP_ENCRYPTION_NONE:
+      token = VSCP_ENCRYPTION_TOKEN_0;
+      break;
+
+    case VSCP_ENCRYPTION_AES128:
+      token = VSCP_ENCRYPTION_TOKEN_1;
+      break;
+
+    case VSCP_ENCRYPTION_AES192:
+      token = VSCP_ENCRYPTION_TOKEN_2;
+      break;
+
+    case VSCP_ENCRYPTION_AES256:
+      token = VSCP_ENCRYPTION_TOKEN_3;
+      break;
+
+    default:
+      /* No encryption */
+      token = VSCP_ENCRYPTION_TOKEN_0;
+      break;
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getFrameSizeFromEvent
+//
+
+size_t
+vscp_fwhlp_getFrameSizeFromEvent(vscpEvent* pEvent)
+{
+  // Check pointer
+  if (nullptr == pEvent) {
+    return false;
+  }
+
+  size_t size = 1 +                                                          // Packet type
+                VSCP_MULTICAST_PACKET0_HEADER_LENGTH + pEvent->sizeData + 2; // CRC
+  return size;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getFrameSizeFromEventEx
+//
+
+size_t
+vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx* pEventEx)
+{
+  // Check pointer
+  if (nullptr == pEventEx) {
+    return false;
+  }
+
+  size_t size = 1 +                                                            // Packet type
+                VSCP_MULTICAST_PACKET0_HEADER_LENGTH + pEventEx->sizeData + 2; // CRC
+  return size;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_writeEventToFrame
+//
+
+bool
+vscp_fwhlp_writeEventToFrame(uint8_t* frame, size_t len, uint8_t pkttype, const vscpEvent* pEvent)
+{
+  // Check pointers
+  if (nullptr == frame) {
+    return false;
+  }
+
+  if (nullptr == pEvent) {
+    return false;
+  }
+
+  // Can't have data size with invalid data pointer
+  if (pEvent->sizeData && (nullptr == pEvent->pdata)) {
+    return false;
+  }
+
+  size_t calcSize = 1 +                                                          // Packet type
+                    VSCP_MULTICAST_PACKET0_HEADER_LENGTH + pEvent->sizeData + 2; // CRC
+
+  if (len < calcSize) {
+    return false;
+  }
+
+  // Frame type
+  frame[VSCP_MULTICAST_PACKET0_POS_PKTTYPE] = pkttype;
+
+  // Header
+  frame[VSCP_MULTICAST_PACKET0_POS_HEAD_MSB] = (pEvent->head >> 8) & 0xff;
+  frame[VSCP_MULTICAST_PACKET0_POS_HEAD_LSB] = pEvent->head & 0xff;
+
+  // Timestamp
+  frame[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP]     = (pEvent->timestamp >> 24) & 0xff;
+  frame[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP + 1] = (pEvent->timestamp >> 16) & 0xff;
+  frame[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP + 2] = (pEvent->timestamp >> 8) & 0xff;
+  frame[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP + 3] = pEvent->timestamp & 0xff;
+
+  // Date / time block GMT
+  frame[VSCP_MULTICAST_PACKET0_POS_YEAR_MSB] = (pEvent->year >> 8) & 0xff;
+  frame[VSCP_MULTICAST_PACKET0_POS_YEAR_LSB] = pEvent->year & 0xff;
+  frame[VSCP_MULTICAST_PACKET0_POS_MONTH]    = pEvent->month;
+  frame[VSCP_MULTICAST_PACKET0_POS_DAY]      = pEvent->day;
+  frame[VSCP_MULTICAST_PACKET0_POS_HOUR]     = pEvent->hour;
+  frame[VSCP_MULTICAST_PACKET0_POS_MINUTE]   = pEvent->minute;
+  frame[VSCP_MULTICAST_PACKET0_POS_SECOND]   = pEvent->second;
+
+  // Class
+  frame[VSCP_MULTICAST_PACKET0_POS_VSCP_CLASS_MSB] = (pEvent->vscp_class >> 8) & 0xff;
+  frame[VSCP_MULTICAST_PACKET0_POS_VSCP_CLASS_LSB] = pEvent->vscp_class & 0xff;
+
+  // Type
+  frame[VSCP_MULTICAST_PACKET0_POS_VSCP_TYPE_MSB] = (pEvent->vscp_type >> 8) & 0xff;
+  frame[VSCP_MULTICAST_PACKET0_POS_VSCP_TYPE_LSB] = pEvent->vscp_type & 0xff;
+
+  // GUID
+  memcpy(frame + VSCP_MULTICAST_PACKET0_POS_VSCP_GUID, pEvent->GUID, 16);
+
+  // Size
+  frame[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_MSB] = (pEvent->sizeData >> 8) & 0xff;
+  frame[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_LSB] = pEvent->sizeData & 0xff;
+
+  // Data
+  if (pEvent->sizeData) {
+    memcpy(frame + VSCP_MULTICAST_PACKET0_POS_VSCP_DATA, pEvent->pdata, pEvent->sizeData);
+  }
+
+  // Calculate CRC
+  crc framecrc = crcFast((unsigned char const*)frame + 1, VSCP_MULTICAST_PACKET0_HEADER_LENGTH + pEvent->sizeData);
+
+  // CRC
+  frame[1 + VSCP_MULTICAST_PACKET0_HEADER_LENGTH + pEvent->sizeData]     = (framecrc >> 8) & 0xff;
+  frame[1 + VSCP_MULTICAST_PACKET0_HEADER_LENGTH + pEvent->sizeData + 1] = framecrc & 0xff;
+
+#if 0
+    printf("CRC1 %02X %02X\n",
+                frame[ 1 + VSCP_MULTICAST_PACKET0_HEADER_LENGTH + pEvent->sizeData ],
+                frame[ 1 + VSCP_MULTICAST_PACKET0_HEADER_LENGTH + pEvent->sizeData + 1 ] );
+    printf("CRC2 %02X %02X\n",
+                ( framecrc >> 8 ) & 0xff,
+                framecrc & 0xff );
+    crc nnnn = crcFast( frame+1,
+                            VSCP_MULTICAST_PACKET0_HEADER_LENGTH +
+                            pEvent->sizeData );
+    printf("CRC3 %02X %02X\n",
+                ( nnnn >> 8 ) & 0xff,
+                nnnn & 0xff );
+    printf("--------------------------------\n");
+#endif
+
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_writeEventExToFrame
+//
+
+bool
+vscp_fwhlp_writeEventExToFrame(uint8_t* frame, size_t len, uint8_t pkttype, const vscpEventEx* pEventEx)
+{
+  vscpEvent* pEvent;
+
+  pEvent = new vscpEvent;
+  if (nullptr == pEvent) {
+    return false;
+  }
+
+  pEvent->pdata = nullptr;
+
+  // Check pointer (rest is checked in vscp_convertEventExToEvent)
+  if (nullptr == pEventEx) {
+    return false;
+  }
+
+  // Convert eventEx to event
+  if (!vscp_convertEventExToEvent(pEvent, pEventEx)) {
+    return false;
+  }
+
+  if (!vscp_writeEventToFrame(frame, len, pkttype, pEvent)) {
+    return false;
+  }
+  vscp_deleteEvent_v2(&pEvent);
+
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getEventFromFrame
+//
+
+bool
+vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
+{
+  // Check pointers
+  if (nullptr == pEvent) {
+    return false;
+  }
+
+  if (nullptr == buf) {
+    return false;
+  }
+
+  //  0           Packet type & encryption settings
+  //  1           HEAD MSB
+  //  2           HEAD LSB
+  //  3           Timestamp microseconds MSB
+  //  4           Timestamp microseconds
+  //  5           Timestamp microseconds
+  //  6           Timestamp microseconds LSB
+  //  7           Year MSB
+  //  8           Year LSB
+  //  9           Month
+  //  10          Day
+  //  11          Hour
+  //  12          Minute
+  //  13          Second
+  //  14          CLASS MSB
+  //  15          CLASS LSB
+  //  16          TYPE MSB
+  //  17          TYPE LSB
+  //  18 - 33     ORIGINATING GUID
+  //  34          DATA SIZE MSB
+  //  35          DATA SIZE LSB
+  //  36 - n 	    data limited to max 512 - 25 = 487 bytes
+  //  len - 2     CRC MSB( Calculated on HEAD + CLASS + TYPE + ADDRESS + SIZE
+  //  + DATA ) len - 1     CRC LSB
+  // if encrypted with AES128/192/256 16.bytes IV here.
+
+  size_t calcFrameSize = 1 +                                    // packet type & encryption
+                         VSCP_MULTICAST_PACKET0_HEADER_LENGTH + // header
+                         2 +                                    // CRC
+                         ((uint16_t)buf[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_MSB] << 8) +
+                         buf[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_LSB];
+
+  // The buffer must hold a frame
+  if (len < calcFrameSize)
+    return false;
+
+  crc crcFrame = ((uint16_t)buf[calcFrameSize - 2] << 8) + buf[calcFrameSize - 1];
+
+  // CRC check (only if not disabled)
+  crc crcnew;
+  if (!((buf[VSCP_MULTICAST_PACKET0_POS_HEAD_LSB] & VSCP_HEADER_NO_CRC) && (VSCP_NOCRC_CALC_DUMMY_CRC == crcFrame))) {
+
+#if 0
+    int i;
+    printf("DUMP = ");
+    for ( i=0; i<calcFrameSize; i++ ) {
+        printf("%02X ", buf[i] );
+    }
+    printf("\n");
+#endif
+
+    // Calculate & check CRC
+    crcnew = crcFast((unsigned char const*)buf + 1, (int)calcFrameSize - 1);
+    // CRC is zero if calculated over itself
+    if (crcnew) {
+      return false;
+    }
+  }
+
+  pEvent->sizeData =
+    ((uint16_t)buf[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_LSB];
+
+  // Allocate data
+  if (nullptr == (pEvent->pdata = new uint8_t[pEvent->sizeData])) {
+    return false;
+  }
+
+  // copy in data
+  memcpy(pEvent->pdata, buf + VSCP_MULTICAST_PACKET0_POS_VSCP_DATA, pEvent->sizeData);
+
+  // Head
+  pEvent->head = ((uint16_t)buf[VSCP_MULTICAST_PACKET0_POS_HEAD_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_HEAD_LSB];
+
+  // Copy in GUID
+  memcpy(pEvent->GUID, buf + VSCP_MULTICAST_PACKET0_POS_VSCP_GUID, pEvent->sizeData);
+
+  // Set CRC
+  pEvent->crc = crcFrame;
+
+  // Set timestamp
+  pEvent->timestamp = ((uint32_t)buf[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP] << 24) +
+                      ((uint32_t)buf[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP + 1] << 16) +
+                      ((uint32_t)buf[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP + 2] << 8) +
+                      buf[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP + 3];
+
+  // If timestamp is zero, set it
+  if (0 == pEvent->timestamp) {
+    pEvent->timestamp = vscp_makeTimeStamp();
+  }
+
+  // Date/time
+  pEvent->year   = ((uint16_t)buf[VSCP_MULTICAST_PACKET0_POS_YEAR_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_YEAR_LSB];
+  pEvent->month  = buf[VSCP_MULTICAST_PACKET0_POS_MONTH];
+  pEvent->day    = buf[VSCP_MULTICAST_PACKET0_POS_DAY];
+  pEvent->hour   = buf[VSCP_MULTICAST_PACKET0_POS_HOUR];
+  pEvent->minute = buf[VSCP_MULTICAST_PACKET0_POS_MINUTE];
+  pEvent->second = buf[VSCP_MULTICAST_PACKET0_POS_SECOND];
+
+  // If date/time field is zero set GMT now
+  if ((0 == pEvent->year) && (0 == pEvent->month) && (0 == pEvent->day) && (0 == pEvent->hour) &&
+      (0 == pEvent->minute) && (0 == pEvent->second)) {
+
+    time_t rawtime;
+    struct tm* ptm;
+
+    time(&rawtime);
+#ifdef WIN32
+    ptm = gmtime(&rawtime);
+#else
+    struct tm tbuf;
+    ptm = gmtime_r(&rawtime, &tbuf);
+#endif
+
+    pEvent->year   = ptm->tm_year + 1900;
+    pEvent->month  = ptm->tm_mon + 1;
+    pEvent->day    = ptm->tm_mday;
+    pEvent->hour   = ptm->tm_hour;
+    pEvent->minute = ptm->tm_min;
+    pEvent->second = ptm->tm_sec;
+  }
+
+  // VSCP Class
+  pEvent->vscp_class =
+    ((uint16_t)buf[VSCP_MULTICAST_PACKET0_POS_VSCP_CLASS_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_VSCP_CLASS_LSB];
+
+  // VSCP Type
+  pEvent->vscp_type =
+    ((uint16_t)buf[VSCP_MULTICAST_PACKET0_POS_VSCP_TYPE_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_VSCP_TYPE_LSB];
+
+  // obid - set to zero so interface fill it in
+  pEvent->obid = 0;
+
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getEventExFromFrame
+//
+
+bool
+vscp_fwhlp_getEventExFromFrame(vscpEventEx* pEventEx, const uint8_t* frame, size_t len)
+{
+  vscpEvent* pEvent;
+
+  pEvent = new vscpEvent;
+  if (nullptr == pEvent) {
+    return false;
+  }
+  pEvent->pdata = nullptr;
+
+  // Check pointer (rest is checked in vscp_getVscpEventFromUdpFrame)
+  if (nullptr == pEventEx) {
+    return false;
+  }
+
+  if (!vscp_getEventFromFrame(pEvent, frame, len)) {
+    return false;
+  }
+
+  // Convert eventEx to event
+  if (vscp_convertEventToEventEx(pEventEx, pEvent)) {
+    return false;
+  }
+
+  return true;
+}
+
+#endif
 
 /*!
   Add AES CBC crypto support
