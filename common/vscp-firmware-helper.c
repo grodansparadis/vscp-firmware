@@ -56,6 +56,10 @@
 #include "vscp-firmware-helper.h"
 #include <vscp.h>
 
+#ifdef VSCP_FWHLP_UDP_FRAME_SUPPORT
+#include <crc.h>
+#endif
+
 #ifdef VSCP_FWHLP_CRYPTO_SUPPORT
 #include <vscp-aes.h>
 #endif
@@ -1591,66 +1595,6 @@ vscp_fwhlp_doLevel2FilterEx(const vscpEventEx* pex, const vscpEventFilter* pFilt
 */
 #ifdef VSCP_FWHLP_UDP_FRAME_SUPPORT
 
-////////////////////////////////////////////////////////////////////////////////
-// vscp_fwhlp_getEncryptionCodeFromToken
-//
-
-uint8_t
-vvscp_fwhlp_getEncryptionCodeFromToken(std::string& token)
-{
-  uint8_t code    = 0;
-  std::string str = token;
-  vscp_makeUpper(str);
-  vscp_trim(str);
-
-  if (0 == vscp_strcasecmp(str.c_str(), VSCP_ENCRYPTION_TOKEN_1)) {
-    code = VSCP_ENCRYPTION_AES128;
-  }
-  else if (0 == vscp_strcasecmp(str.c_str(), VSCP_ENCRYPTION_TOKEN_2)) {
-    code = VSCP_ENCRYPTION_AES192;
-  }
-  else if (0 == vscp_strcasecmp(str.c_str(), VSCP_ENCRYPTION_TOKEN_3)) {
-    code = VSCP_ENCRYPTION_AES256;
-  }
-  else {
-    code = 0;
-  }
-
-  return code;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// vscp_fwhlp_getEncryptionTokenFromCode
-//
-
-void
-vscp_fwhlp_getEncryptionTokenFromCode(uint8_t code, std::string& token)
-{
-  switch (code) {
-
-    case VSCP_ENCRYPTION_NONE:
-      token = VSCP_ENCRYPTION_TOKEN_0;
-      break;
-
-    case VSCP_ENCRYPTION_AES128:
-      token = VSCP_ENCRYPTION_TOKEN_1;
-      break;
-
-    case VSCP_ENCRYPTION_AES192:
-      token = VSCP_ENCRYPTION_TOKEN_2;
-      break;
-
-    case VSCP_ENCRYPTION_AES256:
-      token = VSCP_ENCRYPTION_TOKEN_3;
-      break;
-
-    default:
-      /* No encryption */
-      token = VSCP_ENCRYPTION_TOKEN_0;
-      break;
-  }
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_getFrameSizeFromEvent
 //
@@ -1659,8 +1603,8 @@ size_t
 vscp_fwhlp_getFrameSizeFromEvent(vscpEvent* pEvent)
 {
   // Check pointer
-  if (nullptr == pEvent) {
-    return false;
+  if (NULL == pEvent) {
+    return VSCP_ERROR_PARAMETER;
   }
 
   size_t size = 1 +                                                          // Packet type
@@ -1676,8 +1620,8 @@ size_t
 vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx* pEventEx)
 {
   // Check pointer
-  if (nullptr == pEventEx) {
-    return false;
+  if (NULL == pEventEx) {
+    return VSCP_ERROR_PARAMETER;
   }
 
   size_t size = 1 +                                                            // Packet type
@@ -1689,28 +1633,28 @@ vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx* pEventEx)
 // vscp_fwhlp_writeEventToFrame
 //
 
-bool
+int
 vscp_fwhlp_writeEventToFrame(uint8_t* frame, size_t len, uint8_t pkttype, const vscpEvent* pEvent)
 {
   // Check pointers
-  if (nullptr == frame) {
-    return false;
+  if (NULL == frame) {
+    return VSCP_ERROR_PARAMETER;
   }
 
-  if (nullptr == pEvent) {
-    return false;
+  if (NULL == pEvent) {
+    return VSCP_ERROR_PARAMETER;
   }
 
   // Can't have data size with invalid data pointer
-  if (pEvent->sizeData && (nullptr == pEvent->pdata)) {
-    return false;
+  if (pEvent->sizeData && (NULL == pEvent->pdata)) {
+    return VSCP_ERROR_PARAMETER;
   }
 
   size_t calcSize = 1 +                                                          // Packet type
                     VSCP_MULTICAST_PACKET0_HEADER_LENGTH + pEvent->sizeData + 2; // CRC
 
   if (len < calcSize) {
-    return false;
+    return VSCP_ERROR_BUFFER_TO_SMALL;
   }
 
   // Frame type
@@ -1778,57 +1722,58 @@ vscp_fwhlp_writeEventToFrame(uint8_t* frame, size_t len, uint8_t pkttype, const 
     printf("--------------------------------\n");
 #endif
 
-  return true;
+  return VSCP_ERROR_SUCCESS;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_writeEventExToFrame
 //
 
-bool
+int
 vscp_fwhlp_writeEventExToFrame(uint8_t* frame, size_t len, uint8_t pkttype, const vscpEventEx* pEventEx)
 {
+  int rv;
   vscpEvent* pEvent;
 
-  pEvent = new vscpEvent;
-  if (nullptr == pEvent) {
-    return false;
+  pEvent = (vscpEvent*)malloc(sizeof(vscpEvent));
+  if (NULL == pEvent) {
+    return VSCP_ERROR_PARAMETER;
   }
 
-  pEvent->pdata = nullptr;
+  pEvent->pdata = NULL;
 
   // Check pointer (rest is checked in vscp_convertEventExToEvent)
-  if (nullptr == pEventEx) {
-    return false;
+  if (NULL == pEventEx) {
+    return VSCP_ERROR_PARAMETER;
   }
 
   // Convert eventEx to event
-  if (!vscp_convertEventExToEvent(pEvent, pEventEx)) {
-    return false;
+  if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_convertEventExToEvent(pEvent, pEventEx))) {
+    return rv;
   }
 
-  if (!vscp_writeEventToFrame(frame, len, pkttype, pEvent)) {
-    return false;
+  if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_writeEventToFrame(frame, len, pkttype, pEvent))) {
+    return rv;
   }
-  vscp_deleteEvent_v2(&pEvent);
+  vscp_fwhlp_deleteEvent(&pEvent);
 
-  return true;
+  return VSCP_ERROR_SUCCESS;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_getEventFromFrame
 //
 
-bool
+int
 vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
 {
   // Check pointers
-  if (nullptr == pEvent) {
-    return false;
+  if (NULL == pEvent) {
+    return VSCP_ERROR_PARAMETER;
   }
 
-  if (nullptr == buf) {
-    return false;
+  if (NULL == buf) {
+    return VSCP_ERROR_PARAMETER;
   }
 
   //  0           Packet type & encryption settings
@@ -1865,7 +1810,7 @@ vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
 
   // The buffer must hold a frame
   if (len < calcFrameSize)
-    return false;
+    return VSCP_ERROR_BUFFER_TO_SMALL;
 
   crc crcFrame = ((uint16_t)buf[calcFrameSize - 2] << 8) + buf[calcFrameSize - 1];
 
@@ -1886,7 +1831,7 @@ vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
     crcnew = crcFast((unsigned char const*)buf + 1, (int)calcFrameSize - 1);
     // CRC is zero if calculated over itself
     if (crcnew) {
-      return false;
+      return VSCP_ERROR_INVALID_CHECKSUM;
     }
   }
 
@@ -1894,8 +1839,8 @@ vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
     ((uint16_t)buf[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_LSB];
 
   // Allocate data
-  if (nullptr == (pEvent->pdata = new uint8_t[pEvent->sizeData])) {
-    return false;
+  if (NULL == (pEvent->pdata = (uint8_t *)malloc(pEvent->sizeData))) {
+    return VSCP_ERROR_MEMORY;
   }
 
   // copy in data
@@ -1916,11 +1861,6 @@ vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
                       ((uint32_t)buf[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP + 2] << 8) +
                       buf[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP + 3];
 
-  // If timestamp is zero, set it
-  if (0 == pEvent->timestamp) {
-    pEvent->timestamp = vscp_makeTimeStamp();
-  }
-
   // Date/time
   pEvent->year   = ((uint16_t)buf[VSCP_MULTICAST_PACKET0_POS_YEAR_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_YEAR_LSB];
   pEvent->month  = buf[VSCP_MULTICAST_PACKET0_POS_MONTH];
@@ -1928,29 +1868,6 @@ vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
   pEvent->hour   = buf[VSCP_MULTICAST_PACKET0_POS_HOUR];
   pEvent->minute = buf[VSCP_MULTICAST_PACKET0_POS_MINUTE];
   pEvent->second = buf[VSCP_MULTICAST_PACKET0_POS_SECOND];
-
-  // If date/time field is zero set GMT now
-  if ((0 == pEvent->year) && (0 == pEvent->month) && (0 == pEvent->day) && (0 == pEvent->hour) &&
-      (0 == pEvent->minute) && (0 == pEvent->second)) {
-
-    time_t rawtime;
-    struct tm* ptm;
-
-    time(&rawtime);
-#ifdef WIN32
-    ptm = gmtime(&rawtime);
-#else
-    struct tm tbuf;
-    ptm = gmtime_r(&rawtime, &tbuf);
-#endif
-
-    pEvent->year   = ptm->tm_year + 1900;
-    pEvent->month  = ptm->tm_mon + 1;
-    pEvent->day    = ptm->tm_mday;
-    pEvent->hour   = ptm->tm_hour;
-    pEvent->minute = ptm->tm_min;
-    pEvent->second = ptm->tm_sec;
-  }
 
   // VSCP Class
   pEvent->vscp_class =
@@ -1963,39 +1880,39 @@ vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
   // obid - set to zero so interface fill it in
   pEvent->obid = 0;
 
-  return true;
+  return VSCP_ERROR_SUCCESS;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_getEventExFromFrame
 //
 
-bool
+int
 vscp_fwhlp_getEventExFromFrame(vscpEventEx* pEventEx, const uint8_t* frame, size_t len)
 {
   vscpEvent* pEvent;
 
-  pEvent = new vscpEvent;
-  if (nullptr == pEvent) {
-    return false;
+  pEvent = (vscpEvent*)malloc(sizeof(vscpEvent));
+  if (NULL == pEvent) {
+    return VSCP_ERROR_PARAMETER;
   }
-  pEvent->pdata = nullptr;
+  pEvent->pdata = NULL;
 
   // Check pointer (rest is checked in vscp_getVscpEventFromUdpFrame)
-  if (nullptr == pEventEx) {
-    return false;
+  if (NULL == pEventEx) {
+    return VSCP_ERROR_PARAMETER;
   }
 
-  if (!vscp_getEventFromFrame(pEvent, frame, len)) {
-    return false;
+  if (!vscp_fwhlp_getEventFromFrame(pEvent, frame, len)) {
+    return VSCP_ERROR_PARAMETER;
   }
 
   // Convert eventEx to event
-  if (vscp_convertEventToEventEx(pEventEx, pEvent)) {
-    return false;
+  if (vscp_fwhlp_convertEventToEventEx(pEventEx, pEvent)) {
+    return VSCP_ERROR_ERROR;
   }
 
-  return true;
+  return VSCP_ERROR_SUCCESS;
 }
 
 #endif

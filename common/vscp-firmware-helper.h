@@ -572,38 +572,13 @@ vscp_fwhlp_deleteEvent(vscpEvent** pev);
 #ifdef VSCP_FWHLP_UDP_FRAME_SUPPORT
 
 /*!
- * Get encryption code from token.
- *
- * @param token Encryption token to set encryption from. Tokens are
- *              define in vscp,h
- * @return Return the encryption code if the encryption code is known.
- *         The function does not return an error code and instead set no
- *         encryption if the token is invalid.
- *
- */
-
-uint8_t
-vvscp_fwhlp_getEncryptionCodeFromToken(std::string &token);
-
-/*!
- * Fetch encryption string token from code.
- *
- * @param code Should be a valid encryption code as defined in vscp.h
- * @param token A encryption token is returned if the code is valid. For a
- *         a code == 0 which means no encryption an empty string is
- *         returned. This is also true for invalid codes.
- */
-void
-vscp_fwhlp_getEncryptionTokenFromCode(uint8_t code, std::string &token);
-
-/*!
  * Get UDP frame size from event
  *
  * @param pEventEx Pointer to event ex.
  * @return Size of resulting UDP frame on success. Zero on failure.
  */
 size_t
-vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx *pEventEx);
+vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx* pEventEx);
 
 /*!
  * Write event on UDP frame format
@@ -613,10 +588,10 @@ vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx *pEventEx);
  * @param pkttype Is the first byte of UDP type frames that holds
  *          type of packet and encryption.
  * @param pEvent Pointer to event that should be handled.
- * @return True on success, false on failure.
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure.
  */
-bool
-vscp_fwhlp_writeEventToFrame(uint8_t *frame, size_t len, uint8_t pkttype, const vscpEvent *pEvent);
+int
+vscp_fwhlp_writeEventToFrame(uint8_t* frame, size_t len, uint8_t pkttype, const vscpEvent* pEvent);
 
 /*!
  * Write event ex on UDP frame format
@@ -626,10 +601,10 @@ vscp_fwhlp_writeEventToFrame(uint8_t *frame, size_t len, uint8_t pkttype, const 
  * @param pkttype Is the first byte of UDP type frames that holds
  *          type of packet and encryption.
  * @param pEventEx Pointer to event that should be handled.
- * @return True on success, false on failure.
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure.
  */
-bool
-vscp_fwhlp_writeEventExToFrame(uint8_t *frame, size_t len, uint8_t pkttype, const vscpEventEx *pEventEx);
+int
+vscp_fwhlp_writeEventExToFrame(uint8_t* frame, size_t len, uint8_t pkttype, const vscpEventEx* pEventEx);
 
 /*!
  * Get VSCP event from UDP frame
@@ -637,10 +612,10 @@ vscp_fwhlp_writeEventExToFrame(uint8_t *frame, size_t len, uint8_t pkttype, cons
  * @param pEvent Pointer to VSCP event that will get data from the frame,
  * @param buf A pointer to a buffer that will receive the event.
  * @param len Size of the buffer.
- * @return True on success, false on failure.
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure.
  */
-bool
-vscp_fwhlp_getEventFromFrame(vscpEvent *pEvent, const uint8_t *buf, size_t len);
+int
+vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len);
 
 /*!
  * Get VSCP event ex from UDP frame
@@ -649,10 +624,10 @@ vscp_fwhlp_getEventFromFrame(vscpEvent *pEvent, const uint8_t *buf, size_t len);
  * frame,
  * @param buf A pointer to a buffer that will receive the event.
  * @param len Size of the buffer.
- * @return True on success, false on failure.
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure.
  */
-bool
-vscp_fwhlp_getEventExFromFrame(vscpEventEx *pEventEx, const uint8_t *buf, size_t len);
+int
+vscp_fwhlp_getEventExFromFrame(vscpEventEx* pEventEx, const uint8_t* buf, size_t len);
 
 #endif
 
