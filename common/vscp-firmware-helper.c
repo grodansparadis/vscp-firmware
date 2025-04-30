@@ -537,12 +537,7 @@ vscpEvent*
 vscp_fwhlp_newEvent(void)
 {
   static vscpEvent* pev = NULL;
-
-  pev = (vscpEvent*)malloc(sizeof(vscpEvent));
-  if (NULL != pev) {
-    memset(pev, 0, sizeof(vscpEvent));
-  }
-
+  pev                   = (vscpEvent*)calloc(1, sizeof(vscpEvent));
   return pev;
 }
 
@@ -1735,7 +1730,7 @@ vscp_fwhlp_writeEventExToFrame(uint8_t* frame, size_t len, uint8_t pkttype, cons
   int rv;
   vscpEvent* pEvent;
 
-  pEvent = (vscpEvent*)malloc(sizeof(vscpEvent));
+  pEvent = vscp_fwhlp_newEvent();
   if (NULL == pEvent) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -1755,6 +1750,7 @@ vscp_fwhlp_writeEventExToFrame(uint8_t* frame, size_t len, uint8_t pkttype, cons
   if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_writeEventToFrame(frame, len, pkttype, pEvent))) {
     return rv;
   }
+
   vscp_fwhlp_deleteEvent(&pEvent);
 
   return VSCP_ERROR_SUCCESS;
@@ -1839,7 +1835,7 @@ vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
     ((uint16_t)buf[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_LSB];
 
   // Allocate data
-  if (NULL == (pEvent->pdata = (uint8_t *)malloc(pEvent->sizeData))) {
+  if (NULL == (pEvent->pdata = (uint8_t*)malloc(pEvent->sizeData))) {
     return VSCP_ERROR_MEMORY;
   }
 
@@ -1890,27 +1886,31 @@ vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
 int
 vscp_fwhlp_getEventExFromFrame(vscpEventEx* pEventEx, const uint8_t* frame, size_t len)
 {
+  int rv;
   vscpEvent* pEvent;
 
-  pEvent = (vscpEvent*)malloc(sizeof(vscpEvent));
+  pEvent = (vscpEvent*)calloc(1, sizeof(vscpEvent));
   if (NULL == pEvent) {
     return VSCP_ERROR_PARAMETER;
   }
-  pEvent->pdata = NULL;
 
   // Check pointer (rest is checked in vscp_getVscpEventFromUdpFrame)
   if (NULL == pEventEx) {
     return VSCP_ERROR_PARAMETER;
   }
 
-  if (!vscp_fwhlp_getEventFromFrame(pEvent, frame, len)) {
-    return VSCP_ERROR_PARAMETER;
+  if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_getEventFromFrame(pEvent, frame, len))) {
+    vscp_fwhlp_deleteEvent(&pEvent); // Free event storage
+    return rv;
   }
 
   // Convert eventEx to event
-  if (vscp_fwhlp_convertEventToEventEx(pEventEx, pEvent)) {
+  if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_convertEventToEventEx(pEventEx, pEvent))) {
+    vscp_fwhlp_deleteEvent(&pEvent); // Free event storage
     return VSCP_ERROR_ERROR;
   }
+
+  vscp_fwhlp_deleteEvent(&pEvent); // Free event storage
 
   return VSCP_ERROR_SUCCESS;
 }
