@@ -53,8 +53,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "vscp-firmware-helper.h"
+#include <vscp-class.h>
+#include <vscp-type.h>
 #include <vscp.h>
+#include "vscp-firmware-helper.h"
+
 
 #ifdef VSCP_FWHLP_UDP_FRAME_SUPPORT
 #include <crc.h>
