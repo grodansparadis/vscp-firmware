@@ -2025,7 +2025,7 @@ vscp_fwhlp_encryptFrame(uint8_t* output,
 
     default:
       // Not a valid encryption algorithm
-      return VSCP_ERROR_PARAMETER
+      return VSCP_ERROR_PARAMETER;
   }
 
   // This is needed as byte 0 is not counted and the encrypted data should be
@@ -2117,7 +2117,7 @@ vscp_fwhlp_decryptFrame(uint8_t* output,
 
     default:
       // Not a valid encryption algorithm
-      return VSCP_ERROR_PARAMETER
+      return VSCP_ERROR_PARAMETER;
   }
 
   return VSCP_ERROR_SUCCESS;
