@@ -2016,10 +2016,13 @@ vscp_fwhlp_encryptFrame(uint8_t* output,
       padlen += 16; // length of iv
       break;
 
-    default:
     case VSCP_ENCRYPTION_NONE:
       memcpy(output + 1, input + 1, padlen);
       break;
+
+    default:
+      // Not a valid encryption algorithm
+      return VSCP_ERROR_PARAMETER
   }
 
   // This is needed as byte 0 is not counted and the encrypted data should be
@@ -2100,7 +2103,6 @@ vscp_fwhlp_decryptFrame(uint8_t* output,
                              (const uint8_t*)appended_iv);
       break;
 
-    default:
     case VSCP_ENCRYPTION_AES128:
       AES_CBC_decrypt_buffer(AES128,
                              output + 1,
@@ -2109,6 +2111,10 @@ vscp_fwhlp_decryptFrame(uint8_t* output,
                              key,
                              (const uint8_t*)appended_iv);
       break;
+
+    default:
+      // Not a valid encryption algorithm
+      return VSCP_ERROR_PARAMETER
   }
 
   return VSCP_ERROR_SUCCESS;
