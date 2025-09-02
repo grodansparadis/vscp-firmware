@@ -25,7 +25,7 @@ vscp_class.h and vscp_type.h which reside in the vscp_software repository
 in the path /src/vscp/common. It is preferred to include these files from
 that second repository (and not to make redundant copies if possible).
 
-Documentation on how to build your own nodes from this code is [here](https://grodansparadis.gitbooks.io/vscp-firmware/) 
+Documentation on how to build your own nodes from this code is [here](https://grodansparadis.github.io/vscp-doc-firmware/#/) 
 
 The main reference implementations for VSCP over CAN is the Paris and the Kelvin modules. Both can found [here](http://www.grodansparadis.com/products.html) along with other open source products. All modules are available as 
 ready made modules, bare pcb's and software and hardware is and will always be fully open and free. All design documents are open and available.
