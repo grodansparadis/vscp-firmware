@@ -8,7 +8,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2025 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
+ * Copyright (c) 2000-2026 Ake Hedman, Grodans Paradis AB <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -663,14 +663,14 @@ vscp_readStdReg(uint8_t reg)
 
     uint32_t code = vscp_getFamilyCode();
     uint8_t idx   = reg - VSCP_REG_STANDARD_DEVICE_FAMILY_CODE;
-    rv            = code >> (((3 - idx) * 8) & 0xff);
+    rv            = (uint8_t)(code >> (((3 - idx) * 8) & 0xff));
   }
   else if ((reg >= VSCP_REG_STANDARD_DEVICE_TYPE_CODE) &&
            (reg < (VSCP_REG_STANDARD_DEVICE_TYPE_CODE + 4))) {
 
     uint32_t code = vscp_getFamilyType();
     uint8_t idx   = reg - VSCP_REG_STANDARD_DEVICE_TYPE_CODE;
-    rv            = code >> (((3 - idx) * 8) & 0xff);
+    rv            = (uint8_t)(code >> (((3 - idx) * 8) & 0xff));
   }
   else if ((reg > (VSCP_REG_GUID - 1)) &&
            (reg < VSCP_REG_DEVICE_URL)) {
@@ -1177,7 +1177,7 @@ vscp_handleProtocolEvent(void)
           // Assign the requested page, this variable is used in the implementation
           // specific function 'vscp_readAppReg()' and 'vscp_writeAppReg()' to actually
           // switch pages there
-          vscp_page_select = ((vscp_imsg.data[1] << 8) | vscp_imsg.data[2]);
+          vscp_page_select = (uint16_t)((vscp_imsg.data[1] << 8) | vscp_imsg.data[2]);
 
           // Construct response event
           vscp_omsg.priority   = VSCP_PRIORITY_LOW;
@@ -1193,7 +1193,7 @@ vscp_handleProtocolEvent(void)
               bytes_this_time = 4;
             }
             else {
-              bytes_this_time = (bytes - byte);
+              bytes_this_time = (uint8_t)(bytes - byte);
             }
 
             // define length of this event
@@ -1243,7 +1243,7 @@ vscp_handleProtocolEvent(void)
 
           // Assign the requested page
           // specific function 'vscp_readAppReg()' and 'vscp_writeAppReg()' to actually
-          vscp_page_select = (vscp_imsg.data[1] << 8) | vscp_imsg.data[2];
+          vscp_page_select = (uint16_t)((vscp_imsg.data[1] << 8) | vscp_imsg.data[2]);
 
           for (i = vscp_imsg.data[3]; // register to write
                                       // number of registers to write comes from byte length of write event

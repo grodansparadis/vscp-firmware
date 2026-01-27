@@ -8,7 +8,7 @@
  *
  * 	akhe@eurosource.se
  *
- * Copyright (C) 1995-2025 Ake Hedman, 
+ * Copyright (C) 1995-2026 Ake Hedman, 
  * D of Scandinavia, <akhe@dofscandinavia.com>
  *
  * 060508 Cleaned up

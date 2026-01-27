@@ -5,7 +5,7 @@
  * 	2006-03-20
  * 	akhe@eurosource.se
  *
- *  Copyright (C) 2006-2025 Ake Hedman, Paradise of the Frog AB
+ *  Copyright (C) 2006-2026 Ake Hedman, Paradise of the Frog AB
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages

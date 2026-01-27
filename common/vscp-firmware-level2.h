@@ -4,7 +4,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2025 Ake Hedman, Grodans Paradis AB
+ * Copyright (c) 2000-2026 Ake Hedman, Grodans Paradis AB
  * <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -196,7 +196,7 @@ typedef enum probe_substate_t {
 /*!
   Global structure for protocol functionality
 
-   Used internally
+  Used internally
 */
 typedef struct vscp_frmw2_firmware_config {
 
@@ -231,7 +231,7 @@ typedef struct vscp_frmw2_firmware_config {
   void* m_puserdata; // Points to user supplied data
 
   /*
-    This may (recommended) be register positions on a device
+    This may (recommended) be a register positions on a device
     Set to zero if not used.
   */
   uint8_t m_index;   // index for device
