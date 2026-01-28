@@ -5,7 +5,7 @@
 
  The MIT License (MIT)
 
- Copyright (C) 2000-2025 Ake Hedman, the VSCP project <info@vscp.org>
+ Copyright (C) 2000-2026 Ake Hedman, the VSCP project <info@vscp.org>
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -130,7 +130,7 @@ typedef struct structCanalMsgFD {
   uint32_t timestamp; /* Relative time stamp for package in microseconds */
   uint8_t _reserved[7];
   uint8_t sizeData;                             /* Data size 0-8 (fd: 0-15) */
-  uint8_t data[64] __attribute__((aligned(8))); /* CAN Data	 */
+  uint8_t data[64] /*__attribute__((aligned(8)))*/; /* CAN Data	 */
 } canalMsgFD;
 
 typedef canalMsgFD *PCANALMSGFD;

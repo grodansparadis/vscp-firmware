@@ -30,7 +30,7 @@
  * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
  *  
  * ============================================================================
- *          Changes Copyright (C) 2004-2025 Ake Hedman,Grodans Paradis AB
+ *          Changes Copyright (C) 2004-2026 Ake Hedman,Grodans Paradis AB
  * ============================================================================
  *
  * This software is provided 'as-is', without any express or implied

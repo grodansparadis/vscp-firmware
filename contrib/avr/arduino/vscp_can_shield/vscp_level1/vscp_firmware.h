@@ -8,7 +8,7 @@
  *
  * akhe@eurosource.se
  *
- * Copyright (C) 1995-2025 Ake Hedman,
+ * Copyright (C) 1995-2026 Ake Hedman,
  * Grodans Paradis AB, <akhe@grodansparadis.com>
  *
  * 080702 Cleaned up even more.

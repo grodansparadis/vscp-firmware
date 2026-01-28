@@ -5,7 +5,7 @@
  * 	2005-03-16
  * 	akhe@eurosource.se
  *
- *  Copyright (C) 1995-2025 Ake Hedman, eurosource
+ *  Copyright (C) 1995-2026 Ake Hedman, eurosource
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages

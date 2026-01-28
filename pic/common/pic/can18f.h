@@ -29,7 +29,7 @@
  * IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL OR
  * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
  *
- * Changes Copyright (C) 2004-2025 Ake Hedman, eurosource, <akhe@eurosource.se>
+ * Changes Copyright (C) 2004-2026 Ake Hedman, eurosource, <akhe@eurosource.se>
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages

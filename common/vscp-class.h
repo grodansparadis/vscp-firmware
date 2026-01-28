@@ -15,7 +15,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (C) 2000-2025 Ake Hedman, 
+ * Copyright (C) 2000-2026 Ake Hedman, 
  * The VSCP Project <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -47,7 +47,7 @@
             !!!!!!!!!!!!!!!!!!!!  W A R N I N G  !!!!!!!!!!!!!!!!!!!!
                            This file is auto-generated
                 see https://github.com/grodansparadis/vscp-classes
-                        Generated: 2025-01-19 17:20:08.536812
+                        Generated: 2025-02-20 18:01:00.012698
 */
  
 #ifndef VSCP_CLASS_H

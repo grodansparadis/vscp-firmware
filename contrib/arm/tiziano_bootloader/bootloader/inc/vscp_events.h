@@ -3,7 +3,7 @@
 // File: hulkevents.h
 //
 // 
-// Copyright (C) 2005-2025 Ake Hedman, akhe@eurosource.se
+// Copyright (C) 2005-2026 Ake Hedman, akhe@eurosource.se
 // http://www.vscp.org
 //
 // $RCSfile: hulkevents.h,v $

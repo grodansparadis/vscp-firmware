@@ -4,7 +4,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2025 Ake Hedman, Grodans Paradis AB
+ * Copyright (c) 2000-2026 Ake Hedman, Grodans Paradis AB
  * <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -196,12 +196,9 @@ typedef enum probe_substate_t {
 /*!
   Global structure for protocol functionality
 
-   Used internally
+  Used internally
 */
 typedef struct vscp_frmw2_firmware_config {
-
-  uint8_t m_level;   // 0=Level I, 1 = Level II
-  void* m_puserdata; // Points to user supplied data
 
   probe_state_t m_state;       // State machine state
   probe_substate_t m_substate; // state machine substate
@@ -220,13 +217,43 @@ typedef struct vscp_frmw2_firmware_config {
   uint16_t m_vscp_class; // real VSCP class (vscp_class - 512 if proxy event)
   uint8_t m_ifguid[16];  // interface GUID
 
+  // See CLASS1.PROTOCOL, VSCP_TYPE_PROTOCOL_RESET_DEVICE
+  uint8_t m_reset_device_flags;
+
+  /////////////////////////////////////////////////////////////////////////////
+  //                Configuration settings below this point
+  //
+  // (x)      - x is default value
+  // (init=y) - Initiated to y.
+  /////////////////////////////////////////////////////////////////////////////
+
+  uint8_t m_level;   // 0=Level I, 1 = Level II
+  void* m_puserdata; // Points to user supplied data
+
+  /*
+    This may (recommended) be a register positions on a device
+    Set to zero if not used.
+  */
+  uint8_t m_index;   // index for device
+  uint8_t m_zone;    // zone for device
+  uint8_t m_subzone; // subzone for device
+
+  // Functionality switches
+  int m_bEnableErrorReporting;          // Send error reporting events (FALSE)
+  int m_bEnableLogging;                 // Enable logging events (FALSE)
+  uint8_t m_log_id;                     // Identifies log channel
+  uint8_t m_log_level;                  // Level for logs
+  int m_bHighEndServerResponse;         // React on high end server probe. Only level II (FALSE)
+  int m_bEnableWriteProtectedLocations; // GUID/manufacturer id (FALSE)
+  int m_bUse16BitNickname;              // 16-bit nickname. Default is false. Only for level I (FALSE)
+  int m_bInterestedInAllEvents;         // TRUE if interested in all events. If FALSE
+  // the callback vscp_frmw2_callback_report_events_of_interest
+  // will be called (TRUE)
+
   uint32_t m_interval_heartbeat; // Interval for heartbeats in milli-seconds (0=off)
   uint32_t m_last_heartbeat;     // Time for last heartbeat send
   uint32_t m_interval_caps;      // Interval for capabilities events in milli-seconds (0=off)
   uint32_t m_last_caps;          // Time for last caps send
-
-  // See CLASS1.PROTOCOL, VSCP_TYPE_PROTOCOL_RESET_DEVICE
-  uint8_t m_reset_device_flags;
 
   // Decision matrix
   uint8_t* m_pDm;         // Pointer to decision matrix storage (NULL if no DM).
@@ -245,33 +272,6 @@ typedef struct vscp_frmw2_firmware_config {
                                        // if all events are of interest set to null.
                                        // array = (int*) malloc(n * sizeof(int));
                                        // Last event should be 0
-
-  /*
-    This may be register positions on a device
-    Set to zero if not used.
-  */
-  uint8_t m_index;   // index for device
-  uint8_t m_zone;    // zone for device
-  uint8_t m_subzone; // subzone for device
-
-  /////////////////////////////////////////////////////////////////////////////
-  //                Configuration settings below this point
-  //
-  // (x)      - x is default value
-  // (init=y) - Initiated to y.
-  /////////////////////////////////////////////////////////////////////////////
-
-  // Functionality switches
-  int m_bEnableErrorReporting;          // Send error reporting events (FALSE)
-  int m_bEnableLogging;                 // Enable logging events (FALSE)
-  uint8_t m_log_id;                     // Identifies log channel
-  uint8_t m_log_level;                  // Level for logs
-  int m_bHighEndServerResponse;         // React on high end server probe. Only level II (FALSE)
-  int m_bEnableWriteProtectedLocations; // GUID/manufacturer id (FALSE)
-  int m_bUse16BitNickname;              // 16-bit nickname. Default is false. Only for level I (FALSE)
-  int m_bInterestedInAllEvents;         // TRUE if interested in all events. If FALSE
-                                        // the callback vscp_frmw2_callback_report_events_of_interest
-                                        // will be called (TRUE)
 
   // For high end server response
   uint16_t m_high_end_srv_caps;   // High end server capabilities
@@ -709,6 +709,27 @@ void
 vscp_frmw2_callback_enter_bootloader(void* const puserdata);
 
 /*!
+  @brief Send eventex to transport sublayer.
+  -
+    ex is copied in the callback.
+
+  - if GUID is all zero then the GUID (if Level II) should be set to the GUID of the node.
+  -
+    if requested to send a full Level II event and we are a Level I node skip the
+    event and return VSCP_ERROR_ERROR
+
+    GUID is not used for LEVEL I nodes. Instead 8-bit nickname is stored
+    in the lowest LSB and 16-bit nickname in the two lower LSB's.
+
+  @param pdata Pointer to user data (typical points to context)
+  @param pex Pointer to EventEx to send.
+  @return VSCP_ERROR_SUCCESS on success, or error code.
+*/
+
+int
+vscp_frmw2_callback_send_event_ex(void* const puserdata, vscpEventEx* pex);
+
+/*!
  * @brief Handle DM action
  *
  * @param puserdata Pointer to user data (typical points to context).
@@ -832,27 +853,6 @@ vscp_frmw2_callback_read_reg(void* const puserdata, uint16_t page, uint32_t reg,
 
 int
 vscp_frmw2_callback_write_reg(void* const puserdata, uint16_t page, uint32_t reg, uint8_t val);
-
-/*!
-  @brief Send eventex to transport sublayer.
-  -
-    ex is copied in the callback.
-
-  - if GUID is all zero then the GUID (if Level II) should be set to the GUID of the node.
-  -
-    if requested to send a full Level II event and we are a Level I node skip the
-    event and return VSCP_ERROR_ERROR
-
-    GUID is not used for LEVEL I nodes. Instead 8-bit nickname is stored
-    in the lowest LSB and 16-bit nickname in the two lower LSB's.
-
-  @param pdata Pointer to user data (typical points to context)
-  @param pex Pointer to EventEx to send.
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-*/
-
-int
-vscp_frmw2_callback_send_event_ex(void* const puserdata, vscpEventEx* pex);
 
 /*!
   @brief Information callback to app that standard register has been changed. Typically

@@ -15,7 +15,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2025 Ake Hedman,
+ * Copyright (c) 2000-2026 Ake Hedman,
  * The VSCP Project <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -426,8 +426,8 @@ vscp_fwhlp_idle_worker(const void* pdata);
     return if command was not executed correctly.
 */
 
-int
-vscp_fwhlp_parser(const void* pdata, const char* cmd);
+// int
+// vscp_fwhlp_parser(const void* pdata, const char* cmd);
 
 /**
   @brief Parse GUID string into GUID array
@@ -526,7 +526,7 @@ vscp_fwhlp_newEvent(void);
  */
 
 int
-vscp_convertEventToEventEx(vscpEventEx* pEventEx, const vscpEvent* pEvent);
+vscp_fwhlp_convertEventToEventEx(vscpEventEx* pEventEx, const vscpEvent* pEvent);
 
 /**
  * @brief Convert eventex to event
@@ -537,7 +537,7 @@ vscp_convertEventToEventEx(vscpEventEx* pEventEx, const vscpEvent* pEvent);
  */
 
 int
-vscp_convertEventExToEvent(vscpEvent* pEvent, const vscpEventEx* pEventEx);
+vscp_fwhlp_convertEventExToEvent(vscpEvent* pEvent, const vscpEventEx* pEventEx);
 
 /*!
     @brief Make a copy of an event
@@ -564,6 +564,72 @@ vscp_fwhlp_mkEventExCopy(const vscpEventEx* pex);
 */
 int
 vscp_fwhlp_deleteEvent(vscpEvent** pev);
+
+/*!
+  Compile in UDP frame handling support
+*/
+
+#ifdef VSCP_FWHLP_UDP_FRAME_SUPPORT
+
+/*!
+ * Get UDP frame size from event
+ *
+ * @param pEventEx Pointer to event ex.
+ * @return Size of resulting UDP frame on success. Zero on failure.
+ */
+size_t
+vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx* pEventEx);
+
+/*!
+ * Write event on UDP frame format
+ *
+ * @param buf A pointer to a buffer that will receive the event.
+ * @param len Size of the buffer.
+ * @param pkttype Is the first byte of UDP type frames that holds
+ *          type of packet and encryption.
+ * @param pEvent Pointer to event that should be handled.
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure.
+ */
+int
+vscp_fwhlp_writeEventToFrame(uint8_t* frame, size_t len, uint8_t pkttype, const vscpEvent* pEvent);
+
+/*!
+ * Write event ex on UDP frame format
+ *
+ * @param buf A pointer to a buffer that will receive the event.
+ * @param len Size of the buffer.
+ * @param pkttype Is the first byte of UDP type frames that holds
+ *          type of packet and encryption.
+ * @param pEventEx Pointer to event that should be handled.
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure.
+ */
+int
+vscp_fwhlp_writeEventExToFrame(uint8_t* frame, size_t len, uint8_t pkttype, const vscpEventEx* pEventEx);
+
+/*!
+ * Get VSCP event from UDP frame
+ *
+ * @param pEvent Pointer to VSCP event that will get data from the frame,
+ * @param buf A pointer to a buffer that will receive the event.
+ * @param len Size of the buffer.
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure.
+ */
+int
+vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len);
+
+/*!
+ * Get VSCP event ex from UDP frame
+ *
+ * @param pEventEx Pointer to VSCP event ex that will get data from the
+ * frame,
+ * @param buf A pointer to a buffer that will receive the event.
+ * @param len Size of the buffer.
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure.
+ */
+int
+vscp_fwhlp_getEventExFromFrame(vscpEventEx* pEventEx, const uint8_t* buf, size_t len);
+
+#endif
 
 /*
   AES crypto support  requires the vscp-aes.c lib to be
@@ -629,11 +695,20 @@ vscp_fwhlp_encryptFrame(uint8_t* output,
  * @param nAlgorithm The VSCP defined algorithm (0-15) to decrypt the frame
  * with. (vscp.h) If set to 15 (VSCP_ENCRYPTION_FROM_TYPE_BYTE) the algorithm
  * will be set from the four lower bits of the buffer to decrypt.
- * @return True on success, false on failure.
+ * @return VSCP_ERROR_SUCCESS, errorcode on failure on failure.
  *
- * NOTE: Note that VSCP packet type (first byte in UDP frame) is not
- * recognised here.
+ * Normally used like
  *
+ *  if (VSCP_ERROR_SUCCESS != vscp_fwhlp_decryptFrame(encbuf, 
+ *                                                      buf, 
+ *                                                      buflen - 16, 
+ *                                                      key, 
+ *                                                      buf + buflen - 16, 
+ *                                                      VSCP_ENCRYPTION_FROM_TYPE_BYTE)) {
+ *  };
+ *
+ * where buf is the incoming frame. Encryption type will be found from the first byte
+ * of the frame. The last 16 bytes of the frame is the iv.
  */
 int
 vscp_fwhlp_decryptFrame(uint8_t* output,
