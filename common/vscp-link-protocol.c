@@ -285,20 +285,20 @@ vscp_link_parser(const void* pdata, char* pbuf, char** pnext)
     p += 7;
     return vscp_link_doCmdGetVersion(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "sflt ")) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
-    p += 5;
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "sflt")) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+    p += 4;
     return vscp_link_doCmdSetFilter(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "setfilter ")) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
-    p += 10;
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "setfilter")) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+    p += 9;
     return vscp_link_doCmdSetFilter(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "smsk ")) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
-    p += 5;
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "smsk")) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+    p += 4;
     return vscp_link_doCmdSetMask(pdata, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "setmask ")) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
-    p += 8;
+  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "setmask")) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+    p += 7;
     return vscp_link_doCmdSetMask(pdata, p);
   }
   else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "test")) && (4 == cmdlen) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
@@ -562,7 +562,7 @@ vscp_link_doCmdRetrieve(const void* pdata, const char* pcmd)
   }
 
   int cnt = vscp_fwhlp_readStringValue(pcmd);
-sf  if (cnt <= 0) {
+  if (cnt <= 0) {
     cnt = 1;
   }
 
@@ -904,7 +904,7 @@ vscp_link_doCmdSetFilter(const void* pdata, const char* pcmd)
   }
 
   // Must be a parameter (guid)
-  if (NULL == pcmd) {
+  if (0 == *pcmd) {
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_PARAMETER_ERROR);
   }
 
@@ -937,7 +937,7 @@ vscp_link_doCmdSetMask(const void* pdata, const char* pcmd)
   }
 
   // Must be a parameter (guid)
-  if (NULL == pcmd) {
+  if (0 == *pcmd) {
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_PARAMETER_ERROR);
   }
 
