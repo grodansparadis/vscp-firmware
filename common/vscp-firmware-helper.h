@@ -45,6 +45,10 @@
 #ifndef __VSCP_FIRMWARE_HELPER_H__
 #define __VSCP_FIRMWARE_HELPER_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "vscp-compiler.h"
 #include "vscp-projdefs.h"
 
@@ -834,5 +838,9 @@ vscp_fwhlp__getCANALidFromData(unsigned char priority, const uint16_t vscp_class
 
 uint32_t
 vscp_fwhlp__getCANALidFromEvent(const vscpEvent* pEvent);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
