@@ -2162,11 +2162,16 @@ int
 vscp_fwhlp_parse_json(vscpEvent* pev, const char* jsonVscpEventObj)
 {
   int rv;
-  cJSON* root = cJSON_Parse(jsonVscpEventObj);
+  cJSON* root;
 
   // Check pointers
   if ((NULL == pev) || (NULL == jsonVscpEventObj)) {
     return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  root = cJSON_Parse(jsonVscpEventObj);
+  if (NULL == root) {
+    return VSCP_ERROR_INVALID_SYNTAX;
   }
 
   // Set unused path to known value
@@ -2350,6 +2355,9 @@ vscp_fwhlp_create_json(char* strObj, size_t len, const vscpEvent* pev)
   }
 
   root = cJSON_CreateObject();
+  if (NULL == root) {
+    return VSCP_ERROR_INVALID_SYNTAX;
+  }
 
   cJSON_AddNumberToObject(root, "vscpHead", pev->head);
   cJSON_AddNumberToObject(root, "vscpClass", pev->vscp_class);
