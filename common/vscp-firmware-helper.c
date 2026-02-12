@@ -2259,11 +2259,16 @@ int
 vscp_fwhlp_parse_json_ex(vscpEventEx* pex, const char* jsonVscpEventObj)
 {
   int rv;
-  cJSON* root = cJSON_Parse(jsonVscpEventObj);
+  cJSON* root;
 
   // Check pointers
   if ((NULL == pex) || (NULL == jsonVscpEventObj)) {
     return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  root = cJSON_Parse(jsonVscpEventObj);
+  if (NULL == root) {
+    return VSCP_ERROR_INVALID_SYNTAX;
   }
 
   // Set unused path to known value
