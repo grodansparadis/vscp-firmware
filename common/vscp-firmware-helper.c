@@ -2175,7 +2175,7 @@ vscp_fwhlp_parse_json(vscpEvent* pev, const char* jsonVscpEventObj)
   }
 
   // Set unused path to known value
-  memset(pev, 0, sizeof(vscpEventEx));
+  memset(pev, 0, sizeof(vscpEvent));
 
   if (cJSON_GetObjectItem(root, "vscpHead")) {
     pev->head = (uint16_t)cJSON_GetObjectItem(root, "vscpHead")->valueint;
