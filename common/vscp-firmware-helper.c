@@ -2222,6 +2222,11 @@ vscp_fwhlp_parse_json(vscpEvent* pev, const char* jsonVscpEventObj)
 
     cJSON* pdata  = cJSON_GetObjectItem(root, "vscpData");
     pev->sizeData = cJSON_GetArraySize(pdata);
+    pev->pdata    = (uint8_t*)malloc(pev->sizeData);
+    if (NULL == pev->pdata) {
+      cJSON_Delete(root);
+      return VSCP_ERROR_MEMORY;
+    }
 
     for (int i = 0; i < pev->sizeData; i++) {
       cJSON* pitem = cJSON_GetArrayItem(pdata, i);
