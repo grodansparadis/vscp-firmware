@@ -1,3 +1,6 @@
 [submodule "third-party/cJSON"]
 	path = third-party/cJSON
 	url = https://github.com/DaveGamble/cJSON.git
+[submodule "third-party/sxml"]
+	path = third-party/sxml
+	url = https://github.com/capmar/sxml.git
