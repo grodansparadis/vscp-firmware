@@ -316,6 +316,57 @@ vscp_fwhlp_readStringValue(const char* pString);
 char*
 vscp_fwhlp_stristr(const char* haystack, const char* needle);
 
+/*!
+    Convert traditional VSCP date + timestamp to unix 64-bit timestamp in nanoseconds
+
+    unix_ns =
+    (unix_seconds * 1_000_000_000)
+  + (microsecond * 1_000)
+
+     where unix_seconds is the number of seconds since 1970-01-01T00:00:00Z
+     and microsecond is the microsecond part of the time (0-999999)
+
+    @param year Year of date
+    @param month Month of date (1-12)
+    @param day Day of date (1-31)
+    @param hour Hour of time (0-23)
+    @param minute Minute of time (0-59)
+    @param second Second of time (0-59)
+    @param microsecond Microsecond part of time (0-999999)
+    @return Unix 64-bit timestamp in nanoseconds
+*/
+int64_t
+vscp_fwhlp_to_unix_ns(
+  int year,
+  int month,
+  int day,
+  int hour,
+  int minute,
+  int second,
+  uint32_t microsecond);
+
+/*!
+    Convert unix 64-bit timestamp in nanoseconds to traditional VSCP date + timestamp
+    @param unix_ns Unix timestamp in nanoseconds
+    @param year Pointer to variable that will hold year of date
+    @param month Pointer to variable that will hold month of date (1-12)
+    @param day Pointer to variable that will hold day of date (1-31)
+    @param hour Pointer to variable that will hold hour of time (0-23)
+    @param minute Pointer to variable that will hold minute of time (0-59)
+    @param second Pointer to variable that will hold second of time (0-59)
+    @param microsecond Pointer to variable that will hold microsecond part of time (0-999999)
+*/
+void
+vscp_fwhlp_from_unix_ns(
+  int64_t unix_ns,
+  int* year,
+  int* month,
+  int* day,
+  int* hour,
+  int* minute,
+  int* second,
+  uint32_t* microsecond);
+
 /**
  * @brief Parse MAC address on string form to binary array
  *
@@ -703,11 +754,11 @@ vscp_fwhlp_encryptFrame(uint8_t* output,
  *
  * Normally used like
  *
- *  if (VSCP_ERROR_SUCCESS != vscp_fwhlp_decryptFrame(encbuf, 
- *                                                      buf, 
- *                                                      buflen - 16, 
- *                                                      key, 
- *                                                      buf + buflen - 16, 
+ *  if (VSCP_ERROR_SUCCESS != vscp_fwhlp_decryptFrame(encbuf,
+ *                                                      buf,
+ *                                                      buflen - 16,
+ *                                                      key,
+ *                                                      buf + buflen - 16,
  *                                                      VSCP_ENCRYPTION_FROM_TYPE_BYTE)) {
  *  };
  *

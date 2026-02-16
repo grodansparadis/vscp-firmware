@@ -58,7 +58,6 @@
 #include <vscp.h>
 #include "vscp-firmware-helper.h"
 
-
 #ifdef VSCP_FWHLP_UDP_FRAME_SUPPORT
 #include <crc.h>
 #endif
@@ -69,6 +68,10 @@
 
 #ifdef VSCP_FWHLP_JSON_SUPPORT
 #include <cJSON.h>
+#endif
+
+#ifdef VSCP_FWHLP_XML_SUPPORT
+#include <sxml.h>
 #endif
 
 #define UNUSED(expr) \
@@ -439,6 +442,117 @@ vscp_fwhlp_bin2hex(char* output, size_t outLength, const unsigned char* buf, siz
   }
 
   *output++ = '\0';
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_to_unix_ns
+//
+
+#define NS_PER_SEC   1000000000LL
+#define SECS_PER_DAY 86400LL
+
+// Convert civil date to days since 1970-01-01 (Unix epoch)
+static int64_t
+days_from_civil(int year, int month, int day)
+{
+  year -= (month <= 2);
+  int era      = (year >= 0 ? year : year - 399) / 400;
+  unsigned yoe = (unsigned)(year - era * 400);                             // [0, 399]
+  unsigned doy = (153 * (month + (month > 2 ? -3 : 9)) + 2) / 5 + day - 1; // [0, 365]
+  unsigned doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;                    // [0,146096]
+  return era * 146097LL + (int64_t)doe - 719468LL;
+}
+
+int64_t
+vscp_fwhlp_to_unix_ns(
+  int year,
+  int month,
+  int day,
+  int hour,
+  int minute,
+  int second,
+  uint32_t microsecond)
+{
+  // Convert date to days since epoch
+  int64_t days = days_from_civil(year, month, day);
+
+  // Convert everything to seconds
+  int64_t total_seconds =
+    days * SECS_PER_DAY +
+    hour * 3600LL +
+    minute * 60LL +
+    second;
+
+  // Convert to nanoseconds
+  return total_seconds * NS_PER_SEC + (int64_t)microsecond * 1000LL;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_from_unix_ns
+//
+
+static void
+civil_from_days(int64_t z,
+                int* y,
+                int* m,
+                int* d)
+{
+  // z = days since 1970-01-01
+  z += 719468; // shift to civil 0000-03-01 base
+
+  int64_t era     = (z >= 0 ? z : z - 146096) / 146097;
+  unsigned doe    = (unsigned)(z - era * 146097); // [0, 146096]
+  unsigned yoe    = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
+  int64_t y_full  = (int64_t)yoe + era * 400;
+  unsigned doy    = doe - (365 * yoe + yoe / 4 - yoe / 100);
+  unsigned mp     = (5 * doy + 2) / 153;
+  unsigned d_full = doy - (153 * mp + 2) / 5 + 1;
+  unsigned m_full = mp + (mp < 10 ? 3 : -9);
+
+  *y = (int)(y_full + (m_full <= 2));
+  *m = (int)m_full;
+  *d = (int)d_full;
+}
+
+void
+vscp_fwhlp_from_unix_ns(
+  int64_t unix_ns,
+  int* year,
+  int* month,
+  int* day,
+  int* hour,
+  int* minute,
+  int* second,
+  uint32_t* microsecond)
+{
+  // --- Split seconds and nanoseconds safely ---
+  int64_t sec  = unix_ns / NS_PER_SEC;
+  int64_t nsec = unix_ns % NS_PER_SEC;
+
+  if (nsec < 0) {
+    sec--;
+    nsec += NS_PER_SEC;
+  }
+
+  // --- Split days and time-of-day ---
+  int64_t days = sec / SECS_PER_DAY;
+  int64_t rem  = sec % SECS_PER_DAY;
+
+  if (rem < 0) {
+    rem += SECS_PER_DAY;
+    days--;
+  }
+
+  // --- Convert days → Y/M/D ---
+  civil_from_days(days, year, month, day);
+
+  // --- Convert remainder → H:M:S ---
+  *hour = (int)(rem / 3600);
+  rem %= 3600;
+  *minute = (int)(rem / 60);
+  *second = (int)(rem % 60);
+
+  *microsecond = (uint32_t)(nsec / 1000);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2456,6 +2570,92 @@ vscp_fwhlp_create_json_ex(char* strObj, size_t len, const vscpEventEx* pex)
 }
 
 #endif // JSON support
+
+/*
+  XML support needs VSCP_FWHLP_XML_SUPPORT to be defined
+  in the projdef file and sxml support linked in (can be found
+  in vscp-firmware/third-party or at https://github.com/nopnop2002/esp-idf-xml
+*/
+
+#ifdef VSCP_FWHLP_XML_SUPPORT
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_parse_xml
+//
+// <event
+//     head="3"
+//     obid="1234"
+//     datetime="2017-01-13T10:16:02"
+//     timestamp="50817"
+//     class="10"
+//     type="6"
+//     guid="00:00:00:00:00:00:00:00:00:00:00:00:00:01:00:02"
+//     sizedata="7"
+//     data="0x48,0x34,0x35,0x2E,0x34,0x36,0x34"
+// />
+
+int
+vscp_fwhlp_parse_xml(vscpEvent* pev, const char* xmlVscpEventObj)
+{
+  // Input XML text
+  char buffer[2048];
+  UINT bufferlen = 0;
+
+  // Output token table
+  sxmltok_t tokens[20];
+
+  if ((NULL == pev) || (NULL == xmlVscpEventObj)) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  /// Parser object stores all data required for SXML to be reentrant
+  sxml_t parser;
+  sxml_init(&parser);
+
+  while (true) {
+
+    sxmlerr_t err = sxml_parse(&parser, buffer, bufferlen, tokens, COUNT(tokens));
+    if (err == SXML_SUCCESS) {
+      // SXML_ERROR_BUFFERDRY
+      // SXML_ERROR_XMLINVALID
+      return VSCP_ERROR_INVALID_SYNTAX;
+    }
+  }
+
+  return VSCP_ERROR_SUCCESS;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_parse_xml_ex
+//
+
+int
+vscp_fwhlp_parse_xml_ex(vscpEventEx* pex, const char* xmlVscpEventObj)
+{
+  return VSCP_ERROR_SUCCESS;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_create_xml
+//
+
+int
+vscp_fwhlp_create_xml(char* strObj, size_t len, const vscpEvent* pev)
+{
+  return VSCP_ERROR_SUCCESS;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_create_xml_ex
+//
+
+int
+vscp_fwhlp_create_json_ex(char* strObj, size_t len, const vscpEventEx* pex)
+{
+  return VSCP_ERROR_SUCCESS;
+}
+
+#endif
 
 // ----------------------------------------------------------------------------
 
