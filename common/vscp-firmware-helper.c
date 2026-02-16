@@ -70,10 +70,6 @@
 #include <cJSON.h>
 #endif
 
-#ifdef VSCP_FWHLP_XML_SUPPORT
-#include <sxml.h>
-#endif
-
 #define UNUSED(expr) \
   do {               \
     (void)(expr);    \
@@ -442,6 +438,184 @@ vscp_fwhlp_bin2hex(char* output, size_t outLength, const unsigned char* buf, siz
   }
 
   *output++ = '\0';
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_get_datestr_from_event
+//
+
+char*
+vscp_fwhlp_get_datestr_from_event(char* buf, size_t len, const vscpEvent* pev)
+{
+  if ((NULL == pev) || (NULL == buf) || (len < 21)) {
+    return NULL;
+  }
+
+  snprintf(buf, len, "%04u-%02u-%02uT%02u:%02u:%02uZ", pev->year, pev->month, pev->day, pev->hour, pev->minute, pev->second);
+  return buf;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_get_datestr_from_eventex
+//
+
+char*
+vscp_fwhlp_get_datestr_from_eventex(char* buf, size_t len, const vscpEventEx* pex)
+{
+  if ((NULL == pex) || (NULL == buf) || (len < 21)) {
+    return NULL;
+  }
+
+  snprintf(buf, len, "%04u-%02u-%02uT%02u:%02u:%02uZ", pex->year, pex->month, pex->day, pex->hour, pex->minute, pex->second);
+  return buf;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_parse_event_datestr
+//
+// YYYY-MM-DDTHH:MM:SSZ
+//
+
+int
+vscp_fwhlp_parse_event_datestr(vscpEvent* pev, const char* strdate)
+{
+  if ((NULL == pev) || (NULL == strdate)) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  char* p = strdate;
+
+  // year
+  pev->year = (uint16_t)strtol(p, &p, 0);
+  if ('-' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+  p++; // point beyond dash
+  if (p > (strdate + strlen(strdate))) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // month
+  pev->month = (uint16_t)strtol(p, &p, 0);
+  if ('-' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+  p++; // point beyond dash
+  if (p > (strdate + strlen(strdate))) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // day
+  pev->day = (uint16_t)strtol(p, &p, 0);
+  if ('T' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+  p++; // point beyond "T"
+  if (p > (strdate + strlen(strdate))) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // hour
+  pev->hour = (uint16_t)strtol(p, &p, 0);
+  if (':' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+  p++; // point beyond colon
+  if (p > (strdate + strlen(strdate))) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // minute
+  pev->minute = (uint16_t)strtol(p, &p, 0);
+  if (':' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+  p++; // point beyond colon
+  if (p > (strdate + strlen(strdate))) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // second
+  pev->second = (uint16_t)strtol(p, &p, 0);
+  if ('Z' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  return VSCP_ERROR_SUCCESS;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_parse_eventex_datestr
+//
+// YYYY-MM-DDTHH:MM:SS
+//
+
+int
+vscp_fwhlp_parse_eventex_datestr(vscpEventEx* pex, const char* strdate)
+{
+  if ((NULL == pex) || (NULL == strdate)) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  char* p = strdate;
+
+  // year
+  pex->year = (uint16_t)strtol(p, &p, 0);
+  if ('-' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+  p++; // point beyond dash
+  if (p > (strdate + strlen(strdate))) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // month
+  pex->month = (uint16_t)strtol(p, &p, 0);
+  if ('-' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+  p++; // point beyond dash
+  if (p > (strdate + strlen(strdate))) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // day
+  pex->day = (uint16_t)strtol(p, &p, 0);
+  if ('T' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+  p++; // point beyond "T"
+  if (p > (strdate + strlen(strdate))) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // hour
+  pex->hour = (uint16_t)strtol(p, &p, 0);
+  if (':' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+  p++; // point beyond colon
+  if (p > (strdate + strlen(strdate))) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // minute
+  pex->minute = (uint16_t)strtol(p, &p, 0);
+  if (':' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+  p++; // point beyond colon
+  if (p > (strdate + strlen(strdate))) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // second
+  pex->second = (uint16_t)strtol(p, &p, 0);
+  if ('Z' != *p) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  return VSCP_ERROR_SUCCESS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2579,6 +2753,208 @@ vscp_fwhlp_create_json_ex(char* strObj, size_t len, const vscpEventEx* pex)
 
 #ifdef VSCP_FWHLP_XML_SUPPORT
 
+#define MAX_ATTRIBUTES 20
+#define MAX_NAME_LEN   16
+#define MAX_VALUE_LEN  64
+
+// Known attribute names for reference (not strictly necessary, but can be used
+// for validation or indexing)
+const char known_attributes[][MAX_NAME_LEN] = {
+  "unknown",
+  "head",
+  "obid",
+  "datetime",
+  "timestamp",
+  "class",
+  "type",
+  "guid",
+  "sizedata",
+  "data",
+  // Optional extra attributes that may be present in the event string
+  "value",
+  "unit",
+  "sensorindex",
+  "zone",
+  "subzone",
+  // 64-bit Linux timestamp in nanoseconds (replace year, month, day, hour,
+  // minute, second and 32-bit timestamp with 64-bit timestamps)
+  "timestamps"
+};
+
+// Structure to hold attribute information
+typedef struct {
+  char name[MAX_NAME_LEN];   // Attribute name
+  char value[MAX_VALUE_LEN]; // Attribute value
+  int id;                    // Index in the unique attribute name list
+} attribute_t;
+
+static int
+find_or_add_name(const char* name,
+                 char name_list[MAX_ATTRIBUTES][MAX_NAME_LEN],
+                 size_t* name_count)
+{
+  // Check if the name exists in the known_attributes list
+  for (size_t i = 0; i < sizeof(known_attributes) / sizeof(known_attributes[0]);
+       i++) {
+    if (strcmp(name, known_attributes[i]) == 0) {
+      return i; // Return the index in the known_attributes list
+    }
+  }
+
+  // If the name is not in known_attributes, add it to the dynamic name_list
+  for (size_t i = 0; i < *name_count; i++) {
+    if (strcmp(name, name_list[i]) == 0) {
+      return i +
+             (sizeof(known_attributes) /
+              sizeof(known_attributes[0])); // Offset by known_attributes size
+    }
+  }
+
+  if (*name_count < MAX_ATTRIBUTES) {
+    strncpy(name_list[*name_count], name, MAX_NAME_LEN - 1);
+    name_list[*name_count][MAX_NAME_LEN - 1] = '\0';
+    return (*name_count)++ +
+           (sizeof(known_attributes) /
+            sizeof(
+              known_attributes[0])); // Add the name and return its new index
+  }
+
+  return -1; // Error: name list is full
+}
+
+static int
+validate_event_string(const char* eventstr)
+{
+  if (!eventstr) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  // Skip leading whitespace
+  while (*eventstr && isspace((unsigned char)*eventstr)) {
+    eventstr++;
+  }
+
+  // Ensure the string starts with "<event "
+  if (strncmp(eventstr, "<event ", 7) != 0) {
+    return VSCP_ERROR_INVALID_SYNTAX;
+  }
+
+  // Find the end of the string, skipping trailing whitespace
+  const char* end = eventstr + strlen(eventstr) - 1;
+  while (end > eventstr && isspace((unsigned char)*end)) {
+    end--;
+  }
+
+  // Ensure the string ends with "/>"
+  if (end - eventstr < 1 || strncmp(end - 1, "/>", 2) != 0) {
+    return VSCP_ERROR_INVALID_SYNTAX;
+  }
+
+  return VSCP_ERROR_SUCCESS;
+}
+
+static int
+parse_event_string(attribute_t* attributes, size_t* attribute_count, const char* eventstr)
+{
+  *attribute_count = 0;
+  char name_list[MAX_ATTRIBUTES][MAX_NAME_LEN];
+  size_t name_count = 0;
+
+  if (!eventstr || !attributes || !attribute_count) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if (VSCP_ERROR_SUCCESS != validate_event_string(eventstr)) {
+    return VSCP_ERROR_INVALID_SYNTAX;
+  }
+
+  const char* ptr = eventstr + 7; // Skip the "<event " part
+  while (*ptr && *attribute_count < MAX_ATTRIBUTES) {
+
+    // Skip to the next attribute name
+    while (*ptr && !isalpha(*ptr)) {
+
+      // Also skip comments starting with <!-- and ending with -->
+      if (*ptr == '<' && strncmp(ptr, "<!--", 4) == 0) {
+        const char* comment_end = strstr(ptr, "-->");
+        if (!comment_end) {
+          return VSCP_ERROR_INVALID_SYNTAX; // Malformed comment, stop parsing
+        }
+        ptr = comment_end + 3; // Skip the -->
+      }
+      ptr++;
+    }
+
+    // Skip comments starting with <!-- and ending with -->
+    const char* comment_start = strstr(ptr, "<!--");
+    if (comment_start && (comment_start == ptr)) {
+      ptr = comment_start + 4; // Skip the <!--
+      printf("Skipping comment...\n");
+      const char* comment_end = strstr(ptr, "-->");
+      if (comment_end) {
+        printf("Comment content: %.*s\n", (int)(comment_end - ptr), ptr);
+        ptr = comment_end + 3; // Skip the -->
+      }
+      else {
+        break; // Malformed comment, stop parsing
+      }
+      continue;
+    }
+
+    // Extract the attribute name
+    const char* start = ptr;
+    while (*ptr && *ptr != '=') {
+      ptr++;
+    }
+
+    if (*ptr == '=') {
+      size_t len = ptr - start;
+      if (len >= MAX_NAME_LEN) {
+        len = MAX_NAME_LEN - 1;
+      }
+      char name[MAX_NAME_LEN];
+      strncpy(name, start, len);
+      name[len] = '\0';
+
+      // Skip the '=' and the opening quote
+      ptr++;
+      if (*ptr == '"') {
+        ptr++;
+      }
+
+      // Extract the value
+      start = ptr;
+      while (*ptr && *ptr != '"') {
+        ptr++;
+      }
+
+      len = ptr - start;
+      if (len >= MAX_VALUE_LEN) {
+        len = MAX_VALUE_LEN - 1;
+      }
+      strncpy(attributes[*attribute_count].value, start, len);
+      attributes[*attribute_count].value[len] = '\0';
+
+      // Find or add the name to the name list and store its index in id
+      attributes[*attribute_count].id =
+        find_or_add_name(name, name_list, &name_count);
+
+      // Copy the name to the attribute
+      strncpy(attributes[*attribute_count].name, name, MAX_NAME_LEN - 1);
+      attributes[*attribute_count].name[MAX_NAME_LEN - 1] = '\0';
+
+      // Increment the attribute count
+      (*attribute_count)++;
+
+      // Skip the closing quote
+      if (*ptr == '"') {
+        ptr++;
+      }
+    }
+  }
+  return VSCP_ERROR_SUCCESS;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_parse_xml
 //
@@ -2595,30 +2971,76 @@ vscp_fwhlp_create_json_ex(char* strObj, size_t len, const vscpEventEx* pex)
 // />
 
 int
-vscp_fwhlp_parse_xml(vscpEvent* pev, const char* xmlVscpEventObj)
+vscp_fwhlp_parse_xml_event(vscpEvent* pev, const char* eventstr)
 {
-  // Input XML text
-  char buffer[2048];
-  UINT bufferlen = 0;
+  int rv;
+  attribute_t attributes[MAX_ATTRIBUTES];
+  size_t attribute_count = 0;
 
-  // Output token table
-  sxmltok_t tokens[20];
-
-  if ((NULL == pev) || (NULL == xmlVscpEventObj)) {
+  if ((NULL == pev) || (NULL == eventstr)) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  /// Parser object stores all data required for SXML to be reentrant
-  sxml_t parser;
-  sxml_init(&parser);
+  if (VSCP_ERROR_SUCCESS != (rv = parse_event_string(attributes, &attribute_count, eventstr))) {
+    return rv;
+  }
 
-  while (true) {
+  memset(pev, 0, sizeof(vscpEvent)); // Clear the event structure
 
-    sxmlerr_t err = sxml_parse(&parser, buffer, bufferlen, tokens, COUNT(tokens));
-    if (err == SXML_SUCCESS) {
-      // SXML_ERROR_BUFFERDRY
-      // SXML_ERROR_XMLINVALID
-      return VSCP_ERROR_INVALID_SYNTAX;
+  for (int i = 0; i < attribute_count; i++) {
+    printf("Attribute %d: name='%s', value='%s', id=%d\n", i, attributes[i].name, attributes[i].value, attributes[i].id);
+    // Here you would add code to map the attribute names/ids to the pev fields
+    // For example:
+    // if (strcmp(attributes[i].name, "head") == 0) {
+    //   pev->head = atoi(attributes[i].value);
+    // }
+    // else if (strcmp(attributes[i].name, "obid") == 0) {
+    //   pev->obid = atoi(attributes[i].value);
+    // }
+    // ... and so on for other attributes
+    switch (attributes[i].id) {
+
+      case 1: // head
+        pev->head = atoi(attributes[i].value);
+        break;
+
+      case 2: // obid
+        pev->obid = atoi(attributes[i].value);
+        break;
+
+      case 3: // datetime
+        // Parse datetime string and fill pev->year, pev->month, etc.
+        break;
+
+      case 4: // timestamp
+        pev->timestamp = atoi(attributes[i].value);
+        break;
+
+      case 5: // class
+        pev->vscp_class = atoi(attributes[i].value);
+        break;
+
+      case 6: // type
+        pev->vscp_type = atoi(attributes[i].value);
+        break;
+
+      case 7: // guid
+        if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseGuid(pev->GUID, attributes[i].value, NULL))) {
+          return rv;
+        }
+        break;
+
+      case 8: // sizedata
+        pev->sizeData = atoi(attributes[i].value);
+        break;
+
+      case 9: // data
+        // Parse data string and fill pev->pdata accordingly
+        break;
+
+      default:
+        // Handle unknown attributes if necessary
+        break;
     }
   }
 

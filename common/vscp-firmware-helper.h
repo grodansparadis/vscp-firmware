@@ -316,6 +316,45 @@ vscp_fwhlp_readStringValue(const char* pString);
 char*
 vscp_fwhlp_stristr(const char* haystack, const char* needle);
 
+
+/*!
+    Get date string in format "YYYY-MM-DDTHH:MM:SS" from event
+    @param pev Pointer to VSCP event to get date values from.
+    @param buf Buffer to hold result string.
+    @param len Size of buffer.
+    @return Pointer to result string or NULL if error such as buffer too small.
+*/
+char*
+vscp_fwhlp_get_datestr_from_event(char* buf, size_t len, const vscpEvent* pev);
+
+/*!
+    Get date string in format "YYYY-MM-DDTHH:MM:SS" from eventex
+    @param pex Pointer to VSCP event ex to get date values from.
+    @param buf Buffer to hold result string.
+    @param len Size of buffer.
+    @return Pointer to result string or NULL if error such as buffer too small.
+*/
+char*
+vscp_fwhlp_get_datestr_from_eventex(char* buf, size_t len, const vscpEventEx* pex);
+
+/*!
+    Parse date string in format "YYYY-MM-DDTHH:MM:SS" and fill event with the values
+    @param pev Pointer to VSCP event to fill with date values.
+    @param strdate Date string to parse.
+    @return VSCP_ERROR_SUCCESS if successful, else error code.
+*/
+int
+vscp_fwhlp_parse_event_datestr(vscpEvent* pev, const char* strdate);
+
+/*!
+    Parse date string in format "YYYY-MM-DDTHH:MM:SS" and fill eventex with the values
+    @param pex Pointer to VSCP eventex to fill with date values.
+    @param strdate Date string to parse.
+    @return VSCP_ERROR_SUCCESS if successful, else error code.
+*/
+int
+vscp_fwhlp_parse_eventex_datestr(vscpEventEx* pex, const char* strdate);
+
 /*!
     Convert traditional VSCP date + timestamp to unix 64-bit timestamp in nanoseconds
 
