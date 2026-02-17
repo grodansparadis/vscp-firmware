@@ -483,63 +483,66 @@ vscp_fwhlp_parse_event_datestr(vscpEvent* pev, const char* strdate)
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  char* p = strdate;
+  char* p = (char*)strdate;
 
   // year
-  pev->year = (uint16_t)strtol(p, &p, 0);
+  pev->year = (uint16_t)strtol(p, &p, 10);
   if ('-' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
   p++; // point beyond dash
-  if (p > (strdate + strlen(strdate))) {
-    return VSCP_ERROR_PARAMETER;
+  if (!(*p)) {
+    return VSCP_ERROR_INVALID_FORMAT;
   }
 
   // month
-  pev->month = (uint16_t)strtol(p, &p, 0);
+  pev->month = (uint8_t)strtol(p, &p, 10);
   if ('-' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
   p++; // point beyond dash
-  if (p > (strdate + strlen(strdate))) {
-    return VSCP_ERROR_PARAMETER;
+  if (!(*p)) {
+    return VSCP_ERROR_INVALID_FORMAT;
   }
 
   // day
-  pev->day = (uint16_t)strtol(p, &p, 0);
-  if ('T' != *p) {
+  pev->day = (uint8_t)strtol(p, &p, 10);
+  // We accept both 'T' and space as separator between date and time
+  // even if not fully ISO 8601 compliant
+  if ('T' != *p && ' ' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
   p++; // point beyond "T"
-  if (p > (strdate + strlen(strdate))) {
-    return VSCP_ERROR_PARAMETER;
+  if (!(*p)) {
+    return VSCP_ERROR_INVALID_FORMAT;
   }
 
   // hour
-  pev->hour = (uint16_t)strtol(p, &p, 0);
+  pev->hour = (uint8_t)strtol(p, &p, 10);
   if (':' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
   p++; // point beyond colon
-  if (p > (strdate + strlen(strdate))) {
-    return VSCP_ERROR_PARAMETER;
+  if (!(*p)) {
+    return VSCP_ERROR_INVALID_FORMAT;
   }
 
   // minute
-  pev->minute = (uint16_t)strtol(p, &p, 0);
+  pev->minute = (uint8_t)strtol(p, &p, 10);
   if (':' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
   p++; // point beyond colon
-  if (p > (strdate + strlen(strdate))) {
-    return VSCP_ERROR_PARAMETER;
+  if (!(*p)) {
+    return VSCP_ERROR_INVALID_FORMAT;
   }
 
   // second
-  pev->second = (uint16_t)strtol(p, &p, 0);
-  if ('Z' != *p) {
-    return VSCP_ERROR_PARAMETER;
-  }
+  pev->second = (uint8_t)strtol(p, &p, 10);
+  // If 'Z' is not preset we still accept
+  // if ('Z' != *p) {
+  //   return VSCP_ERROR_INVALID_FORMAT;
+  // }
 
   return VSCP_ERROR_SUCCESS;
 }
@@ -557,63 +560,66 @@ vscp_fwhlp_parse_eventex_datestr(vscpEventEx* pex, const char* strdate)
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  char* p = strdate;
+  char* p = (char*)strdate;
 
   // year
-  pex->year = (uint16_t)strtol(p, &p, 0);
+  pex->year = (uint16_t)strtol(p, &p, 10);
   if ('-' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
   p++; // point beyond dash
-  if (p > (strdate + strlen(strdate))) {
-    return VSCP_ERROR_PARAMETER;
+  if (!(*p)) {
+    return VSCP_ERROR_INVALID_FORMAT;
   }
 
   // month
-  pex->month = (uint16_t)strtol(p, &p, 0);
+  pex->month = (uint16_t)strtol(p, &p, 10);
   if ('-' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
   p++; // point beyond dash
-  if (p > (strdate + strlen(strdate))) {
-    return VSCP_ERROR_PARAMETER;
+  if (!(*p)) {
+    return VSCP_ERROR_INVALID_FORMAT;
   }
 
   // day
-  pex->day = (uint16_t)strtol(p, &p, 0);
-  if ('T' != *p) {
+  pex->day = (uint16_t)strtol(p, &p, 10);
+  // We accept both 'T' and space as separator between date and time
+  // even if not fully ISO 8601 compliant
+  if ('T' != *p && ' ' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
   p++; // point beyond "T"
-  if (p > (strdate + strlen(strdate))) {
-    return VSCP_ERROR_PARAMETER;
+  if (!(*p)) {
+    return VSCP_ERROR_INVALID_FORMAT;
   }
 
   // hour
-  pex->hour = (uint16_t)strtol(p, &p, 0);
+  pex->hour = (uint16_t)strtol(p, &p, 10);
   if (':' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
   p++; // point beyond colon
-  if (p > (strdate + strlen(strdate))) {
-    return VSCP_ERROR_PARAMETER;
+  if (!(*p)) {
+    return VSCP_ERROR_INVALID_FORMAT;
   }
 
   // minute
-  pex->minute = (uint16_t)strtol(p, &p, 0);
+  pex->minute = (uint16_t)strtol(p, &p, 10);
   if (':' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
   p++; // point beyond colon
-  if (p > (strdate + strlen(strdate))) {
-    return VSCP_ERROR_PARAMETER;
+  if (!(*p)) {
+    return VSCP_ERROR_INVALID_FORMAT;
   }
 
   // second
-  pex->second = (uint16_t)strtol(p, &p, 0);
-  if ('Z' != *p) {
-    return VSCP_ERROR_PARAMETER;
-  }
+  pex->second = (uint16_t)strtol(p, &p, 10);
+  // If 'Z' is not preset we still accept
+  // if ('Z' != *p) {
+  //   return VSCP_ERROR_INVALID_FORMAT;
+  // }
 
   return VSCP_ERROR_SUCCESS;
 }
@@ -3048,31 +3054,31 @@ vscp_fwhlp_parse_xml_event(vscpEvent* pev, const char* eventstr)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscp_fwhlp_parse_xml_ex
+// vscp_fwhlp_parse_xml_eventex
 //
 
 int
-vscp_fwhlp_parse_xml_ex(vscpEventEx* pex, const char* xmlVscpEventObj)
+vscp_fwhlp_parse_xml_eventex(vscpEventEx* pex, const char* eventexstr)
 {
   return VSCP_ERROR_SUCCESS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscp_fwhlp_create_xml
+// vscp_fwhlp_event_to_xml
 //
 
 int
-vscp_fwhlp_create_xml(char* strObj, size_t len, const vscpEvent* pev)
+vscp_fwhlp_event_to_xml(char* eventstr, size_t len, const vscpEvent* pev)
 {
   return VSCP_ERROR_SUCCESS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscp_fwhlp_create_xml_ex
+// vscp_fwhlp_eventex_to_xml
 //
 
 int
-vscp_fwhlp_create_json_ex(char* strObj, size_t len, const vscpEventEx* pex)
+vscp_fwhlp_eventex_to_xml(char* eventexstr, size_t len, const vscpEventEx* pex)
 {
   return VSCP_ERROR_SUCCESS;
 }

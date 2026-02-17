@@ -874,6 +874,61 @@ vscp_fwhlp_create_json_ex(char* strObj, size_t len, const vscpEventEx* pex);
 
 // ----------------------------------------------------------------------------
 
+#ifdef VSCP_FWHLP_XML_SUPPORT
+
+/*!
+  * @fn vscp_fwhlp_parse_xml_event
+  * @brief Convert XML string to VSCP event
+  *
+  * @param pev Pointer to event that will get data
+  * @param eventstr Null terminated string with XML event data.
+  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+  *
+*/
+int
+vscp_fwhlp_parse_xml_event(vscpEvent* pev, const char* eventstr);
+
+/*!
+  * @fn vscp_fwhlp_parse_xml_eventex
+  * @brief Convert XML string to VSCP event ex
+  *
+  * @param pev Pointer to event ex that will get data
+  * @param eventstr Null terminated string with XML event data.
+  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+  *
+*/
+int
+vscp_fwhlp_parse_xml_eventex(vscpEventEx* pex, const char* eventexstr);
+
+/*!
+  * @fn vscp_fwhlp_event_to_xml
+  * @brief Convert pointer to VSCP event to XML string
+  *
+  * @param eventstr String buffer that will get result
+  * @param len Size of string buffer
+  * @param pev Pointer to event
+  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+*/
+int
+vscp_fwhlp_event_to_xml(char* eventstr, size_t len, const vscpEvent* pev);
+
+/*!
+  * @fn vscp_fwhlp_eventex_to_xml
+  * @brief Convert pointer to VSCP event ex to XML string
+  *
+  * @param eventexstr String buffer that will get result
+  * @param len Size of string buffer
+  * @param pev Pointer to event ex
+  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+*/
+
+int
+vscp_fwhlp_eventex_to_xml(char* eventexstr, size_t len, const vscpEventEx* pex);
+
+#endif
+
+// ----------------------------------------------------------------------------
+
 uint8_t
 vscp_fwhlp_getMeasurementDataCoding(const vscpEvent* pEvent);
 
