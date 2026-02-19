@@ -1,0 +1,27 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  gtest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ libgtest-dev
+
+      - name: Configure tests
+        run: cmake -S tests -B build-tests -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build tests
+        run: cmake --build build-tests --config Release
+
+      - name: Run Google Tests
+        run: ./build-tests/test
