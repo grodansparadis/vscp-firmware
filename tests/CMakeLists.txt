@@ -23,7 +23,6 @@ add_executable(test
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-helper.h
     ${PROJECT_SOURCE_DIR}/../common/crc.c
     ${PROJECT_SOURCE_DIR}/../common/vscp-aes.c
-    ${PROJECT_SOURCE_DIR}/../third-party/cJSON/cJSON.c
     )
 
 target_include_directories(test PUBLIC 
