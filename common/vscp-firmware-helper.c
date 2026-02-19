@@ -3319,6 +3319,39 @@ vscp_fwhlp_parse_xml_eventex(vscpEventEx *pex, const char *eventexstr)
 int
 vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscpEvent *pev)
 {
+  char strguid[80];
+  char strDateTime[64];
+  char strdata[512 * 5]; // 512 bytes of data can expand to 2048 characters in hex string format 0xff,0xff,... (4
+                         // characters per byte + comma)
+  char buf[80 + 64 + 512 * 5 + 256]; // Buffer to hold the final XML string, adjust size as needed
+
+  // Check pointer
+  if (NULL == pev || NULL == eventstr) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if (VSCP_ERROR_SUCCESS != vscp_fwhlp_writeGuidToString(strguid, pev->GUID)) {
+    return VSCP_ERROR_PARSING;
+  }
+
+  if (NULL != vscp_fwhlp_make_string_from_data(strdata, sizeof(strdata), pev->pdata, pev->sizeData)) {
+    return VSCP_ERROR_PARSING;
+  }
+
+  vscp_fwhlp_get_datestr_from_event(strDateTime, sizeof(strDateTime), pev);
+
+  // datetime,head,obid,datetime,timestamp,class,type,guid,sizedata,data,note
+  sprintf(buf,
+          VSCP_XML_EVENT_TEMPLATE,
+          (unsigned short int) pev->head,
+          (unsigned long) pev->obid,
+          (const char *) strDateTime,
+          (unsigned long) pev->timestamp,
+          (unsigned short int) pev->vscp_class,
+          (unsigned short int) pev->vscp_type,
+          (const char *) strguid,
+          (const char *) strdata);
+
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -3329,7 +3362,6 @@ vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscpEvent *pev)
 int
 vscp_fwhlp_eventex_to_xml(char *eventexstr, size_t len, const vscpEventEx *pex)
 {
-
   char strguid[80];
   char strDateTime[64];
   char strdata[512 * 5]; // 512 bytes of data can expand to 2048 characters in hex string format 0xff,0xff,... (4
