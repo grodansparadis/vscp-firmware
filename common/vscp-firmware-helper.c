@@ -3279,7 +3279,7 @@ vscp_fwhlp_eventex_to_xml(char *eventexstr, size_t len, const vscpEventEx *pex)
   char buf[80 + 64 + 512 * 5 + 256]; // Buffer to hold the final XML string, adjust size as needed
 
   // Check pointer
-  if (nullptr == pex || nullptr == eventexstr) {
+  if (NULL == pex || NULL == eventexstr) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 

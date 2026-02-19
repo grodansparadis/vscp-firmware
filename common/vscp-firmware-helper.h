@@ -947,6 +947,20 @@ vscp_fwhlp_event_to_xml(char* eventstr, size_t len, const vscpEvent* pev);
 int
 vscp_fwhlp_eventex_to_xml(char* eventexstr, size_t len, const vscpEventEx* pex);
 
+/*!*/
+  * @fn vscp_fwhlp_parse_topic
+  * @brief Parse topic string to extract GUID, VSCP class, and VSCP type
+  *
+  * @param topic Null terminated string with topic data.
+  * @param pGuid Array to store extracted GUID (16 bytes).
+  * @param pVscpClass Pointer to store extracted VSCP class.
+  * @param pVscpType Pointer to store extracted VSCP type.
+  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+*/
+int
+vscp_fwhlp_parse_topic(const char* topic, uint8_t* pGuid[16], uint16_t* pVscpClass, uint16_t* pVscpType);
+
+
 #endif
 
 // ----------------------------------------------------------------------------

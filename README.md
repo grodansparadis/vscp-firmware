@@ -28,6 +28,16 @@ that second repository (and not to make redundant copies if possible).
 Documentation on how to build your own nodes from this code is [here](https://grodansparadis.github.io/vscp-doc-firmware/#/) 
 
 Local module documentation for the helper library is available in [docs/vscp-firmware-helper.md](docs/vscp-firmware-helper.md).
+Local module documentation for the VSCP FIFO helper is available in [docs/vscp-fifo.md](docs/vscp-fifo.md).
+Local module documentation for the Level I firmware core is available in [docs/vscp-firmware.md](docs/vscp-firmware.md).
+Local module documentation for the AES module is available in [docs/vscp-aes.md](docs/vscp-aes.md).
+Local module documentation for the Level II firmware framework is available in [docs/vscp-firmware-level2.md](docs/vscp-firmware-level2.md).
+Local module documentation for the VSCP link protocol is available in [docs/vscp-link-protocol.md](docs/vscp-link-protocol.md).
+Local module documentation for serial protocol definitions is available in [docs/vscp-serial.md](docs/vscp-serial.md).
+Local module documentation for the bootloader is available in [docs/vscp-bootloader.md](docs/vscp-bootloader.md).
+Host-side firmware update flow for bootloader integration is available in [docs/vscp-bootloader-host-sequence.md](docs/vscp-bootloader-host-sequence.md).
+Reusable VSCP link protocol callback bring-up checklist is available in [docs/examples/vscp-link-protocol-callback-checklist.md](docs/examples/vscp-link-protocol-callback-checklist.md).
+Reusable VSCP Level I firmware porting checklist is available in [docs/examples/vscp-firmware-porting-checklist.md](docs/examples/vscp-firmware-porting-checklist.md).
 
 The main reference implementations for VSCP over CAN is the Paris and the Kelvin modules. Both can found [here](http://www.grodansparadis.com/products.html) along with other open source products. All modules are available as 
 ready made modules, bare pcb's and software and hardware is and will always be fully open and free. All design documents are open and available.
