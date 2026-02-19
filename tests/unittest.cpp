@@ -2014,6 +2014,59 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_create_json_ex_null_pointer)
 
 #ifdef VSCP_FWHLP_XML_SUPPORT
 
+// No event tag
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_basic_validate_0)
+{
+  vscpEvent ev;
+  const char* xml = "<ev"
+    "head=\"3\" "
+    "obid=\"1234\" "
+    "timestamp=\"50817\" "
+    "class=\"10\" "
+    "type=\"6\" "
+    "guid=\"00:00:00:00:00:00:00:00:00:00:00:00:00:01:00:02\" "
+    "data=\"1,2,3,255,0x05,0x55,7,0b10101010\" "
+    "/>";
+  
+  int rv = vscp_fwhlp_parse_xml_event(&ev, xml);
+  ASSERT_EQ(VSCP_ERROR_INVALID_SYNTAX, rv);
+}
+
+// Event tag misspelled
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_basic_validate_1)
+{
+  vscpEvent ev;
+  const char* xml = "<eventx"
+    "head=\"3\" "
+    "obid=\"1234\" "
+    "timestamp=\"50817\" "
+    "class=\"10\" "
+    "type=\"6\" "
+    "guid=\"00:00:00:00:00:00:00:00:00:00:00:00:00:01:00:02\" "
+    "data=\"1,2,3,255,0x05,0x55,7,0b10101010\" "
+    "/>";
+  
+  int rv = vscp_fwhlp_parse_xml_event(&ev, xml);
+  ASSERT_EQ(VSCP_ERROR_INVALID_SYNTAX, rv);
+}
+
+// Missing end tag
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_basic_validate_2)
+{
+  vscpEvent ev;
+  const char* xml = "<eventx"
+    "head=\"3\" "
+    "obid=\"1234\" "
+    "timestamp=\"50817\" "
+    "class=\"10\" "
+    "type=\"6\" "
+    "guid=\"00:00:00:00:00:00:00:00:00:00:00:00:00:01:00:02\" "
+    "data=\"1,2,3,255,0x05,0x55,7,0b10101010\" ";
+  
+  int rv = vscp_fwhlp_parse_xml_event(&ev, xml);
+  ASSERT_EQ(VSCP_ERROR_INVALID_SYNTAX, rv);
+}
+
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_basic)
 {
   vscpEvent ev;

@@ -2963,7 +2963,7 @@ typedef struct {
 } attribute_t;
 
 static int
-find_or_add_name(const char *name, char name_list[MAX_ATTRIBUTES][MAX_NAME_LEN], size_t *name_count)
+_find_or_add_name(const char *name, char name_list[MAX_ATTRIBUTES][MAX_NAME_LEN], size_t *name_count)
 {
   // Check if the name exists in the known_attributes list
   for (size_t i = 0; i < sizeof(known_attributes) / sizeof(known_attributes[0]); i++) {
@@ -2990,7 +2990,7 @@ find_or_add_name(const char *name, char name_list[MAX_ATTRIBUTES][MAX_NAME_LEN],
 }
 
 static int
-validate_event_string(const char *eventstr)
+_validate_event_string(const char *eventstr)
 {
   if (!eventstr) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -3001,8 +3001,13 @@ validate_event_string(const char *eventstr)
     eventstr++;
   }
 
-  // Ensure the string starts with "<event "
-  if (strncmp(eventstr, "<event ", 7) != 0) {
+  // Ensure the string starts with "<event"
+  // next character can be space, tab, newline or end of string,
+  // all valid except for end of string.
+  if (strncmp(eventstr, "<event ", 7) != 0 && 
+      strncmp(eventstr, "<event\t", 7) != 0 && 
+      strncmp(eventstr, "<event\n", 7) != 0 &&
+      strncmp(eventstr, "<event\r", 7) != 0) {
     return VSCP_ERROR_INVALID_SYNTAX;
   }
 
@@ -3031,7 +3036,7 @@ _parse_event_string(attribute_t *attributes, size_t *attribute_count, const char
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  if (VSCP_ERROR_SUCCESS != validate_event_string(eventstr)) {
+  if (VSCP_ERROR_SUCCESS != _validate_event_string(eventstr)) {
     return VSCP_ERROR_INVALID_SYNTAX;
   }
 
@@ -3103,7 +3108,7 @@ _parse_event_string(attribute_t *attributes, size_t *attribute_count, const char
       attributes[*attribute_count].value[len] = '\0';
 
       // Find or add the name to the name list and store its index in id
-      attributes[*attribute_count].id = find_or_add_name(name, name_list, &name_count);
+      attributes[*attribute_count].id = _find_or_add_name(name, name_list, &name_count);
 
       // Copy the name to the attribute
       strncpy(attributes[*attribute_count].name, name, MAX_NAME_LEN - 1);
