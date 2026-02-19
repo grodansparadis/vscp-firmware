@@ -1,5 +1,7 @@
 # Documentation
 
+[![Tests](https://github.com/grodansparadis/vscp-firmware/actions/workflows/tests.yml/badge.svg)](https://github.com/grodansparadis/vscp-firmware/actions/workflows/tests.yml)
+
 The documentation is [here](https://grodansparadis.github.io/vscp-doc-firmware/#/)
 
 Local module documentation:
@@ -21,3 +23,8 @@ Examples:
 - [vscp-fifo-usage-skeleton.c](examples/vscp-fifo-usage-skeleton.c)
 - [vscp-link-protocol-callback-checklist.md](examples/vscp-link-protocol-callback-checklist.md)
 - [vscp-firmware-porting-checklist.md](examples/vscp-firmware-porting-checklist.md)
+
+## CI
+
+- Tests workflow: [GitHub Actions - Tests](https://github.com/grodansparadis/vscp-firmware/actions/workflows/tests.yml)
+- Latest workflow runs: [GitHub Actions runs](https://github.com/grodansparadis/vscp-firmware/actions)

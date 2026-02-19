@@ -1,4 +1,5 @@
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
+[![Tests](https://github.com/grodansparadis/vscp-firmware/actions/workflows/tests.yml/badge.svg)](https://github.com/grodansparadis/vscp-firmware/actions/workflows/tests.yml)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 
 
@@ -38,6 +39,11 @@ Local module documentation for the bootloader is available in [docs/vscp-bootloa
 Host-side firmware update flow for bootloader integration is available in [docs/vscp-bootloader-host-sequence.md](docs/vscp-bootloader-host-sequence.md).
 Reusable VSCP link protocol callback bring-up checklist is available in [docs/examples/vscp-link-protocol-callback-checklist.md](docs/examples/vscp-link-protocol-callback-checklist.md).
 Reusable VSCP Level I firmware porting checklist is available in [docs/examples/vscp-firmware-porting-checklist.md](docs/examples/vscp-firmware-porting-checklist.md).
+
+## CI
+
+- Tests workflow: [GitHub Actions - Tests](https://github.com/grodansparadis/vscp-firmware/actions/workflows/tests.yml)
+- Latest workflow runs: [GitHub Actions runs](https://github.com/grodansparadis/vscp-firmware/actions)
 
 The main reference implementations for VSCP over CAN is the Paris and the Kelvin modules. Both can found [here](http://www.grodansparadis.com/products.html) along with other open source products. All modules are available as 
 ready made modules, bare pcb's and software and hardware is and will always be fully open and free. All design documents are open and available.
