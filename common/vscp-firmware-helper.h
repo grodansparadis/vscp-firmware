@@ -316,6 +316,28 @@ vscp_fwhlp_readStringValue(const char* pString);
 char*
 vscp_fwhlp_stristr(const char* haystack, const char* needle);
 
+/*!
+  Read VSCP data string into byte array. String should be in format "1,2,3,255,0x05,0x55,0o7,0b10101010"
+  @param data Buffer to fill with data bytes.
+  @param length Size of data buffer.
+  @param datastr String to parse.
+  @param endptr Pointer to pointer that will be set to first character after parsed data. Can be NULL.
+  @return Number of bytes read or -1 if error such as invalid format or buffer too small.
+
+*/
+int vscp_fwhlp_parse_data(uint8_t* data, size_t length, const char* datastr, const char **endptr);
+
+
+/*!
+    Make a string with hex values from binary values in buffer
+    @param buf Buffer to hold result string.
+    @param len Size of result buffer.
+    @param data Buffer with binary values.
+    @param data_len Size of data buffer.
+    @return Pointer to result string or NULL if error such as buffer too small.
+*/
+char*
+vscp_fwhlp_make_string_from_data(char* buf, size_t len, const uint8_t* data, size_t data_len);
 
 /*!
     Get date string in format "YYYY-MM-DDTHH:MM:SS" from event
@@ -344,7 +366,7 @@ vscp_fwhlp_get_datestr_from_eventex(char* buf, size_t len, const vscpEventEx* pe
     @return VSCP_ERROR_SUCCESS if successful, else error code.
 */
 int
-vscp_fwhlp_parse_event_datestr(vscpEvent* pev, const char* strdate);
+vscp_fwhlp_parse_event_datestr(vscpEvent* pev, const char* strdate, char **endptr);
 
 /*!
     Parse date string in format "YYYY-MM-DDTHH:MM:SS" and fill eventex with the values
@@ -353,7 +375,7 @@ vscp_fwhlp_parse_event_datestr(vscpEvent* pev, const char* strdate);
     @return VSCP_ERROR_SUCCESS if successful, else error code.
 */
 int
-vscp_fwhlp_parse_eventex_datestr(vscpEventEx* pex, const char* strdate);
+vscp_fwhlp_parse_eventex_datestr(vscpEventEx* pex, const char* strdate, char **endptr);
 
 /*!
     Convert traditional VSCP date + timestamp to unix 64-bit timestamp in nanoseconds

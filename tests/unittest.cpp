@@ -14,7 +14,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_1)
   int rv;
   vscpEvent ev;
 
-  rv = vscp_fwhlp_parse_event_datestr(&ev, "2024-06-30T23:59:58Z");
+  rv = vscp_fwhlp_parse_event_datestr(&ev, "2024-06-30T23:59:58Z", NULL);
 
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
   ASSERT_EQ(2024, ev.year);
@@ -31,7 +31,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_2)
   int rv;
   vscpEvent ev;
 
-  rv = vscp_fwhlp_parse_event_datestr(&ev, "2024-06-30T23:59:58");
+  rv = vscp_fwhlp_parse_event_datestr(&ev, "2024-06-30T23:59:58", NULL);
 
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
   ASSERT_EQ(2024, ev.year);
@@ -49,7 +49,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_3)
   int rv;
   vscpEvent ev;
 
-  rv = vscp_fwhlp_parse_event_datestr(&ev, "2024-06-30 23:59:58Z");
+  rv = vscp_fwhlp_parse_event_datestr(&ev, "2024-06-30 23:59:58Z", NULL);
 
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 }
@@ -63,7 +63,7 @@ TEST(_vscp_firmware_helper, _vscp_fwhlp_parse_event_datestr_4)
   int rv;
   vscpEvent ev;
 
-  rv = vscp_fwhlp_parse_event_datestr(&ev, "    2024-06-30T23:59:58Z    ");
+  rv = vscp_fwhlp_parse_event_datestr(&ev, "    2024-06-30T23:59:58Z    ", NULL);
 
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 }
@@ -78,7 +78,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_1)
   int rv;
   vscpEventEx ex;
 
-  rv = vscp_fwhlp_parse_eventex_datestr(&ex, "2024-06-30T23:59:58Z");
+  rv = vscp_fwhlp_parse_eventex_datestr(&ex, "2024-06-30T23:59:58Z", NULL);
 
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
   ASSERT_EQ(2024, ex.year);
@@ -95,7 +95,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_2)
   int rv;
   vscpEventEx ex;
 
-  rv = vscp_fwhlp_parse_eventex_datestr(&ex, "2024-06-30T23:59:58");
+  rv = vscp_fwhlp_parse_eventex_datestr(&ex, "2024-06-30T23:59:58", NULL);
 
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
   ASSERT_EQ(2024, ex.year);
@@ -113,7 +113,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_3)
   int rv;
   vscpEventEx ex;
 
-  rv = vscp_fwhlp_parse_eventex_datestr(&ex, "2024-06-30 23:59:58Z");
+  rv = vscp_fwhlp_parse_eventex_datestr(&ex, "2024-06-30 23:59:58Z", NULL);
 
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 }
@@ -127,9 +127,33 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_4)
   int rv;
   vscpEventEx ex;
 
-  rv = vscp_fwhlp_parse_eventex_datestr(&ex, "    2024-06-30T23:59:58Z    ");
+  rv = vscp_fwhlp_parse_eventex_datestr(&ex, "    2024-06-30T23:59:58Z    ", NULL);
 
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+}
+
+/*
+    Test standard ISO 8601 date string with leading spaces parsing to event fields
+    with trailing non-space characters after the date string. The parser should parse 
+    the date string successfully and set endptr to point to the first non-space character 
+    after the date string.
+*/
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_5)
+{
+  int rv;
+  vscpEventEx ex;
+
+  char* endptr = NULL;
+  rv = vscp_fwhlp_parse_eventex_datestr(&ex, "    2024-06-30T23:59:58Z    NEXT", &endptr);
+
+  // Move endptr forward to skip any trailing spaces
+  while (*endptr == ' ') {
+    endptr++;
+  }
+
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);  
+  ASSERT_STREQ("NEXT", endptr); // endptr should point to the 'N' character after the date string
 }
 
 //-----------------------------------------------------------------------------
@@ -326,6 +350,20 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_readStringValue_hex)
   // Test with lowercase works correctly
   val = vscp_fwhlp_readStringValue("0xff");
   ASSERT_NE(0, val);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_read_vscp_data)
+{
+  uint8_t data[8] = { 0 };
+
+  int rv = vscp_fwhlp_parse_data(data, sizeof(data), "1, 2,0x03, 255, 7, 0b10101010", NULL);
+  ASSERT_EQ(6, rv);
+  ASSERT_EQ(1, data[0]);
+  ASSERT_EQ(2, data[1]);
+  ASSERT_EQ(3, data[2]);
+  ASSERT_EQ(255, data[3]);
+  ASSERT_EQ(7, data[4]);
+  ASSERT_EQ(0xaa, data[5]);
 }
 
 //-----------------------------------------------------------------------------
@@ -1957,6 +1995,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_basic)
     "class=\"10\" "
     "type=\"6\" "
     "guid=\"00:00:00:00:00:00:00:00:00:00:00:00:00:01:00:02\" "
+    "data=\"1,2,3,255,0x05,0x55,7,0b10101010\" "
     "/>";
   
   int rv = vscp_fwhlp_parse_xml_event(&ev, xml);
@@ -1968,11 +2007,58 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_basic)
   ASSERT_EQ(50817, ev.timestamp);
   ASSERT_EQ(10, ev.vscp_class);
   ASSERT_EQ(6, ev.vscp_type);
+  ASSERT_EQ(8, ev.sizeData);
+  ASSERT_EQ(1, ev.pdata[0]);
+  ASSERT_EQ(2, ev.pdata[1]);
+  ASSERT_EQ(3, ev.pdata[2]);
+  ASSERT_EQ(255, ev.pdata[3]);
+  ASSERT_EQ(5, ev.pdata[4]);
+  ASSERT_EQ(0x55, ev.pdata[5]);
+  ASSERT_EQ(7, ev.pdata[6]);
+  ASSERT_EQ(0xaa, ev.pdata[7]);
   
   // Verify GUID
   uint8_t expected_guid[16] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
                                 0x00,0x00,0x00,0x00,0x00,0x01,0x00,0x02};
   ASSERT_EQ(0, memcmp(expected_guid, ev.GUID, 16));
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_eventex_basic_full)
+{
+  vscpEventEx ex;
+  const char* xml = "<event "
+    "head=\"3\" "
+    "obid=\"1234\" "
+    "timestamp=\"50817\" "
+    "class=\"10\" "
+    "type=\"6\" "
+    "guid=\"00:00:00:00:00:00:00:00:00:00:00:00:00:01:00:02\" "
+    "data=\"1,2,3,255,0x05,0x55,7,0b10101010\" "
+    "/>";
+  
+  int rv = vscp_fwhlp_parse_xml_eventex(&ex, xml);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  
+  // Verify parsed values
+  ASSERT_EQ(3, ex.head);
+  ASSERT_EQ(1234, ex.obid);
+  ASSERT_EQ(50817, ex.timestamp);
+  ASSERT_EQ(10, ex.vscp_class);
+  ASSERT_EQ(6, ex.vscp_type);
+  ASSERT_EQ(8, ex.sizeData);
+  ASSERT_EQ(1, ex.data[0]);
+  ASSERT_EQ(2, ex.data[1]);
+  ASSERT_EQ(3, ex.data[2]);
+  ASSERT_EQ(255, ex.data[3]);
+  ASSERT_EQ(5, ex.data[4]);
+  ASSERT_EQ(0x55, ex.data[5]);
+  ASSERT_EQ(7, ex.data[6]);
+  ASSERT_EQ(0xaa, ex.data[7]);
+  
+  // Verify GUID
+  uint8_t expected_guid[16] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+                                0x00,0x00,0x00,0x00,0x00,0x01,0x00,0x02};
+  ASSERT_EQ(0, memcmp(expected_guid, ex.GUID, 16));
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_null_pointer)
@@ -2080,6 +2166,13 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_basic)
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 }
 
+TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_null_pointer_current_stub)
+{
+  // Current implementation is a stub that returns SUCCESS without dereferencing.
+  int rv = vscp_fwhlp_event_to_xml(nullptr, 0, nullptr);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+}
+
 TEST(_vscp_firmware_helper, vscp_fwhlp_eventex_to_xml_basic)
 {
   vscpEventEx ex;
@@ -2101,6 +2194,20 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_eventex_to_xml_basic)
   // Note: This function is currently a stub that just returns SUCCESS
   int rv = vscp_fwhlp_eventex_to_xml(xml, sizeof(xml), &ex);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_eventex_to_xml_null_pointer)
+{
+  vscpEventEx ex;
+  char xml[32];
+
+  memset(&ex, 0, sizeof(ex));
+
+  int rv = vscp_fwhlp_eventex_to_xml(nullptr, sizeof(xml), &ex);
+  ASSERT_EQ(VSCP_ERROR_INVALID_POINTER, rv);
+
+  rv = vscp_fwhlp_eventex_to_xml(xml, sizeof(xml), nullptr);
+  ASSERT_EQ(VSCP_ERROR_INVALID_POINTER, rv);
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_single_line)

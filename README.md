@@ -27,6 +27,8 @@ that second repository (and not to make redundant copies if possible).
 
 Documentation on how to build your own nodes from this code is [here](https://grodansparadis.github.io/vscp-doc-firmware/#/) 
 
+Local module documentation for the helper library is available in [docs/vscp-firmware-helper.md](docs/vscp-firmware-helper.md).
+
 The main reference implementations for VSCP over CAN is the Paris and the Kelvin modules. Both can found [here](http://www.grodansparadis.com/products.html) along with other open source products. All modules are available as 
 ready made modules, bare pcb's and software and hardware is and will always be fully open and free. All design documents are open and available.
 

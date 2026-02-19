@@ -70,9 +70,9 @@
 #include <cJSON.h>
 #endif
 
-#define UNUSED(expr) \
-  do {               \
-    (void)(expr);    \
+#define UNUSED(expr)                                                                                                   \
+  do {                                                                                                                 \
+    (void) (expr);                                                                                                     \
   } while (0)
 
 #ifndef TRUE
@@ -94,12 +94,11 @@ int
 vscp_fwhlp_isLittleEndian(void)
 {
   int x = 1;
-  return (*(char*)&x);
+  return (*(char *) &x);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_isBigEndian
-//
 //
 
 int
@@ -113,14 +112,14 @@ vscp_fwhlp_isBigEndian(void)
 //
 
 int
-vscp_fwhlp_a2ul(const char* src, uint8_t srclen, uint8_t base, uint32_t* resultp)
+vscp_fwhlp_a2ul(const char *src, uint8_t srclen, uint8_t base, uint32_t *resultp)
 {
-  const char* stop;
+  const char *stop;
   static char hex[]   = "0123456789abcdef";
   static char uchex[] = "0123456789ABCDEF";
   int d;
   char c;
-  char* p;
+  char *p;
   unsigned long r;
   unsigned long rlimit;
   int dlimit;
@@ -176,7 +175,7 @@ vscp_fwhlp_a2ul(const char* src, uint8_t srclen, uint8_t base, uint32_t* resultp
   }
   else {
     rlimit = ULONG_MAX / base;
-    dlimit = (int)(ULONG_MAX - rlimit * base);
+    dlimit = (int) (ULONG_MAX - rlimit * base);
 
     while (src < stop) {
 
@@ -204,7 +203,7 @@ vscp_fwhlp_a2ul(const char* src, uint8_t srclen, uint8_t base, uint32_t* resultp
 //
 
 void
-vscp_fwhlp_dec2hex(uint8_t dec, char* pBuf, uint16_t len)
+vscp_fwhlp_dec2hex(uint8_t dec, char *pBuf, uint16_t len)
 {
   uint32_t i;
 
@@ -226,7 +225,7 @@ vscp_fwhlp_dec2hex(uint8_t dec, char* pBuf, uint16_t len)
 //
 
 uint32_t
-vscp_fwhlp_hex2dec(const char* pHex)
+vscp_fwhlp_hex2dec(const char *pHex)
 {
   int i;
   uint32_t val = 0;
@@ -251,11 +250,11 @@ vscp_fwhlp_hex2dec(const char* pHex)
 // Substitute string occurrences in string
 //
 
-char*
-vscp_fwhlp_strsubst(char* pNewStr, size_t len, const char* pStr, const char* pTarget, const char* pReplace)
+char *
+vscp_fwhlp_strsubst(char *pNewStr, size_t len, const char *pStr, const char *pTarget, const char *pReplace)
 {
-  char* p     = (char*)pStr;
-  char* pLast = (char*)pStr;
+  char *p     = (char *) pStr;
+  char *pLast = (char *) pStr;
 
   // Check pointers
   if ((NULL == pNewStr) || (NULL == pStr) || (NULL == pTarget) || (NULL == pReplace)) {
@@ -294,10 +293,10 @@ vscp_fwhlp_strsubst(char* pNewStr, size_t len, const char* pStr, const char* pTa
 //
 
 uint32_t
-vscp_fwhlp_readStringValue(const char* pString)
+vscp_fwhlp_readStringValue(const char *pString)
 {
   uint32_t ul;
-  char* p;
+  char *p;
   char buf[128];
 
   memset(buf, 0, sizeof(buf));
@@ -326,7 +325,7 @@ vscp_fwhlp_readStringValue(const char* pString)
     return ul;
   }
   else {
-    ul = (unsigned)atoi(buf);
+    ul = (unsigned) atoi(buf);
     return ul;
   }
 
@@ -337,18 +336,18 @@ vscp_fwhlp_readStringValue(const char* pString)
 // vscp_fwhlp_stristr
 //
 
-char*
-vscp_fwhlp_stristr(const char* haystack, const char* needle)
+char *
+vscp_fwhlp_stristr(const char *haystack, const char *needle)
 {
-  int c = tolower((unsigned char)*needle);
+  int c = tolower((unsigned char) *needle);
   if (c == '\0')
-    return (char*)haystack;
+    return (char *) haystack;
   for (; *haystack; haystack++) {
-    if (tolower((unsigned char)*haystack) == c) {
+    if (tolower((unsigned char) *haystack) == c) {
       for (size_t i = 0;;) {
         if (needle[++i] == '\0')
-          return (char*)haystack;
-        if (tolower((unsigned char)haystack[i]) != tolower((unsigned char)needle[i]))
+          return (char *) haystack;
+        if (tolower((unsigned char) haystack[i]) != tolower((unsigned char) needle[i]))
           break;
       }
     }
@@ -364,13 +363,13 @@ unsigned char
 vscp_fwhlp_hexchar(char c)
 {
   if ('0' <= c && c <= '9') {
-    return (unsigned char)(c - '0');
+    return (unsigned char) (c - '0');
   }
   if ('A' <= c && c <= 'F') {
-    return (unsigned char)(c - 'A' + 10);
+    return (unsigned char) (c - 'A' + 10);
   }
   if ('a' <= c && c <= 'f') {
-    return (unsigned char)(c - 'a' + 10);
+    return (unsigned char) (c - 'a' + 10);
   }
   return 0xFF;
 }
@@ -380,7 +379,7 @@ vscp_fwhlp_hexchar(char c)
 //
 
 int
-vscp_fwhlp_hex2bin(unsigned char* buf, size_t length, const char* s)
+vscp_fwhlp_hex2bin(unsigned char *buf, size_t length, const char *s)
 {
   int result;
   if (!s || !buf || length <= 0) {
@@ -412,7 +411,7 @@ vscp_fwhlp_hex2bin(unsigned char* buf, size_t length, const char* s)
 //
 
 void
-vscp_fwhlp_bin2hex(char* output, size_t outLength, const unsigned char* buf, size_t length)
+vscp_fwhlp_bin2hex(char *output, size_t outLength, const unsigned char *buf, size_t length)
 {
   char binHex[] = "0123456789ABCDEF";
 
@@ -441,32 +440,135 @@ vscp_fwhlp_bin2hex(char* output, size_t outLength, const unsigned char* buf, siz
 }
 
 //////////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_parse_data
+//
+
+int
+vscp_fwhlp_parse_data(uint8_t *data, size_t length, const char *datastr, const char **endptr)
+{
+  uint8_t *p      = data;
+  const char *end = datastr + strlen(datastr);
+
+  if (!datastr || !data || length <= 0) {
+    return -1;
+  }
+
+  const char *s = datastr;  
+  while (*s && s < end) {
+    while (*s == ' ' || *s == ',') {
+      s++;
+    }
+    if (*s == '\0' || s >= end) {
+      break;
+    }
+
+    char *next;
+    unsigned long value = strtoul(s, &next, 0);
+    if (next == s) {
+      return -1; // No conversion performed
+    }
+    if (value > 255) {
+      return -1; // Value out of byte range
+    }
+    if (p - data >= length) {
+      return -1; // Buffer overflow
+    }
+
+    *p++ = (uint8_t) value;
+    s    = next;
+  }
+
+  if (endptr) {
+    *endptr = s;
+  }
+
+  return p - data; // Return number of bytes read
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_make_string_from_data
+//
+
+char *
+vscp_fwhlp_make_string_from_data(char *buf, size_t len, const uint8_t *data, size_t data_len)
+{
+  if (!buf || len <= 0 || !data || data_len <= 0) {
+    return NULL;
+  }
+
+  size_t required_len = data_len * 5; // Max "255," per byte
+  if (len < required_len) {
+    return NULL; // Buffer too small
+  }
+
+  char *p = buf;
+  for (size_t i = 0; i < data_len; ++i) {
+    int written = snprintf(p, len, "%d", data[i]);
+    if (written < 0 || (size_t) written >= len) {
+      return NULL; // Encoding error or buffer overflow
+    }
+    p += written;
+    len -= written;
+
+    if (i < data_len - 1) {
+      if (len < 2) {
+        return NULL; // Buffer too small for comma and null terminator
+      }
+      *p++ = ',';
+      *p   = '\0';
+      len--;
+    }
+  }
+
+  return buf;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_get_datestr_from_event
 //
 
-char*
-vscp_fwhlp_get_datestr_from_event(char* buf, size_t len, const vscpEvent* pev)
+char *
+vscp_fwhlp_get_datestr_from_event(char *buf, size_t len, const vscpEvent *pev)
 {
   if ((NULL == pev) || (NULL == buf) || (len < 21)) {
     return NULL;
   }
 
-  snprintf(buf, len, "%04u-%02u-%02uT%02u:%02u:%02uZ", pev->year, pev->month, pev->day, pev->hour, pev->minute, pev->second);
+  snprintf(buf,
+           len,
+           "%04u-%02u-%02uT%02u:%02u:%02uZ",
+           pev->year,
+           pev->month,
+           pev->day,
+           pev->hour,
+           pev->minute,
+           pev->second);
   return buf;
 }
+
+char *
+vscp_fwhlp_make_string_from_data(char *buf, size_t len, const uint8_t *data, size_t data_len);
 
 //////////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_get_datestr_from_eventex
 //
 
-char*
-vscp_fwhlp_get_datestr_from_eventex(char* buf, size_t len, const vscpEventEx* pex)
+char *
+vscp_fwhlp_get_datestr_from_eventex(char *buf, size_t len, const vscpEventEx *pex)
 {
   if ((NULL == pex) || (NULL == buf) || (len < 21)) {
     return NULL;
   }
 
-  snprintf(buf, len, "%04u-%02u-%02uT%02u:%02u:%02uZ", pex->year, pex->month, pex->day, pex->hour, pex->minute, pex->second);
+  snprintf(buf,
+           len,
+           "%04u-%02u-%02uT%02u:%02u:%02uZ",
+           pex->year,
+           pex->month,
+           pex->day,
+           pex->hour,
+           pex->minute,
+           pex->second);
   return buf;
 }
 
@@ -477,16 +579,16 @@ vscp_fwhlp_get_datestr_from_eventex(char* buf, size_t len, const vscpEventEx* pe
 //
 
 int
-vscp_fwhlp_parse_event_datestr(vscpEvent* pev, const char* strdate)
+vscp_fwhlp_parse_event_datestr(vscpEvent *pev, const char *strdate, char **endptr)
 {
   if ((NULL == pev) || (NULL == strdate)) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  char* p = (char*)strdate;
+  char *p = (char *) strdate;
 
   // year
-  pev->year = (uint16_t)strtol(p, &p, 10);
+  pev->year = (uint16_t) strtol(p, &p, 10);
   if ('-' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -496,7 +598,7 @@ vscp_fwhlp_parse_event_datestr(vscpEvent* pev, const char* strdate)
   }
 
   // month
-  pev->month = (uint8_t)strtol(p, &p, 10);
+  pev->month = (uint8_t) strtol(p, &p, 10);
   if ('-' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -506,7 +608,7 @@ vscp_fwhlp_parse_event_datestr(vscpEvent* pev, const char* strdate)
   }
 
   // day
-  pev->day = (uint8_t)strtol(p, &p, 10);
+  pev->day = (uint8_t) strtol(p, &p, 10);
   // We accept both 'T' and space as separator between date and time
   // even if not fully ISO 8601 compliant
   if ('T' != *p && ' ' != *p) {
@@ -518,7 +620,7 @@ vscp_fwhlp_parse_event_datestr(vscpEvent* pev, const char* strdate)
   }
 
   // hour
-  pev->hour = (uint8_t)strtol(p, &p, 10);
+  pev->hour = (uint8_t) strtol(p, &p, 10);
   if (':' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -528,7 +630,7 @@ vscp_fwhlp_parse_event_datestr(vscpEvent* pev, const char* strdate)
   }
 
   // minute
-  pev->minute = (uint8_t)strtol(p, &p, 10);
+  pev->minute = (uint8_t) strtol(p, &p, 10);
   if (':' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -538,11 +640,17 @@ vscp_fwhlp_parse_event_datestr(vscpEvent* pev, const char* strdate)
   }
 
   // second
-  pev->second = (uint8_t)strtol(p, &p, 10);
+  pev->second = (uint8_t) strtol(p, &p, 10);
+  p++; // point beyond second
+
   // If 'Z' is not preset we still accept
-  // if ('Z' != *p) {
-  //   return VSCP_ERROR_INVALID_FORMAT;
-  // }
+  if ('Z' != *p) {
+    p++; // point beyond "Z" (for endptr
+  }
+
+  if (endptr) {
+    *endptr = p;
+  } 
 
   return VSCP_ERROR_SUCCESS;
 }
@@ -554,16 +662,16 @@ vscp_fwhlp_parse_event_datestr(vscpEvent* pev, const char* strdate)
 //
 
 int
-vscp_fwhlp_parse_eventex_datestr(vscpEventEx* pex, const char* strdate)
+vscp_fwhlp_parse_eventex_datestr(vscpEventEx *pex, const char *strdate, char **endptr)
 {
   if ((NULL == pex) || (NULL == strdate)) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  char* p = (char*)strdate;
+  char *p = (char *) strdate;
 
   // year
-  pex->year = (uint16_t)strtol(p, &p, 10);
+  pex->year = (uint16_t) strtol(p, &p, 10);
   if ('-' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -573,7 +681,7 @@ vscp_fwhlp_parse_eventex_datestr(vscpEventEx* pex, const char* strdate)
   }
 
   // month
-  pex->month = (uint16_t)strtol(p, &p, 10);
+  pex->month = (uint16_t) strtol(p, &p, 10);
   if ('-' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -583,7 +691,7 @@ vscp_fwhlp_parse_eventex_datestr(vscpEventEx* pex, const char* strdate)
   }
 
   // day
-  pex->day = (uint16_t)strtol(p, &p, 10);
+  pex->day = (uint16_t) strtol(p, &p, 10);
   // We accept both 'T' and space as separator between date and time
   // even if not fully ISO 8601 compliant
   if ('T' != *p && ' ' != *p) {
@@ -595,7 +703,7 @@ vscp_fwhlp_parse_eventex_datestr(vscpEventEx* pex, const char* strdate)
   }
 
   // hour
-  pex->hour = (uint16_t)strtol(p, &p, 10);
+  pex->hour = (uint16_t) strtol(p, &p, 10);
   if (':' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -605,7 +713,7 @@ vscp_fwhlp_parse_eventex_datestr(vscpEventEx* pex, const char* strdate)
   }
 
   // minute
-  pex->minute = (uint16_t)strtol(p, &p, 10);
+  pex->minute = (uint16_t) strtol(p, &p, 10);
   if (':' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -615,11 +723,17 @@ vscp_fwhlp_parse_eventex_datestr(vscpEventEx* pex, const char* strdate)
   }
 
   // second
-  pex->second = (uint16_t)strtol(p, &p, 10);
+  pex->second = (uint16_t) strtol(p, &p, 10);
+  p++; // point beyond second
+
   // If 'Z' is not preset we still accept
-  // if ('Z' != *p) {
-  //   return VSCP_ERROR_INVALID_FORMAT;
-  // }
+  if ('Z' != *p) {
+    p++; // point beyond "Z" (for endptr
+  }
+
+  if (endptr) {
+    *endptr = p;
+  }
 
   return VSCP_ERROR_SUCCESS;
 }
@@ -637,34 +751,23 @@ days_from_civil(int year, int month, int day)
 {
   year -= (month <= 2);
   int era      = (year >= 0 ? year : year - 399) / 400;
-  unsigned yoe = (unsigned)(year - era * 400);                             // [0, 399]
+  unsigned yoe = (unsigned) (year - era * 400);                            // [0, 399]
   unsigned doy = (153 * (month + (month > 2 ? -3 : 9)) + 2) / 5 + day - 1; // [0, 365]
   unsigned doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;                    // [0,146096]
-  return era * 146097LL + (int64_t)doe - 719468LL;
+  return era * 146097LL + (int64_t) doe - 719468LL;
 }
 
 int64_t
-vscp_fwhlp_to_unix_ns(
-  int year,
-  int month,
-  int day,
-  int hour,
-  int minute,
-  int second,
-  uint32_t microsecond)
+vscp_fwhlp_to_unix_ns(int year, int month, int day, int hour, int minute, int second, uint32_t microsecond)
 {
   // Convert date to days since epoch
   int64_t days = days_from_civil(year, month, day);
 
   // Convert everything to seconds
-  int64_t total_seconds =
-    days * SECS_PER_DAY +
-    hour * 3600LL +
-    minute * 60LL +
-    second;
+  int64_t total_seconds = days * SECS_PER_DAY + hour * 3600LL + minute * 60LL + second;
 
   // Convert to nanoseconds
-  return total_seconds * NS_PER_SEC + (int64_t)microsecond * 1000LL;
+  return total_seconds * NS_PER_SEC + (int64_t) microsecond * 1000LL;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -672,38 +775,34 @@ vscp_fwhlp_to_unix_ns(
 //
 
 static void
-civil_from_days(int64_t z,
-                int* y,
-                int* m,
-                int* d)
+civil_from_days(int64_t z, int *y, int *m, int *d)
 {
   // z = days since 1970-01-01
   z += 719468; // shift to civil 0000-03-01 base
 
   int64_t era     = (z >= 0 ? z : z - 146096) / 146097;
-  unsigned doe    = (unsigned)(z - era * 146097); // [0, 146096]
+  unsigned doe    = (unsigned) (z - era * 146097); // [0, 146096]
   unsigned yoe    = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
-  int64_t y_full  = (int64_t)yoe + era * 400;
+  int64_t y_full  = (int64_t) yoe + era * 400;
   unsigned doy    = doe - (365 * yoe + yoe / 4 - yoe / 100);
   unsigned mp     = (5 * doy + 2) / 153;
   unsigned d_full = doy - (153 * mp + 2) / 5 + 1;
   unsigned m_full = mp + (mp < 10 ? 3 : -9);
 
-  *y = (int)(y_full + (m_full <= 2));
-  *m = (int)m_full;
-  *d = (int)d_full;
+  *y = (int) (y_full + (m_full <= 2));
+  *m = (int) m_full;
+  *d = (int) d_full;
 }
 
 void
-vscp_fwhlp_from_unix_ns(
-  int64_t unix_ns,
-  int* year,
-  int* month,
-  int* day,
-  int* hour,
-  int* minute,
-  int* second,
-  uint32_t* microsecond)
+vscp_fwhlp_from_unix_ns(int64_t unix_ns,
+                        int *year,
+                        int *month,
+                        int *day,
+                        int *hour,
+                        int *minute,
+                        int *second,
+                        uint32_t *microsecond)
 {
   // --- Split seconds and nanoseconds safely ---
   int64_t sec  = unix_ns / NS_PER_SEC;
@@ -727,12 +826,12 @@ vscp_fwhlp_from_unix_ns(
   civil_from_days(days, year, month, day);
 
   // --- Convert remainder → H:M:S ---
-  *hour = (int)(rem / 3600);
+  *hour = (int) (rem / 3600);
   rem %= 3600;
-  *minute = (int)(rem / 60);
-  *second = (int)(rem % 60);
+  *minute = (int) (rem / 60);
+  *second = (int) (rem % 60);
 
-  *microsecond = (uint32_t)(nsec / 1000);
+  *microsecond = (uint32_t) (nsec / 1000);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -740,10 +839,10 @@ vscp_fwhlp_from_unix_ns(
 //
 
 int
-vscp_fwhlp_parseMac(uint8_t* pmac, const char* strmac, char** endptr)
+vscp_fwhlp_parseMac(uint8_t *pmac, const char *strmac, char **endptr)
 {
   int i;
-  char* p = (char*)strmac;
+  char *p = (char *) strmac;
 
   // Check pointers
   if (NULL == strmac) {
@@ -771,7 +870,7 @@ vscp_fwhlp_parseMac(uint8_t* pmac, const char* strmac, char** endptr)
   }
 
   for (i = 0; i < 6; i++) {
-    pmac[i] = (uint8_t)strtol(p, &p, 16);
+    pmac[i] = (uint8_t) strtol(p, &p, 16);
     if (!*p) {
       break; // at end?
     }
@@ -800,7 +899,7 @@ vscp_fwhlp_parseMac(uint8_t* pmac, const char* strmac, char** endptr)
 // vscp_fwhlp_getEventPriority
 
 unsigned char
-vscp_fwhlp_getEventPriority(const vscpEvent* pev)
+vscp_fwhlp_getEventPriority(const vscpEvent *pev)
 {
   // Must be a valid message pointer
   if (NULL == pev) {
@@ -814,7 +913,7 @@ vscp_fwhlp_getEventPriority(const vscpEvent* pev)
 // vscp_fwhlp_getEventPriorityEx
 
 unsigned char
-vscp_fwhlp_getEventPriorityEx(const vscpEventEx* pex)
+vscp_fwhlp_getEventPriorityEx(const vscpEventEx *pex)
 {
   // Must be a valid message pointer
   if (NULL == pex) {
@@ -830,11 +929,11 @@ vscp_fwhlp_getEventPriorityEx(const vscpEventEx* pex)
 // vscp_fwhlp_newEvent
 //
 
-vscpEvent*
+vscpEvent *
 vscp_fwhlp_newEvent(void)
 {
-  static vscpEvent* pev = NULL;
-  pev                   = (vscpEvent*)calloc(1, sizeof(vscpEvent));
+  static vscpEvent *pev = NULL;
+  pev                   = (vscpEvent *) calloc(1, sizeof(vscpEvent));
   return pev;
 }
 
@@ -842,7 +941,7 @@ vscp_fwhlp_newEvent(void)
 // vscp_fwhlp_convertEventToEventEx
 
 int
-vscp_fwhlp_convertEventToEventEx(vscpEventEx* pEventEx, const vscpEvent* pEvent)
+vscp_fwhlp_convertEventToEventEx(vscpEventEx *pEventEx, const vscpEvent *pEvent)
 {
   // Check pointers
   if (NULL == pEvent) {
@@ -884,7 +983,7 @@ vscp_fwhlp_convertEventToEventEx(vscpEventEx* pEventEx, const vscpEvent* pEvent)
 //
 
 int
-vscp_fwhlp_convertEventExToEvent(vscpEvent* pEvent, const vscpEventEx* pEventEx)
+vscp_fwhlp_convertEventExToEvent(vscpEvent *pEvent, const vscpEventEx *pEventEx)
 {
   // Check pointers
   if (NULL == pEvent) {
@@ -931,15 +1030,15 @@ vscp_fwhlp_convertEventExToEvent(vscpEvent* pEvent, const vscpEventEx* pEventEx)
 // vscp_fwhlp_mkEventCopy
 //
 
-vscpEvent*
-vscp_fwhlp_mkEventCopy(const vscpEvent* pev)
+vscpEvent *
+vscp_fwhlp_mkEventCopy(const vscpEvent *pev)
 {
   // Must have event to work on
   if (NULL == pev) {
     return NULL;
   }
 
-  vscpEvent* pnewEvent = vscp_fwhlp_newEvent();
+  vscpEvent *pnewEvent = vscp_fwhlp_newEvent();
   if (NULL == pnewEvent) {
     return NULL;
   }
@@ -948,7 +1047,7 @@ vscp_fwhlp_mkEventCopy(const vscpEvent* pev)
   memcpy(pnewEvent, pev, sizeof(vscpEvent));
 
   if (pev->sizeData) {
-    pnewEvent->pdata = (uint8_t*)malloc(pev->sizeData);
+    pnewEvent->pdata = (uint8_t *) malloc(pev->sizeData);
     if (NULL == pnewEvent->pdata) {
       free(pnewEvent);
       return NULL;
@@ -966,15 +1065,15 @@ vscp_fwhlp_mkEventCopy(const vscpEvent* pev)
 // vscp_fwhlp_mkEventExCopy
 //
 
-vscpEventEx*
-vscp_fwhlp_mkEventExCopy(const vscpEventEx* pex)
+vscpEventEx *
+vscp_fwhlp_mkEventExCopy(const vscpEventEx *pex)
 {
   // Must have event to work on
   if (NULL == pex) {
     return NULL;
   }
 
-  vscpEventEx* pnewEventEx = (vscpEventEx*)malloc(sizeof(vscpEventEx));
+  vscpEventEx *pnewEventEx = (vscpEventEx *) malloc(sizeof(vscpEventEx));
   ;
   if (NULL == pnewEventEx) {
     return NULL;
@@ -991,7 +1090,7 @@ vscp_fwhlp_mkEventExCopy(const vscpEventEx* pex)
 //
 
 int
-vscp_fwhlp_deleteEvent(vscpEvent** pev)
+vscp_fwhlp_deleteEvent(vscpEvent **pev)
 {
   if (NULL == *pev)
     return VSCP_ERROR_INVALID_POINTER;
@@ -1011,10 +1110,10 @@ vscp_fwhlp_deleteEvent(vscpEvent** pev)
 //
 
 int
-vscp_fwhlp_parseGuid(uint8_t* guid, const char* strguid, char** endptr)
+vscp_fwhlp_parseGuid(uint8_t *guid, const char *strguid, char **endptr)
 {
   int i;
-  char* p = (char*)strguid;
+  char *p = (char *) strguid;
 
   // Check pointers
   if (NULL == strguid) {
@@ -1042,7 +1141,7 @@ vscp_fwhlp_parseGuid(uint8_t* guid, const char* strguid, char** endptr)
   }
 
   for (i = 0; i < 16; i++) {
-    guid[i] = (uint8_t)strtol(p, &p, 16);
+    guid[i] = (uint8_t) strtol(p, &p, 16);
     if (!*p) {
       break; // at end?
     }
@@ -1072,7 +1171,7 @@ vscp_fwhlp_parseGuid(uint8_t* guid, const char* strguid, char** endptr)
 //
 
 int
-vscp_fwhlp_writeGuidToString(char* strguid, const uint8_t* guid)
+vscp_fwhlp_writeGuidToString(char *strguid, const uint8_t *guid)
 {
   // Check pointers
   if (NULL == strguid) {
@@ -1112,9 +1211,9 @@ vscp_fwhlp_writeGuidToString(char* strguid, const uint8_t* guid)
 //
 
 int
-vscp_fwhlp_parseFilter(vscpEventFilter* pfilter, const char* strfilter)
+vscp_fwhlp_parseFilter(vscpEventFilter *pfilter, const char *strfilter)
 {
-  char* p = (char*)strfilter;
+  char *p = (char *) strfilter;
 
   // Check pointers
   if (NULL == strfilter) {
@@ -1126,7 +1225,7 @@ vscp_fwhlp_parseFilter(vscpEventFilter* pfilter, const char* strfilter)
   }
 
   // Priority
-  pfilter->filter_priority = (uint8_t)strtol(p, &p, 0);
+  pfilter->filter_priority = (uint8_t) strtol(p, &p, 0);
   if (',' != *p) {
     return VSCP_ERROR_ERROR;
   }
@@ -1137,7 +1236,7 @@ vscp_fwhlp_parseFilter(vscpEventFilter* pfilter, const char* strfilter)
   }
 
   // Class filter
-  pfilter->filter_class = (uint16_t)strtol(p, &p, 0);
+  pfilter->filter_class = (uint16_t) strtol(p, &p, 0);
   if (',' != *p) {
     return VSCP_ERROR_ERROR;
   }
@@ -1148,7 +1247,7 @@ vscp_fwhlp_parseFilter(vscpEventFilter* pfilter, const char* strfilter)
   }
 
   // Type filter
-  pfilter->filter_type = (uint16_t)strtol(p, &p, 0);
+  pfilter->filter_type = (uint16_t) strtol(p, &p, 0);
   if (',' != *p) {
     return VSCP_ERROR_ERROR;
   }
@@ -1169,9 +1268,9 @@ vscp_fwhlp_parseFilter(vscpEventFilter* pfilter, const char* strfilter)
 //
 
 int
-vscp_fwhlp_parseMask(vscpEventFilter* pfilter, const char* strmask)
+vscp_fwhlp_parseMask(vscpEventFilter *pfilter, const char *strmask)
 {
-  char* p = (char*)strmask;
+  char *p = (char *) strmask;
 
   // Check pointers
   if (NULL == strmask) {
@@ -1183,7 +1282,7 @@ vscp_fwhlp_parseMask(vscpEventFilter* pfilter, const char* strmask)
   }
 
   // Priority
-  pfilter->mask_priority = (uint8_t)strtol(p, &p, 0);
+  pfilter->mask_priority = (uint8_t) strtol(p, &p, 0);
   if (',' != *p) {
     return VSCP_ERROR_ERROR;
   }
@@ -1193,7 +1292,7 @@ vscp_fwhlp_parseMask(vscpEventFilter* pfilter, const char* strmask)
   }
 
   // Class mask
-  pfilter->mask_class = (uint16_t)strtol(p, &p, 0);
+  pfilter->mask_class = (uint16_t) strtol(p, &p, 0);
   if (',' != *p) {
     return VSCP_ERROR_ERROR;
   }
@@ -1203,7 +1302,7 @@ vscp_fwhlp_parseMask(vscpEventFilter* pfilter, const char* strmask)
   }
 
   // Type mask
-  pfilter->mask_type = (uint16_t)strtol(p, &p, 0);
+  pfilter->mask_type = (uint16_t) strtol(p, &p, 0);
   if (',' != *p) {
     return VSCP_ERROR_ERROR;
   }
@@ -1223,10 +1322,10 @@ vscp_fwhlp_parseMask(vscpEventFilter* pfilter, const char* strmask)
 //
 
 int
-vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
+vscp_fwhlp_parseEvent(vscpEvent *pev, const char *buf)
 {
   uint8_t wrkbuf[512];
-  char* p = (char*)buf;
+  char *p = (char *) buf;
 
   // Check pointers
   if (NULL == buf) {
@@ -1240,7 +1339,7 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
   memset(pev, 0, sizeof(vscpEvent));
 
   // head
-  pev->head = (uint16_t)strtol(p, &p, 0);
+  pev->head = (uint16_t) strtol(p, &p, 0);
   if (',' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -1250,7 +1349,7 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
   }
 
   // VSCP class
-  pev->vscp_class = (uint16_t)strtol(p, &p, 0);
+  pev->vscp_class = (uint16_t) strtol(p, &p, 0);
   if (',' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -1260,7 +1359,7 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
   }
 
   // VSCP type
-  pev->vscp_type = (uint16_t)strtol(p, &p, 0);
+  pev->vscp_type = (uint16_t) strtol(p, &p, 0);
   if (',' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -1275,7 +1374,7 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
     p++; // point beyond comma
   }
   else {
-    pev->obid = (uint32_t)strtol(p, &p, 0);
+    pev->obid = (uint32_t) strtol(p, &p, 0);
     if (',' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -1302,7 +1401,7 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
   }
   else {
     // year
-    pev->year = (uint16_t)strtol(p, &p, 0);
+    pev->year = (uint16_t) strtol(p, &p, 0);
     if ('-' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -1312,7 +1411,7 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
     }
 
     // month
-    pev->month = (uint16_t)strtol(p, &p, 0);
+    pev->month = (uint16_t) strtol(p, &p, 0);
     if ('-' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -1322,7 +1421,7 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
     }
 
     // day
-    pev->day = (uint16_t)strtol(p, &p, 0);
+    pev->day = (uint16_t) strtol(p, &p, 0);
     if ('T' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -1332,7 +1431,7 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
     }
 
     // hour
-    pev->hour = (uint16_t)strtol(p, &p, 0);
+    pev->hour = (uint16_t) strtol(p, &p, 0);
     if (':' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -1342,7 +1441,7 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
     }
 
     // minute
-    pev->minute = (uint16_t)strtol(p, &p, 0);
+    pev->minute = (uint16_t) strtol(p, &p, 0);
     if (':' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -1352,7 +1451,7 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
     }
 
     // second
-    pev->second = (uint16_t)strtol(p, &p, 0);
+    pev->second = (uint16_t) strtol(p, &p, 0);
     if (',' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -1368,7 +1467,7 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
     p++; // point beyond comma
   }
   else {
-    pev->timestamp = (uint32_t)strtol(p, &p, 0);
+    pev->timestamp = (uint32_t) strtol(p, &p, 0);
     if (',' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -1391,7 +1490,7 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
 
   // Get data (if any )
   while ((p <= (buf + strlen(buf))) && (pev->sizeData < 512)) {
-    wrkbuf[pev->sizeData] = (uint8_t)strtol(p, &p, 0);
+    wrkbuf[pev->sizeData] = (uint8_t) strtol(p, &p, 0);
     pev->sizeData++;
     p++; // point beyond comma
   }
@@ -1413,10 +1512,10 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf)
 //
 
 int
-vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
+vscp_fwhlp_parseEventEx(vscpEventEx *pex, const char *buf)
 {
   uint8_t wrkbuf[512];
-  char* p = (char*)buf;
+  char *p = (char *) buf;
 
   // Check pointers
   if (NULL == buf) {
@@ -1430,7 +1529,7 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
   memset(pex, 0, sizeof(vscpEventEx));
 
   // head
-  pex->head = (uint16_t)strtol(p, &p, 0);
+  pex->head = (uint16_t) strtol(p, &p, 0);
   if (',' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -1440,7 +1539,7 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
   }
 
   // VSCP class
-  pex->vscp_class = (uint16_t)strtol(p, &p, 0);
+  pex->vscp_class = (uint16_t) strtol(p, &p, 0);
   if (',' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -1450,7 +1549,7 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
   }
 
   // VSCP type
-  pex->vscp_type = (uint16_t)strtol(p, &p, 0);
+  pex->vscp_type = (uint16_t) strtol(p, &p, 0);
   if (',' != *p) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -1465,7 +1564,7 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
     p++; // point beyond comma
   }
   else {
-    pex->obid = (uint32_t)strtol(p, &p, 0);
+    pex->obid = (uint32_t) strtol(p, &p, 0);
     if (',' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -1492,7 +1591,7 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
   }
   else {
     // year
-    pex->year = (uint16_t)strtol(p, &p, 0);
+    pex->year = (uint16_t) strtol(p, &p, 0);
     if ('-' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -1502,7 +1601,7 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
     }
 
     // month
-    pex->month = (uint16_t)strtol(p, &p, 0);
+    pex->month = (uint16_t) strtol(p, &p, 0);
     if ('-' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -1512,7 +1611,7 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
     }
 
     // day
-    pex->day = (uint16_t)strtol(p, &p, 0);
+    pex->day = (uint16_t) strtol(p, &p, 0);
     if ('T' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -1522,7 +1621,7 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
     }
 
     // hour
-    pex->hour = (uint16_t)strtol(p, &p, 0);
+    pex->hour = (uint16_t) strtol(p, &p, 0);
     if (':' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -1532,7 +1631,7 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
     }
 
     // minute
-    pex->minute = (uint16_t)strtol(p, &p, 0);
+    pex->minute = (uint16_t) strtol(p, &p, 0);
     if (':' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -1542,7 +1641,7 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
     }
 
     // second
-    pex->second = (uint16_t)strtol(p, &p, 0);
+    pex->second = (uint16_t) strtol(p, &p, 0);
     if (',' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -1558,7 +1657,7 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
     p++; // point beyond comma
   }
   else {
-    pex->timestamp = (uint32_t)strtol(p, &p, 0);
+    pex->timestamp = (uint32_t) strtol(p, &p, 0);
     if (',' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -1581,7 +1680,7 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
 
   // Get data (if any )
   while ((p <= (buf + strlen(buf))) && (pex->sizeData < 512)) {
-    wrkbuf[pex->sizeData] = (uint8_t)strtol(p, &p, 0);
+    wrkbuf[pex->sizeData] = (uint8_t) strtol(p, &p, 0);
     pex->sizeData++;
     p++; // point beyond comma
   }
@@ -1610,7 +1709,7 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* buf)
 //
 
 int
-vscp_fwhlp_eventToString(char* buf, size_t size, const vscpEvent* pev)
+vscp_fwhlp_eventToString(char *buf, size_t size, const vscpEvent *pev)
 {
   char wrkbuf[48]; // Can hold full GUID
 
@@ -1626,15 +1725,33 @@ vscp_fwhlp_eventToString(char* buf, size_t size, const vscpEvent* pev)
 
   // Len must be able to hold content
   // data size for each byte is 5 as worst '0xff,'
-  if (size < ((size_t)((size_t)((size_t)((pev->sizeData * 5) + 110 + 1))))) {
+  if (size < ((size_t) ((size_t) ((size_t) ((pev->sizeData * 5) + 110 + 1))))) {
     return VSCP_ERROR_BUFFER_TO_SMALL;
   }
 
   if (pev->year || pev->month || pev->day || pev->hour || pev->minute || pev->second) {
-    sprintf(buf, "%u,%u,%u,%lu,%4d-%02d-%02dT%02d:%02d:%02dZ,%lu,", (unsigned)pev->head, (unsigned)pev->vscp_class, (unsigned)pev->vscp_type, (unsigned long)pev->obid, (int)pev->year, (int)pev->month, (int)pev->day, (int)pev->hour, (int)pev->minute, (int)pev->second, (unsigned long)pev->timestamp);
+    sprintf(buf,
+            "%u,%u,%u,%lu,%4d-%02d-%02dT%02d:%02d:%02dZ,%lu,",
+            (unsigned) pev->head,
+            (unsigned) pev->vscp_class,
+            (unsigned) pev->vscp_type,
+            (unsigned long) pev->obid,
+            (int) pev->year,
+            (int) pev->month,
+            (int) pev->day,
+            (int) pev->hour,
+            (int) pev->minute,
+            (int) pev->second,
+            (unsigned long) pev->timestamp);
   }
   else {
-    sprintf(buf, "%d,%u,%u,%lu,,%lu,", (unsigned)pev->head, (unsigned)pev->vscp_class, (unsigned)pev->vscp_type, (unsigned long)pev->obid, (unsigned long)pev->timestamp);
+    sprintf(buf,
+            "%d,%u,%u,%lu,,%lu,",
+            (unsigned) pev->head,
+            (unsigned) pev->vscp_class,
+            (unsigned) pev->vscp_type,
+            (unsigned long) pev->obid,
+            (unsigned long) pev->timestamp);
   }
 
   // GUID
@@ -1654,10 +1771,10 @@ vscp_fwhlp_eventToString(char* buf, size_t size, const vscpEvent* pev)
     for (int i = 0; i < pev->sizeData; i++) {
 
       if (i < (pev->sizeData - 1)) {
-        sprintf(wrkbuf, "%d,", (int)pev->pdata[i]);
+        sprintf(wrkbuf, "%d,", (int) pev->pdata[i]);
       }
       else {
-        sprintf(wrkbuf, "%d", (int)pev->pdata[i]);
+        sprintf(wrkbuf, "%d", (int) pev->pdata[i]);
       }
 
       // Check that data fits
@@ -1689,7 +1806,7 @@ vscp_fwhlp_eventToString(char* buf, size_t size, const vscpEvent* pev)
 // data: ",255" => 4 * 512 = 2048
 
 int
-vscp_fwhlp_eventToStringEx(char* buf, size_t size, const vscpEventEx* pex)
+vscp_fwhlp_eventToStringEx(char *buf, size_t size, const vscpEventEx *pex)
 {
   char wrkbuf[48]; // Can hold full GUID
 
@@ -1705,33 +1822,33 @@ vscp_fwhlp_eventToStringEx(char* buf, size_t size, const vscpEventEx* pex)
 
   // Len must be able to hold content
   // data size for each byte is 5 as worst '0xff,'
-  if (size < ((size_t)((pex->sizeData * 5) + 110 + 1))) {
+  if (size < ((size_t) ((pex->sizeData * 5) + 110 + 1))) {
     return VSCP_ERROR_BUFFER_TO_SMALL;
   }
 
   if (pex->year || pex->month || pex->day || pex->hour || pex->minute || pex->second) {
     sprintf(buf,
             "%u,%u,%u,%lu,%4d-%02d-%02dT%02d:%02d:%02dZ,%lu,",
-            (unsigned)pex->head,
-            (unsigned)pex->vscp_class,
-            (unsigned)pex->vscp_type,
-            (unsigned long)pex->obid,
-            (int)pex->year,
-            (int)pex->month,
-            (int)pex->day,
-            (int)pex->hour,
-            (int)pex->minute,
-            (int)pex->second,
-            (unsigned long)pex->timestamp);
+            (unsigned) pex->head,
+            (unsigned) pex->vscp_class,
+            (unsigned) pex->vscp_type,
+            (unsigned long) pex->obid,
+            (int) pex->year,
+            (int) pex->month,
+            (int) pex->day,
+            (int) pex->hour,
+            (int) pex->minute,
+            (int) pex->second,
+            (unsigned long) pex->timestamp);
   }
   else {
     sprintf(buf,
             "%d,%u,%u,%lu,,%lu,",
-            (unsigned)pex->head,
-            (unsigned)pex->vscp_class,
-            (unsigned)pex->vscp_type,
-            (unsigned long)pex->obid,
-            (unsigned long)pex->timestamp);
+            (unsigned) pex->head,
+            (unsigned) pex->vscp_class,
+            (unsigned) pex->vscp_type,
+            (unsigned long) pex->obid,
+            (unsigned long) pex->timestamp);
   }
 
   // GUID
@@ -1751,10 +1868,10 @@ vscp_fwhlp_eventToStringEx(char* buf, size_t size, const vscpEventEx* pex)
     for (int i = 0; i < pex->sizeData; i++) {
 
       if (i < (pex->sizeData - 1)) {
-        sprintf(wrkbuf, "%d,", (int)pex->data[i]);
+        sprintf(wrkbuf, "%d,", (int) pex->data[i]);
       }
       else {
-        sprintf(wrkbuf, "%d", (int)pex->data[i]);
+        sprintf(wrkbuf, "%d", (int) pex->data[i]);
       }
 
       // Check that data fits
@@ -1790,7 +1907,7 @@ vscp_fwhlp_eventToStringEx(char* buf, size_t size, const vscpEventEx* pex)
 //
 
 int
-vscp_fwhlp_doLevel2Filter(const vscpEvent* pev, const vscpEventFilter* pFilter)
+vscp_fwhlp_doLevel2Filter(const vscpEvent *pev, const vscpEventFilter *pFilter)
 {
   // A NULL filter is wildcard
   if (NULL == pFilter) {
@@ -1803,23 +1920,23 @@ vscp_fwhlp_doLevel2Filter(const vscpEvent* pev, const vscpEventFilter* pFilter)
   }
 
   // Test vscp_class
-  if (0xffff != (uint16_t)(~(pFilter->filter_class ^ pev->vscp_class) | ~pFilter->mask_class)) {
+  if (0xffff != (uint16_t) (~(pFilter->filter_class ^ pev->vscp_class) | ~pFilter->mask_class)) {
     return 0;
   }
 
   // Test vscp_type
-  if (0xffff != (uint16_t)(~(pFilter->filter_type ^ pev->vscp_type) | ~pFilter->mask_type)) {
+  if (0xffff != (uint16_t) (~(pFilter->filter_type ^ pev->vscp_type) | ~pFilter->mask_type)) {
     return 0;
   }
 
   // GUID
   for (int i = 0; i < 16; i++) {
-    if (0xff != (uint8_t)(~(pFilter->filter_GUID[i] ^ pev->GUID[i]) | ~pFilter->mask_GUID[i]))
+    if (0xff != (uint8_t) (~(pFilter->filter_GUID[i] ^ pev->GUID[i]) | ~pFilter->mask_GUID[i]))
       return 0;
   }
 
   // Test priority
-  if (0xff != (uint8_t)(~(pFilter->filter_priority ^ vscp_fwhlp_getEventPriority(pev)) | ~pFilter->mask_priority)) {
+  if (0xff != (uint8_t) (~(pFilter->filter_priority ^ vscp_fwhlp_getEventPriority(pev)) | ~pFilter->mask_priority)) {
     return 0;
   }
 
@@ -1846,7 +1963,7 @@ vscp_fwhlp_doLevel2Filter(const vscpEvent* pev, const vscpEventFilter* pFilter)
 //
 
 int
-vscp_fwhlp_doLevel2FilterEx(const vscpEventEx* pex, const vscpEventFilter* pFilter)
+vscp_fwhlp_doLevel2FilterEx(const vscpEventEx *pex, const vscpEventFilter *pFilter)
 {
   // A NULL filter is wildcard
   if (NULL == pFilter) {
@@ -1859,23 +1976,23 @@ vscp_fwhlp_doLevel2FilterEx(const vscpEventEx* pex, const vscpEventFilter* pFilt
   }
 
   // Test vscp_class
-  if (0xffff != (uint16_t)(~(pFilter->filter_class ^ pex->vscp_class) | ~pFilter->mask_class)) {
+  if (0xffff != (uint16_t) (~(pFilter->filter_class ^ pex->vscp_class) | ~pFilter->mask_class)) {
     return 0;
   }
 
   // Test vscp_type
-  if (0xffff != (uint16_t)(~(pFilter->filter_type ^ pex->vscp_type) | ~pFilter->mask_type)) {
+  if (0xffff != (uint16_t) (~(pFilter->filter_type ^ pex->vscp_type) | ~pFilter->mask_type)) {
     return 0;
   }
 
   // GUID
   for (int i = 0; i < 16; i++) {
-    if (0xff != (uint8_t)(~(pFilter->filter_GUID[i] ^ pex->GUID[i]) | ~pFilter->mask_GUID[i]))
+    if (0xff != (uint8_t) (~(pFilter->filter_GUID[i] ^ pex->GUID[i]) | ~pFilter->mask_GUID[i]))
       return 0;
   }
 
   // Test priority
-  if (0xff != (uint8_t)(~(pFilter->filter_priority ^ vscp_fwhlp_getEventPriorityEx(pex)) | ~pFilter->mask_priority)) {
+  if (0xff != (uint8_t) (~(pFilter->filter_priority ^ vscp_fwhlp_getEventPriorityEx(pex)) | ~pFilter->mask_priority)) {
     return 0;
   }
 
@@ -1892,7 +2009,7 @@ vscp_fwhlp_doLevel2FilterEx(const vscpEventEx* pex, const vscpEventFilter* pFilt
 //
 
 size_t
-vscp_fwhlp_getFrameSizeFromEvent(vscpEvent* pEvent)
+vscp_fwhlp_getFrameSizeFromEvent(vscpEvent *pEvent)
 {
   // Check pointer
   if (NULL == pEvent) {
@@ -1909,7 +2026,7 @@ vscp_fwhlp_getFrameSizeFromEvent(vscpEvent* pEvent)
 //
 
 size_t
-vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx* pEventEx)
+vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx *pEventEx)
 {
   // Check pointer
   if (NULL == pEventEx) {
@@ -1926,7 +2043,7 @@ vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx* pEventEx)
 //
 
 int
-vscp_fwhlp_writeEventToFrame(uint8_t* frame, size_t len, uint8_t pkttype, const vscpEvent* pEvent)
+vscp_fwhlp_writeEventToFrame(uint8_t *frame, size_t len, uint8_t pkttype, const vscpEvent *pEvent)
 {
   // Check pointers
   if (NULL == frame) {
@@ -1992,7 +2109,7 @@ vscp_fwhlp_writeEventToFrame(uint8_t* frame, size_t len, uint8_t pkttype, const 
   }
 
   // Calculate CRC
-  crc framecrc = crcFast((unsigned char const*)frame + 1, VSCP_MULTICAST_PACKET0_HEADER_LENGTH + pEvent->sizeData);
+  crc framecrc = crcFast((unsigned char const *) frame + 1, VSCP_MULTICAST_PACKET0_HEADER_LENGTH + pEvent->sizeData);
 
   // CRC
   frame[1 + VSCP_MULTICAST_PACKET0_HEADER_LENGTH + pEvent->sizeData]     = (framecrc >> 8) & 0xff;
@@ -2022,10 +2139,10 @@ vscp_fwhlp_writeEventToFrame(uint8_t* frame, size_t len, uint8_t pkttype, const 
 //
 
 int
-vscp_fwhlp_writeEventExToFrame(uint8_t* frame, size_t len, uint8_t pkttype, const vscpEventEx* pEventEx)
+vscp_fwhlp_writeEventExToFrame(uint8_t *frame, size_t len, uint8_t pkttype, const vscpEventEx *pEventEx)
 {
   int rv;
-  vscpEvent* pEvent;
+  vscpEvent *pEvent;
 
   pEvent = vscp_fwhlp_newEvent();
   if (NULL == pEvent) {
@@ -2058,7 +2175,7 @@ vscp_fwhlp_writeEventExToFrame(uint8_t* frame, size_t len, uint8_t pkttype, cons
 //
 
 int
-vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
+vscp_fwhlp_getEventFromFrame(vscpEvent *pEvent, const uint8_t *buf, size_t len)
 {
   // Check pointers
   if (NULL == pEvent) {
@@ -2098,14 +2215,14 @@ vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
   size_t calcFrameSize = 1 +                                    // packet type & encryption
                          VSCP_MULTICAST_PACKET0_HEADER_LENGTH + // header
                          2 +                                    // CRC
-                         ((uint16_t)buf[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_MSB] << 8) +
+                         ((uint16_t) buf[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_MSB] << 8) +
                          buf[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_LSB];
 
   // The buffer must hold a frame
   if (len < calcFrameSize)
     return VSCP_ERROR_BUFFER_TO_SMALL;
 
-  crc crcFrame = ((uint16_t)buf[calcFrameSize - 2] << 8) + buf[calcFrameSize - 1];
+  crc crcFrame = ((uint16_t) buf[calcFrameSize - 2] << 8) + buf[calcFrameSize - 1];
 
   // CRC check (only if not disabled)
   crc crcnew;
@@ -2121,7 +2238,7 @@ vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
 #endif
 
     // Calculate & check CRC
-    crcnew = crcFast((unsigned char const*)buf + 1, (int)calcFrameSize - 1);
+    crcnew = crcFast((unsigned char const *) buf + 1, (int) calcFrameSize - 1);
     // CRC is zero if calculated over itself
     if (crcnew) {
       return VSCP_ERROR_INVALID_CHECKSUM;
@@ -2129,10 +2246,10 @@ vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
   }
 
   pEvent->sizeData =
-    ((uint16_t)buf[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_LSB];
+    ((uint16_t) buf[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_VSCP_SIZE_LSB];
 
   // Allocate data
-  if (NULL == (pEvent->pdata = (uint8_t*)malloc(pEvent->sizeData))) {
+  if (NULL == (pEvent->pdata = (uint8_t *) malloc(pEvent->sizeData))) {
     return VSCP_ERROR_MEMORY;
   }
 
@@ -2140,7 +2257,7 @@ vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
   memcpy(pEvent->pdata, buf + VSCP_MULTICAST_PACKET0_POS_VSCP_DATA, pEvent->sizeData);
 
   // Head
-  pEvent->head = ((uint16_t)buf[VSCP_MULTICAST_PACKET0_POS_HEAD_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_HEAD_LSB];
+  pEvent->head = ((uint16_t) buf[VSCP_MULTICAST_PACKET0_POS_HEAD_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_HEAD_LSB];
 
   // Copy in GUID
   memcpy(pEvent->GUID, buf + VSCP_MULTICAST_PACKET0_POS_VSCP_GUID, pEvent->sizeData);
@@ -2149,26 +2266,26 @@ vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
   pEvent->crc = crcFrame;
 
   // Set timestamp
-  pEvent->timestamp = ((uint32_t)buf[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP] << 24) +
-                      ((uint32_t)buf[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP + 1] << 16) +
-                      ((uint32_t)buf[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP + 2] << 8) +
+  pEvent->timestamp = ((uint32_t) buf[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP] << 24) +
+                      ((uint32_t) buf[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP + 1] << 16) +
+                      ((uint32_t) buf[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP + 2] << 8) +
                       buf[VSCP_MULTICAST_PACKET0_POS_TIMESTAMP + 3];
 
   // Date/time
-  pEvent->year   = ((uint16_t)buf[VSCP_MULTICAST_PACKET0_POS_YEAR_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_YEAR_LSB];
-  pEvent->month  = buf[VSCP_MULTICAST_PACKET0_POS_MONTH];
-  pEvent->day    = buf[VSCP_MULTICAST_PACKET0_POS_DAY];
-  pEvent->hour   = buf[VSCP_MULTICAST_PACKET0_POS_HOUR];
+  pEvent->year  = ((uint16_t) buf[VSCP_MULTICAST_PACKET0_POS_YEAR_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_YEAR_LSB];
+  pEvent->month = buf[VSCP_MULTICAST_PACKET0_POS_MONTH];
+  pEvent->day   = buf[VSCP_MULTICAST_PACKET0_POS_DAY];
+  pEvent->hour  = buf[VSCP_MULTICAST_PACKET0_POS_HOUR];
   pEvent->minute = buf[VSCP_MULTICAST_PACKET0_POS_MINUTE];
   pEvent->second = buf[VSCP_MULTICAST_PACKET0_POS_SECOND];
 
   // VSCP Class
   pEvent->vscp_class =
-    ((uint16_t)buf[VSCP_MULTICAST_PACKET0_POS_VSCP_CLASS_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_VSCP_CLASS_LSB];
+    ((uint16_t) buf[VSCP_MULTICAST_PACKET0_POS_VSCP_CLASS_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_VSCP_CLASS_LSB];
 
   // VSCP Type
   pEvent->vscp_type =
-    ((uint16_t)buf[VSCP_MULTICAST_PACKET0_POS_VSCP_TYPE_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_VSCP_TYPE_LSB];
+    ((uint16_t) buf[VSCP_MULTICAST_PACKET0_POS_VSCP_TYPE_MSB] << 8) + buf[VSCP_MULTICAST_PACKET0_POS_VSCP_TYPE_LSB];
 
   // obid - set to zero so interface fill it in
   pEvent->obid = 0;
@@ -2181,12 +2298,12 @@ vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len)
 //
 
 int
-vscp_fwhlp_getEventExFromFrame(vscpEventEx* pEventEx, const uint8_t* frame, size_t len)
+vscp_fwhlp_getEventExFromFrame(vscpEventEx *pEventEx, const uint8_t *frame, size_t len)
 {
   int rv;
-  vscpEvent* pEvent;
+  vscpEvent *pEvent;
 
-  pEvent = (vscpEvent*)calloc(1, sizeof(vscpEvent));
+  pEvent = (vscpEvent *) calloc(1, sizeof(vscpEvent));
   if (NULL == pEvent) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -2224,11 +2341,11 @@ vscp_fwhlp_getEventExFromFrame(vscpEventEx* pEventEx, const uint8_t* frame, size
 //
 
 size_t
-vscp_fwhlp_encryptFrame(uint8_t* output,
-                        uint8_t* input,
+vscp_fwhlp_encryptFrame(uint8_t *output,
+                        uint8_t *input,
                         size_t len,
-                        const uint8_t* key,
-                        const uint8_t* iv,
+                        const uint8_t *key,
+                        const uint8_t *iv,
                         uint8_t nAlgorithm)
 {
   uint8_t generated_iv[16];
@@ -2281,9 +2398,9 @@ vscp_fwhlp_encryptFrame(uint8_t* output,
       AES_CBC_encrypt_buffer(AES192,
                              output + 1,
                              input + 1, // Not Packet type byte
-                             (uint32_t)padlen,
+                             (uint32_t) padlen,
                              key,
-                             (const uint8_t*)generated_iv);
+                             (const uint8_t *) generated_iv);
       // Append iv
       memcpy(output + 1 + padlen, generated_iv, 16);
       padlen += 16; // length of iv
@@ -2293,9 +2410,9 @@ vscp_fwhlp_encryptFrame(uint8_t* output,
       AES_CBC_encrypt_buffer(AES256,
                              output + 1,
                              input + 1, // Not Packet type byte
-                             (uint32_t)padlen,
+                             (uint32_t) padlen,
                              key,
-                             (const uint8_t*)generated_iv);
+                             (const uint8_t *) generated_iv);
       // Append iv
       memcpy(output + 1 + padlen, generated_iv, 16);
       padlen += 16; // length of iv
@@ -2305,9 +2422,9 @@ vscp_fwhlp_encryptFrame(uint8_t* output,
       AES_CBC_encrypt_buffer(AES128,
                              output + 1,
                              input + 1, // Not Packet type byte
-                             (uint32_t)padlen,
+                             (uint32_t) padlen,
                              key,
-                             (const uint8_t*)generated_iv);
+                             (const uint8_t *) generated_iv);
       // Append iv
       memcpy(output + 1 + padlen, generated_iv, 16);
       padlen += 16; // length of iv
@@ -2334,11 +2451,11 @@ vscp_fwhlp_encryptFrame(uint8_t* output,
 //
 
 int
-vscp_fwhlp_decryptFrame(uint8_t* output,
-                        uint8_t* input,
+vscp_fwhlp_decryptFrame(uint8_t *output,
+                        uint8_t *input,
                         size_t len,
-                        const uint8_t* key,
-                        const uint8_t* iv,
+                        const uint8_t *key,
+                        const uint8_t *iv,
                         uint8_t nAlgorithm)
 {
   uint8_t appended_iv[16];
@@ -2386,27 +2503,27 @@ vscp_fwhlp_decryptFrame(uint8_t* output,
       AES_CBC_decrypt_buffer(AES256,
                              output + 1,
                              input + 1,
-                             (uint32_t)real_len - 1,
+                             (uint32_t) real_len - 1,
                              key,
-                             (const uint8_t*)appended_iv);
+                             (const uint8_t *) appended_iv);
       break;
 
     case VSCP_ENCRYPTION_AES192:
       AES_CBC_decrypt_buffer(AES192,
                              output + 1,
                              input + 1,
-                             (uint32_t)real_len - 1,
+                             (uint32_t) real_len - 1,
                              key,
-                             (const uint8_t*)appended_iv);
+                             (const uint8_t *) appended_iv);
       break;
 
     case VSCP_ENCRYPTION_AES128:
       AES_CBC_decrypt_buffer(AES128,
                              output + 1,
                              input + 1,
-                             (uint32_t)real_len - 1,
+                             (uint32_t) real_len - 1,
                              key,
-                             (const uint8_t*)appended_iv);
+                             (const uint8_t *) appended_iv);
       break;
 
     default:
@@ -2453,10 +2570,10 @@ vscp_fwhlp_decryptFrame(uint8_t* output,
 */
 
 int
-vscp_fwhlp_parse_json(vscpEvent* pev, const char* jsonVscpEventObj)
+vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj)
 {
   int rv;
-  cJSON* root;
+  cJSON *root;
 
   // Check pointers
   if ((NULL == pev) || (NULL == jsonVscpEventObj)) {
@@ -2472,17 +2589,17 @@ vscp_fwhlp_parse_json(vscpEvent* pev, const char* jsonVscpEventObj)
   memset(pev, 0, sizeof(vscpEvent));
 
   if (cJSON_GetObjectItem(root, "vscpHead")) {
-    pev->head = (uint16_t)cJSON_GetObjectItem(root, "vscpHead")->valueint;
+    pev->head = (uint16_t) cJSON_GetObjectItem(root, "vscpHead")->valueint;
   }
 
   if (cJSON_GetObjectItem(root, "vscpObId")) {
-    pev->obid = (uint32_t)cJSON_GetObjectItem(root, "vscpObId")->valuedouble;
+    pev->obid = (uint32_t) cJSON_GetObjectItem(root, "vscpObId")->valuedouble;
   }
 
   // "2017-01-13T10:16:02",
   if (cJSON_GetObjectItem(root, "vscpDateTime")) {
     int year, month, day, hour, minute, second;
-    const char* str = cJSON_GetObjectItem(root, "vscpDateTime")->valuestring;
+    const char *str = cJSON_GetObjectItem(root, "vscpDateTime")->valuestring;
     sscanf(str, "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second);
     pev->year   = year;
     pev->month  = month;
@@ -2493,20 +2610,20 @@ vscp_fwhlp_parse_json(vscpEvent* pev, const char* jsonVscpEventObj)
   }
 
   if (cJSON_GetObjectItem(root, "vscpTimeStamp")) {
-    pev->timestamp = (uint32_t)cJSON_GetObjectItem(root, "vscpTimeStamp")->valuedouble;
+    pev->timestamp = (uint32_t) cJSON_GetObjectItem(root, "vscpTimeStamp")->valuedouble;
   }
 
   if (cJSON_GetObjectItem(root, "vscpClass")) {
-    pev->vscp_class = (uint16_t)cJSON_GetObjectItem(root, "vscpClass")->valueint;
+    pev->vscp_class = (uint16_t) cJSON_GetObjectItem(root, "vscpClass")->valueint;
     ;
   }
 
   if (cJSON_GetObjectItem(root, "vscpType")) {
-    pev->vscp_type = (uint16_t)cJSON_GetObjectItem(root, "vscpType")->valueint;
+    pev->vscp_type = (uint16_t) cJSON_GetObjectItem(root, "vscpType")->valueint;
   }
 
   if (cJSON_GetObjectItem(root, "vscpGuid")) {
-    const char* str = cJSON_GetObjectItem(root, "vscpGuid")->valuestring;
+    const char *str = cJSON_GetObjectItem(root, "vscpGuid")->valuestring;
     if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseGuid(pev->GUID, str, NULL))) {
       return rv;
     }
@@ -2514,16 +2631,16 @@ vscp_fwhlp_parse_json(vscpEvent* pev, const char* jsonVscpEventObj)
 
   if (cJSON_GetObjectItem(root, "vscpData")) {
 
-    cJSON* pdata  = cJSON_GetObjectItem(root, "vscpData");
+    cJSON *pdata  = cJSON_GetObjectItem(root, "vscpData");
     pev->sizeData = cJSON_GetArraySize(pdata);
-    pev->pdata    = (uint8_t*)malloc(pev->sizeData);
+    pev->pdata    = (uint8_t *) malloc(pev->sizeData);
     if (NULL == pev->pdata) {
       cJSON_Delete(root);
       return VSCP_ERROR_MEMORY;
     }
 
     for (int i = 0; i < pev->sizeData; i++) {
-      cJSON* pitem = cJSON_GetArrayItem(pdata, i);
+      cJSON *pitem = cJSON_GetArrayItem(pdata, i);
       if (pitem->type == cJSON_Number && i < 512) {
         pev->pdata[i] = pitem->valueint;
       }
@@ -2560,10 +2677,10 @@ vscp_fwhlp_parse_json(vscpEvent* pev, const char* jsonVscpEventObj)
 */
 
 int
-vscp_fwhlp_parse_json_ex(vscpEventEx* pex, const char* jsonVscpEventObj)
+vscp_fwhlp_parse_json_ex(vscpEventEx *pex, const char *jsonVscpEventObj)
 {
   int rv;
-  cJSON* root;
+  cJSON *root;
 
   // Check pointers
   if ((NULL == pex) || (NULL == jsonVscpEventObj)) {
@@ -2579,17 +2696,17 @@ vscp_fwhlp_parse_json_ex(vscpEventEx* pex, const char* jsonVscpEventObj)
   memset(pex, 0, sizeof(vscpEventEx));
 
   if (cJSON_GetObjectItem(root, "vscpHead")) {
-    pex->head = (uint16_t)cJSON_GetObjectItem(root, "vscpHead")->valueint;
+    pex->head = (uint16_t) cJSON_GetObjectItem(root, "vscpHead")->valueint;
   }
 
   if (cJSON_GetObjectItem(root, "vscpObId")) {
-    pex->obid = (uint32_t)cJSON_GetObjectItem(root, "vscpObId")->valuedouble;
+    pex->obid = (uint32_t) cJSON_GetObjectItem(root, "vscpObId")->valuedouble;
   }
 
   // "2017-01-13T10:16:02",
   if (cJSON_GetObjectItem(root, "vscpDateTime")) {
     int year, month, day, hour, minute, second;
-    const char* str = cJSON_GetObjectItem(root, "vscpDateTime")->valuestring;
+    const char *str = cJSON_GetObjectItem(root, "vscpDateTime")->valuestring;
     sscanf(str, "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second);
     pex->year   = year;
     pex->month  = month;
@@ -2600,20 +2717,20 @@ vscp_fwhlp_parse_json_ex(vscpEventEx* pex, const char* jsonVscpEventObj)
   }
 
   if (cJSON_GetObjectItem(root, "vscpTimeStamp")) {
-    pex->timestamp = (uint32_t)cJSON_GetObjectItem(root, "vscpTimeStamp")->valuedouble;
+    pex->timestamp = (uint32_t) cJSON_GetObjectItem(root, "vscpTimeStamp")->valuedouble;
   }
 
   if (cJSON_GetObjectItem(root, "vscpClass")) {
-    pex->vscp_class = (uint16_t)cJSON_GetObjectItem(root, "vscpClass")->valueint;
+    pex->vscp_class = (uint16_t) cJSON_GetObjectItem(root, "vscpClass")->valueint;
     ;
   }
 
   if (cJSON_GetObjectItem(root, "vscpType")) {
-    pex->vscp_type = (uint16_t)cJSON_GetObjectItem(root, "vscpType")->valueint;
+    pex->vscp_type = (uint16_t) cJSON_GetObjectItem(root, "vscpType")->valueint;
   }
 
   if (cJSON_GetObjectItem(root, "vscpGuid")) {
-    const char* str = cJSON_GetObjectItem(root, "vscpGuid")->valuestring;
+    const char *str = cJSON_GetObjectItem(root, "vscpGuid")->valuestring;
     if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseGuid(pex->GUID, str, NULL))) {
       return rv;
     }
@@ -2621,11 +2738,11 @@ vscp_fwhlp_parse_json_ex(vscpEventEx* pex, const char* jsonVscpEventObj)
 
   if (cJSON_GetObjectItem(root, "vscpData")) {
 
-    cJSON* pdata  = cJSON_GetObjectItem(root, "vscpData");
+    cJSON *pdata  = cJSON_GetObjectItem(root, "vscpData");
     pex->sizeData = cJSON_GetArraySize(pdata);
 
     for (int i = 0; i < pex->sizeData; i++) {
-      cJSON* pitem = cJSON_GetArrayItem(pdata, i);
+      cJSON *pitem = cJSON_GetArrayItem(pdata, i);
       if (pitem->type == cJSON_Number && i < 512) {
         pex->data[i] = pitem->valueint;
       }
@@ -2643,10 +2760,10 @@ vscp_fwhlp_parse_json_ex(vscpEventEx* pex, const char* jsonVscpEventObj)
 //
 
 int
-vscp_fwhlp_create_json(char* strObj, size_t len, const vscpEvent* pev)
+vscp_fwhlp_create_json(char *strObj, size_t len, const vscpEvent *pev)
 {
   char str[80];
-  cJSON* root;
+  cJSON *root;
 
   // Check pointers
   if ((NULL == strObj) || (NULL == pev)) {
@@ -2667,14 +2784,14 @@ vscp_fwhlp_create_json(char* strObj, size_t len, const vscpEvent* pev)
   cJSON_AddStringToObject(root, "vscpGUID", str);
   sprintf(str, "%04d-%02d-%02dT%02d:%02d:%02d", pev->year, pev->month, pev->day, pev->hour, pev->minute, pev->second);
   cJSON_AddStringToObject(root, "vscpDateTime", str);
-  cJSON* array;
+  cJSON *array;
   array = cJSON_AddArrayToObject(root, "vscpData");
-  cJSON* element;
+  cJSON *element;
   for (int i = 0; i < pev->sizeData; i++) {
     element = cJSON_CreateNumber(pev->pdata[i]);
     cJSON_AddItemToArray(array, element);
   }
-  char* json_string = cJSON_Print(root);
+  char *json_string = cJSON_Print(root);
   if (NULL == json_string) {
     cJSON_Delete(root);
     return VSCP_ERROR_PARSING;
@@ -2701,10 +2818,10 @@ vscp_fwhlp_create_json(char* strObj, size_t len, const vscpEvent* pev)
 //
 
 int
-vscp_fwhlp_create_json_ex(char* strObj, size_t len, const vscpEventEx* pex)
+vscp_fwhlp_create_json_ex(char *strObj, size_t len, const vscpEventEx *pex)
 {
   char str[80];
-  cJSON* root;
+  cJSON *root;
 
   // Check pointers
   if ((NULL == strObj) || (NULL == pex)) {
@@ -2722,14 +2839,14 @@ vscp_fwhlp_create_json_ex(char* strObj, size_t len, const vscpEventEx* pex)
   cJSON_AddStringToObject(root, "vscpGUID", str);
   sprintf(str, "%04d-%02d-%02dT%02d:%02d:%02d", pex->year, pex->month, pex->day, pex->hour, pex->minute, pex->second);
   cJSON_AddStringToObject(root, "vscpDateTime", str);
-  cJSON* array;
+  cJSON *array;
   array = cJSON_AddArrayToObject(root, "vscpData");
-  cJSON* element;
+  cJSON *element;
   for (int i = 0; i < pex->sizeData; i++) {
     element = cJSON_CreateNumber(pex->data[i]);
     cJSON_AddItemToArray(array, element);
   }
-  char* json_string = cJSON_Print(root);
+  char *json_string = cJSON_Print(root);
   if (NULL == json_string) {
     cJSON_Delete(root);
     return VSCP_ERROR_PARSING;
@@ -2765,27 +2882,25 @@ vscp_fwhlp_create_json_ex(char* strObj, size_t len, const vscpEventEx* pex)
 
 // Known attribute names for reference (not strictly necessary, but can be used
 // for validation or indexing)
-const char known_attributes[][MAX_NAME_LEN] = {
-  "unknown",
-  "head",
-  "obid",
-  "datetime",
-  "timestamp",
-  "class",
-  "type",
-  "guid",
-  "sizedata",
-  "data",
-  // Optional extra attributes that may be present in the event string
-  "value",
-  "unit",
-  "sensorindex",
-  "zone",
-  "subzone",
-  // 64-bit Linux timestamp in nanoseconds (replace year, month, day, hour,
-  // minute, second and 32-bit timestamp with 64-bit timestamps)
-  "timestamps"
-};
+const char known_attributes[][MAX_NAME_LEN] = { "unknown",
+                                                "head",
+                                                "obid",
+                                                "datetime",
+                                                "timestamp",
+                                                "class",
+                                                "type",
+                                                "guid",
+                                                "sizedata",
+                                                "data",
+                                                // Optional extra attributes that may be present in the event string
+                                                "value",
+                                                "unit",
+                                                "sensorindex",
+                                                "zone",
+                                                "subzone",
+                                                // 64-bit Linux timestamp in nanoseconds (replace year, month, day,
+                                                // hour, minute, second and 32-bit timestamp with 64-bit timestamps)
+                                                "timestamps" };
 
 // Structure to hold attribute information
 typedef struct {
@@ -2795,13 +2910,10 @@ typedef struct {
 } attribute_t;
 
 static int
-find_or_add_name(const char* name,
-                 char name_list[MAX_ATTRIBUTES][MAX_NAME_LEN],
-                 size_t* name_count)
+find_or_add_name(const char *name, char name_list[MAX_ATTRIBUTES][MAX_NAME_LEN], size_t *name_count)
 {
   // Check if the name exists in the known_attributes list
-  for (size_t i = 0; i < sizeof(known_attributes) / sizeof(known_attributes[0]);
-       i++) {
+  for (size_t i = 0; i < sizeof(known_attributes) / sizeof(known_attributes[0]); i++) {
     if (strcmp(name, known_attributes[i]) == 0) {
       return i; // Return the index in the known_attributes list
     }
@@ -2810,9 +2922,7 @@ find_or_add_name(const char* name,
   // If the name is not in known_attributes, add it to the dynamic name_list
   for (size_t i = 0; i < *name_count; i++) {
     if (strcmp(name, name_list[i]) == 0) {
-      return i +
-             (sizeof(known_attributes) /
-              sizeof(known_attributes[0])); // Offset by known_attributes size
+      return i + (sizeof(known_attributes) / sizeof(known_attributes[0])); // Offset by known_attributes size
     }
   }
 
@@ -2820,23 +2930,21 @@ find_or_add_name(const char* name,
     strncpy(name_list[*name_count], name, MAX_NAME_LEN - 1);
     name_list[*name_count][MAX_NAME_LEN - 1] = '\0';
     return (*name_count)++ +
-           (sizeof(known_attributes) /
-            sizeof(
-              known_attributes[0])); // Add the name and return its new index
+           (sizeof(known_attributes) / sizeof(known_attributes[0])); // Add the name and return its new index
   }
 
   return -1; // Error: name list is full
 }
 
 static int
-validate_event_string(const char* eventstr)
+validate_event_string(const char *eventstr)
 {
   if (!eventstr) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
   // Skip leading whitespace
-  while (*eventstr && isspace((unsigned char)*eventstr)) {
+  while (*eventstr && isspace((unsigned char) *eventstr)) {
     eventstr++;
   }
 
@@ -2846,8 +2954,8 @@ validate_event_string(const char* eventstr)
   }
 
   // Find the end of the string, skipping trailing whitespace
-  const char* end = eventstr + strlen(eventstr) - 1;
-  while (end > eventstr && isspace((unsigned char)*end)) {
+  const char *end = eventstr + strlen(eventstr) - 1;
+  while (end > eventstr && isspace((unsigned char) *end)) {
     end--;
   }
 
@@ -2860,7 +2968,7 @@ validate_event_string(const char* eventstr)
 }
 
 static int
-parse_event_string(attribute_t* attributes, size_t* attribute_count, const char* eventstr)
+_parse_event_string(attribute_t *attributes, size_t *attribute_count, const char *eventstr)
 {
   *attribute_count = 0;
   char name_list[MAX_ATTRIBUTES][MAX_NAME_LEN];
@@ -2874,7 +2982,7 @@ parse_event_string(attribute_t* attributes, size_t* attribute_count, const char*
     return VSCP_ERROR_INVALID_SYNTAX;
   }
 
-  const char* ptr = eventstr + 7; // Skip the "<event " part
+  const char *ptr = eventstr + 7; // Skip the "<event " part
   while (*ptr && *attribute_count < MAX_ATTRIBUTES) {
 
     // Skip to the next attribute name
@@ -2882,7 +2990,7 @@ parse_event_string(attribute_t* attributes, size_t* attribute_count, const char*
 
       // Also skip comments starting with <!-- and ending with -->
       if (*ptr == '<' && strncmp(ptr, "<!--", 4) == 0) {
-        const char* comment_end = strstr(ptr, "-->");
+        const char *comment_end = strstr(ptr, "-->");
         if (!comment_end) {
           return VSCP_ERROR_INVALID_SYNTAX; // Malformed comment, stop parsing
         }
@@ -2892,13 +3000,13 @@ parse_event_string(attribute_t* attributes, size_t* attribute_count, const char*
     }
 
     // Skip comments starting with <!-- and ending with -->
-    const char* comment_start = strstr(ptr, "<!--");
+    const char *comment_start = strstr(ptr, "<!--");
     if (comment_start && (comment_start == ptr)) {
       ptr = comment_start + 4; // Skip the <!--
       printf("Skipping comment...\n");
-      const char* comment_end = strstr(ptr, "-->");
+      const char *comment_end = strstr(ptr, "-->");
       if (comment_end) {
-        printf("Comment content: %.*s\n", (int)(comment_end - ptr), ptr);
+        printf("Comment content: %.*s\n", (int) (comment_end - ptr), ptr);
         ptr = comment_end + 3; // Skip the -->
       }
       else {
@@ -2908,7 +3016,7 @@ parse_event_string(attribute_t* attributes, size_t* attribute_count, const char*
     }
 
     // Extract the attribute name
-    const char* start = ptr;
+    const char *start = ptr;
     while (*ptr && *ptr != '=') {
       ptr++;
     }
@@ -2942,8 +3050,7 @@ parse_event_string(attribute_t* attributes, size_t* attribute_count, const char*
       attributes[*attribute_count].value[len] = '\0';
 
       // Find or add the name to the name list and store its index in id
-      attributes[*attribute_count].id =
-        find_or_add_name(name, name_list, &name_count);
+      attributes[*attribute_count].id = find_or_add_name(name, name_list, &name_count);
 
       // Copy the name to the attribute
       strncpy(attributes[*attribute_count].name, name, MAX_NAME_LEN - 1);
@@ -2962,7 +3069,7 @@ parse_event_string(attribute_t* attributes, size_t* attribute_count, const char*
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscp_fwhlp_parse_xml
+// vscp_fwhlp_parse_xml_event
 //
 // <event
 //     head="3"
@@ -2977,7 +3084,7 @@ parse_event_string(attribute_t* attributes, size_t* attribute_count, const char*
 // />
 
 int
-vscp_fwhlp_parse_xml_event(vscpEvent* pev, const char* eventstr)
+vscp_fwhlp_parse_xml_event(vscpEvent *pev, const char *eventstr)
 {
   int rv;
   attribute_t attributes[MAX_ATTRIBUTES];
@@ -2987,23 +3094,14 @@ vscp_fwhlp_parse_xml_event(vscpEvent* pev, const char* eventstr)
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  if (VSCP_ERROR_SUCCESS != (rv = parse_event_string(attributes, &attribute_count, eventstr))) {
+  if (VSCP_ERROR_SUCCESS != (rv = _parse_event_string(attributes, &attribute_count, eventstr))) {
     return rv;
   }
 
   memset(pev, 0, sizeof(vscpEvent)); // Clear the event structure
 
   for (int i = 0; i < attribute_count; i++) {
-    printf("Attribute %d: name='%s', value='%s', id=%d\n", i, attributes[i].name, attributes[i].value, attributes[i].id);
-    // Here you would add code to map the attribute names/ids to the pev fields
-    // For example:
-    // if (strcmp(attributes[i].name, "head") == 0) {
-    //   pev->head = atoi(attributes[i].value);
-    // }
-    // else if (strcmp(attributes[i].name, "obid") == 0) {
-    //   pev->obid = atoi(attributes[i].value);
-    // }
-    // ... and so on for other attributes
+
     switch (attributes[i].id) {
 
       case 1: // head
@@ -3016,6 +3114,9 @@ vscp_fwhlp_parse_xml_event(vscpEvent* pev, const char* eventstr)
 
       case 3: // datetime
         // Parse datetime string and fill pev->year, pev->month, etc.
+        if (VSCP_ERROR_SUCCESS != vscp_fwhlp_parse_event_datestr(pev, attributes[i].value, NULL)) {
+          return VSCP_ERROR_PARAMETER;  
+        }
         break;
 
       case 4: // timestamp
@@ -3042,6 +3143,24 @@ vscp_fwhlp_parse_xml_event(vscpEvent* pev, const char* eventstr)
 
       case 9: // data
         // Parse data string and fill pev->pdata accordingly
+        {
+          pev->pdata = (uint8_t *) malloc(512); // Allocate maximum possible data size
+          if (NULL == pev->pdata) {
+            return VSCP_ERROR_MEMORY;
+          }
+          const char *endptr;
+          rv = vscp_fwhlp_parse_data(pev->pdata, 512, attributes[i].value, &endptr);
+          if (rv < 0) {
+            free(pev->pdata);
+            pev->pdata = NULL;
+            return rv; // Return the error code from data parsing
+          }
+          pev->sizeData = rv;                                             // Set the actual size of data parsed
+          pev->pdata    = (uint8_t *) realloc(pev->pdata, pev->sizeData); // Resize to actual data size
+          if (NULL == pev->pdata) {
+            return VSCP_ERROR_MEMORY;
+          }
+        }
         break;
 
       default:
@@ -3058,8 +3177,80 @@ vscp_fwhlp_parse_xml_event(vscpEvent* pev, const char* eventstr)
 //
 
 int
-vscp_fwhlp_parse_xml_eventex(vscpEventEx* pex, const char* eventexstr)
+vscp_fwhlp_parse_xml_eventex(vscpEventEx *pex, const char *eventexstr)
 {
+  int rv;
+  attribute_t attributes[MAX_ATTRIBUTES];
+  size_t attribute_count = 0;
+
+  if ((NULL == pex) || (NULL == eventexstr)) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if (VSCP_ERROR_SUCCESS != (rv = _parse_event_string(attributes, &attribute_count, eventexstr))) {
+    return rv;
+  }
+
+  memset(pex, 0, sizeof(vscpEventEx)); // Clear the event structure
+
+  for (int i = 0; i < attribute_count; i++) {
+
+    switch (attributes[i].id) {
+
+      case 1: // head
+        pex->head = atoi(attributes[i].value);
+        break;
+
+      case 2: // obid
+        pex->obid = atoi(attributes[i].value);
+        break;
+
+      case 3: // datetime
+        // Parse datetime string and fill pex->year, pex->month, etc.
+        if (VSCP_ERROR_SUCCESS != vscp_fwhlp_parse_eventex_datestr(pex, attributes[i].value, NULL)) {
+          return VSCP_ERROR_PARAMETER;  
+        }
+        break;
+
+      case 4: // timestamp
+        pex->timestamp = atoi(attributes[i].value);
+        break;
+
+      case 5: // class
+        pex->vscp_class = atoi(attributes[i].value);
+        break;
+
+      case 6: // type
+        pex->vscp_type = atoi(attributes[i].value);
+        break;
+
+      case 7: // guid
+        if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseGuid(pex->GUID, attributes[i].value, NULL))) {
+          return rv;
+        }
+        break;
+
+      case 8: // sizedata
+        pex->sizeData = atoi(attributes[i].value);
+        break;
+
+      case 9: // data
+        // Parse data string and fill pex->pdata accordingly
+        {
+          rv = vscp_fwhlp_parse_data(pex->data, 512, attributes[i].value, NULL);
+          if (rv < 0) {
+            return rv; // Return the error code from data parsing
+          }
+          pex->sizeData = rv; // Set the actual size of data parsed
+        }
+        break;
+
+      default:
+        // Handle unknown attributes if necessary
+        break;
+    }
+  }
+
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -3068,7 +3259,7 @@ vscp_fwhlp_parse_xml_eventex(vscpEventEx* pex, const char* eventexstr)
 //
 
 int
-vscp_fwhlp_event_to_xml(char* eventstr, size_t len, const vscpEvent* pev)
+vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscpEvent *pev)
 {
   return VSCP_ERROR_SUCCESS;
 }
@@ -3078,8 +3269,42 @@ vscp_fwhlp_event_to_xml(char* eventstr, size_t len, const vscpEvent* pev)
 //
 
 int
-vscp_fwhlp_eventex_to_xml(char* eventexstr, size_t len, const vscpEventEx* pex)
+vscp_fwhlp_eventex_to_xml(char *eventexstr, size_t len, const vscpEventEx *pex)
 {
+
+  char strguid[80];
+  char strDateTime[64];
+  char strdata[512 * 5]; // 512 bytes of data can expand to 2048 characters in hex string format 0xff,0xff,... (4
+                         // characters per byte + comma)
+  char buf[80 + 64 + 512 * 5 + 256]; // Buffer to hold the final XML string, adjust size as needed
+
+  // Check pointer
+  if (nullptr == pex || nullptr == eventexstr) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if (VSCP_ERROR_SUCCESS != vscp_fwhlp_writeGuidToString(strguid, pex->GUID)) {
+    return VSCP_ERROR_PARSING;
+  }
+
+  if (NULL != vscp_fwhlp_make_string_from_data(strdata, sizeof(strdata), pex->data, pex->sizeData)) {
+    return VSCP_ERROR_PARSING;
+  }
+
+  vscp_fwhlp_get_datestr_from_eventex(strDateTime, sizeof(strDateTime), pex);
+
+  // datetime,head,obid,datetime,timestamp,class,type,guid,sizedata,data,note
+  sprintf(buf,
+          VSCP_XML_EVENT_TEMPLATE,
+          (unsigned short int) pex->head,
+          (unsigned long) pex->obid,
+          (const char *) strDateTime,
+          (unsigned long) pex->timestamp,
+          (unsigned short int) pex->vscp_class,
+          (unsigned short int) pex->vscp_type,
+          (const char *) strguid,
+          (const char *) strdata);
+
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -3096,7 +3321,7 @@ vscp_fwhlp_eventex_to_xml(char* eventexstr, size_t len, const vscpEventEx* pex)
 //
 
 uint8_t
-vscp_fwhlp_getMeasurementDataCoding(const vscpEvent* pEvent)
+vscp_fwhlp_getMeasurementDataCoding(const vscpEvent *pEvent)
 {
   uint8_t datacoding_byte = -1;
 
@@ -3137,7 +3362,7 @@ vscp_fwhlp_getMeasurementDataCoding(const vscpEvent* pEvent)
 //
 
 uint64_t
-vscp_fwhlp_getDataCodingBitArray(const uint8_t* pCode, const uint8_t length)
+vscp_fwhlp_getDataCodingBitArray(const uint8_t *pCode, const uint8_t length)
 {
   uint64_t bitArray = 0;
 
@@ -3163,7 +3388,7 @@ vscp_fwhlp_getDataCodingBitArray(const uint8_t* pCode, const uint8_t length)
 //
 
 int64_t
-vscp_fwhlp_getDataCodingInteger(const uint8_t* pCode, uint8_t length)
+vscp_fwhlp_getDataCodingInteger(const uint8_t *pCode, uint8_t length)
 {
   int64_t value64 = 0;
 
@@ -3178,10 +3403,10 @@ vscp_fwhlp_getDataCodingInteger(const uint8_t* pCode, uint8_t length)
 
   // Check if this is a negative number
   if ((*(pCode + 1)) & 0x80) {
-    memset((uint8_t*)&value64, 0xff, 8);
+    memset((uint8_t *) &value64, 0xff, 8);
   }
   else {
-    memset((uint8_t*)&value64, 0, 8);
+    memset((uint8_t *) &value64, 0, 8);
   }
 
   for (int i = 1; i < length; i++) {
@@ -3196,7 +3421,7 @@ vscp_fwhlp_getDataCodingInteger(const uint8_t* pCode, uint8_t length)
 //
 
 double
-vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t* pCode, uint8_t length)
+vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t *pCode, uint8_t length)
 {
   uint8_t valarray[8];
   uint8_t normbyte;
@@ -3230,29 +3455,29 @@ vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t* pCode, uint8_t length)
   switch (length - 2) {
 
     case 1: // 8-bit
-      memcpy((char*)&valarray, (pCode + 2), (length - 2));
-      value = *((int8_t*)valarray);
+      memcpy((char *) &valarray, (pCode + 2), (length - 2));
+      value = *((int8_t *) valarray);
       break;
 
     case 2: // 16-bit
-      memcpy((char*)&valarray, (pCode + 2), (length - 2));
-      value = VSCP_INT16_SWAP_ON_LE(*((uint16_t*)valarray));
+      memcpy((char *) &valarray, (pCode + 2), (length - 2));
+      value = VSCP_INT16_SWAP_ON_LE(*((uint16_t *) valarray));
       break;
 
     case 3: // 24-bit
-      memcpy(((char*)&valarray + 1), (pCode + 2), (length - 2));
+      memcpy(((char *) &valarray + 1), (pCode + 2), (length - 2));
       if (bNegative)
         *valarray = 0xff; // First byte must be 0xff
-      value = VSCP_INT32_SWAP_ON_LE(*((int32_t*)valarray));
+      value = VSCP_INT32_SWAP_ON_LE(*((int32_t *) valarray));
       break;
 
     case 4: // 32-bit
-      memcpy((char*)&valarray, (pCode + 2), (length - 2));
-      value = VSCP_INT32_SWAP_ON_LE(*((int32_t*)valarray));
+      memcpy((char *) &valarray, (pCode + 2), (length - 2));
+      value = VSCP_INT32_SWAP_ON_LE(*((int32_t *) valarray));
       break;
 
     case 5: // 40-bit
-      memcpy(((char*)&valarray + 3), (pCode + 2), (length - 2));
+      memcpy(((char *) &valarray + 3), (pCode + 2), (length - 2));
       if (bNegative) {
         *valarray       = 0xff; // First byte must be 0xff
         *(valarray + 1) = 0xff;
@@ -3260,25 +3485,25 @@ vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t* pCode, uint8_t length)
       }
 
 #ifdef __BIG_ENDIAN__
-      value = *((int64_t*)valarray);
+      value = *((int64_t *) valarray);
 #else
-      value64 = Swap8Bytes(*((int64_t*)valarray));
-      value   = (double)value64;
+      value64 = Swap8Bytes(*((int64_t *) valarray));
+      value   = (double) value64;
 #endif
       break;
 
     case 6: // 48-bit
-      memcpy(((char*)&valarray + 2), (pCode + 2), (length - 2));
+      memcpy(((char *) &valarray + 2), (pCode + 2), (length - 2));
       if (bNegative) {
         *valarray       = 0xff; // First byte must be 0xff
         *(valarray + 1) = 0xff;
       }
 
 #ifdef __BIG_ENDIAN__
-      value = *((int64_t*)valarray);
+      value = *((int64_t *) valarray);
 #else
-      value64 = Swap8Bytes(*((int64_t*)valarray));
-      value   = (double)value64;
+      value64 = Swap8Bytes(*((int64_t *) valarray));
+      value   = (double) value64;
 #endif
       break;
   }
@@ -3324,7 +3549,7 @@ vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t* pCode, uint8_t length)
 // vscp_fwhlp_setEventPriority
 
 void
-vscp_fwhlp_setEventPriority(vscpEvent* pEvent, unsigned char priority)
+vscp_fwhlp_setEventPriority(vscpEvent *pEvent, unsigned char priority)
 {
   // Must be a valid message pointer
   if (NULL == pEvent) {
@@ -3340,7 +3565,7 @@ vscp_fwhlp_setEventPriority(vscpEvent* pEvent, unsigned char priority)
 //
 
 int
-vscp_fwhlp_getMeasurementUnit(const vscpEvent* pEvent)
+vscp_fwhlp_getMeasurementUnit(const vscpEvent *pEvent)
 {
   int offset = 0;
 
@@ -3396,7 +3621,7 @@ vscp_fwhlp_getMeasurementUnit(const vscpEvent* pEvent)
 //
 
 int
-vscp_fwhlp_getMeasurementSensorIndex(const vscpEvent* pEvent)
+vscp_fwhlp_getMeasurementSensorIndex(const vscpEvent *pEvent)
 {
   int offset = 0;
 
@@ -3461,7 +3686,7 @@ vscp_fwhlp_getMeasurementSensorIndex(const vscpEvent* pEvent)
 //
 
 int
-vscp_fwhlp_getMeasurementZone(const vscpEvent* pEvent)
+vscp_fwhlp_getMeasurementZone(const vscpEvent *pEvent)
 {
   int offset = 0;
 
@@ -3526,7 +3751,7 @@ vscp_fwhlp_getMeasurementZone(const vscpEvent* pEvent)
 //
 
 int
-vscp_fwhlp_getMeasurementSubZone(const vscpEvent* pEvent)
+vscp_fwhlp_getMeasurementSubZone(const vscpEvent *pEvent)
 {
   int offset = 0;
 
@@ -3587,7 +3812,7 @@ vscp_fwhlp_getMeasurementSubZone(const vscpEvent* pEvent)
 //
 
 int
-vscp_fwhlp_isMeasurement(const vscpEvent* pEvent)
+vscp_fwhlp_isMeasurement(const vscpEvent *pEvent)
 {
   if (NULL == pEvent) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -3663,7 +3888,7 @@ vscp_fwhlp_getHeadFromCANALid(uint32_t id)
 uint16_t
 vscp_fwhlp_getVscpClassFromCANALid(uint32_t id)
 {
-  return (uint16_t)(0x1ff & (id >> 16));
+  return (uint16_t) (0x1ff & (id >> 16));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3673,7 +3898,7 @@ vscp_fwhlp_getVscpClassFromCANALid(uint32_t id)
 uint16_t
 vscp_fwhlp_getVscpTypeFromCANALid(uint32_t id)
 {
-  return (uint16_t)(0xff & (id >> 8));
+  return (uint16_t) (0xff & (id >> 8));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3696,7 +3921,7 @@ vscp_fwhlp_getCANALidFromData(unsigned char priority, const uint16_t vscp_class,
   // unsigned long t1 = (unsigned long)priority << 20;
   // unsigned long t2 = (unsigned long)pvscpMsg->vscp_class << 16;
   // unsigned long t3 = (unsigned long)pvscpMsg->vscp_type << 8;
-  return (((unsigned long)priority << 26) | ((unsigned long)vscp_class << 16) | ((unsigned long)vscp_type << 8) | 0);
+  return (((unsigned long) priority << 26) | ((unsigned long) vscp_class << 16) | ((unsigned long) vscp_type << 8) | 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3704,8 +3929,8 @@ vscp_fwhlp_getCANALidFromData(unsigned char priority, const uint16_t vscp_class,
 //
 
 uint32_t
-vscp_fwhlp_getCANALidFromEvent(const vscpEvent* pEvent)
+vscp_fwhlp_getCANALidFromEvent(const vscpEvent *pEvent)
 {
-  return (((unsigned long)vscp_fwhlp_getEventPriority(pEvent) << 26) | ((unsigned long)pEvent->vscp_class << 16) |
-          ((unsigned long)pEvent->vscp_type << 8) | 0);
+  return (((unsigned long) vscp_fwhlp_getEventPriority(pEvent) << 26) | ((unsigned long) pEvent->vscp_class << 16) |
+          ((unsigned long) pEvent->vscp_type << 8) | 0);
 }
