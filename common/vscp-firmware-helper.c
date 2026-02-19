@@ -3039,7 +3039,7 @@ _parse_event_string(attribute_t *attributes, size_t *attribute_count, const char
   while (*ptr && *attribute_count < MAX_ATTRIBUTES) {
 
     // Skip to the next attribute name
-    while (*ptr && !isalpha(*ptr)) {
+    while (*ptr && !isalpha((unsigned char)*ptr)) {
 
       // Also skip comments starting with <!-- and ending with -->
       if (*ptr == '<' && strncmp(ptr, "<!--", 4) == 0) {
