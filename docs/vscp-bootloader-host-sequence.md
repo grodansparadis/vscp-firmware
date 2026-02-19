@@ -1,5 +1,7 @@
 # vscp-bootloader-host-sequence
 
+Last updated: 2026-02-19
+
 This document describes the host-side firmware update sequence for nodes running the VSCP bootloader.
 
 It complements the node-side module guide:

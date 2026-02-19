@@ -1,5 +1,7 @@
 # vscp-fifo
 
+Last updated: 2026-02-19
+
 `vscp-fifo` provides a small ring-buffer queue for `vscpEvent*` pointers.
 
 - Header: `common/vscp-fifo.h`

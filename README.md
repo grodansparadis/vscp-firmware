@@ -5,6 +5,8 @@
 
 # VCSP Firmware
 
+Last updated: 2026-02-19
+
 <img src="http://vscp.org/images/logo.png" width="200px" alt="VSCP logo">
 
 VSCP firmware contains examples for different hardware architectures of how to
@@ -39,6 +41,10 @@ Local module documentation for the bootloader is available in [docs/vscp-bootloa
 Host-side firmware update flow for bootloader integration is available in [docs/vscp-bootloader-host-sequence.md](docs/vscp-bootloader-host-sequence.md).
 Reusable VSCP link protocol callback bring-up checklist is available in [docs/examples/vscp-link-protocol-callback-checklist.md](docs/examples/vscp-link-protocol-callback-checklist.md).
 Reusable VSCP Level I firmware porting checklist is available in [docs/examples/vscp-firmware-porting-checklist.md](docs/examples/vscp-firmware-porting-checklist.md).
+
+## Recent updates
+
+- Added `vscp_fwhlp_parseStringValue` behavior notes in [docs/vscp-firmware-helper.md](docs/vscp-firmware-helper.md), including base-prefix handling (`0x`, `0`, `0b`) and `endptr` token parsing semantics.
 
 ## CI
 

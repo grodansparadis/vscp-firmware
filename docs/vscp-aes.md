@@ -1,5 +1,7 @@
 # vscp-aes
 
+Last updated: 2026-02-19
+
 This document describes the AES helper module implemented by:
 
 - `common/vscp-aes.h`

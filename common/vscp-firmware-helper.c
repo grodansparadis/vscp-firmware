@@ -112,7 +112,7 @@ vscp_fwhlp_isBigEndian(void)
 //
 
 int
-vscp_fwhlp_a2ul(const char *src, uint8_t srclen, uint8_t base, uint32_t *resultp)
+vscp_fwhlp_a2ul(const char *src, uint8_t srclen, uint8_t base, uint32_t *resultp, char** endptr)
 {
   const char *stop;
   static char hex[]   = "0123456789abcdef";
@@ -135,14 +135,14 @@ vscp_fwhlp_a2ul(const char *src, uint8_t srclen, uint8_t base, uint32_t *resultp
   if (base == 0 || base == 13) {
 
     if (srclen > 2 && *src == '0' && CIEQ(*(src + 1), 'x')) {
-      return vscp_fwhlp_a2ul(src + 2, srclen - 2, 16, resultp);
+      return vscp_fwhlp_a2ul(src + 2, srclen - 2, 16, resultp, endptr);
     }
 
     if (srclen > 1 && *src == '0' && base != 13) {
-      return vscp_fwhlp_a2ul(src + 1, srclen - 1, 8, resultp);
+      return vscp_fwhlp_a2ul(src + 1, srclen - 1, 8, resultp, endptr);
     }
 
-    return vscp_fwhlp_a2ul(src, srclen, 10, resultp);
+    return vscp_fwhlp_a2ul(src, srclen, 10, resultp, endptr);
   }
 
   if (base != 8 && base != 10 && base != 16) {
@@ -195,6 +195,10 @@ vscp_fwhlp_a2ul(const char *src, uint8_t srclen, uint8_t base, uint32_t *resultp
   }
 
   *resultp = r;
+  if (endptr) {
+    *endptr = (char *) src;
+  }
+
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -311,22 +315,71 @@ vscp_fwhlp_readStringValue(const char *pString)
 
   if (NULL != (p = strstr(buf, "0x"))) {
     p += 2; // Point at the data
-    vscp_fwhlp_a2ul(buf, 0, 16, &ul);
+    vscp_fwhlp_a2ul(buf, 0, 16, &ul, NULL);
     return ul;
   }
   if (NULL != (p = strstr(buf, "0"))) {
     p += 2; // Point at the data
-    vscp_fwhlp_a2ul(buf, 0, 8, &ul);
+    vscp_fwhlp_a2ul(buf, 0, 8, &ul, NULL);
     return ul;
   }
   if (NULL != (p = strstr(buf, "0b"))) {
     p += 2; // Point at the data
-    vscp_fwhlp_a2ul(buf, 0, 2, &ul);
+    vscp_fwhlp_a2ul(buf, 0, 2, &ul, NULL);
     return ul;
   }
   else {
     ul = (unsigned) atoi(buf);
     return ul;
+  }
+
+  return ul;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_parseStringValue
+//
+
+uint32_t
+vscp_fwhlp_parseStringValue(const char *pString, char **endptr)
+{
+  uint32_t ul = 0;
+  char *p     = (char *) pString;
+  char *pend  = NULL;
+
+  if (NULL == pString) {
+    if (endptr) {
+      *endptr = NULL;
+    }
+    return 0;
+  }
+
+  while (*p && isspace((unsigned char) *p)) {
+    p++;
+  }
+
+  if (('0' == p[0]) && ('b' == tolower((unsigned char) p[1]))) {
+    char *pb = p + 2;
+    ul       = 0;
+
+    if ((*pb != '0') && (*pb != '1')) {
+      pend = p;
+    }
+    else {
+      while ((*pb == '0') || (*pb == '1')) {
+        ul = (ul << 1) | (uint32_t) (*pb - '0');
+        pb++;
+      }
+      pend = pb;
+    }
+  }
+  else {
+    unsigned long val = strtoul(p, &pend, 0);
+    ul                = (uint32_t) val;
+  }
+
+  if (endptr) {
+    *endptr = (NULL != pend) ? pend : p;
   }
 
   return ul;
@@ -463,7 +516,7 @@ vscp_fwhlp_parse_data(uint8_t *data, size_t length, const char *datastr, const c
     }
 
     char *next;
-    unsigned long value = strtoul(s, &next, 0);
+    unsigned long value = vscp_fwhlp_parseStringValue(s, &next);
     if (next == s) {
       return -1; // No conversion performed
     }

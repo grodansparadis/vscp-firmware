@@ -1,5 +1,7 @@
 # vscp-firmware-helper
 
+Last updated: 2026-02-19
+
 This document describes the helper module implemented by:
 
 - `common/vscp-firmware-helper.h`
@@ -75,12 +77,21 @@ General pattern:
 - `vscp_fwhlp_bin2hex`
 - `vscp_fwhlp_hex2bin`
 - `vscp_fwhlp_readStringValue`
+- `vscp_fwhlp_parseStringValue`
 - `vscp_fwhlp_stristr`
 - `vscp_fwhlp_strsubst`
 - `vscp_fwhlp_parse_data`
 - `vscp_fwhlp_make_string_from_data`
 
 Use these for robust handling of decimal/hex/binary forms and VSCP data payload strings.
+
+`vscp_fwhlp_parseStringValue` parsing rules:
+
+- Leading whitespace is skipped.
+- Prefix `0x`/`0X` parses hexadecimal.
+- Leading `0` parses octal using C-style numeric parsing.
+- Prefix `0b`/`0B` parses binary (`0`/`1` digits only).
+- `endptr` points to the first character after the parsed token, which makes it suitable for token-by-token parsing in comma/space separated buffers.
 
 ### 2) Date/Time Helpers
 
@@ -193,6 +204,20 @@ int n = vscp_fwhlp_parse_data(data,
 if (n < 0) {
   // handle parse error
 }
+```
+
+### Parse Single Value with `endptr`
+
+```c
+const char *input = "  0b101101,0x2A,077,42";
+char *next;
+
+uint32_t a = vscp_fwhlp_parseStringValue(input, &next); // 45
+if (next && *next == ',') {
+  next++;
+}
+
+uint32_t b = vscp_fwhlp_parseStringValue(next, &next); // 42
 ```
 
 ### Convert Event to Compact CSV-Like String

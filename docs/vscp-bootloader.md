@@ -1,5 +1,7 @@
 # vscp-bootloader
 
+Last updated: 2026-02-19
+
 This document describes the VSCP bootloader module implemented by:
 
 - `common/vscp-bootloader.h`

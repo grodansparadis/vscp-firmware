@@ -1,5 +1,7 @@
 # vscp-link-protocol
 
+Last updated: 2026-02-19
+
 This module implements the VSCP Link text command protocol dispatcher for firmware targets. It parses CRLF-terminated lines, maps commands to handlers, and delegates all transport/application work through callbacks.
 
 - Header: `common/vscp-link-protocol.h`

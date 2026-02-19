@@ -1,4 +1,5 @@
 
+260219 - Documented vscp_fwhlp_parseStringValue parsing semantics (0x/0/0b and endptr behavior) in helper docs and README indexes.
 
 220123 - Added handling of firmware code added i spec 1.13.
 200508 - vscp_initbtncnt increased to 16-bit (1.6.3)

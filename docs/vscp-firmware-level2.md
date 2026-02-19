@@ -1,5 +1,7 @@
 # vscp-firmware-level2
 
+Last updated: 2026-02-19
+
 This document describes the VSCP Level II firmware framework implemented by:
 
 - `common/vscp-firmware-level2.h`

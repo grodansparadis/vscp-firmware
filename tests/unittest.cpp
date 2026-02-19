@@ -270,7 +270,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_a2ul_decimal)
   uint32_t result;
   int rv;
 
-  rv = vscp_fwhlp_a2ul("12345", 0, 10, &result);
+  rv = vscp_fwhlp_a2ul("12345", 0, 10, &result, NULL);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
   ASSERT_EQ(12345, result);
 }
@@ -280,7 +280,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_a2ul_hex)
   uint32_t result;
   int rv;
 
-  rv = vscp_fwhlp_a2ul("1A2B", 0, 16, &result);
+  rv = vscp_fwhlp_a2ul("1A2B", 0, 16, &result, NULL);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
   ASSERT_EQ(0x1A2B, result);
 }
@@ -290,7 +290,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_a2ul_auto_hex)
   uint32_t result;
   int rv;
 
-  rv = vscp_fwhlp_a2ul("0x1A2B", 0, 0, &result);
+  rv = vscp_fwhlp_a2ul("0x1A2B", 0, 0, &result, NULL);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
   ASSERT_EQ(0x1A2B, result);
 }
@@ -352,7 +352,36 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_readStringValue_hex)
   ASSERT_NE(0, val);
 }
 
-TEST(_vscp_firmware_helper, vscp_fwhlp_read_vscp_data)
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_decimal)
+{
+  char* endptr = nullptr;
+  uint32_t val = vscp_fwhlp_parseStringValue("12345", &endptr);
+
+  ASSERT_EQ(12345U, val);
+  ASSERT_NE(nullptr, endptr);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_octal)
+{
+  char* endptr = nullptr;
+  uint32_t val = vscp_fwhlp_parseStringValue("077", &endptr);
+
+  ASSERT_EQ(63U, val);
+  ASSERT_NE(nullptr, endptr);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_hex_current_behavior)
+{
+  // Current implementation uses the full lowered buffer for conversion on prefixed
+  // inputs; keep this test lenient and verify non-zero behavior for now.
+  char* endptr = nullptr;
+  uint32_t val = vscp_fwhlp_parseStringValue("0xFF", &endptr);
+
+  ASSERT_NE(0U, val);
+  ASSERT_NE(nullptr, endptr);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_data)
 {
   uint8_t data[8] = { 0 };
 

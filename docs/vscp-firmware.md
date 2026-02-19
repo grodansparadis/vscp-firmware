@@ -1,5 +1,7 @@
 # vscp-firmware
 
+Last updated: 2026-02-19
+
 This document describes the Level I firmware core implemented in `common/vscp-firmware.h` and `common/vscp-firmware.c`.
 
 The module targets resource-constrained nodes and provides:

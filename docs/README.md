@@ -1,5 +1,7 @@
 # Documentation
 
+Last updated: 2026-02-19
+
 [![Tests](https://github.com/grodansparadis/vscp-firmware/actions/workflows/tests.yml/badge.svg)](https://github.com/grodansparadis/vscp-firmware/actions/workflows/tests.yml)
 
 The documentation is [here](https://grodansparadis.github.io/vscp-doc-firmware/#/)
@@ -23,6 +25,10 @@ Examples:
 - [vscp-fifo-usage-skeleton.c](examples/vscp-fifo-usage-skeleton.c)
 - [vscp-link-protocol-callback-checklist.md](examples/vscp-link-protocol-callback-checklist.md)
 - [vscp-firmware-porting-checklist.md](examples/vscp-firmware-porting-checklist.md)
+
+## Recent updates
+
+- Added `vscp_fwhlp_parseStringValue` behavior notes in [vscp-firmware-helper](vscp-firmware-helper.md), including base-prefix handling (`0x`, `0`, `0b`) and `endptr` token parsing semantics.
 
 ## CI
 

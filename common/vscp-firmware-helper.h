@@ -227,10 +227,12 @@ vscp_fwhlp_isBigEndian(void);
     @param srclen length of string, 0 means strlen( src )
     @param base The base for the conversion, 0 means figure it out.
     @param resultp Pointer that holds unsigned long result after conversion.
+    @param endptr Pointer to pointer that will be set to first character after parsed value. Can be NULL.
     @return  VSCP_ERROR_SUCCESS for success, else VSCP_ERROR_ERROR.
 */
 int
-vscp_fwhlp_a2ul(const char* src, uint8_t srclen, uint8_t base, uint32_t* resultp);
+vscp_fwhlp_a2ul(const char* src, uint8_t srclen, uint8_t base, uint32_t* resultp, char** endptr);
+
 
 /**
     Convert decimal byte to hex string
@@ -306,6 +308,17 @@ vscp_fwhlp_strsubst(char* pNewStr, size_t len, const char* pStr, const char* pTa
 */
 uint32_t
 vscp_fwhlp_readStringValue(const char* pString);
+
+/**
+    Read a value (hex or decimal)
+    @param pString Pointe to value. A hex value should be
+    be preceded by "0x" or "0X". Binary values can also be specified with "0b" or "0B" prefix. 
+    Octal values can be specified with "0o" or "0O" prefix.
+      @param endptr Pointer to pointer that will be set to first character after parsed value. Can be NULL.    
+    @return Converted value in decimal form.
+*/
+uint32_t
+vscp_fwhlp_parseStringValue(const char* pString, char** endptr);
 
 /**
   Find substring of other string and return pointer to it
