@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.10)
 # set the project name
 project(test LANGUAGES CXX C)
 
+include(CTest)
+enable_testing()
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # specify the C++ standard
@@ -15,9 +18,10 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 message(STATUS "Build dir: " ${PROJECT_SOURCE_DIR})
 
 find_package(GTest REQUIRED)
+include(GoogleTest)
 
 # add the executable
-add_executable(test 
+add_executable(vscp_firmware_tests 
     unittest.cpp
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-helper.c
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-helper.h
@@ -26,16 +30,20 @@ add_executable(test
     ${PROJECT_SOURCE_DIR}/../third-party/cJSON/cJSON.c
     )
 
-target_include_directories(test PUBLIC 
+set_target_properties(vscp_firmware_tests PROPERTIES OUTPUT_NAME test)
+
+target_include_directories(vscp_firmware_tests PUBLIC 
     ${PROJECT_SOURCE_DIR}/../common/
     ${PROJECT_SOURCE_DIR}/../third-party/cJSON/
     )
 
-target_link_libraries(test PRIVATE m
+target_link_libraries(vscp_firmware_tests PRIVATE m
     dl
     pthread
     gtest
     gtest_main
     )    
+
+gtest_discover_tests(vscp_firmware_tests)
 
 #add_library(MathFunctions mysqrt.cxx)

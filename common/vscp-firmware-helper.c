@@ -960,10 +960,10 @@ vscp_fwhlp_getEventPriority(const vscpEvent *pev)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscp_fwhlp_getEventPriorityEx
+// vscp_fwhlp_getEventExPriority
 
 unsigned char
-vscp_fwhlp_getEventPriorityEx(const vscpEventEx *pex)
+vscp_fwhlp_getEventExPriority(const vscpEventEx *pex)
 {
   // Must be a valid message pointer
   if (NULL == pex) {
@@ -971,6 +971,36 @@ vscp_fwhlp_getEventPriorityEx(const vscpEventEx *pex)
   }
 
   return ((pex->head >> 5) & 0x07);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_setEventPriority
+
+void
+vscp_fwhlp_setEventPriority(vscpEvent *pEvent, unsigned char priority)
+{
+  // Must be a valid message pointer
+  if (NULL == pEvent) {
+    return;
+  }
+
+  pEvent->head &= ~VSCP_HEADER_PRIORITY_MASK;
+  pEvent->head |= (priority << 5);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_setEventExPriority
+
+void
+vscp_fwhlp_setEventExPriority(vscpEventEx *pEventEx, unsigned char priority)
+{
+  // Must be a valid message pointer
+  if (NULL == pEventEx) {
+    return;
+  }
+
+  pEventEx->head &= ~VSCP_HEADER_PRIORITY_MASK;
+  pEventEx->head |= (priority << 5);
 }
 
 // ----------------------------------------------------------------------------
@@ -2042,7 +2072,7 @@ vscp_fwhlp_doLevel2FilterEx(const vscpEventEx *pex, const vscpEventFilter *pFilt
   }
 
   // Test priority
-  if (0xff != (uint8_t) (~(pFilter->filter_priority ^ vscp_fwhlp_getEventPriorityEx(pex)) | ~pFilter->mask_priority)) {
+  if (0xff != (uint8_t) (~(pFilter->filter_priority ^ vscp_fwhlp_getEventExPriority(pex)) | ~pFilter->mask_priority)) {
     return 0;
   }
 
@@ -3319,13 +3349,13 @@ vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscpEvent *pev)
   char strGuid[80]      = { 0 };
   char strData[512 * 5] = { 0 }; // 512 bytes of data can expand to 2048 characters in hex string format 0xff,0xff,...
                                  // (4 characters per byte + comma)
- 
+
   // Check pointer
   if (NULL == pev || NULL == eventstr) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  // Check buffer length 
+  // Check buffer length
   if (len < (80 + 64 + 512 * 5 + 256)) {
     return VSCP_ERROR_BUFFER_TO_SMALL;
   }
@@ -3336,7 +3366,7 @@ vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscpEvent *pev)
 
   // NULL result is OK, it just means there is no data to convert and strData will be empty string
   vscp_fwhlp_make_string_from_data(strData, sizeof(strData), pev->pdata, pev->sizeData);
-  
+
   // NULL result is OK, it just means there is no date information to convert and strDateTime will be empty string
   vscp_fwhlp_get_datestr_from_event(strDateTime, sizeof(strDateTime), pev);
 
@@ -3367,13 +3397,13 @@ vscp_fwhlp_eventex_to_xml(char *eventexstr, size_t len, const vscpEventEx *pex)
   char strDateTime[64];
   char strData[512 * 5]; // 512 bytes of data can expand to 2048 characters in hex string format 0xff,0xff,... (4
                          // characters per byte + comma)
-  
+
   // Check pointer
   if (NULL == pex || NULL == eventexstr) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  // Check buffer length 
+  // Check buffer length
   if (len < (80 + 64 + 512 * 5 + 256)) {
     return VSCP_ERROR_BUFFER_TO_SMALL;
   }
@@ -3414,6 +3444,7 @@ vscp_fwhlp_set_event_info_from_topic(vscpEvent *pev, const char *topic)
   char strGuid[80];
   char strClass[16];
   char strType[16];
+
   // Check pointer
   if (NULL == pev || NULL == topic) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -3428,8 +3459,9 @@ vscp_fwhlp_set_event_info_from_topic(vscpEvent *pev, const char *topic)
   }
   // Set the class
   pev->vscp_class = atoi(strClass);
+
   // Set the type
-  pev->vscp_type = atoi(strType); 
+  pev->vscp_type = atoi(strType);
 
   return VSCP_ERROR_SUCCESS;
 }
@@ -3445,6 +3477,7 @@ vscp_fwhlp_set_eventex_info_from_topic(vscpEventEx *pex, const char *topic)
   char strGuid[80];
   char strClass[16];
   char strType[16];
+
   // Check pointer
   if (NULL == pex || NULL == topic) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -3459,8 +3492,9 @@ vscp_fwhlp_set_eventex_info_from_topic(vscpEventEx *pex, const char *topic)
   }
   // Set the class
   pex->vscp_class = atoi(strClass);
+
   // Set the type
-  pex->vscp_type = atoi(strType); 
+  pex->vscp_type = atoi(strType);
 
   return VSCP_ERROR_SUCCESS;
 }
@@ -3686,35 +3720,6 @@ vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t *pCode, uint8_t length)
   }
 #endif
   return value;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// vscp_fwhlp_getEventPriority
-
-// unsigned char
-// vscp_fwhlp_getEventPriority(const vscpEvent *pEvent)
-// {
-//   // Must be a valid message pointer
-//   if (NULL == pEvent) {
-//     return 0;
-//   }
-
-//   return ((pEvent->head >> 5) & 0x07);
-// }
-
-///////////////////////////////////////////////////////////////////////////////
-// vscp_fwhlp_setEventPriority
-
-void
-vscp_fwhlp_setEventPriority(vscpEvent *pEvent, unsigned char priority)
-{
-  // Must be a valid message pointer
-  if (NULL == pEvent) {
-    return;
-  }
-
-  pEvent->head &= ~VSCP_HEADER_PRIORITY_MASK;
-  pEvent->head |= (priority << 5);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -4017,6 +4022,402 @@ vscp_fwhlp_isMeasurement(const vscpEvent *pEvent)
 
   return VSCP_ERROR_ERROR;
 }
+
+// ----------------------------------------------------------------------------
+
+//////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getMeasurementAsFloat
+//
+
+float
+vscp_fwhlp_getMeasurementAsFloat(const unsigned char *pNorm, unsigned char length)
+{
+  float *pfloat = nullptr;
+  float value   = 0.0f;
+
+  // Check pointer
+  if (nullptr == pNorm) {
+    return false;
+  }
+
+  // Floating point value will be received big endian
+
+  if (length >= 5) {
+    uint32_t n = *((uint32_t *) (pNorm + 1));
+    n          = VSCP_UINT32_SWAP_ON_LE(n);
+    uint8_t *p = (uint8_t *) &n;
+    pfloat     = (float *) p;
+    value      = *pfloat;
+
+    // TODO: please insert test for (!NaN || !INF)
+  }
+
+  return value;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getMeasurementAsString
+//
+//
+
+bool
+vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent)
+{
+  int i, j;
+  int offset = 0;
+
+  // Check pointers
+  if (nullptr == pEvent) {
+    return false;
+  }
+
+  if (nullptr == pEvent->pdata) {
+    return false;
+  }
+
+  strValue[0] = '\0';
+
+  if (VSCP_CLASS2_MEASUREMENT_STR == pEvent->vscp_class) {
+
+    char buf[512];
+
+    memset(buf, 0, sizeof(buf));
+    memcpy(buf, pEvent->pdata + 4, pEvent->sizeData - 4);
+    strncpy(strValue, buf, pEvent->sizeData - 4);
+    strValue[pEvent->sizeData - 4] = '\0';
+  }
+  else if (VSCP_CLASS2_MEASUREMENT_FLOAT == pEvent->vscp_class) {
+
+    uint8_t buf[8];
+
+    // Must be correct data
+    if (12 != pEvent->sizeData) {
+      return false;
+    }
+
+    memset(buf, 0, sizeof(buf));
+    memcpy(buf, pEvent->pdata + 4, 8); // Double
+
+    // Take care of byte order on little endian
+    if (vscp_fwhlp_isLittleEndian()) {
+      for (int i = 7; i > 0; i--) {
+        buf[i] = buf[7 - i];
+      }
+    }
+
+    sprintf(strValue, "%f", *((double *) buf));
+  }
+  else if (VSCP_CLASS1_MEASUREMENT32 == pEvent->vscp_class) {
+
+    uint8_t buf[4];
+
+    // Must be correct data
+    if (4 != pEvent->sizeData)
+      return false;
+
+    memset(buf, 0, sizeof(buf));
+    memcpy(buf, pEvent->pdata, 4); // float
+
+    sprintf(strValue, "%f", *((float *) buf));
+  }
+  else if (VSCP_CLASS2_LEVEL1_MEASUREMENT32 == pEvent->vscp_class) {
+    uint8_t buf[4];
+
+    // Must be correct data
+    if ((16 + 4) != pEvent->sizeData) {
+      return false;
+    }
+
+    memset(buf, 0, sizeof(buf));
+    memcpy(buf, pEvent->pdata + 16, 4); // float
+
+    sprintf(strValue, "%f", *((float *) buf));
+  }
+  else if (VSCP_CLASS1_MEASUREMENT64 == pEvent->vscp_class) {
+    uint8_t buf[8];
+
+    // Must be correct data
+    if (8 != pEvent->sizeData) {
+      return false;
+    }
+
+    memset(buf, 0, sizeof(buf));
+    memcpy(buf, pEvent->pdata, 8); // Double
+
+    sprintf(strValue, "%f", *((double *) buf));
+  }
+  else if (VSCP_CLASS2_LEVEL1_MEASUREMENT64 == pEvent->vscp_class) {
+
+    uint8_t buf[8];
+
+    // Must be correct data
+    if ((16 + 8) != pEvent->sizeData) {
+      return false;
+    }
+
+    memset(buf, 0, sizeof(buf));
+    memcpy(buf, pEvent->pdata + 16, 8); // Double
+
+    sprintf(strValue, "%f", *((double *) buf));
+  }
+
+  else if ((VSCP_CLASS1_MEASUREMENT == pEvent->vscp_class) || (VSCP_CLASS1_MEASUREZONE == pEvent->vscp_class) ||
+           (VSCP_CLASS1_SETVALUEZONE == pEvent->vscp_class) || (VSCP_CLASS1_DATA == pEvent->vscp_class) ||
+           (VSCP_CLASS2_LEVEL1_MEASUREMENT == pEvent->vscp_class) ||
+           (VSCP_CLASS2_LEVEL1_MEASUREZONE == pEvent->vscp_class) ||
+           (VSCP_CLASS2_LEVEL1_SETVALUEZONE == pEvent->vscp_class)) {
+
+    // If class >= 512 and class < 1024 we
+    // have GUID in front of data.
+    if ((pEvent->vscp_class >= VSCP_CLASS2_LEVEL1_PROTOCOL)) {
+      offset = 16;
+    }
+
+    // Must be at least two data bytes
+    if (pEvent->sizeData - offset < 2) {
+      return false;
+    }
+
+    // Point past index,zone,subzone
+    if ((VSCP_CLASS1_MEASUREZONE == pEvent->vscp_class) || (VSCP_CLASS1_SETVALUEZONE == pEvent->vscp_class) ||
+        (VSCP_CLASS2_LEVEL1_MEASUREZONE == pEvent->vscp_class) ||
+        (VSCP_CLASS2_LEVEL1_SETVALUEZONE == pEvent->vscp_class)) {
+
+      offset += 3;
+    }
+
+    unsigned short type = (0x07 & (pEvent->pdata[0 + offset] >> 5));
+
+    switch (type) {
+
+      case 0: // series of bits
+        for (i = 1; i < (pEvent->sizeData - offset); i++) {
+
+          for (j = 7; j >= 0; j--) {
+
+            if (pEvent->pdata[i + offset] & (1 << j)) {
+              strcat(strValue, "1");
+            }
+            else {
+              strcat(strValue, "0");
+            }
+          }
+          strcat(strValue, " ");
+        }
+        break;
+
+      case 1: // series of bytes
+        for (i = 1; i < (pEvent->sizeData - offset); i++) {
+
+          sprintf(strValue + strlen(strValue), "%d", pEvent->pdata[i + offset]);
+
+          if (i != (pEvent->sizeData - 1 - offset)) {
+            strcat(strValue, ",");
+          }
+        }
+        break;
+
+      case 2: // string
+      {
+        char strData[9];
+        memset(strData, 0, sizeof(strData));
+        for (i = 1; i < (pEvent->sizeData - offset); i++) {
+          strData[i - 1] = pEvent->pdata[i + offset];
+        }
+
+        strncpy(strValue, strData, sizeof(strData) - 1);
+        strValue[sizeof(strData) - 1] = '\0';
+
+      } break;
+
+      case 3: // integer
+      {
+        double value = (double) vscp_fwhlp_getDataCodingInteger(pEvent->pdata + offset, pEvent->sizeData - offset);
+        sprintf(strValue, "%.0lf", value);
+      } break;
+
+      case 4: // normalized integer
+      {
+        double value = vscp_fwhlp_getDataCodingNormalizedInteger(pEvent->pdata + offset, pEvent->sizeData - offset);
+        sprintf(strValue, "%lf", value);
+      } break;
+
+      case 5: // Floating point value
+      {
+        float val = vscp_fwhlp_getMeasurementAsFloat(pEvent->pdata, (uint8_t) pEvent->sizeData);
+        sprintf(strValue, "%g", val);
+      } break;
+
+      case 6: // Not defined yet
+        break;
+
+      case 7: // Not defined yet
+        break;
+    }
+  }
+  else {
+    return false; // Measurement type is not supported
+  }
+
+  return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getMeasurementFloat64AsString
+//
+//
+
+bool
+vscp_fwhlp_getMeasurementFloat64AsString(char *strValue, const vscpEvent *pEvent)
+{
+  int offset = 0;
+
+  // If class >= 512 and class <1024 we
+  // have GUID in front of data.
+  if ((pEvent->vscp_class >= VSCP_CLASS2_LEVEL1_PROTOCOL)) {
+    offset = 16;
+  }
+
+  if (pEvent->sizeData - offset != 8) {
+    return false;
+  }
+
+  double *pfloat = (double *) (pEvent->pdata + offset);
+  sprintf(strValue, "%lf", *pfloat);
+
+  return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getMeasurementAsDouble
+//
+//
+
+bool
+vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscpEvent *pEvent)
+{
+  char str[80];
+
+  // Check pointers
+  if (nullptr == pEvent) {
+    return false;
+  }
+
+  if (nullptr == pvalue) {
+    return false;
+  }
+
+  if ((VSCP_CLASS1_MEASUREMENT == pEvent->vscp_class) || (VSCP_CLASS1_DATA == pEvent->vscp_class) ||
+      (VSCP_CLASS2_LEVEL1_MEASUREMENT == pEvent->vscp_class) || (VSCP_CLASS1_MEASUREZONE == pEvent->vscp_class) ||
+      (VSCP_CLASS1_SETVALUEZONE == pEvent->vscp_class)) {
+
+    if (!vscp_fwhlp_getMeasurementAsString(str, pEvent)) {
+      return false;
+    }
+
+    sscanf(str, "%lf", pvalue);
+  }
+  else if (VSCP_CLASS1_MEASUREMENT64 == pEvent->vscp_class) {
+
+    if (!vscp_fwhlp_getMeasurementFloat64AsString(str, pEvent)) {
+      return false;
+    }
+    sscanf(str, "%lf", pvalue);
+  }
+  else if (VSCP_CLASS1_MEASUREMENT64 == pEvent->vscp_class) {
+
+    if (!vscp_fwhlp_getMeasurementFloat64AsString(str, pEvent)) {}
+    else if (VSCP_CLASS2_MEASUREMENT_STR == pEvent->vscp_class) {
+
+      char buf[512];
+
+      if (0 == pEvent->sizeData || nullptr == pEvent->pdata) {
+        return false;
+      }
+      memcpy(buf, pEvent->pdata + 4, pEvent->sizeData - 4);
+
+      sscanf(buf, "%lf", pvalue);
+    }
+    else if (VSCP_CLASS2_MEASUREMENT_FLOAT == pEvent->vscp_class) {
+
+      char buf[8];
+
+      memcpy(buf, pEvent->pdata + 4, 8);
+      *pvalue = *(double *) (buf);
+    }
+    else {
+      return false;
+    }    
+  }
+  return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getMeasurementAsDoubleEx
+//
+//
+
+bool
+vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscpEventEx *pEventEx)
+{
+  vscpEvent *pev = (vscpEvent *) malloc(sizeof(vscpEvent));
+  if (nullptr == pev) {
+    return false;
+  }
+
+  pev->pdata    = nullptr;
+  pev->sizeData = 0;
+
+  if (VSCP_ERROR_SUCCESS != vscp_fwhlp_convertEventExToEvent(pev, pEventEx)) {
+    vscp_fwhlp_deleteEvent(&pev);
+    return false;
+  }
+
+  int rv = vscp_fwhlp_getMeasurementAsDouble(pvalue, pev);
+  vscp_fwhlp_deleteEvent(&pev);
+
+  return rv;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_getMeasurementWithZoneAsString
+//
+//
+
+bool
+vscp_fwhlp_getMeasurementWithZoneAsString(const vscpEvent *pEvent)
+{
+  int offset = 0;
+
+  // If class >= 512 and class <1024 we
+  // have GUID in front of data.
+  if ((pEvent->vscp_class >= VSCP_CLASS2_LEVEL1_PROTOCOL) && (pEvent->vscp_class < VSCP_CLASS2_PROTOCOL)) {
+    offset = 16;
+  }
+
+  // Must at least have index, zone, subzone, normaliser byte, one data byte
+  if (pEvent->sizeData - offset < 5) {
+    return false;
+  }
+
+  // We mimic a standard measurement
+  vscpEvent eventMimic;
+  memset(&eventMimic, 0, sizeof(eventMimic));
+
+  eventMimic.pdata      = (uint8_t *) malloc(pEvent->sizeData - offset - 3);
+  eventMimic.vscp_class = pEvent->vscp_class;
+  eventMimic.vscp_type  = pEvent->vscp_type;
+  eventMimic.sizeData   = pEvent->sizeData;
+  memcpy(eventMimic.pdata, pEvent->pdata + offset + 3, pEvent->sizeData - offset - 3);
+
+  return true;
+}
+
+// ----------------------------------------------------------------------------
+
+
+
+
 
 // ****************************
 //            CANAL

@@ -2,6 +2,7 @@
 #include <string.h>
 #include <climits>
 #include <gtest/gtest.h>
+#include <vscp-class.h>
 #include <vscp-firmware-helper.h>
 
 //-----------------------------------------------------------------------------
@@ -561,10 +562,28 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getEventPriorityEx)
   vscpEventEx ex;
 
   ex.head = 0x00;
-  ASSERT_EQ(0, vscp_fwhlp_getEventPriorityEx(&ex));
+  ASSERT_EQ(0, vscp_fwhlp_getEventExPriority(&ex));
 
   ex.head = 0xE0; // Priority 7
-  ASSERT_EQ(7, vscp_fwhlp_getEventPriorityEx(&ex));
+  ASSERT_EQ(7, vscp_fwhlp_getEventExPriority(&ex));
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_setEventExPriority)
+{
+  vscpEventEx ex;
+
+  ex.head = 0x00;
+  vscp_fwhlp_setEventExPriority(&ex, 7);
+  ASSERT_EQ(7, vscp_fwhlp_getEventExPriority(&ex));
+
+  ex.head = 0x00;
+  vscp_fwhlp_setEventExPriority(&ex, 0);
+  ASSERT_EQ(0, vscp_fwhlp_getEventExPriority(&ex));
+
+  ex.head = 0x1F; // Set non-priority bits
+  vscp_fwhlp_setEventExPriority(&ex, 5);
+  ASSERT_EQ(5, vscp_fwhlp_getEventExPriority(&ex));
+  ASSERT_EQ(0x1F, ex.head & 0x1F); // Lower bits should be preserved
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_setEventPriority)
@@ -583,6 +602,18 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_setEventPriority)
   vscp_fwhlp_setEventPriority(&ev, 5);
   ASSERT_EQ(5, vscp_fwhlp_getEventPriority(&ev));
   ASSERT_EQ(0x1F, ev.head & 0x1F); // Lower bits should be preserved
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_setEventPriority_null_pointer)
+{
+  vscp_fwhlp_setEventPriority(NULL, 3);
+  SUCCEED();
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_setEventExPriority_null_pointer)
+{
+  vscp_fwhlp_setEventExPriority(NULL, 3);
+  SUCCEED();
 }
 
 //-----------------------------------------------------------------------------
@@ -2490,6 +2521,23 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_success)
   ASSERT_EQ(0, memcmp(expected_guid, ev.GUID, 16));
 }
 
+TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_success_with_extra_parts)
+{
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+
+  const char *topic = "vscp/FF:EE:DD:CC:BB:AA:99:88:77:66:55:44:33:22:11:00/10/6/extra/parts/ignored";
+
+  int rv = vscp_fwhlp_set_event_info_from_topic(&ev, topic);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(10, ev.vscp_class);
+  ASSERT_EQ(6, ev.vscp_type);
+
+  uint8_t expected_guid[16] = { 0xFF, 0xEE, 0xDD, 0xCC, 0xBB, 0xAA, 0x99, 0x88,
+                                0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0x00 };
+  ASSERT_EQ(0, memcmp(expected_guid, ev.GUID, 16));
+}
+
 TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_invalid_syntax)
 {
   vscpEvent ev;
@@ -2537,6 +2585,23 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_set_eventex_info_from_topic_success)
   ASSERT_EQ(0, memcmp(expected_guid, ex.GUID, 16));
 }
 
+TEST(_vscp_firmware_helper, vscp_fwhlp_set_eventex_info_from_topic_success_with_extra_parts)
+{
+  vscpEventEx ex;
+  memset(&ex, 0, sizeof(ex));
+
+  const char *topic = "vscp/00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F/1040/42/extra/parts/ignored";
+
+  int rv = vscp_fwhlp_set_eventex_info_from_topic(&ex, topic);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(1040, ex.vscp_class);
+  ASSERT_EQ(42, ex.vscp_type);
+
+  uint8_t expected_guid[16] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+                                0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+  ASSERT_EQ(0, memcmp(expected_guid, ex.GUID, 16));
+}
+
 TEST(_vscp_firmware_helper, vscp_fwhlp_set_eventex_info_from_topic_invalid_syntax)
 {
   vscpEventEx ex;
@@ -2561,6 +2626,111 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_set_eventex_info_from_topic_null_pointer)
 #endif // VSCP_FWHLP_XML_SUPPORT
 
 //-----------------------------------------------------------------------------
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsFloat)
+{
+  unsigned char norm[5] = { 0x00, 0x3f, 0x80, 0x00, 0x00 };
+
+  float val = vscp_fwhlp_getMeasurementAsFloat(norm, sizeof(norm));
+  ASSERT_NEAR(1.0f, val, 0.000001f);
+
+  ASSERT_EQ(0.0f, vscp_fwhlp_getMeasurementAsFloat(nullptr, sizeof(norm)));
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsString)
+{
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+
+  uint8_t payload[] = { 0x00, 0x00, 0x00, 0x00, '1', '2', '.', '5' };
+  ev.vscp_class     = VSCP_CLASS2_MEASUREMENT_STR;
+  ev.sizeData       = sizeof(payload);
+  ev.pdata          = payload;
+
+  char out[64];
+  memset(out, 0, sizeof(out));
+
+  ASSERT_TRUE(vscp_fwhlp_getMeasurementAsString(out, &ev));
+  ASSERT_STREQ("12.5", out);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementFloat64AsString)
+{
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+
+  double source = 12.5;
+  uint8_t payload[8];
+  memcpy(payload, &source, sizeof(payload));
+
+  ev.vscp_class = VSCP_CLASS1_MEASUREMENT64;
+  ev.sizeData   = sizeof(payload);
+  ev.pdata      = payload;
+
+  char out[64];
+  memset(out, 0, sizeof(out));
+
+  ASSERT_TRUE(vscp_fwhlp_getMeasurementFloat64AsString(out, &ev));
+
+  double parsed = 0;
+  ASSERT_EQ(1, sscanf(out, "%lf", &parsed));
+  ASSERT_NEAR(source, parsed, 0.000001);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsDouble)
+{
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+
+  double source = 37.125;
+  uint8_t payload[8];
+  memcpy(payload, &source, sizeof(payload));
+
+  ev.vscp_class = VSCP_CLASS1_MEASUREMENT64;
+  ev.sizeData   = sizeof(payload);
+  ev.pdata      = payload;
+
+  double val = 0;
+  ASSERT_TRUE(vscp_fwhlp_getMeasurementAsDouble(&val, &ev));
+  ASSERT_NEAR(source, val, 0.000001);
+
+  ASSERT_FALSE(vscp_fwhlp_getMeasurementAsDouble(nullptr, &ev));
+  ASSERT_FALSE(vscp_fwhlp_getMeasurementAsDouble(&val, nullptr));
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsDoubleEx)
+{
+  vscpEventEx ex;
+  memset(&ex, 0, sizeof(ex));
+
+  double source = 98.25;
+  memcpy(ex.data, &source, sizeof(source));
+  ex.vscp_class = VSCP_CLASS1_MEASUREMENT64;
+  ex.sizeData   = sizeof(source);
+
+  double val = 0;
+  ASSERT_TRUE(vscp_fwhlp_getMeasurementAsDoubleEx(&val, &ex));
+  ASSERT_NEAR(source, val, 0.000001);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementWithZoneAsString)
+{
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+
+  uint8_t ok_payload[] = { 0x01, 0x02, 0x03, 0x60, 0x0a };
+  ev.vscp_class        = VSCP_CLASS1_MEASUREZONE;
+  ev.sizeData          = sizeof(ok_payload);
+  ev.pdata             = ok_payload;
+
+  ASSERT_TRUE(vscp_fwhlp_getMeasurementWithZoneAsString(&ev));
+
+  uint8_t short_payload[] = { 0x01, 0x02, 0x03, 0x60 };
+  ev.sizeData             = sizeof(short_payload);
+  ev.pdata                = short_payload;
+
+  ASSERT_FALSE(vscp_fwhlp_getMeasurementWithZoneAsString(&ev));
+}
 
 int
 main(int argc, char **argv)

@@ -452,21 +452,7 @@ vscp_fwhlp_from_unix_ns(
 int
 vscp_fwhlp_parseMac(uint8_t* pmac, const char* strmac, char** endptr);
 
-/**
-    Get VSCP priority
-    @param pEvent Pointer to VSCP event to set priority for.
-    @return Priority (0-7) for event.
-*/
-unsigned char
-vscp_fwhlp_getEventPriority(const vscpEvent* pev);
 
-/**
-    Get VSCP EventEx priority
-    @param pEvent Pointer to VSCP event ex to set priority for.
-    @return Priority (0-7) for event.
-*/
-unsigned char
-vscp_fwhlp_getEventPriorityEx(const vscpEventEx* pex);
 
 /**
     Check filter/mask to check if filter should be delivered
@@ -1019,38 +1005,201 @@ vscp_fwhlp_set_eventex_info_from_topic(vscpEventEx *pex, const char *topic);
 
 // ----------------------------------------------------------------------------
 
+/*!
+  * @fn vscp_fwhlp_getMeasurementDataCoding
+  * @brief Get the measurement data coding from a VSCP event
+  *
+  * @param pEvent Pointer to event to get data coding from.
+  * @return uint8_t Measurement data coding value. Returns 0 if not a measurement event or if data coding is not set.
+*/
 uint8_t
 vscp_fwhlp_getMeasurementDataCoding(const vscpEvent* pEvent);
 
+/*!
+  * @fn vscp_fwhlp_getDataCodingBitArray
+  * @brief Get the data coding bit array from a measurement event
+  *
+  * @param pCode Pointer to data coding byte array.
+  * @param length Length of data coding byte array.
+  * @return uint64_t Data coding bit array. Returns 0 if data coding is not a bit array or if length is invalid.
+*/
 uint64_t
 vscp_fwhlp_getDataCodingBitArray(const uint8_t* pCode, const uint8_t length);
 
+/*!
+  * @fn vscp_fwhlp_getDataCodingInteger
+  * @brief Get the data coding integer value from a measurement event
+  *
+  * @param pCode Pointer to data coding byte array.
+  * @param length Length of data coding byte array.
+  * @return int64_t Data coding integer value. Returns 0 if data coding is not an integer or if length is invalid.
+*/
 int64_t
 vscp_fwhlp_getDataCodingInteger(const uint8_t* pCode, uint8_t length);
 
+/*!
+  * @fn vscp_fwhlp_getDataCodingNormalizedInteger
+  * @brief Get the data coding normalized integer value from a measurement event
+  *
+  * @param pCode Pointer to data coding byte array.
+  * @param length Length of data coding byte array.
+  * @return double Data coding normalized integer value. Returns 0 if data coding is not a normalized integer or if length is invalid.
+*/
 double
 vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t* pCode, uint8_t length);
 
-// unsigned char
-// vscp_fwhlp_getEventPriority(const vscpEvent *pEvent);
 
-void
-vscp_fwhlp_setEventPriority(vscpEvent* pEvent, unsigned char priority);
 
+/*!
+  * @fn vscp_fwhlp_getMeasurementUnit
+  * @brief Get the measurement unit of a measurement event
+  *
+  * @param pEvent Pointer to event to get measurement unit from.
+  * @return int Measurement unit value. Returns -1 if not a measurement event or if measurement unit is not set.
+*/
 int
 vscp_fwhlp_getMeasurementUnit(const vscpEvent* pEvent);
 
+/*!
+  * @fn vscp_fwhlp_getMeasurementSensorIndex
+  * @brief Get the sensor index of a measurement event
+  *
+  * @param pEvent Pointer to event to get sensor index from.
+  * @return int Sensor index value. Returns -1 if not a measurement event or if sensor index is not set.
+*/
 int
 vscp_fwhlp_getMeasurementSensorIndex(const vscpEvent* pEvent);
 
+/*!
+  * @fn vscp_fwhlp_getMeasurementZone
+  * @brief Get the measurement zone of a measurement event
+  *
+  * @param pEvent Pointer to event to get measurement zone from.
+  * @return int Measurement zone value. Returns -1 if not a measurement event or if measurement zone is not set.
+*/
 int
 vscp_fwhlp_getMeasurementZone(const vscpEvent* pEvent);
 
+/*!
+  * @fn vscp_fwhlp_getMeasurementSubZone
+  * @brief Get the measurement subzone of a measurement event
+  *
+  * @param pEvent Pointer to event to get measurement subzone from.
+  * @return int Measurement subzone value. Returns -1 if not a measurement event or if measurement subzone is not set.
+*/
 int
 vscp_fwhlp_getMeasurementSubZone(const vscpEvent* pEvent);
 
+/*!
+  * @fn vscp_fwhlp_isMeasurement
+  * @brief Check if a VSCP event is a measurement event
+  *
+  * @param pEvent Pointer to event to check.
+  * @return int Returns 1 if event is a measurement event, 0 if not.
+*/
 int
 vscp_fwhlp_isMeasurement(const vscpEvent* pEvent);
+
+/*!
+ * @fn vscp_fwhlp_getMeasurementAsFloat
+ * @brief Get the measurement value of a measurement event as a float
+ *
+ * @param pNorm Pointer to normalized data bytes of the measurement event.
+ * @param length Length of the normalized data bytes.
+ * @return float Measurement value as a float. Returns 0 if not a measurement event or if data is not valid for conversion.
+*/
+float
+vscp_fwhlp_getMeasurementAsFloat(const unsigned char *pNorm, unsigned char length);
+
+/*!
+  * @fn vscp_fwhlp_getMeasurementAsFloatEx
+  * @brief Get the measurement value of a measurement event as a float
+  *
+  * @param pEvent Pointer to event to get measurement value from.
+  * @return float Measurement value as a float. Returns 0 if not a measurement event or if data is not valid for conversion.
+*/
+bool
+vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent);
+
+/*!
+  * @fn vscp_fwhlp_getMeasurementAsFloatEx
+  * @brief Get the measurement value of a measurement event as a float
+  *
+  * @param pEvent Pointer to event to get measurement value from.
+  * @return float Measurement value as a float. Returns 0 if not a measurement event or if data is not valid for conversion.
+*/
+bool
+vscp_fwhlp_getMeasurementFloat64AsString(char *strValue, const vscpEvent *pEvent);
+
+/*!
+  * @fn vscp_fwhlp_getMeasurementAsDouble
+  * @brief Get the measurement value of a measurement event as a double
+  *
+  * @param pEvent Pointer to event to get measurement value from.
+  * @return double Measurement value as a double. Returns 0 if not a measurement event or if data is not valid for conversion.
+*/
+bool
+vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscpEvent *pEvent);
+
+/*!
+  * @fn vscp_fwhlp_getMeasurementAsDoubleEx
+  * @brief Get the measurement value of a measurement event as a double
+  *
+  * @param pEvent Pointer to event to get measurement value from.
+  * @return double Measurement value as a double. Returns 0 if not a measurement event or if data is not valid for conversion.
+*/
+bool
+vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscpEventEx *pEventEx);
+
+/*!
+  * @fn vscp_fwhlp_getMeasurementAsDoubleEx
+  * @brief Get the measurement value of a measurement event as a double
+  *
+  * @param pEvent Pointer to event to get measurement value from.
+  * @return double Measurement value as a double. Returns 0 if not a measurement event or if data is not valid for conversion.
+*/
+bool
+vscp_fwhlp_getMeasurementWithZoneAsString(const vscpEvent *pEvent);
+
+/**
+    Get VSCP priority
+    @param pEvent Pointer to VSCP event to set priority for.
+    @return Priority (0-7) for event.
+*/
+unsigned char
+vscp_fwhlp_getEventPriority(const vscpEvent* pev);
+
+/**
+    Get VSCP EventEx priority
+    @param pEvent Pointer to VSCP event ex to set priority for.
+    @return Priority (0-7) for event.
+*/
+unsigned char
+vscp_fwhlp_getEventExPriority(const vscpEventEx* pex);
+
+/*!
+  * @fn vscp_fwhlp_setEventPriority
+  * @brief Set the priority of a VSCP event
+  *
+  * @param pEvent Pointer to event to set priority for.
+  * @param priority Priority (0-7) to set for event.
+*/
+void
+vscp_fwhlp_setEventPriority(vscpEvent* pEvent, unsigned char priority);
+
+/*!
+  * @fn vscp_fwhlp_setEventExPriority
+  * @brief Set the priority of a VSCP event ex
+  *
+  * @param pEvent Pointer to event ex to set priority for.
+  * @param priority Priority (0-7) to set for event.
+*/
+void
+vscp_fwhlp_setEventExPriority(vscpEventEx* pEventEx, unsigned char priority);
+
+
+
+
 
 // ****************************
 //            CANAL

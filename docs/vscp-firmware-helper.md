@@ -115,6 +115,7 @@ Date strings follow ISO-style form such as `YYYY-MM-DDTHH:MM:SSZ`.
 - `vscp_fwhlp_getEventPriority`
 - `vscp_fwhlp_getEventPriorityEx`
 - `vscp_fwhlp_setEventPriority`
+- `vscp_fwhlp_setEventExPriority`
 - `vscp_fwhlp_doLevel2Filter`
 - `vscp_fwhlp_doLevel2FilterEx`
 - `vscp_fwhlp_parseFilter`
@@ -187,6 +188,16 @@ Topic format for the two helper functions:
 - `vscp_fwhlp_getMeasurementZone`
 - `vscp_fwhlp_getMeasurementSubZone`
 - `vscp_fwhlp_isMeasurement`
+- `vscp_fwhlp_getMeasurementAsFloat`
+- `vscp_fwhlp_getMeasurementAsString`
+- `vscp_fwhlp_getMeasurementFloat64AsString`
+- `vscp_fwhlp_getMeasurementAsDouble`
+- `vscp_fwhlp_getMeasurementAsDoubleEx`
+- `vscp_fwhlp_getMeasurementWithZoneAsString`
+
+Measurement conversion helpers provide float/string/double extraction for common
+measurement classes. `vscp_fwhlp_getMeasurementAsDoubleEx` accepts `vscpEventEx`
+and internally converts to `vscpEvent` before extraction.
 
 ### 11) CANAL ID Helpers
 
