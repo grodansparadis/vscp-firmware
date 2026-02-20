@@ -2,7 +2,7 @@
  * 	VSCP (Very Simple Control Protocol) 
  * 	https://www.vscp.org
  *
- *  Copyright (C) 1995-2026 Ake Hedman, Grodans Paradis AB, 
+ *  Copyright (C) 1995-2026 Ake Hedman, the VSCP Project, 
  *  akhe@paradiseofthefrog.com
  *
  * This software is provided 'as-is', without any express or implied

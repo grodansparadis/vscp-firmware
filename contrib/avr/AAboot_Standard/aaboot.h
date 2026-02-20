@@ -86,7 +86,7 @@ void sendChar (char data);
  * akhe@eurosource.se
  *
  * Copyright (C) 1995-2026 Ake Hedman,
- * Grodans Paradis AB, <akhe@grodansparadis.com>
+ * the VSCP Project, <akhe@grodansparadis.com>
  *
  * 080702 Cleaned up even more.
  * 060508 Cleaned up.

@@ -1650,14 +1650,14 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_basic)
 {
   vscpEvent ev;
   const char *json = "{"
-                     "\"vscpHead\":3,"
-                     "\"vscpClass\":10,"
-                     "\"vscpType\":6,"
-                     "\"vscpGuid\":\"FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:CF:3A:15:00:01\","
-                     "\"vscpObId\":11,"
-                     "\"vscpTimeStamp\":467530633,"
-                     "\"vscpDateTime\":\"2022-12-16T16:41:02\","
-                     "\"vscpData\":[72,51,57,46,55,48,52]"
+                     "\"head\":3,"
+                     "\"class\":10,"
+                     "\"type\":6,"
+                     "\"guid\":\"FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:CF:3A:15:00:01\","
+                     "\"obid\":11,"
+                     "\"timestamp\":467530633,"
+                     "\"datetime\":\"2022-12-16T16:41:02\","
+                     "\"data\":[72,51,57,46,55,48,52]"
                      "}";
 
   int rv = vscp_fwhlp_parse_json(&ev, json);
@@ -1699,14 +1699,14 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_ex_basic)
 {
   vscpEventEx ex;
   const char *json = "{"
-                     "\"vscpHead\":5,"
-                     "\"vscpClass\":20,"
-                     "\"vscpType\":8,"
-                     "\"vscpGuid\":\"00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F\","
-                     "\"vscpObId\":99,"
-                     "\"vscpTimeStamp\":123456789,"
-                     "\"vscpDateTime\":\"2023-06-15T10:30:45\","
-                     "\"vscpData\":[1,2,3,4,5]"
+                     "\"head\":5,"
+                     "\"class\":20,"
+                     "\"type\":8,"
+                     "\"guid\":\"00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F\","
+                     "\"obid\":99,"
+                     "\"timestamp\":123456789,"
+                     "\"datetime\":\"2023-06-15T10:30:45\","
+                     "\"data\":[1,2,3,4,5]"
                      "}";
 
   int rv = vscp_fwhlp_parse_json_ex(&ex, json);
@@ -1770,12 +1770,12 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_create_json_basic)
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
   // Verify JSON contains expected fields (basic check)
-  ASSERT_NE(nullptr, strstr(json, "\"vscpHead\""));
-  ASSERT_NE(nullptr, strstr(json, "\"vscpClass\""));
-  ASSERT_NE(nullptr, strstr(json, "\"vscpType\""));
-  ASSERT_NE(nullptr, strstr(json, "\"vscpGUID\""));
-  ASSERT_NE(nullptr, strstr(json, "\"vscpData\""));
-  ASSERT_NE(nullptr, strstr(json, "\"vscpDateTime\""));
+  ASSERT_NE(nullptr, strstr(json, "\"head\""));
+  ASSERT_NE(nullptr, strstr(json, "\"class\""));
+  ASSERT_NE(nullptr, strstr(json, "\"type\""));
+  ASSERT_NE(nullptr, strstr(json, "\"guid\""));
+  ASSERT_NE(nullptr, strstr(json, "\"data\""));
+  ASSERT_NE(nullptr, strstr(json, "\"datetime\""));
   ASSERT_NE(nullptr, strstr(json, "2024-03-20T14:25:30"));
 }
 
@@ -1813,12 +1813,12 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_create_json_ex_basic)
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
   // Verify JSON contains expected fields
-  ASSERT_NE(nullptr, strstr(json, "\"vscpHead\""));
-  ASSERT_NE(nullptr, strstr(json, "\"vscpClass\""));
-  ASSERT_NE(nullptr, strstr(json, "\"vscpType\""));
-  ASSERT_NE(nullptr, strstr(json, "\"vscpGUID\""));
-  ASSERT_NE(nullptr, strstr(json, "\"vscpData\""));
-  ASSERT_NE(nullptr, strstr(json, "2025-07-04T09:15:45"));
+  ASSERT_NE(nullptr, strstr(json, "\"head\""));
+  ASSERT_NE(nullptr, strstr(json, "\"class\""));
+  ASSERT_NE(nullptr, strstr(json, "\"type\""));
+  ASSERT_NE(nullptr, strstr(json, "\"guid\""));
+  ASSERT_NE(nullptr, strstr(json, "\"data\""));
+  ASSERT_NE(nullptr, strstr(json, "\"datetime\""));
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_json_roundtrip_event)
@@ -1932,7 +1932,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_json_roundtrip_eventex)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_null_pointer)
 {
   vscpEvent ev;
-  const char *json = "{\"vscpHead\":1}";
+  const char *json = "{\"head\":1}";
 
   // Test NULL event pointer
   int rv = vscp_fwhlp_parse_json(NULL, json);
@@ -1946,7 +1946,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_null_pointer)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_invalid_syntax)
 {
   vscpEvent ev;
-  const char *invalid_json = "{\"vscpHead\":1,}"; // Trailing comma
+  const char *invalid_json = "{\"head\":1,}"; // Trailing comma
 
   int rv = vscp_fwhlp_parse_json(&ev, invalid_json);
   ASSERT_EQ(VSCP_ERROR_INVALID_SYNTAX, rv);
@@ -1977,11 +1977,11 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_empty_data)
 {
   vscpEvent ev;
   const char *json = "{"
-                     "\"vscpHead\":1,"
-                     "\"vscpClass\":5,"
-                     "\"vscpType\":3,"
-                     "\"vscpGuid\":\"00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00\","
-                     "\"vscpData\":[]"
+                     "\"head\":1,"
+                     "\"class\":5,"
+                     "\"type\":3,"
+                     "\"guid\":\"00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00\","
+                     "\"data\":[]"
                      "}";
 
   int rv = vscp_fwhlp_parse_json(&ev, json);
@@ -2471,6 +2471,91 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_eventex_max_values)
   uint8_t max_guid[16];
   memset(max_guid, 0xFF, 16);
   ASSERT_EQ(0, memcmp(max_guid, ex.GUID, 16));
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_success)
+{
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+
+  const char *topic = "vscp/FF:EE:DD:CC:BB:AA:99:88:77:66:55:44:33:22:11:00/10/6";
+
+  int rv = vscp_fwhlp_set_event_info_from_topic(&ev, topic);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(10, ev.vscp_class);
+  ASSERT_EQ(6, ev.vscp_type);
+
+  uint8_t expected_guid[16] = { 0xFF, 0xEE, 0xDD, 0xCC, 0xBB, 0xAA, 0x99, 0x88,
+                                0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0x00 };
+  ASSERT_EQ(0, memcmp(expected_guid, ev.GUID, 16));
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_invalid_syntax)
+{
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+
+  int rv = vscp_fwhlp_set_event_info_from_topic(&ev, "vscp/FF:EE:DD:CC:BB:AA:99:88:77:66:55:44:33:22:11:00/10");
+  ASSERT_EQ(VSCP_ERROR_INVALID_SYNTAX, rv);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_invalid_guid)
+{
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+
+  int rv = vscp_fwhlp_set_event_info_from_topic(&ev, "vscp/ZZ:EE:DD:CC:BB:AA:99:88:77:66:55:44:33:22:11:00/10/6");
+  ASSERT_NE(VSCP_ERROR_SUCCESS, rv);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_null_pointer)
+{
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+
+  int rv = vscp_fwhlp_set_event_info_from_topic(NULL, "vscp/FF:EE:DD:CC:BB:AA:99:88:77:66:55:44:33:22:11:00/10/6");
+  ASSERT_EQ(VSCP_ERROR_INVALID_POINTER, rv);
+
+  rv = vscp_fwhlp_set_event_info_from_topic(&ev, NULL);
+  ASSERT_EQ(VSCP_ERROR_INVALID_POINTER, rv);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_set_eventex_info_from_topic_success)
+{
+  vscpEventEx ex;
+  memset(&ex, 0, sizeof(ex));
+
+  const char *topic = "vscp/00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F/1040/42";
+
+  int rv = vscp_fwhlp_set_eventex_info_from_topic(&ex, topic);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(1040, ex.vscp_class);
+  ASSERT_EQ(42, ex.vscp_type);
+
+  uint8_t expected_guid[16] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+                                0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+  ASSERT_EQ(0, memcmp(expected_guid, ex.GUID, 16));
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_set_eventex_info_from_topic_invalid_syntax)
+{
+  vscpEventEx ex;
+  memset(&ex, 0, sizeof(ex));
+
+  int rv = vscp_fwhlp_set_eventex_info_from_topic(&ex, "foo/00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F/10/6");
+  ASSERT_EQ(VSCP_ERROR_INVALID_SYNTAX, rv);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_set_eventex_info_from_topic_null_pointer)
+{
+  vscpEventEx ex;
+  memset(&ex, 0, sizeof(ex));
+
+  int rv = vscp_fwhlp_set_eventex_info_from_topic(NULL, "vscp/00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F/10/6");
+  ASSERT_EQ(VSCP_ERROR_INVALID_POINTER, rv);
+
+  rv = vscp_fwhlp_set_eventex_info_from_topic(&ex, NULL);
+  ASSERT_EQ(VSCP_ERROR_INVALID_POINTER, rv);
 }
 
 #endif // VSCP_FWHLP_XML_SUPPORT

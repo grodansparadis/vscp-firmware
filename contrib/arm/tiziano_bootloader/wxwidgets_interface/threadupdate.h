@@ -14,7 +14,7 @@
 // 
 // This file is part of the VSCP (http://can.sourceforge.net) 
 //
-// Copyright (C) 2000-2026 Ake Hedman, Grodans Paradis AB, <info@grodansparadis.com>
+// Copyright (C) 2000-2026 Ake Hedman, the VSCP Project, <info@grodansparadis.com>
 // 
 // This file is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of

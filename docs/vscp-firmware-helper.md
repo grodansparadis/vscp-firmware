@@ -1,6 +1,6 @@
 # vscp-firmware-helper
 
-Last updated: 2026-02-19
+Last updated: 2026-02-20
 
 This document describes the helper module implemented by:
 
@@ -167,6 +167,14 @@ Date strings follow ISO-style form such as `YYYY-MM-DDTHH:MM:SSZ`.
 - `vscp_fwhlp_parse_xml_eventex`
 - `vscp_fwhlp_event_to_xml`
 - `vscp_fwhlp_eventex_to_xml`
+- `vscp_fwhlp_set_event_info_from_topic`
+- `vscp_fwhlp_set_eventex_info_from_topic`
+
+Topic format for the two helper functions:
+
+- `vscp/guid/class/type`
+- `guid` is `00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF`
+- `class` and `type` are decimal strings
 
 ### 10) Measurement Helpers
 
@@ -388,6 +396,31 @@ Common Failures and Checks:
 - Type-byte decode mode: when using `VSCP_ENCRYPTION_FROM_TYPE_BYTE`, verify the frame encryption nibble is preserved.
 - Frame length: use `vscp_fwhlp_getFrameSizeFromEventEx` before encryption.
 - Pointer/return checks: validate all pointers and check for `VSCP_ERROR_SUCCESS` or positive encrypted length.
+
+### Quickstart: Set Event Info from MQTT Topic
+
+Requires `VSCP_FWHLP_XML_SUPPORT`.
+
+```c
+vscpEvent ev;
+vscpEventEx ex;
+
+memset(&ev, 0, sizeof(ev));
+memset(&ex, 0, sizeof(ex));
+
+const char *topic =
+  "vscp/FF:EE:DD:CC:BB:AA:99:88:77:66:55:44:33:22:11:00/10/6";
+
+int rv = vscp_fwhlp_set_event_info_from_topic(&ev, topic);
+if (VSCP_ERROR_SUCCESS == rv) {
+  // ev.GUID, ev.vscp_class, ev.vscp_type are now set from topic
+}
+
+rv = vscp_fwhlp_set_eventex_info_from_topic(&ex, topic);
+if (VSCP_ERROR_SUCCESS == rv) {
+  // ex.GUID, ex.vscp_class, ex.vscp_type are now set from topic
+}
+```
 
 ---
 

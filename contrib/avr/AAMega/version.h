@@ -2,7 +2,7 @@
  * 	VSCP (Very Simple Control Protocol) 
  * 	http://www.vscp.org
  *
- *  Copyright (C) 2006-2026 Ake Hedman, Grodans Paradis AB
+ *  Copyright (C) 2006-2026 Ake Hedman, the VSCP Project
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages

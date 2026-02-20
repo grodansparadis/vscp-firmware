@@ -4,7 +4,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2000-2026 Ake Hedman, Grodans Paradis AB
+ * Copyright (c) 2000-2026 Ake Hedman, the VSCP Project
  * <info@grodansparadis.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy

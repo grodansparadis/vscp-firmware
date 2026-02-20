@@ -2600,14 +2600,14 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
 // // https://github.com/nopnop2002/esp-idf-json
 /*
 {
-  "vscpHead":3,
-  "vscpClass":10,
-  "vscpType":6,
-  "vscpGuid":"FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:CF:3A:15:00:01",
-  "vscpObId":11,
-  "vscpTimeStamp":467530633,
-  "vscpDateTime":"2022-12-16T16:41:02.000Z",
-  "vscpData":[72,51,57,46,55,48,52],
+  "head":3,
+  "class":10,
+  "type":6,
+  "guid":"FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:CF:3A:15:00:01",
+  "obid":11,
+  "timestamp":467530633,
+  "datetime":"2022-12-16T16:41:02.000Z",
+  "data":[72,51,57,46,55,48,52],
   "measurement": {
     "value":39.704,
     "unit":1,
@@ -2638,18 +2638,18 @@ vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj)
   // Set unused path to known value
   memset(pev, 0, sizeof(vscpEvent));
 
-  if (cJSON_GetObjectItem(root, "vscpHead")) {
-    pev->head = (uint16_t) cJSON_GetObjectItem(root, "vscpHead")->valueint;
+  if (cJSON_GetObjectItem(root, "head")) {
+    pev->head = (uint16_t) cJSON_GetObjectItem(root, "head")->valueint;
   }
 
-  if (cJSON_GetObjectItem(root, "vscpObId")) {
-    pev->obid = (uint32_t) cJSON_GetObjectItem(root, "vscpObId")->valuedouble;
+  if (cJSON_GetObjectItem(root, "obid")) {
+    pev->obid = (uint32_t) cJSON_GetObjectItem(root, "obid")->valuedouble;
   }
 
   // "2017-01-13T10:16:02",
-  if (cJSON_GetObjectItem(root, "vscpDateTime")) {
+  if (cJSON_GetObjectItem(root, "datetime")) {
     int year, month, day, hour, minute, second;
-    const char *str = cJSON_GetObjectItem(root, "vscpDateTime")->valuestring;
+    const char *str = cJSON_GetObjectItem(root, "datetime")->valuestring;
     sscanf(str, "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second);
     pev->year   = year;
     pev->month  = month;
@@ -2659,29 +2659,29 @@ vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj)
     pev->second = second;
   }
 
-  if (cJSON_GetObjectItem(root, "vscpTimeStamp")) {
-    pev->timestamp = (uint32_t) cJSON_GetObjectItem(root, "vscpTimeStamp")->valuedouble;
+  if (cJSON_GetObjectItem(root, "timestamp")) {
+    pev->timestamp = (uint32_t) cJSON_GetObjectItem(root, "timestamp")->valuedouble;
   }
 
-  if (cJSON_GetObjectItem(root, "vscpClass")) {
-    pev->vscp_class = (uint16_t) cJSON_GetObjectItem(root, "vscpClass")->valueint;
+  if (cJSON_GetObjectItem(root, "class")) {
+    pev->vscp_class = (uint16_t) cJSON_GetObjectItem(root, "class")->valueint;
     ;
   }
 
-  if (cJSON_GetObjectItem(root, "vscpType")) {
-    pev->vscp_type = (uint16_t) cJSON_GetObjectItem(root, "vscpType")->valueint;
+  if (cJSON_GetObjectItem(root, "type")) {
+    pev->vscp_type = (uint16_t) cJSON_GetObjectItem(root, "type")->valueint;
   }
 
-  if (cJSON_GetObjectItem(root, "vscpGuid")) {
-    const char *str = cJSON_GetObjectItem(root, "vscpGuid")->valuestring;
+  if (cJSON_GetObjectItem(root, "guid")) {
+    const char *str = cJSON_GetObjectItem(root, "guid")->valuestring;
     if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseGuid(pev->GUID, str, NULL))) {
       return rv;
     }
   }
 
-  if (cJSON_GetObjectItem(root, "vscpData")) {
+  if (cJSON_GetObjectItem(root, "data")) {
 
-    cJSON *pdata  = cJSON_GetObjectItem(root, "vscpData");
+    cJSON *pdata  = cJSON_GetObjectItem(root, "data");
     pev->sizeData = cJSON_GetArraySize(pdata);
     pev->pdata    = (uint8_t *) malloc(pev->sizeData);
     if (NULL == pev->pdata) {
@@ -2707,14 +2707,14 @@ vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj)
 // // https://github.com/nopnop2002/esp-idf-json
 /*
 {
-  "vscpHead":3,
-  "vscpClass":10,
-  "vscpType":6,
-  "vscpGuid":"FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:CF:3A:15:00:01",
-  "vscpObId":11,
-  "vscpTimeStamp":467530633,
-  "vscpDateTime":"2022-12-16T16:41:02.000Z",
-  "vscpData":[72,51,57,46,55,48,52],
+  "head":3,
+  "class":10,
+  "type":6,
+  "guid":"FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:CF:3A:15:00:01",
+  "obid":11,
+  "timestamp":467530633,
+  "datetime":"2022-12-16T16:41:02.000Z",
+  "data":[72,51,57,46,55,48,52],
   "measurement": {
     "value":39.704,
     "unit":1,
@@ -2745,18 +2745,18 @@ vscp_fwhlp_parse_json_ex(vscpEventEx *pex, const char *jsonVscpEventObj)
   // Set unused path to known value
   memset(pex, 0, sizeof(vscpEventEx));
 
-  if (cJSON_GetObjectItem(root, "vscpHead")) {
-    pex->head = (uint16_t) cJSON_GetObjectItem(root, "vscpHead")->valueint;
+  if (cJSON_GetObjectItem(root, "head")) {
+    pex->head = (uint16_t) cJSON_GetObjectItem(root, "head")->valueint;
   }
 
-  if (cJSON_GetObjectItem(root, "vscpObId")) {
-    pex->obid = (uint32_t) cJSON_GetObjectItem(root, "vscpObId")->valuedouble;
+  if (cJSON_GetObjectItem(root, "obid")) {
+    pex->obid = (uint32_t) cJSON_GetObjectItem(root, "obid")->valuedouble;
   }
 
   // "2017-01-13T10:16:02",
-  if (cJSON_GetObjectItem(root, "vscpDateTime")) {
+  if (cJSON_GetObjectItem(root, "datetime")) {
     int year, month, day, hour, minute, second;
-    const char *str = cJSON_GetObjectItem(root, "vscpDateTime")->valuestring;
+    const char *str = cJSON_GetObjectItem(root, "datetime")->valuestring;
     sscanf(str, "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second);
     pex->year   = year;
     pex->month  = month;
@@ -2766,29 +2766,29 @@ vscp_fwhlp_parse_json_ex(vscpEventEx *pex, const char *jsonVscpEventObj)
     pex->second = second;
   }
 
-  if (cJSON_GetObjectItem(root, "vscpTimeStamp")) {
-    pex->timestamp = (uint32_t) cJSON_GetObjectItem(root, "vscpTimeStamp")->valuedouble;
+  if (cJSON_GetObjectItem(root, "timestamp")) {
+    pex->timestamp = (uint32_t) cJSON_GetObjectItem(root, "timestamp")->valuedouble;
   }
 
-  if (cJSON_GetObjectItem(root, "vscpClass")) {
-    pex->vscp_class = (uint16_t) cJSON_GetObjectItem(root, "vscpClass")->valueint;
+  if (cJSON_GetObjectItem(root, "class")) {
+    pex->vscp_class = (uint16_t) cJSON_GetObjectItem(root, "class")->valueint;
     ;
   }
 
-  if (cJSON_GetObjectItem(root, "vscpType")) {
-    pex->vscp_type = (uint16_t) cJSON_GetObjectItem(root, "vscpType")->valueint;
+  if (cJSON_GetObjectItem(root, "type")) {
+    pex->vscp_type = (uint16_t) cJSON_GetObjectItem(root, "type")->valueint;
   }
 
-  if (cJSON_GetObjectItem(root, "vscpGuid")) {
-    const char *str = cJSON_GetObjectItem(root, "vscpGuid")->valuestring;
+  if (cJSON_GetObjectItem(root, "guid")) {
+    const char *str = cJSON_GetObjectItem(root, "guid")->valuestring;
     if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseGuid(pex->GUID, str, NULL))) {
       return rv;
     }
   }
 
-  if (cJSON_GetObjectItem(root, "vscpData")) {
+  if (cJSON_GetObjectItem(root, "data")) {
 
-    cJSON *pdata  = cJSON_GetObjectItem(root, "vscpData");
+    cJSON *pdata  = cJSON_GetObjectItem(root, "data");
     pex->sizeData = cJSON_GetArraySize(pdata);
 
     for (int i = 0; i < pex->sizeData; i++) {
@@ -2825,17 +2825,17 @@ vscp_fwhlp_create_json(char *strObj, size_t len, const vscpEvent *pev)
     return VSCP_ERROR_INVALID_SYNTAX;
   }
 
-  cJSON_AddNumberToObject(root, "vscpHead", pev->head);
-  cJSON_AddNumberToObject(root, "vscpClass", pev->vscp_class);
-  cJSON_AddNumberToObject(root, "vscpType", pev->vscp_type);
-  cJSON_AddNumberToObject(root, "vscpObid", pev->obid);
-  cJSON_AddNumberToObject(root, "vscpTimeStamp", pev->timestamp);
+  cJSON_AddNumberToObject(root, "head", pev->head);
+  cJSON_AddNumberToObject(root, "class", pev->vscp_class);
+  cJSON_AddNumberToObject(root, "type", pev->vscp_type);
+  cJSON_AddNumberToObject(root, "obid", pev->obid);
+  cJSON_AddNumberToObject(root, "timestamp", pev->timestamp);
   vscp_fwhlp_writeGuidToString(str, pev->GUID);
-  cJSON_AddStringToObject(root, "vscpGUID", str);
+  cJSON_AddStringToObject(root, "guid", str);
   sprintf(str, "%04d-%02d-%02dT%02d:%02d:%02d", pev->year, pev->month, pev->day, pev->hour, pev->minute, pev->second);
-  cJSON_AddStringToObject(root, "vscpDateTime", str);
+  cJSON_AddStringToObject(root, "datetime", str);
   cJSON *array;
-  array = cJSON_AddArrayToObject(root, "vscpData");
+  array = cJSON_AddArrayToObject(root, "data");
   cJSON *element;
   for (int i = 0; i < pev->sizeData; i++) {
     element = cJSON_CreateNumber(pev->pdata[i]);
@@ -2880,17 +2880,17 @@ vscp_fwhlp_create_json_ex(char *strObj, size_t len, const vscpEventEx *pex)
 
   root = cJSON_CreateObject();
 
-  cJSON_AddNumberToObject(root, "vscpHead", pex->head);
-  cJSON_AddNumberToObject(root, "vscpClass", pex->vscp_class);
-  cJSON_AddNumberToObject(root, "vscpType", pex->vscp_type);
-  cJSON_AddNumberToObject(root, "vscpObid", pex->obid);
-  cJSON_AddNumberToObject(root, "vscpTimeStamp", pex->timestamp);
+  cJSON_AddNumberToObject(root, "head", pex->head);
+  cJSON_AddNumberToObject(root, "class", pex->vscp_class);
+  cJSON_AddNumberToObject(root, "type", pex->vscp_type);
+  cJSON_AddNumberToObject(root, "obid", pex->obid);
+  cJSON_AddNumberToObject(root, "timestamp", pex->timestamp);
   vscp_fwhlp_writeGuidToString(str, pex->GUID);
-  cJSON_AddStringToObject(root, "vscpGUID", str);
+  cJSON_AddStringToObject(root, "guid", str);
   sprintf(str, "%04d-%02d-%02dT%02d:%02d:%02d", pex->year, pex->month, pex->day, pex->hour, pex->minute, pex->second);
-  cJSON_AddStringToObject(root, "vscpDateTime", str);
+  cJSON_AddStringToObject(root, "datetime", str);
   cJSON *array;
-  array = cJSON_AddArrayToObject(root, "vscpData");
+  array = cJSON_AddArrayToObject(root, "data");
   cJSON *element;
   for (int i = 0; i < pex->sizeData; i++) {
     element = cJSON_CreateNumber(pex->data[i]);
@@ -3399,6 +3399,68 @@ vscp_fwhlp_eventex_to_xml(char *eventexstr, size_t len, const vscpEventEx *pex)
           (unsigned short int) pex->vscp_type,
           (const char *) strGuid,
           (const char *) strData);
+
+  return VSCP_ERROR_SUCCESS;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_set_event_info_from_topic
+//
+
+int
+vscp_fwhlp_set_event_info_from_topic(vscpEvent *pev, const char *topic)
+{
+  int rv;
+  char strGuid[80];
+  char strClass[16];
+  char strType[16];
+  // Check pointer
+  if (NULL == pev || NULL == topic) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+  // Parse the topic
+  if (sscanf(topic, "vscp/%79[^/]/%15[^/]/%15s", strGuid, strClass, strType) != 3) {
+    return VSCP_ERROR_INVALID_SYNTAX;
+  }
+  // Set the guid
+  if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseGuid(pev->GUID, strGuid, NULL))) {
+    return rv;
+  }
+  // Set the class
+  pev->vscp_class = atoi(strClass);
+  // Set the type
+  pev->vscp_type = atoi(strType); 
+
+  return VSCP_ERROR_SUCCESS;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_set_eventex_info_from_topic
+//
+
+int
+vscp_fwhlp_set_eventex_info_from_topic(vscpEventEx *pex, const char *topic)
+{
+  int rv;
+  char strGuid[80];
+  char strClass[16];
+  char strType[16];
+  // Check pointer
+  if (NULL == pex || NULL == topic) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+  // Parse the topic
+  if (sscanf(topic, "vscp/%79[^/]/%15[^/]/%15s", strGuid, strClass, strType) != 3) {
+    return VSCP_ERROR_INVALID_SYNTAX;
+  }
+  // Set the guid
+  if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseGuid(pex->GUID, strGuid, NULL))) {
+    return rv;
+  }
+  // Set the class
+  pex->vscp_class = atoi(strClass);
+  // Set the type
+  pex->vscp_type = atoi(strType); 
 
   return VSCP_ERROR_SUCCESS;
 }

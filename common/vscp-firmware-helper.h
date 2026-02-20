@@ -975,6 +975,45 @@ vscp_fwhlp_eventex_to_xml(char* eventexstr, size_t len, const vscpEventEx* pex);
 int
 vscp_fwhlp_parse_topic(const char* topic, uint8_t* pGuid[16], uint16_t* pVscpClass, uint16_t* pVscpType);
 
+/*!
+  * @fn vscp_fwhlp_set_event_info_from_topic
+  * @brief Parse topic string and set event GUID, VSCP class, and VSCP type
+  *
+  * @param pev Pointer to event to set data for.
+  * @param topic Null terminated string with topic data.
+  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+  *
+  * topic is on form "vscp/guid/CLASS/TYPE" where guid is 16 bytes in hex format 
+  * with ":" as separator, CLASS and TYPE are in decimal format. We can get this
+  * information from MQTT topic when MQTT is used as transport and the topic is 
+  * on the above form. This allows us to set guid, class and type of the event 
+  * from the topic without needing to include this information in the payload of 
+  * the event. This is useful for MQTT where the topic is often used to route the 
+  * event to the correct place and including guid, class and type in the topic is 
+  * more efficient than including it in the payload.
+*/
+int
+vscp_fwhlp_set_event_info_from_topic(vscpEvent *pev, const char *topic);
+
+/*!
+  * @fn vscp_fwhlp_set_event_info_from_topic
+  * @brief Parse topic string and set event GUID, VSCP class, and VSCP type
+  *
+  * @param pev Pointer to event to set data for.
+  * @param topic Null terminated string with topic data.
+  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+  *
+  * topic is on form "vscp/guid/CLASS/TYPE" where guid is 16 bytes in hex format 
+  * with ":" as separator, CLASS and TYPE are in decimal format. We can get this
+  * information from MQTT topic when MQTT is used as transport and the topic is 
+  * on the above form. This allows us to set guid, class and type of the event 
+  * from the topic without needing to include this information in the payload of 
+  * the event. This is useful for MQTT where the topic is often used to route the 
+  * event to the correct place and including guid, class and type in the topic is 
+  * more efficient than including it in the payload.
+*/
+int
+vscp_fwhlp_set_eventex_info_from_topic(vscpEventEx *pex, const char *topic);
 
 #endif
 

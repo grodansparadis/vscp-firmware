@@ -8,7 +8,7 @@
  *    http://www.skpang.co.uk/catalog/arduino-canbus-shield-with-usd-card-holder-p-706.html
  *    is used for this sample.
  *
- *  Copyright (C) 1995-2026 Ake Hedman, Grodans Paradis AB, http://www.auto.grodansparadis.com/products.html
+ *  Copyright (C) 1995-2026 Ake Hedman, the VSCP Project, http://www.auto.grodansparadis.com/products.html
  *                          <akhe@grodansparadis.com>  
  *  Part of the VSCP Project - http://www.vscp.org
  *
