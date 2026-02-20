@@ -53,7 +53,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <stdbool.h>
 #include <vscp-class.h>
 #include <vscp-type.h>
 #include <vscp.h>
@@ -1975,7 +1974,7 @@ vscp_fwhlp_eventToStringEx(char *buf, size_t size, const vscpEventEx *pex)
 //  ============================
 //        0          0       1    filter == bit, mask=don't care result = true
 //        0          1       1    filter == bit, mask=valid, result = true
-//        1          0       1    filter != bit, makse=don't care, result = true
+//        1          0       1    filter != bit, mask=don't care, result = true
 //        1          1       0    filter != bit, mask=valid, result = false
 //
 // Mask tells *which* bits that are of interest means
@@ -4038,7 +4037,7 @@ vscp_fwhlp_getMeasurementAsFloat(const unsigned char *pNorm, unsigned char lengt
 
   // Check pointer
   if (NULL == pNorm) {
-    return false;
+    return 0.0f;
   }
 
   // Floating point value will be received big endian
@@ -4061,7 +4060,7 @@ vscp_fwhlp_getMeasurementAsFloat(const unsigned char *pNorm, unsigned char lengt
 //
 //
 
-bool
+int
 vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent)
 {
   int i, j;
@@ -4069,11 +4068,11 @@ vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent)
 
   // Check pointers
   if (NULL == pEvent) {
-    return false;
+    return -1;
   }
 
   if (NULL == pEvent->pdata) {
-    return false;
+    return -1;
   }
 
   strValue[0] = '\0';
@@ -4093,7 +4092,7 @@ vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent)
 
     // Must be correct data
     if (12 != pEvent->sizeData) {
-      return false;
+      return -1;
     }
 
     memset(buf, 0, sizeof(buf));
@@ -4114,7 +4113,7 @@ vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent)
 
     // Must be correct data
     if (4 != pEvent->sizeData)
-      return false;
+      return -1;
 
     memset(buf, 0, sizeof(buf));
     memcpy(buf, pEvent->pdata, 4); // float
@@ -4126,7 +4125,7 @@ vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent)
 
     // Must be correct data
     if ((16 + 4) != pEvent->sizeData) {
-      return false;
+      return -1;
     }
 
     memset(buf, 0, sizeof(buf));
@@ -4139,7 +4138,7 @@ vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent)
 
     // Must be correct data
     if (8 != pEvent->sizeData) {
-      return false;
+      return -1;
     }
 
     memset(buf, 0, sizeof(buf));
@@ -4153,7 +4152,7 @@ vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent)
 
     // Must be correct data
     if ((16 + 8) != pEvent->sizeData) {
-      return false;
+      return -1;
     }
 
     memset(buf, 0, sizeof(buf));
@@ -4176,7 +4175,7 @@ vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent)
 
     // Must be at least two data bytes
     if (pEvent->sizeData - offset < 2) {
-      return false;
+      return -1;
     }
 
     // Point past index,zone,subzone
@@ -4257,10 +4256,10 @@ vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent)
     }
   }
   else {
-    return false; // Measurement type is not supported
+    return -1; // Measurement type is not supported
   }
 
-  return true;
+  return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -4268,7 +4267,7 @@ vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent)
 //
 //
 
-bool
+int
 vscp_fwhlp_getMeasurementFloat64AsString(char *strValue, const vscpEvent *pEvent)
 {
   int offset = 0;
@@ -4280,13 +4279,13 @@ vscp_fwhlp_getMeasurementFloat64AsString(char *strValue, const vscpEvent *pEvent
   }
 
   if (pEvent->sizeData - offset != 8) {
-    return false;
+    return -1;
   }
 
   double *pfloat = (double *) (pEvent->pdata + offset);
   sprintf(strValue, "%lf", *pfloat);
 
-  return true;
+  return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -4294,63 +4293,59 @@ vscp_fwhlp_getMeasurementFloat64AsString(char *strValue, const vscpEvent *pEvent
 //
 //
 
-bool
+int
 vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscpEvent *pEvent)
 {
   char str[80];
 
   // Check pointers
   if (NULL == pEvent) {
-    return false;
+    return -1;
   }
 
   if (NULL == pvalue) {
-    return false;
+    return -1;
   }
 
   if ((VSCP_CLASS1_MEASUREMENT == pEvent->vscp_class) || (VSCP_CLASS1_DATA == pEvent->vscp_class) ||
       (VSCP_CLASS2_LEVEL1_MEASUREMENT == pEvent->vscp_class) || (VSCP_CLASS1_MEASUREZONE == pEvent->vscp_class) ||
       (VSCP_CLASS1_SETVALUEZONE == pEvent->vscp_class)) {
 
-    if (!vscp_fwhlp_getMeasurementAsString(str, pEvent)) {
-      return false;
+    if (-1 == vscp_fwhlp_getMeasurementAsString(str, pEvent)) {
+      return -1;
     }
 
     sscanf(str, "%lf", pvalue);
   }
   else if (VSCP_CLASS1_MEASUREMENT64 == pEvent->vscp_class) {
 
-    if (!vscp_fwhlp_getMeasurementFloat64AsString(str, pEvent)) {
-      return false;
+    if (-1 == vscp_fwhlp_getMeasurementFloat64AsString(str, pEvent)) {
+      return -1;
     }
     sscanf(str, "%lf", pvalue);
   }
-  else if (VSCP_CLASS1_MEASUREMENT64 == pEvent->vscp_class) {
+  else if (VSCP_CLASS2_MEASUREMENT_STR == pEvent->vscp_class) {
 
-    if (!vscp_fwhlp_getMeasurementFloat64AsString(str, pEvent)) {}
-    else if (VSCP_CLASS2_MEASUREMENT_STR == pEvent->vscp_class) {
+    char buf[512];
 
-      char buf[512];
-
-      if (0 == pEvent->sizeData || NULL == pEvent->pdata) {
-        return false;
-      }
-      memcpy(buf, pEvent->pdata + 4, pEvent->sizeData - 4);
-
-      sscanf(buf, "%lf", pvalue);
+    if (0 == pEvent->sizeData || NULL == pEvent->pdata) {
+      return -1;
     }
-    else if (VSCP_CLASS2_MEASUREMENT_FLOAT == pEvent->vscp_class) {
+    memcpy(buf, pEvent->pdata + 4, pEvent->sizeData - 4);
 
-      char buf[8];
-
-      memcpy(buf, pEvent->pdata + 4, 8);
-      *pvalue = *(double *) (buf);
-    }
-    else {
-      return false;
-    }
+    sscanf(buf, "%lf", pvalue);
   }
-  return true;
+  else if (VSCP_CLASS2_MEASUREMENT_FLOAT == pEvent->vscp_class) {
+
+    char buf[8];
+
+    memcpy(buf, pEvent->pdata + 4, 8);
+    *pvalue = *(double *) (buf);
+  }
+  else {
+    return -1;
+  }
+  return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -4358,12 +4353,12 @@ vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscpEvent *pEvent)
 //
 //
 
-bool
+int
 vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscpEventEx *pEventEx)
 {
   vscpEvent *pev = (vscpEvent *) malloc(sizeof(vscpEvent));
   if (NULL == pev) {
-    return false;
+    return -1;
   }
 
   pev->pdata    = NULL;
@@ -4371,7 +4366,7 @@ vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscpEventEx *pEventEx)
 
   if (VSCP_ERROR_SUCCESS != vscp_fwhlp_convertEventExToEvent(pev, pEventEx)) {
     vscp_fwhlp_deleteEvent(&pev);
-    return false;
+    return -1;
   }
 
   int rv = vscp_fwhlp_getMeasurementAsDouble(pvalue, pev);
@@ -4385,7 +4380,7 @@ vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscpEventEx *pEventEx)
 //
 //
 
-bool
+int
 vscp_fwhlp_getMeasurementWithZoneAsString(const vscpEvent *pEvent)
 {
   int offset = 0;
@@ -4398,7 +4393,7 @@ vscp_fwhlp_getMeasurementWithZoneAsString(const vscpEvent *pEvent)
 
   // Must at least have index, zone, subzone, normaliser byte, one data byte
   if (pEvent->sizeData - offset < 5) {
-    return false;
+    return -1;
   }
 
   // We mimic a standard measurement
@@ -4411,7 +4406,7 @@ vscp_fwhlp_getMeasurementWithZoneAsString(const vscpEvent *pEvent)
   eventMimic.sizeData   = pEvent->sizeData;
   memcpy(eventMimic.pdata, pEvent->pdata + offset + 3, pEvent->sizeData - offset - 3);
 
-  return true;
+  return 0;
 }
 
 // ----------------------------------------------------------------------------

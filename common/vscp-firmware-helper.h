@@ -1102,7 +1102,7 @@ vscp_fwhlp_getMeasurementAsFloat(const unsigned char *pNorm, unsigned char lengt
  * @return float Measurement value as a float. Returns 0 if not a measurement event or if data is not valid for
  * conversion.
  */
-bool
+int
 vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent);
 
 /*!
@@ -1113,7 +1113,7 @@ vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent);
  * @return float Measurement value as a float. Returns 0 if not a measurement event or if data is not valid for
  * conversion.
  */
-bool
+int
 vscp_fwhlp_getMeasurementFloat64AsString(char *strValue, const vscpEvent *pEvent);
 
 /*!
@@ -1124,7 +1124,7 @@ vscp_fwhlp_getMeasurementFloat64AsString(char *strValue, const vscpEvent *pEvent
  * @return double Measurement value as a double. Returns 0 if not a measurement event or if data is not valid for
  * conversion.
  */
-bool
+int
 vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscpEvent *pEvent);
 
 /*!
@@ -1135,7 +1135,7 @@ vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscpEvent *pEvent);
  * @return double Measurement value as a double. Returns 0 if not a measurement event or if data is not valid for
  * conversion.
  */
-bool
+int
 vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscpEventEx *pEventEx);
 
 /*!
@@ -1146,7 +1146,7 @@ vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscpEventEx *pEventEx)
  * @return double Measurement value as a double. Returns 0 if not a measurement event or if data is not valid for
  * conversion.
  */
-bool
+int
 vscp_fwhlp_getMeasurementWithZoneAsString(const vscpEvent *pEvent);
 
 /**

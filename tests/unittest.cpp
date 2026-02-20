@@ -2650,7 +2650,8 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsString)
   char out[64];
   memset(out, 0, sizeof(out));
 
-  ASSERT_TRUE(vscp_fwhlp_getMeasurementAsString(out, &ev));
+  int rv = vscp_fwhlp_getMeasurementAsString(out, &ev);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
   ASSERT_STREQ("12.5", out);
 }
 
@@ -2670,7 +2671,8 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementFloat64AsString)
   char out[64];
   memset(out, 0, sizeof(out));
 
-  ASSERT_TRUE(vscp_fwhlp_getMeasurementFloat64AsString(out, &ev));
+  int rv = vscp_fwhlp_getMeasurementFloat64AsString(out, &ev);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
   double parsed = 0;
   ASSERT_EQ(1, sscanf(out, "%lf", &parsed));
@@ -2691,11 +2693,14 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsDouble)
   ev.pdata      = payload;
 
   double val = 0;
-  ASSERT_TRUE(vscp_fwhlp_getMeasurementAsDouble(&val, &ev));
+  int rv = vscp_fwhlp_getMeasurementAsDouble(&val, &ev);
+  ASSERT_EQ(0, rv);
   ASSERT_NEAR(source, val, 0.000001);
 
-  ASSERT_FALSE(vscp_fwhlp_getMeasurementAsDouble(nullptr, &ev));
-  ASSERT_FALSE(vscp_fwhlp_getMeasurementAsDouble(&val, nullptr));
+  rv = vscp_fwhlp_getMeasurementAsDouble(nullptr, &ev);
+  ASSERT_EQ(-1, rv);
+  rv = vscp_fwhlp_getMeasurementAsDouble(&val, nullptr);
+  ASSERT_EQ(-1, rv);
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsDoubleEx)
@@ -2709,7 +2714,8 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsDoubleEx)
   ex.sizeData   = sizeof(source);
 
   double val = 0;
-  ASSERT_TRUE(vscp_fwhlp_getMeasurementAsDoubleEx(&val, &ex));
+  int rv = vscp_fwhlp_getMeasurementAsDoubleEx(&val, &ex);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
   ASSERT_NEAR(source, val, 0.000001);
 }
 
@@ -2718,18 +2724,31 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementWithZoneAsString)
   vscpEvent ev;
   memset(&ev, 0, sizeof(ev));
 
+  // Datacoding = Integer, value =10
   uint8_t ok_payload[] = { 0x01, 0x02, 0x03, 0x60, 0x0a };
   ev.vscp_class        = VSCP_CLASS1_MEASUREZONE;
   ev.sizeData          = sizeof(ok_payload);
   ev.pdata             = ok_payload;
 
-  ASSERT_TRUE(vscp_fwhlp_getMeasurementWithZoneAsString(&ev));
+  int rv = vscp_fwhlp_getMeasurementWithZoneAsString(&ev);
+  ASSERT_EQ(0, rv);
 
+  // Datacoding = Integer, value is not present
   uint8_t short_payload[] = { 0x01, 0x02, 0x03, 0x60 };
   ev.sizeData             = sizeof(short_payload);
   ev.pdata                = short_payload;
 
-  ASSERT_FALSE(vscp_fwhlp_getMeasurementWithZoneAsString(&ev));
+  rv = vscp_fwhlp_getMeasurementWithZoneAsString(&ev);
+  ASSERT_EQ(-1, rv);
+
+  // Payload is not valid for this class (e.g. wrong class)
+   uint8_t wrong_class_payload[] = { 0x01, 0x02, 0x03, 0x60, 0x0a };
+   ev.vscp_class              = VSCP_CLASS1_MEASUREMENT64;
+   ev.sizeData                = sizeof(wrong_class_payload);
+   ev.pdata                   = wrong_class_payload;
+
+   rv = vscp_fwhlp_getMeasurementWithZoneAsString(&ev);
+   ASSERT_EQ(0, rv);
 }
 
 int
