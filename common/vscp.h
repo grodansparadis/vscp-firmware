@@ -720,14 +720,14 @@ datetime,vscpHead,vscpObId,vscpDateTime,vscpTimeStamp,vscpClass,vscpType,vscpGui
  */
 #define VSCP_XML_EVENT_TEMPLATE                                                                                        \
   "<event "                                                                                                            \
-  "vscpHead=\"%d\" "                                                                                                   \
-  "vscpObId=\"%lu\" "                                                                                                  \
-  "vscpDateTime=\"%s\" "                                                                                               \
-  "vscpTimeStamp=\"%lu\" "                                                                                             \
-  "vscpClass=\"%d\" "                                                                                                  \
-  "vscpType=\"%d\" "                                                                                                   \
-  "vscpGuid=\"%s\" "                                                                                                   \
-  "vscpData=\"%s\" "                                                                                                   \
+  "head=\"%d\" "                                                                                                   \
+  "obid=\"%lu\" "                                                                                                  \
+  "datetime=\"%s\" "                                                                                               \
+  "timestamp=\"%lu\" "                                                                                             \
+  "class=\"%d\" "                                                                                                  \
+  "type=\"%d\" "                                                                                                   \
+  "guid=\"%s\" "                                                                                                   \
+  "data=\"%s\" "                                                                                                   \
   "/>"
 
 /*

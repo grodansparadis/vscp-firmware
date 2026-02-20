@@ -939,7 +939,8 @@ vscp_fwhlp_parse_xml_eventex(vscpEventEx* pex, const char* eventexstr);
   * @fn vscp_fwhlp_event_to_xml
   * @brief Convert pointer to VSCP event to XML string
   *
-  * @param eventstr String buffer that will get result
+  * @param eventstr String buffer that will get result. Must be at least
+  * 2960 bytes to hold max result.
   * @param len Size of string buffer
   * @param pev Pointer to event
   * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
@@ -951,7 +952,8 @@ vscp_fwhlp_event_to_xml(char* eventstr, size_t len, const vscpEvent* pev);
   * @fn vscp_fwhlp_eventex_to_xml
   * @brief Convert pointer to VSCP event ex to XML string
   *
-  * @param eventexstr String buffer that will get result
+  * @param eventexstr String buffer that will get result. Must be at least
+  * 2960 bytes to hold max result.
   * @param len Size of string buffer
   * @param pev Pointer to event ex
   * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.

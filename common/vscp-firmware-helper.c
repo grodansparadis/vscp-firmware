@@ -112,7 +112,7 @@ vscp_fwhlp_isBigEndian(void)
 //
 
 int
-vscp_fwhlp_a2ul(const char *src, uint8_t srclen, uint8_t base, uint32_t *resultp, char** endptr)
+vscp_fwhlp_a2ul(const char *src, uint8_t srclen, uint8_t base, uint32_t *resultp, char **endptr)
 {
   const char *stop;
   static char hex[]   = "0123456789abcdef";
@@ -506,7 +506,7 @@ vscp_fwhlp_parse_data(uint8_t *data, size_t length, const char *datastr, const c
     return -1;
   }
 
-  const char *s = datastr;  
+  const char *s = datastr;
   while (*s && s < end) {
     while (*s == ' ' || *s == ',') {
       s++;
@@ -598,9 +598,6 @@ vscp_fwhlp_get_datestr_from_event(char *buf, size_t len, const vscpEvent *pev)
            pev->second);
   return buf;
 }
-
-char *
-vscp_fwhlp_make_string_from_data(char *buf, size_t len, const uint8_t *data, size_t data_len);
 
 //////////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_get_datestr_from_eventex
@@ -703,7 +700,7 @@ vscp_fwhlp_parse_event_datestr(vscpEvent *pev, const char *strdate, char **endpt
 
   if (endptr) {
     *endptr = p;
-  } 
+  }
 
   return VSCP_ERROR_SUCCESS;
 }
@@ -3004,10 +3001,8 @@ _validate_event_string(const char *eventstr)
   // Ensure the string starts with "<event"
   // next character can be space, tab, newline or end of string,
   // all valid except for end of string.
-  if (strncmp(eventstr, "<event ", 7) != 0 && 
-      strncmp(eventstr, "<event\t", 7) != 0 && 
-      strncmp(eventstr, "<event\n", 7) != 0 &&
-      strncmp(eventstr, "<event\r", 7) != 0) {
+  if (strncmp(eventstr, "<event ", 7) != 0 && strncmp(eventstr, "<event\t", 7) != 0 &&
+      strncmp(eventstr, "<event\n", 7) != 0 && strncmp(eventstr, "<event\r", 7) != 0) {
     return VSCP_ERROR_INVALID_SYNTAX;
   }
 
@@ -3044,7 +3039,7 @@ _parse_event_string(attribute_t *attributes, size_t *attribute_count, const char
   while (*ptr && *attribute_count < MAX_ATTRIBUTES) {
 
     // Skip to the next attribute name
-    while (*ptr && !isalpha((unsigned char)*ptr)) {
+    while (*ptr && !isalpha((unsigned char) *ptr)) {
 
       // Also skip comments starting with <!-- and ending with -->
       if (*ptr == '<' && strncmp(ptr, "<!--", 4) == 0) {
@@ -3173,7 +3168,7 @@ vscp_fwhlp_parse_xml_event(vscpEvent *pev, const char *eventstr)
       case 3: // datetime
         // Parse datetime string and fill pev->year, pev->month, etc.
         if (VSCP_ERROR_SUCCESS != vscp_fwhlp_parse_event_datestr(pev, attributes[i].value, NULL)) {
-          return VSCP_ERROR_PARAMETER;  
+          return VSCP_ERROR_PARAMETER;
         }
         break;
 
@@ -3244,7 +3239,7 @@ vscp_fwhlp_parse_xml_eventex(vscpEventEx *pex, const char *eventexstr)
   if ((NULL == pex) || (NULL == eventexstr)) {
     return VSCP_ERROR_INVALID_POINTER;
   }
-
+  printf("Parsing event string: %s\n", eventexstr);
   if (VSCP_ERROR_SUCCESS != (rv = _parse_event_string(attributes, &attribute_count, eventexstr))) {
     return rv;
   }
@@ -3266,7 +3261,7 @@ vscp_fwhlp_parse_xml_eventex(vscpEventEx *pex, const char *eventexstr)
       case 3: // datetime
         // Parse datetime string and fill pex->year, pex->month, etc.
         if (VSCP_ERROR_SUCCESS != vscp_fwhlp_parse_eventex_datestr(pex, attributes[i].value, NULL)) {
-          return VSCP_ERROR_PARAMETER;  
+          return VSCP_ERROR_PARAMETER;
         }
         break;
 
@@ -3319,29 +3314,34 @@ vscp_fwhlp_parse_xml_eventex(vscpEventEx *pex, const char *eventexstr)
 int
 vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscpEvent *pev)
 {
-  char strguid[80];
-  char strDateTime[64];
-  char strdata[512 * 5]; // 512 bytes of data can expand to 2048 characters in hex string format 0xff,0xff,... (4
-                         // characters per byte + comma)
-  char buf[80 + 64 + 512 * 5 + 256]; // Buffer to hold the final XML string, adjust size as needed
-
+  int rv;
+  char strDateTime[64]  = { 0 };
+  char strGuid[80]      = { 0 };
+  char strData[512 * 5] = { 0 }; // 512 bytes of data can expand to 2048 characters in hex string format 0xff,0xff,...
+                                 // (4 characters per byte + comma)
+ 
   // Check pointer
   if (NULL == pev || NULL == eventstr) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  if (VSCP_ERROR_SUCCESS != vscp_fwhlp_writeGuidToString(strguid, pev->GUID)) {
-    return VSCP_ERROR_PARSING;
+  // Check buffer length 
+  if (len < (80 + 64 + 512 * 5 + 256)) {
+    return VSCP_ERROR_BUFFER_TO_SMALL;
   }
 
-  if (NULL != vscp_fwhlp_make_string_from_data(strdata, sizeof(strdata), pev->pdata, pev->sizeData)) {
-    return VSCP_ERROR_PARSING;
+  if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_writeGuidToString(strGuid, pev->GUID))) {
+    return rv;
   }
 
+  // NULL result is OK, it just means there is no data to convert and strData will be empty string
+  vscp_fwhlp_make_string_from_data(strData, sizeof(strData), pev->pdata, pev->sizeData);
+  
+  // NULL result is OK, it just means there is no date information to convert and strDateTime will be empty string
   vscp_fwhlp_get_datestr_from_event(strDateTime, sizeof(strDateTime), pev);
 
   // datetime,head,obid,datetime,timestamp,class,type,guid,sizedata,data,note
-  sprintf(buf,
+  sprintf(eventstr,
           VSCP_XML_EVENT_TEMPLATE,
           (unsigned short int) pev->head,
           (unsigned long) pev->obid,
@@ -3349,8 +3349,8 @@ vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscpEvent *pev)
           (unsigned long) pev->timestamp,
           (unsigned short int) pev->vscp_class,
           (unsigned short int) pev->vscp_type,
-          (const char *) strguid,
-          (const char *) strdata);
+          (const char *) strGuid,
+          (const char *) strData);
 
   return VSCP_ERROR_SUCCESS;
 }
@@ -3362,29 +3362,34 @@ vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscpEvent *pev)
 int
 vscp_fwhlp_eventex_to_xml(char *eventexstr, size_t len, const vscpEventEx *pex)
 {
-  char strguid[80];
+  int rv;
+  char strGuid[80];
   char strDateTime[64];
-  char strdata[512 * 5]; // 512 bytes of data can expand to 2048 characters in hex string format 0xff,0xff,... (4
+  char strData[512 * 5]; // 512 bytes of data can expand to 2048 characters in hex string format 0xff,0xff,... (4
                          // characters per byte + comma)
-  char buf[80 + 64 + 512 * 5 + 256]; // Buffer to hold the final XML string, adjust size as needed
-
+  
   // Check pointer
   if (NULL == pex || NULL == eventexstr) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  if (VSCP_ERROR_SUCCESS != vscp_fwhlp_writeGuidToString(strguid, pex->GUID)) {
-    return VSCP_ERROR_PARSING;
+  // Check buffer length 
+  if (len < (80 + 64 + 512 * 5 + 256)) {
+    return VSCP_ERROR_BUFFER_TO_SMALL;
   }
 
-  if (NULL != vscp_fwhlp_make_string_from_data(strdata, sizeof(strdata), pex->data, pex->sizeData)) {
-    return VSCP_ERROR_PARSING;
+  if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_writeGuidToString(strGuid, pex->GUID))) {
+    return rv;
   }
 
+  // NULL result is OK, it just means there is no data to convert and strData will be empty string
+  vscp_fwhlp_make_string_from_data(strData, sizeof(strData), pex->data, pex->sizeData);
+
+  // NULL result is OK, it just means there is no date information to convert and strDateTime will be empty string
   vscp_fwhlp_get_datestr_from_eventex(strDateTime, sizeof(strDateTime), pex);
 
   // datetime,head,obid,datetime,timestamp,class,type,guid,sizedata,data,note
-  sprintf(buf,
+  sprintf(eventexstr,
           VSCP_XML_EVENT_TEMPLATE,
           (unsigned short int) pex->head,
           (unsigned long) pex->obid,
@@ -3392,8 +3397,8 @@ vscp_fwhlp_eventex_to_xml(char *eventexstr, size_t len, const vscpEventEx *pex)
           (unsigned long) pex->timestamp,
           (unsigned short int) pex->vscp_class,
           (unsigned short int) pex->vscp_type,
-          (const char *) strguid,
-          (const char *) strdata);
+          (const char *) strGuid,
+          (const char *) strData);
 
   return VSCP_ERROR_SUCCESS;
 }
