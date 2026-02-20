@@ -53,6 +53,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <stdbool.h>
 #include <vscp-class.h>
 #include <vscp-type.h>
 #include <vscp.h>
@@ -4347,7 +4348,7 @@ vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscpEvent *pEvent)
     }
     else {
       return false;
-    }    
+    }
   }
   return true;
 }
@@ -4414,10 +4415,6 @@ vscp_fwhlp_getMeasurementWithZoneAsString(const vscpEvent *pEvent)
 }
 
 // ----------------------------------------------------------------------------
-
-
-
-
 
 // ****************************
 //            CANAL

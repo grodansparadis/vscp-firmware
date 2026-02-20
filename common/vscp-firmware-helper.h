@@ -59,84 +59,78 @@ extern "C" {
 
 /* This macro construct a signed integer from two unsigned chars in a safe way */
 #if !defined(construct_signed16)
-#define construct_signed16(msb, lsb) ((int16_t)((((uint16_t)msb) << 8) + \
-                                                (uint16_t)lsb))
+#define construct_signed16(msb, lsb) ((int16_t) ((((uint16_t) msb) << 8) + (uint16_t) lsb))
 #endif
 
 /* This macro construct a unsigned integer from two unsigned chars in a safe way */
 #if !defined(construct_unsigned16)
-#define construct_unsigned16(msb, lsb) ((uint16_t)((((uint16_t)msb) << 8) + \
-                                                   (uint16_t)lsb))
+#define construct_unsigned16(msb, lsb) ((uint16_t) ((((uint16_t) msb) << 8) + (uint16_t) lsb))
 #endif
 
 /* This macro construct a signed long from four unsigned chars in a safe way */
 #if !defined(construct_signed32)
-#define construct_signed32(b0, b1, b2, b3) ((int32_t)((((uint32_t)b0) << 24) + \
-                                                      (((uint32_t)b1) << 16) + \
-                                                      (((uint32_t)b2) << 8) +  \
-                                                      (uint32_t)b3))
+#define construct_signed32(b0, b1, b2, b3)                                                                             \
+  ((int32_t) ((((uint32_t) b0) << 24) + (((uint32_t) b1) << 16) + (((uint32_t) b2) << 8) + (uint32_t) b3))
 #endif
 
 /* This macro construct a unsigned long from four unsigned chars in a safe way */
 #if !defined(construct_unsigned32)
-#define construct_unsigned32(b0, b1, b2, b3) ((uint32_t)((((uint32_t)b0) << 24) + \
-                                                         (((uint32_t)b1) << 16) + \
-                                                         (((uint32_t)b2) << 8) +  \
-                                                         (uint32_t)b3))
+#define construct_unsigned32(b0, b1, b2, b3)                                                                           \
+  ((uint32_t) ((((uint32_t) b0) << 24) + (((uint32_t) b1) << 16) + (((uint32_t) b2) << 8) + (uint32_t) b3))
 #endif
 
 /*  byte swapping */
 
 #if !defined(VSCP_UINT16_SWAP_ALWAYS)
-#define VSCP_UINT16_SWAP_ALWAYS(val) \
-  ((uint16_t)((((uint16_t)(val) & (uint16_t)0x00ffU) << 8) | (((uint16_t)(val) & (uint16_t)0xff00U) >> 8)))
+#define VSCP_UINT16_SWAP_ALWAYS(val)                                                                                   \
+  ((uint16_t) ((((uint16_t) (val) & (uint16_t) 0x00ffU) << 8) | (((uint16_t) (val) & (uint16_t) 0xff00U) >> 8)))
 #endif
 
 #if !defined(VSCP_INT16_SWAP_ALWAYS)
-#define VSCP_INT16_SWAP_ALWAYS(val) \
-  ((int16_t)((((uint16_t)(val) & (uint16_t)0x00ffU) << 8) | (((uint16_t)(val) & (uint16_t)0xff00U) >> 8)))
+#define VSCP_INT16_SWAP_ALWAYS(val)                                                                                    \
+  ((int16_t) ((((uint16_t) (val) & (uint16_t) 0x00ffU) << 8) | (((uint16_t) (val) & (uint16_t) 0xff00U) >> 8)))
 #endif
 
 #if !defined(VSCP_UINT32_SWAP_ALWAYS)
-#define VSCP_UINT32_SWAP_ALWAYS(val)                              \
-  ((uint32_t)((((uint32_t)(val) & (uint32_t)0x000000ffU) << 24) | \
-              (((uint32_t)(val) & (uint32_t)0x0000ff00U) << 8) |  \
-              (((uint32_t)(val) & (uint32_t)0x00ff0000U) >> 8) |  \
-              (((uint32_t)(val) & (uint32_t)0xff000000U) >> 24)))
+#define VSCP_UINT32_SWAP_ALWAYS(val)                                                                                   \
+  ((uint32_t) ((((uint32_t) (val) & (uint32_t) 0x000000ffU) << 24) |                                                   \
+               (((uint32_t) (val) & (uint32_t) 0x0000ff00U) << 8) |                                                    \
+               (((uint32_t) (val) & (uint32_t) 0x00ff0000U) >> 8) |                                                    \
+               (((uint32_t) (val) & (uint32_t) 0xff000000U) >> 24)))
 #endif
 
 #if !defined(VSCP_INT32_SWAP_ALWAYS)
-#define VSCP_INT32_SWAP_ALWAYS(val)                              \
-  ((int32_t)((((uint32_t)(val) & (uint32_t)0x000000ffU) << 24) | \
-             (((uint32_t)(val) & (uint32_t)0x0000ff00U) << 8) |  \
-             (((uint32_t)(val) & (uint32_t)0x00ff0000U) >> 8) |  \
-             (((uint32_t)(val) & (uint32_t)0xff000000U) >> 24)))
+#define VSCP_INT32_SWAP_ALWAYS(val)                                                                                    \
+  ((int32_t) ((((uint32_t) (val) & (uint32_t) 0x000000ffU) << 24) |                                                    \
+              (((uint32_t) (val) & (uint32_t) 0x0000ff00U) << 8) |                                                     \
+              (((uint32_t) (val) & (uint32_t) 0x00ff0000U) >> 8) |                                                     \
+              (((uint32_t) (val) & (uint32_t) 0xff000000U) >> 24)))
 #endif
 
 /*  machine specific byte swapping */
 
 #if !defined(VSCP_UINT64_SWAP_ALWAYS)
-#define VSCP_UINT64_SWAP_ALWAYS(val)                                       \
-  ((uint64_t)((((uint64_t)(val) & (uint64_t)(0x00000000000000ff)) << 56) | \
-              (((uint64_t)(val) & (uint64_t)(0x000000000000ff00)) << 40) | \
-              (((uint64_t)(val) & (uint64_t)(0x0000000000ff0000)) << 24) | \
-              (((uint64_t)(val) & (uint64_t)(0x00000000ff000000)) << 8) |  \
-              (((uint64_t)(val) & (uint64_t)(0x000000ff00000000)) >> 8) |  \
-              (((uint64_t)(val) & (uint64_t)(0x0000ff0000000000)) >> 24) | \
-              (((uint64_t)(val) & (uint64_t)(0x00ff000000000000)) >> 40) | \
-              (((uint64_t)(val) & (uint64_t)(0xff00000000000000)) >> 56)))
+#define VSCP_UINT64_SWAP_ALWAYS(val)                                                                                   \
+  ((uint64_t) ((((uint64_t) (val) & (uint64_t) (0x00000000000000ff)) << 56) |                                          \
+               (((uint64_t) (val) & (uint64_t) (0x000000000000ff00)) << 40) |                                          \
+               (((uint64_t) (val) & (uint64_t) (0x0000000000ff0000)) << 24) |                                          \
+               (((uint64_t) (val) & (uint64_t) (0x00000000ff000000)) << 8) |                                           \
+               (((uint64_t) (val) & (uint64_t) (0x000000ff00000000)) >> 8) |                                           \
+               (((uint64_t) (val) & (uint64_t) (0x0000ff0000000000)) >> 24) |                                          \
+               (((uint64_t) (val) & (uint64_t) (0x00ff000000000000)) >> 40) |                                          \
+               (((uint64_t) (val) & (uint64_t) (0xff00000000000000)) >> 56)))
 #endif
 
 #if !defined(VSCP_INT64_SWAP_ALWAYS)
-#define VSCP_INT64_SWAP_ALWAYS(val)                                       \
-  ((int64_t)((((uint64_t)(val) & (uint64_t)(0x00000000000000ff)) << 56) | \
-             (((uint64_t)(val) & (uint64_t)(0x000000000000ff00)) << 40) | \
-             (((uint64_t)(val) & (uint64_t)(0x0000000000ff0000)) << 24) | \
-             (((uint64_t)(val) & (uint64_t)(0x00000000ff000000)) << 8) |  \
-             (((uint64_t)(val) & (uint64_t)(0x000000ff00000000)) >> 8) |  \
-             (((uint64_t)(val) & (uint64_t)(0x0000ff0000000000)) >> 24) | \
-             (((uint64_t)(val) & (uint64_t)(0x00ff000000000000)) >> 40) | \
-             (((uint64_t)(val) & (uint64_t)(0xff00000000000000)) >> 56)))
+#define VSCP_INT64_SWAP_ALWAYS(val)                                                                                    \
+  ((int64_t) ((((uint64_t) (val) & (uint64_t) (0x00000000000000ff)) << 56) |                                           \
+              (((uint64_t) (val) & (uint64_t) (0x000000000000ff00)) << 40) |                                           \
+              (((uint64_t) (val) & (uint64_t) (0x0000000000ff0000)) << 24) |                                           \
+              (((uint64_t) (val) & (uint64_t) (0x00000000ff000000)) << 8) |                                            \
+              (((uint64_t) (val) & (uint64_t) (0x000000ff00000000)) >> 8) |                                            \
+              (((uint64_t) (val) & (uint64_t) (0x0000ff0000000000)) >> 24) |                                           \
+              (((uint64_t) (val) & (uint64_t) (0x00ff000000000000)) >> 40) |                                           \
+              (((uint64_t) (val) & (uint64_t) (0xff00000000000000)) >> 56)))
 #endif
 
 #ifdef __BIG_ENDIAN__
@@ -172,9 +166,9 @@ extern "C" {
 #endif
 
 #if !defined(Swap8Bytes)
-#define Swap8Bytes(val)                                                                                               \
-  ((((val) >> 56) & 0x00000000000000FF) | (((val) >> 40) & 0x000000000000FF00) |                                      \
-   (((val) >> 24) & 0x0000000000FF0000) | (((val) >> 8) & 0x00000000FF000000) | (((val) << 8) & 0x000000FF00000000) | \
+#define Swap8Bytes(val)                                                                                                \
+  ((((val) >> 56) & 0x00000000000000FF) | (((val) >> 40) & 0x000000000000FF00) |                                       \
+   (((val) >> 24) & 0x0000000000FF0000) | (((val) >> 8) & 0x00000000FF000000) | (((val) << 8) & 0x000000FF00000000) |  \
    (((val) << 24) & 0x0000FF0000000000) | (((val) << 40) & 0x00FF000000000000) | (((val) << 56) & 0xFF00000000000000))
 #endif
 
@@ -231,8 +225,7 @@ vscp_fwhlp_isBigEndian(void);
     @return  VSCP_ERROR_SUCCESS for success, else VSCP_ERROR_ERROR.
 */
 int
-vscp_fwhlp_a2ul(const char* src, uint8_t srclen, uint8_t base, uint32_t* resultp, char** endptr);
-
+vscp_fwhlp_a2ul(const char *src, uint8_t srclen, uint8_t base, uint32_t *resultp, char **endptr);
 
 /**
     Convert decimal byte to hex string
@@ -241,7 +234,7 @@ vscp_fwhlp_a2ul(const char* src, uint8_t srclen, uint8_t base, uint32_t* resultp
     @param len Number of digits to convert.
 */
 void
-vscp_fwhlp_dec2hex(uint8_t d, char* pBuf, uint16_t len);
+vscp_fwhlp_dec2hex(uint8_t d, char *pBuf, uint16_t len);
 
 /**
     Convert hexadecimal integer to a decimal value
@@ -249,7 +242,7 @@ vscp_fwhlp_dec2hex(uint8_t d, char* pBuf, uint16_t len);
     @return Converted value in decimal form.
 */
 uint32_t
-vscp_fwhlp_hex2dec(const char* pHex);
+vscp_fwhlp_hex2dec(const char *pHex);
 
 /**
  * @brief Convert one hex character
@@ -270,7 +263,7 @@ vscp_fwhlp_hexchar(char c);
  */
 
 void
-vscp_fwhlp_bin2hex(char* output, size_t outLength, const unsigned char* buf, size_t length);
+vscp_fwhlp_bin2hex(char *output, size_t outLength, const unsigned char *buf, size_t length);
 
 /**
  * @brief Convert a string of hex values to binary values in buffer
@@ -282,7 +275,7 @@ vscp_fwhlp_bin2hex(char* output, size_t outLength, const unsigned char* buf, siz
  */
 
 int
-vscp_fwhlp_hex2bin(unsigned char* buf, size_t length, const char* s);
+vscp_fwhlp_hex2bin(unsigned char *buf, size_t length, const char *s);
 
 /**
  * @fn vscp_fwhlp_strsubst
@@ -297,8 +290,8 @@ vscp_fwhlp_hex2bin(unsigned char* buf, size_t length, const char* s);
  * to small result buffer len for the result.
  */
 
-char*
-vscp_fwhlp_strsubst(char* pNewStr, size_t len, const char* pStr, const char* pTarget, const char* pReplace);
+char *
+vscp_fwhlp_strsubst(char *pNewStr, size_t len, const char *pStr, const char *pTarget, const char *pReplace);
 
 /**
     Read a value (hex or decimal)
@@ -307,18 +300,18 @@ vscp_fwhlp_strsubst(char* pNewStr, size_t len, const char* pStr, const char* pTa
     @return Converted value in decimal form.
 */
 uint32_t
-vscp_fwhlp_readStringValue(const char* pString);
+vscp_fwhlp_readStringValue(const char *pString);
 
 /**
     Read a value (hex or decimal)
     @param pString Pointe to value. A hex value should be
-    be preceded by "0x" or "0X". Binary values can also be specified with "0b" or "0B" prefix. 
+    be preceded by "0x" or "0X". Binary values can also be specified with "0b" or "0B" prefix.
     Octal values can be specified with "0o" or "0O" prefix.
-      @param endptr Pointer to pointer that will be set to first character after parsed value. Can be NULL.    
+      @param endptr Pointer to pointer that will be set to first character after parsed value. Can be NULL.
     @return Converted value in decimal form.
 */
 uint32_t
-vscp_fwhlp_parseStringValue(const char* pString, char** endptr);
+vscp_fwhlp_parseStringValue(const char *pString, char **endptr);
 
 /**
   Find substring of other string and return pointer to it
@@ -326,8 +319,8 @@ vscp_fwhlp_parseStringValue(const char* pString, char** endptr);
   @param needle String to search for.
   @return Pointer to substring or NULL if not found.
 */
-char*
-vscp_fwhlp_stristr(const char* haystack, const char* needle);
+char *
+vscp_fwhlp_stristr(const char *haystack, const char *needle);
 
 /*!
   Read VSCP data string into byte array. String should be in format "1,2,3,255,0x05,0x55,0o7,0b10101010"
@@ -338,8 +331,8 @@ vscp_fwhlp_stristr(const char* haystack, const char* needle);
   @return Number of bytes read or -1 if error such as invalid format or buffer too small.
 
 */
-int vscp_fwhlp_parse_data(uint8_t* data, size_t length, const char* datastr, const char **endptr);
-
+int
+vscp_fwhlp_parse_data(uint8_t *data, size_t length, const char *datastr, const char **endptr);
 
 /*!
     Make a string with hex values from binary values in buffer
@@ -349,8 +342,8 @@ int vscp_fwhlp_parse_data(uint8_t* data, size_t length, const char* datastr, con
     @param data_len Size of data buffer.
     @return Pointer to result string or NULL if error such as buffer too small.
 */
-char*
-vscp_fwhlp_make_string_from_data(char* buf, size_t len, const uint8_t* data, size_t data_len);
+char *
+vscp_fwhlp_make_string_from_data(char *buf, size_t len, const uint8_t *data, size_t data_len);
 
 /*!
     Get date string in format "YYYY-MM-DDTHH:MM:SS" from event
@@ -359,8 +352,8 @@ vscp_fwhlp_make_string_from_data(char* buf, size_t len, const uint8_t* data, siz
     @param len Size of buffer.
     @return Pointer to result string or NULL if error such as buffer too small.
 */
-char*
-vscp_fwhlp_get_datestr_from_event(char* buf, size_t len, const vscpEvent* pev);
+char *
+vscp_fwhlp_get_datestr_from_event(char *buf, size_t len, const vscpEvent *pev);
 
 /*!
     Get date string in format "YYYY-MM-DDTHH:MM:SS" from eventex
@@ -369,8 +362,8 @@ vscp_fwhlp_get_datestr_from_event(char* buf, size_t len, const vscpEvent* pev);
     @param len Size of buffer.
     @return Pointer to result string or NULL if error such as buffer too small.
 */
-char*
-vscp_fwhlp_get_datestr_from_eventex(char* buf, size_t len, const vscpEventEx* pex);
+char *
+vscp_fwhlp_get_datestr_from_eventex(char *buf, size_t len, const vscpEventEx *pex);
 
 /*!
     Parse date string in format "YYYY-MM-DDTHH:MM:SS" and fill event with the values
@@ -379,7 +372,7 @@ vscp_fwhlp_get_datestr_from_eventex(char* buf, size_t len, const vscpEventEx* pe
     @return VSCP_ERROR_SUCCESS if successful, else error code.
 */
 int
-vscp_fwhlp_parse_event_datestr(vscpEvent* pev, const char* strdate, char **endptr);
+vscp_fwhlp_parse_event_datestr(vscpEvent *pev, const char *strdate, char **endptr);
 
 /*!
     Parse date string in format "YYYY-MM-DDTHH:MM:SS" and fill eventex with the values
@@ -388,7 +381,7 @@ vscp_fwhlp_parse_event_datestr(vscpEvent* pev, const char* strdate, char **endpt
     @return VSCP_ERROR_SUCCESS if successful, else error code.
 */
 int
-vscp_fwhlp_parse_eventex_datestr(vscpEventEx* pex, const char* strdate, char **endptr);
+vscp_fwhlp_parse_eventex_datestr(vscpEventEx *pex, const char *strdate, char **endptr);
 
 /*!
     Convert traditional VSCP date + timestamp to unix 64-bit timestamp in nanoseconds
@@ -410,14 +403,7 @@ vscp_fwhlp_parse_eventex_datestr(vscpEventEx* pex, const char* strdate, char **e
     @return Unix 64-bit timestamp in nanoseconds
 */
 int64_t
-vscp_fwhlp_to_unix_ns(
-  int year,
-  int month,
-  int day,
-  int hour,
-  int minute,
-  int second,
-  uint32_t microsecond);
+vscp_fwhlp_to_unix_ns(int year, int month, int day, int hour, int minute, int second, uint32_t microsecond);
 
 /*!
     Convert unix 64-bit timestamp in nanoseconds to traditional VSCP date + timestamp
@@ -431,15 +417,14 @@ vscp_fwhlp_to_unix_ns(
     @param microsecond Pointer to variable that will hold microsecond part of time (0-999999)
 */
 void
-vscp_fwhlp_from_unix_ns(
-  int64_t unix_ns,
-  int* year,
-  int* month,
-  int* day,
-  int* hour,
-  int* minute,
-  int* second,
-  uint32_t* microsecond);
+vscp_fwhlp_from_unix_ns(int64_t unix_ns,
+                        int *year,
+                        int *month,
+                        int *day,
+                        int *hour,
+                        int *minute,
+                        int *second,
+                        uint32_t *microsecond);
 
 /**
  * @brief Parse MAC address on string form to binary array
@@ -450,9 +435,7 @@ vscp_fwhlp_from_unix_ns(
  * @return int Returns VSCP_ERROR_SUCCESS if OK, else error code.
  */
 int
-vscp_fwhlp_parseMac(uint8_t* pmac, const char* strmac, char** endptr);
-
-
+vscp_fwhlp_parseMac(uint8_t *pmac, const char *strmac, char **endptr);
 
 /**
     Check filter/mask to check if filter should be delivered
@@ -477,7 +460,7 @@ vscp_fwhlp_parseMac(uint8_t* pmac, const char* strmac, char** endptr);
     @return true if message should be delivered false if not.
     */
 int
-vscp_fwhlp_doLevel2Filter(const vscpEvent* pev, const vscpEventFilter* pFilter);
+vscp_fwhlp_doLevel2Filter(const vscpEvent *pev, const vscpEventFilter *pFilter);
 
 /**
     Check filter/mask to check if filter should be delivered
@@ -502,7 +485,7 @@ vscp_fwhlp_doLevel2Filter(const vscpEvent* pev, const vscpEventFilter* pFilter);
     @return true if message should be delivered false if not.
     */
 int
-vscp_fwhlp_doLevel2FilterEx(const vscpEventEx* pex, const vscpEventFilter* pFilter);
+vscp_fwhlp_doLevel2FilterEx(const vscpEventEx *pex, const vscpEventFilter *pFilter);
 
 /**
     Called by the system when a new connection is made.
@@ -511,7 +494,7 @@ vscp_fwhlp_doLevel2FilterEx(const vscpEventEx* pex, const vscpEventFilter* pFilt
 */
 
 int
-vscp_fwhlp_connect(const void* pdata);
+vscp_fwhlp_connect(const void *pdata);
 
 /**
     @brief Called by the system when a connection is closed.
@@ -522,7 +505,7 @@ vscp_fwhlp_connect(const void* pdata);
 */
 
 int
-vscp_fwhlp_disconnect(const void* pdata);
+vscp_fwhlp_disconnect(const void *pdata);
 
 /**
     Called by the system when no command is available
@@ -530,7 +513,7 @@ vscp_fwhlp_disconnect(const void* pdata);
     @return VSCP_ERROR_SUCCESS if command was executed correctly,
 */
 int
-vscp_fwhlp_idle_worker(const void* pdata);
+vscp_fwhlp_idle_worker(const void *pdata);
 
 /**
   @brief Parse a command from the client
@@ -554,7 +537,7 @@ vscp_fwhlp_idle_worker(const void* pdata);
 */
 
 int
-vscp_fwhlp_parseGuid(uint8_t* guid, const char* strguid, char** endptr);
+vscp_fwhlp_parseGuid(uint8_t *guid, const char *strguid, char **endptr);
 
 /**
   @brief Write GUID to string
@@ -567,7 +550,7 @@ vscp_fwhlp_parseGuid(uint8_t* guid, const char* strguid, char** endptr);
 */
 
 int
-vscp_fwhlp_writeGuidToString(char* strguid, const uint8_t* guid);
+vscp_fwhlp_writeGuidToString(char *strguid, const uint8_t *guid);
 
 /**
   @brief Parse a filter string and write data to a filter structure
@@ -576,7 +559,7 @@ vscp_fwhlp_writeGuidToString(char* strguid, const uint8_t* guid);
   @return VSCP_ERROR_SUCCESS if filter was parsed correctly.
 */
 int
-vscp_fwhlp_parseFilter(vscpEventFilter* pfilter, const char* strfilter);
+vscp_fwhlp_parseFilter(vscpEventFilter *pfilter, const char *strfilter);
 
 /**
   @brief Parse a filter mask and write data to a filter structure
@@ -585,7 +568,7 @@ vscp_fwhlp_parseFilter(vscpEventFilter* pfilter, const char* strfilter);
   @return VSCP_ERROR_SUCCESS if mask was parsed correctly.
 */
 int
-vscp_fwhlp_parseMask(vscpEventFilter* pfilter, const char* strmask);
+vscp_fwhlp_parseMask(vscpEventFilter *pfilter, const char *strmask);
 
 /**
   @brief Parse an event on string form and write data to an event structure
@@ -594,7 +577,7 @@ vscp_fwhlp_parseMask(vscpEventFilter* pfilter, const char* strmask);
   @return VSCP_ERROR_SUCCESS if event was parsed correctly.
 */
 int
-vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf);
+vscp_fwhlp_parseEvent(vscpEvent *pev, const char *buf);
 
 /**
   @brief Parse an event on string form and write data to an event ex structure
@@ -603,7 +586,7 @@ vscp_fwhlp_parseEvent(vscpEvent* pev, const char* buf);
   @return VSCP_ERROR_SUCCESS if event was parsed correctly.
 */
 int
-vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* streventex);
+vscp_fwhlp_parseEventEx(vscpEventEx *pex, const char *streventex);
 
 /**
   @brief Write event to string
@@ -613,7 +596,7 @@ vscp_fwhlp_parseEventEx(vscpEventEx* pex, const char* streventex);
   @return VSCP_ERROR_SUCCESS if event was written correctly.
 */
 int
-vscp_fwhlp_eventToString(char* buf, size_t len, const vscpEvent* pev);
+vscp_fwhlp_eventToString(char *buf, size_t len, const vscpEvent *pev);
 
 /**
   @brief Write event ex to string
@@ -623,13 +606,13 @@ vscp_fwhlp_eventToString(char* buf, size_t len, const vscpEvent* pev);
   @return VSCP_ERROR_SUCCESS if event was written correctly.
 */
 int
-vscp_fwhlp_eventToStringEx(char* buf, size_t len, const vscpEventEx* pex);
+vscp_fwhlp_eventToStringEx(char *buf, size_t len, const vscpEventEx *pex);
 
 /**
   @brief Allocate a new event with zero data.
   @return Pointer to the new event if successful, NULL if not.
 */
-vscpEvent*
+vscpEvent *
 vscp_fwhlp_newEvent(void);
 
 /**
@@ -641,7 +624,7 @@ vscp_fwhlp_newEvent(void);
  */
 
 int
-vscp_fwhlp_convertEventToEventEx(vscpEventEx* pEventEx, const vscpEvent* pEvent);
+vscp_fwhlp_convertEventToEventEx(vscpEventEx *pEventEx, const vscpEvent *pEvent);
 
 /**
  * @brief Convert eventex to event
@@ -652,7 +635,7 @@ vscp_fwhlp_convertEventToEventEx(vscpEventEx* pEventEx, const vscpEvent* pEvent)
  */
 
 int
-vscp_fwhlp_convertEventExToEvent(vscpEvent* pEvent, const vscpEventEx* pEventEx);
+vscp_fwhlp_convertEventExToEvent(vscpEvent *pEvent, const vscpEventEx *pEventEx);
 
 /*!
     @brief Make a copy of an event
@@ -660,8 +643,8 @@ vscp_fwhlp_convertEventExToEvent(vscpEvent* pEvent, const vscpEventEx* pEventEx)
     @return Pointer to the new event if successful, NULL if not.
 */
 
-vscpEvent*
-vscp_fwhlp_mkEventCopy(const vscpEvent* pev);
+vscpEvent *
+vscp_fwhlp_mkEventCopy(const vscpEvent *pev);
 
 /*!
     @brief Make a copy of an eventex
@@ -669,8 +652,8 @@ vscp_fwhlp_mkEventCopy(const vscpEvent* pev);
     @return Pointer to the new event if successful, NULL if not.
 */
 
-vscpEventEx*
-vscp_fwhlp_mkEventExCopy(const vscpEventEx* pex);
+vscpEventEx *
+vscp_fwhlp_mkEventExCopy(const vscpEventEx *pex);
 
 /**
   @brief Delete an event and it's data.
@@ -678,7 +661,7 @@ vscp_fwhlp_mkEventExCopy(const vscpEventEx* pex);
   @return VSCP_ERROR_SUCCESS if event was deleted correctly,
 */
 int
-vscp_fwhlp_deleteEvent(vscpEvent** pev);
+vscp_fwhlp_deleteEvent(vscpEvent **pev);
 
 /*!
   Compile in UDP frame handling support
@@ -693,7 +676,7 @@ vscp_fwhlp_deleteEvent(vscpEvent** pev);
  * @return Size of resulting UDP frame on success. Zero on failure.
  */
 size_t
-vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx* pEventEx);
+vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx *pEventEx);
 
 /*!
  * Write event on UDP frame format
@@ -706,7 +689,7 @@ vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx* pEventEx);
  * @return VSCP_ERROR_SUCCESS on success, error code on failure.
  */
 int
-vscp_fwhlp_writeEventToFrame(uint8_t* frame, size_t len, uint8_t pkttype, const vscpEvent* pEvent);
+vscp_fwhlp_writeEventToFrame(uint8_t *frame, size_t len, uint8_t pkttype, const vscpEvent *pEvent);
 
 /*!
  * Write event ex on UDP frame format
@@ -719,7 +702,7 @@ vscp_fwhlp_writeEventToFrame(uint8_t* frame, size_t len, uint8_t pkttype, const 
  * @return VSCP_ERROR_SUCCESS on success, error code on failure.
  */
 int
-vscp_fwhlp_writeEventExToFrame(uint8_t* frame, size_t len, uint8_t pkttype, const vscpEventEx* pEventEx);
+vscp_fwhlp_writeEventExToFrame(uint8_t *frame, size_t len, uint8_t pkttype, const vscpEventEx *pEventEx);
 
 /*!
  * Get VSCP event from UDP frame
@@ -730,7 +713,7 @@ vscp_fwhlp_writeEventExToFrame(uint8_t* frame, size_t len, uint8_t pkttype, cons
  * @return VSCP_ERROR_SUCCESS on success, error code on failure.
  */
 int
-vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len);
+vscp_fwhlp_getEventFromFrame(vscpEvent *pEvent, const uint8_t *buf, size_t len);
 
 /*!
  * Get VSCP event ex from UDP frame
@@ -742,7 +725,7 @@ vscp_fwhlp_getEventFromFrame(vscpEvent* pEvent, const uint8_t* buf, size_t len);
  * @return VSCP_ERROR_SUCCESS on success, error code on failure.
  */
 int
-vscp_fwhlp_getEventExFromFrame(vscpEventEx* pEventEx, const uint8_t* buf, size_t len);
+vscp_fwhlp_getEventExFromFrame(vscpEventEx *pEventEx, const uint8_t *buf, size_t len);
 
 #endif
 
@@ -786,11 +769,11 @@ vscp_fwhlp_getEventExFromFrame(vscpEventEx* pEventEx, const uint8_t* buf, size_t
  *
  */
 size_t
-vscp_fwhlp_encryptFrame(uint8_t* output,
-                        uint8_t* input,
+vscp_fwhlp_encryptFrame(uint8_t *output,
+                        uint8_t *input,
                         size_t len,
-                        const uint8_t* key,
-                        const uint8_t* iv,
+                        const uint8_t *key,
+                        const uint8_t *iv,
                         uint8_t nAlgorithm);
 
 /*!
@@ -826,11 +809,11 @@ vscp_fwhlp_encryptFrame(uint8_t* output,
  * of the frame. The last 16 bytes of the frame is the iv.
  */
 int
-vscp_fwhlp_decryptFrame(uint8_t* output,
-                        uint8_t* input,
+vscp_fwhlp_decryptFrame(uint8_t *output,
+                        uint8_t *input,
                         size_t len,
-                        const uint8_t* key,
-                        const uint8_t* iv,
+                        const uint8_t *key,
+                        const uint8_t *iv,
                         uint8_t nAlgorithm);
 
 #endif
@@ -853,7 +836,7 @@ vscp_fwhlp_decryptFrame(uint8_t* output,
  */
 
 int
-vscp_fwhlp_parse_json(vscpEvent* pev, const char* jsonVscpEventObj);
+vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj);
 
 /**
  * @fn vscp_fwhlp_parse_json_ex
@@ -865,7 +848,7 @@ vscp_fwhlp_parse_json(vscpEvent* pev, const char* jsonVscpEventObj);
  */
 
 int
-vscp_fwhlp_parse_json_ex(vscpEventEx* pex, const char* jsonVscpEventObj);
+vscp_fwhlp_parse_json_ex(vscpEventEx *pex, const char *jsonVscpEventObj);
 
 /**
  * @fn vscp_fwhlp_create_json
@@ -877,7 +860,7 @@ vscp_fwhlp_parse_json_ex(vscpEventEx* pex, const char* jsonVscpEventObj);
  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
  */
 int
-vscp_fwhlp_create_json(char* strObj, size_t len, const vscpEvent* pev);
+vscp_fwhlp_create_json(char *strObj, size_t len, const vscpEvent *pev);
 
 /**
  * @fn vscp_fwhlp_create_json_ex
@@ -889,7 +872,7 @@ vscp_fwhlp_create_json(char* strObj, size_t len, const vscpEvent* pev);
  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
  */
 int
-vscp_fwhlp_create_json_ex(char* strObj, size_t len, const vscpEventEx* pex);
+vscp_fwhlp_create_json_ex(char *strObj, size_t len, const vscpEventEx *pex);
 
 #endif // JSON support
 
@@ -898,106 +881,106 @@ vscp_fwhlp_create_json_ex(char* strObj, size_t len, const vscpEventEx* pex);
 #ifdef VSCP_FWHLP_XML_SUPPORT
 
 /*!
-  * @fn vscp_fwhlp_parse_xml_event
-  * @brief Convert XML string to VSCP event
-  *
-  * @param pev Pointer to event that will get data
-  * @param eventstr Null terminated string with XML event data.
-  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
-  *
-*/
+ * @fn vscp_fwhlp_parse_xml_event
+ * @brief Convert XML string to VSCP event
+ *
+ * @param pev Pointer to event that will get data
+ * @param eventstr Null terminated string with XML event data.
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ *
+ */
 int
-vscp_fwhlp_parse_xml_event(vscpEvent* pev, const char* eventstr);
+vscp_fwhlp_parse_xml_event(vscpEvent *pev, const char *eventstr);
 
 /*!
-  * @fn vscp_fwhlp_parse_xml_eventex
-  * @brief Convert XML string to VSCP event ex
-  *
-  * @param pev Pointer to event ex that will get data
-  * @param eventstr Null terminated string with XML event data.
-  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
-  *
-*/
+ * @fn vscp_fwhlp_parse_xml_eventex
+ * @brief Convert XML string to VSCP event ex
+ *
+ * @param pev Pointer to event ex that will get data
+ * @param eventstr Null terminated string with XML event data.
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ *
+ */
 int
-vscp_fwhlp_parse_xml_eventex(vscpEventEx* pex, const char* eventexstr);
+vscp_fwhlp_parse_xml_eventex(vscpEventEx *pex, const char *eventexstr);
 
 /*!
-  * @fn vscp_fwhlp_event_to_xml
-  * @brief Convert pointer to VSCP event to XML string
-  *
-  * @param eventstr String buffer that will get result. Must be at least
-  * 2960 bytes to hold max result.
-  * @param len Size of string buffer
-  * @param pev Pointer to event
-  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
-*/
+ * @fn vscp_fwhlp_event_to_xml
+ * @brief Convert pointer to VSCP event to XML string
+ *
+ * @param eventstr String buffer that will get result. Must be at least
+ * 2960 bytes to hold max result.
+ * @param len Size of string buffer
+ * @param pev Pointer to event
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ */
 int
-vscp_fwhlp_event_to_xml(char* eventstr, size_t len, const vscpEvent* pev);
+vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscpEvent *pev);
 
 /*!
-  * @fn vscp_fwhlp_eventex_to_xml
-  * @brief Convert pointer to VSCP event ex to XML string
-  *
-  * @param eventexstr String buffer that will get result. Must be at least
-  * 2960 bytes to hold max result.
-  * @param len Size of string buffer
-  * @param pev Pointer to event ex
-  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
-*/
+ * @fn vscp_fwhlp_eventex_to_xml
+ * @brief Convert pointer to VSCP event ex to XML string
+ *
+ * @param eventexstr String buffer that will get result. Must be at least
+ * 2960 bytes to hold max result.
+ * @param len Size of string buffer
+ * @param pev Pointer to event ex
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ */
 
 int
-vscp_fwhlp_eventex_to_xml(char* eventexstr, size_t len, const vscpEventEx* pex);
+vscp_fwhlp_eventex_to_xml(char *eventexstr, size_t len, const vscpEventEx *pex);
 
 /*!
-  * @fn vscp_fwhlp_parse_topic
-  * @brief Parse topic string to extract GUID, VSCP class, and VSCP type
-  *
-  * @param topic Null terminated string with topic data.
-  * @param pGuid Array to store extracted GUID (16 bytes).
-  * @param pVscpClass Pointer to store extracted VSCP class.
-  * @param pVscpType Pointer to store extracted VSCP type.
-  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
-*/
+ * @fn vscp_fwhlp_parse_topic
+ * @brief Parse topic string to extract GUID, VSCP class, and VSCP type
+ *
+ * @param topic Null terminated string with topic data.
+ * @param pGuid Array to store extracted GUID (16 bytes).
+ * @param pVscpClass Pointer to store extracted VSCP class.
+ * @param pVscpType Pointer to store extracted VSCP type.
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ */
 int
-vscp_fwhlp_parse_topic(const char* topic, uint8_t* pGuid[16], uint16_t* pVscpClass, uint16_t* pVscpType);
+vscp_fwhlp_parse_topic(const char *topic, uint8_t *pGuid[16], uint16_t *pVscpClass, uint16_t *pVscpType);
 
 /*!
-  * @fn vscp_fwhlp_set_event_info_from_topic
-  * @brief Parse topic string and set event GUID, VSCP class, and VSCP type
-  *
-  * @param pev Pointer to event to set data for.
-  * @param topic Null terminated string with topic data.
-  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
-  *
-  * topic is on form "vscp/guid/CLASS/TYPE" where guid is 16 bytes in hex format 
-  * with ":" as separator, CLASS and TYPE are in decimal format. We can get this
-  * information from MQTT topic when MQTT is used as transport and the topic is 
-  * on the above form. This allows us to set guid, class and type of the event 
-  * from the topic without needing to include this information in the payload of 
-  * the event. This is useful for MQTT where the topic is often used to route the 
-  * event to the correct place and including guid, class and type in the topic is 
-  * more efficient than including it in the payload.
-*/
+ * @fn vscp_fwhlp_set_event_info_from_topic
+ * @brief Parse topic string and set event GUID, VSCP class, and VSCP type
+ *
+ * @param pev Pointer to event to set data for.
+ * @param topic Null terminated string with topic data.
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ *
+ * topic is on form "vscp/guid/CLASS/TYPE" where guid is 16 bytes in hex format
+ * with ":" as separator, CLASS and TYPE are in decimal format. We can get this
+ * information from MQTT topic when MQTT is used as transport and the topic is
+ * on the above form. This allows us to set guid, class and type of the event
+ * from the topic without needing to include this information in the payload of
+ * the event. This is useful for MQTT where the topic is often used to route the
+ * event to the correct place and including guid, class and type in the topic is
+ * more efficient than including it in the payload.
+ */
 int
 vscp_fwhlp_set_event_info_from_topic(vscpEvent *pev, const char *topic);
 
 /*!
-  * @fn vscp_fwhlp_set_event_info_from_topic
-  * @brief Parse topic string and set event GUID, VSCP class, and VSCP type
-  *
-  * @param pev Pointer to event to set data for.
-  * @param topic Null terminated string with topic data.
-  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
-  *
-  * topic is on form "vscp/guid/CLASS/TYPE" where guid is 16 bytes in hex format 
-  * with ":" as separator, CLASS and TYPE are in decimal format. We can get this
-  * information from MQTT topic when MQTT is used as transport and the topic is 
-  * on the above form. This allows us to set guid, class and type of the event 
-  * from the topic without needing to include this information in the payload of 
-  * the event. This is useful for MQTT where the topic is often used to route the 
-  * event to the correct place and including guid, class and type in the topic is 
-  * more efficient than including it in the payload.
-*/
+ * @fn vscp_fwhlp_set_event_info_from_topic
+ * @brief Parse topic string and set event GUID, VSCP class, and VSCP type
+ *
+ * @param pev Pointer to event to set data for.
+ * @param topic Null terminated string with topic data.
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ *
+ * topic is on form "vscp/guid/CLASS/TYPE" where guid is 16 bytes in hex format
+ * with ":" as separator, CLASS and TYPE are in decimal format. We can get this
+ * information from MQTT topic when MQTT is used as transport and the topic is
+ * on the above form. This allows us to set guid, class and type of the event
+ * from the topic without needing to include this information in the payload of
+ * the event. This is useful for MQTT where the topic is often used to route the
+ * event to the correct place and including guid, class and type in the topic is
+ * more efficient than including it in the payload.
+ */
 int
 vscp_fwhlp_set_eventex_info_from_topic(vscpEventEx *pex, const char *topic);
 
@@ -1006,99 +989,98 @@ vscp_fwhlp_set_eventex_info_from_topic(vscpEventEx *pex, const char *topic);
 // ----------------------------------------------------------------------------
 
 /*!
-  * @fn vscp_fwhlp_getMeasurementDataCoding
-  * @brief Get the measurement data coding from a VSCP event
-  *
-  * @param pEvent Pointer to event to get data coding from.
-  * @return uint8_t Measurement data coding value. Returns 0 if not a measurement event or if data coding is not set.
-*/
+ * @fn vscp_fwhlp_getMeasurementDataCoding
+ * @brief Get the measurement data coding from a VSCP event
+ *
+ * @param pEvent Pointer to event to get data coding from.
+ * @return uint8_t Measurement data coding value. Returns 0 if not a measurement event or if data coding is not set.
+ */
 uint8_t
-vscp_fwhlp_getMeasurementDataCoding(const vscpEvent* pEvent);
+vscp_fwhlp_getMeasurementDataCoding(const vscpEvent *pEvent);
 
 /*!
-  * @fn vscp_fwhlp_getDataCodingBitArray
-  * @brief Get the data coding bit array from a measurement event
-  *
-  * @param pCode Pointer to data coding byte array.
-  * @param length Length of data coding byte array.
-  * @return uint64_t Data coding bit array. Returns 0 if data coding is not a bit array or if length is invalid.
-*/
+ * @fn vscp_fwhlp_getDataCodingBitArray
+ * @brief Get the data coding bit array from a measurement event
+ *
+ * @param pCode Pointer to data coding byte array.
+ * @param length Length of data coding byte array.
+ * @return uint64_t Data coding bit array. Returns 0 if data coding is not a bit array or if length is invalid.
+ */
 uint64_t
-vscp_fwhlp_getDataCodingBitArray(const uint8_t* pCode, const uint8_t length);
+vscp_fwhlp_getDataCodingBitArray(const uint8_t *pCode, const uint8_t length);
 
 /*!
-  * @fn vscp_fwhlp_getDataCodingInteger
-  * @brief Get the data coding integer value from a measurement event
-  *
-  * @param pCode Pointer to data coding byte array.
-  * @param length Length of data coding byte array.
-  * @return int64_t Data coding integer value. Returns 0 if data coding is not an integer or if length is invalid.
-*/
+ * @fn vscp_fwhlp_getDataCodingInteger
+ * @brief Get the data coding integer value from a measurement event
+ *
+ * @param pCode Pointer to data coding byte array.
+ * @param length Length of data coding byte array.
+ * @return int64_t Data coding integer value. Returns 0 if data coding is not an integer or if length is invalid.
+ */
 int64_t
-vscp_fwhlp_getDataCodingInteger(const uint8_t* pCode, uint8_t length);
+vscp_fwhlp_getDataCodingInteger(const uint8_t *pCode, uint8_t length);
 
 /*!
-  * @fn vscp_fwhlp_getDataCodingNormalizedInteger
-  * @brief Get the data coding normalized integer value from a measurement event
-  *
-  * @param pCode Pointer to data coding byte array.
-  * @param length Length of data coding byte array.
-  * @return double Data coding normalized integer value. Returns 0 if data coding is not a normalized integer or if length is invalid.
-*/
+ * @fn vscp_fwhlp_getDataCodingNormalizedInteger
+ * @brief Get the data coding normalized integer value from a measurement event
+ *
+ * @param pCode Pointer to data coding byte array.
+ * @param length Length of data coding byte array.
+ * @return double Data coding normalized integer value. Returns 0 if data coding is not a normalized integer or if
+ * length is invalid.
+ */
 double
-vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t* pCode, uint8_t length);
-
-
+vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t *pCode, uint8_t length);
 
 /*!
-  * @fn vscp_fwhlp_getMeasurementUnit
-  * @brief Get the measurement unit of a measurement event
-  *
-  * @param pEvent Pointer to event to get measurement unit from.
-  * @return int Measurement unit value. Returns -1 if not a measurement event or if measurement unit is not set.
-*/
+ * @fn vscp_fwhlp_getMeasurementUnit
+ * @brief Get the measurement unit of a measurement event
+ *
+ * @param pEvent Pointer to event to get measurement unit from.
+ * @return int Measurement unit value. Returns -1 if not a measurement event or if measurement unit is not set.
+ */
 int
-vscp_fwhlp_getMeasurementUnit(const vscpEvent* pEvent);
+vscp_fwhlp_getMeasurementUnit(const vscpEvent *pEvent);
 
 /*!
-  * @fn vscp_fwhlp_getMeasurementSensorIndex
-  * @brief Get the sensor index of a measurement event
-  *
-  * @param pEvent Pointer to event to get sensor index from.
-  * @return int Sensor index value. Returns -1 if not a measurement event or if sensor index is not set.
-*/
+ * @fn vscp_fwhlp_getMeasurementSensorIndex
+ * @brief Get the sensor index of a measurement event
+ *
+ * @param pEvent Pointer to event to get sensor index from.
+ * @return int Sensor index value. Returns -1 if not a measurement event or if sensor index is not set.
+ */
 int
-vscp_fwhlp_getMeasurementSensorIndex(const vscpEvent* pEvent);
+vscp_fwhlp_getMeasurementSensorIndex(const vscpEvent *pEvent);
 
 /*!
-  * @fn vscp_fwhlp_getMeasurementZone
-  * @brief Get the measurement zone of a measurement event
-  *
-  * @param pEvent Pointer to event to get measurement zone from.
-  * @return int Measurement zone value. Returns -1 if not a measurement event or if measurement zone is not set.
-*/
+ * @fn vscp_fwhlp_getMeasurementZone
+ * @brief Get the measurement zone of a measurement event
+ *
+ * @param pEvent Pointer to event to get measurement zone from.
+ * @return int Measurement zone value. Returns -1 if not a measurement event or if measurement zone is not set.
+ */
 int
-vscp_fwhlp_getMeasurementZone(const vscpEvent* pEvent);
+vscp_fwhlp_getMeasurementZone(const vscpEvent *pEvent);
 
 /*!
-  * @fn vscp_fwhlp_getMeasurementSubZone
-  * @brief Get the measurement subzone of a measurement event
-  *
-  * @param pEvent Pointer to event to get measurement subzone from.
-  * @return int Measurement subzone value. Returns -1 if not a measurement event or if measurement subzone is not set.
-*/
+ * @fn vscp_fwhlp_getMeasurementSubZone
+ * @brief Get the measurement subzone of a measurement event
+ *
+ * @param pEvent Pointer to event to get measurement subzone from.
+ * @return int Measurement subzone value. Returns -1 if not a measurement event or if measurement subzone is not set.
+ */
 int
-vscp_fwhlp_getMeasurementSubZone(const vscpEvent* pEvent);
+vscp_fwhlp_getMeasurementSubZone(const vscpEvent *pEvent);
 
 /*!
-  * @fn vscp_fwhlp_isMeasurement
-  * @brief Check if a VSCP event is a measurement event
-  *
-  * @param pEvent Pointer to event to check.
-  * @return int Returns 1 if event is a measurement event, 0 if not.
-*/
+ * @fn vscp_fwhlp_isMeasurement
+ * @brief Check if a VSCP event is a measurement event
+ *
+ * @param pEvent Pointer to event to check.
+ * @return int Returns 1 if event is a measurement event, 0 if not.
+ */
 int
-vscp_fwhlp_isMeasurement(const vscpEvent* pEvent);
+vscp_fwhlp_isMeasurement(const vscpEvent *pEvent);
 
 /*!
  * @fn vscp_fwhlp_getMeasurementAsFloat
@@ -1106,58 +1088,64 @@ vscp_fwhlp_isMeasurement(const vscpEvent* pEvent);
  *
  * @param pNorm Pointer to normalized data bytes of the measurement event.
  * @param length Length of the normalized data bytes.
- * @return float Measurement value as a float. Returns 0 if not a measurement event or if data is not valid for conversion.
-*/
+ * @return float Measurement value as a float. Returns 0 if not a measurement event or if data is not valid for
+ * conversion.
+ */
 float
 vscp_fwhlp_getMeasurementAsFloat(const unsigned char *pNorm, unsigned char length);
 
 /*!
-  * @fn vscp_fwhlp_getMeasurementAsFloatEx
-  * @brief Get the measurement value of a measurement event as a float
-  *
-  * @param pEvent Pointer to event to get measurement value from.
-  * @return float Measurement value as a float. Returns 0 if not a measurement event or if data is not valid for conversion.
-*/
+ * @fn vscp_fwhlp_getMeasurementAsFloatEx
+ * @brief Get the measurement value of a measurement event as a float
+ *
+ * @param pEvent Pointer to event to get measurement value from.
+ * @return float Measurement value as a float. Returns 0 if not a measurement event or if data is not valid for
+ * conversion.
+ */
 bool
 vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent);
 
 /*!
-  * @fn vscp_fwhlp_getMeasurementAsFloatEx
-  * @brief Get the measurement value of a measurement event as a float
-  *
-  * @param pEvent Pointer to event to get measurement value from.
-  * @return float Measurement value as a float. Returns 0 if not a measurement event or if data is not valid for conversion.
-*/
+ * @fn vscp_fwhlp_getMeasurementAsFloatEx
+ * @brief Get the measurement value of a measurement event as a float
+ *
+ * @param pEvent Pointer to event to get measurement value from.
+ * @return float Measurement value as a float. Returns 0 if not a measurement event or if data is not valid for
+ * conversion.
+ */
 bool
 vscp_fwhlp_getMeasurementFloat64AsString(char *strValue, const vscpEvent *pEvent);
 
 /*!
-  * @fn vscp_fwhlp_getMeasurementAsDouble
-  * @brief Get the measurement value of a measurement event as a double
-  *
-  * @param pEvent Pointer to event to get measurement value from.
-  * @return double Measurement value as a double. Returns 0 if not a measurement event or if data is not valid for conversion.
-*/
+ * @fn vscp_fwhlp_getMeasurementAsDouble
+ * @brief Get the measurement value of a measurement event as a double
+ *
+ * @param pEvent Pointer to event to get measurement value from.
+ * @return double Measurement value as a double. Returns 0 if not a measurement event or if data is not valid for
+ * conversion.
+ */
 bool
 vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscpEvent *pEvent);
 
 /*!
-  * @fn vscp_fwhlp_getMeasurementAsDoubleEx
-  * @brief Get the measurement value of a measurement event as a double
-  *
-  * @param pEvent Pointer to event to get measurement value from.
-  * @return double Measurement value as a double. Returns 0 if not a measurement event or if data is not valid for conversion.
-*/
+ * @fn vscp_fwhlp_getMeasurementAsDoubleEx
+ * @brief Get the measurement value of a measurement event as a double
+ *
+ * @param pEvent Pointer to event to get measurement value from.
+ * @return double Measurement value as a double. Returns 0 if not a measurement event or if data is not valid for
+ * conversion.
+ */
 bool
 vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscpEventEx *pEventEx);
 
 /*!
-  * @fn vscp_fwhlp_getMeasurementAsDoubleEx
-  * @brief Get the measurement value of a measurement event as a double
-  *
-  * @param pEvent Pointer to event to get measurement value from.
-  * @return double Measurement value as a double. Returns 0 if not a measurement event or if data is not valid for conversion.
-*/
+ * @fn vscp_fwhlp_getMeasurementAsDoubleEx
+ * @brief Get the measurement value of a measurement event as a double
+ *
+ * @param pEvent Pointer to event to get measurement value from.
+ * @return double Measurement value as a double. Returns 0 if not a measurement event or if data is not valid for
+ * conversion.
+ */
 bool
 vscp_fwhlp_getMeasurementWithZoneAsString(const vscpEvent *pEvent);
 
@@ -1167,7 +1155,7 @@ vscp_fwhlp_getMeasurementWithZoneAsString(const vscpEvent *pEvent);
     @return Priority (0-7) for event.
 */
 unsigned char
-vscp_fwhlp_getEventPriority(const vscpEvent* pev);
+vscp_fwhlp_getEventPriority(const vscpEvent *pev);
 
 /**
     Get VSCP EventEx priority
@@ -1175,31 +1163,27 @@ vscp_fwhlp_getEventPriority(const vscpEvent* pev);
     @return Priority (0-7) for event.
 */
 unsigned char
-vscp_fwhlp_getEventExPriority(const vscpEventEx* pex);
+vscp_fwhlp_getEventExPriority(const vscpEventEx *pex);
 
 /*!
-  * @fn vscp_fwhlp_setEventPriority
-  * @brief Set the priority of a VSCP event
-  *
-  * @param pEvent Pointer to event to set priority for.
-  * @param priority Priority (0-7) to set for event.
-*/
+ * @fn vscp_fwhlp_setEventPriority
+ * @brief Set the priority of a VSCP event
+ *
+ * @param pEvent Pointer to event to set priority for.
+ * @param priority Priority (0-7) to set for event.
+ */
 void
-vscp_fwhlp_setEventPriority(vscpEvent* pEvent, unsigned char priority);
+vscp_fwhlp_setEventPriority(vscpEvent *pEvent, unsigned char priority);
 
 /*!
-  * @fn vscp_fwhlp_setEventExPriority
-  * @brief Set the priority of a VSCP event ex
-  *
-  * @param pEvent Pointer to event ex to set priority for.
-  * @param priority Priority (0-7) to set for event.
-*/
+ * @fn vscp_fwhlp_setEventExPriority
+ * @brief Set the priority of a VSCP event ex
+ *
+ * @param pEvent Pointer to event ex to set priority for.
+ * @param priority Priority (0-7) to set for event.
+ */
 void
-vscp_fwhlp_setEventExPriority(vscpEventEx* pEventEx, unsigned char priority);
-
-
-
-
+vscp_fwhlp_setEventExPriority(vscpEventEx *pEventEx, unsigned char priority);
 
 // ****************************
 //            CANAL
@@ -1221,7 +1205,7 @@ uint32_t
 vscp_fwhlp__getCANALidFromData(unsigned char priority, const uint16_t vscp_class, const uint16_t vscp_type);
 
 uint32_t
-vscp_fwhlp__getCANALidFromEvent(const vscpEvent* pEvent);
+vscp_fwhlp__getCANALidFromEvent(const vscpEvent *pEvent);
 
 #ifdef __cplusplus
 }
