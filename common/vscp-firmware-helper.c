@@ -4033,11 +4033,11 @@ vscp_fwhlp_isMeasurement(const vscpEvent *pEvent)
 float
 vscp_fwhlp_getMeasurementAsFloat(const unsigned char *pNorm, unsigned char length)
 {
-  float *pfloat = nullptr;
+  float *pfloat = NULL;
   float value   = 0.0f;
 
   // Check pointer
-  if (nullptr == pNorm) {
+  if (NULL == pNorm) {
     return false;
   }
 
@@ -4068,11 +4068,11 @@ vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent)
   int offset = 0;
 
   // Check pointers
-  if (nullptr == pEvent) {
+  if (NULL == pEvent) {
     return false;
   }
 
-  if (nullptr == pEvent->pdata) {
+  if (NULL == pEvent->pdata) {
     return false;
   }
 
@@ -4300,11 +4300,11 @@ vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscpEvent *pEvent)
   char str[80];
 
   // Check pointers
-  if (nullptr == pEvent) {
+  if (NULL == pEvent) {
     return false;
   }
 
-  if (nullptr == pvalue) {
+  if (NULL == pvalue) {
     return false;
   }
 
@@ -4332,7 +4332,7 @@ vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscpEvent *pEvent)
 
       char buf[512];
 
-      if (0 == pEvent->sizeData || nullptr == pEvent->pdata) {
+      if (0 == pEvent->sizeData || NULL == pEvent->pdata) {
         return false;
       }
       memcpy(buf, pEvent->pdata + 4, pEvent->sizeData - 4);
@@ -4362,11 +4362,11 @@ bool
 vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscpEventEx *pEventEx)
 {
   vscpEvent *pev = (vscpEvent *) malloc(sizeof(vscpEvent));
-  if (nullptr == pev) {
+  if (NULL == pev) {
     return false;
   }
 
-  pev->pdata    = nullptr;
+  pev->pdata    = NULL;
   pev->sizeData = 0;
 
   if (VSCP_ERROR_SUCCESS != vscp_fwhlp_convertEventExToEvent(pev, pEventEx)) {
