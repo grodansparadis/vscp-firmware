@@ -1396,13 +1396,13 @@ vscp_fwhlp_parseMask(vscpEventFilter *pfilter, const char *strmask)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscp_fwhlp_parseEvent
+// vscp_fwhlp_parseStringToEvent
 //
 // head,class,type,obid,datetime,timestamp,GUID,data1,data2,data3....
 //
 
 int
-vscp_fwhlp_parseEvent(vscpEvent *pev, const char *buf)
+vscp_fwhlp_parseStringToEvent(vscpEvent *pev, const char *buf)
 {
   uint8_t wrkbuf[512];
   char *p = (char *) buf;
@@ -1588,11 +1588,11 @@ vscp_fwhlp_parseEvent(vscpEvent *pev, const char *buf)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscp_fwhlp_parseEventEx
+// vscp_fwhlp_parseStringToEventEx
 //
 
 int
-vscp_fwhlp_parseEventEx(vscpEventEx *pex, const char *buf)
+vscp_fwhlp_parseStringToEventEx(vscpEventEx *pex, const char *buf)
 {
   uint8_t wrkbuf[512];
   char *p = (char *) buf;

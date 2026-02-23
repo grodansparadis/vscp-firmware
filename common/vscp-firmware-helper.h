@@ -577,7 +577,7 @@ vscp_fwhlp_parseMask(vscpEventFilter *pfilter, const char *strmask);
   @return VSCP_ERROR_SUCCESS if event was parsed correctly.
 */
 int
-vscp_fwhlp_parseEvent(vscpEvent *pev, const char *buf);
+vscp_fwhlp_parseStringToEvent(vscpEvent *pev, const char *buf);
 
 /**
   @brief Parse an event on string form and write data to an event ex structure
@@ -586,7 +586,7 @@ vscp_fwhlp_parseEvent(vscpEvent *pev, const char *buf);
   @return VSCP_ERROR_SUCCESS if event was parsed correctly.
 */
 int
-vscp_fwhlp_parseEventEx(vscpEventEx *pex, const char *streventex);
+vscp_fwhlp_parseStringToEventEx(vscpEventEx *pex, const char *streventex);
 
 /**
   @brief Write event to string

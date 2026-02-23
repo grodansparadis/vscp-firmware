@@ -123,8 +123,8 @@ Date strings follow ISO-style form such as `YYYY-MM-DDTHH:MM:SSZ`.
 
 ### 5) Event and EventEx Parse/Format and Memory Helpers
 
-- `vscp_fwhlp_parseEvent`
-- `vscp_fwhlp_parseEventEx`
+- `vscp_fwhlp_parseStringToEvent`
+- `vscp_fwhlp_parseStringToEventEx`
 - `vscp_fwhlp_eventToString`
 - `vscp_fwhlp_eventToStringEx`
 - `vscp_fwhlp_newEvent`
