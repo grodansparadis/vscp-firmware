@@ -665,9 +665,13 @@ vscp_fwhlp_deleteEvent(vscpEvent **pev);
 
 /*!
   Compile in UDP frame handling support
+
+  AES crypto support  requires the crc.c lib to be
+  linked in (from the vscp-firmware common folder).
 */
 
 #ifdef VSCP_FWHLP_UDP_FRAME_SUPPORT
+
 
 /*!
  * Get UDP frame size from event

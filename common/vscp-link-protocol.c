@@ -509,7 +509,7 @@ vscp_link_doCmdSend(const void* pdata, const char* pcmd)
   }
 
   pev = vscp_fwhlp_newEvent();
-  if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseEvent(pev, pcmd))) {
+  if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseStringToEvent(pev, pcmd))) {
     if (VSCP_ERROR_INVALID_POINTER == rv) {
       vscp_fwhlp_deleteEvent(&pev);
       return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_ERROR);
