@@ -865,6 +865,27 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_doLevel2Filter_dont_care_mask)
 
 #ifdef VSCP_FWHLP_UDP_FRAME_SUPPORT
 
+TEST(_vscp_firmware_helper, vscp_fwhlp_getFrameSizeFromEvent)
+{
+  vscpEvent ev;
+  size_t size;
+
+  ev.sizeData = 0;
+  size        = vscp_fwhlp_getFrameSizeFromEvent(&ev);
+  // Size = 1 (pkttype) + 35 (header) + 0 (data) + 2 (CRC) = 38
+  ASSERT_EQ(38, size);
+
+  ev.sizeData = 10;
+  size        = vscp_fwhlp_getFrameSizeFromEvent(&ev);
+  // Size = 1 (pkttype) + 35 (header) + 10 (data) + 2 (CRC) = 48
+  ASSERT_EQ(48, size);
+
+  ev.sizeData = 100;
+  size        = vscp_fwhlp_getFrameSizeFromEvent(&ev);
+  // Size = 1 (pkttype) + 35 (header) + 100 (data) + 2 (CRC) = 138
+  ASSERT_EQ(138, size);
+}
+
 TEST(_vscp_firmware_helper, vscp_fwhlp_getFrameSizeFromEventEx)
 {
   vscpEventEx ex;

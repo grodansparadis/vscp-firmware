@@ -672,6 +672,15 @@ vscp_fwhlp_deleteEvent(vscpEvent **pev);
 /*!
  * Get UDP frame size from event
  *
+ * @param pEventEx Pointer to event.
+ * @return Size of resulting UDP frame on success. Zero on failure.
+ */
+size_t
+vscp_fwhlp_getFrameSizeFromEvent(vscpEvent *pEvent);
+
+/*!
+ * Get UDP frame size from event
+ *
  * @param pEventEx Pointer to event ex.
  * @return Size of resulting UDP frame on success. Zero on failure.
  */

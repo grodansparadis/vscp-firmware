@@ -2084,6 +2084,8 @@ vscp_fwhlp_doLevel2FilterEx(const vscpEventEx *pex, const vscpEventFilter *pFilt
 */
 #ifdef VSCP_FWHLP_UDP_FRAME_SUPPORT
 
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_getFrameSizeFromEvent
 //
