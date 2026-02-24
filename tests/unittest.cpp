@@ -508,6 +508,33 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseGuid_roundtrip)
   ASSERT_EQ(0, memcmp(guid1, guid2, 16));
 }
 
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseGuid_all_zeros)
+{
+  uint8_t guid1[16] = { 0 };
+  uint8_t guid2[16] = { 0 };
+  int rv;
+
+  rv = vscp_fwhlp_parseGuid(guid2, "-", NULL);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  ASSERT_EQ(0, memcmp(guid1, guid2, 16));
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseGuid_1_2_3)
+{
+  uint8_t guid2[16] = { 0 };
+  uint8_t guid1[16] = {
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15
+  };
+  int rv;
+
+  // Note that GUID strings are always hexadecimal
+  rv = vscp_fwhlp_parseGuid(guid2, "0:1:2:3:4:5:6:7:8:9:10:11:12:13:14:15", NULL);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  ASSERT_EQ(0, memcmp(guid1, guid2, 16));
+}
+
 //-----------------------------------------------------------------------------
 // MAC address tests
 //-----------------------------------------------------------------------------
@@ -2263,8 +2290,6 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_minimal)
   ASSERT_EQ(3, ev.vscp_type);
 }
 
-
-
 TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_basic)
 {
   vscpEvent ev;
@@ -2285,7 +2310,6 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_basic)
 
   int rv = vscp_fwhlp_event_to_xml(xml, sizeof(xml), &ev);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
-
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_basic_with_parse)
@@ -2300,12 +2324,12 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_basic_with_parse)
   ev.vscp_type  = 8;
   ev.obid       = 999;
   ev.timestamp  = 123456;
-  ev.sizeData    = 4;
-  ev.pdata       = (uint8_t *) malloc(ev.sizeData);
-  ev.pdata[0]    = 10;
-  ev.pdata[1]    = 20;
-  ev.pdata[2]    = 30;
-  ev.pdata[3]    = 40;
+  ev.sizeData   = 4;
+  ev.pdata      = (uint8_t *) malloc(ev.sizeData);
+  ev.pdata[0]   = 10;
+  ev.pdata[1]   = 20;
+  ev.pdata[2]   = 30;
+  ev.pdata[3]   = 40;
 
   // Setup GUID
   for (int i = 0; i < 16; i++) {
@@ -2325,7 +2349,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_basic_with_parse)
   ASSERT_EQ(ev.timestamp, ex.timestamp);
   ASSERT_EQ(ev.vscp_class, ex.vscp_class);
   ASSERT_EQ(ev.vscp_type, ex.vscp_type);
-  ASSERT_EQ(0, memcmp(ev.GUID, ex.GUID, 16)); 
+  ASSERT_EQ(0, memcmp(ev.GUID, ex.GUID, 16));
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_null_pointer)
@@ -2341,10 +2365,6 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_null_pointer)
   rv = vscp_fwhlp_event_to_xml(xml, sizeof(xml), nullptr);
   ASSERT_EQ(VSCP_ERROR_INVALID_POINTER, rv);
 }
-
-
-
-
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_all_zeros)
 {
@@ -2398,7 +2418,6 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_max_values)
   memset(max_guid, 0xFF, 16);
   ASSERT_EQ(0, memcmp(max_guid, ex.GUID, 16));
 }
-
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_eventex_basic)
 {
@@ -2495,8 +2514,6 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_eventex_to_xml_null_pointer)
   rv = vscp_fwhlp_eventex_to_xml(xml, sizeof(xml), nullptr);
   ASSERT_EQ(VSCP_ERROR_INVALID_POINTER, rv);
 }
-
-
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_eventex_max_values)
 {
@@ -2714,7 +2731,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsDouble)
   ev.pdata      = payload;
 
   double val = 0;
-  int rv = vscp_fwhlp_getMeasurementAsDouble(&val, &ev);
+  int rv     = vscp_fwhlp_getMeasurementAsDouble(&val, &ev);
   ASSERT_EQ(0, rv);
   ASSERT_NEAR(source, val, 0.000001);
 
@@ -2735,7 +2752,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsDoubleEx)
   ex.sizeData   = sizeof(source);
 
   double val = 0;
-  int rv = vscp_fwhlp_getMeasurementAsDoubleEx(&val, &ex);
+  int rv     = vscp_fwhlp_getMeasurementAsDoubleEx(&val, &ex);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
   ASSERT_NEAR(source, val, 0.000001);
 }
@@ -2763,13 +2780,182 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementWithZoneAsString)
   ASSERT_EQ(-1, rv);
 
   // Payload is not valid for this class (e.g. wrong class)
-   uint8_t wrong_class_payload[] = { 0x01, 0x02, 0x03, 0x60, 0x0a };
-   ev.vscp_class              = VSCP_CLASS1_MEASUREMENT64;
-   ev.sizeData                = sizeof(wrong_class_payload);
-   ev.pdata                   = wrong_class_payload;
+  uint8_t wrong_class_payload[] = { 0x01, 0x02, 0x03, 0x60, 0x0a };
+  ev.vscp_class                 = VSCP_CLASS1_MEASUREMENT64;
+  ev.sizeData                   = sizeof(wrong_class_payload);
+  ev.pdata                      = wrong_class_payload;
 
-   rv = vscp_fwhlp_getMeasurementWithZoneAsString(&ev);
-   ASSERT_EQ(0, rv);
+  rv = vscp_fwhlp_getMeasurementWithZoneAsString(&ev);
+  ASSERT_EQ(0, rv);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_1)
+{
+  int rv;
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+
+  rv = vscp_fwhlp_parseStringToEvent(&ev, "6,20,3,,,,00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F,0,1,35");
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  ASSERT_EQ(6, ev.head);
+  ASSERT_EQ(20, ev.vscp_class);
+  ASSERT_EQ(3, ev.vscp_type);
+  ASSERT_EQ(3, ev.sizeData);
+  ASSERT_EQ(0, ev.obid);
+  ASSERT_EQ(0, ev.timestamp);
+  ASSERT_EQ(0, ev.year);
+  ASSERT_EQ(0, ev.month);
+  ASSERT_EQ(0, ev.day);
+  ASSERT_EQ(0, ev.hour);
+  ASSERT_EQ(0, ev.minute);
+  ASSERT_EQ(0, ev.second);
+  ASSERT_EQ(0, memcmp(ev.GUID, (uint8_t[]) { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }, 16));
+  ASSERT_EQ(0, ev.pdata[0]);
+  ASSERT_EQ(1, ev.pdata[1]);
+  ASSERT_EQ(35, ev.pdata[2]);
+  delete[] ev.pdata;
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_2)
+{
+  int rv;
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+  uint8_t guid[16] = { 0 };
+
+  rv = vscp_fwhlp_parseStringToEvent(&ev, "1,20,3,,,,-,0,0x44,35");
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  ASSERT_EQ(1, ev.head);
+  ASSERT_EQ(20, ev.vscp_class);
+  ASSERT_EQ(3, ev.vscp_type);
+  ASSERT_EQ(3, ev.sizeData);
+  ASSERT_EQ(0, ev.obid);
+  ASSERT_EQ(0, ev.timestamp);
+  ASSERT_EQ(0, ev.year);
+  ASSERT_EQ(0, ev.month);
+  ASSERT_EQ(0, ev.day);
+  ASSERT_EQ(0, ev.hour);
+  ASSERT_EQ(0, ev.minute);
+  ASSERT_EQ(0, ev.second);
+  ASSERT_EQ(0, memcmp(ev.GUID, guid, 16));
+  ASSERT_EQ(0, ev.pdata[0]);
+  ASSERT_EQ(0x44, ev.pdata[1]);
+  ASSERT_EQ(35, ev.pdata[2]);
+  delete[] ev.pdata;  
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_3)
+{
+  int rv;
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+  uint8_t guid[16] = { 0 };
+
+  rv = vscp_fwhlp_parseStringToEvent(&ev, "9,20,3,,2001-11-02T18:00:01,,-,0,1,35");
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  ASSERT_EQ(9, ev.head);
+  ASSERT_EQ(20, ev.vscp_class);
+  ASSERT_EQ(3, ev.vscp_type);
+  ASSERT_EQ(3, ev.sizeData);
+  ASSERT_EQ(0, ev.obid);
+  ASSERT_EQ(0, ev.timestamp);
+  ASSERT_EQ(2001, ev.year);
+  ASSERT_EQ(11, ev.month);
+  ASSERT_EQ(2, ev.day);
+  ASSERT_EQ(18, ev.hour);
+  ASSERT_EQ(0, ev.minute);
+  ASSERT_EQ(1, ev.second);
+  ASSERT_EQ(0, memcmp(ev.GUID, guid, 16));
+  ASSERT_EQ(0, ev.pdata[0]);
+  ASSERT_EQ(1, ev.pdata[1]);
+  ASSERT_EQ(35, ev.pdata[2]);
+  delete[] ev.pdata;
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_1)
+{
+  int rv;
+  vscpEventEx ex;
+  memset(&ex, 0, sizeof(ex));
+
+  rv = vscp_fwhlp_parseStringToEventEx(&ex, "6,20,3,,,,00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F,0,1,35");
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  ASSERT_EQ(6, ex.head);
+  ASSERT_EQ(20, ex.vscp_class);
+  ASSERT_EQ(3, ex.vscp_type);
+  ASSERT_EQ(3, ex.sizeData);
+  ASSERT_EQ(0, ex.obid);
+  ASSERT_EQ(0, ex.timestamp);
+  ASSERT_EQ(0, ex.year);
+  ASSERT_EQ(0, ex.month);
+  ASSERT_EQ(0, ex.day);
+  ASSERT_EQ(0, ex.hour);
+  ASSERT_EQ(0, ex.minute);
+  ASSERT_EQ(0, ex.second);
+  ASSERT_EQ(0, memcmp(ex.GUID, (uint8_t[]) { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }, 16));
+  ASSERT_EQ(0, ex.data[0]);
+  ASSERT_EQ(1, ex.data[1]);
+  ASSERT_EQ(35, ex.data[2]);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_2)
+{
+  int rv;
+  vscpEventEx ex;
+  memset(&ex, 0, sizeof(ex));
+  uint8_t guid[16] = { 0 };
+
+  rv = vscp_fwhlp_parseStringToEventEx(&ex, "1,20,3,,,,-,0,0x44,35");
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  ASSERT_EQ(1, ex.head);
+  ASSERT_EQ(20, ex.vscp_class);
+  ASSERT_EQ(3, ex.vscp_type);
+  ASSERT_EQ(3, ex.sizeData);
+  ASSERT_EQ(0, ex.obid);
+  ASSERT_EQ(0, ex.timestamp);
+  ASSERT_EQ(0, ex.year);
+  ASSERT_EQ(0, ex.month);
+  ASSERT_EQ(0, ex.day);
+  ASSERT_EQ(0, ex.hour);
+  ASSERT_EQ(0, ex.minute);
+  ASSERT_EQ(0, ex.second);
+  ASSERT_EQ(0, memcmp(ex.GUID, guid, 16));
+  ASSERT_EQ(0, ex.data[0]);
+  ASSERT_EQ(0x44, ex.data[1]);
+  ASSERT_EQ(35, ex.data[2]);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_3)
+{
+  int rv;
+  vscpEventEx ex;
+  memset(&ex, 0, sizeof(ex));
+  uint8_t guid[16] = { 0 };
+
+  rv = vscp_fwhlp_parseStringToEventEx(&ex, "9,20,3,,2001-11-02T18:00:01,,-,0,1,35");
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  ASSERT_EQ(9, ex.head);
+  ASSERT_EQ(20, ex.vscp_class);
+  ASSERT_EQ(3, ex.vscp_type);
+  ASSERT_EQ(3, ex.sizeData);
+  ASSERT_EQ(0, ex.obid);
+  ASSERT_EQ(0, ex.timestamp);
+  ASSERT_EQ(2001, ex.year);
+  ASSERT_EQ(11, ex.month);
+  ASSERT_EQ(2, ex.day);
+  ASSERT_EQ(18, ex.hour);
+  ASSERT_EQ(0, ex.minute);
+  ASSERT_EQ(1, ex.second);
+  ASSERT_EQ(0, memcmp(ex.GUID, guid, 16));
+  ASSERT_EQ(0, ex.data[0]);
+  ASSERT_EQ(1, ex.data[1]);
+  ASSERT_EQ(35, ex.data[2]);
 }
 
 int
