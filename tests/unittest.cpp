@@ -2339,7 +2339,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_basic_with_parse)
   int rv = vscp_fwhlp_event_to_xml(xml, sizeof(xml), &ev);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  printf("Generated XML:\n%s\n", xml);
+  //printf("Generated XML:\n%s\n", xml);
 
   vscpEventEx ex;
   rv = vscp_fwhlp_parse_xml_eventex(&ex, xml);
@@ -2810,7 +2810,10 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_1)
   ASSERT_EQ(0, ev.hour);
   ASSERT_EQ(0, ev.minute);
   ASSERT_EQ(0, ev.second);
-  ASSERT_EQ(0, memcmp(ev.GUID, (uint8_t[]) { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }, 16));
+  for (int i = 0; i < 16; i++) {
+    ASSERT_EQ(i, ev.GUID[i]);
+  }
+  //ASSERT_EQ(0, memcmp(ev.GUID, (uint8_t[]) { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }, 16));
   ASSERT_EQ(0, ev.pdata[0]);
   ASSERT_EQ(1, ev.pdata[1]);
   ASSERT_EQ(35, ev.pdata[2]);
@@ -2896,7 +2899,10 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_1)
   ASSERT_EQ(0, ex.hour);
   ASSERT_EQ(0, ex.minute);
   ASSERT_EQ(0, ex.second);
-  ASSERT_EQ(0, memcmp(ex.GUID, (uint8_t[]) { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }, 16));
+  for (int i = 0; i < 16; i++) {
+    ASSERT_EQ(i, ex.GUID[i]);
+  }
+  //ASSERT_EQ(0, memcmp(ex.GUID, (uint8_t[]) { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }, 16));
   ASSERT_EQ(0, ex.data[0]);
   ASSERT_EQ(1, ex.data[1]);
   ASSERT_EQ(35, ex.data[2]);

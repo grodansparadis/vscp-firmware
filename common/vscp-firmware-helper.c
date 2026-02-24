@@ -3271,7 +3271,7 @@ vscp_fwhlp_parse_xml_eventex(vscpEventEx *pex, const char *eventexstr)
   if ((NULL == pex) || (NULL == eventexstr)) {
     return VSCP_ERROR_INVALID_POINTER;
   }
-  printf("Parsing event string: %s\n", eventexstr);
+  //printf("Parsing event string: %s\n", eventexstr);
   if (VSCP_ERROR_SUCCESS != (rv = _parse_event_string(attributes, &attribute_count, eventexstr))) {
     return rv;
   }
