@@ -23,9 +23,23 @@ include(GoogleTest)
 # add the executable
 add_executable(vscp_firmware_tests 
     unittest.cpp
+    vscp-aes-unittest.cpp
+    crc-unittest.cpp
+    crc8-unittest.cpp
+    fifo-unittest.cpp
+    vscp-fifo-unittest.cpp
+    vscp-bootloader-unittest.cpp
+    vscp-firmware-level2-unittest.cpp
+    vscp-firmware-unittest.cpp
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-helper.c
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-helper.h
     ${PROJECT_SOURCE_DIR}/../common/crc.c
+    ${PROJECT_SOURCE_DIR}/../common/crc8.c
+    ${PROJECT_SOURCE_DIR}/../common/fifo.c
+    ${PROJECT_SOURCE_DIR}/../common/vscp-fifo.c
+    ${PROJECT_SOURCE_DIR}/../common/vscp-bootloader.c
+    ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-level2.c
+    ${PROJECT_SOURCE_DIR}/../common/vscp-firmware.c
     ${PROJECT_SOURCE_DIR}/../common/vscp-aes.c
     ${PROJECT_SOURCE_DIR}/../third-party/cJSON/cJSON.c
     )

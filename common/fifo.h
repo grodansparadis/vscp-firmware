@@ -10,6 +10,8 @@
  extern "C" {
 #endif 
 
+#include <stdint.h>
+
 typedef struct {
     uint8_t *buf;
     uint16_t head;
