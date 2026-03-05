@@ -67,7 +67,8 @@ typedef struct _vscpEvent {
       Bit 14 - GUID type
       Bit 13 - GUID type
       Bit 12 - GUID type (GUID is IP v.6 address if set and 13/14 is zero.)
-      Bit 8-11 = Reserved
+      Bit 8-9 - Frame version. (0 = original, 1 = frame with Unix ns timestamp, 2 = reserved, 3 = reserved)
+      Bit 10-11 = Reserved
       Bit 765 =  priority, Priority 0-7 where 0 is highest priority.
       Bit 4 = hard coded, true for a hard coded device.
       Bit 3 = Don't calculate CRC, false for CRC usage.
@@ -90,11 +91,11 @@ typedef struct _vscpEvent {
     If year is set to 0xffff a unix UTC timestamp with nanosecond precision is formed by the
     eight byte buffer starting at the day field MSB first.
   */
-  uint16_t year;
+  uint16_t year; // set to 0xffff for UTC timestamp with nanosecond precision
   uint8_t month; /* 1-12 */
 
   union {
-    uint64_t timestamp_ns; /* Unix timestamp with nanosecond precision (when year == 0xffff) */
+    uint64_t timestamp_ns; /* Unix timestamp with nanosecond precision (when frame version = 1) */
     struct {
       uint8_t day;        /* 1-31 */
       uint8_t hour;       /* 0-23 */
@@ -131,7 +132,7 @@ typedef struct _vscpEventEx {
       Bit 14 - GUID type
       Bit 13 - GUID type
       Bit 12 - GUID type (GUID is IP v.6 address if set and 13/14 is zero.)
-      Bit 8-11 = Reserved
+      Bit 8-9 - Frame version. (0 = original, 1 = frame with Unix ns timestamp, 2 = reserved, 3 = reserved)
       Bit 765 =  priority, Priority 0-7 where 0 is highest priority.
       Bit 4 = hard coded, true for a hard coded device.
       Bit 3 = Don't calculate CRC, false for CRC usage.
@@ -154,11 +155,11 @@ typedef struct _vscpEventEx {
     If year is set to 0xffff a unix UTC timestamp with nanosecond precision is formed by the eight
     byte buffer starting at the day field MSB first.
   */
-  uint16_t year;
+  uint16_t year; // set to 0xffff for UTC timestamp with nanosecond precision
   uint8_t month; /* 1-12 */
 
   union {
-    uint64_t timestamp_ns; /* Unix timestamp with nanosecond precision (when year == 0xffff) */
+    uint64_t timestamp_ns; /* Unix timestamp with nanosecond precision (when frame version = 1) */
     struct {
       uint8_t day;        /* 1-31 */
       uint8_t hour;       /* 0-23 */
@@ -680,6 +681,7 @@ struct vscpMyNode {
 #define VSCP_ERROR_INVALID_CHECKSUM   67 /* Checksum is not correct */
 #define VSCP_ERROR_INTERFACE          68 /* Interface error (not defined etc) */
 #define VSCP_ERROR_INVALID_FORMAT     69 /* Format is wrong. Error in conversion */
+#define VSCP_ERROR_INVALID_CONTEXT    70 /* Context is invalid or missing */
 
 /*!
     HLO (High Level Object) type (bits 7,6,5,4)
@@ -720,14 +722,14 @@ datetime,head,obid,datetime,timestamp,class,type,guid,data,note
  */
 #define VSCP_XML_EVENT_TEMPLATE                                                                                        \
   "<event "                                                                                                            \
-  "head=\"%d\" "                                                                                                   \
-  "obid=\"%lu\" "                                                                                                  \
-  "datetime=\"%s\" "                                                                                               \
-  "timestamp=\"%lu\" "                                                                                             \
-  "class=\"%d\" "                                                                                                  \
-  "type=\"%d\" "                                                                                                   \
-  "guid=\"%s\" "                                                                                                   \
-  "data=\"%s\" "                                                                                                   \
+  "head=\"%d\" "                                                                                                       \
+  "obid=\"%lu\" "                                                                                                      \
+  "datetime=\"%s\" "                                                                                                   \
+  "timestamp=\"%lu\" "                                                                                                 \
+  "class=\"%d\" "                                                                                                      \
+  "type=\"%d\" "                                                                                                       \
+  "guid=\"%s\" "                                                                                                       \
+  "data=\"%s\" "                                                                                                       \
   "/>"
 
 /*
@@ -749,15 +751,15 @@ datetime,head,obid,datetime,timestamp,class,type,guid,data,note
 */
 #define VSCP_JSON_EVENT_TEMPLATE                                                                                       \
   "{\n"                                                                                                                \
-  "\"head\": %d,\n"                                                                                                \
-  "\"obid\":  %lu,\n"                                                                                              \
-  "\"datetime\": \"%s\",\n"                                                                                        \
-  "\"timestamp\": %lu,\n"                                                                                          \
-  "\"class\": %d,\n"                                                                                               \
-  "\"type\": %d,\n"                                                                                                \
-  "\"guid\": \"%s\",\n"                                                                                            \
-  "\"data\": [%s],\n"                                                                                              \
-  "\"note\": \"%s\"\n"                                                                                             \
+  "\"head\": %d,\n"                                                                                                    \
+  "\"obid\":  %lu,\n"                                                                                                  \
+  "\"datetime\": \"%s\",\n"                                                                                            \
+  "\"timestamp\": %lu,\n"                                                                                              \
+  "\"class\": %d,\n"                                                                                                   \
+  "\"type\": %d,\n"                                                                                                    \
+  "\"guid\": \"%s\",\n"                                                                                                \
+  "\"data\": [%s],\n"                                                                                                  \
+  "\"note\": \"%s\"\n"                                                                                                 \
   "}"
 
 /*!
@@ -797,14 +799,14 @@ note: This is a note <br>
   "type: %d <br>"                                                                                                      \
   "</p>"                                                                                                               \
   "<p>"                                                                                                                \
-  "data size: %d<br>"                                                                                                 \
+  "data size: %d<br>"                                                                                                  \
   "data: %s<br>"                                                                                                       \
   "</p>"                                                                                                               \
   "<p>"                                                                                                                \
-  "guid: %s<br>"                                                                                                  \
+  "guid: %s<br>"                                                                                                       \
   "</p>"                                                                                                               \
   "<p>"                                                                                                                \
-  "head: %d <br>"                                                                                                  \
+  "head: %d <br>"                                                                                                      \
   "<p>"                                                                                                                \
   "datetime: %s <br>"                                                                                                  \
   "</p>"                                                                                                               \
@@ -843,6 +845,8 @@ enum enumMqttMsgFormat { jsonfmt, xmlfmt, strfmt, binfmt, autofmt };
 #define VSCP_DROPLET_BETA  1
 #define VSCP_DROPLET_GAMMA 2
 
+// clang-format off
+
 /*!
   Use to print GUIDs
 
@@ -854,6 +858,126 @@ enum enumMqttMsgFormat { jsonfmt, xmlfmt, strfmt, binfmt, autofmt };
     (a)[14], (a)[15]
 #define GUIDSTR "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x"
 #endif
+
+// ----------------------------------------------------------------
+// 64-bit user rights bit array that is used by VSCP clients to determine 
+// what a user is allowed to do and not do. The rights are defined in the 
+// following way:
+//------------------------------------------------------------------
+
+// Rights nibble 7
+#define VSCP_USER_RIGHT_ALLOW_TEST          0x0000000010000000
+#define VSCP_USER_RIGHT_ALLOW_INTERFACE     0x0000000020000000
+#define VSCP_USER_RIGHT_ALLOW_RESTART       0x0000000040000000
+#define VSCP_USER_RIGHT_ALLOW_SHUTDOWN      0x0000000080000000
+
+// Rights nibble 6
+#define VSCP_USER_RIGHT_ALLOW_SETFILTER     0x0000000004000000
+#define VSCP_USER_RIGHT_ALLOW_SETGUID       0x0000000008000000
+
+// Rights nibble 5
+#define VSCP_USER_RIGHT_ALLOW_RCV_EVENT     0x0000000000100000  // Allowed to receive events
+
+// Rights nibble 4
+#define VSCP_USER_RIGHT_ALLOW_SEND_EVENT    0x0000000000010000  // Allowed to send events
+#define VSCP_USER_RIGHT_ALLOW_SEND_L1CTRL_EVENT                                \
+    0x0000000000020000 // Allowed to send Level I protocol events
+#define VSCP_USER_RIGHT_ALLOW_SEND_L2CTRL_EVENT                                \
+    0x0000000000040000 // Allowed to send Level 2 protocol events
+#define VSCP_USER_RIGHT_ALLOW_SEND_HLO_EVENT                                   \
+    0x0000000000080000 // Allowed to send HLO event(s)
+
+// Rights nibble 3
+
+
+// Rights nibble 2
+
+
+// Rights nibble 0/1
+#define VSCP_USER_RIGHT_ALLOW_TCPIP      0x0000000000000001
+#define VSCP_USER_RIGHT_ALLOW_WEBSOCKETS 0x0000000000000002  // ws1/ws2
+#define VSCP_USER_RIGHT_ALLOW_WEB        0x0000000000000004  // Web interface
+#define VSCP_USER_RIGHT_ALLOW_REST       0x0000000000000008  // REST
+#define VSCP_USER_RIGHT_ALLOW_UDP        0x0000000000000010  // UDP clienty
+#define VSCP_USER_RIGHT_ALLOW_MQTT       0x0000000000000020  // MQTT
+#define VSCP_USER_RIGHT_ALLOW_MULTICAST  0x0000000000000040  // Multicast
+
+// "admin" has all rights.
+// "user" standard user rights
+// "driver" can send and receive events and log in to tcp/ip through local host
+
+// Default admin privilege
+#define VSCP_ADMIN_DEFAULT_RIGHTS 0xFFFFFFFFFFFFFFFF    // Can do everything (and more)
+
+// Default user privilege
+#define VSCP_USER_DEFAULT_RIGHTS                                               \
+        VSCP_USER_RIGHT_ALLOW_TCPIP |                                          \
+        VSCP_USER_RIGHT_ALLOW_WEBSOCKETS |                                     \
+        VSCP_USER_RIGHT_ALLOW_WEB |                                            \
+        VSCP_USER_RIGHT_ALLOW_REST |                                           \
+        VSCP_USER_RIGHT_ALLOW_UDP |                                            \
+        VSCP_USER_RIGHT_ALLOW_MULTICAST |                                      \
+        VSCP_USER_RIGHT_ALLOW_MQTT |                                           \
+        VSCP_USER_RIGHT_ALLOW_SEND_EVENT |                                     \
+        VSCP_USER_RIGHT_ALLOW_RCV_EVENT |                                      \
+        VSCP_USER_RIGHT_ALLOW_SEND_L1CTRL_EVENT |                              \
+        VSCP_USER_RIGHT_ALLOW_SEND_L2CTRL_EVENT
+
+#define VSCP_DRIVER_DEFAULT_RIGHTS                                             \
+      VSCP_USER_RIGHT_ALLOW_SEND_EVENT |                                       \
+      VSCP_USER_RIGHT_ALLOW_RCV_EVENT |                                        \
+      VSCP_USER_RIGHT_ALLOW_SEND_L1CTRL_EVENT |                                \
+      VSCP_USER_RIGHT_ALLOW_SEND_L2CTRL_EVENT
+
+#define VSCP_TCPIP_DEFAULT_RIGHTS                                              \
+      VSCP_USER_RIGHT_ALLOW_TCPIP |                                            \
+      VSCP_USER_RIGHT_ALLOW_SEND_EVENT |                                       \
+      VSCP_USER_RIGHT_ALLOW_RCV_EVENT |                                        \
+      VSCP_USER_RIGHT_ALLOW_SEND_L1CTRL_EVENT |                                \
+      VSCP_USER_RIGHT_ALLOW_SEND_L2CTRL_EVENT 
+
+#define VSCP_WEBSOCKETS_DEFAULT_RIGHTS                                         \
+      VSCP_USER_RIGHT_ALLOW_WEBSOCKETS |                                       \
+      VSCP_USER_RIGHT_ALLOW_SEND_EVENT |                                       \
+      VSCP_USER_RIGHT_ALLOW_RCV_EVENT |                                        \
+      VSCP_USER_RIGHT_ALLOW_SEND_L1CTRL_EVENT |                                \
+      VSCP_USER_RIGHT_ALLOW_SEND_L2CTRL_EVENT
+
+#define VSCP_WEB_DEFAULT_RIGHTS                                                \
+      VSCP_USER_RIGHT_ALLOW_WEB |                                              \
+      VSCP_USER_RIGHT_ALLOW_SEND_EVENT |                                       \
+      VSCP_USER_RIGHT_ALLOW_RCV_EVENT |                                        \
+      VSCP_USER_RIGHT_ALLOW_SEND_L1CTRL_EVENT |                                \
+      VSCP_USER_RIGHT_ALLOW_SEND_L2CTRL_EVENT
+
+#define VSCP_REST_DEFAULT_RIGHTS                                               \
+      VSCP_USER_RIGHT_ALLOW_REST |                                             \
+      VSCP_USER_RIGHT_ALLOW_SEND_EVENT |                                       \
+      VSCP_USER_RIGHT_ALLOW_RCV_EVENT |                                        \
+      VSCP_USER_RIGHT_ALLOW_SEND_L1CTRL_EVENT |                                \
+      VSCP_USER_RIGHT_ALLOW_SEND_L2CTRL_EVENT
+
+#define VSCP_UDP_DEFAULT_RIGHTS                                                \
+      VSCP_USER_RIGHT_ALLOW_UDP |                                              \
+      VSCP_USER_RIGHT_ALLOW_SEND_EVENT |                                       \
+      VSCP_USER_RIGHT_ALLOW_RCV_EVENT |                                        \
+      VSCP_USER_RIGHT_ALLOW_SEND_L1CTRL_EVENT |                                \
+      VSCP_USER_RIGHT_ALLOW_SEND_L2CTRL_EVENT      
+
+#define VSCP_MULTICAST_DEFAULT_RIGHTS                                          \
+      VSCP_USER_RIGHT_ALLOW_MULTICAST |                                        \
+      VSCP_USER_RIGHT_ALLOW_SEND_EVENT |                                       \
+      VSCP_USER_RIGHT_ALLOW_RCV_EVENT |                                        \
+      VSCP_USER_RIGHT_ALLOW_SEND_L1CTRL_EVENT |                                \
+      VSCP_USER_RIGHT_ALLOW_SEND_L2CTRL_EVENT  
+
+#define VSCP_MQTT_DEFAULT_RIGHTS                                               \
+      VSCP_USER_RIGHT_ALLOW_MQTT |                                             \
+      VSCP_USER_RIGHT_ALLOW_SEND_EVENT |                                       \
+      VSCP_USER_RIGHT_ALLOW_RCV_EVENT |                                        \
+      VSCP_USER_RIGHT_ALLOW_SEND_L1CTRL_EVENT |                                \
+      VSCP_USER_RIGHT_ALLOW_SEND_L2CTRL_EVENT
+// clang-format on
 
 #ifdef __cplusplus
 }
