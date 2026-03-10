@@ -2964,6 +2964,178 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_3)
   ASSERT_EQ(35, ex.data[2]);
 }
 
+//-----------------------------------------------------------------------------
+// Filter/Mask string conversion tests
+//-----------------------------------------------------------------------------
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeFilterToString_basic)
+{
+  vscpEventFilter filter;
+  char strFilter[128];
+  int rv;
+
+  memset(&filter, 0, sizeof(filter));
+  filter.filter_priority = 3;
+  filter.filter_class    = 10;
+  filter.filter_type     = 6;
+
+  // Set filter GUID
+  for (int i = 0; i < 16; i++) {
+    filter.filter_GUID[i] = i;
+  }
+
+  rv = vscp_fwhlp_writeFilterToString(strFilter, sizeof(strFilter), &filter);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Verify the string contains expected values
+  ASSERT_NE(nullptr, strstr(strFilter, "3,10,6,"));
+  ASSERT_NE(nullptr, strstr(strFilter, "00:01:02:03:04:05:06:07"));
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeFilterToString_buffer_too_small)
+{
+  vscpEventFilter filter;
+  char strFilter[10]; // Too small
+  int rv;
+
+  memset(&filter, 0, sizeof(filter));
+
+  rv = vscp_fwhlp_writeFilterToString(strFilter, sizeof(strFilter), &filter);
+  ASSERT_EQ(VSCP_ERROR_BUFFER_TO_SMALL, rv);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeFilterToString_roundtrip)
+{
+  vscpEventFilter filter_original;
+  vscpEventFilter filter_parsed;
+  char strFilter[128];
+  int rv;
+
+  // Setup original filter
+  memset(&filter_original, 0, sizeof(filter_original));
+  filter_original.filter_priority = 5;
+  filter_original.filter_class    = 1000;
+  filter_original.filter_type     = 255;
+
+  for (int i = 0; i < 16; i++) {
+    filter_original.filter_GUID[i] = (i * 17) % 256;
+  }
+
+  // Write to string
+  rv = vscp_fwhlp_writeFilterToString(strFilter, sizeof(strFilter), &filter_original);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Parse it back
+  memset(&filter_parsed, 0, sizeof(filter_parsed));
+  rv = vscp_fwhlp_parseFilter(&filter_parsed, strFilter);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Verify roundtrip
+  ASSERT_EQ(filter_original.filter_priority, filter_parsed.filter_priority);
+  ASSERT_EQ(filter_original.filter_class, filter_parsed.filter_class);
+  ASSERT_EQ(filter_original.filter_type, filter_parsed.filter_type);
+  ASSERT_EQ(0, memcmp(filter_original.filter_GUID, filter_parsed.filter_GUID, 16));
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeMaskToString_basic)
+{
+  vscpEventFilter filter;
+  char strMask[128];
+  int rv;
+
+  memset(&filter, 0, sizeof(filter));
+  filter.mask_priority = 7;
+  filter.mask_class    = 0xFFFF;
+  filter.mask_type     = 0xFFFF;
+
+  // Set mask GUID to all 0xFF
+  memset(filter.mask_GUID, 0xFF, 16);
+
+  rv = vscp_fwhlp_writeMaskToString(strMask, sizeof(strMask), &filter);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Verify the string contains expected values
+  ASSERT_NE(nullptr, strstr(strMask, "7,65535,65535,"));
+  ASSERT_NE(nullptr, strstr(strMask, "FF:FF:FF:FF:FF:FF:FF:FF"));
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeMaskToString_buffer_too_small)
+{
+  vscpEventFilter filter;
+  char strMask[10]; // Too small
+  int rv;
+
+  memset(&filter, 0, sizeof(filter));
+
+  rv = vscp_fwhlp_writeMaskToString(strMask, sizeof(strMask), &filter);
+  ASSERT_EQ(VSCP_ERROR_BUFFER_TO_SMALL, rv);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeMaskToString_roundtrip)
+{
+  vscpEventFilter filter_original;
+  vscpEventFilter filter_parsed;
+  char strMask[128];
+  int rv;
+
+  // Setup original mask
+  memset(&filter_original, 0, sizeof(filter_original));
+  filter_original.mask_priority = 3;
+  filter_original.mask_class    = 512;
+  filter_original.mask_type     = 128;
+
+  for (int i = 0; i < 16; i++) {
+    filter_original.mask_GUID[i] = (i * 7) % 256;
+  }
+
+  // Write to string
+  rv = vscp_fwhlp_writeMaskToString(strMask, sizeof(strMask), &filter_original);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Parse it back
+  memset(&filter_parsed, 0, sizeof(filter_parsed));
+  rv = vscp_fwhlp_parseMask(&filter_parsed, strMask);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Verify roundtrip
+  ASSERT_EQ(filter_original.mask_priority, filter_parsed.mask_priority);
+  ASSERT_EQ(filter_original.mask_class, filter_parsed.mask_class);
+  ASSERT_EQ(filter_original.mask_type, filter_parsed.mask_type);
+  ASSERT_EQ(0, memcmp(filter_original.mask_GUID, filter_parsed.mask_GUID, 16));
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeFilterToString_all_zeros)
+{
+  vscpEventFilter filter;
+  char strFilter[128];
+  int rv;
+
+  memset(&filter, 0, sizeof(filter));
+
+  rv = vscp_fwhlp_writeFilterToString(strFilter, sizeof(strFilter), &filter);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Should output "0,0,0,00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
+  ASSERT_NE(nullptr, strstr(strFilter, "0,0,0,"));
+  ASSERT_NE(nullptr, strstr(strFilter, "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"));
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeMaskToString_all_zeros)
+{
+  vscpEventFilter filter;
+  char strMask[128];
+  int rv;
+
+  memset(&filter, 0, sizeof(filter));
+
+  rv = vscp_fwhlp_writeMaskToString(strMask, sizeof(strMask), &filter);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Should output "0,0,0,00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
+  ASSERT_NE(nullptr, strstr(strMask, "0,0,0,"));
+  ASSERT_NE(nullptr, strstr(strMask, "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"));
+}
+
 int
 main(int argc, char **argv)
 {

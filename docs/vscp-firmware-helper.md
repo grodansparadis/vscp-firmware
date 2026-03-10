@@ -119,7 +119,9 @@ Date strings follow ISO-style form such as `YYYY-MM-DDTHH:MM:SSZ`.
 - `vscp_fwhlp_doLevel2Filter`
 - `vscp_fwhlp_doLevel2FilterEx`
 - `vscp_fwhlp_parseFilter`
+- `vscp_fwhlp_writeFilterToString`
 - `vscp_fwhlp_parseMask`
+- `vscp_fwhlp_writeMaskToString`
 
 ### 5) Event and EventEx Parse/Format and Memory Helpers
 
@@ -268,6 +270,48 @@ if (VSCP_ERROR_SUCCESS == rv) {
   // json now contains serialized event
 }
 ```
+
+### Filter/Mask String Serialization
+
+Write filter and mask to string representation for storage or transmission:
+
+```c
+vscpEventFilter filter;
+char strFilter[128];
+char strMask[128];
+
+// Setup filter
+memset(&filter, 0, sizeof(filter));
+filter.filter_priority = 3;
+filter.filter_class    = 10;
+filter.filter_type     = 6;
+filter.mask_priority   = 7;
+filter.mask_class      = 0xFFFF;
+filter.mask_type       = 0xFFFF;
+
+// Write filter to string: "priority,class,type,GUID"
+int rv = vscp_fwhlp_writeFilterToString(strFilter, sizeof(strFilter), &filter);
+if (VSCP_ERROR_SUCCESS == rv) {
+  // strFilter contains "3,10,6,00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
+}
+
+// Write mask to string
+rv = vscp_fwhlp_writeMaskToString(strMask, sizeof(strMask), &filter);
+if (VSCP_ERROR_SUCCESS == rv) {
+  // strMask contains "7,65535,65535,00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
+}
+
+// Parse strings back to filter structure
+vscpEventFilter restored;
+memset(&restored, 0, sizeof(restored));
+vscp_fwhlp_parseFilter(&restored, strFilter);
+vscp_fwhlp_parseMask(&restored, strMask);
+```
+
+The string format for both filter and mask is:
+`priority,class,type,GUID` where GUID is colon-separated hex bytes.
+
+Buffer size requirement: minimum 62 bytes for output string.
 
 ---
 

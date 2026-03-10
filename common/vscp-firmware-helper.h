@@ -561,6 +561,19 @@ vscp_fwhlp_writeGuidToString(char *strguid, const uint8_t *guid);
 int
 vscp_fwhlp_parseFilter(vscpEventFilter *pfilter, const char *strfilter);
 
+
+/*!
+  @fn vscp_fwhlp_writeFilterToString
+  @brief Write filter to string
+  @param strFilter Filter in string form
+          filter-priority, filter-class, filter-type, filter-GUID
+  @param len Size of string buffer
+  @param pFilter Filter structure to write out to string.
+  @return true on success, false on failure.
+*/
+int
+vscp_fwhlp_writeFilterToString(char *strFilter, size_t len, const vscpEventFilter *pFilter);
+
 /**
   @brief Parse a filter mask and write data to a filter structure
   @param pfilter Pointer to filter structure to fill.
@@ -569,6 +582,18 @@ vscp_fwhlp_parseFilter(vscpEventFilter *pfilter, const char *strfilter);
 */
 int
 vscp_fwhlp_parseMask(vscpEventFilter *pfilter, const char *strmask);
+
+/*!
+  @fn vscp_writeMaskToString
+  @brief Write mask to string
+  @param strMask Mask in string form
+          mask-priority, mask-class, mask-type, mask-GUID
+  @param len Size of string buffer        
+  @param pFilter Filter structure to write out to string.
+  @return true on success, false on failure.
+*/
+int
+vscp_fwhlp_writeMaskToString(char *strMask, size_t len, const vscpEventFilter *pFilter);
 
 /**
   @brief Parse an event on string form and write data to an event structure
@@ -763,11 +788,13 @@ vscp_fwhlp_getEventExFromFrame(vscpEventEx *pEventEx, const uint8_t *buf, size_t
  *          (which should not be encrypted) then 16 is the encryption block and 16 + 1
  *          bytes will be the minimum needed output buffer size.
  * @param input This is the frame that should be encrypted. The first
- *          byte in the frame is the packet type which is not encrypted.
+ *          byte in the frame is the packet type which is left unencrypted.
  * @param len This is the length of the frame to be encrypted. This
  *          length includes the frame encryption type in the first byte.
- *          NOTE:   Length must be evenly divisible by 16 bytes (len % 16 == 0)
-            You should pad the end of the string with zeros if this is not the case.
+ * NOTE:   Length for encrypted data (without initial byte) must be evenly 
+ * divisible by 16 bytes (len % 16 == 0). But the library will take care of that for you
+ * and return the new length of the encrypted data. So you can just pass the original length 
+ * of the data to encrypt and the library will add padding if needed.
  * @param key This is a pointer to the secret encryption key. This key
  *          should be 128 bits for AES128, 192 bits for AES192, 256 bits
  *          for AES256.
@@ -780,6 +807,21 @@ vscp_fwhlp_getEventExFromFrame(vscpEventEx *pEventEx, const uint8_t *buf, size_t
  * set from the four lower bits of the buffer to decrypt.
  * @return Packet length on success, zero on failure.
  *
+ * Normally used like this
+ * 
+ * (strlen(test)+1 - to include the encryption type byte in the length of the data to encrypt. 
+ * The first byte of the test string should be reserved for the encryption type and should not 
+ * be encrypted.
+ *
+ * pmk - 128 bit primary key
+ * piv - 128 bit iv
+ * char buf[128]; 
+ * const char test[128];
+ * strcpy(test+1, "admin:secret"); // First byte is reserved for encryption type and should not be encrypted.
+ * if (!(len = vscp_fwhlp_encryptFrame(buf, test, strlen(test)+1, pmk, piv, 1))) {
+ *   ESP_LOGE(TAG, "Failed to encrypt credentials with error %d", len);
+ *   return VSCP_ERROR_ERROR;
+  }
  */
 size_t
 vscp_fwhlp_encryptFrame(uint8_t *output,

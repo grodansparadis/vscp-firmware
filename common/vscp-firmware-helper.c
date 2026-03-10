@@ -1342,6 +1342,42 @@ vscp_fwhlp_parseFilter(vscpEventFilter *pfilter, const char *strfilter)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_writeFilterToString
+//
+
+int
+vscp_fwhlp_writeFilterToString(char *strFilter, size_t len, const vscpEventFilter *pFilter)
+{
+  if (len < 62) { // Minimum length for mask string
+    return VSCP_ERROR_BUFFER_TO_SMALL;
+  }
+  
+  sprintf(strFilter,
+          "%u,%u,%u,%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:"
+          "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
+          pFilter->filter_priority,
+          pFilter->filter_class,
+          pFilter->filter_type,
+          pFilter->filter_GUID[0],
+          pFilter->filter_GUID[1],
+          pFilter->filter_GUID[2],
+          pFilter->filter_GUID[3],
+          pFilter->filter_GUID[4],
+          pFilter->filter_GUID[5],
+          pFilter->filter_GUID[6],
+          pFilter->filter_GUID[7],
+          pFilter->filter_GUID[8],
+          pFilter->filter_GUID[9],
+          pFilter->filter_GUID[10],
+          pFilter->filter_GUID[11],
+          pFilter->filter_GUID[12],
+          pFilter->filter_GUID[13],
+          pFilter->filter_GUID[14],
+          pFilter->filter_GUID[15]);
+  return VSCP_ERROR_SUCCESS;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_parseMask
 //
 // mask-priority, mask-class, mask-type, mask-GUID
@@ -1393,6 +1429,42 @@ vscp_fwhlp_parseMask(vscpEventFilter *pfilter, const char *strmask)
 
   // GUID mask
   return vscp_fwhlp_parseGuid(pfilter->mask_GUID, p, NULL);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_writeMaskToString
+//
+
+int
+vscp_fwhlp_writeMaskToString(char *strMask, size_t len, const vscpEventFilter *pFilter)
+{
+  if (len < 62) { // Minimum length for mask string
+    return VSCP_ERROR_BUFFER_TO_SMALL;
+  }
+
+  sprintf(strMask,
+          "%u,%u,%u,%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:"
+          "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
+          pFilter->mask_priority,
+          pFilter->mask_class,
+          pFilter->mask_type,
+          pFilter->mask_GUID[0],
+          pFilter->mask_GUID[1],
+          pFilter->mask_GUID[2],
+          pFilter->mask_GUID[3],
+          pFilter->mask_GUID[4],
+          pFilter->mask_GUID[5],
+          pFilter->mask_GUID[6],
+          pFilter->mask_GUID[7],
+          pFilter->mask_GUID[8],
+          pFilter->mask_GUID[9],
+          pFilter->mask_GUID[10],
+          pFilter->mask_GUID[11],
+          pFilter->mask_GUID[12],
+          pFilter->mask_GUID[13],
+          pFilter->mask_GUID[14],
+          pFilter->mask_GUID[15]);
+  return VSCP_ERROR_SUCCESS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2451,7 +2523,7 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
     return len;
   }
 
-  // Must be padded if needed (should have length 16).
+  // Must be padded if needed (should have length multiple of 16).
   // Encrypted len is len-1 because of leading encryption byte
   size_t padlen = len - 1;
   padlen        = padlen + (16 - (padlen % 16));
