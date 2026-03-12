@@ -126,6 +126,7 @@ vscp_guid_parse(uint8_t *guid, const char *strguid, char **endptr)
 {
   const char *p = strguid;
   int guid_idx  = 0;
+  int has_braces = 0;
 
   // Check pointers
   if (NULL == strguid) {
@@ -144,6 +145,16 @@ vscp_guid_parse(uint8_t *guid, const char *strguid, char **endptr)
     p++;
   }
 
+  // Check for opening brace
+  if (*p == '{') {
+    has_braces = 1;
+    p++;
+    // Skip whitespace after opening brace
+    while (*p && (*p == ' ' || *p == '\t')) {
+      p++;
+    }
+  }
+
   // Empty string or just whitespace
   if (!*p) {
     if (endptr)
@@ -151,12 +162,88 @@ vscp_guid_parse(uint8_t *guid, const char *strguid, char **endptr)
     return VSCP_ERROR_SUCCESS;
   }
 
-  // Special case: "-" means all zeros
-  if (*p == '-' && (!*(p + 1) || !is_hex_digit(*(p + 1)))) {
-    p++;
-    if (endptr)
-      *endptr = (char *) p;
-    return VSCP_ERROR_SUCCESS;
+  // Special case: "-" means all zeros, "-:" means leading zeros with trailing values
+  if (*p == '-') {
+    // Check for "-:" prefix (leading zeros with trailing values)
+    if (*(p + 1) == ':') {
+      p += 2; // Skip "-:"
+
+      // Parse the remaining bytes into a temporary buffer
+      uint8_t temp_bytes[16];
+      int temp_count = 0;
+
+      while (*p && temp_count < 16) {
+        if (!is_hex_digit(*p)) {
+          break;
+        }
+
+        int hex_len = count_hex_digits(p);
+
+        if (hex_len <= 2) {
+          // Single byte value
+          temp_bytes[temp_count++] = (uint8_t) parse_hex_value(&p, 2);
+        }
+        else if (hex_len <= 4) {
+          // Two byte value (big endian)
+          uint16_t val = (uint16_t) parse_hex_value(&p, 4);
+          temp_bytes[temp_count++] = (val >> 8) & 0xFF;
+          temp_bytes[temp_count++] = val & 0xFF;
+        }
+        else {
+          // Up to 4 bytes (8 hex digits)
+          int bytes_to_parse = (hex_len + 1) / 2;
+          if (bytes_to_parse > 4)
+            bytes_to_parse = 4;
+
+          uint32_t val = (uint32_t) parse_hex_value(&p, bytes_to_parse * 2);
+
+          // Store bytes in big-endian order
+          for (int i = bytes_to_parse - 1; i >= 0 && temp_count < 16; i--) {
+            temp_bytes[temp_count++] = (val >> (i * 8)) & 0xFF;
+          }
+        }
+
+        // Skip separator if present (colon, dash, or comma)
+        if (*p == ':' || *p == '-' || *p == ',') {
+          p++;
+        }
+      }
+
+      // GUID already initialized to zeros, copy temp bytes to end
+      int zero_count = 16 - temp_count;
+      memcpy(guid + zero_count, temp_bytes, temp_count);
+
+      // Skip closing brace if we had an opening one
+      if (has_braces) {
+        while (*p && (*p == ' ' || *p == '\t')) {
+          p++;
+        }
+        if (*p == '}') {
+          p++;
+        }
+      }
+
+      if (endptr)
+        *endptr = (char *) p;
+      return VSCP_ERROR_SUCCESS;
+    }
+
+    // "-" alone (not followed by hex) means all zeros
+    if (!*(p + 1) || !is_hex_digit(*(p + 1))) {
+      p++;
+      // Skip closing brace if we had an opening one
+      if (has_braces) {
+        while (*p && (*p == ' ' || *p == '\t')) {
+          p++;
+        }
+        if (*p == '}') {
+          p++;
+        }
+      }
+      if (endptr)
+        *endptr = (char *) p;
+      return VSCP_ERROR_SUCCESS;
+    }
   }
 
   // Special case: "::" at start
@@ -165,6 +252,15 @@ vscp_guid_parse(uint8_t *guid, const char *strguid, char **endptr)
     if (!p[2] || !is_hex_digit(p[2])) {
       memset(guid, 0xFF, 16);
       p += 2;
+      // Skip closing brace if we had an opening one
+      if (has_braces) {
+        while (*p && (*p == ' ' || *p == '\t')) {
+          p++;
+        }
+        if (*p == '}') {
+          p++;
+        }
+      }
       if (endptr)
         *endptr = (char *) p;
       return VSCP_ERROR_SUCCESS;
@@ -209,7 +305,7 @@ vscp_guid_parse(uint8_t *guid, const char *strguid, char **endptr)
       }
 
       // Skip separator if present
-      if (*p == ':' || *p == '-') {
+      if (*p == ':' || *p == '-' || *p == ',') {
         p++;
       }
     }
@@ -220,6 +316,16 @@ vscp_guid_parse(uint8_t *guid, const char *strguid, char **endptr)
       memset(guid, 0xFF, ff_count);
     }
     memcpy(guid + ff_count, temp_bytes, temp_count);
+
+    // Skip closing brace if we had an opening one
+    if (has_braces) {
+      while (*p && (*p == ' ' || *p == '\t')) {
+        p++;
+      }
+      if (*p == '}') {
+        p++;
+      }
+    }
 
     if (endptr)
       *endptr = (char *) p;
@@ -251,7 +357,17 @@ vscp_guid_parse(uint8_t *guid, const char *strguid, char **endptr)
       }
 
       // Skip separator
-      if (*p == '-' || *p == ':') {
+      if (*p == '-' || *p == ':' || *p == ',') {
+        p++;
+      }
+    }
+
+    // Skip closing brace if we had an opening one
+    if (has_braces) {
+      while (*p && (*p == ' ' || *p == '\t')) {
+        p++;
+      }
+      if (*p == '}') {
         p++;
       }
     }
@@ -300,7 +416,17 @@ vscp_guid_parse(uint8_t *guid, const char *strguid, char **endptr)
     }
 
     // Skip separator
-    if (*p == ':' || *p == '-') {
+    if (*p == ':' || *p == '-' || *p == ',') {
+      p++;
+    }
+  }
+
+  // Skip closing brace if we had an opening one
+  if (has_braces) {
+    while (*p && (*p == ' ' || *p == '\t')) {
+      p++;
+    }
+    if (*p == '}') {
       p++;
     }
   }

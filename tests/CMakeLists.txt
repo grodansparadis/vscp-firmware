@@ -24,6 +24,7 @@ include(GoogleTest)
 add_executable(vscp_firmware_tests 
     unittest.cpp
     vscp-aes-unittest.cpp
+    vscp-guid-parser-unittest.cpp
     crc-unittest.cpp
     crc8-unittest.cpp
     fifo-unittest.cpp
@@ -33,6 +34,7 @@ add_executable(vscp_firmware_tests
     vscp-firmware-unittest.cpp
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-helper.c
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-helper.h
+    ${PROJECT_SOURCE_DIR}/../common/vscp-guid-parser.c
     ${PROJECT_SOURCE_DIR}/../common/crc.c
     ${PROJECT_SOURCE_DIR}/../common/crc8.c
     ${PROJECT_SOURCE_DIR}/../common/fifo.c

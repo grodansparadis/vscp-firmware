@@ -43,6 +43,7 @@ extern "C" {
  *
  * 1. Standard colon-separated (16 single-byte values):
  *    FF:FF:FF:FF:FF:FF:FF:FF:01:02:03:AA:BB:44:01:30
+ *    (colons, dashes, and commas can be used as separators)
  *
  * 2. Double-colon prefix for leading 0xFF bytes:
  *    ::01:02:03:AA:BB:44:01:30
@@ -61,6 +62,16 @@ extern "C" {
  * 6. Special values:
  *    "-"  = All zeros (00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00)
  *    "::" = All 0xFF  (FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF)
+ *
+ * 7. Hyphen-colon prefix for leading zero bytes:
+ *    -:01:02:03:AA:BB:44:01:30
+ *    (equivalent to 00:00:00:00:00:00:00:00:01:02:03:AA:BB:44:01:30)
+ *    -:1,2,3  (comma separators also supported)
+ *
+ * 8. Brace-enclosed formats (any of the above can be enclosed in {}):
+ *    {FF:FF:FF:FF:FF:FF:FF:FF:01:02:03:AA:BB:44:01:30}
+ *    {FFFFFFFF-FFFF-FFFF-0102-03AABB440130}
+ *    {::01:02:03:AA:BB:44:01:30}
  *
  * @param guid    Pointer to 16-byte buffer to receive parsed GUID
  * @param strguid Input string containing GUID in any supported format
