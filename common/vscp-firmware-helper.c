@@ -1186,14 +1186,96 @@ vscp_fwhlp_deleteEvent(vscpEvent **pev)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Helper: Check if character is a hex digit
+//
+
+static inline int
+is_hex_digit(char c)
+{
+  return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Helper: Convert hex character to value
+//
+
+static inline uint8_t
+hex_to_val(char c)
+{
+  if (c >= '0' && c <= '9')
+    return c - '0';
+  if (c >= 'a' && c <= 'f')
+    return c - 'a' + 10;
+  if (c >= 'A' && c <= 'F')
+    return c - 'A' + 10;
+  return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Helper: Count consecutive hex digits
+//
+
+static int
+count_hex_digits(const char *p)
+{
+  int count = 0;
+  while (is_hex_digit(*p)) {
+    count++;
+    p++;
+  }
+  return count;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Helper: Parse hex value of up to max_digits
+//
+
+static uint32_t
+parse_hex_value(const char **pp, int max_digits)
+{
+  uint32_t value = 0;
+  int count      = 0;
+  const char *p  = *pp;
+
+  while (is_hex_digit(*p) && count < max_digits) {
+    value = (value << 4) | hex_to_val(*p);
+    p++;
+    count++;
+  }
+  *pp = p;
+  return value;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Helper: Check if string looks like UUID format (8-4-4-4-12 or similar)
+//
+
+static int
+is_uuid_format(const char *p)
+{
+  // Count hex digits before first separator
+  int hex_count = count_hex_digits(p);
+
+  // UUID format typically starts with 8 hex digits
+  if (hex_count >= 8) {
+    const char *sep = p + hex_count;
+    if (*sep == '-' || *sep == ':') {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_parseGuid
 //
 
 int
 vscp_fwhlp_parseGuid(uint8_t *guid, const char *strguid, char **endptr)
 {
-  int i;
-  char *p = (char *) strguid;
+  const char *p = strguid;
+  int guid_idx  = 0;
+  int has_braces = 0;
 
   // Check pointers
   if (NULL == strguid) {
@@ -1204,47 +1286,314 @@ vscp_fwhlp_parseGuid(uint8_t *guid, const char *strguid, char **endptr)
     return VSCP_ERROR_INVALID_POINTER;
   }
 
+  // Initialize GUID to zeros
   memset(guid, 0, 16);
 
-  // remove initial white space
-  while (' ' == *p) {
+  // Skip leading whitespace
+  while (*p && (*p == ' ' || *p == '\t')) {
     p++;
   }
 
-  // Empty GUID or GUID  set to '-' means all nulls
-  if (!*p || ('-' == *p)) {
-    if (NULL != endptr) {
+  // Check for opening brace
+  if (*p == '{') {
+    has_braces = 1;
+    p++;
+    // Skip whitespace after opening brace
+    while (*p && (*p == ' ' || *p == '\t')) {
       p++;
-      *endptr = p;
     }
+  }
+
+  // Empty string or just whitespace
+  if (!*p) {
+    if (endptr)
+      *endptr = (char *) p;
     return VSCP_ERROR_SUCCESS;
   }
 
-  for (i = 0; i < 16; i++) {
-    guid[i] = (uint8_t) strtol(p, &p, 16);
-    if (!*p) {
-      break; // at end?
-    }
-    if (i != 15) {
-      if (':' != *p) {
-        return VSCP_ERROR_ERROR;
-      }
-      p++; // Move beyond ':'
-      if (p > (strguid + strlen(strguid))) {
-        if (NULL != endptr) {
-          *endptr = p;
+  // Special case: "-" means all zeros, "-:" means leading zeros with trailing values
+  if (*p == '-') {
+    // Check for "-:" prefix (leading zeros with trailing values)
+    if (*(p + 1) == ':') {
+      p += 2; // Skip "-:"
+
+      // Parse the remaining bytes into a temporary buffer
+      uint8_t temp_bytes[16];
+      int temp_count = 0;
+
+      while (*p && temp_count < 16) {
+        if (!is_hex_digit(*p)) {
+          break;
         }
-        return VSCP_ERROR_ERROR;
+
+        int hex_len = count_hex_digits(p);
+
+        if (hex_len <= 2) {
+          // Single byte value
+          temp_bytes[temp_count++] = (uint8_t) parse_hex_value(&p, 2);
+        }
+        else if (hex_len <= 4) {
+          // Two byte value (big endian)
+          uint16_t val = (uint16_t) parse_hex_value(&p, 4);
+          temp_bytes[temp_count++] = (val >> 8) & 0xFF;
+          temp_bytes[temp_count++] = val & 0xFF;
+        }
+        else {
+          // Up to 4 bytes (8 hex digits)
+          int bytes_to_parse = (hex_len + 1) / 2;
+          if (bytes_to_parse > 4)
+            bytes_to_parse = 4;
+
+          uint32_t val = (uint32_t) parse_hex_value(&p, bytes_to_parse * 2);
+
+          // Store bytes in big-endian order
+          for (int i = bytes_to_parse - 1; i >= 0 && temp_count < 16; i--) {
+            temp_bytes[temp_count++] = (val >> (i * 8)) & 0xFF;
+          }
+        }
+
+        // Skip separator if present (colon, dash, or comma)
+        if (*p == ':' || *p == '-' || *p == ',') {
+          p++;
+        }
       }
+
+      // GUID already initialized to zeros, copy temp bytes to end
+      int zero_count = 16 - temp_count;
+      memcpy(guid + zero_count, temp_bytes, temp_count);
+
+      // Skip closing brace if we had an opening one
+      if (has_braces) {
+        while (*p && (*p == ' ' || *p == '\t')) {
+          p++;
+        }
+        if (*p == '}') {
+          p++;
+        }
+      }
+
+      if (endptr)
+        *endptr = (char *) p;
+      return VSCP_ERROR_SUCCESS;
+    }
+
+    // "-" alone (not followed by hex) means all zeros
+    if (!*(p + 1) || !is_hex_digit(*(p + 1))) {
+      p++;
+      // Skip closing brace if we had an opening one
+      if (has_braces) {
+        while (*p && (*p == ' ' || *p == '\t')) {
+          p++;
+        }
+        if (*p == '}') {
+          p++;
+        }
+      }
+      if (endptr)
+        *endptr = (char *) p;
+      return VSCP_ERROR_SUCCESS;
     }
   }
 
-  if (NULL != endptr) {
-    *endptr = p;
+  // Special case: "::" at start
+  if (p[0] == ':' && p[1] == ':') {
+    // "::" alone means all 0xFF
+    if (!p[2] || !is_hex_digit(p[2])) {
+      memset(guid, 0xFF, 16);
+      p += 2;
+      // Skip closing brace if we had an opening one
+      if (has_braces) {
+        while (*p && (*p == ' ' || *p == '\t')) {
+          p++;
+        }
+        if (*p == '}') {
+          p++;
+        }
+      }
+      if (endptr)
+        *endptr = (char *) p;
+      return VSCP_ERROR_SUCCESS;
+    }
+
+    // "::" followed by hex means fill leading bytes with 0xFF
+    p += 2;
+
+    // Parse the remaining bytes into a temporary buffer
+    uint8_t temp_bytes[16];
+    int temp_count = 0;
+
+    while (*p && temp_count < 16) {
+      if (!is_hex_digit(*p)) {
+        break;
+      }
+
+      int hex_len = count_hex_digits(p);
+
+      if (hex_len <= 2) {
+        // Single byte value
+        temp_bytes[temp_count++] = (uint8_t) parse_hex_value(&p, 2);
+      }
+      else if (hex_len <= 4) {
+        // Two byte value (big endian)
+        uint16_t val = (uint16_t) parse_hex_value(&p, 4);
+        temp_bytes[temp_count++] = (val >> 8) & 0xFF;
+        temp_bytes[temp_count++] = val & 0xFF;
+      }
+      else {
+        // Up to 4 bytes (8 hex digits)
+        int bytes_to_parse = (hex_len + 1) / 2;
+        if (bytes_to_parse > 4)
+          bytes_to_parse = 4;
+
+        uint32_t val = (uint32_t) parse_hex_value(&p, bytes_to_parse * 2);
+
+        // Store bytes in big-endian order
+        for (int i = bytes_to_parse - 1; i >= 0 && temp_count < 16; i--) {
+          temp_bytes[temp_count++] = (val >> (i * 8)) & 0xFF;
+        }
+      }
+
+      // Skip separator if present
+      if (*p == ':' || *p == '-' || *p == ',') {
+        p++;
+      }
+    }
+
+    // Fill leading bytes with 0xFF, then copy temp bytes to end
+    int ff_count = 16 - temp_count;
+    if (ff_count > 0) {
+      memset(guid, 0xFF, ff_count);
+    }
+    memcpy(guid + ff_count, temp_bytes, temp_count);
+
+    // Skip closing brace if we had an opening one
+    if (has_braces) {
+      while (*p && (*p == ' ' || *p == '\t')) {
+        p++;
+      }
+      if (*p == '}') {
+        p++;
+      }
+    }
+
+    if (endptr)
+      *endptr = (char *) p;
+    return VSCP_ERROR_SUCCESS;
   }
+
+  // Check if this looks like UUID format (e.g., FFFFFFFF-FFFF-FFFF-0102-03AABB440130)
+  if (is_uuid_format(p)) {
+    // Parse UUID format: 8-4-4-4-12 hex digits with - or : separators
+    int segments[]       = { 8, 4, 4, 4, 12 };
+    int byte_pos         = 0;
+    int num_segments     = sizeof(segments) / sizeof(segments[0]);
+
+    for (int seg = 0; seg < num_segments && byte_pos < 16; seg++) {
+      int expected_hex = segments[seg];
+      int hex_count    = count_hex_digits(p);
+
+      if (hex_count < expected_hex) {
+        // Not enough hex digits for this segment
+        return VSCP_ERROR_ERROR;
+      }
+
+      // Parse the segment
+      int bytes_in_segment = expected_hex / 2;
+      for (int i = 0; i < bytes_in_segment && byte_pos < 16; i++) {
+        uint8_t hi          = hex_to_val(*p++);
+        uint8_t lo          = hex_to_val(*p++);
+        guid[byte_pos++] = (hi << 4) | lo;
+      }
+
+      // Skip separator
+      if (*p == '-' || *p == ':' || *p == ',') {
+        p++;
+      }
+    }
+
+    // Skip closing brace if we had an opening one
+    if (has_braces) {
+      while (*p && (*p == ' ' || *p == '\t')) {
+        p++;
+      }
+      if (*p == '}') {
+        p++;
+      }
+    }
+
+    if (endptr)
+      *endptr = (char *) p;
+    return VSCP_ERROR_SUCCESS;
+  }
+
+  // Standard colon-separated format or mixed format
+  // Parse bytes one group at a time
+  while (*p && guid_idx < 16) {
+    if (!is_hex_digit(*p)) {
+      break;
+    }
+
+    int hex_len = count_hex_digits(p);
+
+    if (hex_len <= 2) {
+      // Single byte value (1-2 hex digits)
+      guid[guid_idx++] = (uint8_t) parse_hex_value(&p, 2);
+    }
+    else if (hex_len <= 4) {
+      // Two bytes (3-4 hex digits) - big endian
+      uint16_t val = (uint16_t) parse_hex_value(&p, 4);
+      if (guid_idx + 1 < 16) {
+        guid[guid_idx++] = (val >> 8) & 0xFF;
+        guid[guid_idx++] = val & 0xFF;
+      }
+      else {
+        guid[guid_idx++] = val & 0xFF;
+      }
+    }
+    else {
+      // More than 4 hex digits - parse as multiple bytes
+      int bytes_to_parse = (hex_len + 1) / 2;
+      if (bytes_to_parse > (16 - guid_idx)) {
+        bytes_to_parse = 16 - guid_idx;
+      }
+
+      for (int i = 0; i < bytes_to_parse && guid_idx < 16; i++) {
+        uint8_t hi       = hex_to_val(*p++);
+        uint8_t lo       = is_hex_digit(*p) ? hex_to_val(*p++) : 0;
+        guid[guid_idx++] = (hi << 4) | lo;
+      }
+    }
+
+    // Skip separator only if we haven't completed the GUID
+    // (don't consume trailing comma which may be part of outer format)
+    if (guid_idx < 16 && (*p == ':' || *p == '-' || *p == ',')) {
+      p++;
+    }
+  }
+
+  // If no bytes were parsed in standard format, return error
+  // (special cases like "-", "::", "-:", etc. return earlier)
+  if (guid_idx == 0) {
+    return VSCP_ERROR_INVALID_SYNTAX;
+  }
+
+  // Skip closing brace if we had an opening one
+  if (has_braces) {
+    while (*p && (*p == ' ' || *p == '\t')) {
+      p++;
+    }
+    if (*p == '}') {
+      p++;
+    }
+  }
+
+  if (endptr)
+    *endptr = (char *) p;
 
   return VSCP_ERROR_SUCCESS;
 }
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_writeGuidToString
@@ -1280,6 +1629,81 @@ vscp_fwhlp_writeGuidToString(char *strguid, const uint8_t *guid)
           guid[13],
           guid[14],
           guid[15]);
+
+  return VSCP_ERROR_SUCCESS;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_writeGuidToStringCompact
+//
+
+int
+vscp_fwhlp_writeGuidToStringCompact(char *strguid, const uint8_t *guid)
+{
+  int ff_count = 0;
+
+  if (NULL == strguid) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+  if (NULL == guid) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  // Count leading 0xFF bytes
+  while (ff_count < 16 && guid[ff_count] == 0xFF) {
+    ff_count++;
+  }
+
+  // All 0xFF
+  if (ff_count == 16) {
+    strcpy(strguid, "::");
+    return VSCP_ERROR_SUCCESS;
+  }
+
+  // No leading 0xFF bytes - use standard format
+  if (ff_count == 0) {
+    return vscp_fwhlp_writeGuidToString(strguid, guid);
+  }
+
+  // Some leading 0xFF bytes - use :: notation
+  char *p = strguid;
+  *p++    = ':';
+  *p++    = ':';
+
+  for (int i = ff_count; i < 16; i++) {
+    if (i > ff_count) {
+      *p++ = ':';
+    }
+    sprintf(p, "%02X", guid[i]);
+    p += 2;
+  }
+
+  return VSCP_ERROR_SUCCESS;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_writeGuidToStringUUID
+//
+
+int
+vscp_fwhlp_writeGuidToStringUUID(char *strguid, const uint8_t *guid)
+{
+  if (NULL == strguid) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+  if (NULL == guid) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  // Format: 8-4-4-4-12 hex digits with dashes
+  // FFFFFFFF-FFFF-FFFF-0102-03AABB440130
+  sprintf(strguid,
+          "%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+          guid[0], guid[1], guid[2], guid[3],
+          guid[4], guid[5],
+          guid[6], guid[7],
+          guid[8], guid[9],
+          guid[10], guid[11], guid[12], guid[13], guid[14], guid[15]);
 
   return VSCP_ERROR_SUCCESS;
 }

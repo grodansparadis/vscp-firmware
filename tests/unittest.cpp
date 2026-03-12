@@ -535,6 +535,189 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseGuid_1_2_3)
   ASSERT_EQ(0, memcmp(guid1, guid2, 16));
 }
 
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseGuid_double_colon_prefix)
+{
+  uint8_t guid[16];
+  int rv;
+
+  // :: followed by values should fill leading bytes with 0xFF
+  rv = vscp_fwhlp_parseGuid(guid, "::01:02:03", NULL);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  // First 13 bytes should be 0xFF
+  for (int i = 0; i < 13; i++) {
+    ASSERT_EQ(0xFF, guid[i]);
+  }
+  ASSERT_EQ(0x01, guid[13]);
+  ASSERT_EQ(0x02, guid[14]);
+  ASSERT_EQ(0x03, guid[15]);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseGuid_all_ff)
+{
+  uint8_t guid[16];
+  int rv;
+
+  rv = vscp_fwhlp_parseGuid(guid, "::", NULL);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  for (int i = 0; i < 16; i++) {
+    ASSERT_EQ(0xFF, guid[i]);
+  }
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseGuid_hyphen_colon_prefix)
+{
+  uint8_t guid[16];
+  int rv;
+
+  // -: followed by values should fill leading bytes with 0x00
+  rv = vscp_fwhlp_parseGuid(guid, "-:01:02:03", NULL);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  // First 13 bytes should be 0x00
+  for (int i = 0; i < 13; i++) {
+    ASSERT_EQ(0x00, guid[i]);
+  }
+  ASSERT_EQ(0x01, guid[13]);
+  ASSERT_EQ(0x02, guid[14]);
+  ASSERT_EQ(0x03, guid[15]);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseGuid_hyphen_colon_comma)
+{
+  uint8_t guid[16];
+  int rv;
+
+  // -: with comma separators
+  rv = vscp_fwhlp_parseGuid(guid, "-:1,2,3", NULL);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  for (int i = 0; i < 13; i++) {
+    ASSERT_EQ(0x00, guid[i]);
+  }
+  ASSERT_EQ(0x01, guid[13]);
+  ASSERT_EQ(0x02, guid[14]);
+  ASSERT_EQ(0x03, guid[15]);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseGuid_uuid_format)
+{
+  uint8_t guid[16];
+  int rv;
+
+  // UUID format: 8-4-4-4-12
+  rv = vscp_fwhlp_parseGuid(guid, "FFFFFFFF-FFFF-FFFF-0102-03AABB440130", NULL);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(0xFF, guid[0]);
+  ASSERT_EQ(0xFF, guid[7]);
+  ASSERT_EQ(0x01, guid[8]);
+  ASSERT_EQ(0x02, guid[9]);
+  ASSERT_EQ(0x30, guid[15]);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseGuid_braces)
+{
+  uint8_t guid[16];
+  int rv;
+
+  rv = vscp_fwhlp_parseGuid(guid, "{FF:EE:DD:CC:BB:AA:99:88:77:66:55:44:33:22:11:00}", NULL);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(0xFF, guid[0]);
+  ASSERT_EQ(0xEE, guid[1]);
+  ASSERT_EQ(0x00, guid[15]);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseGuid_braces_uuid)
+{
+  uint8_t guid[16];
+  int rv;
+
+  rv = vscp_fwhlp_parseGuid(guid, "{FFFFFFFF-FFFF-FFFF-0102-03AABB440130}", NULL);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(0xFF, guid[0]);
+  ASSERT_EQ(0x01, guid[8]);
+  ASSERT_EQ(0x30, guid[15]);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeGuidToStringCompact_leading_ff)
+{
+  uint8_t guid[16] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                       0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
+  char strguid[48];
+  int rv;
+
+  rv = vscp_fwhlp_writeGuidToStringCompact(strguid, guid);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_STREQ("::01:02:03:04:05:06:07:08", strguid);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeGuidToStringCompact_all_ff)
+{
+  uint8_t guid[16] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                       0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+  char strguid[48];
+  int rv;
+
+  rv = vscp_fwhlp_writeGuidToStringCompact(strguid, guid);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_STREQ("::", strguid);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeGuidToStringCompact_no_leading_ff)
+{
+  uint8_t guid[16] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                       0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10 };
+  char strguid[48];
+  int rv;
+
+  rv = vscp_fwhlp_writeGuidToStringCompact(strguid, guid);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_STREQ("01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F:10", strguid);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeGuidToStringUUID)
+{
+  uint8_t guid[16] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                       0x01, 0x02, 0x03, 0xAA, 0xBB, 0x44, 0x01, 0x30 };
+  char strguid[48];
+  int rv;
+
+  rv = vscp_fwhlp_writeGuidToStringUUID(strguid, guid);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_STREQ("FFFFFFFF-FFFF-FFFF-0102-03AABB440130", strguid);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseGuid_roundtrip_compact)
+{
+  uint8_t guid1[16] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                        0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
+  uint8_t guid2[16];
+  char strguid[48];
+  int rv;
+
+  rv = vscp_fwhlp_writeGuidToStringCompact(strguid, guid1);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  rv = vscp_fwhlp_parseGuid(guid2, strguid, NULL);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  ASSERT_EQ(0, memcmp(guid1, guid2, 16));
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseGuid_roundtrip_uuid)
+{
+  uint8_t guid1[16] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                        0x01, 0x02, 0x03, 0xAA, 0xBB, 0x44, 0x01, 0x30 };
+  uint8_t guid2[16];
+  char strguid[48];
+  int rv;
+
+  rv = vscp_fwhlp_writeGuidToStringUUID(strguid, guid1);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  rv = vscp_fwhlp_parseGuid(guid2, strguid, NULL);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  ASSERT_EQ(0, memcmp(guid1, guid2, 16));
+}
+
 //-----------------------------------------------------------------------------
 // MAC address tests
 //-----------------------------------------------------------------------------

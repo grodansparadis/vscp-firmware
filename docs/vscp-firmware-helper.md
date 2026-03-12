@@ -109,6 +109,55 @@ Date strings follow ISO-style form such as `YYYY-MM-DDTHH:MM:SSZ`.
 - `vscp_fwhlp_parseMac`
 - `vscp_fwhlp_parseGuid`
 - `vscp_fwhlp_writeGuidToString`
+- `vscp_fwhlp_writeGuidToStringCompact`
+- `vscp_fwhlp_writeGuidToStringUUID`
+
+#### vscp_fwhlp_parseGuid
+
+Parse GUID string with extended format support.
+
+```c
+int vscp_fwhlp_parseGuid(uint8_t *guid, const char *strguid, char **endptr);
+```
+
+Supported formats:
+
+| Format | Example | Description |
+|--------|---------|-------------|
+| Standard | `FF:EE:DD:CC:BB:AA:99:88:77:66:55:44:33:22:11:00` | Colon, dash, or comma separated |
+| All zeros | `-` | Returns all 0x00 bytes |
+| All 0xFF | `::` | Returns all 0xFF bytes |
+| Leading 0xFF | `::01:02:03` | Fills leading bytes with 0xFF |
+| Leading zeros | `-:01:02:03` | Fills leading bytes with 0x00 |
+| UUID | `FFFFFFFF-FFFF-FFFF-0102-03AABB440130` | 8-4-4-4-12 format |
+| Brace-enclosed | `{FF:EE:DD:CC:...}` | Any format inside `{}` |
+
+#### vscp_fwhlp_writeGuidToStringCompact
+
+Write GUID using `::` notation for leading 0xFF bytes.
+
+```c
+int vscp_fwhlp_writeGuidToStringCompact(char *strguid, const uint8_t *guid);
+```
+
+Output examples:
+- `FF:FF:FF:FF:FF:FF:FF:FF:01:02:03:04:05:06:07:08` → `::01:02:03:04:05:06:07:08`
+- `FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF` → `::`
+- `01:02:03:04:...` → Standard format (no leading 0xFF)
+
+Buffer must be at least 48 bytes.
+
+#### vscp_fwhlp_writeGuidToStringUUID
+
+Write GUID in UUID format (8-4-4-4-12).
+
+```c
+int vscp_fwhlp_writeGuidToStringUUID(char *strguid, const uint8_t *guid);
+```
+
+Output format: `FFFFFFFF-FFFF-FFFF-0102-03AABB440130`
+
+Buffer must be at least 48 bytes.
 
 ### 4) Priority/Filter Helpers
 

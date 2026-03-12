@@ -552,6 +552,31 @@ vscp_fwhlp_parseGuid(uint8_t *guid, const char *strguid, char **endptr);
 int
 vscp_fwhlp_writeGuidToString(char *strguid, const uint8_t *guid);
 
+/*!
+  @brief Write GUID to string in compact form
+  @param strguid Buffer that the GUID string will be written to. This buffer
+    must be at least 48 bytes long to hold GUID string on the form
+    "FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF" including a terminating
+    null character.
+  @param guid Pointer to GUID array of 16 bytes to write.
+  @return VSCP_ERROR_SUCCESS if GUID was written correctly,
+
+*/
+int
+vscp_fwhlp_writeGuidToStringCompact(char *strguid, const uint8_t *guid);
+
+/*!
+  @brief Write GUID to string in UUID form
+  @param strguid Buffer that the GUID string will be written to. This buffer
+    must be at least 48 bytes long to hold GUID string on the form
+    "FFFFFFFF-FFFF-FFFF-0102-03AABB440130" including a terminating
+    null character.
+  @param guid Pointer to GUID array of 16 bytes to write.
+  @return VSCP_ERROR_SUCCESS if GUID was written correctly.
+*/
+int
+vscp_fwhlp_writeGuidToStringUUID(char *strguid, const uint8_t *guid);
+
 /**
   @brief Parse a filter string and write data to a filter structure
   @param pfilter Pointer to filter structure to fill.

@@ -415,10 +415,17 @@ vscp_guid_parse(uint8_t *guid, const char *strguid, char **endptr)
       }
     }
 
-    // Skip separator
-    if (*p == ':' || *p == '-' || *p == ',') {
+    // Skip separator only if we haven't completed the GUID
+    // (don't consume trailing comma which may be part of outer format)
+    if (guid_idx < 16 && (*p == ':' || *p == '-' || *p == ',')) {
       p++;
     }
+  }
+
+  // If no bytes were parsed in standard format, return error
+  // (special cases like "-", "::", "-:", etc. return earlier)
+  if (guid_idx == 0) {
+    return VSCP_ERROR_INVALID_SYNTAX;
   }
 
   // Skip closing brace if we had an opening one
