@@ -4059,10 +4059,10 @@ vscp_fwhlp_parse_xml_event(vscpEvent *pev, const char *eventstr)
   for (int i = 0; i < attribute_count; i++) {
 
     if (strcmp(attributes[i].name, "head") == 0) {
-      pev->head = atoi(attributes[i].value);
+      pev->head = (uint16_t) vscp_fwhlp_readStringValue(attributes[i].value);
     }
     else if (strcmp(attributes[i].name, "obid") == 0) {
-      pev->obid = atoi(attributes[i].value);
+      pev->obid = (uint32_t) vscp_fwhlp_readStringValue(attributes[i].value);
     }
     else if (strcmp(attributes[i].name, "datetime") == 0) {
       // Store datetime string for later parsing
@@ -4070,17 +4070,17 @@ vscp_fwhlp_parse_xml_event(vscpEvent *pev, const char *eventstr)
       has_datetime = 1;
     }
     else if (strcmp(attributes[i].name, "timestamp") == 0) {
-      timestamp = (uint32_t) atol(attributes[i].value);
+      timestamp = (uint32_t) vscp_fwhlp_readStringValue(attributes[i].value);
     }
     else if (strcmp(attributes[i].name, "timestamp_ns") == 0) {
-      timestamp_ns = (uint64_t) strtoull(attributes[i].value, NULL, 0);  // Base 0 for auto-detect (hex or decimal)
+      timestamp_ns = (uint64_t) vscp_fwhlp_readStringValue(attributes[i].value);
       has_timestamp_ns = 1;
     }
     else if (strcmp(attributes[i].name, "class") == 0) {
-      pev->vscp_class = atoi(attributes[i].value);
+      pev->vscp_class = (uint16_t) vscp_fwhlp_readStringValue(attributes[i].value);
     }
     else if (strcmp(attributes[i].name, "type") == 0) {
-      pev->vscp_type = atoi(attributes[i].value);
+      pev->vscp_type = (uint16_t) vscp_fwhlp_readStringValue(attributes[i].value);
     }
     else if (strcmp(attributes[i].name, "guid") == 0) {
       if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseGuid(pev->GUID, attributes[i].value, NULL))) {
@@ -4088,7 +4088,7 @@ vscp_fwhlp_parse_xml_event(vscpEvent *pev, const char *eventstr)
       }
     }
     else if (strcmp(attributes[i].name, "sizedata") == 0) {
-      pev->sizeData = atoi(attributes[i].value);
+      pev->sizeData = (uint16_t) vscp_fwhlp_readStringValue(attributes[i].value);
     }
     else if (strcmp(attributes[i].name, "data") == 0) {
       // Parse data string and fill pev->pdata accordingly
@@ -4180,10 +4180,10 @@ vscp_fwhlp_parse_xml_eventex(vscpEventEx *pex, const char *eventexstr)
   for (int i = 0; i < attribute_count; i++) {
 
     if (strcmp(attributes[i].name, "head") == 0) {
-      pex->head = atoi(attributes[i].value);
+      pex->head = (uint16_t) vscp_fwhlp_readStringValue(attributes[i].value);
     }
     else if (strcmp(attributes[i].name, "obid") == 0) {
-      pex->obid = atoi(attributes[i].value);
+      pex->obid = (uint32_t) vscp_fwhlp_readStringValue(attributes[i].value);
     }
     else if (strcmp(attributes[i].name, "datetime") == 0) {
       // Store datetime string for later parsing
@@ -4191,17 +4191,17 @@ vscp_fwhlp_parse_xml_eventex(vscpEventEx *pex, const char *eventexstr)
       has_datetime = 1;
     }
     else if (strcmp(attributes[i].name, "timestamp") == 0) {
-      timestamp = (uint32_t) atol(attributes[i].value);
+      timestamp = (uint32_t) vscp_fwhlp_readStringValue(attributes[i].value);
     }
     else if (strcmp(attributes[i].name, "timestamp_ns") == 0) {
-      timestamp_ns = (uint64_t) strtoull(attributes[i].value, NULL, 0);  // Base 0 for auto-detect (hex or decimal)
+      timestamp_ns = (uint64_t) vscp_fwhlp_readStringValue(attributes[i].value);
       has_timestamp_ns = 1;
     }
     else if (strcmp(attributes[i].name, "class") == 0) {
-      pex->vscp_class = atoi(attributes[i].value);
+      pex->vscp_class = (uint16_t) vscp_fwhlp_readStringValue(attributes[i].value);
     }
     else if (strcmp(attributes[i].name, "type") == 0) {
-      pex->vscp_type = atoi(attributes[i].value);
+      pex->vscp_type = (uint16_t) vscp_fwhlp_readStringValue(attributes[i].value);
     }
     else if (strcmp(attributes[i].name, "guid") == 0) {
       if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseGuid(pex->GUID, attributes[i].value, NULL))) {
@@ -4209,7 +4209,7 @@ vscp_fwhlp_parse_xml_eventex(vscpEventEx *pex, const char *eventexstr)
       }
     }
     else if (strcmp(attributes[i].name, "sizedata") == 0) {
-      pex->sizeData = atoi(attributes[i].value);
+      pex->sizeData = (uint16_t) vscp_fwhlp_readStringValue(attributes[i].value);
     }
     else if (strcmp(attributes[i].name, "data") == 0) {
       // Parse data string and fill pex->data accordingly
