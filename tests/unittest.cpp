@@ -571,29 +571,130 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_readStringValue_hex)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_decimal)
 {
   char *endptr = nullptr;
-  uint32_t val = vscp_fwhlp_parseStringValue("12345", &endptr);
+  uint64_t val = vscp_fwhlp_parseStringValue("12345", &endptr);
 
-  ASSERT_EQ(12345U, val);
+  ASSERT_EQ(12345ULL, val);
   ASSERT_NE(nullptr, endptr);
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_octal)
 {
   char *endptr = nullptr;
-  uint32_t val = vscp_fwhlp_parseStringValue("077", &endptr);
+  uint64_t val = vscp_fwhlp_parseStringValue("077", &endptr);
 
-  ASSERT_EQ(63U, val);
+  ASSERT_EQ(63ULL, val);
   ASSERT_NE(nullptr, endptr);
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_hex_current_behavior)
 {
-  // Current implementation uses the full lowered buffer for conversion on prefixed
-  // inputs; keep this test lenient and verify non-zero behavior for now.
   char *endptr = nullptr;
-  uint32_t val = vscp_fwhlp_parseStringValue("0xFF", &endptr);
+  uint64_t val = vscp_fwhlp_parseStringValue("0xFF", &endptr);
 
-  ASSERT_NE(0U, val);
+  ASSERT_EQ(255ULL, val);
+  ASSERT_NE(nullptr, endptr);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_hex_large)
+{
+  char *endptr = nullptr;
+  uint64_t val = vscp_fwhlp_parseStringValue("0xFFFFFFFFFFFFFFFF", &endptr);
+
+  ASSERT_EQ(UINT64_MAX, val);
+  ASSERT_NE(nullptr, endptr);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_decimal_64bit)
+{
+  char *endptr = nullptr;
+  // 2^40 = 1099511627776
+  uint64_t val = vscp_fwhlp_parseStringValue("1099511627776", &endptr);
+
+  ASSERT_EQ(1099511627776ULL, val);
+  ASSERT_NE(nullptr, endptr);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_binary)
+{
+  char *endptr = nullptr;
+  uint64_t val = vscp_fwhlp_parseStringValue("0b10101010", &endptr);
+
+  ASSERT_EQ(0xAAULL, val);
+  ASSERT_NE(nullptr, endptr);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_binary_64bit)
+{
+  char *endptr = nullptr;
+  // 33 bits: 0x1FFFFFFFF
+  uint64_t val = vscp_fwhlp_parseStringValue("0b111111111111111111111111111111111", &endptr);
+
+  ASSERT_EQ(0x1FFFFFFFFULL, val);
+  ASSERT_NE(nullptr, endptr);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_zero)
+{
+  char *endptr = nullptr;
+  uint64_t val = vscp_fwhlp_parseStringValue("0", &endptr);
+
+  ASSERT_EQ(0ULL, val);
+  ASSERT_NE(nullptr, endptr);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_leading_spaces)
+{
+  char *endptr = nullptr;
+  uint64_t val = vscp_fwhlp_parseStringValue("   42", &endptr);
+
+  ASSERT_EQ(42ULL, val);
+  ASSERT_NE(nullptr, endptr);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_null)
+{
+  char *endptr = (char *) "notnull";
+  uint64_t val = vscp_fwhlp_parseStringValue(nullptr, &endptr);
+
+  ASSERT_EQ(0ULL, val);
+  ASSERT_EQ(nullptr, endptr);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_endptr_null)
+{
+  // Should not crash when endptr is NULL
+  uint64_t val = vscp_fwhlp_parseStringValue("100", nullptr);
+
+  ASSERT_EQ(100ULL, val);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_endptr_trailing)
+{
+  char *endptr = nullptr;
+  uint64_t val = vscp_fwhlp_parseStringValue("123abc", &endptr);
+
+  ASSERT_EQ(123ULL, val);
+  ASSERT_NE(nullptr, endptr);
+  ASSERT_EQ('a', *endptr);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_binary_invalid)
+{
+  // "0b" followed by non-binary char should return 0 and endptr at start
+  char *endptr = nullptr;
+  uint64_t val = vscp_fwhlp_parseStringValue("0bXYZ", &endptr);
+
+  ASSERT_EQ(0ULL, val);
+  ASSERT_NE(nullptr, endptr);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringValue_octal_explicit)
+{
+  char *endptr = nullptr;
+  // 0777 octal = 511 decimal
+  uint64_t val = vscp_fwhlp_parseStringValue("0777", &endptr);
+
+  ASSERT_EQ(511ULL, val);
   ASSERT_NE(nullptr, endptr);
 }
 

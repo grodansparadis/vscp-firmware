@@ -310,7 +310,7 @@ vscp_fwhlp_readStringValue(const char *pString);
       @param endptr Pointer to pointer that will be set to first character after parsed value. Can be NULL.
     @return Converted value in decimal form.
 */
-uint32_t
+uint64_t
 vscp_fwhlp_parseStringValue(const char *pString, char **endptr);
 
 /**

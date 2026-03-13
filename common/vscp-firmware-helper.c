@@ -341,10 +341,10 @@ vscp_fwhlp_readStringValue(const char *pString)
 // vscp_fwhlp_parseStringValue
 //
 
-uint32_t
+uint64_t
 vscp_fwhlp_parseStringValue(const char *pString, char **endptr)
 {
-  uint32_t ul = 0;
+  uint64_t ul = 0;
   char *p     = (char *) pString;
   char *pend  = NULL;
 
@@ -368,15 +368,15 @@ vscp_fwhlp_parseStringValue(const char *pString, char **endptr)
     }
     else {
       while ((*pb == '0') || (*pb == '1')) {
-        ul = (ul << 1) | (uint32_t) (*pb - '0');
+        ul = (ul << 1) | (uint64_t) (*pb - '0');
         pb++;
       }
       pend = pb;
     }
   }
   else {
-    unsigned long val = strtoul(p, &pend, 0);
-    ul                = (uint32_t) val;
+    unsigned long long val = strtoull(p, &pend, 0);
+    ul                     = (uint64_t) val;
   }
 
   if (endptr) {
@@ -517,7 +517,7 @@ vscp_fwhlp_parse_data(uint8_t *data, size_t length, const char *datastr, const c
     }
 
     char *next;
-    unsigned long value = vscp_fwhlp_parseStringValue(s, &next);
+    uint64_t value = vscp_fwhlp_parseStringValue(s, &next);
     if (next == s) {
       return -1; // No conversion performed
     }
