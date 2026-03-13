@@ -1119,7 +1119,7 @@ vscp_fwhlp_newEvent(void)
 bool
 setFrameVersion(vscpEvent *pEvent, uint16_t version)
 {
-  if (nullptr == pEvent) {
+  if (NULL == pEvent) {
     return false;
   }
 
@@ -1139,7 +1139,7 @@ setFrameVersion(vscpEvent *pEvent, uint16_t version)
 bool
 setFrameVersionEx(vscpEventEx *pEventEx, uint16_t version)
 {
-  if (nullptr == pEventEx) {
+  if (NULL == pEventEx) {
     return false;
   }
 
