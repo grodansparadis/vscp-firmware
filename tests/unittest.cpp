@@ -3842,18 +3842,16 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_3)
   rv = vscp_fwhlp_parseStringToEvent(&ev, "9,20,3,,2001-11-02T18:00:01,,-,0,1,35");
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  ASSERT_EQ(9, ev.head);
+  // Result always has frame version 1 (UNIX_NS) with nanosecond timestamp
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS | 9, ev.head);
   ASSERT_EQ(20, ev.vscp_class);
   ASSERT_EQ(3, ev.vscp_type);
   ASSERT_EQ(3, ev.sizeData);
   ASSERT_EQ(0, ev.obid);
-  ASSERT_EQ(0, ev.timestamp);
-  ASSERT_EQ(2001, ev.year);
-  ASSERT_EQ(11, ev.month);
-  ASSERT_EQ(2, ev.day);
-  ASSERT_EQ(18, ev.hour);
-  ASSERT_EQ(0, ev.minute);
-  ASSERT_EQ(1, ev.second);
+  // Timestamp ns is converted from 2001-11-02T18:00:01 with 0 microseconds
+  ASSERT_EQ(vscp_fwhlp_to_unix_ns(2001, 11, 2, 18, 0, 1, 0), ev.timestamp_ns);
+  ASSERT_EQ(0xffff, ev.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ev.month);
   ASSERT_EQ(0, memcmp(ev.GUID, guid, 16));
   ASSERT_EQ(0, ev.pdata[0]);
   ASSERT_EQ(1, ev.pdata[1]);
@@ -3925,18 +3923,16 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_3)
   rv = vscp_fwhlp_parseStringToEventEx(&ex, "9,20,3,,2001-11-02T18:00:01,,-,0,1,35");
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  ASSERT_EQ(9, ex.head);
+  // Result always has frame version 1 (UNIX_NS) with nanosecond timestamp
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS | 9, ex.head);
   ASSERT_EQ(20, ex.vscp_class);
   ASSERT_EQ(3, ex.vscp_type);
   ASSERT_EQ(3, ex.sizeData);
   ASSERT_EQ(0, ex.obid);
-  ASSERT_EQ(0, ex.timestamp);
-  ASSERT_EQ(2001, ex.year);
-  ASSERT_EQ(11, ex.month);
-  ASSERT_EQ(2, ex.day);
-  ASSERT_EQ(18, ex.hour);
-  ASSERT_EQ(0, ex.minute);
-  ASSERT_EQ(1, ex.second);
+  // Timestamp ns is converted from 2001-11-02T18:00:01 with 0 microseconds
+  ASSERT_EQ(vscp_fwhlp_to_unix_ns(2001, 11, 2, 18, 0, 1, 0), ex.timestamp_ns);
+  ASSERT_EQ(0xffff, ex.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ex.month);
   ASSERT_EQ(0, memcmp(ex.GUID, guid, 16));
   ASSERT_EQ(0, ex.data[0]);
   ASSERT_EQ(1, ex.data[1]);
@@ -3995,7 +3991,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_unix_ns_timestamp)
   ASSERT_EQ(35, ex.data[2]);
 }
 
-// Test that microsecond timestamp is used when datestr is provided
+// Test that datetime with microsecond timestamp is converted to nanoseconds
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_microsecond_timestamp)
 {
   int rv;
@@ -4006,21 +4002,19 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_microsecond_timestamp)
   rv = vscp_fwhlp_parseStringToEvent(&ev, "0,20,3,,2024-06-30T23:59:58,12345678,-,0,1,35");
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  // Frame version should be original (0x0000)
-  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_ORIGINAL, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+  // Result always has frame version 1 (UNIX_NS) with nanosecond timestamp
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
   ASSERT_EQ(20, ev.vscp_class);
   ASSERT_EQ(3, ev.vscp_type);
-  ASSERT_EQ(2024, ev.year);
-  ASSERT_EQ(6, ev.month);
-  ASSERT_EQ(30, ev.day);
-  ASSERT_EQ(23, ev.hour);
-  ASSERT_EQ(59, ev.minute);
-  ASSERT_EQ(58, ev.second);
-  ASSERT_EQ(12345678u, ev.timestamp);  // microsecond timestamp
+  ASSERT_EQ(0xffff, ev.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ev.month);
+  // Timestamp ns is converted from 2024-06-30T23:59:58 with 12345678 microseconds
+  ASSERT_EQ(vscp_fwhlp_to_unix_ns(2024, 6, 30, 23, 59, 58, 12345678), ev.timestamp_ns);
   ASSERT_EQ(0, memcmp(ev.GUID, guid, 16));
   delete[] ev.pdata;
 }
 
+// Test that datetime with microsecond timestamp is converted to nanoseconds
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_microsecond_timestamp)
 {
   int rv;
@@ -4031,17 +4025,14 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_microsecond_timestam
   rv = vscp_fwhlp_parseStringToEventEx(&ex, "0,20,3,,2024-06-30T23:59:58,12345678,-,0,1,35");
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  // Frame version should be original (0x0000)
-  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_ORIGINAL, ex.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+  // Result always has frame version 1 (UNIX_NS) with nanosecond timestamp
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ex.head & VSCP_HEADER16_FRAME_VERSION_MASK);
   ASSERT_EQ(20, ex.vscp_class);
   ASSERT_EQ(3, ex.vscp_type);
-  ASSERT_EQ(2024, ex.year);
-  ASSERT_EQ(6, ex.month);
-  ASSERT_EQ(30, ex.day);
-  ASSERT_EQ(23, ex.hour);
-  ASSERT_EQ(59, ex.minute);
-  ASSERT_EQ(58, ex.second);
-  ASSERT_EQ(12345678u, ex.timestamp);  // microsecond timestamp
+  ASSERT_EQ(0xffff, ex.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ex.month);
+  // Timestamp ns is converted from 2024-06-30T23:59:58 with 12345678 microseconds
+  ASSERT_EQ(vscp_fwhlp_to_unix_ns(2024, 6, 30, 23, 59, 58, 12345678), ex.timestamp_ns);
   ASSERT_EQ(0, memcmp(ex.GUID, guid, 16));
 }
 

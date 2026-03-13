@@ -2124,17 +2124,19 @@ vscp_fwhlp_parseStringToEvent(vscpEvent *pev, const char *buf)
   // this case the timestamp field is expected to be a
   // Unix nanosecond timestamp.
 
+  // Temporary variables to hold datetime if provided
+  int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
+  uint32_t microsecond = 0;
+  int has_datetime = 0;
+
   if (',' == *p) {
     p++; // point beyond comma
-    // Set year to 0xffff to indicate nanosecond timestamp mode
-    pev->year  = 0xffff;
-    pev->month = 0xff;
-    // Set frame version to Unix nanosecond
-    setFrameVersion(pev, VSCP_HEADER16_FRAME_VERSION_UNIX_NS);
   }
   else {
+    has_datetime = 1;
+    
     // year
-    pev->year = (uint16_t) strtol(p, &p, 0);
+    year = (int) strtol(p, &p, 0);
     if ('-' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -2144,7 +2146,7 @@ vscp_fwhlp_parseStringToEvent(vscpEvent *pev, const char *buf)
     }
 
     // month
-    pev->month = (uint16_t) strtol(p, &p, 0);
+    month = (int) strtol(p, &p, 0);
     if ('-' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -2154,7 +2156,7 @@ vscp_fwhlp_parseStringToEvent(vscpEvent *pev, const char *buf)
     }
 
     // day
-    pev->day = (uint16_t) strtol(p, &p, 0);
+    day = (int) strtol(p, &p, 0);
     if ('T' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -2164,7 +2166,7 @@ vscp_fwhlp_parseStringToEvent(vscpEvent *pev, const char *buf)
     }
 
     // hour
-    pev->hour = (uint16_t) strtol(p, &p, 0);
+    hour = (int) strtol(p, &p, 0);
     if (':' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -2174,7 +2176,7 @@ vscp_fwhlp_parseStringToEvent(vscpEvent *pev, const char *buf)
     }
 
     // minute
-    pev->minute = (uint16_t) strtol(p, &p, 0);
+    minute = (int) strtol(p, &p, 0);
     if (':' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -2184,7 +2186,7 @@ vscp_fwhlp_parseStringToEvent(vscpEvent *pev, const char *buf)
     }
 
     // second
-    pev->second = (uint16_t) strtol(p, &p, 0);
+    second = (int) strtol(p, &p, 0);
     if (',' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -2195,26 +2197,28 @@ vscp_fwhlp_parseStringToEvent(vscpEvent *pev, const char *buf)
   }
 
   // timestamp
-  // If datestr was empty, this is a nanosecond timestamp (64-bit)
-  // Otherwise it is a microsecond timestamp (32-bit)
+  // Parse timestamp field - either nanosecond (if no datetime) or microsecond (if datetime provided)
+  // Result is always converted to nanosecond timestamp
   if (',' == *p) {
     // Empty timestamp field
-    if (VSCP_HEADER16_FRAME_VERSION_UNIX_NS == (pev->head & VSCP_HEADER16_FRAME_VERSION_MASK)) {
-      pev->timestamp_ns = 0;
+    if (has_datetime) {
+      // Convert datetime to nanosecond timestamp
+      pev->timestamp_ns = vscp_fwhlp_to_unix_ns(year, month, day, hour, minute, second, 0);
     }
     else {
-      pev->timestamp = 0;
+      pev->timestamp_ns = 0;
     }
     p++; // point beyond comma
   }
   else {
-    if (VSCP_HEADER16_FRAME_VERSION_UNIX_NS == (pev->head & VSCP_HEADER16_FRAME_VERSION_MASK)) {
-      // Parse as 64-bit nanosecond timestamp
-      pev->timestamp_ns = (uint64_t) strtoull(p, &p, 0);
+    if (has_datetime) {
+      // Parse as 32-bit microsecond timestamp, then convert to nanoseconds
+      microsecond = (uint32_t) strtoul(p, &p, 0);
+      pev->timestamp_ns = vscp_fwhlp_to_unix_ns(year, month, day, hour, minute, second, microsecond);
     }
     else {
-      // Parse as 32-bit microsecond timestamp
-      pev->timestamp = (uint32_t) strtoul(p, &p, 0);
+      // Parse as 64-bit nanosecond timestamp directly
+      pev->timestamp_ns = (uint64_t) strtoull(p, &p, 0);
     }
     if (',' != *p) {
       return VSCP_ERROR_PARAMETER;
@@ -2224,6 +2228,11 @@ vscp_fwhlp_parseStringToEvent(vscpEvent *pev, const char *buf)
       return VSCP_ERROR_PARAMETER;
     }
   }
+
+  // Always set frame version to Unix nanosecond
+  setFrameVersion(pev, VSCP_HEADER16_FRAME_VERSION_UNIX_NS);
+  pev->year  = 0xffff;
+  pev->month = 0xff;
 
   // Get GUID
   if (VSCP_ERROR_SUCCESS != vscp_fwhlp_parseGuid(pev->GUID, p, &p)) {
@@ -2328,17 +2337,19 @@ vscp_fwhlp_parseStringToEventEx(vscpEventEx *pex, const char *buf)
   // this case the timestamp field is expected to be a
   // Unix nanosecond timestamp.
 
+  // Temporary variables to hold datetime if provided
+  int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
+  uint32_t microsecond = 0;
+  int has_datetime = 0;
+
   if (',' == *p) {
     p++; // point beyond comma
-    // Set year to 0xffff to indicate nanosecond timestamp mode
-    pex->year  = 0xffff;
-    pex->month = 0xff;
-    // Set frame version to Unix nanosecond
-    setFrameVersionEx(pex, VSCP_HEADER16_FRAME_VERSION_UNIX_NS);
   }
   else {
+    has_datetime = 1;
+    
     // year
-    pex->year = (uint16_t) strtol(p, &p, 0);
+    year = (int) strtol(p, &p, 0);
     if ('-' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -2348,7 +2359,7 @@ vscp_fwhlp_parseStringToEventEx(vscpEventEx *pex, const char *buf)
     }
 
     // month
-    pex->month = (uint16_t) strtol(p, &p, 0);
+    month = (int) strtol(p, &p, 0);
     if ('-' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -2358,7 +2369,7 @@ vscp_fwhlp_parseStringToEventEx(vscpEventEx *pex, const char *buf)
     }
 
     // day
-    pex->day = (uint16_t) strtol(p, &p, 0);
+    day = (int) strtol(p, &p, 0);
     if ('T' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -2368,7 +2379,7 @@ vscp_fwhlp_parseStringToEventEx(vscpEventEx *pex, const char *buf)
     }
 
     // hour
-    pex->hour = (uint16_t) strtol(p, &p, 0);
+    hour = (int) strtol(p, &p, 0);
     if (':' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -2378,7 +2389,7 @@ vscp_fwhlp_parseStringToEventEx(vscpEventEx *pex, const char *buf)
     }
 
     // minute
-    pex->minute = (uint16_t) strtol(p, &p, 0);
+    minute = (int) strtol(p, &p, 0);
     if (':' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -2388,7 +2399,7 @@ vscp_fwhlp_parseStringToEventEx(vscpEventEx *pex, const char *buf)
     }
 
     // second
-    pex->second = (uint16_t) strtol(p, &p, 0);
+    second = (int) strtol(p, &p, 0);
     if (',' != *p) {
       return VSCP_ERROR_PARAMETER;
     }
@@ -2399,26 +2410,28 @@ vscp_fwhlp_parseStringToEventEx(vscpEventEx *pex, const char *buf)
   }
 
   // timestamp
-  // If datestr was empty, this is a nanosecond timestamp (64-bit)
-  // Otherwise it is a microsecond timestamp (32-bit)
+  // Parse timestamp field - either nanosecond (if no datetime) or microsecond (if datetime provided)
+  // Result is always converted to nanosecond timestamp
   if (',' == *p) {
     // Empty timestamp field
-    if (VSCP_HEADER16_FRAME_VERSION_UNIX_NS == (pex->head & VSCP_HEADER16_FRAME_VERSION_MASK)) {
-      pex->timestamp_ns = 0;
+    if (has_datetime) {
+      // Convert datetime to nanosecond timestamp
+      pex->timestamp_ns = vscp_fwhlp_to_unix_ns(year, month, day, hour, minute, second, 0);
     }
     else {
-      pex->timestamp = 0;
+      pex->timestamp_ns = 0;
     }
     p++; // point beyond comma
   }
   else {
-    if (VSCP_HEADER16_FRAME_VERSION_UNIX_NS == (pex->head & VSCP_HEADER16_FRAME_VERSION_MASK)) {
-      // Parse as 64-bit nanosecond timestamp
-      pex->timestamp_ns = (uint64_t) strtoull(p, &p, 0);
+    if (has_datetime) {
+      // Parse as 32-bit microsecond timestamp, then convert to nanoseconds
+      microsecond = (uint32_t) strtoul(p, &p, 0);
+      pex->timestamp_ns = vscp_fwhlp_to_unix_ns(year, month, day, hour, minute, second, microsecond);
     }
     else {
-      // Parse as 32-bit microsecond timestamp
-      pex->timestamp = (uint32_t) strtoul(p, &p, 0);
+      // Parse as 64-bit nanosecond timestamp directly
+      pex->timestamp_ns = (uint64_t) strtoull(p, &p, 0);
     }
     if (',' != *p) {
       return VSCP_ERROR_PARAMETER;
@@ -2428,6 +2441,11 @@ vscp_fwhlp_parseStringToEventEx(vscpEventEx *pex, const char *buf)
       return VSCP_ERROR_PARAMETER;
     }
   }
+
+  // Always set frame version to Unix nanosecond
+  setFrameVersionEx(pex, VSCP_HEADER16_FRAME_VERSION_UNIX_NS);
+  pex->year  = 0xffff;
+  pex->month = 0xff;
 
   // Get GUID
   if (VSCP_ERROR_SUCCESS != vscp_fwhlp_parseGuid(pex->GUID, p, &p)) {
@@ -2491,41 +2509,23 @@ vscp_fwhlp_eventToString(char *buf, size_t size, const vscpEvent *pev)
     return VSCP_ERROR_BUFFER_TO_SMALL;
   }
 
-  // Check if using Unix nanosecond timestamp format
-  if (VSCP_HEADER16_FRAME_VERSION_UNIX_NS == (pev->head & VSCP_HEADER16_FRAME_VERSION_MASK)) {
-    // Output empty datestr with nanosecond timestamp
-    sprintf(buf,
-            "%u,%u,%u,%lu,,%llu,",
-            (unsigned) pev->head,
-            (unsigned) pev->vscp_class,
-            (unsigned) pev->vscp_type,
-            (unsigned long) pev->obid,
-            (unsigned long long) pev->timestamp_ns);
-  }
-  else if (pev->year || pev->month || pev->day || pev->hour || pev->minute || pev->second) {
-    sprintf(buf,
-            "%u,%u,%u,%lu,%4d-%02d-%02dT%02d:%02d:%02dZ,%lu,",
-            (unsigned) pev->head,
-            (unsigned) pev->vscp_class,
-            (unsigned) pev->vscp_type,
-            (unsigned long) pev->obid,
-            (int) pev->year,
-            (int) pev->month,
-            (int) pev->day,
-            (int) pev->hour,
-            (int) pev->minute,
-            (int) pev->second,
-            (unsigned long) pev->timestamp);
+  // Always calculate timestamp_ns - convert from datetime+timestamp if old frame type
+  uint64_t timestamp_ns;
+  if ((pev->head & VSCP_HEADER16_FRAME_VERSION_MASK) == VSCP_HEADER16_FRAME_VERSION_UNIX_NS) {
+    timestamp_ns = pev->timestamp_ns;
   }
   else {
-    sprintf(buf,
-            "%d,%u,%u,%lu,,%lu,",
-            (unsigned) pev->head,
-            (unsigned) pev->vscp_class,
-            (unsigned) pev->vscp_type,
-            (unsigned long) pev->obid,
-            (unsigned long) pev->timestamp);
+    timestamp_ns = vscp_fwhlp_to_unix_ns(pev->year, pev->month, pev->day, pev->hour, pev->minute, pev->second, pev->timestamp);
   }
+
+  // Always output nanosecond timestamp format
+  sprintf(buf,
+          "%u,%u,%u,%lu,,%llu,",
+          (unsigned) pev->head,
+          (unsigned) pev->vscp_class,
+          (unsigned) pev->vscp_type,
+          (unsigned long) pev->obid,
+          (unsigned long long) timestamp_ns);
 
   // GUID
   memset(wrkbuf, 0, sizeof(wrkbuf));
@@ -2599,41 +2599,23 @@ vscp_fwhlp_eventToStringEx(char *buf, size_t size, const vscpEventEx *pex)
     return VSCP_ERROR_BUFFER_TO_SMALL;
   }
 
-  // Check if using Unix nanosecond timestamp format
-  if (VSCP_HEADER16_FRAME_VERSION_UNIX_NS == (pex->head & VSCP_HEADER16_FRAME_VERSION_MASK)) {
-    // Output empty datestr with nanosecond timestamp
-    sprintf(buf,
-            "%u,%u,%u,%lu,,%llu,",
-            (unsigned) pex->head,
-            (unsigned) pex->vscp_class,
-            (unsigned) pex->vscp_type,
-            (unsigned long) pex->obid,
-            (unsigned long long) pex->timestamp_ns);
-  }
-  else if (pex->year || pex->month || pex->day || pex->hour || pex->minute || pex->second) {
-    sprintf(buf,
-            "%u,%u,%u,%lu,%4d-%02d-%02dT%02d:%02d:%02dZ,%lu,",
-            (unsigned) pex->head,
-            (unsigned) pex->vscp_class,
-            (unsigned) pex->vscp_type,
-            (unsigned long) pex->obid,
-            (int) pex->year,
-            (int) pex->month,
-            (int) pex->day,
-            (int) pex->hour,
-            (int) pex->minute,
-            (int) pex->second,
-            (unsigned long) pex->timestamp);
+  // Always calculate timestamp_ns - convert from datetime+timestamp if old frame type
+  uint64_t timestamp_ns;
+  if ((pex->head & VSCP_HEADER16_FRAME_VERSION_MASK) == VSCP_HEADER16_FRAME_VERSION_UNIX_NS) {
+    timestamp_ns = pex->timestamp_ns;
   }
   else {
-    sprintf(buf,
-            "%d,%u,%u,%lu,,%lu,",
-            (unsigned) pex->head,
-            (unsigned) pex->vscp_class,
-            (unsigned) pex->vscp_type,
-            (unsigned long) pex->obid,
-            (unsigned long) pex->timestamp);
+    timestamp_ns = vscp_fwhlp_to_unix_ns(pex->year, pex->month, pex->day, pex->hour, pex->minute, pex->second, pex->timestamp);
   }
+
+  // Always output nanosecond timestamp format
+  sprintf(buf,
+          "%u,%u,%u,%lu,,%llu,",
+          (unsigned) pex->head,
+          (unsigned) pex->vscp_class,
+          (unsigned) pex->vscp_type,
+          (unsigned long) pex->obid,
+          (unsigned long long) timestamp_ns);
 
   // GUID
   memset(wrkbuf, 0, sizeof(wrkbuf));
