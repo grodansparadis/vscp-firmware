@@ -2,8 +2,10 @@
 #include <string.h>
 #include <climits>
 #include <gtest/gtest.h>
+#include <vscp.h>
 #include <vscp-class.h>
 #include <vscp-firmware-helper.h>
+#include <crc.h>
 
 //-----------------------------------------------------------------------------
 // Parse datestr for event tests
@@ -67,6 +69,68 @@ TEST(_vscp_firmware_helper, _vscp_fwhlp_parse_event_datestr_4)
   rv = vscp_fwhlp_parse_event_datestr(&ev, "    2024-06-30T23:59:58Z    ", NULL);
 
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+}
+
+// Test Unix nanosecond timestamp parsing (no datestr format, just numeric)
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_unix_ns_1)
+{
+  int rv;
+  vscpEvent ev;
+
+  // 2024-06-30T23:59:58Z = 1719791998 seconds since epoch
+  // In nanoseconds: 1719791998000000000
+  rv = vscp_fwhlp_parse_event_datestr(&ev, "1719791998000000000", NULL);
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(0xffff, ev.year);  // year set to 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ev.month);   // month set to 0xff (unused in nanosecond mode)
+  ASSERT_EQ(1719791998000000000ULL, ev.timestamp_ns);
+}
+
+// Test Unix nanosecond timestamp parsing with leading spaces
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_unix_ns_2)
+{
+  int rv;
+  vscpEvent ev;
+
+  rv = vscp_fwhlp_parse_event_datestr(&ev, "   1719791998000000000", NULL);
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(0xffff, ev.year);
+  ASSERT_EQ(1719791998000000000ULL, ev.timestamp_ns);
+}
+
+// Test Unix nanosecond timestamp parsing with endptr
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_unix_ns_3)
+{
+  int rv;
+  vscpEvent ev;
+  char *endptr = NULL;
+
+  rv = vscp_fwhlp_parse_event_datestr(&ev, "1719791998000000000 NEXT", &endptr);
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(0xffff, ev.year);
+  ASSERT_EQ(1719791998000000000ULL, ev.timestamp_ns);
+
+  // Skip trailing space
+  while (*endptr == ' ') {
+    endptr++;
+  }
+  ASSERT_STREQ("NEXT", endptr);
+}
+
+// Test zero timestamp
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_unix_ns_zero)
+{
+  int rv;
+  vscpEvent ev;
+
+  rv = vscp_fwhlp_parse_event_datestr(&ev, "0", NULL);
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(0xffff, ev.year);
+  ASSERT_EQ(0ULL, ev.timestamp_ns);
 }
 
 //-----------------------------------------------------------------------------
@@ -156,6 +220,68 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_5)
   ASSERT_STREQ("NEXT", endptr); // endptr should point to the 'N' character after the date string
 }
 
+// Test Unix nanosecond timestamp parsing (no datestr format, just numeric)
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_unix_ns_1)
+{
+  int rv;
+  vscpEventEx ex;
+
+  // 2024-06-30T23:59:58Z = 1719791998 seconds since epoch
+  // In nanoseconds: 1719791998000000000
+  rv = vscp_fwhlp_parse_eventex_datestr(&ex, "1719791998000000000", NULL);
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(0xffff, ex.year);  // year set to 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ex.month);   // month set to 0xff (unused in nanosecond mode)
+  ASSERT_EQ(1719791998000000000ULL, ex.timestamp_ns);
+}
+
+// Test Unix nanosecond timestamp parsing with leading spaces
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_unix_ns_2)
+{
+  int rv;
+  vscpEventEx ex;
+
+  rv = vscp_fwhlp_parse_eventex_datestr(&ex, "   1719791998000000000", NULL);
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(0xffff, ex.year);
+  ASSERT_EQ(1719791998000000000ULL, ex.timestamp_ns);
+}
+
+// Test Unix nanosecond timestamp parsing with endptr
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_unix_ns_3)
+{
+  int rv;
+  vscpEventEx ex;
+  char *endptr = NULL;
+
+  rv = vscp_fwhlp_parse_eventex_datestr(&ex, "1719791998000000000 NEXT", &endptr);
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(0xffff, ex.year);
+  ASSERT_EQ(1719791998000000000ULL, ex.timestamp_ns);
+
+  // Skip trailing space
+  while (*endptr == ' ') {
+    endptr++;
+  }
+  ASSERT_STREQ("NEXT", endptr);
+}
+
+// Test zero timestamp
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_unix_ns_zero)
+{
+  int rv;
+  vscpEventEx ex;
+
+  rv = vscp_fwhlp_parse_eventex_datestr(&ex, "0", NULL);
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(0xffff, ex.year);
+  ASSERT_EQ(0ULL, ex.timestamp_ns);
+}
+
 //-----------------------------------------------------------------------------
 // Datestr from event tests
 //-----------------------------------------------------------------------------
@@ -189,6 +315,8 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_event_2)
   vscpEvent ev;
   char buf[21];
 
+  memset(&ev, 0, sizeof(ev));
+  ev.head   = 0; // Original frame format
   ev.year   = 2024;
   ev.month  = 6;
   ev.day    = 30;
@@ -198,6 +326,26 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_event_2)
 
   result = vscp_fwhlp_get_datestr_from_event(buf, sizeof(buf), &ev);
 
+  ASSERT_STREQ("2024-06-30T23:59:58Z", buf);
+}
+
+/*!
+  Buffer OK, valid date string using Unix nanosecond timestamp
+*/
+TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_event_unix_ns)
+{
+  char *result;
+  vscpEvent ev;
+  char buf[21];
+
+  memset(&ev, 0, sizeof(ev));
+  ev.head = VSCP_HEADER16_FRAME_VERSION_UNIX_NS; // Unix nanosecond timestamp format
+  // 2024-06-30T23:59:58Z = 1719791998 seconds since epoch
+  ev.timestamp_ns = 1719791998ULL * 1000000000ULL;
+
+  result = vscp_fwhlp_get_datestr_from_event(buf, sizeof(buf), &ev);
+
+  ASSERT_NE(nullptr, result);
   ASSERT_STREQ("2024-06-30T23:59:58Z", buf);
 }
 
@@ -234,6 +382,8 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_eventex_2)
   vscpEventEx ex;
   char buf[21];
 
+  memset(&ex, 0, sizeof(ex));
+  ex.head   = 0; // Original frame format
   ex.year   = 2024;
   ex.month  = 6;
   ex.day    = 30;
@@ -243,6 +393,26 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_eventex_2)
 
   result = vscp_fwhlp_get_datestr_from_eventex(buf, sizeof(buf), &ex);
 
+  ASSERT_STREQ("2024-06-30T23:59:58Z", buf);
+}
+
+/*!
+  Buffer OK, valid date string using Unix nanosecond timestamp
+*/
+TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_eventex_unix_ns)
+{
+  char *result;
+  vscpEventEx ex;
+  char buf[21];
+
+  memset(&ex, 0, sizeof(ex));
+  ex.head = VSCP_HEADER16_FRAME_VERSION_UNIX_NS; // Unix nanosecond timestamp format
+  // 2024-06-30T23:59:58Z = 1719791998 seconds since epoch
+  ex.timestamp_ns = 1719791998ULL * 1000000000ULL;
+
+  result = vscp_fwhlp_get_datestr_from_eventex(buf, sizeof(buf), &ex);
+
+  ASSERT_NE(nullptr, result);
   ASSERT_STREQ("2024-06-30T23:59:58Z", buf);
 }
 
@@ -267,7 +437,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_endian)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_a2ul_decimal)
 {
-  uint32_t result;
+  uint64_t result;
   int rv;
 
   rv = vscp_fwhlp_a2ul("12345", 0, 10, &result, NULL);
@@ -277,7 +447,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_a2ul_decimal)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_a2ul_hex)
 {
-  uint32_t result;
+  uint64_t result;
   int rv;
 
   rv = vscp_fwhlp_a2ul("1A2B", 0, 16, &result, NULL);
@@ -287,12 +457,58 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_a2ul_hex)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_a2ul_auto_hex)
 {
-  uint32_t result;
+  uint64_t result;
   int rv;
 
   rv = vscp_fwhlp_a2ul("0x1A2B", 0, 0, &result, NULL);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
   ASSERT_EQ(0x1A2B, result);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_a2ul_64bit_decimal)
+{
+  uint64_t result;
+  int rv;
+
+  // Test value larger than 32-bit max (4294967295)
+  rv = vscp_fwhlp_a2ul("9876543210123456789", 0, 10, &result, NULL);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(9876543210123456789ULL, result);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_a2ul_64bit_hex)
+{
+  uint64_t result;
+  int rv;
+
+  // Test 64-bit hex value
+  rv = vscp_fwhlp_a2ul("FEDCBA9876543210", 0, 16, &result, NULL);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(0xFEDCBA9876543210ULL, result);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_a2ul_64bit_auto_hex)
+{
+  uint64_t result;
+  int rv;
+
+  // Test 64-bit value with 0x prefix
+  rv = vscp_fwhlp_a2ul("0x0123456789ABCDEF", 0, 0, &result, NULL);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(0x0123456789ABCDEFULL, result);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_readStringValue_64bit)
+{
+  uint64_t result;
+
+  // Test 64-bit hex value
+  result = vscp_fwhlp_readStringValue("0xFEDCBA9876543210");
+  ASSERT_EQ(0xFEDCBA9876543210ULL, result);
+
+  // Test 64-bit decimal value
+  result = vscp_fwhlp_readStringValue("12345678901234567890");
+  ASSERT_EQ(12345678901234567890ULL, result);
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_dec2hex)
@@ -827,6 +1043,136 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_setEventExPriority_null_pointer)
 }
 
 //-----------------------------------------------------------------------------
+// Frame version tests
+//-----------------------------------------------------------------------------
+
+TEST(_vscp_firmware_helper, setFrameVersion_original)
+{
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+
+  bool rv = setFrameVersion(&ev, VSCP_HEADER16_FRAME_VERSION_ORIGINAL);
+  ASSERT_TRUE(rv);
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_ORIGINAL, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+}
+
+TEST(_vscp_firmware_helper, setFrameVersion_unix_ns)
+{
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+
+  bool rv = setFrameVersion(&ev, VSCP_HEADER16_FRAME_VERSION_UNIX_NS);
+  ASSERT_TRUE(rv);
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+}
+
+TEST(_vscp_firmware_helper, setFrameVersion_preserves_other_bits)
+{
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+
+  // Set priority and other bits
+  ev.head = 0xE0FF;  // Priority 7 and other bits set
+
+  bool rv = setFrameVersion(&ev, VSCP_HEADER16_FRAME_VERSION_UNIX_NS);
+  ASSERT_TRUE(rv);
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+  // Verify other bits are preserved (excluding frame version bits)
+  ASSERT_EQ(0xE0FF & ~VSCP_HEADER16_FRAME_VERSION_MASK, ev.head & ~VSCP_HEADER16_FRAME_VERSION_MASK);
+}
+
+TEST(_vscp_firmware_helper, setFrameVersion_null_pointer)
+{
+  bool rv = setFrameVersion(NULL, VSCP_HEADER16_FRAME_VERSION_UNIX_NS);
+  ASSERT_FALSE(rv);
+}
+
+TEST(_vscp_firmware_helper, setFrameVersionEx_original)
+{
+  vscpEventEx ex;
+  memset(&ex, 0, sizeof(ex));
+
+  bool rv = setFrameVersionEx(&ex, VSCP_HEADER16_FRAME_VERSION_ORIGINAL);
+  ASSERT_TRUE(rv);
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_ORIGINAL, ex.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+}
+
+TEST(_vscp_firmware_helper, setFrameVersionEx_unix_ns)
+{
+  vscpEventEx ex;
+  memset(&ex, 0, sizeof(ex));
+
+  bool rv = setFrameVersionEx(&ex, VSCP_HEADER16_FRAME_VERSION_UNIX_NS);
+  ASSERT_TRUE(rv);
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ex.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+}
+
+TEST(_vscp_firmware_helper, setFrameVersionEx_preserves_other_bits)
+{
+  vscpEventEx ex;
+  memset(&ex, 0, sizeof(ex));
+
+  // Set priority and other bits
+  ex.head = 0xE0FF;  // Priority 7 and other bits set
+
+  bool rv = setFrameVersionEx(&ex, VSCP_HEADER16_FRAME_VERSION_UNIX_NS);
+  ASSERT_TRUE(rv);
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ex.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+  // Verify other bits are preserved (excluding frame version bits)
+  ASSERT_EQ(0xE0FF & ~VSCP_HEADER16_FRAME_VERSION_MASK, ex.head & ~VSCP_HEADER16_FRAME_VERSION_MASK);
+}
+
+TEST(_vscp_firmware_helper, setFrameVersionEx_null_pointer)
+{
+  bool rv = setFrameVersionEx(NULL, VSCP_HEADER16_FRAME_VERSION_UNIX_NS);
+  ASSERT_FALSE(rv);
+}
+
+TEST(_vscp_firmware_helper, setFrameVersion_all_versions)
+{
+  vscpEvent ev;
+
+  // Test all frame version values
+  memset(&ev, 0, sizeof(ev));
+  ASSERT_TRUE(setFrameVersion(&ev, VSCP_HEADER16_FRAME_VERSION_ORIGINAL));
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_ORIGINAL, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+
+  memset(&ev, 0, sizeof(ev));
+  ASSERT_TRUE(setFrameVersion(&ev, VSCP_HEADER16_FRAME_VERSION_UNIX_NS));
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+
+  memset(&ev, 0, sizeof(ev));
+  ASSERT_TRUE(setFrameVersion(&ev, VSCP_HEADER16_FRAME_VERSION_2));
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_2, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+
+  memset(&ev, 0, sizeof(ev));
+  ASSERT_TRUE(setFrameVersion(&ev, VSCP_HEADER16_FRAME_VERSION_3));
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_3, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+}
+
+TEST(_vscp_firmware_helper, setFrameVersionEx_all_versions)
+{
+  vscpEventEx ex;
+
+  // Test all frame version values
+  memset(&ex, 0, sizeof(ex));
+  ASSERT_TRUE(setFrameVersionEx(&ex, VSCP_HEADER16_FRAME_VERSION_ORIGINAL));
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_ORIGINAL, ex.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+
+  memset(&ex, 0, sizeof(ex));
+  ASSERT_TRUE(setFrameVersionEx(&ex, VSCP_HEADER16_FRAME_VERSION_UNIX_NS));
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ex.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+
+  memset(&ex, 0, sizeof(ex));
+  ASSERT_TRUE(setFrameVersionEx(&ex, VSCP_HEADER16_FRAME_VERSION_2));
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_2, ex.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+
+  memset(&ex, 0, sizeof(ex));
+  ASSERT_TRUE(setFrameVersionEx(&ex, VSCP_HEADER16_FRAME_VERSION_3));
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_3, ex.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+}
+
+//-----------------------------------------------------------------------------
 // Event conversion tests
 //-----------------------------------------------------------------------------
 
@@ -916,6 +1262,93 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_convertEventExToEvent)
   }
 }
 
+TEST(_vscp_firmware_helper, vscp_fwhlp_convertEventToEventEx_unix_ns)
+{
+  vscpEvent ev;
+  vscpEventEx ex;
+  int rv;
+
+  memset(&ev, 0, sizeof(ev));
+  memset(&ex, 0, sizeof(ex));
+
+  // Setup event with Unix nanosecond timestamp format
+  ev.head = VSCP_HEADER16_FRAME_VERSION_UNIX_NS; // Unix nanosecond timestamp format
+  ev.obid       = 0x12345678;
+  ev.year       = 0xffff;  // Indicates Unix ns timestamp mode
+  ev.month      = 0xff;
+  ev.timestamp_ns = 1719791998000000000ULL;  // 2024-06-30T23:59:58Z in nanoseconds
+  ev.vscp_class = 10;
+  ev.vscp_type  = 6;
+  ev.sizeData   = 3;
+
+  uint8_t data[3] = { 0x01, 0x02, 0x03 };
+  ev.pdata        = data;
+
+  for (int i = 0; i < 16; i++) {
+    ev.GUID[i] = i;
+  }
+
+  rv = vscp_fwhlp_convertEventToEventEx(&ex, &ev);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(ev.head, ex.head);
+  ASSERT_EQ(ev.vscp_class, ex.vscp_class);
+  ASSERT_EQ(ev.vscp_type, ex.vscp_type);
+  ASSERT_EQ(ev.obid, ex.obid);
+  ASSERT_EQ(ev.year, ex.year);
+  ASSERT_EQ(0xffff, ex.year);
+  ASSERT_EQ(ev.timestamp_ns, ex.timestamp_ns);
+  ASSERT_EQ(1719791998000000000ULL, ex.timestamp_ns);
+  ASSERT_EQ(ev.sizeData, ex.sizeData);
+  ASSERT_EQ(0, memcmp(ev.GUID, ex.GUID, 16));
+  ASSERT_EQ(0, memcmp(ev.pdata, ex.data, 3));
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_convertEventExToEvent_unix_ns)
+{
+  vscpEvent ev;
+  vscpEventEx ex;
+  int rv;
+
+  memset(&ev, 0, sizeof(ev));
+  memset(&ex, 0, sizeof(ex));
+
+  // Setup eventex with Unix nanosecond timestamp format
+  ex.head = VSCP_HEADER16_FRAME_VERSION_UNIX_NS;  // Unix nanosecond timestamp format
+  ex.obid       = 0x12345678;
+  ex.year       = 0xffff;  // Indicates Unix ns timestamp mode
+  ex.month      = 0xff;
+  ex.timestamp_ns = 1719791998000000000ULL;  // 2024-06-30T23:59:58Z in nanoseconds
+  ex.vscp_class = 10;
+  ex.vscp_type  = 6;
+  ex.sizeData   = 3;
+  ex.data[0]    = 0x01;
+  ex.data[1]    = 0x02;
+  ex.data[2]    = 0x03;
+
+  for (int i = 0; i < 16; i++) {
+    ex.GUID[i] = i;
+  }
+
+  rv = vscp_fwhlp_convertEventExToEvent(&ev, &ex);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+  ASSERT_EQ(ex.head, ev.head);
+  ASSERT_EQ(ex.vscp_class, ev.vscp_class);
+  ASSERT_EQ(ex.vscp_type, ev.vscp_type);
+  ASSERT_EQ(ex.obid, ev.obid);
+  ASSERT_EQ(ex.year, ev.year);
+  ASSERT_EQ(0xffff, ev.year);
+  ASSERT_EQ(ex.timestamp_ns, ev.timestamp_ns);
+  ASSERT_EQ(1719791998000000000ULL, ev.timestamp_ns);
+  ASSERT_EQ(ex.sizeData, ev.sizeData);
+  ASSERT_EQ(0, memcmp(ex.GUID, ev.GUID, 16));
+  ASSERT_EQ(0, memcmp(ex.data, ev.pdata, 3));
+
+  // Cleanup
+  if (ev.pdata) {
+    free(ev.pdata);
+  }
+}
+
 //-----------------------------------------------------------------------------
 // Event parsing and string conversion tests
 //-----------------------------------------------------------------------------
@@ -986,6 +1419,126 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_eventToStringEx)
   // String should contain event data
   ASSERT_NE(nullptr, strstr(buf, "10")); // class
   ASSERT_NE(nullptr, strstr(buf, "6"));  // type
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_eventToString_unix_ns)
+{
+  vscpEvent ev;
+  char buf[512];
+  int rv;
+
+  memset(&ev, 0, sizeof(ev));
+
+  // Setup event with Unix nanosecond timestamp format
+  ev.head         = VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+  ev.obid         = 0;
+  ev.year         = 0xffff;
+  ev.month        = 0xff;
+  ev.timestamp_ns = 1719791998000000000ULL;  // 2024-06-30T23:59:58Z in nanoseconds
+  ev.vscp_class   = 10;
+  ev.vscp_type    = 6;
+  ev.sizeData     = 3;
+
+  uint8_t data[3] = { 0x01, 0x02, 0x03 };
+  ev.pdata        = data;
+
+  for (int i = 0; i < 16; i++) {
+    ev.GUID[i] = i;
+  }
+
+  rv = vscp_fwhlp_eventToString(buf, sizeof(buf), &ev);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // String should contain empty datestr (,,) and nanosecond timestamp
+  ASSERT_NE(nullptr, strstr(buf, "256,"));  // head with VSCP_HEADER16_FRAME_VERSION_UNIX_NS
+  ASSERT_NE(nullptr, strstr(buf, ",10,"));  // class
+  ASSERT_NE(nullptr, strstr(buf, ",6,"));   // type
+  ASSERT_NE(nullptr, strstr(buf, ",,1719791998000000000,")); // empty datestr + ns timestamp
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_eventToStringEx_unix_ns)
+{
+  vscpEventEx ex;
+  char buf[512];
+  int rv;
+
+  memset(&ex, 0, sizeof(ex));
+
+  // Setup eventex with Unix nanosecond timestamp format
+  ex.head         = VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+  ex.obid         = 0;
+  ex.year         = 0xffff;
+  ex.month        = 0xff;
+  ex.timestamp_ns = 1719791998000000000ULL;  // 2024-06-30T23:59:58Z in nanoseconds
+  ex.vscp_class   = 10;
+  ex.vscp_type    = 6;
+  ex.sizeData     = 3;
+  ex.data[0]      = 0x01;
+  ex.data[1]      = 0x02;
+  ex.data[2]      = 0x03;
+
+  for (int i = 0; i < 16; i++) {
+    ex.GUID[i] = i;
+  }
+
+  rv = vscp_fwhlp_eventToStringEx(buf, sizeof(buf), &ex);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // String should contain empty datestr (,,) and nanosecond timestamp
+  ASSERT_NE(nullptr, strstr(buf, "256,"));  // head with VSCP_HEADER16_FRAME_VERSION_UNIX_NS
+  ASSERT_NE(nullptr, strstr(buf, ",10,"));  // class
+  ASSERT_NE(nullptr, strstr(buf, ",6,"));   // type
+  ASSERT_NE(nullptr, strstr(buf, ",,1719791998000000000,")); // empty datestr + ns timestamp
+}
+
+// Test roundtrip: parse -> toString -> parse
+TEST(_vscp_firmware_helper, vscp_fwhlp_eventToString_unix_ns_roundtrip)
+{
+  vscpEvent ev1, ev2;
+  char buf[512];
+  int rv;
+
+  memset(&ev1, 0, sizeof(ev1));
+  memset(&ev2, 0, sizeof(ev2));
+
+  // Setup event with Unix nanosecond timestamp format
+  ev1.head         = VSCP_HEADER16_FRAME_VERSION_UNIX_NS | 0x03;  // Unix ns + rolling index
+  ev1.obid         = 12345;
+  ev1.year         = 0xffff;
+  ev1.month        = 0xff;
+  ev1.timestamp_ns = 1719791998000000000ULL;
+  ev1.vscp_class   = 20;
+  ev1.vscp_type    = 3;
+  ev1.sizeData     = 2;
+
+  uint8_t data[2] = { 0xAA, 0xBB };
+  ev1.pdata       = data;
+
+  for (int i = 0; i < 16; i++) {
+    ev1.GUID[i] = 0;
+  }
+
+  // Convert to string
+  rv = vscp_fwhlp_eventToString(buf, sizeof(buf), &ev1);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Parse back
+  rv = vscp_fwhlp_parseStringToEvent(&ev2, buf);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Verify roundtrip
+  ASSERT_EQ(ev1.head, ev2.head);
+  ASSERT_EQ(ev1.vscp_class, ev2.vscp_class);
+  ASSERT_EQ(ev1.vscp_type, ev2.vscp_type);
+  ASSERT_EQ(ev1.year, ev2.year);
+  ASSERT_EQ(0xffff, ev2.year);
+  ASSERT_EQ(ev1.timestamp_ns, ev2.timestamp_ns);
+  ASSERT_EQ(ev1.sizeData, ev2.sizeData);
+  ASSERT_EQ(0, memcmp(ev1.pdata, ev2.pdata, ev1.sizeData));
+
+  if (ev2.pdata) {
+    free(ev2.pdata);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1123,20 +1676,14 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_writeEventToFrame_basic)
   uint8_t frame[100];
   int rv;
 
-  // Setup event with minimal data
+  // Setup event with minimal data - uses nanosecond timestamp (packet format 1)
   memset(&ev, 0, sizeof(vscpEvent));
-  ev.head       = 0x20; // Priority 1
-  ev.timestamp  = 1234567;
-  ev.year       = 2024;
-  ev.month      = 6;
-  ev.day        = 30;
-  ev.hour       = 23;
-  ev.minute     = 59;
-  ev.second     = 58;
-  ev.vscp_class = 10;
-  ev.vscp_type  = 6;
-  ev.sizeData   = 0;
-  ev.pdata      = NULL;
+  ev.head         = VSCP_HEADER16_FRAME_VERSION_UNIX_NS | 0x20; // Priority 1, UNIX_NS frame version
+  ev.timestamp_ns = 1234567890123456789ULL;
+  ev.vscp_class   = 10;
+  ev.vscp_type    = 6;
+  ev.sizeData     = 0;
+  ev.pdata        = NULL;
 
   for (int i = 0; i < 16; i++) {
     ev.GUID[i] = i;
@@ -1145,12 +1692,12 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_writeEventToFrame_basic)
   rv = vscp_fwhlp_writeEventToFrame(frame, sizeof(frame), 0x00, &ev);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  // Verify frame type
-  ASSERT_EQ(0x00, frame[0]);
+  // Verify frame type is packet format 1 (0x10 = type 1 in upper nibble)
+  ASSERT_EQ(0x10, frame[0]);
 
-  // Verify head
-  ASSERT_EQ(0x00, frame[1]);
-  ASSERT_EQ(0x20, frame[2]);
+  // Verify head (frame version bits should be set to UNIX_NS)
+  ASSERT_EQ(0x01, frame[1]); // MSB - frame version bits
+  ASSERT_EQ(0x20, frame[2]); // LSB - priority
 
   // Verify class
   ASSERT_EQ(0x00, frame[14]);
@@ -1277,20 +1824,14 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getEventFromFrame)
   uint8_t data[3] = { 0x01, 0x02, 0x03 };
   int rv;
 
-  // Setup event to write
+  // Setup event to write - packet format 1 uses nanosecond timestamp
   memset(&ev_write, 0, sizeof(vscpEvent));
-  ev_write.head       = 0x60; // Priority 3
-  ev_write.timestamp  = 555555;
-  ev_write.year       = 2024;
-  ev_write.month      = 7;
-  ev_write.day        = 15;
-  ev_write.hour       = 14;
-  ev_write.minute     = 25;
-  ev_write.second     = 30;
-  ev_write.vscp_class = 50;
-  ev_write.vscp_type  = 25;
-  ev_write.sizeData   = 3;
-  ev_write.pdata      = data;
+  ev_write.head         = VSCP_HEADER16_FRAME_VERSION_UNIX_NS | 0x60; // Priority 3, UNIX_NS frame version
+  ev_write.timestamp_ns = 555555000000000ULL;
+  ev_write.vscp_class   = 50;
+  ev_write.vscp_type    = 25;
+  ev_write.sizeData     = 3;
+  ev_write.pdata        = data;
 
   for (int i = 0; i < 16; i++) {
     ev_write.GUID[i] = i * 2;
@@ -1305,18 +1846,16 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getEventFromFrame)
   rv = vscp_fwhlp_getEventFromFrame(&ev_read, frame, sizeof(frame));
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  // Verify data was preserved
-  ASSERT_EQ(ev_write.head, ev_read.head);
-  ASSERT_EQ(ev_write.timestamp, ev_read.timestamp);
-  ASSERT_EQ(ev_write.year, ev_read.year);
-  ASSERT_EQ(ev_write.month, ev_read.month);
-  ASSERT_EQ(ev_write.day, ev_read.day);
-  ASSERT_EQ(ev_write.hour, ev_read.hour);
-  ASSERT_EQ(ev_write.minute, ev_read.minute);
-  ASSERT_EQ(ev_write.second, ev_read.second);
+  // Verify data was preserved (head will have frame version set)
+  uint16_t expected_head = (ev_write.head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+  ASSERT_EQ(expected_head, ev_read.head);
+  ASSERT_EQ(ev_write.timestamp_ns, ev_read.timestamp_ns);
   ASSERT_EQ(ev_write.vscp_class, ev_read.vscp_class);
   ASSERT_EQ(ev_write.vscp_type, ev_read.vscp_type);
   ASSERT_EQ(ev_write.sizeData, ev_read.sizeData);
+
+  // Verify GUID
+  ASSERT_EQ(0, memcmp(ev_write.GUID, ev_read.GUID, 16));
 
   // Verify data content
   ASSERT_EQ(0, memcmp(ev_write.pdata, ev_read.pdata, 3));
@@ -1333,24 +1872,17 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getEventExFromFrame)
   uint8_t frame[100];
   int rv;
 
-  // Setup eventex to write
+  // Setup eventex to write - packet format 1 uses nanosecond timestamp
   memset(&ex_write, 0, sizeof(vscpEventEx));
-  ex_write.head       = 0xE0; // Priority 7
-  ex_write.timestamp  = 123456789;
-  ex_write.year       = 2025;
-  ex_write.month      = 3;
-  ex_write.day        = 20;
-  ex_write.hour       = 10;
-  ex_write.minute     = 15;
-  ex_write.second     = 20;
-  ex_write.vscp_class = 100;
-  ex_write.vscp_type  = 50;
-  // NOTE: sizeData must be 16 to work around GUID copy bug in vscp_fwhlp_getEventFromFrame
-  ex_write.sizeData = 16;
-  ex_write.data[0]  = 0xDE;
-  ex_write.data[1]  = 0xAD;
-  ex_write.data[2]  = 0xBE;
-  ex_write.data[3]  = 0xEF;
+  ex_write.head         = VSCP_HEADER16_FRAME_VERSION_UNIX_NS | 0xE0; // Priority 7, UNIX_NS frame version
+  ex_write.timestamp_ns = 123456789012345678ULL;
+  ex_write.vscp_class   = 100;
+  ex_write.vscp_type    = 50;
+  ex_write.sizeData     = 16;
+  ex_write.data[0]      = 0xDE;
+  ex_write.data[1]      = 0xAD;
+  ex_write.data[2]      = 0xBE;
+  ex_write.data[3]      = 0xEF;
 
   for (int i = 0; i < 16; i++) {
     ex_write.GUID[i] = (i + 1) * 3;
@@ -1365,15 +1897,10 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getEventExFromFrame)
   rv = vscp_fwhlp_getEventExFromFrame(&ex_read, frame, sizeof(frame));
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  // Verify data was preserved
-  ASSERT_EQ(ex_write.head, ex_read.head);
-  ASSERT_EQ(ex_write.timestamp, ex_read.timestamp);
-  ASSERT_EQ(ex_write.year, ex_read.year);
-  ASSERT_EQ(ex_write.month, ex_read.month);
-  ASSERT_EQ(ex_write.day, ex_read.day);
-  ASSERT_EQ(ex_write.hour, ex_read.hour);
-  ASSERT_EQ(ex_write.minute, ex_read.minute);
-  ASSERT_EQ(ex_write.second, ex_read.second);
+  // Verify data was preserved (head will have frame version set)
+  uint16_t expected_head = (ex_write.head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+  ASSERT_EQ(expected_head, ex_read.head);
+  ASSERT_EQ(ex_write.timestamp_ns, ex_read.timestamp_ns);
   ASSERT_EQ(ex_write.vscp_class, ex_read.vscp_class);
   ASSERT_EQ(ex_write.vscp_type, ex_read.vscp_type);
   ASSERT_EQ(ex_write.sizeData, ex_read.sizeData);
@@ -1395,20 +1922,14 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_frame_roundtrip_event)
   uint8_t data[10] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99 };
   int rv;
 
-  // Setup original event
+  // Setup original event - packet format 1 uses nanosecond timestamp
   memset(&ev_original, 0, sizeof(vscpEvent));
-  ev_original.head       = 0xA0; // Priority 5
-  ev_original.timestamp  = 0xABCDEF12;
-  ev_original.year       = 2026;
-  ev_original.month      = 2;
-  ev_original.day        = 17;
-  ev_original.hour       = 16;
-  ev_original.minute     = 45;
-  ev_original.second     = 55;
-  ev_original.vscp_class = 512;
-  ev_original.vscp_type  = 128;
-  ev_original.sizeData   = 10;
-  ev_original.pdata      = data;
+  ev_original.head         = VSCP_HEADER16_FRAME_VERSION_UNIX_NS | 0xA0; // Priority 5, UNIX_NS frame version
+  ev_original.timestamp_ns = 0xABCDEF1234567890ULL;
+  ev_original.vscp_class   = 512;
+  ev_original.vscp_type    = 128;
+  ev_original.sizeData     = 10;
+  ev_original.pdata        = data;
 
   for (int i = 0; i < 16; i++) {
     ev_original.GUID[i] = (i * 17) % 256;
@@ -1423,18 +1944,16 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_frame_roundtrip_event)
   rv = vscp_fwhlp_getEventFromFrame(&ev_recovered, frame, sizeof(frame));
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  // Verify complete round-trip preservation
-  ASSERT_EQ(ev_original.head, ev_recovered.head);
-  ASSERT_EQ(ev_original.timestamp, ev_recovered.timestamp);
-  ASSERT_EQ(ev_original.year, ev_recovered.year);
-  ASSERT_EQ(ev_original.month, ev_recovered.month);
-  ASSERT_EQ(ev_original.day, ev_recovered.day);
-  ASSERT_EQ(ev_original.hour, ev_recovered.hour);
-  ASSERT_EQ(ev_original.minute, ev_recovered.minute);
-  ASSERT_EQ(ev_original.second, ev_recovered.second);
+  // Verify complete round-trip preservation (head will have frame version set)
+  uint16_t expected_head = (ev_original.head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+  ASSERT_EQ(expected_head, ev_recovered.head);
+  ASSERT_EQ(ev_original.timestamp_ns, ev_recovered.timestamp_ns);
   ASSERT_EQ(ev_original.vscp_class, ev_recovered.vscp_class);
   ASSERT_EQ(ev_original.vscp_type, ev_recovered.vscp_type);
   ASSERT_EQ(ev_original.sizeData, ev_recovered.sizeData);
+
+  // Verify GUID
+  ASSERT_EQ(0, memcmp(ev_original.GUID, ev_recovered.GUID, 16));
 
   // Verify all data
   ASSERT_EQ(0, memcmp(ev_original.pdata, ev_recovered.pdata, 10));
@@ -1451,20 +1970,13 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_frame_roundtrip_eventex)
   uint8_t frame[200];
   int rv;
 
-  // Setup original eventex
+  // Setup original eventex - packet format 1 uses nanosecond timestamp
   memset(&ex_original, 0, sizeof(vscpEventEx));
-  ex_original.head       = 0xC0; // Priority 6
-  ex_original.timestamp  = 0x87654321;
-  ex_original.year       = 2026;
-  ex_original.month      = 11;
-  ex_original.day        = 5;
-  ex_original.hour       = 8;
-  ex_original.minute     = 30;
-  ex_original.second     = 15;
-  ex_original.vscp_class = 1024;
-  ex_original.vscp_type  = 256;
-  // NOTE: sizeData must be 16 to work around GUID copy bug in vscp_fwhlp_getEventFromFrame
-  ex_original.sizeData = 16;
+  ex_original.head         = VSCP_HEADER16_FRAME_VERSION_UNIX_NS | 0xC0; // Priority 6, UNIX_NS frame version
+  ex_original.timestamp_ns = 0x8765432112345678ULL;
+  ex_original.vscp_class   = 1024;
+  ex_original.vscp_type    = 256;
+  ex_original.sizeData     = 16;
 
   for (int i = 0; i < 16; i++) {
     ex_original.data[i] = (i * 7) % 256;
@@ -1483,15 +1995,10 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_frame_roundtrip_eventex)
   rv = vscp_fwhlp_getEventExFromFrame(&ex_recovered, frame, sizeof(frame));
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  // Verify complete round-trip preservation
-  ASSERT_EQ(ex_original.head, ex_recovered.head);
-  ASSERT_EQ(ex_original.timestamp, ex_recovered.timestamp);
-  ASSERT_EQ(ex_original.year, ex_recovered.year);
-  ASSERT_EQ(ex_original.month, ex_recovered.month);
-  ASSERT_EQ(ex_original.day, ex_recovered.day);
-  ASSERT_EQ(ex_original.hour, ex_recovered.hour);
-  ASSERT_EQ(ex_original.minute, ex_recovered.minute);
-  ASSERT_EQ(ex_original.second, ex_recovered.second);
+  // Verify complete round-trip preservation (head will have frame version set)
+  uint16_t expected_head = (ex_original.head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+  ASSERT_EQ(expected_head, ex_recovered.head);
+  ASSERT_EQ(ex_original.timestamp_ns, ex_recovered.timestamp_ns);
   ASSERT_EQ(ex_original.vscp_class, ex_recovered.vscp_class);
   ASSERT_EQ(ex_original.vscp_type, ex_recovered.vscp_type);
   ASSERT_EQ(ex_original.sizeData, ex_recovered.sizeData);
@@ -1501,6 +2008,223 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_frame_roundtrip_eventex)
 
   // Verify GUID
   ASSERT_EQ(0, memcmp(ex_original.GUID, ex_recovered.GUID, 16));
+}
+
+// Test reading packet format 0 (legacy format with date/time fields)
+TEST(_vscp_firmware_helper, vscp_fwhlp_getEventFromFrame_packet0)
+{
+  vscpEvent ev;
+  int rv;
+
+  // Manually construct a packet format 0 frame
+  // Format 0 layout:
+  //  0           Packet type & encryption (0x00 = type 0, no encryption)
+  //  1           HEAD MSB
+  //  2           HEAD LSB
+  //  3-6         Timestamp microseconds (4 bytes, MSB first)
+  //  7-8         Year (MSB first)
+  //  9           Month
+  //  10          Day
+  //  11          Hour
+  //  12          Minute
+  //  13          Second
+  //  14-15       CLASS (MSB first)
+  //  16-17       TYPE (MSB first)
+  //  18-33       GUID (16 bytes)
+  //  34-35       DATA SIZE (MSB first)
+  //  36-n        DATA
+  //  n+1, n+2    CRC (MSB first)
+
+  uint8_t frame[100];
+  memset(frame, 0, sizeof(frame));
+
+  // Packet type 0, no encryption
+  frame[0] = 0x00;
+
+  // Head = 0x0080 (priority 4)
+  frame[1] = 0x00;
+  frame[2] = 0x80;
+
+  // Timestamp = 0x12345678
+  frame[3] = 0x12;
+  frame[4] = 0x34;
+  frame[5] = 0x56;
+  frame[6] = 0x78;
+
+  // Year = 2024 (0x07E8)
+  frame[7] = 0x07;
+  frame[8] = 0xE8;
+
+  // Month = 6, Day = 15, Hour = 12, Minute = 30, Second = 45
+  frame[9]  = 0x06;
+  frame[10] = 0x0F;
+  frame[11] = 0x0C;
+  frame[12] = 0x1E;
+  frame[13] = 0x2D;
+
+  // Class = 10 (0x000A)
+  frame[14] = 0x00;
+  frame[15] = 0x0A;
+
+  // Type = 6 (0x0006)
+  frame[16] = 0x00;
+  frame[17] = 0x06;
+
+  // GUID = 0x00, 0x01, 0x02, ..., 0x0F
+  for (int i = 0; i < 16; i++) {
+    frame[18 + i] = i;
+  }
+
+  // Data size = 3
+  frame[34] = 0x00;
+  frame[35] = 0x03;
+
+  // Data = 0xAA, 0xBB, 0xCC
+  frame[36] = 0xAA;
+  frame[37] = 0xBB;
+  frame[38] = 0xCC;
+
+  // Calculate CRC over bytes 1 through 38 (header + data) and append
+  crc framecrc = crcFast((unsigned char const *) frame + 1, 35 + 3);
+  frame[39] = (framecrc >> 8) & 0xff;
+  frame[40] = framecrc & 0xff;
+
+  // Read from frame
+  memset(&ev, 0, sizeof(vscpEvent));
+  rv = vscp_fwhlp_getEventFromFrame(&ev, frame, 41);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Verify format 0 specific fields
+  ASSERT_EQ(0x0080, ev.head & ~VSCP_HEADER16_FRAME_VERSION_MASK); // Priority bits
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_ORIGINAL, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+  ASSERT_EQ(0x12345678, ev.timestamp);
+  ASSERT_EQ(2024, ev.year);
+  ASSERT_EQ(6, ev.month);
+  ASSERT_EQ(15, ev.day);
+  ASSERT_EQ(12, ev.hour);
+  ASSERT_EQ(30, ev.minute);
+  ASSERT_EQ(45, ev.second);
+
+  // Verify common fields
+  ASSERT_EQ(10, ev.vscp_class);
+  ASSERT_EQ(6, ev.vscp_type);
+  ASSERT_EQ(3, ev.sizeData);
+
+  // Verify GUID
+  for (int i = 0; i < 16; i++) {
+    ASSERT_EQ(i, ev.GUID[i]);
+  }
+
+  // Verify data
+  ASSERT_EQ(0xAA, ev.pdata[0]);
+  ASSERT_EQ(0xBB, ev.pdata[1]);
+  ASSERT_EQ(0xCC, ev.pdata[2]);
+
+  // Cleanup
+  if (ev.pdata) {
+    free(ev.pdata);
+  }
+}
+
+// Test reading packet format 1 (new format with nanosecond timestamp)
+TEST(_vscp_firmware_helper, vscp_fwhlp_getEventFromFrame_packet1)
+{
+  vscpEvent ev;
+  int rv;
+
+  // Manually construct a packet format 1 frame
+  // Format 1 layout:
+  //  0           Packet type & encryption (0x10 = type 1, no encryption)
+  //  1           HEAD MSB
+  //  2           HEAD LSB
+  //  3-10        Timestamp nanoseconds (8 bytes, MSB first)
+  //  11-13       Reserved bytes
+  //  14-15       CLASS (MSB first)
+  //  16-17       TYPE (MSB first)
+  //  18-33       GUID (16 bytes)
+  //  34-35       DATA SIZE (MSB first)
+  //  36-n        DATA
+  //  n+1, n+2    CRC (MSB first)
+
+  uint8_t frame[100];
+  memset(frame, 0, sizeof(frame));
+
+  // Packet type 1, no encryption
+  frame[0] = 0x10;
+
+  // Head = 0x0160 (frame version UNIX_NS + priority 3)
+  frame[1] = 0x01;
+  frame[2] = 0x60;
+
+  // Timestamp_ns = 0x1234567890ABCDEF
+  frame[3]  = 0x12;
+  frame[4]  = 0x34;
+  frame[5]  = 0x56;
+  frame[6]  = 0x78;
+  frame[7]  = 0x90;
+  frame[8]  = 0xAB;
+  frame[9]  = 0xCD;
+  frame[10] = 0xEF;
+
+  // Reserved bytes
+  frame[11] = 0x00;
+  frame[12] = 0x00;
+  frame[13] = 0x00;
+
+  // Class = 20 (0x0014)
+  frame[14] = 0x00;
+  frame[15] = 0x14;
+
+  // Type = 8 (0x0008)
+  frame[16] = 0x00;
+  frame[17] = 0x08;
+
+  // GUID = 0xFF, 0xFE, 0xFD, ..., 0xF0
+  for (int i = 0; i < 16; i++) {
+    frame[18 + i] = 0xFF - i;
+  }
+
+  // Data size = 2
+  frame[34] = 0x00;
+  frame[35] = 0x02;
+
+  // Data = 0x11, 0x22
+  frame[36] = 0x11;
+  frame[37] = 0x22;
+
+  // Calculate CRC over bytes 1 through 37 (header + data) and append
+  crc framecrc = crcFast((unsigned char const *) frame + 1, 35 + 2);
+  frame[38] = (framecrc >> 8) & 0xff;
+  frame[39] = framecrc & 0xff;
+
+  // Read from frame
+  memset(&ev, 0, sizeof(vscpEvent));
+  rv = vscp_fwhlp_getEventFromFrame(&ev, frame, 40);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Verify format 1 specific fields
+  ASSERT_EQ(0x0060, ev.head & ~VSCP_HEADER16_FRAME_VERSION_MASK); // Priority bits
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+  ASSERT_EQ(0x1234567890ABCDEFULL, ev.timestamp_ns);
+
+  // Verify common fields
+  ASSERT_EQ(20, ev.vscp_class);
+  ASSERT_EQ(8, ev.vscp_type);
+  ASSERT_EQ(2, ev.sizeData);
+
+  // Verify GUID
+  for (int i = 0; i < 16; i++) {
+    ASSERT_EQ(0xFF - i, ev.GUID[i]);
+  }
+
+  // Verify data
+  ASSERT_EQ(0x11, ev.pdata[0]);
+  ASSERT_EQ(0x22, ev.pdata[1]);
+
+  // Cleanup
+  if (ev.pdata) {
+    free(ev.pdata);
+  }
 }
 
 #endif // VSCP_FWHLP_UDP_FRAME_SUPPORT
@@ -1925,18 +2649,16 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_basic)
   int rv = vscp_fwhlp_parse_json(&ev, json);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  // Verify parsed values
-  ASSERT_EQ(3, ev.head);
+  // Verify parsed values - head should have UNIX_NS frame version set
+  uint16_t expected_head = (3 & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+  ASSERT_EQ(expected_head, ev.head);
   ASSERT_EQ(10, ev.vscp_class);
   ASSERT_EQ(6, ev.vscp_type);
   ASSERT_EQ(11, ev.obid);
-  ASSERT_EQ(467530633, ev.timestamp);
-  ASSERT_EQ(2022, ev.year);
-  ASSERT_EQ(12, ev.month);
-  ASSERT_EQ(16, ev.day);
-  ASSERT_EQ(16, ev.hour);
-  ASSERT_EQ(41, ev.minute);
-  ASSERT_EQ(2, ev.second);
+  // datetime + timestamp combined to Unix nanoseconds
+  ASSERT_EQ(vscp_fwhlp_to_unix_ns(2022, 12, 16, 16, 41, 2, 467530633), ev.timestamp_ns);
+  // Note: year/month/day/hour/minute/second share union memory with timestamp_ns
+  // so they are not valid when timestamp_ns is set
 
   // Verify GUID
   uint8_t expected_guid[16] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE,
@@ -1974,18 +2696,16 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_ex_basic)
   int rv = vscp_fwhlp_parse_json_ex(&ex, json);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  // Verify parsed values
-  ASSERT_EQ(5, ex.head);
+  // Verify parsed values - head should have UNIX_NS frame version set
+  uint16_t expected_head = (5 & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+  ASSERT_EQ(expected_head, ex.head);
   ASSERT_EQ(20, ex.vscp_class);
   ASSERT_EQ(8, ex.vscp_type);
   ASSERT_EQ(99, ex.obid);
-  ASSERT_EQ(123456789, ex.timestamp);
-  ASSERT_EQ(2023, ex.year);
-  ASSERT_EQ(6, ex.month);
-  ASSERT_EQ(15, ex.day);
-  ASSERT_EQ(10, ex.hour);
-  ASSERT_EQ(30, ex.minute);
-  ASSERT_EQ(45, ex.second);
+  // datetime + timestamp combined to Unix nanoseconds
+  ASSERT_EQ(vscp_fwhlp_to_unix_ns(2023, 6, 15, 10, 30, 45, 123456789), ex.timestamp_ns);
+  // Note: year/month/day/hour/minute/second share union memory with timestamp_ns
+  // so they are not valid when timestamp_ns is set
 
   // Verify GUID
   for (int i = 0; i < 16; i++) {
@@ -2118,18 +2838,18 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_json_roundtrip_event)
   rv = vscp_fwhlp_parse_json(&parsed, json);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  // Verify round-trip
-  ASSERT_EQ(original.head, parsed.head);
+  // Verify round-trip - head will have UNIX_NS frame version set after parsing
+  uint16_t expected_head = (original.head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+  ASSERT_EQ(expected_head, parsed.head);
   ASSERT_EQ(original.vscp_class, parsed.vscp_class);
   ASSERT_EQ(original.vscp_type, parsed.vscp_type);
   ASSERT_EQ(original.obid, parsed.obid);
-  ASSERT_EQ(original.timestamp, parsed.timestamp);
-  ASSERT_EQ(original.year, parsed.year);
-  ASSERT_EQ(original.month, parsed.month);
-  ASSERT_EQ(original.day, parsed.day);
-  ASSERT_EQ(original.hour, parsed.hour);
-  ASSERT_EQ(original.minute, parsed.minute);
-  ASSERT_EQ(original.second, parsed.second);
+  // datetime + timestamp combined to Unix nanoseconds
+  // timestamp_ns is stored as hex string in JSON, so no precision loss
+  int64_t expected_ns = vscp_fwhlp_to_unix_ns(original.year, original.month, original.day, original.hour, original.minute, original.second, original.timestamp);
+  ASSERT_EQ(expected_ns, (int64_t)parsed.timestamp_ns);
+  // Note: year/month/day/hour/minute/second share union memory with timestamp_ns
+  // so they are not valid when timestamp_ns is set
   ASSERT_EQ(0, memcmp(original.GUID, parsed.GUID, 16));
   ASSERT_EQ(original.sizeData, parsed.sizeData);
   ASSERT_EQ(0, memcmp(original.pdata, parsed.pdata, original.sizeData));
@@ -2174,21 +2894,96 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_json_roundtrip_eventex)
   rv = vscp_fwhlp_parse_json_ex(&parsed, json);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  // Verify round-trip
-  ASSERT_EQ(original.head, parsed.head);
+  // Verify round-trip - head will have UNIX_NS frame version set after parsing
+  uint16_t expected_head = (original.head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+  ASSERT_EQ(expected_head, parsed.head);
   ASSERT_EQ(original.vscp_class, parsed.vscp_class);
   ASSERT_EQ(original.vscp_type, parsed.vscp_type);
   ASSERT_EQ(original.obid, parsed.obid);
-  ASSERT_EQ(original.timestamp, parsed.timestamp);
-  ASSERT_EQ(original.year, parsed.year);
-  ASSERT_EQ(original.month, parsed.month);
-  ASSERT_EQ(original.day, parsed.day);
-  ASSERT_EQ(original.hour, parsed.hour);
-  ASSERT_EQ(original.minute, parsed.minute);
-  ASSERT_EQ(original.second, parsed.second);
+  // datetime + timestamp combined to Unix nanoseconds
+  // timestamp_ns is stored as hex string in JSON, so no precision loss
+  int64_t expected_ns_ex = vscp_fwhlp_to_unix_ns(original.year, original.month, original.day, original.hour, original.minute, original.second, original.timestamp);
+  ASSERT_EQ(expected_ns_ex, (int64_t)parsed.timestamp_ns);
+  // Note: year/month/day/hour/minute/second share union memory with timestamp_ns
+  // so they are not valid when timestamp_ns is set
   ASSERT_EQ(0, memcmp(original.GUID, parsed.GUID, 16));
   ASSERT_EQ(original.sizeData, parsed.sizeData);
   ASSERT_EQ(0, memcmp(original.data, parsed.data, original.sizeData));
+}
+
+// Test parsing JSON with timestamp_ns field (preferred over timestamp)
+// Note: JSON numbers use double precision which limits accuracy to ~15 significant digits
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_timestamp_ns)
+{
+  vscpEvent ev;
+  const char *json = "{"
+                     "\"head\":3,"
+                     "\"class\":10,"
+                     "\"type\":6,"
+                     "\"guid\":\"FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:CF:3A:15:00:01\","
+                     "\"obid\":11,"
+                     "\"timestamp_ns\":1234567890123456,"
+                     "\"data\":[1,2,3]"
+                     "}";
+
+  int rv = vscp_fwhlp_parse_json(&ev, json);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Verify timestamp_ns is used directly
+  ASSERT_EQ(1234567890123456ULL, ev.timestamp_ns);
+
+  // Verify frame version is set to UNIX_NS
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+
+  // Free allocated data
+  free(ev.pdata);
+}
+
+// Test parsing JSON with both timestamp and timestamp_ns - timestamp_ns takes priority
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_timestamp_ns_priority)
+{
+  vscpEvent ev;
+  const char *json = "{"
+                     "\"head\":5,"
+                     "\"class\":20,"
+                     "\"type\":8,"
+                     "\"guid\":\"00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F\","
+                     "\"obid\":99,"
+                     "\"timestamp\":999999999,"
+                     "\"timestamp_ns\":5555666677778888"
+                     "}";
+
+  int rv = vscp_fwhlp_parse_json(&ev, json);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // timestamp_ns should take priority over timestamp
+  ASSERT_EQ(5555666677778888ULL, ev.timestamp_ns);
+
+  // Verify frame version is set to UNIX_NS
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+}
+
+// Test parsing JSON with timestamp_ns for vscpEventEx
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_ex_timestamp_ns)
+{
+  vscpEventEx ex;
+  const char *json = "{"
+                     "\"head\":7,"
+                     "\"class\":30,"
+                     "\"type\":12,"
+                     "\"guid\":\"AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99\","
+                     "\"obid\":42,"
+                     "\"timestamp_ns\":9876543210987654"
+                     "}";
+
+  int rv = vscp_fwhlp_parse_json_ex(&ex, json);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Verify timestamp_ns is used directly
+  ASSERT_EQ(9876543210987654ULL, ex.timestamp_ns);
+
+  // Verify frame version is set to UNIX_NS
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ex.head & VSCP_HEADER16_FRAME_VERSION_MASK);
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_null_pointer)
@@ -2500,13 +3295,19 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_basic_with_parse)
   vscpEvent ev;
   char xml[3000];
 
-  // Setup event
+  // Setup event with proper datetime values
   memset(&ev, 0, sizeof(ev));
   ev.head       = 4;
   ev.vscp_class = 15;
   ev.vscp_type  = 8;
   ev.obid       = 999;
   ev.timestamp  = 123456;
+  ev.year       = 2024;
+  ev.month      = 6;
+  ev.day        = 15;
+  ev.hour       = 12;
+  ev.minute     = 30;
+  ev.second     = 45;
   ev.sizeData   = 4;
   ev.pdata      = (uint8_t *) malloc(ev.sizeData);
   ev.pdata[0]   = 10;
@@ -2527,9 +3328,12 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_basic_with_parse)
   vscpEventEx ex;
   rv = vscp_fwhlp_parse_xml_eventex(&ex, xml);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
-  ASSERT_EQ(ev.head, ex.head);
+  // head will have UNIX_NS frame version set after parsing XML with datetime
+  uint16_t expected_head = (ev.head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+  ASSERT_EQ(expected_head, ex.head);
   ASSERT_EQ(ev.obid, ex.obid);
-  ASSERT_EQ(ev.timestamp, ex.timestamp);
+  // datetime + timestamp combined to Unix nanoseconds
+  ASSERT_EQ(vscp_fwhlp_to_unix_ns(ev.year, ev.month, ev.day, ev.hour, ev.minute, ev.second, ev.timestamp), ex.timestamp_ns);
   ASSERT_EQ(ev.vscp_class, ex.vscp_class);
   ASSERT_EQ(ev.vscp_type, ex.vscp_type);
   ASSERT_EQ(0, memcmp(ev.GUID, ex.GUID, 16));
@@ -2978,21 +3782,19 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_1)
   vscpEvent ev;
   memset(&ev, 0, sizeof(ev));
 
+  // Empty datestr means nanosecond timestamp mode
   rv = vscp_fwhlp_parseStringToEvent(&ev, "6,20,3,,,,00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F,0,1,35");
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  ASSERT_EQ(6, ev.head);
+  // head=6 with VSCP_HEADER16_FRAME_VERSION_UNIX_NS (0x0100) set = 0x0106
+  ASSERT_EQ(0x0106, ev.head);
   ASSERT_EQ(20, ev.vscp_class);
   ASSERT_EQ(3, ev.vscp_type);
   ASSERT_EQ(3, ev.sizeData);
   ASSERT_EQ(0, ev.obid);
-  ASSERT_EQ(0, ev.timestamp);
-  ASSERT_EQ(0, ev.year);
-  ASSERT_EQ(0, ev.month);
-  ASSERT_EQ(0, ev.day);
-  ASSERT_EQ(0, ev.hour);
-  ASSERT_EQ(0, ev.minute);
-  ASSERT_EQ(0, ev.second);
+  ASSERT_EQ(0ULL, ev.timestamp_ns);  // nanosecond timestamp
+  ASSERT_EQ(0xffff, ev.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ev.month);
   for (int i = 0; i < 16; i++) {
     ASSERT_EQ(i, ev.GUID[i]);
   }
@@ -3010,21 +3812,19 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_2)
   memset(&ev, 0, sizeof(ev));
   uint8_t guid[16] = { 0 };
 
+  // Empty datestr means nanosecond timestamp mode
   rv = vscp_fwhlp_parseStringToEvent(&ev, "1,20,3,,,,-,0,0x44,35");
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  ASSERT_EQ(1, ev.head);
+  // head=1 with VSCP_HEADER16_FRAME_VERSION_UNIX_NS (0x0100) set = 0x0101
+  ASSERT_EQ(0x0101, ev.head);
   ASSERT_EQ(20, ev.vscp_class);
   ASSERT_EQ(3, ev.vscp_type);
   ASSERT_EQ(3, ev.sizeData);
   ASSERT_EQ(0, ev.obid);
-  ASSERT_EQ(0, ev.timestamp);
-  ASSERT_EQ(0, ev.year);
-  ASSERT_EQ(0, ev.month);
-  ASSERT_EQ(0, ev.day);
-  ASSERT_EQ(0, ev.hour);
-  ASSERT_EQ(0, ev.minute);
-  ASSERT_EQ(0, ev.second);
+  ASSERT_EQ(0ULL, ev.timestamp_ns);  // nanosecond timestamp
+  ASSERT_EQ(0xffff, ev.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ev.month);
   ASSERT_EQ(0, memcmp(ev.GUID, guid, 16));
   ASSERT_EQ(0, ev.pdata[0]);
   ASSERT_EQ(0x44, ev.pdata[1]);
@@ -3067,21 +3867,19 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_1)
   vscpEventEx ex;
   memset(&ex, 0, sizeof(ex));
 
+  // Empty datestr means nanosecond timestamp mode
   rv = vscp_fwhlp_parseStringToEventEx(&ex, "6,20,3,,,,00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F,0,1,35");
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  ASSERT_EQ(6, ex.head);
+  // head=6 with VSCP_HEADER16_FRAME_VERSION_UNIX_NS (0x0100) set = 0x0106
+  ASSERT_EQ(0x0106, ex.head);
   ASSERT_EQ(20, ex.vscp_class);
   ASSERT_EQ(3, ex.vscp_type);
   ASSERT_EQ(3, ex.sizeData);
   ASSERT_EQ(0, ex.obid);
-  ASSERT_EQ(0, ex.timestamp);
-  ASSERT_EQ(0, ex.year);
-  ASSERT_EQ(0, ex.month);
-  ASSERT_EQ(0, ex.day);
-  ASSERT_EQ(0, ex.hour);
-  ASSERT_EQ(0, ex.minute);
-  ASSERT_EQ(0, ex.second);
+  ASSERT_EQ(0ULL, ex.timestamp_ns);  // nanosecond timestamp
+  ASSERT_EQ(0xffff, ex.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ex.month);
   for (int i = 0; i < 16; i++) {
     ASSERT_EQ(i, ex.GUID[i]);
   }
@@ -3098,21 +3896,19 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_2)
   memset(&ex, 0, sizeof(ex));
   uint8_t guid[16] = { 0 };
 
+  // Empty datestr means nanosecond timestamp mode
   rv = vscp_fwhlp_parseStringToEventEx(&ex, "1,20,3,,,,-,0,0x44,35");
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  ASSERT_EQ(1, ex.head);
+  // head=1 with VSCP_HEADER16_FRAME_VERSION_UNIX_NS (0x0100) set = 0x0101
+  ASSERT_EQ(0x0101, ex.head);
   ASSERT_EQ(20, ex.vscp_class);
   ASSERT_EQ(3, ex.vscp_type);
   ASSERT_EQ(3, ex.sizeData);
   ASSERT_EQ(0, ex.obid);
-  ASSERT_EQ(0, ex.timestamp);
-  ASSERT_EQ(0, ex.year);
-  ASSERT_EQ(0, ex.month);
-  ASSERT_EQ(0, ex.day);
-  ASSERT_EQ(0, ex.hour);
-  ASSERT_EQ(0, ex.minute);
-  ASSERT_EQ(0, ex.second);
+  ASSERT_EQ(0ULL, ex.timestamp_ns);  // nanosecond timestamp
+  ASSERT_EQ(0xffff, ex.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ex.month);
   ASSERT_EQ(0, memcmp(ex.GUID, guid, 16));
   ASSERT_EQ(0, ex.data[0]);
   ASSERT_EQ(0x44, ex.data[1]);
@@ -3145,6 +3941,108 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_3)
   ASSERT_EQ(0, ex.data[0]);
   ASSERT_EQ(1, ex.data[1]);
   ASSERT_EQ(35, ex.data[2]);
+}
+
+// Test parsing with empty datestr and nanosecond timestamp
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_unix_ns_timestamp)
+{
+  int rv;
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+  uint8_t guid[16] = { 0 };
+
+  // Empty datestr with Unix nanosecond timestamp (2024-06-30T23:59:58Z = 1719791998000000000 ns)
+  rv = vscp_fwhlp_parseStringToEvent(&ev, "0,20,3,,,1719791998000000000,-,0,1,35");
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Frame version should be VSCP_HEADER16_FRAME_VERSION_UNIX_NS (0x0100)
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+  ASSERT_EQ(20, ev.vscp_class);
+  ASSERT_EQ(3, ev.vscp_type);
+  ASSERT_EQ(3, ev.sizeData);
+  ASSERT_EQ(0xffff, ev.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ev.month);
+  ASSERT_EQ(1719791998000000000ULL, ev.timestamp_ns);
+  ASSERT_EQ(0, memcmp(ev.GUID, guid, 16));
+  ASSERT_EQ(0, ev.pdata[0]);
+  ASSERT_EQ(1, ev.pdata[1]);
+  ASSERT_EQ(35, ev.pdata[2]);
+  delete[] ev.pdata;
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_unix_ns_timestamp)
+{
+  int rv;
+  vscpEventEx ex;
+  memset(&ex, 0, sizeof(ex));
+  uint8_t guid[16] = { 0 };
+
+  // Empty datestr with Unix nanosecond timestamp (2024-06-30T23:59:58Z = 1719791998000000000 ns)
+  rv = vscp_fwhlp_parseStringToEventEx(&ex, "0,20,3,,,1719791998000000000,-,0,1,35");
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Frame version should be VSCP_HEADER16_FRAME_VERSION_UNIX_NS (0x0100)
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ex.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+  ASSERT_EQ(20, ex.vscp_class);
+  ASSERT_EQ(3, ex.vscp_type);
+  ASSERT_EQ(3, ex.sizeData);
+  ASSERT_EQ(0xffff, ex.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ex.month);
+  ASSERT_EQ(1719791998000000000ULL, ex.timestamp_ns);
+  ASSERT_EQ(0, memcmp(ex.GUID, guid, 16));
+  ASSERT_EQ(0, ex.data[0]);
+  ASSERT_EQ(1, ex.data[1]);
+  ASSERT_EQ(35, ex.data[2]);
+}
+
+// Test that microsecond timestamp is used when datestr is provided
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_microsecond_timestamp)
+{
+  int rv;
+  vscpEvent ev;
+  memset(&ev, 0, sizeof(ev));
+  uint8_t guid[16] = { 0 };
+
+  rv = vscp_fwhlp_parseStringToEvent(&ev, "0,20,3,,2024-06-30T23:59:58,12345678,-,0,1,35");
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Frame version should be original (0x0000)
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_ORIGINAL, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+  ASSERT_EQ(20, ev.vscp_class);
+  ASSERT_EQ(3, ev.vscp_type);
+  ASSERT_EQ(2024, ev.year);
+  ASSERT_EQ(6, ev.month);
+  ASSERT_EQ(30, ev.day);
+  ASSERT_EQ(23, ev.hour);
+  ASSERT_EQ(59, ev.minute);
+  ASSERT_EQ(58, ev.second);
+  ASSERT_EQ(12345678u, ev.timestamp);  // microsecond timestamp
+  ASSERT_EQ(0, memcmp(ev.GUID, guid, 16));
+  delete[] ev.pdata;
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_microsecond_timestamp)
+{
+  int rv;
+  vscpEventEx ex;
+  memset(&ex, 0, sizeof(ex));
+  uint8_t guid[16] = { 0 };
+
+  rv = vscp_fwhlp_parseStringToEventEx(&ex, "0,20,3,,2024-06-30T23:59:58,12345678,-,0,1,35");
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Frame version should be original (0x0000)
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_ORIGINAL, ex.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+  ASSERT_EQ(20, ex.vscp_class);
+  ASSERT_EQ(3, ex.vscp_type);
+  ASSERT_EQ(2024, ex.year);
+  ASSERT_EQ(6, ex.month);
+  ASSERT_EQ(30, ex.day);
+  ASSERT_EQ(23, ex.hour);
+  ASSERT_EQ(59, ex.minute);
+  ASSERT_EQ(58, ex.second);
+  ASSERT_EQ(12345678u, ex.timestamp);  // microsecond timestamp
+  ASSERT_EQ(0, memcmp(ex.GUID, guid, 16));
 }
 
 //-----------------------------------------------------------------------------

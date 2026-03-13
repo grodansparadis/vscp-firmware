@@ -225,7 +225,7 @@ vscp_fwhlp_isBigEndian(void);
     @return  VSCP_ERROR_SUCCESS for success, else VSCP_ERROR_ERROR.
 */
 int
-vscp_fwhlp_a2ul(const char *src, uint8_t srclen, uint8_t base, uint32_t *resultp, char **endptr);
+vscp_fwhlp_a2ul(const char *src, uint8_t srclen, uint8_t base, uint64_t *resultp, char **endptr);
 
 /**
     Convert decimal byte to hex string
@@ -299,7 +299,7 @@ vscp_fwhlp_strsubst(char *pNewStr, size_t len, const char *pStr, const char *pTa
     be preceded by "0x" or "0X"
     @return Converted value in decimal form.
 */
-uint32_t
+uint64_t
 vscp_fwhlp_readStringValue(const char *pString);
 
 /**
@@ -665,6 +665,32 @@ vscp_fwhlp_eventToStringEx(char *buf, size_t len, const vscpEventEx *pex);
 vscpEvent *
 vscp_fwhlp_newEvent(void);
 
+/*!
+  @brief Set VSCP frame version in event structure. 
+  This is used to indicate which version of the VSCP frame 
+  format the event is using. The version is stored in the head 
+  of the data array and can be used by the receiving end to 
+  determine how to parse the rest of the data.
+  @param pEvent Pointer to event structure to set frame version in.
+  @param version Version number (0-3) to set in event data.
+  @return true if all is OK, false if not.
+*/
+bool
+setFrameVersion(vscpEvent *pEvent, uint16_t version);
+
+/*!
+  @brief Set VSCP frame version in event ex structure. 
+  This is used to indicate which version of the VSCP frame 
+  format the event ex is using. The version is stored in the head 
+  of the data array and can be used by the receiving end to 
+  determine how to parse the rest of the data.
+  @param pEventEx Pointer to event ex structure to set frame version in.
+  @param version Version number (0-3) to set in event ex data.
+  @return true if all is OK, false if not.
+*/
+bool
+setFrameVersionEx(vscpEventEx *pEventEx, uint16_t version);
+
 /**
  * @brief Convert event to eventex
  *
@@ -698,8 +724,8 @@ vscp_fwhlp_mkEventCopy(const vscpEvent *pev);
 
 /*!
     @brief Make a copy of an eventex
-    @param pex Pointer to event structure to make copy of.
-    @return Pointer to the new event if successful, NULL if not.
+    @param pex Pointer to eventex structure to make copy of.
+    @return Pointer to the new eventex if successful, NULL if not.
 */
 
 vscpEventEx *

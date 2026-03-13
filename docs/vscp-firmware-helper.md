@@ -159,18 +159,78 @@ Output format: `FFFFFFFF-FFFF-FFFF-0102-03AABB440130`
 
 Buffer must be at least 48 bytes.
 
-### 4) Priority/Filter Helpers
+### 4) Priority/Filter/Frame Version Helpers
 
 - `vscp_fwhlp_getEventPriority`
 - `vscp_fwhlp_getEventPriorityEx`
 - `vscp_fwhlp_setEventPriority`
 - `vscp_fwhlp_setEventExPriority`
+- `setFrameVersion`
+- `setFrameVersionEx`
 - `vscp_fwhlp_doLevel2Filter`
 - `vscp_fwhlp_doLevel2FilterEx`
 - `vscp_fwhlp_parseFilter`
 - `vscp_fwhlp_writeFilterToString`
 - `vscp_fwhlp_parseMask`
 - `vscp_fwhlp_writeMaskToString`
+
+#### setFrameVersion
+
+Set VSCP frame version in event structure.
+
+```c
+bool setFrameVersion(vscpEvent *pEvent, uint16_t version);
+```
+
+The frame version indicates which version of the VSCP frame format the event uses.
+It is stored in bits 8-9 of the 16-bit `head` field.
+
+**Parameters:**
+- `pEvent` - Pointer to event structure.
+- `version` - Frame version value. Use one of:
+  - `VSCP_HEADER16_FRAME_VERSION_ORIGINAL` (0x0000) - Original frame format
+  - `VSCP_HEADER16_FRAME_VERSION_UNIX_NS` (0x0100) - Frame with Unix nanosecond timestamp
+  - `VSCP_HEADER16_FRAME_VERSION_2` (0x0200) - Reserved
+  - `VSCP_HEADER16_FRAME_VERSION_3` (0x0300) - Reserved
+
+**Returns:** `true` on success, `false` if `pEvent` is NULL.
+
+**Example:**
+
+```c
+vscpEvent ev;
+memset(&ev, 0, sizeof(ev));
+
+// Set frame to use Unix nanosecond timestamp format
+setFrameVersion(&ev, VSCP_HEADER16_FRAME_VERSION_UNIX_NS);
+```
+
+#### setFrameVersionEx
+
+Set VSCP frame version in event ex structure.
+
+```c
+bool setFrameVersionEx(vscpEventEx *pEventEx, uint16_t version);
+```
+
+The frame version indicates which version of the VSCP frame format the event uses.
+It is stored in bits 8-9 of the 16-bit `head` field.
+
+**Parameters:**
+- `pEventEx` - Pointer to event ex structure.
+- `version` - Frame version value (same constants as `setFrameVersion`).
+
+**Returns:** `true` on success, `false` if `pEventEx` is NULL.
+
+**Example:**
+
+```c
+vscpEventEx ex;
+memset(&ex, 0, sizeof(ex));
+
+// Set frame to use Unix nanosecond timestamp format
+setFrameVersionEx(&ex, VSCP_HEADER16_FRAME_VERSION_UNIX_NS);
+```
 
 ### 5) Event and EventEx Parse/Format and Memory Helpers
 

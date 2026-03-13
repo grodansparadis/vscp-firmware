@@ -58,15 +58,24 @@ extern "C" {
 
 /*          * * * General structure for VSCP * * *   */
 
-/* This structure is for VSCP Level II   */
+/*
+  This structure is for VSCP Level II
+*/
 
 typedef struct _vscpEvent {
 
   /*
       Bit 15 - This is a dumb node. No MDF, register, nothing.
+
+      -------------------------------------------
+      GUID types: 0-7 (see defined below)
+      -------------------------------------------
       Bit 14 - GUID type
       Bit 13 - GUID type
-      Bit 12 - GUID type (GUID is IP v.6 address if set and 13/14 is zero.)
+      Bit 12 - GUID type
+
+      Bit 10-11 - Reserved
+
       Bit 8-9 - Frame version. (0 = original, 1 = frame with Unix ns timestamp, 2 = reserved, 3 = reserved)
       Bit 10-11 = Reserved
       Bit 765 =  priority, Priority 0-7 where 0 is highest priority.
@@ -114,7 +123,7 @@ typedef struct _vscpEvent {
 
   uint8_t *pdata; /* Pointer to data. Max 512 bytes */
 
-  uint16_t crc; /* Used for UDP/Ethernet etc */
+  uint16_t crc; /* Rarely used */
 
 } vscpEvent;
 
@@ -129,9 +138,16 @@ typedef struct _vscpEventEx {
 
   /*
       Bit 15 - This is a dumb node. No MDF, register, nothing.
+
+      -------------------------------------------
+      GUID types: 0-7 (see defined below)
+      -------------------------------------------
       Bit 14 - GUID type
       Bit 13 - GUID type
-      Bit 12 - GUID type (GUID is IP v.6 address if set and 13/14 is zero.)
+      Bit 12 - GUID type
+
+      Bit 10-11 - Reserved
+
       Bit 8-9 - Frame version. (0 = original, 1 = frame with Unix ns timestamp, 2 = reserved, 3 = reserved)
       Bit 765 =  priority, Priority 0-7 where 0 is highest priority.
       Bit 4 = hard coded, true for a hard coded device.
@@ -169,9 +185,9 @@ typedef struct _vscpEventEx {
                           /* ~71 minutes before roll over */
                           /* If all zero set relative time on receiving end */
     };
-
-    uint16_t crc; /* Used for UDP/Ethernet etc */
   };
+
+  uint16_t crc; /* Rarely used */
 
   uint16_t vscp_class; /* VSCP class   */
   uint16_t vscp_type;  /* VSCP type    */
@@ -207,15 +223,23 @@ typedef vscpEventEx *PVSCPEVENTEX;
 
 #define VSCP_NO_CRC_CALC 0x08 /* If set no CRC is calculated */
 
-#define VSCP_HEADER16_DUMB      0x8000 /* This node is dumb */
-#define VSCP_HEADER16_IPV6_GUID 0x1000 /* GUID is IPv6 address */
+#define VSCP_HEADER16_DUMB      0x8000u /* This node is dumb */
+#define VSCP_HEADER16_IPV6_GUID 0x1000u /* GUID is IPv6 address */
 
 /* Bits 14/13/12 for GUID type */
-#define VSCP_HEADER16_GUID_TYPE_STANDARD 0x0000 /* VSCP standard GUID */
-#define VSCP_HEADER16_GUID_TYPE_IPV6     0x1000 /* GUID is IPv6 address */
+#define VSCP_HEADER16_GUID_TYPE_STANDARD 0x0000u /* VSCP standard GUID */
+#define VSCP_HEADER16_GUID_TYPE_IPV6     0x1000u /* GUID is IPv6 address */
 /* https://www.sohamkamani.com/blog/2016/10/05/uuid1-vs-uuid4/ */
-#define VSCP_HEADER16_GUID_TYPE_RFC4122V1 0x2000 /* GUID is RFC 4122 Version 1 */
-#define VSCP_HEADER16_GUID_TYPE_RFC4122V4 0x3000 /* GUID is RFC 4122 Version 4 */
+#define VSCP_HEADER16_GUID_TYPE_RFC4122V1 0x2000u /* GUID is RFC 4122 Version 1 */
+#define VSCP_HEADER16_GUID_TYPE_RFC4122V4 0x3000u /* GUID is RFC 4122 Version 4 */
+#define VSCP_HEADER16_GUID_TYPE_RANDOM    0x4000u /* GUID is random number (not recommended) */
+
+// Frame version bits (8-9)
+#define VSCP_HEADER16_FRAME_VERSION_MASK     0x0300u
+#define VSCP_HEADER16_FRAME_VERSION_ORIGINAL 0x0000u /* Original frame format */
+#define VSCP_HEADER16_FRAME_VERSION_UNIX_NS  0x0100u /* Frame with Unix timestamp with nanosecond precision */
+#define VSCP_HEADER16_FRAME_VERSION_2        0x0200u /* Reserved */
+#define VSCP_HEADER16_FRAME_VERSION_3        0x0300u /* Reserved */
 
 #define VSCP_MASK_PRIORITY  0xE0
 #define VSCP_MASK_GUID_TYPE 0x8000
@@ -229,7 +253,7 @@ typedef vscpEventEx *PVSCPEVENTEX;
                                          /* should be set to this value for the CRC  */
                                          /* calculation to be skipped. */
 
-#define VSCP_CAN_ID_HARD_CODED 0x02000000 /* Hard coded bit in CAN frame id */
+#define VSCP_CAN_ID_HARD_CODED 0x02000000u /* Hard coded bit in CAN frame id */
 
 /* GUID byte positions */
 #define VSCP_GUID_MSB 0
@@ -376,8 +400,39 @@ typedef VSCPChannelInfo *PVSCPCHANNELINFO;
 // Maximum packet size (for buffer allocation)
 #define VSCP_MULTICAST_PACKET0_MAX (1 + VSCP_MULTICAST_PACKET0_HEADER_LENGTH + 2 + VSCP_LEVEL2_MAXDATA + 16)
 
+/* Packet frame format type = 1 (UNIX_NS nanosecond timestamp)  */
+/*      without byte0 and CRC                                   */
+/*      total frame size is 1 + 35 + 2 + data-length            */
+#define VSCP_MULTICAST_PACKET1_HEADER_LENGTH 35
+
+/* Multicast packet1 ordinals */
+#define VSCP_MULTICAST_PACKET1_POS_PKTTYPE        0
+#define VSCP_MULTICAST_PACKET1_POS_HEAD           1
+#define VSCP_MULTICAST_PACKET1_POS_HEAD_MSB       1
+#define VSCP_MULTICAST_PACKET1_POS_HEAD_LSB       2
+#define VSCP_MULTICAST_PACKET1_POS_TIMESTAMP      3  /* 8-byte nanosecond timestamp */
+#define VSCP_MULTICAST_PACKET1_POS_RESERVED1      11 /* Reserved byte 1 */
+#define VSCP_MULTICAST_PACKET1_POS_RESERVED2      12 /* Reserved byte 2 */
+#define VSCP_MULTICAST_PACKET1_POS_RESERVED3      13 /* Reserved byte 3 */
+#define VSCP_MULTICAST_PACKET1_POS_VSCP_CLASS     14
+#define VSCP_MULTICAST_PACKET1_POS_VSCP_CLASS_MSB 14
+#define VSCP_MULTICAST_PACKET1_POS_VSCP_CLASS_LSB 15
+#define VSCP_MULTICAST_PACKET1_POS_VSCP_TYPE      16
+#define VSCP_MULTICAST_PACKET1_POS_VSCP_TYPE_MSB  16
+#define VSCP_MULTICAST_PACKET1_POS_VSCP_TYPE_LSB  17
+#define VSCP_MULTICAST_PACKET1_POS_VSCP_GUID      18
+#define VSCP_MULTICAST_PACKET1_POS_VSCP_SIZE      34
+#define VSCP_MULTICAST_PACKET1_POS_VSCP_SIZE_MSB  34
+#define VSCP_MULTICAST_PACKET1_POS_VSCP_SIZE_LSB  35
+#define VSCP_MULTICAST_PACKET1_POS_VSCP_DATA      36
+
+// Maximum packet1 size (for buffer allocation)
+#define VSCP_MULTICAST_PACKET1_MAX (1 + VSCP_MULTICAST_PACKET1_HEADER_LENGTH + 2 + VSCP_LEVEL2_MAXDATA + 16)
+
 /* VSCP multicast packet types */
-#define VSCP_MULTICAST_TYPE_EVENT 0
+#define VSCP_MULTICAST_TYPE_EVENT0 0
+#define VSCP_MULTICAST_TYPE_EVENT1 1
+#define VSCP_MULTICAST_TYPE_EVENT  0 /* Legacy alias */
 
 #define SET_VSCP_MULTICAST_TYPE(type, encryption)  ((type << 4) | encryption)
 #define GET_VSCP_MULTICAST_PACKET_TYPE(type)       ((type >> 4) & 0x0f)
@@ -682,6 +737,13 @@ struct vscpMyNode {
 #define VSCP_ERROR_INTERFACE          68 /* Interface error (not defined etc) */
 #define VSCP_ERROR_INVALID_FORMAT     69 /* Format is wrong. Error in conversion */
 #define VSCP_ERROR_INVALID_CONTEXT    70 /* Context is invalid or missing */
+
+/*!
+  A timestamp that is less than this value is considered to be an event that should
+  have date and time set by the receiving end. This is the same as was true before
+  when all parts of datetime were set to zero.
+*/
+#define VSCP_TIMESTAMP_ONE_SECOND 1000000000 /* One second in nanoseconds */
 
 /*!
     HLO (High Level Object) type (bits 7,6,5,4)
