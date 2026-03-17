@@ -59,7 +59,7 @@
 #include <vscp.h>
 #include "vscp-firmware-helper.h"
 
-#ifdef VSCP_FWHLP_UDP_FRAME_SUPPORT
+#ifdef VSCP_FWHLP_BINARY_FRAME_SUPPORT
 #include <crc.h>
 #endif
 
@@ -2763,7 +2763,7 @@ vscp_fwhlp_doLevel2FilterEx(const vscpEventEx *pex, const vscpEventFilter *pFilt
 /*!
   UDP frame handling support
 */
-#ifdef VSCP_FWHLP_UDP_FRAME_SUPPORT
+#ifdef VSCP_FWHLP_BINARY_FRAME_SUPPORT
 
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_getFrameSizeFromEvent

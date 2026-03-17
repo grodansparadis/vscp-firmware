@@ -1724,10 +1724,10 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_doLevel2Filter_dont_care_mask)
 }
 
 //-----------------------------------------------------------------------------
-// UDP Frame tests (VSCP_FWHLP_UDP_FRAME_SUPPORT)
+// UDP Frame tests (VSCP_FWHLP_BINARY_FRAME_SUPPORT)
 //-----------------------------------------------------------------------------
 
-#ifdef VSCP_FWHLP_UDP_FRAME_SUPPORT
+#ifdef VSCP_FWHLP_BINARY_FRAME_SUPPORT
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_getFrameSizeFromEvent)
 {
@@ -2342,7 +2342,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getEventFromFrame_packet1)
   }
 }
 
-#endif // VSCP_FWHLP_UDP_FRAME_SUPPORT
+#endif // VSCP_FWHLP_BINARY_FRAME_SUPPORT
 
 //-----------------------------------------------------------------------------
 // Crypto tests (VSCP_FWHLP_CRYPTO_SUPPORT)
