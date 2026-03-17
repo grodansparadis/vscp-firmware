@@ -1790,11 +1790,11 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_writeEventToFrame_basic)
     ev.GUID[i] = i;
   }
 
-  rv = vscp_fwhlp_writeEventToFrame(frame, sizeof(frame), 0x00, &ev);
+  rv = vscp_fwhlp_writeEventToFrame(frame, sizeof(frame), VSCP_BINARY_PACKET_TYPE_EVENT, &ev);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
   // Verify frame type is packet format 1 (0x10 = type 1 in upper nibble)
-  ASSERT_EQ(0x10, frame[0]);
+  ASSERT_EQ(0x00, frame[0]);
 
   // Verify head (frame version bits should be set to UNIX_NS)
   ASSERT_EQ(0x01, frame[1]); // MSB - frame version bits
@@ -2195,16 +2195,28 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getEventFromFrame_packet0)
   rv = vscp_fwhlp_getEventFromFrame(&ev, frame, 41);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
-  // Verify format 0 specific fields
+  // Verify format 0 written, will always be frame 1 when read
   ASSERT_EQ(0x0080, ev.head & ~VSCP_HEADER16_FRAME_VERSION_MASK); // Priority bits
-  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_ORIGINAL, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
-  ASSERT_EQ(0x12345678, ev.timestamp);
-  ASSERT_EQ(2024, ev.year);
-  ASSERT_EQ(6, ev.month);
-  ASSERT_EQ(15, ev.day);
-  ASSERT_EQ(12, ev.hour);
-  ASSERT_EQ(30, ev.minute);
-  ASSERT_EQ(45, ev.second);
+  ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+  ASSERT_EQ(0xffff, ev.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ev.month);
+
+  // The function converts format 0 to nanosecond timestamp (forcing frame version 1).
+  // Convert back from timestamp_ns to verify the date/time fields.
+  // Original: 2024-06-15 12:30:45 + 0x12345678 µs (305419896 µs ≈ 305s)
+  // → 2024-06-15 12:35:50.419896
+  int conv_year, conv_month, conv_day, conv_hour, conv_minute, conv_second;
+  uint32_t conv_microsecond;
+  vscp_fwhlp_from_unix_ns(&conv_year, &conv_month, &conv_day,
+                          &conv_hour, &conv_minute, &conv_second,
+                          &conv_microsecond, ev.timestamp_ns);
+  ASSERT_EQ(2024, conv_year);
+  ASSERT_EQ(6, conv_month);
+  ASSERT_EQ(15, conv_day);
+  ASSERT_EQ(12, conv_hour);
+  ASSERT_EQ(35, conv_minute);
+  ASSERT_EQ(50, conv_second);
+  ASSERT_EQ(419896, conv_microsecond);
 
   // Verify common fields
   ASSERT_EQ(10, ev.vscp_class);
@@ -2250,8 +2262,8 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getEventFromFrame_packet1)
   uint8_t frame[100];
   memset(frame, 0, sizeof(frame));
 
-  // Packet type 1, no encryption
-  frame[0] = 0x10;
+  // Packet type EVENT, no encryption
+  frame[0] = 0x00;
 
   // Head = 0x0160 (frame version UNIX_NS + priority 3)
   frame[1] = 0x01;
@@ -2307,6 +2319,8 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getEventFromFrame_packet1)
   ASSERT_EQ(0x0060, ev.head & ~VSCP_HEADER16_FRAME_VERSION_MASK); // Priority bits
   ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
   ASSERT_EQ(0x1234567890ABCDEFULL, ev.timestamp_ns);
+  ASSERT_EQ(0xffff, ev.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ev.month);
 
   // Verify common fields
   ASSERT_EQ(20, ev.vscp_class);
@@ -2758,6 +2772,8 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_basic)
   ASSERT_EQ(11, ev.obid);
   // datetime + timestamp combined to Unix nanoseconds
   ASSERT_EQ(vscp_fwhlp_to_unix_ns(2022, 12, 16, 16, 41, 2, 467530633), ev.timestamp_ns);
+  ASSERT_EQ(0xffff, ev.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ev.month);
   // Note: year/month/day/hour/minute/second share union memory with timestamp_ns
   // so they are not valid when timestamp_ns is set
 
@@ -2805,6 +2821,8 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_ex_basic)
   ASSERT_EQ(99, ex.obid);
   // datetime + timestamp combined to Unix nanoseconds
   ASSERT_EQ(vscp_fwhlp_to_unix_ns(2023, 6, 15, 10, 30, 45, 123456789), ex.timestamp_ns);
+  ASSERT_EQ(0xffff, ex.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ex.month);
   // Note: year/month/day/hour/minute/second share union memory with timestamp_ns
   // so they are not valid when timestamp_ns is set
 
@@ -3035,6 +3053,8 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_timestamp_ns)
 
   // Verify frame version is set to UNIX_NS
   ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+  ASSERT_EQ(0xffff, ev.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ev.month);
 
   // Free allocated data
   free(ev.pdata);
@@ -3062,6 +3082,8 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_timestamp_ns_priority)
 
   // Verify frame version is set to UNIX_NS
   ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ev.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+  ASSERT_EQ(0xffff, ev.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ev.month);
 }
 
 // Test parsing JSON with timestamp_ns for vscpEventEx
@@ -3085,6 +3107,8 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_ex_timestamp_ns)
 
   // Verify frame version is set to UNIX_NS
   ASSERT_EQ(VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ex.head & VSCP_HEADER16_FRAME_VERSION_MASK);
+  ASSERT_EQ(0xffff, ex.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ex.month);
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_null_pointer)
@@ -3435,6 +3459,8 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_basic_with_parse)
   ASSERT_EQ(ev.obid, ex.obid);
   // datetime + timestamp combined to Unix nanoseconds
   ASSERT_EQ(vscp_fwhlp_to_unix_ns(ev.year, ev.month, ev.day, ev.hour, ev.minute, ev.second, ev.timestamp), ex.timestamp_ns);
+  ASSERT_EQ(0xffff, ex.year);  // 0xffff indicates nanosecond timestamp mode
+  ASSERT_EQ(0xff, ex.month);
   ASSERT_EQ(ev.vscp_class, ex.vscp_class);
   ASSERT_EQ(ev.vscp_type, ex.vscp_type);
   ASSERT_EQ(0, memcmp(ev.GUID, ex.GUID, 16));

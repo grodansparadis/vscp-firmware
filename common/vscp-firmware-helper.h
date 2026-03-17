@@ -418,14 +418,14 @@ vscp_fwhlp_to_unix_ns(int year, int month, int day, int hour, int minute, int se
     @param microsecond Pointer to variable that will hold microsecond part of time (0-999999)
 */
 void
-vscp_fwhlp_from_unix_ns(int64_t unix_ns,
-                        int *year,
+vscp_fwhlp_from_unix_ns(int *year,
                         int *month,
                         int *day,
                         int *hour,
                         int *minute,
                         int *second,
-                        uint32_t *microsecond);
+                        uint32_t *microsecond,
+                        int64_t unix_ns);
 
 /**
  * @brief Parse MAC address on string form to binary array
@@ -587,7 +587,6 @@ vscp_fwhlp_writeGuidToStringUUID(char *strguid, const uint8_t *guid);
 int
 vscp_fwhlp_parseFilter(vscpEventFilter *pfilter, const char *strfilter);
 
-
 /*!
   @fn vscp_fwhlp_writeFilterToString
   @brief Write filter to string
@@ -614,7 +613,7 @@ vscp_fwhlp_parseMask(vscpEventFilter *pfilter, const char *strmask);
   @brief Write mask to string
   @param strMask Mask in string form
           mask-priority, mask-class, mask-type, mask-GUID
-  @param len Size of string buffer        
+  @param len Size of string buffer
   @param pFilter Filter structure to write out to string.
   @return true on success, false on failure.
 */
@@ -667,10 +666,10 @@ vscpEvent *
 vscp_fwhlp_newEvent(void);
 
 /*!
-  @brief Set VSCP frame version in event structure. 
-  This is used to indicate which version of the VSCP frame 
-  format the event is using. The version is stored in the head 
-  of the data array and can be used by the receiving end to 
+  @brief Set VSCP frame version in event structure.
+  This is used to indicate which version of the VSCP frame
+  format the event is using. The version is stored in the head
+  of the data array and can be used by the receiving end to
   determine how to parse the rest of the data.
   @param pEvent Pointer to event structure to set frame version in.
   @param version Version number (0-3) to set in event data.
@@ -680,10 +679,10 @@ bool
 setFrameVersion(vscpEvent *pEvent, uint16_t version);
 
 /*!
-  @brief Set VSCP frame version in event ex structure. 
-  This is used to indicate which version of the VSCP frame 
-  format the event ex is using. The version is stored in the head 
-  of the data array and can be used by the receiving end to 
+  @brief Set VSCP frame version in event ex structure.
+  This is used to indicate which version of the VSCP frame
+  format the event ex is using. The version is stored in the head
+  of the data array and can be used by the receiving end to
   determine how to parse the rest of the data.
   @param pEventEx Pointer to event ex structure to set frame version in.
   @param version Version number (0-3) to set in event ex data.
@@ -749,7 +748,6 @@ vscp_fwhlp_deleteEvent(vscpEvent **pev);
 
 #ifdef VSCP_FWHLP_UDP_FRAME_SUPPORT
 
-
 /*!
  * Get UDP frame size from event
  *
@@ -769,33 +767,43 @@ size_t
 vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx *pEventEx);
 
 /*!
- * Write event on UDP frame format
+ * Write event on binary frame format
+ *
+ * Note! Will always convert frames to version 1 (Unix timestamp with nanosecond precision) format.
  *
  * @param buf A pointer to a buffer that will receive the event.
  * @param len Size of the buffer.
- * @param pkttype Is the first byte of UDP type frames that holds
- *          type of packet and encryption.
+ * @param encryption Set encryption that should be used for the binary frame.
+                      0 means no encryption, 1-15 means the VSCP defined encryption
+                      algorithm to use. If set to 15 (VSCP_ENCRYPTION_FROM_TYPE_BYTE)
+                      the algorithm will be set from the four lower bits of the buffer.
  * @param pEvent Pointer to event that should be handled.
  * @return VSCP_ERROR_SUCCESS on success, error code on failure.
  */
 int
-vscp_fwhlp_writeEventToFrame(uint8_t *frame, size_t len, uint8_t pkttype, const vscpEvent *pEvent);
+vscp_fwhlp_writeEventToFrame(uint8_t *frame, size_t len, uint8_t encryption, const vscpEvent *pEvent);
 
 /*!
- * Write event ex on UDP frame format
+ * Write event ex on binary frame format
+ *
+ * note! Will always convert frames to version 1 (Unix timestamp with nanosecond precision) format.
  *
  * @param buf A pointer to a buffer that will receive the event.
  * @param len Size of the buffer.
- * @param pkttype Is the first byte of UDP type frames that holds
- *          type of packet and encryption.
+ * @param encryption Set encryption that should be used for the binary frame.
+                      0 means no encryption, 1-15 means the VSCP defined encryption
+                      algorithm to use. If set to 15 (VSCP_ENCRYPTION_FROM_TYPE_BYTE)
+                      the algorithm will be set from the four lower bits of the buffer.
  * @param pEventEx Pointer to event that should be handled.
  * @return VSCP_ERROR_SUCCESS on success, error code on failure.
  */
 int
-vscp_fwhlp_writeEventExToFrame(uint8_t *frame, size_t len, uint8_t pkttype, const vscpEventEx *pEventEx);
+vscp_fwhlp_writeEventExToFrame(uint8_t *frame, size_t len, uint8_t encryption, const vscpEventEx *pEventEx);
 
 /*!
- * Get VSCP event from UDP frame
+ * Get VSCP event from binary frame
+ *
+ * Note! Will always convert frames to version 1 (Unix timestamp with nanosecond precision) format.
  *
  * @param pEvent Pointer to VSCP event that will get data from the frame,
  * @param buf A pointer to a buffer that will receive the event.
@@ -806,7 +814,9 @@ int
 vscp_fwhlp_getEventFromFrame(vscpEvent *pEvent, const uint8_t *buf, size_t len);
 
 /*!
- * Get VSCP event ex from UDP frame
+ * Get VSCP event ex from binary frame
+ *
+ * Note! Will always convert frames to version 1 (Unix timestamp with nanosecond precision) format.
  *
  * @param pEventEx Pointer to VSCP event ex that will get data from the
  * frame,
@@ -843,9 +853,9 @@ vscp_fwhlp_getEventExFromFrame(vscpEventEx *pEventEx, const uint8_t *buf, size_t
  *          byte in the frame is the packet type which is left unencrypted.
  * @param len This is the length of the frame to be encrypted. This
  *          length includes the frame encryption type in the first byte.
- * NOTE:   Length for encrypted data (without initial byte) must be evenly 
+ * NOTE:   Length for encrypted data (without initial byte) must be evenly
  * divisible by 16 bytes (len % 16 == 0). But the library will take care of that for you
- * and return the new length of the encrypted data. So you can just pass the original length 
+ * and return the new length of the encrypted data. So you can just pass the original length
  * of the data to encrypt and the library will add padding if needed.
  * @param key This is a pointer to the secret encryption key. This key
  *          should be 128 bits for AES128, 192 bits for AES192, 256 bits
@@ -860,14 +870,14 @@ vscp_fwhlp_getEventExFromFrame(vscpEventEx *pEventEx, const uint8_t *buf, size_t
  * @return Packet length on success, zero on failure.
  *
  * Normally used like this
- * 
- * (strlen(test)+1 - to include the encryption type byte in the length of the data to encrypt. 
- * The first byte of the test string should be reserved for the encryption type and should not 
+ *
+ * (strlen(test)+1 - to include the encryption type byte in the length of the data to encrypt.
+ * The first byte of the test string should be reserved for the encryption type and should not
  * be encrypted.
  *
  * pmk - 128 bit primary key
  * piv - 128 bit iv
- * char buf[128]; 
+ * char buf[128];
  * const char test[128];
  * strcpy(test+1, "admin:secret"); // First byte is reserved for encryption type and should not be encrypted.
  * if (!(len = vscp_fwhlp_encryptFrame(buf, test, strlen(test)+1, pmk, piv, 1))) {
@@ -890,7 +900,7 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
  * @param output Buffer that will receive the decrypted result. The buffer
  *          should have a size of at lest equal to the encrypted block.
  * @param input This is the frame that should be decrypted.
- * @param len This is the length of the frame to be decrypted.
+ * @param len This is the length of the frame to be decrypted (not including IV).
  * @param key This is a pointer to the secret encryption key. This key
  *            should be 128 bits for AES128, 192 bits for AES192,
  *            256 bits for AES256.
