@@ -100,8 +100,8 @@ typedef struct _vscpEvent {
     If year is set to 0xffff a unix UTC timestamp with nanosecond precision is formed by the
     eight byte buffer starting at the day field MSB first.
   */
-  uint16_t year; // set to 0xffff for UTC timestamp with nanosecond precision
-  uint8_t month; /* 1-12 */
+  uint16_t year; /* set to 0xffff for UTC timestamp with nanosecond precision */
+  uint8_t month; /* 1-12 set to 0xff for UTC timestamp with nanosecond precision */ 
 
   union {
     uint64_t timestamp_ns; /* Unix timestamp with nanosecond precision (when frame version = 1) */
@@ -171,8 +171,8 @@ typedef struct _vscpEventEx {
     If year is set to 0xffff a unix UTC timestamp with nanosecond precision is formed by the eight
     byte buffer starting at the day field MSB first.
   */
-  uint16_t year; // set to 0xffff for UTC timestamp with nanosecond precision
-  uint8_t month; /* 1-12 */
+  uint16_t year; /* set to 0xffff for UTC timestamp with nanosecond precision */
+  uint8_t month; /* 1-12 set to 0xff for UTC timestamp with nanosecond precision */ 
 
   union {
     uint64_t timestamp_ns; /* Unix timestamp with nanosecond precision (when frame version = 1) */
@@ -519,6 +519,7 @@ typedef VSCPChannelInfo *PVSCPCHANNELINFO;
 #define VSCP_BINARY_RESPONSE_PACKET_POS_ARG 5 /* Command argument starts here */
 /* Two byte CRC follow here and if the frame is encrypted */
 /* the initialization vector (16 bytes) follows the CRC. */
+
 
 /*
   Default encryption keys for VSCP Server - !!!! should only be used on test systems !!!!
