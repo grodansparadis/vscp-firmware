@@ -40,8 +40,8 @@ Optional dependencies:
 
 The helper API is split into always-available and feature-gated parts.
 
-- `VSCP_FWHLP_UDP_FRAME_SUPPORT`
-  - Enables UDP frame conversion APIs.
+- `VSCP_FWHLP_BINARY_FRAME_SUPPORT`
+  - Enables binary frame conversion APIs (event/command/reply framing).
 - `VSCP_FWHLP_CRYPTO_SUPPORT`
   - Enables `vscp_fwhlp_encryptFrame` and `vscp_fwhlp_decryptFrame`.
 - `VSCP_FWHLP_JSON_SUPPORT`
@@ -245,15 +245,88 @@ setFrameVersionEx(&ex, VSCP_HEADER16_FRAME_VERSION_UNIX_NS);
 - `vscp_fwhlp_convertEventToEventEx`
 - `vscp_fwhlp_convertEventExToEvent`
 
-### 6) UDP Frame Helpers (Optional)
+### 6) Binary Frame Helpers (Optional)
 
-(Requires `VSCP_FWHLP_UDP_FRAME_SUPPORT`)
+(Requires `VSCP_FWHLP_BINARY_FRAME_SUPPORT`)
 
+- `vscp_fwhlp_getFrameSizeFromEvent`
 - `vscp_fwhlp_getFrameSizeFromEventEx`
 - `vscp_fwhlp_writeEventToFrame`
 - `vscp_fwhlp_writeEventExToFrame`
 - `vscp_fwhlp_getEventFromFrame`
 - `vscp_fwhlp_getEventExFromFrame`
+- `vscp_fwhlp_writeCommandToFrame`
+- `vscp_fwhlp_writeReplyToFrame`
+
+#### vscp_fwhlp_writeCommandToFrame
+
+Write a command to a binary frame.
+
+```c
+int vscp_fwhlp_writeCommandToFrame(uint8_t *frame, size_t len, uint16_t command,
+                                   const uint8_t *arg, size_t arg_len);
+```
+
+**Parameters:**
+- `frame` - Buffer to receive the command frame.
+- `len` - Size of the buffer.
+- `command` - 16-bit command code.
+- `arg` - Optional argument data (can be NULL if `arg_len` is 0).
+- `arg_len` - Size of argument data.
+
+**Returns:** `VSCP_ERROR_SUCCESS` on success, `VSCP_ERROR_PARAMETER` for invalid pointers,
+`VSCP_ERROR_BUFFER_TO_SMALL` if the buffer is too small.
+
+Frame layout: `[pkttype(1)] [command(2)] [arg(n)] [CRC(2)]`
+
+Encryption is set to none. If encryption is needed, use `vscp_fwhlp_encryptFrame()` on the
+resulting frame before sending.
+
+**Example:**
+
+```c
+uint8_t frame[64];
+uint8_t args[] = { 0x01, 0x02 };
+int rv = vscp_fwhlp_writeCommandToFrame(frame, sizeof(frame), 0x0010, args, 2);
+if (VSCP_ERROR_SUCCESS == rv) {
+  // frame is ready to send
+}
+```
+
+#### vscp_fwhlp_writeReplyToFrame
+
+Write a reply to a binary frame.
+
+```c
+int vscp_fwhlp_writeReplyToFrame(uint8_t *frame, size_t len, uint16_t command,
+                                 uint16_t error, const uint8_t *arg, size_t arg_len);
+```
+
+**Parameters:**
+- `frame` - Buffer to receive the reply frame.
+- `len` - Size of the buffer.
+- `command` - 16-bit command code being replied to.
+- `error` - 16-bit error code for the reply.
+- `arg` - Optional argument data (can be NULL if `arg_len` is 0).
+- `arg_len` - Size of argument data.
+
+**Returns:** `VSCP_ERROR_SUCCESS` on success, `VSCP_ERROR_PARAMETER` for invalid pointers,
+`VSCP_ERROR_BUFFER_TO_SMALL` if the buffer is too small.
+
+Frame layout: `[pkttype(1)] [command(2)] [error(2)] [arg(n)] [CRC(2)]`
+
+Encryption is set to none. If encryption is needed, use `vscp_fwhlp_encryptFrame()` on the
+resulting frame before sending.
+
+**Example:**
+
+```c
+uint8_t frame[64];
+int rv = vscp_fwhlp_writeReplyToFrame(frame, sizeof(frame), 0x0010, 0x0000, NULL, 0);
+if (VSCP_ERROR_SUCCESS == rv) {
+  // frame contains success reply to command 0x0010
+}
+```
 
 ### 7) Crypto Helpers (Optional)
 
@@ -469,9 +542,9 @@ For JSON and XML workflows, use the same pattern with:
 - `vscp_fwhlp_parse_json` / `vscp_fwhlp_create_json`
 - `vscp_fwhlp_parse_xml_event` / `vscp_fwhlp_event_to_xml`
 
-### Quickstart: `vscpEventEx` + UDP Frame Flow
+### Quickstart: `vscpEventEx` + Binary Frame Flow
 
-Requires `VSCP_FWHLP_UDP_FRAME_SUPPORT`.
+Requires `VSCP_FWHLP_BINARY_FRAME_SUPPORT`.
 
 ```c
 vscpEventEx ex_in;
@@ -503,9 +576,9 @@ if (VSCP_ERROR_SUCCESS == rv) {
 }
 ```
 
-### Quickstart: Encrypted UDP Frame Flow (AES128)
+### Quickstart: Encrypted Binary Frame Flow (AES128)
 
-Requires both `VSCP_FWHLP_UDP_FRAME_SUPPORT` and `VSCP_FWHLP_CRYPTO_SUPPORT`.
+Requires both `VSCP_FWHLP_BINARY_FRAME_SUPPORT` and `VSCP_FWHLP_CRYPTO_SUPPORT`.
 
 ```c
 uint8_t key[16] = {
@@ -554,7 +627,7 @@ if (VSCP_ERROR_SUCCESS == rv) {
 
 Common Failures and Checks:
 
-- Feature flags: ensure both `VSCP_FWHLP_UDP_FRAME_SUPPORT` and `VSCP_FWHLP_CRYPTO_SUPPORT` are defined.
+- Feature flags: ensure both `VSCP_FWHLP_BINARY_FRAME_SUPPORT` and `VSCP_FWHLP_CRYPTO_SUPPORT` are defined.
 - Buffer size: `encrypted` and `decrypted` buffers must be larger than plain frame data (padding + IV).
 - Key/algorithm mismatch: decrypt with the same key and algorithm used for encrypt.
 - Type-byte decode mode: when using `VSCP_ENCRYPTION_FROM_TYPE_BYTE`, verify the frame encryption nibble is preserved.

@@ -746,10 +746,10 @@ vscp_fwhlp_deleteEvent(vscpEvent **pev);
   linked in (from the vscp-firmware common folder).
 */
 
-#ifdef VSCP_FWHLP_UDP_FRAME_SUPPORT
+#ifdef VSCP_FWHLP_BINARY_FRAME_SUPPORT
 
 /*!
- * Get UDP frame size from event
+ * Get binary frame size from event
  *
  * @param pEventEx Pointer to event.
  * @return Size of resulting UDP frame on success. Zero on failure.
@@ -827,7 +827,47 @@ vscp_fwhlp_getEventFromFrame(vscpEvent *pEvent, const uint8_t *buf, size_t len);
 int
 vscp_fwhlp_getEventExFromFrame(vscpEventEx *pEventEx, const uint8_t *buf, size_t len);
 
-#endif
+/*!
+ * Write a command frame
+ *
+ * @param frame A pointer to a buffer that will receive the command frame.
+ * @param len Size of the buffer.
+ * @param command The command to be written to the frame.
+ * @param arg Optional argument data to include in the command frame. Can be NULL if no argument data should be included.
+ * @param arg_len Size of argument data. Should be zero if arg is NULL.
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure.
+ *
+ * Encryption is set to none by this function (byte 0 of frame). If encryption is needed the caller should encrypt the
+ * resulting frame with vscp_fwhlp_encryptFrame() before sending it.
+ */
+int
+vscp_fwhlp_writeCommandToFrame(uint8_t *frame, size_t len, uint16_t command, const uint8_t *arg, size_t arg_len);
+
+/*!
+ * Write a reply to a frame
+ *
+ * Note! Will always convert frames to version 1 (Unix timestamp with nanosecond precision) format.
+ *
+ * @param frame A pointer to a buffer that will receive the reply frame.
+ * @param len Size of the buffer.
+ * @param command The command that is being replied to. This will be included in the reply frame.
+ * @param error The error code for the reply. This will be included in the reply frame.
+ * @param arg Optional argument data to include in the reply frame. Can be NULL if no argument data should be included.
+ * @param arg_len Size of argument data. Should be zero if arg is NULL.
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure.
+ *
+ * Encryption is set to none by this function (byte 0 of frame). If encryption is needed the caller should encrypt the
+ * resulting frame with vscp_fwhlp_encryptFrame() before sending it.
+ */
+int
+vscp_fwhlp_writeReplyToFrame(uint8_t *frame,
+                             size_t len,
+                             uint16_t command,
+                             uint16_t error,
+                             const uint8_t *arg,
+                             size_t arg_len);
+
+#endif // VSCP_FWHLP_BINARY_FRAME_SUPPORT
 
 /*
   AES crypto support  requires the vscp-aes.c lib to be
@@ -850,7 +890,7 @@ vscp_fwhlp_getEventExFromFrame(vscpEventEx *pEventEx, const uint8_t *buf, size_t
  *          (which should not be encrypted) then 16 is the encryption block and 16 + 1
  *          bytes will be the minimum needed output buffer size.
  * @param input This is the frame that should be encrypted. The first
- *          byte in the frame is the packet type which is left unencrypted.
+ *          byte in the frame is the packet type and encryption type which always is left unencrypted.
  * @param len This is the length of the frame to be encrypted. This
  *          length includes the frame encryption type in the first byte.
  * NOTE:   Length for encrypted data (without initial byte) must be evenly
@@ -872,8 +912,8 @@ vscp_fwhlp_getEventExFromFrame(vscpEventEx *pEventEx, const uint8_t *buf, size_t
  * Normally used like this
  *
  * (strlen(test)+1 - to include the encryption type byte in the length of the data to encrypt.
- * The first byte of the test string should be reserved for the encryption type and should not
- * be encrypted.
+ * The first byte of the test string should be reserved for packet type and the encryption type 
+ * and should not be encrypted.
  *
  * pmk - 128 bit primary key
  * piv - 128 bit iv

@@ -4335,6 +4335,188 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_writeMaskToString_all_zeros)
   ASSERT_NE(nullptr, strstr(strMask, "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"));
 }
 
+//-----------------------------------------------------------------------------
+// writeCommandToFrame tests
+//-----------------------------------------------------------------------------
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeCommandToFrame_basic)
+{
+  uint8_t frame[64];
+  int rv;
+
+  rv = vscp_fwhlp_writeCommandToFrame(frame, sizeof(frame), 0x0001, NULL, 0);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Packet type byte: command type in upper nibble, no encryption in lower nibble
+  ASSERT_EQ(VSCP_BINARY_PACKET_TYPE_COMMAND, frame[0]);
+
+  // Command MSB, LSB
+  ASSERT_EQ(0x00, frame[1]);
+  ASSERT_EQ(0x01, frame[2]);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeCommandToFrame_with_args)
+{
+  uint8_t frame[64];
+  uint8_t args[4] = { 0xAA, 0xBB, 0xCC, 0xDD };
+  int rv;
+
+  rv = vscp_fwhlp_writeCommandToFrame(frame, sizeof(frame), 0x1234, args, 4);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Command
+  ASSERT_EQ(0x12, frame[1]);
+  ASSERT_EQ(0x34, frame[2]);
+
+  // Arguments
+  ASSERT_EQ(0xAA, frame[3]);
+  ASSERT_EQ(0xBB, frame[4]);
+  ASSERT_EQ(0xCC, frame[5]);
+  ASSERT_EQ(0xDD, frame[6]);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeCommandToFrame_null_frame)
+{
+  int rv;
+
+  rv = vscp_fwhlp_writeCommandToFrame(NULL, 64, 0x0001, NULL, 0);
+  ASSERT_EQ(VSCP_ERROR_PARAMETER, rv);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeCommandToFrame_null_arg_nonzero_len)
+{
+  uint8_t frame[64];
+  int rv;
+
+  rv = vscp_fwhlp_writeCommandToFrame(frame, sizeof(frame), 0x0001, NULL, 5);
+  ASSERT_EQ(VSCP_ERROR_PARAMETER, rv);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeCommandToFrame_buffer_too_small)
+{
+  uint8_t frame[3]; // Too small: need at least 1 + 2 + 0 + 2 = 5
+  int rv;
+
+  rv = vscp_fwhlp_writeCommandToFrame(frame, sizeof(frame), 0x0001, NULL, 0);
+  ASSERT_EQ(VSCP_ERROR_BUFFER_TO_SMALL, rv);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeCommandToFrame_large_command)
+{
+  uint8_t frame[64];
+  int rv;
+
+  rv = vscp_fwhlp_writeCommandToFrame(frame, sizeof(frame), 0xFFFF, NULL, 0);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Command MSB, LSB
+  ASSERT_EQ(0xFF, frame[1]);
+  ASSERT_EQ(0xFF, frame[2]);
+}
+
+//-----------------------------------------------------------------------------
+// writeReplyToFrame tests
+//-----------------------------------------------------------------------------
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeReplyToFrame_basic)
+{
+  uint8_t frame[64];
+  int rv;
+
+  rv = vscp_fwhlp_writeReplyToFrame(frame, sizeof(frame), 0x0001, 0x0000, NULL, 0);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Packet type: reply
+  ASSERT_EQ(VSCP_BINARY_PACKET_TYPE_RESPONSE, frame[0]);
+
+  // Command
+  ASSERT_EQ(0x00, frame[1]);
+  ASSERT_EQ(0x01, frame[2]);
+
+  // Error
+  ASSERT_EQ(0x00, frame[3]);
+  ASSERT_EQ(0x00, frame[4]);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeReplyToFrame_with_error)
+{
+  uint8_t frame[64];
+  int rv;
+
+  rv = vscp_fwhlp_writeReplyToFrame(frame, sizeof(frame), 0x0001, 0x0005, NULL, 0);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Error
+  ASSERT_EQ(0x00, frame[3]);
+  ASSERT_EQ(0x05, frame[4]);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeReplyToFrame_with_args)
+{
+  uint8_t frame[64];
+  uint8_t args[3] = { 0x11, 0x22, 0x33 };
+  int rv;
+
+  rv = vscp_fwhlp_writeReplyToFrame(frame, sizeof(frame), 0x4321, 0x0000, args, 3);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Command
+  ASSERT_EQ(0x43, frame[1]);
+  ASSERT_EQ(0x21, frame[2]);
+
+  // Error
+  ASSERT_EQ(0x00, frame[3]);
+  ASSERT_EQ(0x00, frame[4]);
+
+  // Arguments
+  ASSERT_EQ(0x11, frame[5]);
+  ASSERT_EQ(0x22, frame[6]);
+  ASSERT_EQ(0x33, frame[7]);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeReplyToFrame_null_frame)
+{
+  int rv;
+
+  rv = vscp_fwhlp_writeReplyToFrame(NULL, 64, 0x0001, 0x0000, NULL, 0);
+  ASSERT_EQ(VSCP_ERROR_PARAMETER, rv);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeReplyToFrame_null_arg_nonzero_len)
+{
+  uint8_t frame[64];
+  int rv;
+
+  rv = vscp_fwhlp_writeReplyToFrame(frame, sizeof(frame), 0x0001, 0x0000, NULL, 5);
+  ASSERT_EQ(VSCP_ERROR_PARAMETER, rv);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeReplyToFrame_buffer_too_small)
+{
+  uint8_t frame[4]; // Too small: need at least 1 + 2 + 2 + 0 + 2 = 7
+  int rv;
+
+  rv = vscp_fwhlp_writeReplyToFrame(frame, sizeof(frame), 0x0001, 0x0000, NULL, 0);
+  ASSERT_EQ(VSCP_ERROR_BUFFER_TO_SMALL, rv);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_writeReplyToFrame_large_values)
+{
+  uint8_t frame[64];
+  int rv;
+
+  rv = vscp_fwhlp_writeReplyToFrame(frame, sizeof(frame), 0xFFFF, 0xFFFF, NULL, 0);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  // Command
+  ASSERT_EQ(0xFF, frame[1]);
+  ASSERT_EQ(0xFF, frame[2]);
+
+  // Error
+  ASSERT_EQ(0xFF, frame[3]);
+  ASSERT_EQ(0xFF, frame[4]);
+}
+
 int
 main(int argc, char **argv)
 {
