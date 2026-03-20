@@ -54,4 +54,12 @@ Reusable VSCP Level I firmware porting checklist is available in [docs/examples/
 The main reference implementations for VSCP over CAN is the Paris and the Kelvin modules. Both can found [here](http://www.grodansparadis.com/products.html) along with other open source products. All modules are available as 
 ready made modules, bare pcb's and software and hardware is and will always be fully open and free. All design documents are open and available.
 
-Ake Hedman <akhe@grodansparadis.com>, <a href="http://www.grodansparadis.com">Grodans Paradis AB</a>
+## License
+
+The whole source code is published under the MIT license. Consider the different licenses of possible third party libraries too!
+
+## Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, shall be licensed as above, without any additional terms or conditions.
+
+Copyright 2000-2026 Ake Hedman <akhe@grodansparadis.com>, <a href="http://www.grodansparadis.com">Grodans Paradis AB</a>

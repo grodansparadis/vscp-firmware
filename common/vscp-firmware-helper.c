@@ -49,6 +49,7 @@
 #include <limits.h>
 #include <math.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -592,7 +593,7 @@ vscp_fwhlp_get_datestr_from_event(char *buf, size_t len, const vscpEvent *pev)
   if (VSCP_HEADER16_FRAME_VERSION_UNIX_NS == (pev->head & VSCP_HEADER16_FRAME_VERSION_MASK)) {
     int year, month, day, hour, minute, second;
     uint32_t nanosecond;
-    vscp_fwhlp_from_unix_ns(&year, &month, &day, &hour, &minute, &second, &nanosecond, pev->timestamp_ns);
+    vscp_fwhlp_from_unix_ns( &year, &month, &day, &hour, &minute, &second, &nanosecond,pev->timestamp_ns);
     snprintf(buf, len, "%04u-%02u-%02uT%02u:%02u:%02uZ", year, month, day, hour, minute, second);
   }
   else {
@@ -624,7 +625,7 @@ vscp_fwhlp_get_datestr_from_eventex(char *buf, size_t len, const vscpEventEx *pe
   if (VSCP_HEADER16_FRAME_VERSION_UNIX_NS == (pex->head & VSCP_HEADER16_FRAME_VERSION_MASK)) {
     int year, month, day, hour, minute, second;
     uint32_t nanosecond;
-    vscp_fwhlp_from_unix_ns(&year, &month, &day, &hour, &minute, &second, &nanosecond, pex->timestamp_ns);
+    vscp_fwhlp_from_unix_ns( &year, &month, &day, &hour, &minute, &second, &nanosecond,pex->timestamp_ns);
     snprintf(buf, len, "%04u-%02u-%02uT%02u:%02u:%02uZ", year, month, day, hour, minute, second);
   }
   else {
@@ -3052,7 +3053,7 @@ vscp_fwhlp_getEventFromFrame(vscpEvent *pEvent, const uint8_t *buf, size_t len)
           ((uint32_t) buf[VSCP_BINARY_PACKET_FRAME0_POS_TIMESTAMP + 2] << 8) +
           buf[VSCP_BINARY_PACKET_FRAME0_POS_TIMESTAMP + 3]);
       // Marks assume frame version 1 (nanosecond timestamp)
-      pEvent->head  = (pEvent->head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+      pEvent->head = (pEvent->head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
       pEvent->year  = 0xffff;
       pEvent->month = 0xff;
     }
@@ -3229,115 +3230,7 @@ vscp_fwhlp_getEventExFromFrame(vscpEventEx *pEventEx, const uint8_t *frame, size
   return VSCP_ERROR_SUCCESS;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// vscp_fwhlp_writeCommandToFrame
-//
-// This function writes a command to a frame
-//
-
-int
-vscp_fwhlp_writeCommandToFrame(uint8_t *frame, size_t len, uint16_t command, const uint8_t *arg, size_t arg_len)
-{
-  // Check pointers
-  if (NULL == frame) {
-    return VSCP_ERROR_PARAMETER;
-  }
-
-  if (NULL == arg && arg_len) {
-    return VSCP_ERROR_PARAMETER;
-  }
-
-  size_t calcSize = 1 +       // Packet type
-                    2 +       // Command
-                    arg_len + // Arguments
-                    2;        // CRC
-
-  if (len < calcSize) {
-    return VSCP_ERROR_BUFFER_TO_SMALL;
-  }
-
-  // Set packet type for command
-  frame[0] = VSCP_BINARY_PACKET_TYPE_COMMAND | VSCP_ENCRYPTION_NONE;
-
-  // Command
-  frame[1] = (command >> 8) & 0xff;
-  frame[2] = command & 0xff;
-
-  // Arguments
-  if (arg_len) {
-    memcpy(frame + 3, arg, arg_len);
-  }
-
-  // Calculate CRC
-  crc framecrc = crcFast((unsigned char const *) frame + 1, (int) calcSize - 1);
-
-  // CRC
-  frame[calcSize - 2] = (framecrc >> 8) & 0xff;
-  frame[calcSize - 1] = framecrc & 0xff;
-
-  return VSCP_ERROR_SUCCESS;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// vscp_fwhlp_writeReplyToFrame
-//
-// This function writes a reply to a frame
-//
-
-int
-vscp_fwhlp_writeReplyToFrame(uint8_t *frame,
-                             size_t len,
-                             uint16_t command,
-                             uint16_t error,
-                             const uint8_t *arg,
-                             size_t arg_len)
-{
-  // Check pointers
-  if (NULL == frame) {
-    return VSCP_ERROR_PARAMETER;
-  }
-
-  if (NULL == arg && arg_len) {
-    return VSCP_ERROR_PARAMETER;
-  }
-
-  size_t calcSize = 1 +       // Packet type
-                    2 +       // Command
-                    2 +       // Error
-                    arg_len + // Arguments
-                    2;        // CRC
-
-  if (len < calcSize) {
-    return VSCP_ERROR_BUFFER_TO_SMALL;
-  }
-
-  // Set packet type for reply
-  frame[0] = VSCP_BINARY_PACKET_TYPE_RESPONSE | VSCP_ENCRYPTION_NONE;
-
-  // Command
-  frame[1] = (command >> 8) & 0xff;
-  frame[2] = command & 0xff;
-
-  // Error
-  frame[3] = (error >> 8) & 0xff;
-  frame[4] = error & 0xff;
-
-  // Arguments
-  if (arg_len) {
-    memcpy(frame + 5, arg, arg_len);
-  }
-
-  // Calculate CRC
-  crc framecrc = crcFast((unsigned char const *) frame + 1, (int) calcSize - 1);
-
-  // CRC
-  frame[calcSize - 2] = (framecrc >> 8) & 0xff;
-  frame[calcSize - 1] = framecrc & 0xff;
-
-  return VSCP_ERROR_SUCCESS;
-}
-
-#endif // Binary frame support
+#endif
 
 /*!
   Add AES CBC crypto support
@@ -3634,7 +3527,7 @@ vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj)
       pev->timestamp_ns = (uint64_t) ts_item->valuedouble;
     }
     // Set frame version to UNIX_NS
-    pev->head  = (pev->head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+    pev->head = (pev->head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
     pev->year  = 0xffff;
     pev->month = 0xff;
   }
@@ -3642,7 +3535,7 @@ vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj)
     // Convert datetime + microsecond timestamp to Unix nanoseconds
     pev->timestamp_ns = vscp_fwhlp_to_unix_ns(year, month, day, hour, minute, second, timestamp_us);
     // Set frame version to UNIX_NS
-    pev->head  = (pev->head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+    pev->head = (pev->head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
     pev->year  = 0xffff;
     pev->month = 0xff;
   }
@@ -3767,7 +3660,7 @@ vscp_fwhlp_parse_json_ex(vscpEventEx *pex, const char *jsonVscpEventObj)
       pex->timestamp_ns = (uint64_t) ts_item->valuedouble;
     }
     // Set frame version to UNIX_NS
-    pex->head  = (pex->head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+    pex->head = (pex->head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
     pex->year  = 0xffff;
     pex->month = 0xff;
   }
@@ -3775,7 +3668,7 @@ vscp_fwhlp_parse_json_ex(vscpEventEx *pex, const char *jsonVscpEventObj)
     // Convert datetime + microsecond timestamp to Unix nanoseconds
     pex->timestamp_ns = vscp_fwhlp_to_unix_ns(year, month, day, hour, minute, second, timestamp_us);
     // Set frame version to UNIX_NS
-    pex->head  = (pex->head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+    pex->head = (pex->head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
     pex->year  = 0xffff;
     pex->month = 0xff;
   }
@@ -4259,8 +4152,8 @@ vscp_fwhlp_parse_xml_event(vscpEvent *pev, const char *eventstr)
     pev->head &= ~VSCP_HEADER16_FRAME_VERSION_MASK;
     pev->head |= VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
     pev->timestamp_ns = timestamp_ns;
-    pev->year         = 0xffff;
-    pev->month        = 0xff;
+    pev->year  = 0xffff;
+    pev->month = 0xff;
   }
   else if (has_datetime) {
     // Parse datetime and combine with timestamp
@@ -4269,8 +4162,8 @@ vscp_fwhlp_parse_xml_event(vscpEvent *pev, const char *eventstr)
       pev->head &= ~VSCP_HEADER16_FRAME_VERSION_MASK;
       pev->head |= VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
       pev->timestamp_ns = vscp_fwhlp_to_unix_ns(year, month, day, hour, minute, second, timestamp);
-      pev->year         = 0xffff;
-      pev->month        = 0xff;
+      pev->year  = 0xffff;
+      pev->month = 0xff;
     }
     else {
       // Fallback: couldn't parse datetime, just use timestamp as-is (legacy mode)
@@ -4366,8 +4259,8 @@ vscp_fwhlp_parse_xml_eventex(vscpEventEx *pex, const char *eventexstr)
     pex->head &= ~VSCP_HEADER16_FRAME_VERSION_MASK;
     pex->head |= VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
     pex->timestamp_ns = timestamp_ns;
-    pex->year         = 0xffff;
-    pex->month        = 0xff;
+    pex->year  = 0xffff;
+    pex->month = 0xff;
   }
   else if (has_datetime) {
     // Parse datetime and combine with timestamp
@@ -4376,8 +4269,8 @@ vscp_fwhlp_parse_xml_eventex(vscpEventEx *pex, const char *eventexstr)
       pex->head &= ~VSCP_HEADER16_FRAME_VERSION_MASK;
       pex->head |= VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
       pex->timestamp_ns = vscp_fwhlp_to_unix_ns(year, month, day, hour, minute, second, timestamp);
-      pex->year         = 0xffff;
-      pex->month        = 0xff;
+      pex->year  = 0xffff;
+      pex->month = 0xff;
     }
     else {
       // Fallback: couldn't parse datetime, just use timestamp as-is (legacy mode)
@@ -4436,7 +4329,15 @@ vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscpEvent *pev)
   int year, month, day, hour, minute, second;
   uint32_t microsecond;
   vscp_fwhlp_from_unix_ns(&year, &month, &day, &hour, &minute, &second, &microsecond, timestamp_ns);
-  sprintf(strDateTime, "%04d-%02d-%02dT%02d:%02d:%02d.%06uZ", year, month, day, hour, minute, second, microsecond);
+  sprintf(strDateTime,
+          "%04d-%02d-%02dT%02d:%02d:%02d.%06" PRIu32 "Z",
+          year,
+          month,
+          day,
+          hour,
+          minute,
+          second,
+          microsecond);
 
   // datetime,head,obid,datetime,timestamp_ns,class,type,guid,data
   sprintf(eventstr,
@@ -4506,7 +4407,15 @@ vscp_fwhlp_eventex_to_xml(char *eventexstr, size_t len, const vscpEventEx *pex)
   int year, month, day, hour, minute, second;
   uint32_t microsecond;
   vscp_fwhlp_from_unix_ns(&year, &month, &day, &hour, &minute, &second, &microsecond, timestamp_ns);
-  sprintf(strDateTime, "%04d-%02d-%02dT%02d:%02d:%02d.%06uZ", year, month, day, hour, minute, second, microsecond);
+  sprintf(strDateTime,
+          "%04d-%02d-%02dT%02d:%02d:%02d.%06" PRIu32 "Z",
+          year,
+          month,
+          day,
+          hour,
+          minute,
+          second,
+          microsecond);
 
   // datetime,head,obid,datetime,timestamp_ns,class,type,guid,data
   sprintf(eventexstr,
