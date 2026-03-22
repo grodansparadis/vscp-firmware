@@ -112,7 +112,7 @@ typedef struct aes_state_t {
 
 #if defined(CBC) && CBC
     // Initial Vector used only for CBC mode
-    uint8_t* Iv;
+    const uint8_t* Iv;
 #endif
     
     // Keylength variables
@@ -594,7 +594,7 @@ static void XorWithIv(aes_state_t *state, uint8_t* buf)
   }
 }
 
-void AES_CBC_encrypt_buffer(uint8_t type, uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv)
+void AES_CBC_encrypt_buffer(uint8_t type, uint8_t* output, const uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv)
 {
   uintptr_t i;
   uint8_t extra = length % BLOCKLEN; /* Remaining bytes in the last non-full block */
@@ -614,13 +614,13 @@ void AES_CBC_encrypt_buffer(uint8_t type, uint8_t* output, uint8_t* input, uint3
 
   if(iv != 0)
   {
-    state.Iv = (uint8_t*)iv;
+    state.Iv = iv;
   }
 
   for(i = 0; i < length; i += BLOCKLEN)
   {
-    XorWithIv(&state, input);
     memcpy(output, input, BLOCKLEN);
+    XorWithIv(&state, output);
     state.state = (state_t*)output;
     Cipher(&state);
     state.Iv = output;
@@ -640,7 +640,7 @@ void AES_CBC_encrypt_buffer(uint8_t type, uint8_t* output, uint8_t* input, uint3
   
 }
 
-void AES_CBC_decrypt_buffer(uint8_t type,uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv)
+void AES_CBC_decrypt_buffer(uint8_t type,uint8_t* output, const uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv)
 {
   uintptr_t i;
   uint8_t extra = length % BLOCKLEN; /* Remaining bytes in the last non-full block */
@@ -661,7 +661,7 @@ void AES_CBC_decrypt_buffer(uint8_t type,uint8_t* output, uint8_t* input, uint32
   // If iv is passed as 0, we continue to encrypt without re-setting the Iv
   if(iv != 0)
   {
-    state.Iv = (uint8_t*)iv;
+    state.Iv = iv;
   }
 
   for(i = 0; i < length; i += BLOCKLEN)
