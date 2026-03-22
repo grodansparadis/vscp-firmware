@@ -3461,7 +3461,7 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
 
 int
 vscp_fwhlp_decryptFrame(uint8_t *output,
-                        uint8_t *input,
+                        const uint8_t *input,
                         size_t len,
                         const uint8_t *key,
                         const uint8_t *iv,
