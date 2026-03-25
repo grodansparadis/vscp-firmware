@@ -3191,6 +3191,8 @@ vscp_fwhlp_getEventFromFrame(vscpEvent *pEvent, const uint8_t *buf, size_t len)
     // Convert to frame format 1 (nanosecond timestamp) - we always use frame format 1 internally, so convert if needed
     pEvent->timestamp_ns = vscp_fwhlp_to_unix_ns(pEvent->year, pEvent->month, pEvent->day, pEvent->hour, pEvent->minute, pEvent->second, pEvent->timestamp);
     pEvent->head         = (pEvent->head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;  
+    pEvent->year         = 0xffff;
+    pEvent->month        = 0xff;
   } // Frame format 0
 
   // obid - set to zero so interface fill it in
