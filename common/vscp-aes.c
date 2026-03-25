@@ -112,7 +112,7 @@ typedef struct aes_state_t {
 
 #if defined(CBC) && CBC
     // Initial Vector used only for CBC mode
-    const uint8_t* Iv;
+  const uint8_t* Iv;
 #endif
     
     // Keylength variables
@@ -597,13 +597,15 @@ static void XorWithIv(aes_state_t *state, uint8_t* buf)
 void AES_CBC_encrypt_buffer(uint8_t type, uint8_t* output, const uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv)
 {
   uintptr_t i;
-  uint8_t extra = length % BLOCKLEN; /* Remaining bytes in the last non-full block */
   aes_state_t state;
   
   init( type, &state ); // Init. cypher parameters
 
-  memcpy(output, input, BLOCKLEN);
-  state.state = (state_t*)output;
+  if ((0 == length) || (0 != (length % BLOCKLEN)))
+  {
+    cleanup(&state);
+    return;
+  }
 
   // Skip the key expansion if key is passed as 0
   if(0 != key)
@@ -628,13 +630,6 @@ void AES_CBC_encrypt_buffer(uint8_t type, uint8_t* output, const uint8_t* input,
     output += BLOCKLEN;
     //printf("Step %d - %d", i/16, i);
   }
-
-  if(extra)
-  {
-    memcpy(output, input, extra);
-    state.state = (state_t*)output;
-    Cipher(&state);
-  }
   
   cleanup(&state);
   
@@ -643,13 +638,15 @@ void AES_CBC_encrypt_buffer(uint8_t type, uint8_t* output, const uint8_t* input,
 void AES_CBC_decrypt_buffer(uint8_t type,uint8_t* output, const uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv)
 {
   uintptr_t i;
-  uint8_t extra = length % BLOCKLEN; /* Remaining bytes in the last non-full block */
   aes_state_t state;
   
   init( type, &state ); // Init. cypher parameters
 
-  memcpy(output, input, BLOCKLEN);
-  state.state = (state_t*)output;
+  if ((0 == length) || (0 != (length % BLOCKLEN)))
+  {
+    cleanup(&state);
+    return;
+  }
   
   // Skip the key expansion if key is passed as 0
   if(0 != key)
@@ -673,13 +670,6 @@ void AES_CBC_decrypt_buffer(uint8_t type,uint8_t* output, const uint8_t* input, 
     state.Iv = input;
     input += BLOCKLEN;
     output += BLOCKLEN;
-  }
-
-  if(extra)
-  {
-    memcpy(output, input, extra);
-    state.state = (state_t*)output;
-    InvCipher(&state);
   }
   
   cleanup(&state);

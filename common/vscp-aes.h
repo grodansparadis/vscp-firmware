@@ -49,7 +49,8 @@ void AES_ECB_decrypt( uint8_t type,
  * @param type The algorithm to use AES128/AES192/AES256
  * @param output Buffer that holds the result.
  * @param input Buffer with data that should be encrypted.
- * @param length Size of the data that should be encrypted.
+ * @param length Size of the data that should be encrypted. Must be a
+ *               multiple of 16 bytes.
  * @param key Pointer to encryption key. Should be of same length as
  *            the algorithm used (128/192/256)
  * @param if Pointer to initialization vector. Should always be 128 bits.
@@ -67,7 +68,8 @@ void AES_CBC_encrypt_buffer( uint8_t type,
  * @param type The algorithm to use AES128/AES192/AES256
  * @param output Buffer that holds the result.
  * @param input Buffer with data that should be decrypted.
- * @param length Size of the data that should be decrypted.
+ * @param length Size of the data that should be decrypted. Must be a
+ *               multiple of 16 bytes.
  * @param key Pointer to encryption key. Should be of same length as
  *            the algorithm used (128/192/256)
  * @param if Pointer to initialization vector. Should always be 128 bits.

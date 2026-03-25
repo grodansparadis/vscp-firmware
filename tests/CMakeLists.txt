@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.11)
 
 # set the project name
 project(test LANGUAGES CXX C)
@@ -17,7 +17,30 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 
 message(STATUS "Build dir: " ${PROJECT_SOURCE_DIR})
 
-find_package(GTest REQUIRED)
+find_package(GTest QUIET)
+
+if(NOT GTest_FOUND)
+    include(FetchContent)
+
+    message(STATUS "GTest not found. Fetching googletest.")
+
+    FetchContent_Declare(
+        googletest
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+        URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+    )
+
+    if(COMMAND FetchContent_MakeAvailable)
+        FetchContent_MakeAvailable(googletest)
+    else()
+        FetchContent_GetProperties(googletest)
+        if(NOT googletest_POPULATED)
+            FetchContent_Populate(googletest)
+            add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
+        endif()
+    endif()
+endif()
+
 include(GoogleTest)
 
 # add the executable
@@ -56,9 +79,9 @@ target_include_directories(vscp_firmware_tests PUBLIC
 target_link_libraries(vscp_firmware_tests PRIVATE m
     dl
     pthread
-    gtest
-    gtest_main
-    )    
+    GTest::gtest
+    GTest::gtest_main
+    )
 
 gtest_discover_tests(vscp_firmware_tests)
 

@@ -2762,7 +2762,7 @@ vscp_fwhlp_doLevel2FilterEx(const vscpEventEx *pex, const vscpEventFilter *pFilt
 }
 
 /*!
-  UDP frame handling support
+  Binary frame handling support
 */
 #ifdef VSCP_FWHLP_BINARY_FRAME_SUPPORT
 
@@ -3003,8 +3003,9 @@ vscp_fwhlp_getEventFromFrame(vscpEvent *pEvent, const uint8_t *buf, size_t len)
                            buf[VSCP_BINARY_PACKET_FRAME0_POS_SIZE_LSB];
 
     // The buffer must hold a frame
-    if (len < calcFrameSize)
+    if (len < calcFrameSize) {
       return VSCP_ERROR_BUFFER_TO_SMALL;
+    }
 
     crc crcFrame = ((uint16_t) buf[calcFrameSize - 2] << 8) + buf[calcFrameSize - 1];
 
@@ -3186,7 +3187,11 @@ vscp_fwhlp_getEventFromFrame(vscpEvent *pEvent, const uint8_t *buf, size_t len)
     // VSCP Type
     pEvent->vscp_type =
       ((uint16_t) buf[VSCP_BINARY_PACKET_FRAME0_POS_TYPE_MSB] << 8) + buf[VSCP_BINARY_PACKET_FRAME0_POS_TYPE_LSB];
-  }
+
+    // Convert to frame format 1 (nanosecond timestamp) - we always use frame format 1 internally, so convert if needed
+    pEvent->timestamp_ns = vscp_fwhlp_to_unix_ns(pEvent->year, pEvent->month, pEvent->day, pEvent->hour, pEvent->minute, pEvent->second, pEvent->timestamp);
+    pEvent->head         = (pEvent->head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;  
+  } // Frame format 0
 
   // obid - set to zero so interface fill it in
   pEvent->obid = 0;
