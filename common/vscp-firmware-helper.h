@@ -187,17 +187,6 @@ extern "C" {
 /* @} */
 
 /**
- * @brief VSCP TCP/IP link interface description
- * Describes one interface
- */
-typedef struct vscp_interface_info {
-  uint16_t idx;
-  uint16_t type;
-  uint8_t guid[16];
-  char description[64];
-} vscp_interface_info_t;
-
-/**
  * @fn vscp_fwhlp_isLittleEndian
  * @brief Check if little endian system
  * @return Non zero fo rlittle endian system.

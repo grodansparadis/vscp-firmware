@@ -324,16 +324,29 @@ typedef VSCPStatus *PVSCPSTATUS;
     VSCP Channel Info
 
     This is the channel VSCP Info structure
+
+    **Deprecated** use vscp_interface_info_t instead.
 */
 
 typedef struct structVSCPChannelInfo {
   unsigned char channelType; /* Level I, Level II etc. from canal.h  */
-  unsigned short channel;    /* daemon channel number */
+  unsigned short channel;    /* Device channel number */
   char GUID[16];             /* Channel GUID id */
 
 } VSCPChannelInfo;
 
 typedef VSCPChannelInfo *PVSCPCHANNELINFO;
+
+/**
+ * @brief VSCP TCP/IP link interface description
+ * Describes one interface
+ */
+typedef struct vscp_interface_info {
+  uint16_t idx;
+  uint16_t type;
+  uint8_t guid[16];
+  char description[64];
+} vscp_interface_info_t;
 
 /* Interface types */
 #define VSCP_INTERFACE_TYPE_UNKNOWN        0
