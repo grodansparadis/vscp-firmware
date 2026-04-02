@@ -729,7 +729,7 @@ int
 vscp_fwhlp_deleteEvent(vscpEvent **pev);
 
 /*!
-  Compile in UDP frame handling support
+  Compile in binary frame handling support
 
   AES crypto support  requires the crc.c lib to be
   linked in (from the vscp-firmware common folder).

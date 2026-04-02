@@ -46,8 +46,8 @@
 #define VSCP_ADDRESS_SEGMENT_CONTROLLER 0x00
 #define VSCP_ADDRESS_NEW_NODE           0xff
 
-#define VSCP_MAX_DATA  (512) /* was 487 */
-#define VSCP_SIZE_GUID (16)  /* GUID array size */
+#define VSCP_MAX_DATA  (512)
+#define VSCP_SIZE_GUID (16) /* GUID array size */
 
 #define VSCP_LEVEL1 0 /* Changed 151104  Was 1/2 */
 #define VSCP_LEVEL2 1
@@ -101,7 +101,7 @@ typedef struct _vscpEvent {
     eight byte buffer starting at the day field MSB first.
   */
   uint16_t year; /* set to 0xffff for UTC timestamp with nanosecond precision */
-  uint8_t month; /* 1-12 set to 0xff for UTC timestamp with nanosecond precision */ 
+  uint8_t month; /* 1-12 set to 0xff for UTC timestamp with nanosecond precision */
 
   union {
     uint64_t timestamp_ns; /* Unix timestamp with nanosecond precision (when frame version = 1) */
@@ -172,7 +172,7 @@ typedef struct _vscpEventEx {
     byte buffer starting at the day field MSB first.
   */
   uint16_t year; /* set to 0xffff for UTC timestamp with nanosecond precision */
-  uint8_t month; /* 1-12 set to 0xff for UTC timestamp with nanosecond precision */ 
+  uint8_t month; /* 1-12 set to 0xff for UTC timestamp with nanosecond precision */
 
   union {
     uint64_t timestamp_ns; /* Unix timestamp with nanosecond precision (when frame version = 1) */
@@ -246,10 +246,10 @@ typedef vscpEventEx *PVSCPEVENTEX;
 #define VSCP_MASK_HARDCODED 0x10
 #define VSCP_MASK_NOCRCCALC 0x08
 
-#define VSCP_LEVEL1_MAXDATA 8
+#define VSCP_LEVEL1_MAXDATA (8)
 #define VSCP_LEVEL2_MAXDATA (512)
 
-#define VSCP_NOCRC_CALC_DUMMY_CRC 0xAA55 /* If no CRC cal bit is set the CRC value */
+#define VSCP_NOCRC_CALC_DUMMY_CRC 0xAA55 /* If no CRC calc bit is set the CRC value */
                                          /* should be set to this value for the CRC  */
                                          /* calculation to be skipped. */
 
@@ -296,12 +296,12 @@ typedef struct structVSCPStatistics {
   unsigned long x;                 /* Currently undefined value */
   unsigned long y;                 /* Currently undefined value */
   unsigned long z;                 /* Currently undefined value */
-} VSCPStatistics;
+} vscp_statistics_t;
 
-typedef VSCPStatistics *PVSCPSTATISTICS;
+typedef vscp_statistics_t *PVSCPSTATISTICS;
 
 /*
-    VSCPStatus
+    VSCPStatus (info command)
 
     This is the general channel state structure
 */
@@ -313,9 +313,9 @@ typedef struct structVSCPStatus {
   unsigned long lasterrorcode;                      /* Last error code */
   unsigned long lasterrorsubcode;                   /* Last error sub code */
   char lasterrorstr[VSCP_STATUS_ERROR_STRING_SIZE]; /* Last error string */
-} VSCPStatus;
+} vscp_status_t;
 
-typedef VSCPStatus *PVSCPSTATUS;
+typedef vscp_status_t *PVSCPSTATUS;
 
 /* VSCP LEVEL II UDP datagram offsets     */
 /*  Same format as multicast i used below */
@@ -333,9 +333,9 @@ typedef struct structVSCPChannelInfo {
   unsigned short channel;    /* Device channel number */
   char GUID[16];             /* Channel GUID id */
 
-} VSCPChannelInfo;
+} vscp_channel_info_t;
 
-typedef VSCPChannelInfo *PVSCPCHANNELINFO;
+typedef vscp_channel_info_t *PVSCPCHANNELINFO;
 
 /**
  * @brief VSCP TCP/IP link interface description
@@ -389,7 +389,7 @@ typedef struct vscp_interface_info {
 /* Packet frame format type = 0                         */
 /*      without byte0 and CRC                           */
 /*      total frame size is 1 + 34 + 2 + data-length    */
-//#define VSCP_MULTICAST_PACKET0_HEADER_LENGTH 35
+// #define VSCP_MULTICAST_PACKET0_HEADER_LENGTH 35
 
 /* Multicast packet ordinals */
 // #define VSCP_MULTICAST_PACKET0_POS_PKTTYPE        0
@@ -420,14 +420,12 @@ typedef struct vscp_interface_info {
 /* the initialization vector (16 bytes) follows the CRC. */
 
 // Maximum packet size (for buffer allocation)
-//#define VSCP_MULTICAST_PACKET0_MAX (1 + VSCP_MULTICAST_PACKET0_HEADER_LENGTH + 2 + VSCP_LEVEL2_MAXDATA + 16)
+// #define VSCP_MULTICAST_PACKET0_MAX (1 + VSCP_MULTICAST_PACKET0_HEADER_LENGTH + 2 + VSCP_LEVEL2_MAXDATA + 16)
 
 /* VSCP multicast packet types */
 #define VSCP_MULTICAST_TYPE_EVENT0 0
 #define VSCP_MULTICAST_TYPE_EVENT1 1
 #define VSCP_MULTICAST_TYPE_EVENT  0 /* Legacy alias */
-
-
 
 /* Multicast proxy CLASS=1026, TYPE=3  */
 /* https://www.vscp.org/docs/vscpspec/doku.php?id=class2.information#type_3_0x0003_level_ii_proxy_node_heartbeat
@@ -516,23 +514,22 @@ typedef struct vscp_interface_info {
 #define VSCP_BINARY_PACKET0_MAX (1 + VSCP_BINARY_PACKET1_HEADER_LENGTH + 2 + VSCP_LEVEL2_MAXDATA + 16)
 
 // Command packet ordinals
-#define VSCP_BINARY_COMMAND_PACKET_POS_PKTTYPE 0 /* Packet type is in the first byte of the head field */
+#define VSCP_BINARY_COMMAND_PACKET_POS_PKTTYPE     0 /* Packet type is in the first byte of the head field */
 #define VSCP_BINARY_COMMAND_PACKET_POS_COMMAND_MSB 1 /* Command code MSB */
 #define VSCP_BINARY_COMMAND_PACKET_POS_COMMAND_LSB 2 /* Command code LSB */
-#define VSCP_BINARY_COMMAND_PACKET_POS_ARG 3 /* Command argument starts here */
+#define VSCP_BINARY_COMMAND_PACKET_POS_ARG         3 /* Command argument starts here */
 /* Two byte CRC follow here and if the frame is encrypted */
 /* the initialization vector (16 bytes) follows the CRC. */
 
 // Response packet ordinals
-#define VSCP_BINARY_RESPONSE_PACKET_POS_PKTTYPE 0 /* Packet type is in the first byte of the head field */
+#define VSCP_BINARY_RESPONSE_PACKET_POS_PKTTYPE     0 /* Packet type is in the first byte of the head field */
 #define VSCP_BINARY_RESPONSE_PACKET_POS_COMMAND_MSB 1 /* Command code MSB */
 #define VSCP_BINARY_RESPONSE_PACKET_POS_COMMAND_LSB 2 /* Command code LSB */
-#define VSCP_BINARY_RESPONSE_PACKET_POS_ERROR_MSB 3 /* Error code MSB */
-#define VSCP_BINARY_RESPONSE_PACKET_POS_ERROR_LSB 4 /* Error code LSB */
-#define VSCP_BINARY_RESPONSE_PACKET_POS_ARG 5 /* Command argument starts here */
+#define VSCP_BINARY_RESPONSE_PACKET_POS_ERROR_MSB   3 /* Error code MSB */
+#define VSCP_BINARY_RESPONSE_PACKET_POS_ERROR_LSB   4 /* Error code LSB */
+#define VSCP_BINARY_RESPONSE_PACKET_POS_ARG         5 /* Command argument starts here */
 /* Two byte CRC follow here and if the frame is encrypted */
 /* the initialization vector (16 bytes) follows the CRC. */
-
 
 /*
   Default encryption keys for VSCP Server - !!!! should only be used on test systems !!!!
@@ -824,6 +821,10 @@ struct vscpMyNode {
 #define VSCP_ERROR_INVALID_FORMAT     69 /* Format is wrong. Error in conversion */
 #define VSCP_ERROR_INVALID_CONTEXT    70 /* Context is invalid or missing */
 #define VSCP_ERROR_UNSUPPORTED        71 /* Not supported */
+#define VSCP_ERROR_UNKNOWN_COMMAND    72 /* This command is not available */
+#define VSCP_ERROR_CREDENTIALS        73 /* Invalid credentials */
+#define VSCP_ERROR_NOT_AUTHORIZED     74 /* Not authorized to do that */
+#define VSCP_ERROR_FORBIDDEN          75 /* Forbidden to do that */
 
 /*!
   A timestamp that is less than this value is considered to be an event that should

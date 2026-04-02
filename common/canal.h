@@ -149,9 +149,9 @@ typedef struct structCanalStatistics {
   unsigned long cntOverruns;       /* # of overruns */
   unsigned long cntBusWarnings;    /* # of bys warnings */
   unsigned long cntBusOff;         /* # of bus off's */
-} canalStatistics;
+} canal_statistics_t;
 
-typedef canalStatistics *PCANALSTATISTICS;
+typedef canal_statistics_t *PCANALSTATISTICS;
 
 /*
     CanalStatus
@@ -164,9 +164,9 @@ typedef struct structCanalStatus {
   unsigned long lasterrorcode;    /* Last error code */
   unsigned long lasterrorsubcode; /* Last error sub code */
   char lasterrorstr[80];          /* Last error string */
-} canalStatus;
+} canal_status_t;
 
-typedef canalStatus *PCANALSTATUS;
+typedef canal_status_t *PCANALSTATUS;
 
 /* This is the define for the received callback method */
 #ifdef WIN32
