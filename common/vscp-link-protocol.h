@@ -964,7 +964,7 @@
    */
 
   int
-  vscp_link_callback_statistics(const void* pdata, VSCPStatistics* pStatistics);
+  vscp_link_callback_statistics(const void* pdata, vscp_statistics_t* pStatistics);
 
   /**
    * @fn vscp_link_callback_info
@@ -976,7 +976,7 @@
    */
 
   int
-  vscp_link_callback_info(const void* pdata, VSCPStatus* pstatus);
+  vscp_link_callback_info(const void* pdata, vscp_status_t* pstatus);
 
   /**
    *

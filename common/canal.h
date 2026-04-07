@@ -151,6 +151,7 @@ typedef struct structCanalStatistics {
   unsigned long cntBusOff;         /* # of bus off's */
 } canal_statistics_t;
 
+typedef canal_statistics_t canalStatistics;
 typedef canal_statistics_t *PCANALSTATISTICS;
 
 /*
@@ -166,6 +167,7 @@ typedef struct structCanalStatus {
   char lasterrorstr[80];          /* Last error string */
 } canal_status_t;
 
+typedef canal_status_t canalStatus;
 typedef canal_status_t *PCANALSTATUS;
 
 /* This is the define for the received callback method */

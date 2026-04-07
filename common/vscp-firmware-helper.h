@@ -792,10 +792,13 @@ vscp_fwhlp_writeEventExToFrame(uint8_t *frame, size_t len, uint8_t encryption, c
 /*!
  * Get VSCP event from binary frame
  *
- * Note! Will always convert frames to version 1 (Unix timestamp with nanosecond precision) format.
+ * Note! Will always convert frames to version 1 
+ * (Unix timestamp with nanosecond precision) format.
  *
  * @param pEvent Pointer to VSCP event that will get data from the frame,
- * @param buf A pointer to a buffer that will receive the event.
+ * @param buf A pointer to a buffer that holds the binary frame data. First
+ * byte in the buffer is the frame version and encryption type byte, followed 
+ * by the rest of the frame data. 
  * @param len Size of the buffer.
  * @return VSCP_ERROR_SUCCESS on success, error code on failure.
  */
@@ -809,7 +812,9 @@ vscp_fwhlp_getEventFromFrame(vscpEvent *pEvent, const uint8_t *buf, size_t len);
  *
  * @param pEventEx Pointer to VSCP event ex that will get data from the
  * frame,
- * @param buf A pointer to a buffer that will receive the event.
+ * @param buf A pointer to a buffer that holds the binary frame data. First
+ * byte in the buffer is the frame version and encryption type byte, followed
+ * by the rest of the frame data.
  * @param len Size of the buffer.
  * @return VSCP_ERROR_SUCCESS on success, error code on failure.
  */

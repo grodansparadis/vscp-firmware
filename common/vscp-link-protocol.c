@@ -706,7 +706,7 @@ int
 vscp_link_doCmdStatistics(const void* pdata, const char* pcmd)
 {
   char buf[1000];
-  VSCPStatistics statistics;
+  vscp_statistics_t statistics;
 
   if (VSCP_ERROR_SUCCESS != vscp_link_callback_check_authenticated(pdata)) {
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_NOT_ACCREDITED);
@@ -742,7 +742,7 @@ int
 vscp_link_doCmdInfo(const void* pdata, const char* pcmd)
 {
   char buf[1000];
-  VSCPStatus status;
+  vscp_status_t status;
 
   if (VSCP_ERROR_SUCCESS != vscp_link_callback_check_authenticated(pdata)) {
     return vscp_link_callback_write_client(pdata, VSCP_LINK_MSG_NOT_ACCREDITED);

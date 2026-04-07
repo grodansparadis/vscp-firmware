@@ -125,9 +125,10 @@ typedef struct _vscpEvent {
 
   uint16_t crc; /* Rarely used */
 
-} vscpEvent;
+} vscp_event_t;
 
-typedef vscpEvent *PVSCPEVENT;
+typedef  vscp_event_t vscpEvent;
+typedef const vscp_event_t *PCVSCPEVENT;
 
 /*
     WARNING!!!
@@ -196,9 +197,11 @@ typedef struct _vscpEventEx {
 
   uint8_t data[VSCP_MAX_DATA]; /* Pointer to data. Max. 512 bytes     */
 
-} vscpEventEx;
+} vscp_event_ex_t;
 
-typedef vscpEventEx *PVSCPEVENTEX;
+typedef  vscp_event_ex_t vscpEventEx;
+typedef const vscp_event_ex_t *PCVSCPEVENTEX;
+
 
 /* Priorities in the header byte as or'in values */
 /* Priorities goes from 0-7 where 0 is highest   */
@@ -277,9 +280,10 @@ typedef struct _vscpEventFilter {
                               nickname id */
   uint8_t mask_GUID[16];   /* when interfacing the VSCP daemon. */
 
-} vscpEventFilter;
+} vscp_event_filter_t;
 
-typedef vscpEventFilter *PVSCPEVENTFILTER;
+typedef  vscp_event_filter_t vscpEventFilter;
+typedef vscp_event_filter_t *PVSCPEVENTFILTER;
 
 /*
     Statistics
@@ -298,11 +302,11 @@ typedef struct structVSCPStatistics {
   unsigned long z;                 /* Currently undefined value */
 } vscp_statistics_t;
 
+typedef vscp_statistics_t VSCPStatistics;
 typedef vscp_statistics_t *PVSCPSTATISTICS;
 
 /*
     VSCPStatus (info command)
-
     This is the general channel state structure
 */
 
@@ -315,6 +319,7 @@ typedef struct structVSCPStatus {
   char lasterrorstr[VSCP_STATUS_ERROR_STRING_SIZE]; /* Last error string */
 } vscp_status_t;
 
+typedef vscp_status_t VSCPStatus;
 typedef vscp_status_t *PVSCPSTATUS;
 
 /* VSCP LEVEL II UDP datagram offsets     */
@@ -335,6 +340,7 @@ typedef struct structVSCPChannelInfo {
 
 } vscp_channel_info_t;
 
+typedef vscp_channel_info_t VSCPChannelInfo;
 typedef vscp_channel_info_t *PVSCPCHANNELINFO;
 
 /**
