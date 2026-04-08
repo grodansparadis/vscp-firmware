@@ -179,7 +179,7 @@ Buffer must be at least 48 bytes.
 Set VSCP frame version in event structure.
 
 ```c
-bool setFrameVersion(vscpEvent *pEvent, uint16_t version);
+bool setFrameVersion(vscp_event_t *pEvent, uint16_t version);
 ```
 
 The frame version indicates which version of the VSCP frame format the event uses.
@@ -198,7 +198,7 @@ It is stored in bits 8-9 of the 16-bit `head` field.
 **Example:**
 
 ```c
-vscpEvent ev;
+vscp_event_t ev;
 memset(&ev, 0, sizeof(ev));
 
 // Set frame to use Unix nanosecond timestamp format
@@ -210,7 +210,7 @@ setFrameVersion(&ev, VSCP_HEADER16_FRAME_VERSION_UNIX_NS);
 Set VSCP frame version in event ex structure.
 
 ```c
-bool setFrameVersionEx(vscpEventEx *pEventEx, uint16_t version);
+bool setFrameVersionEx(vscp_event_ex_t *pEventEx, uint16_t version);
 ```
 
 The frame version indicates which version of the VSCP frame format the event uses.
@@ -225,7 +225,7 @@ It is stored in bits 8-9 of the 16-bit `head` field.
 **Example:**
 
 ```c
-vscpEventEx ex;
+vscp_event_ex_t ex;
 memset(&ex, 0, sizeof(ex));
 
 // Set frame to use Unix nanosecond timestamp format
@@ -436,7 +436,7 @@ if (VSCP_ERROR_SUCCESS != rv) {
 ### Convert Between `vscpEvent` and `vscpEventEx`
 
 ```c
-vscpEventEx ex;
+vscp_event_ex_t ex;
 int rv = vscp_fwhlp_convertEventToEventEx(&ex, &event);
 if (VSCP_ERROR_SUCCESS != rv) {
   // handle conversion error
@@ -507,8 +507,8 @@ Minimal end-to-end flow for common integration:
 4. Free allocated dynamic data (`vscpEvent.pdata`) when done.
 
 ```c
-vscpEvent ev;
-vscpEventEx ex;
+vscp_event_t ev;
+vscp_event_ex_t ex;
 char out[256];
 
 memset(&ev, 0, sizeof(ev));
@@ -547,8 +547,8 @@ For JSON and XML workflows, use the same pattern with:
 Requires `VSCP_FWHLP_BINARY_FRAME_SUPPORT`.
 
 ```c
-vscpEventEx ex_in;
-vscpEventEx ex_out;
+vscp_event_ex_t ex_in;
+vscp_event_ex_t ex_out;
 uint8_t frame[600];
 
 memset(&ex_in, 0, sizeof(ex_in));
@@ -590,7 +590,7 @@ uint8_t frame[600];
 uint8_t encrypted[640];
 uint8_t decrypted[640];
 
-vscpEventEx ex;
+vscp_event_ex_t ex;
 memset(&ex, 0, sizeof(ex));
 ex.head = 3;
 ex.vscp_class = 10;
@@ -639,8 +639,8 @@ Common Failures and Checks:
 Requires `VSCP_FWHLP_XML_SUPPORT`.
 
 ```c
-vscpEvent ev;
-vscpEventEx ex;
+vscp_event_t ev;
+vscp_event_ex_t ex;
 
 memset(&ev, 0, sizeof(ev));
 memset(&ex, 0, sizeof(ex));

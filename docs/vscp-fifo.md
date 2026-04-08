@@ -13,7 +13,7 @@ The queue state is stored in:
 
 ```c
 typedef struct {
-  vscpEvent **buf;
+  vscp_event_t **buf;
   size_t head;
   size_t tail;
   size_t size;
@@ -32,9 +32,9 @@ Design notes:
   - Initializes indices, allocates pointer array, zeros storage.
 - `void vscp_fifo_clear(vscp_fifo_t *f)`
   - Resets indices and attempts to clear queued entries.
-- `size_t vscp_fifo_write(vscp_fifo_t *f, vscpEvent *pev)`
+- `size_t vscp_fifo_write(vscp_fifo_t *f, vscp_event_t *pev)`
   - Enqueue one pointer. Returns `1` on success, `0` if full.
-- `size_t vscp_fifo_read(vscp_fifo_t *f, vscpEvent **pev)`
+- `size_t vscp_fifo_read(vscp_fifo_t *f, vscp_event_t **pev)`
   - Dequeue one pointer. Returns `1` on success, `0` if empty.
 - `size_t vscp_fifo_getFree(vscp_fifo_t *f)`
   - Returns number of free slots available for enqueue.
@@ -49,7 +49,7 @@ if (!vscp_fifo_write(&q, pev)) {
   // queue full
 }
 
-vscpEvent *out = NULL;
+vscp_event_t *out = NULL;
 if (vscp_fifo_read(&q, &out)) {
   // process out
 }

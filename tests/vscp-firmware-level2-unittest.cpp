@@ -23,7 +23,7 @@ struct Frmw2StubState {
   int report_interest_calls;
   int read_reg_calls;
   int write_reg_calls;
-  vscpEventEx last_sent;
+  vscp_event_ex_t last_sent;
 } g_stub;
 
 void reset_stub()
@@ -208,7 +208,7 @@ TEST(_vscp_frmw2, setup_event_ex_level1_uses_nickname_in_guid)
   cfg.m_level    = VSCP_LEVEL1;
   cfg.m_nickname = 0x1234;
 
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   std::memset(&ex, 0, sizeof(ex));
   vscp_frmw2_setup_event_ex(&ex);
 

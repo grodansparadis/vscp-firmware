@@ -278,7 +278,7 @@ if (VSCP_ERROR_SUCCESS == rv) {
     vscp_frmw2_work(NULL);
 
     // If an incoming event is available:
-    // vscpEventEx ex; fill from transport...
+    // vscp_event_ex_t ex; fill from transport...
     // vscp_frmw2_work(&ex);
   }
 }

@@ -4,9 +4,9 @@
 #include <vscp-fifo.h>
 #include <vscp-firmware-helper.h>
 
-static vscpEvent *new_test_event(uint16_t vscp_class, uint16_t vscp_type)
+static vscp_event_t *new_test_event(uint16_t vscp_class, uint16_t vscp_type)
 {
-  vscpEvent *pev = vscp_fwhlp_newEvent();
+  vscp_event_t *pev = vscp_fwhlp_newEvent();
   if (NULL == pev) {
     return NULL;
   }
@@ -23,12 +23,12 @@ static vscpEvent *new_test_event(uint16_t vscp_class, uint16_t vscp_type)
 int main(void)
 {
   vscp_fifo_t queue;
-  vscpEvent *rx = NULL;
+  vscp_event_t *rx = NULL;
 
   vscp_fifo_init(&queue, 8);
 
-  vscpEvent *ev1 = new_test_event(10, 6);
-  vscpEvent *ev2 = new_test_event(20, 8);
+  vscp_event_t *ev1 = new_test_event(10, 6);
+  vscp_event_t *ev2 = new_test_event(20, 8);
 
   if ((NULL != ev1) && (NULL != ev2)) {
     (void)vscp_fifo_write(&queue, ev1);

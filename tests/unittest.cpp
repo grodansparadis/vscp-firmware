@@ -15,7 +15,7 @@
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_1)
 {
   int rv;
-  vscpEvent ev;
+  vscp_event_t ev;
 
   rv = vscp_fwhlp_parse_event_datestr(&ev, "2024-06-30T23:59:58Z", NULL);
 
@@ -32,7 +32,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_1)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_2)
 {
   int rv;
-  vscpEvent ev;
+  vscp_event_t ev;
 
   rv = vscp_fwhlp_parse_event_datestr(&ev, "2024-06-30T23:59:58", NULL);
 
@@ -50,7 +50,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_2)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_3)
 {
   int rv;
-  vscpEvent ev;
+  vscp_event_t ev;
 
   rv = vscp_fwhlp_parse_event_datestr(&ev, "2024-06-30 23:59:58Z", NULL);
 
@@ -64,7 +64,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_3)
 TEST(_vscp_firmware_helper, _vscp_fwhlp_parse_event_datestr_4)
 {
   int rv;
-  vscpEvent ev;
+  vscp_event_t ev;
 
   rv = vscp_fwhlp_parse_event_datestr(&ev, "    2024-06-30T23:59:58Z    ", NULL);
 
@@ -75,7 +75,7 @@ TEST(_vscp_firmware_helper, _vscp_fwhlp_parse_event_datestr_4)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_unix_ns_1)
 {
   int rv;
-  vscpEvent ev;
+  vscp_event_t ev;
 
   // 2024-06-30T23:59:58Z = 1719791998 seconds since epoch
   // In nanoseconds: 1719791998000000000
@@ -91,7 +91,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_unix_ns_1)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_unix_ns_2)
 {
   int rv;
-  vscpEvent ev;
+  vscp_event_t ev;
 
   rv = vscp_fwhlp_parse_event_datestr(&ev, "   1719791998000000000", NULL);
 
@@ -104,7 +104,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_unix_ns_2)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_unix_ns_3)
 {
   int rv;
-  vscpEvent ev;
+  vscp_event_t ev;
   char *endptr = NULL;
 
   rv = vscp_fwhlp_parse_event_datestr(&ev, "1719791998000000000 NEXT", &endptr);
@@ -124,7 +124,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_unix_ns_3)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_unix_ns_zero)
 {
   int rv;
-  vscpEvent ev;
+  vscp_event_t ev;
 
   rv = vscp_fwhlp_parse_event_datestr(&ev, "0", NULL);
 
@@ -141,7 +141,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_event_datestr_unix_ns_zero)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_1)
 {
   int rv;
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
 
   rv = vscp_fwhlp_parse_eventex_datestr(&ex, "2024-06-30T23:59:58Z", NULL);
 
@@ -158,7 +158,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_1)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_2)
 {
   int rv;
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
 
   rv = vscp_fwhlp_parse_eventex_datestr(&ex, "2024-06-30T23:59:58", NULL);
 
@@ -176,7 +176,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_2)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_3)
 {
   int rv;
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
 
   rv = vscp_fwhlp_parse_eventex_datestr(&ex, "2024-06-30 23:59:58Z", NULL);
 
@@ -190,7 +190,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_3)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_4)
 {
   int rv;
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
 
   rv = vscp_fwhlp_parse_eventex_datestr(&ex, "    2024-06-30T23:59:58Z    ", NULL);
 
@@ -206,7 +206,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_4)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_5)
 {
   int rv;
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
 
   char *endptr = NULL;
   rv           = vscp_fwhlp_parse_eventex_datestr(&ex, "    2024-06-30T23:59:58Z    NEXT", &endptr);
@@ -224,7 +224,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_5)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_unix_ns_1)
 {
   int rv;
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
 
   // 2024-06-30T23:59:58Z = 1719791998 seconds since epoch
   // In nanoseconds: 1719791998000000000
@@ -240,7 +240,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_unix_ns_1)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_unix_ns_2)
 {
   int rv;
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
 
   rv = vscp_fwhlp_parse_eventex_datestr(&ex, "   1719791998000000000", NULL);
 
@@ -253,7 +253,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_unix_ns_2)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_unix_ns_3)
 {
   int rv;
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   char *endptr = NULL;
 
   rv = vscp_fwhlp_parse_eventex_datestr(&ex, "1719791998000000000 NEXT", &endptr);
@@ -273,7 +273,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_unix_ns_3)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_unix_ns_zero)
 {
   int rv;
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
 
   rv = vscp_fwhlp_parse_eventex_datestr(&ex, "0", NULL);
 
@@ -291,7 +291,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_unix_ns_zero)
 */
 TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_event_1)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   char buf[10];
 
   ev.year   = 2024;
@@ -312,7 +312,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_event_1)
 TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_event_2)
 {
   char *result;
-  vscpEvent ev;
+  vscp_event_t ev;
   char buf[21];
 
   memset(&ev, 0, sizeof(ev));
@@ -335,7 +335,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_event_2)
 TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_event_unix_ns)
 {
   char *result;
-  vscpEvent ev;
+  vscp_event_t ev;
   char buf[21];
 
   memset(&ev, 0, sizeof(ev));
@@ -358,7 +358,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_event_unix_ns)
 */
 TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_eventex_1)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   char buf[10];
 
   ex.year   = 2024;
@@ -379,7 +379,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_eventex_1)
 TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_eventex_2)
 {
   char *result;
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   char buf[21];
 
   memset(&ex, 0, sizeof(ex));
@@ -402,7 +402,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_eventex_2)
 TEST(_vscp_firmware_helper, vscp_fwhlp_get_datestr_from_eventex_unix_ns)
 {
   char *result;
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   char buf[21];
 
   memset(&ex, 0, sizeof(ex));
@@ -1072,7 +1072,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseMac_lowercase)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_getEventPriority)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
 
   ev.head = 0x00;
   ASSERT_EQ(0, vscp_fwhlp_getEventPriority(&ev));
@@ -1086,7 +1086,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getEventPriority)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_getEventPriorityEx)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
 
   ex.head = 0x00;
   ASSERT_EQ(0, vscp_fwhlp_getEventExPriority(&ex));
@@ -1097,7 +1097,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getEventPriorityEx)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_setEventExPriority)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
 
   ex.head = 0x00;
   vscp_fwhlp_setEventExPriority(&ex, 7);
@@ -1115,7 +1115,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_setEventExPriority)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_setEventPriority)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
 
   ev.head = 0x00;
   vscp_fwhlp_setEventPriority(&ev, 7);
@@ -1149,7 +1149,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_setEventExPriority_null_pointer)
 
 TEST(_vscp_firmware_helper, setFrameVersion_original)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
 
   bool rv = setFrameVersion(&ev, VSCP_HEADER16_FRAME_VERSION_ORIGINAL);
@@ -1159,7 +1159,7 @@ TEST(_vscp_firmware_helper, setFrameVersion_original)
 
 TEST(_vscp_firmware_helper, setFrameVersion_unix_ns)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
 
   bool rv = setFrameVersion(&ev, VSCP_HEADER16_FRAME_VERSION_UNIX_NS);
@@ -1169,7 +1169,7 @@ TEST(_vscp_firmware_helper, setFrameVersion_unix_ns)
 
 TEST(_vscp_firmware_helper, setFrameVersion_preserves_other_bits)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
 
   // Set priority and other bits
@@ -1190,7 +1190,7 @@ TEST(_vscp_firmware_helper, setFrameVersion_null_pointer)
 
 TEST(_vscp_firmware_helper, setFrameVersionEx_original)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   memset(&ex, 0, sizeof(ex));
 
   bool rv = setFrameVersionEx(&ex, VSCP_HEADER16_FRAME_VERSION_ORIGINAL);
@@ -1200,7 +1200,7 @@ TEST(_vscp_firmware_helper, setFrameVersionEx_original)
 
 TEST(_vscp_firmware_helper, setFrameVersionEx_unix_ns)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   memset(&ex, 0, sizeof(ex));
 
   bool rv = setFrameVersionEx(&ex, VSCP_HEADER16_FRAME_VERSION_UNIX_NS);
@@ -1210,7 +1210,7 @@ TEST(_vscp_firmware_helper, setFrameVersionEx_unix_ns)
 
 TEST(_vscp_firmware_helper, setFrameVersionEx_preserves_other_bits)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   memset(&ex, 0, sizeof(ex));
 
   // Set priority and other bits
@@ -1231,7 +1231,7 @@ TEST(_vscp_firmware_helper, setFrameVersionEx_null_pointer)
 
 TEST(_vscp_firmware_helper, setFrameVersion_all_versions)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
 
   // Test all frame version values
   memset(&ev, 0, sizeof(ev));
@@ -1253,7 +1253,7 @@ TEST(_vscp_firmware_helper, setFrameVersion_all_versions)
 
 TEST(_vscp_firmware_helper, setFrameVersionEx_all_versions)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
 
   // Test all frame version values
   memset(&ex, 0, sizeof(ex));
@@ -1279,8 +1279,8 @@ TEST(_vscp_firmware_helper, setFrameVersionEx_all_versions)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_convertEventToEventEx)
 {
-  vscpEvent ev;
-  vscpEventEx ex;
+  vscp_event_t ev;
+  vscp_event_ex_t ex;
   int rv;
 
   // Setup event
@@ -1320,8 +1320,8 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_convertEventToEventEx)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_convertEventExToEvent)
 {
-  vscpEvent ev;
-  vscpEventEx ex;
+  vscp_event_t ev;
+  vscp_event_ex_t ex;
   int rv;
 
   // Setup eventex
@@ -1365,8 +1365,8 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_convertEventExToEvent)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_convertEventToEventEx_unix_ns)
 {
-  vscpEvent ev;
-  vscpEventEx ex;
+  vscp_event_t ev;
+  vscp_event_ex_t ex;
   int rv;
 
   memset(&ev, 0, sizeof(ev));
@@ -1406,8 +1406,8 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_convertEventToEventEx_unix_ns)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_convertEventExToEvent_unix_ns)
 {
-  vscpEvent ev;
-  vscpEventEx ex;
+  vscp_event_t ev;
+  vscp_event_ex_t ex;
   int rv;
 
   memset(&ev, 0, sizeof(ev));
@@ -1456,7 +1456,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_convertEventExToEvent_unix_ns)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_eventToString)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   char buf[512];
   int rv;
 
@@ -1490,7 +1490,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_eventToString)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_eventToStringEx)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   char buf[512];
   int rv;
 
@@ -1524,7 +1524,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_eventToStringEx)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_eventToString_unix_ns)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   char buf[512];
   int rv;
 
@@ -1559,7 +1559,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_eventToString_unix_ns)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_eventToStringEx_unix_ns)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   char buf[512];
   int rv;
 
@@ -1595,7 +1595,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_eventToStringEx_unix_ns)
 // Test roundtrip: parse -> toString -> parse
 TEST(_vscp_firmware_helper, vscp_fwhlp_eventToString_unix_ns_roundtrip)
 {
-  vscpEvent ev1, ev2;
+  vscp_event_t ev1, ev2;
   char buf[512];
   int rv;
 
@@ -1648,7 +1648,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_eventToString_unix_ns_roundtrip)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_doLevel2Filter_null_filter)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
 
   ev.vscp_class = 10;
   ev.vscp_type  = 6;
@@ -1659,7 +1659,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_doLevel2Filter_null_filter)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_doLevel2Filter_class_match)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   vscpEventFilter filter;
 
   memset(&filter, 0, sizeof(vscpEventFilter));
@@ -1680,7 +1680,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_doLevel2Filter_class_match)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_doLevel2Filter_type_match)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   vscpEventFilter filter;
 
   memset(&filter, 0, sizeof(vscpEventFilter));
@@ -1701,7 +1701,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_doLevel2Filter_type_match)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_doLevel2Filter_dont_care_mask)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   vscpEventFilter filter;
 
   memset(&filter, 0, sizeof(vscpEventFilter));
@@ -1731,7 +1731,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_doLevel2Filter_dont_care_mask)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_getFrameSizeFromEvent)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   size_t size;
 
   ev.sizeData = 0;
@@ -1752,7 +1752,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getFrameSizeFromEvent)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_getFrameSizeFromEventEx)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   size_t size;
 
   ex.sizeData = 0;
@@ -1773,7 +1773,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getFrameSizeFromEventEx)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_writeEventToFrame_basic)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   uint8_t frame[100];
   int rv;
 
@@ -1820,7 +1820,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_writeEventToFrame_basic)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_writeEventToFrame_with_data)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   uint8_t frame[100];
   uint8_t data[5] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE };
   int rv;
@@ -1862,7 +1862,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_writeEventToFrame_with_data)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_writeEventToFrame_buffer_too_small)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   uint8_t frame[10]; // Too small
   int rv;
 
@@ -1876,7 +1876,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_writeEventToFrame_buffer_too_small)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_writeEventExToFrame)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   uint8_t frame[100];
   int rv;
 
@@ -1920,7 +1920,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_writeEventExToFrame)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_getEventFromFrame)
 {
-  vscpEvent ev_write, ev_read;
+  vscp_event_t ev_write, ev_read;
   uint8_t frame[100];
   uint8_t data[3] = { 0x01, 0x02, 0x03 };
   int rv;
@@ -1969,7 +1969,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getEventFromFrame)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_getEventExFromFrame)
 {
-  vscpEventEx ex_write, ex_read;
+  vscp_event_ex_t ex_write, ex_read;
   uint8_t frame[100];
   int rv;
 
@@ -2018,7 +2018,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getEventExFromFrame)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_frame_roundtrip_event)
 {
-  vscpEvent ev_original, ev_recovered;
+  vscp_event_t ev_original, ev_recovered;
   uint8_t frame[200];
   uint8_t data[10] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99 };
   int rv;
@@ -2067,7 +2067,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_frame_roundtrip_event)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_frame_roundtrip_eventex)
 {
-  vscpEventEx ex_original, ex_recovered;
+  vscp_event_ex_t ex_original, ex_recovered;
   uint8_t frame[200];
   int rv;
 
@@ -2114,7 +2114,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_frame_roundtrip_eventex)
 // Test reading packet format 0 (legacy format with date/time fields)
 TEST(_vscp_firmware_helper, vscp_fwhlp_getEventFromFrame_packet0)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   int rv;
 
   // Manually construct a packet format 0 frame
@@ -2242,7 +2242,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getEventFromFrame_packet0)
 // Test reading packet format 1 (new format with nanosecond timestamp)
 TEST(_vscp_firmware_helper, vscp_fwhlp_getEventFromFrame_packet1)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   int rv;
 
   // Manually construct a packet format 1 frame
@@ -2749,7 +2749,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_crypto_explicit_iv)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_basic)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   const char *json = "{"
                      "\"head\":3,"
                      "\"class\":10,"
@@ -2798,7 +2798,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_basic)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_ex_basic)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   const char *json = "{"
                      "\"head\":5,"
                      "\"class\":20,"
@@ -2840,7 +2840,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_ex_basic)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_create_json_basic)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   char json[1024];
 
   // Setup event
@@ -2882,7 +2882,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_create_json_basic)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_create_json_ex_basic)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   char json[1024];
 
   // Setup event
@@ -2924,7 +2924,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_create_json_ex_basic)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_json_roundtrip_event)
 {
-  vscpEvent original, parsed;
+  vscp_event_t original, parsed;
   char json[1024];
 
   // Setup original event
@@ -2979,7 +2979,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_json_roundtrip_event)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_json_roundtrip_eventex)
 {
-  vscpEventEx original, parsed;
+  vscp_event_ex_t original, parsed;
   char json[2048];
 
   // Setup original event
@@ -3034,7 +3034,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_json_roundtrip_eventex)
 // Note: JSON numbers use double precision which limits accuracy to ~15 significant digits
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_timestamp_ns)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   const char *json = "{"
                      "\"head\":3,"
                      "\"class\":10,"
@@ -3063,7 +3063,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_timestamp_ns)
 // Test parsing JSON with both timestamp and timestamp_ns - timestamp_ns takes priority
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_timestamp_ns_priority)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   const char *json = "{"
                      "\"head\":5,"
                      "\"class\":20,"
@@ -3089,7 +3089,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_timestamp_ns_priority)
 // Test parsing JSON with timestamp_ns for vscpEventEx
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_ex_timestamp_ns)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   const char *json = "{"
                      "\"head\":7,"
                      "\"class\":30,"
@@ -3113,7 +3113,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_ex_timestamp_ns)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_null_pointer)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   const char *json = "{\"head\":1}";
 
   // Test NULL event pointer
@@ -3127,7 +3127,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_null_pointer)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_invalid_syntax)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   const char *invalid_json = "{\"head\":1,}"; // Trailing comma
 
   int rv = vscp_fwhlp_parse_json(&ev, invalid_json);
@@ -3136,7 +3136,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_invalid_syntax)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_create_json_buffer_too_small)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   char json[10]; // Too small
 
   memset(&ev, 0, sizeof(ev));
@@ -3157,7 +3157,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_create_json_buffer_too_small)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_empty_data)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   const char *json = "{"
                      "\"head\":1,"
                      "\"class\":5,"
@@ -3178,7 +3178,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_empty_data)
 TEST(_vscp_firmware_helper, vscp_fwhlp_create_json_ex_null_pointer)
 {
   char json[1024];
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
 
   // Test NULL event pointer
   int rv = vscp_fwhlp_create_json_ex(NULL, sizeof(json), &ex);
@@ -3200,7 +3200,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_create_json_ex_null_pointer)
 // No event tag
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_basic_validate_0)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   const char *xml = "<ev"
                     "head=\"3\" "
                     "obid=\"1234\" "
@@ -3218,7 +3218,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_basic_validate_0)
 // Event tag misspelled
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_basic_validate_1)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   const char *xml = "<eventx"
                     "head=\"3\" "
                     "obid=\"1234\" "
@@ -3236,7 +3236,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_basic_validate_1)
 // Missing end tag
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_basic_validate_2)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   const char *xml = "<eventx"
                     "head=\"3\" "
                     "obid=\"1234\" "
@@ -3252,7 +3252,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_basic_validate_2)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_basic)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   const char *xml = "<event "
                     "head=\"3\" "
                     "obid=\"1234\" "
@@ -3290,7 +3290,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_basic)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_eventex_basic_full)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   const char *xml = "<event "
                     "head=\"3\" "
                     "obid=\"1234\" "
@@ -3328,7 +3328,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_eventex_basic_full)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_null_pointer)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   const char *xml = "<event head=\"1\" />";
 
   // Test NULL event pointer
@@ -3342,7 +3342,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_null_pointer)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_invalid_syntax)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
 
   // Missing opening tag
   const char *invalid_xml1 = "head=\"1\" />";
@@ -3362,7 +3362,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_invalid_syntax)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_with_whitespace)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   // Note: Leading/trailing whitespace is OK, but internal whitespace affects parsing
   const char *xml = "<event head=\"5\" class=\"20\" type=\"8\" "
                     "guid=\"FF:FF:FF:FF:FF:FF:FF:FE:B8:27:EB:CF:3A:15:00:01\" />";
@@ -3383,7 +3383,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_with_whitespace)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_minimal)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   const char *xml = "<event class=\"15\" type=\"3\" />";
 
   int rv = vscp_fwhlp_parse_xml_event(&ev, xml);
@@ -3395,7 +3395,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_minimal)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_basic)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   char xml[3000];
 
   // Setup event
@@ -3417,7 +3417,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_basic)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_basic_with_parse)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   char xml[3000];
 
   // Setup event with proper datetime values
@@ -3450,7 +3450,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_basic_with_parse)
 
   //printf("Generated XML:\n%s\n", xml);
 
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   rv = vscp_fwhlp_parse_xml_eventex(&ex, xml);
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
   // head will have UNIX_NS frame version set after parsing XML with datetime
@@ -3468,7 +3468,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_basic_with_parse)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_null_pointer)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   char xml[32];
 
   memset(&ev, 0, sizeof(ev));
@@ -3482,7 +3482,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_event_to_xml_null_pointer)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_all_zeros)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   const char *xml = "<event "
                     "head=\"0\" "
                     "obid=\"0\" "
@@ -3508,7 +3508,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_all_zeros)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_max_values)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   const char *xml = "<event "
                     "head=\"65535\" "
                     "obid=\"4294967295\" "
@@ -3535,7 +3535,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_max_values)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_eventex_basic)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   const char *xml = "<event "
                     "head=\"7\" "
                     "class=\"30\" "
@@ -3550,7 +3550,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_eventex_basic)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_eventex_single_line)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   const char *xml = "<event head=\"2\" obid=\"5678\" timestamp=\"99999\" class=\"25\" type=\"10\" "
                     "guid=\"AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99\" />";
 
@@ -3572,7 +3572,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_eventex_single_line)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_single_line)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   const char *xml = "<event head=\"2\" obid=\"5678\" timestamp=\"99999\" class=\"25\" type=\"10\" "
                     "guid=\"AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99\" />";
 
@@ -3594,7 +3594,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_event_single_line)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_eventex_to_xml_basic)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   char xml[3000];
 
   // Setup event
@@ -3617,7 +3617,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_eventex_to_xml_basic)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_eventex_to_xml_null_pointer)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   char xml[32];
 
   memset(&ex, 0, sizeof(ex));
@@ -3631,7 +3631,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_eventex_to_xml_null_pointer)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_eventex_max_values)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   const char *xml = "<event "
                     "head=\"65535\" "
                     "obid=\"4294967295\" "
@@ -3658,7 +3658,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_xml_eventex_max_values)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_success)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
 
   const char *topic = "vscp/FF:EE:DD:CC:BB:AA:99:88:77:66:55:44:33:22:11:00/10/6";
@@ -3675,7 +3675,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_success)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_success_with_extra_parts)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
 
   const char *topic = "vscp/FF:EE:DD:CC:BB:AA:99:88:77:66:55:44:33:22:11:00/10/6/extra/parts/ignored";
@@ -3692,7 +3692,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_success_with_ex
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_invalid_syntax)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
 
   int rv = vscp_fwhlp_set_event_info_from_topic(&ev, "vscp/FF:EE:DD:CC:BB:AA:99:88:77:66:55:44:33:22:11:00/10");
@@ -3701,7 +3701,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_invalid_syntax)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_invalid_guid)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
 
   int rv = vscp_fwhlp_set_event_info_from_topic(&ev, "vscp/ZZ:EE:DD:CC:BB:AA:99:88:77:66:55:44:33:22:11:00/10/6");
@@ -3710,7 +3710,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_invalid_guid)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_null_pointer)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
 
   int rv = vscp_fwhlp_set_event_info_from_topic(NULL, "vscp/FF:EE:DD:CC:BB:AA:99:88:77:66:55:44:33:22:11:00/10/6");
@@ -3722,7 +3722,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_set_event_info_from_topic_null_pointer)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_set_eventex_info_from_topic_success)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   memset(&ex, 0, sizeof(ex));
 
   const char *topic = "vscp/00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F/1040/42";
@@ -3739,7 +3739,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_set_eventex_info_from_topic_success)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_set_eventex_info_from_topic_success_with_extra_parts)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   memset(&ex, 0, sizeof(ex));
 
   const char *topic = "vscp/00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F/1040/42/extra/parts/ignored";
@@ -3756,7 +3756,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_set_eventex_info_from_topic_success_with_
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_set_eventex_info_from_topic_invalid_syntax)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   memset(&ex, 0, sizeof(ex));
 
   int rv = vscp_fwhlp_set_eventex_info_from_topic(&ex, "foo/00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F/10/6");
@@ -3765,7 +3765,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_set_eventex_info_from_topic_invalid_synta
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_set_eventex_info_from_topic_null_pointer)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   memset(&ex, 0, sizeof(ex));
 
   int rv = vscp_fwhlp_set_eventex_info_from_topic(NULL, "vscp/00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F/10/6");
@@ -3791,7 +3791,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsFloat)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsString)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
 
   uint8_t payload[] = { 0x00, 0x00, 0x00, 0x00, '1', '2', '.', '5' };
@@ -3809,7 +3809,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsString)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementFloat64AsString)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
 
   double source = 12.5;
@@ -3833,7 +3833,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementFloat64AsString)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsDouble)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
 
   double source = 37.125;
@@ -3857,7 +3857,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsDouble)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsDoubleEx)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   memset(&ex, 0, sizeof(ex));
 
   double source = 98.25;
@@ -3873,7 +3873,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsDoubleEx)
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementWithZoneAsString)
 {
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
 
   // Datacoding = Integer, value =10
@@ -3906,7 +3906,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementWithZoneAsString)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_1)
 {
   int rv;
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
 
   // Empty datestr means nanosecond timestamp mode
@@ -3935,7 +3935,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_1)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_2)
 {
   int rv;
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
   uint8_t guid[16] = { 0 };
 
@@ -3962,7 +3962,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_2)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_3)
 {
   int rv;
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
   uint8_t guid[16] = { 0 };
 
@@ -3989,7 +3989,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_3)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_1)
 {
   int rv;
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   memset(&ex, 0, sizeof(ex));
 
   // Empty datestr means nanosecond timestamp mode
@@ -4017,7 +4017,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_1)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_2)
 {
   int rv;
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   memset(&ex, 0, sizeof(ex));
   uint8_t guid[16] = { 0 };
 
@@ -4043,7 +4043,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_2)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_3)
 {
   int rv;
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   memset(&ex, 0, sizeof(ex));
   uint8_t guid[16] = { 0 };
 
@@ -4070,7 +4070,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_3)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_unix_ns_timestamp)
 {
   int rv;
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
   uint8_t guid[16] = { 0 };
 
@@ -4096,7 +4096,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_unix_ns_timestamp)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_unix_ns_timestamp)
 {
   int rv;
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   memset(&ex, 0, sizeof(ex));
   uint8_t guid[16] = { 0 };
 
@@ -4122,7 +4122,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_unix_ns_timestamp)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_microsecond_timestamp)
 {
   int rv;
-  vscpEvent ev;
+  vscp_event_t ev;
   memset(&ev, 0, sizeof(ev));
   uint8_t guid[16] = { 0 };
 
@@ -4145,7 +4145,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_microsecond_timestamp)
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_microsecond_timestamp)
 {
   int rv;
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   memset(&ex, 0, sizeof(ex));
   uint8_t guid[16] = { 0 };
 

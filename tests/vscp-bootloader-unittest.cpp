@@ -23,7 +23,7 @@ struct BootloaderStubState {
   uint8_t bootflag;
   vscpboot_config_t cfg;
   uint8_t guid[16];
-  vscpEventEx last_sent;
+  vscp_event_ex_t last_sent;
 } g_stub;
 
 void reset_stub()
