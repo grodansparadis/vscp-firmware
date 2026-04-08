@@ -68,6 +68,12 @@
 #include <vscp-aes.h>
 #endif
 
+#ifdef VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO
+#ifdef ESP_PLATFORM
+#include <psa/crypto.h>
+#endif
+#endif
+
 #ifdef VSCP_FWHLP_JSON_SUPPORT
 #include <cJSON.h>
 #endif
@@ -583,7 +589,7 @@ vscp_fwhlp_make_string_from_data(char *buf, size_t len, const uint8_t *data, siz
 //
 
 char *
-vscp_fwhlp_get_datestr_from_event(char *buf, size_t len, const vscpEvent *pev)
+vscp_fwhlp_get_datestr_from_event(char *buf, size_t len, const vscp_event_t *pev)
 {
   if ((NULL == pev) || (NULL == buf) || (len < 21)) {
     return NULL;
@@ -615,7 +621,7 @@ vscp_fwhlp_get_datestr_from_event(char *buf, size_t len, const vscpEvent *pev)
 //
 
 char *
-vscp_fwhlp_get_datestr_from_eventex(char *buf, size_t len, const vscpEventEx *pex)
+vscp_fwhlp_get_datestr_from_eventex(char *buf, size_t len, const vscp_event_ex_t *pex)
 {
   if ((NULL == pex) || (NULL == buf) || (len < 21)) {
     return NULL;
@@ -649,7 +655,7 @@ vscp_fwhlp_get_datestr_from_eventex(char *buf, size_t len, const vscpEventEx *pe
 //
 
 int
-vscp_fwhlp_parse_event_datestr(vscpEvent *pev, const char *strdate, char **endptr)
+vscp_fwhlp_parse_event_datestr(vscp_event_t *pev, const char *strdate, char **endptr)
 {
   if ((NULL == pev) || (NULL == strdate)) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -760,7 +766,7 @@ vscp_fwhlp_parse_event_datestr(vscpEvent *pev, const char *strdate, char **endpt
 //
 
 int
-vscp_fwhlp_parse_eventex_datestr(vscpEventEx *pex, const char *strdate, char **endptr)
+vscp_fwhlp_parse_eventex_datestr(vscp_event_ex_t *pex, const char *strdate, char **endptr)
 {
   if ((NULL == pex) || (NULL == strdate)) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -1025,7 +1031,7 @@ vscp_fwhlp_parseMac(uint8_t *pmac, const char *strmac, char **endptr)
 // vscp_fwhlp_getEventPriority
 
 unsigned char
-vscp_fwhlp_getEventPriority(const vscpEvent *pev)
+vscp_fwhlp_getEventPriority(const vscp_event_t *pev)
 {
   // Must be a valid message pointer
   if (NULL == pev) {
@@ -1039,7 +1045,7 @@ vscp_fwhlp_getEventPriority(const vscpEvent *pev)
 // vscp_fwhlp_getEventExPriority
 
 unsigned char
-vscp_fwhlp_getEventExPriority(const vscpEventEx *pex)
+vscp_fwhlp_getEventExPriority(const vscp_event_ex_t *pex)
 {
   // Must be a valid message pointer
   if (NULL == pex) {
@@ -1053,7 +1059,7 @@ vscp_fwhlp_getEventExPriority(const vscpEventEx *pex)
 // vscp_fwhlp_setEventPriority
 
 void
-vscp_fwhlp_setEventPriority(vscpEvent *pEvent, unsigned char priority)
+vscp_fwhlp_setEventPriority(vscp_event_t *pEvent, unsigned char priority)
 {
   // Must be a valid message pointer
   if (NULL == pEvent) {
@@ -1068,7 +1074,7 @@ vscp_fwhlp_setEventPriority(vscpEvent *pEvent, unsigned char priority)
 // vscp_fwhlp_setEventExPriority
 
 void
-vscp_fwhlp_setEventExPriority(vscpEventEx *pEventEx, unsigned char priority)
+vscp_fwhlp_setEventExPriority(vscp_event_ex_t *pEventEx, unsigned char priority)
 {
   // Must be a valid message pointer
   if (NULL == pEventEx) {
@@ -1085,11 +1091,11 @@ vscp_fwhlp_setEventExPriority(vscpEventEx *pEventEx, unsigned char priority)
 // vscp_fwhlp_newEvent
 //
 
-vscpEvent *
+vscp_event_t *
 vscp_fwhlp_newEvent(void)
 {
-  static vscpEvent *pev = NULL;
-  pev                   = (vscpEvent *) calloc(1, sizeof(vscpEvent));
+  static vscp_event_t *pev = NULL;
+  pev                   = (vscp_event_t *) calloc(1, sizeof(vscpEvent));
   if (NULL == pev) {
     return NULL;
   }
@@ -1102,7 +1108,7 @@ vscp_fwhlp_newEvent(void)
 //
 
 bool
-setFrameVersion(vscpEvent *pEvent, uint16_t version)
+setFrameVersion(vscp_event_t *pEvent, uint16_t version)
 {
   if (NULL == pEvent) {
     return false;
@@ -1122,7 +1128,7 @@ setFrameVersion(vscpEvent *pEvent, uint16_t version)
 //
 
 bool
-setFrameVersionEx(vscpEventEx *pEventEx, uint16_t version)
+setFrameVersionEx(vscp_event_ex_t *pEventEx, uint16_t version)
 {
   if (NULL == pEventEx) {
     return false;
@@ -1141,7 +1147,7 @@ setFrameVersionEx(vscpEventEx *pEventEx, uint16_t version)
 // vscp_fwhlp_convertEventToEventEx
 
 int
-vscp_fwhlp_convertEventToEventEx(vscpEventEx *pEventEx, const vscpEvent *pEvent)
+vscp_fwhlp_convertEventToEventEx(vscp_event_ex_t *pEventEx, const vscp_event_t *pEvent)
 {
   // Check pointers
   if (NULL == pEvent) {
@@ -1195,7 +1201,7 @@ vscp_fwhlp_convertEventToEventEx(vscpEventEx *pEventEx, const vscpEvent *pEvent)
 //
 
 int
-vscp_fwhlp_convertEventExToEvent(vscpEvent *pEvent, const vscpEventEx *pEventEx)
+vscp_fwhlp_convertEventExToEvent(vscp_event_t *pEvent, const vscp_event_ex_t *pEventEx)
 {
   // Check pointers
   if (NULL == pEvent) {
@@ -1252,15 +1258,15 @@ vscp_fwhlp_convertEventExToEvent(vscpEvent *pEvent, const vscpEventEx *pEventEx)
 // vscp_fwhlp_mkEventCopy
 //
 
-vscpEvent *
-vscp_fwhlp_mkEventCopy(const vscpEvent *pev)
+vscp_event_t *
+vscp_fwhlp_mkEventCopy(const vscp_event_t *pev)
 {
   // Must have event to work on
   if (NULL == pev) {
     return NULL;
   }
 
-  vscpEvent *pnewEvent = vscp_fwhlp_newEvent();
+  vscp_event_t *pnewEvent = vscp_fwhlp_newEvent();
   if (NULL == pnewEvent) {
     return NULL;
   }
@@ -1287,15 +1293,15 @@ vscp_fwhlp_mkEventCopy(const vscpEvent *pev)
 // vscp_fwhlp_mkEventExCopy
 //
 
-vscpEventEx *
-vscp_fwhlp_mkEventExCopy(const vscpEventEx *pex)
+vscp_event_ex_t *
+vscp_fwhlp_mkEventExCopy(const vscp_event_ex_t *pex)
 {
   // Must have event to work on
   if (NULL == pex) {
     return NULL;
   }
 
-  vscpEventEx *pnewEventEx = (vscpEventEx *) malloc(sizeof(vscpEventEx));
+  vscp_event_ex_t *pnewEventEx = (vscp_event_ex_t *) malloc(sizeof(vscpEventEx));
   ;
   if (NULL == pnewEventEx) {
     return NULL;
@@ -1312,7 +1318,7 @@ vscp_fwhlp_mkEventExCopy(const vscpEventEx *pex)
 //
 
 int
-vscp_fwhlp_deleteEvent(vscpEvent **pev)
+vscp_fwhlp_deleteEvent(vscp_event_t **pev)
 {
   if (NULL == *pev) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -2050,7 +2056,7 @@ vscp_fwhlp_writeMaskToString(char *strMask, size_t len, const vscpEventFilter *p
 //
 
 int
-vscp_fwhlp_parseStringToEvent(vscpEvent *pev, const char *buf)
+vscp_fwhlp_parseStringToEvent(vscp_event_t *pev, const char *buf)
 {
   uint8_t wrkbuf[512];
   char *p = (char *) buf;
@@ -2263,7 +2269,7 @@ vscp_fwhlp_parseStringToEvent(vscpEvent *pev, const char *buf)
 //
 
 int
-vscp_fwhlp_parseStringToEventEx(vscpEventEx *pex, const char *buf)
+vscp_fwhlp_parseStringToEventEx(vscp_event_ex_t *pex, const char *buf)
 {
   uint8_t wrkbuf[512];
   char *p = (char *) buf;
@@ -2483,7 +2489,7 @@ vscp_fwhlp_parseStringToEventEx(vscpEventEx *pex, const char *buf)
 //
 
 int
-vscp_fwhlp_eventToString(char *buf, size_t size, const vscpEvent *pev)
+vscp_fwhlp_eventToString(char *buf, size_t size, const vscp_event_t *pev)
 {
   char wrkbuf[48]; // Can hold full GUID
 
@@ -2574,7 +2580,7 @@ vscp_fwhlp_eventToString(char *buf, size_t size, const vscpEvent *pev)
 // data: ",255" => 4 * 512 = 2048
 
 int
-vscp_fwhlp_eventToStringEx(char *buf, size_t size, const vscpEventEx *pex)
+vscp_fwhlp_eventToStringEx(char *buf, size_t size, const vscp_event_ex_t *pex)
 {
   char wrkbuf[48]; // Can hold full GUID
 
@@ -2669,7 +2675,7 @@ vscp_fwhlp_eventToStringEx(char *buf, size_t size, const vscpEventEx *pex)
 //
 
 int
-vscp_fwhlp_doLevel2Filter(const vscpEvent *pev, const vscpEventFilter *pFilter)
+vscp_fwhlp_doLevel2Filter(const vscp_event_t *pev, const vscpEventFilter *pFilter)
 {
   // A NULL filter is wildcard
   if (NULL == pFilter) {
@@ -2725,7 +2731,7 @@ vscp_fwhlp_doLevel2Filter(const vscpEvent *pev, const vscpEventFilter *pFilter)
 //
 
 int
-vscp_fwhlp_doLevel2FilterEx(const vscpEventEx *pex, const vscpEventFilter *pFilter)
+vscp_fwhlp_doLevel2FilterEx(const vscp_event_ex_t *pex, const vscpEventFilter *pFilter)
 {
   // A NULL filter is wildcard
   if (NULL == pFilter) {
@@ -2773,7 +2779,7 @@ vscp_fwhlp_doLevel2FilterEx(const vscpEventEx *pex, const vscpEventFilter *pFilt
 //
 
 size_t
-vscp_fwhlp_getFrameSizeFromEvent(vscpEvent *pEvent)
+vscp_fwhlp_getFrameSizeFromEvent(vscp_event_t *pEvent)
 {
   // Check pointer
   if (NULL == pEvent) {
@@ -2792,7 +2798,7 @@ vscp_fwhlp_getFrameSizeFromEvent(vscpEvent *pEvent)
 //
 
 size_t
-vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx *pEventEx)
+vscp_fwhlp_getFrameSizeFromEventEx(vscp_event_ex_t *pEventEx)
 {
   // Check pointer
   if (NULL == pEventEx) {
@@ -2812,7 +2818,7 @@ vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx *pEventEx)
 //
 
 int
-vscp_fwhlp_writeEventToFrame(uint8_t *frame, size_t len, uint8_t encryption, const vscpEvent *pEvent)
+vscp_fwhlp_writeEventToFrame(uint8_t *frame, size_t len, uint8_t encryption, const vscp_event_t *pEvent)
 {
   uint16_t head         = pEvent->head;
   uint64_t timestamp_ns = pEvent->timestamp_ns;
@@ -2916,10 +2922,10 @@ vscp_fwhlp_writeEventToFrame(uint8_t *frame, size_t len, uint8_t encryption, con
 //
 
 int
-vscp_fwhlp_writeEventExToFrame(uint8_t *frame, size_t len, uint8_t encryption, const vscpEventEx *pEventEx)
+vscp_fwhlp_writeEventExToFrame(uint8_t *frame, size_t len, uint8_t encryption, const vscp_event_ex_t *pEventEx)
 {
   int rv;
-  vscpEvent *pEvent;
+  vscp_event_t *pEvent;
 
   pEvent = vscp_fwhlp_newEvent();
   if (NULL == pEvent) {
@@ -2955,7 +2961,7 @@ vscp_fwhlp_writeEventExToFrame(uint8_t *frame, size_t len, uint8_t encryption, c
 //
 
 int
-vscp_fwhlp_getEventFromFrame(vscpEvent *pEvent, const uint8_t *buf, size_t len)
+vscp_fwhlp_getEventFromFrame(vscp_event_t *pEvent, const uint8_t *buf, size_t len)
 {
   // Check pointers
   if (NULL == pEvent) {
@@ -3206,12 +3212,12 @@ vscp_fwhlp_getEventFromFrame(vscpEvent *pEvent, const uint8_t *buf, size_t len)
 //
 
 int
-vscp_fwhlp_getEventExFromFrame(vscpEventEx *pEventEx, const uint8_t *frame, size_t len)
+vscp_fwhlp_getEventExFromFrame(vscp_event_ex_t *pEventEx, const uint8_t *frame, size_t len)
 {
   int rv;
-  vscpEvent *pEvent;
+  vscp_event_t *pEvent;
 
-  pEvent = (vscpEvent *) calloc(1, sizeof(vscpEvent));
+  pEvent = (vscp_event_t *) calloc(1, sizeof(vscpEvent));
   if (NULL == pEvent) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -3364,6 +3370,11 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
                         const uint8_t *iv,
                         uint8_t nAlgorithm)
 {
+#ifdef VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO
+  // Use PSA crypto backend when enabled
+  return vscp_fwhlp_encryptFrame_psa(output, input, len, key, iv, nAlgorithm);
+#else
+  // Use AES backend (default)
   uint8_t generated_iv[16];
 
   // Check pointers
@@ -3460,6 +3471,7 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
   padlen++;
 
   return padlen;
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3474,6 +3486,11 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
                         const uint8_t *iv,
                         uint8_t nAlgorithm)
 {
+#ifdef VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO
+  // Use PSA crypto backend when enabled
+  return vscp_fwhlp_decryptFrame_psa(output, input, len, key, iv, nAlgorithm);
+#else
+  // Use AES backend (default)
   uint8_t appended_iv[16];
   size_t real_len = len;
 
@@ -3548,9 +3565,320 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
   }
 
   return VSCP_ERROR_SUCCESS;
+#endif
 }
 
 #endif // VSCP_FWHLP_CRYPTO_SUPPORT
+
+///////////////////////////////////////////////////////////////////////////////
+// PSA Crypto Support
+//
+// Platform Security Architecture (PSA) Crypto implementations for
+// encryption and decryption. These functions provide an alternative
+// to the AES-based implementations.
+// Only available on ESP32 hardware (ESP_PLATFORM).
+//
+
+#if defined(VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO) && defined(ESP_PLATFORM)
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_encryptFrame_psa
+//
+
+size_t
+vscp_fwhlp_encryptFrame_psa(uint8_t *output,
+                            uint8_t *input,
+                            size_t len,
+                            const uint8_t *key,
+                            const uint8_t *iv,
+                            uint8_t nAlgorithm)
+{
+  psa_status_t status;
+  psa_cipher_operation_t operation;
+  psa_algorithm_t psa_alg;
+  psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+  psa_key_id_t key_id;
+  uint8_t generated_iv[16];
+  size_t output_len = 0;
+  size_t ciphertext_len;
+
+  // Check pointers
+  if (NULL == output) {
+    return 0;
+  }
+
+  if (NULL == input) {
+    return 0;
+  }
+
+  if (NULL == key) {
+    return 0;
+  }
+
+  // If no encryption needed - return
+  if (VSCP_ENCRYPTION_NONE == nAlgorithm) {
+    memcpy(output, input, len);
+    return len;
+  }
+
+  // Must be padded if needed (should have length multiple of 16).
+  // Encrypted len is len-1 because of leading encryption byte
+  size_t padlen = len - 1;
+  padlen        = padlen + (16 - (padlen % 16));
+
+  // The frame type is always unencrypted
+  output[0] = input[0];
+
+  // Should encryption algorithm be set by package
+  if (VSCP_ENCRYPTION_FROM_TYPE_BYTE == (nAlgorithm & 0x0f)) {
+    nAlgorithm = input[0] & 0x0f;
+  }
+
+  // If iv is not given it should be generated
+  if (NULL == iv) {
+    if (16 != getRandomIV(generated_iv, 16)) {
+      return 0;
+    }
+  }
+  else {
+    memcpy(generated_iv, iv, 16);
+  }
+
+  // Initialize PSA framework
+  status = psa_crypto_init();
+  if (PSA_SUCCESS != status) {
+    return 0;
+  }
+
+  // Set key attributes based on algorithm
+  switch (nAlgorithm) {
+    case VSCP_ENCRYPTION_AES128:
+      psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_ENCRYPT);
+      psa_set_key_algorithm(&attributes, PSA_ALG_CBC_NO_PADDING);
+      psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
+      psa_set_key_bits(&attributes, 128);
+      psa_alg = PSA_ALG_CBC_NO_PADDING;
+      break;
+
+    case VSCP_ENCRYPTION_AES192:
+      psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_ENCRYPT);
+      psa_set_key_algorithm(&attributes, PSA_ALG_CBC_NO_PADDING);
+      psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
+      psa_set_key_bits(&attributes, 192);
+      psa_alg = PSA_ALG_CBC_NO_PADDING;
+      break;
+
+    case VSCP_ENCRYPTION_AES256:
+      psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_ENCRYPT);
+      psa_set_key_algorithm(&attributes, PSA_ALG_CBC_NO_PADDING);
+      psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
+      psa_set_key_bits(&attributes, 256);
+      psa_alg = PSA_ALG_CBC_NO_PADDING;
+      break;
+
+    default:
+      // Not a valid encryption algorithm
+      return 0;
+  }
+
+  // Import the key
+  status = psa_import_key(&attributes, key, 16 + ((nAlgorithm - VSCP_ENCRYPTION_AES128) * 8), &key_id);
+  if (PSA_SUCCESS != status) {
+    psa_reset_key_attributes(&attributes);
+    return 0;
+  }
+
+  // Setup cipher operation
+  status = psa_cipher_encrypt_setup(&operation, key_id, psa_alg);
+  if (PSA_SUCCESS != status) {
+    psa_destroy_key(key_id);
+    psa_reset_key_attributes(&attributes);
+    return 0;
+  }
+
+  // Set IV
+  status = psa_cipher_set_iv(&operation, generated_iv, 16);
+  if (PSA_SUCCESS != status) {
+    psa_cipher_abort(&operation);
+    psa_destroy_key(key_id);
+    psa_reset_key_attributes(&attributes);
+    return 0;
+  }
+
+  // Update with input data (skipping frame type byte)
+  status = psa_cipher_update(&operation, input + 1, padlen, output + 1, padlen, &output_len);
+  if (PSA_SUCCESS != status) {
+    psa_cipher_abort(&operation);
+    psa_destroy_key(key_id);
+    psa_reset_key_attributes(&attributes);
+    return 0;
+  }
+
+  // Finish encryption
+  ciphertext_len = 0;
+  status = psa_cipher_finish(&operation, output + 1 + output_len, padlen - output_len, &ciphertext_len);
+  if (PSA_SUCCESS != status) {
+    psa_destroy_key(key_id);
+    psa_reset_key_attributes(&attributes);
+    return 0;
+  }
+
+  // Cleanup
+  psa_destroy_key(key_id);
+  psa_reset_key_attributes(&attributes);
+
+  // Append iv
+  memcpy(output + 1 + padlen, generated_iv, 16);
+  padlen += 16; // length of iv
+  padlen++;     // Account for frame type byte
+
+  return padlen;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_decryptFrame_psa
+//
+
+int
+vscp_fwhlp_decryptFrame_psa(uint8_t *output,
+                            const uint8_t *input,
+                            size_t len,
+                            const uint8_t *key,
+                            const uint8_t *iv,
+                            uint8_t nAlgorithm)
+{
+  psa_status_t status;
+  psa_cipher_operation_t operation;
+  psa_algorithm_t psa_alg;
+  psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+  psa_key_id_t key_id;
+  uint8_t appended_iv[16];
+  size_t output_len = 0;
+  size_t plaintext_len;
+  size_t real_len = len;
+
+  // Check pointers
+  if (NULL == output) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if (NULL == input) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if (NULL == key) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if (VSCP_ENCRYPTION_NONE == GET_VSCP_BINARY_PACKET_ENCRYPTION(nAlgorithm)) {
+    memcpy(output, input, len);
+    return VSCP_ERROR_SUCCESS;
+  }
+
+  // If iv is not given it should be fetched from the end of input (last 16 bytes)
+  if (NULL == iv) {
+    memcpy(appended_iv, (input + len - 16), 16);
+    real_len -= 16; // Adjust frame length accordingly
+  }
+  else {
+    memcpy(appended_iv, iv, 16);
+  }
+
+  // Preserve frame type which always is un-encrypted
+  output[0] = input[0];
+
+  // Should decryption algorithm be set by package
+  if (VSCP_ENCRYPTION_FROM_TYPE_BYTE == (nAlgorithm & 0x0f)) {
+    nAlgorithm = input[0] & 0x0f;
+  }
+
+  // Initialize PSA framework
+  status = psa_crypto_init();
+  if (PSA_SUCCESS != status) {
+    return VSCP_ERROR_ERROR;
+  }
+
+  // Set key attributes based on algorithm
+  switch (nAlgorithm) {
+    case VSCP_ENCRYPTION_AES128:
+      psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DECRYPT);
+      psa_set_key_algorithm(&attributes, PSA_ALG_CBC_NO_PADDING);
+      psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
+      psa_set_key_bits(&attributes, 128);
+      psa_alg = PSA_ALG_CBC_NO_PADDING;
+      break;
+
+    case VSCP_ENCRYPTION_AES192:
+      psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DECRYPT);
+      psa_set_key_algorithm(&attributes, PSA_ALG_CBC_NO_PADDING);
+      psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
+      psa_set_key_bits(&attributes, 192);
+      psa_alg = PSA_ALG_CBC_NO_PADDING;
+      break;
+
+    case VSCP_ENCRYPTION_AES256:
+      psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DECRYPT);
+      psa_set_key_algorithm(&attributes, PSA_ALG_CBC_NO_PADDING);
+      psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
+      psa_set_key_bits(&attributes, 256);
+      psa_alg = PSA_ALG_CBC_NO_PADDING;
+      break;
+
+    default:
+      // Not a valid encryption algorithm
+      return VSCP_ERROR_PARAMETER;
+  }
+
+  // Import the key
+  status = psa_import_key(&attributes, key, 16 + ((nAlgorithm - VSCP_ENCRYPTION_AES128) * 8), &key_id);
+  if (PSA_SUCCESS != status) {
+    psa_reset_key_attributes(&attributes);
+    return VSCP_ERROR_ERROR;
+  }
+
+  // Setup cipher operation for decryption
+  status = psa_cipher_decrypt_setup(&operation, key_id, psa_alg);
+  if (PSA_SUCCESS != status) {
+    psa_destroy_key(key_id);
+    psa_reset_key_attributes(&attributes);
+    return VSCP_ERROR_ERROR;
+  }
+
+  // Set IV
+  status = psa_cipher_set_iv(&operation, appended_iv, 16);
+  if (PSA_SUCCESS != status) {
+    psa_cipher_abort(&operation);
+    psa_destroy_key(key_id);
+    psa_reset_key_attributes(&attributes);
+    return VSCP_ERROR_ERROR;
+  }
+
+  // Update with input data (skipping frame type byte)
+  status = psa_cipher_update(&operation, input + 1, real_len - 1, output + 1, real_len - 1, &output_len);
+  if (PSA_SUCCESS != status) {
+    psa_cipher_abort(&operation);
+    psa_destroy_key(key_id);
+    psa_reset_key_attributes(&attributes);
+    return VSCP_ERROR_ERROR;
+  }
+
+  // Finish decryption
+  plaintext_len = 0;
+  status = psa_cipher_finish(&operation, output + 1 + output_len, real_len - 1 - output_len, &plaintext_len);
+  if (PSA_SUCCESS != status) {
+    psa_destroy_key(key_id);
+    psa_reset_key_attributes(&attributes);
+    return VSCP_ERROR_ERROR;
+  }
+
+  // Cleanup
+  psa_destroy_key(key_id);
+  psa_reset_key_attributes(&attributes);
+
+  return VSCP_ERROR_SUCCESS;
+}
+
+#endif // VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO && ESP_PLATFORM
 
 /*
   JSON support needs VSCP_FWHLP_JSON_SUPPORT to be defined
@@ -3587,7 +3915,7 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
 */
 
 int
-vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj)
+vscp_fwhlp_parse_json(vscp_event_t *pev, const char *jsonVscpEventObj)
 {
   int rv;
   cJSON *root;
@@ -3720,7 +4048,7 @@ vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj)
 */
 
 int
-vscp_fwhlp_parse_json_ex(vscpEventEx *pex, const char *jsonVscpEventObj)
+vscp_fwhlp_parse_json_ex(vscp_event_ex_t *pex, const char *jsonVscpEventObj)
 {
   int rv;
   cJSON *root;
@@ -3828,7 +4156,7 @@ vscp_fwhlp_parse_json_ex(vscpEventEx *pex, const char *jsonVscpEventObj)
 //
 
 int
-vscp_fwhlp_create_json(char *strObj, size_t len, const vscpEvent *pev)
+vscp_fwhlp_create_json(char *strObj, size_t len, const vscp_event_t *pev)
 {
   char str[80];
   cJSON *root;
@@ -3898,7 +4226,7 @@ vscp_fwhlp_create_json(char *strObj, size_t len, const vscpEvent *pev)
 //
 
 int
-vscp_fwhlp_create_json_ex(char *strObj, size_t len, const vscpEventEx *pex)
+vscp_fwhlp_create_json_ex(char *strObj, size_t len, const vscp_event_ex_t *pex)
 {
   char str[80];
   cJSON *root;
@@ -4180,7 +4508,7 @@ _parse_event_string(attribute_t *attributes, size_t *attribute_count, const char
 // />
 
 int
-vscp_fwhlp_parse_xml_event(vscpEvent *pev, const char *eventstr)
+vscp_fwhlp_parse_xml_event(vscp_event_t *pev, const char *eventstr)
 {
   int rv;
   attribute_t attributes[MAX_ATTRIBUTES];
@@ -4298,7 +4626,7 @@ vscp_fwhlp_parse_xml_event(vscpEvent *pev, const char *eventstr)
 //
 
 int
-vscp_fwhlp_parse_xml_eventex(vscpEventEx *pex, const char *eventexstr)
+vscp_fwhlp_parse_xml_eventex(vscp_event_ex_t *pex, const char *eventexstr)
 {
   int rv;
   attribute_t attributes[MAX_ATTRIBUTES];
@@ -4405,7 +4733,7 @@ vscp_fwhlp_parse_xml_eventex(vscpEventEx *pex, const char *eventexstr)
 //
 
 int
-vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscpEvent *pev)
+vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscp_event_t *pev)
 {
   int rv;
   char strDateTime[64]  = { 0 };
@@ -4475,7 +4803,7 @@ vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscpEvent *pev)
 //
 
 int
-vscp_fwhlp_eventex_to_xml(char *eventexstr, size_t len, const vscpEventEx *pex)
+vscp_fwhlp_eventex_to_xml(char *eventexstr, size_t len, const vscp_event_ex_t *pex)
 {
   int rv;
   char strGuid[80];
@@ -4545,7 +4873,7 @@ vscp_fwhlp_eventex_to_xml(char *eventexstr, size_t len, const vscpEventEx *pex)
 //
 
 int
-vscp_fwhlp_set_event_info_from_topic(vscpEvent *pev, const char *topic)
+vscp_fwhlp_set_event_info_from_topic(vscp_event_t *pev, const char *topic)
 {
   int rv;
   char strGuid[80];
@@ -4578,7 +4906,7 @@ vscp_fwhlp_set_event_info_from_topic(vscpEvent *pev, const char *topic)
 //
 
 int
-vscp_fwhlp_set_eventex_info_from_topic(vscpEventEx *pex, const char *topic)
+vscp_fwhlp_set_eventex_info_from_topic(vscp_event_ex_t *pex, const char *topic)
 {
   int rv;
   char strGuid[80];
@@ -4619,7 +4947,7 @@ vscp_fwhlp_set_eventex_info_from_topic(vscpEventEx *pex, const char *topic)
 //
 
 uint8_t
-vscp_fwhlp_getMeasurementDataCoding(const vscpEvent *pEvent)
+vscp_fwhlp_getMeasurementDataCoding(const vscp_event_t *pEvent)
 {
   uint8_t datacoding_byte = -1;
 
@@ -4834,7 +5162,7 @@ vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t *pCode, uint8_t length)
 //
 
 int
-vscp_fwhlp_getMeasurementUnit(const vscpEvent *pEvent)
+vscp_fwhlp_getMeasurementUnit(const vscp_event_t *pEvent)
 {
   int offset = 0;
 
@@ -4890,7 +5218,7 @@ vscp_fwhlp_getMeasurementUnit(const vscpEvent *pEvent)
 //
 
 int
-vscp_fwhlp_getMeasurementSensorIndex(const vscpEvent *pEvent)
+vscp_fwhlp_getMeasurementSensorIndex(const vscp_event_t *pEvent)
 {
   int offset = 0;
 
@@ -4955,7 +5283,7 @@ vscp_fwhlp_getMeasurementSensorIndex(const vscpEvent *pEvent)
 //
 
 int
-vscp_fwhlp_getMeasurementZone(const vscpEvent *pEvent)
+vscp_fwhlp_getMeasurementZone(const vscp_event_t *pEvent)
 {
   int offset = 0;
 
@@ -5020,7 +5348,7 @@ vscp_fwhlp_getMeasurementZone(const vscpEvent *pEvent)
 //
 
 int
-vscp_fwhlp_getMeasurementSubZone(const vscpEvent *pEvent)
+vscp_fwhlp_getMeasurementSubZone(const vscp_event_t *pEvent)
 {
   int offset = 0;
 
@@ -5081,7 +5409,7 @@ vscp_fwhlp_getMeasurementSubZone(const vscpEvent *pEvent)
 //
 
 int
-vscp_fwhlp_isMeasurement(const vscpEvent *pEvent)
+vscp_fwhlp_isMeasurement(const vscp_event_t *pEvent)
 {
   if (NULL == pEvent) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -5168,7 +5496,7 @@ vscp_fwhlp_getMeasurementAsFloat(const unsigned char *pNorm, unsigned char lengt
 //
 
 int
-vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent)
+vscp_fwhlp_getMeasurementAsString(char *strValue, const vscp_event_t *pEvent)
 {
   int i, j;
   int offset = 0;
@@ -5375,7 +5703,7 @@ vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent)
 //
 
 int
-vscp_fwhlp_getMeasurementFloat64AsString(char *strValue, const vscpEvent *pEvent)
+vscp_fwhlp_getMeasurementFloat64AsString(char *strValue, const vscp_event_t *pEvent)
 {
   int offset = 0;
 
@@ -5401,7 +5729,7 @@ vscp_fwhlp_getMeasurementFloat64AsString(char *strValue, const vscpEvent *pEvent
 //
 
 int
-vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscpEvent *pEvent)
+vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscp_event_t *pEvent)
 {
   char str[80];
 
@@ -5461,9 +5789,9 @@ vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscpEvent *pEvent)
 //
 
 int
-vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscpEventEx *pEventEx)
+vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscp_event_ex_t *pEventEx)
 {
-  vscpEvent *pev = (vscpEvent *) malloc(sizeof(vscpEvent));
+  vscp_event_t *pev = (vscp_event_t *) malloc(sizeof(vscpEvent));
   if (NULL == pev) {
     return -1;
   }
@@ -5488,7 +5816,7 @@ vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscpEventEx *pEventEx)
 //
 
 int
-vscp_fwhlp_getMeasurementWithZoneAsString(const vscpEvent *pEvent)
+vscp_fwhlp_getMeasurementWithZoneAsString(const vscp_event_t *pEvent)
 {
   int offset = 0;
 
@@ -5504,7 +5832,7 @@ vscp_fwhlp_getMeasurementWithZoneAsString(const vscpEvent *pEvent)
   }
 
   // We mimic a standard measurement
-  vscpEvent eventMimic;
+  vscp_event_t eventMimic;
   memset(&eventMimic, 0, sizeof(eventMimic));
 
   eventMimic.pdata      = (uint8_t *) malloc(pEvent->sizeData - offset - 3);
@@ -5586,7 +5914,7 @@ vscp_fwhlp_getCANALidFromData(unsigned char priority, const uint16_t vscp_class,
 //
 
 uint32_t
-vscp_fwhlp_getCANALidFromEvent(const vscpEvent *pEvent)
+vscp_fwhlp_getCANALidFromEvent(const vscp_event_t *pEvent)
 {
   return (((unsigned long) vscp_fwhlp_getEventPriority(pEvent) << 26) | ((unsigned long) pEvent->vscp_class << 16) |
           ((unsigned long) pEvent->vscp_type << 8) | 0);

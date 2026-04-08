@@ -218,7 +218,7 @@ vscp_ws1_callback_reply(const char *response, void *pdata);
   or an appropriate error code if there was a failure.
 */
 int
-vscp_ws1_callback_event(vscpEvent *pEvent, void *pdata);
+vscp_ws1_callback_event(vscp_event_t *pEvent, void *pdata);
 
 /*!
   @fn vscp_ws1_callback_copyright

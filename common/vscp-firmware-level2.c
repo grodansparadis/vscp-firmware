@@ -70,7 +70,7 @@ vscp_frmw2_init(vscp_frmw2_firmware_config_t* const pcfg)
   g_pconfig->m_page_select        = 0;
   g_pconfig->m_reset_device_flags = 0; // VSCP_TYPE_PROTOCOL_RESET_DEVICE
 
-  vscpEventEx exrply;
+  vscp_event_ex_t exrply;
   vscp_frmw2_setup_event_ex(&exrply);
 
   if (VSCP_LEVEL1 == g_pconfig->m_level) {
@@ -157,7 +157,7 @@ vscp_frmw2_init(vscp_frmw2_firmware_config_t* const pcfg)
 int
 vscp_frmw2_send_probe(int bNewNodeOnLine)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
 
   // Send probe
   vscp_frmw2_setup_event_ex(&ex);
@@ -344,7 +344,7 @@ vscp_frmw2_nickname_wait(const vscpEventEx* const pex)
           vscp_frmw2_callback_stdreg_change(g_pconfig->m_puserdata, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
           vscp_frmw2_callback_stdreg_change(g_pconfig->m_puserdata, VSCP_STD_REGISTER_NICKNAME_ID_LSB);
 
-          vscpEventEx exrply;
+          vscp_event_ex_t exrply;
           vscp_frmw2_setup_event_ex(&exrply);
           exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
           exrply.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
@@ -363,7 +363,7 @@ vscp_frmw2_nickname_wait(const vscpEventEx* const pex)
           vscp_frmw2_callback_stdreg_change(g_pconfig->m_puserdata, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
           vscp_frmw2_callback_stdreg_change(g_pconfig->m_puserdata, VSCP_STD_REGISTER_NICKNAME_ID_LSB);
 
-          vscpEventEx exrply;
+          vscp_event_ex_t exrply;
           vscp_frmw2_setup_event_ex(&exrply);
           exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
           exrply.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
@@ -490,7 +490,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
           // If addressed to us?
           if (construct_unsigned16(EXDTA(0), EXDTA(1)) == g_pconfig->m_nickname) {
             // Confirm probe
-            vscpEventEx exrply;
+            vscp_event_ex_t exrply;
             vscp_frmw2_setup_event_ex(&exrply);
             exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
             exrply.vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
@@ -501,7 +501,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
           // If addressed to us?
           if (construct_unsigned16(EXDTA(0), EXDTA(1)) == g_pconfig->m_nickname) {
             // Confirm probe
-            vscpEventEx exrply;
+            vscp_event_ex_t exrply;
             vscp_frmw2_setup_event_ex(&exrply);
             exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
             exrply.vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
@@ -511,7 +511,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
         else if (16 == ADJSIZEX) {
           // 16-bit node id
           if (0 == memcmp(g_pconfig->m_guid, &EXDTA(0), 16)) {
-            vscpEventEx exrply;
+            vscp_event_ex_t exrply;
             vscp_frmw2_setup_event_ex(&exrply);
             exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
             exrply.vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
@@ -536,7 +536,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
             vscp_frmw2_callback_stdreg_change(g_pconfig->m_puserdata, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
             vscp_frmw2_callback_stdreg_change(g_pconfig->m_puserdata, VSCP_STD_REGISTER_NICKNAME_ID_LSB);
 
-            vscpEventEx exrply;
+            vscp_event_ex_t exrply;
             vscp_frmw2_setup_event_ex(&exrply);
             exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
             exrply.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
@@ -555,7 +555,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
             vscp_frmw2_callback_stdreg_change(g_pconfig->m_puserdata, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
             vscp_frmw2_callback_stdreg_change(g_pconfig->m_puserdata, VSCP_STD_REGISTER_NICKNAME_ID_LSB);
 
-            vscpEventEx exrply;
+            vscp_event_ex_t exrply;
             vscp_frmw2_setup_event_ex(&exrply);
             exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
             exrply.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
@@ -668,7 +668,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
 
         // Send response
         if (VSCP_ERROR_SUCCESS == rv) {
-          vscpEventEx exrply;
+          vscp_event_ex_t exrply;
           vscp_frmw2_setup_event_ex(&exrply);
           exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
           exrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
@@ -726,7 +726,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
 
         // Send response
         if (VSCP_ERROR_SUCCESS == rv) {
-          vscpEventEx exrply;
+          vscp_event_ex_t exrply;
           vscp_frmw2_setup_event_ex(&exrply);
           exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
           exrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
@@ -760,7 +760,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
         }
         else {
           // Send negative response
-          vscpEventEx exrply;
+          vscp_event_ex_t exrply;
           vscp_frmw2_setup_event_ex(&exrply);
           exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
           exrply.vscp_type  = VSCP_TYPE_PROTOCOL_NACK_BOOT_LOADER;
@@ -856,7 +856,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
 
       case VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_PROBE:
         if (g_pconfig->m_bHighEndServerResponse) {
-          vscpEventEx exrply;
+          vscp_event_ex_t exrply;
           vscp_frmw2_setup_event_ex(&exrply);
           exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
           exrply.vscp_type  = VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_RESPONSE;
@@ -880,7 +880,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
       case VSCP_TYPE_PROTOCOL_INCREMENT_REGISTER: {
 
         uint8_t val;
-        vscpEventEx exrply;
+        vscp_event_ex_t exrply;
         vscp_frmw2_setup_event_ex(&exrply);
 
         if ((2 == ADJSIZEX) &&
@@ -919,7 +919,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
       case VSCP_TYPE_PROTOCOL_DECREMENT_REGISTER: {
 
         uint8_t val;
-        vscpEventEx exrply;
+        vscp_event_ex_t exrply;
         vscp_frmw2_setup_event_ex(&exrply);
 
         if ((2 == ADJSIZEX) &&
@@ -980,7 +980,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
 
         uint16_t uppermax;
         uint16_t nframes;
-        vscpEventEx exrply;
+        vscp_event_ex_t exrply;
         vscp_frmw2_setup_event_ex(&exrply);
         if (VSCP_LEVEL1 == g_pconfig->m_level) {
           exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
@@ -1078,7 +1078,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
 
       case VSCP_TYPE_PROTOCOL_GET_EVENT_INTEREST: {
 
-        vscpEventEx exrply;
+        vscp_event_ex_t exrply;
         vscp_frmw2_setup_event_ex(&exrply);
 
         if (NULL == g_pconfig->m_pEventsOfInterest) {
@@ -1192,7 +1192,7 @@ vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex)
         //char devname[64];
         //char url[32];
 
-        vscpEventEx exrply;
+        vscp_event_ex_t exrply;
         vscp_frmw2_setup_event_ex(&exrply);
 
         memcpy(exrply.data, g_pconfig->m_guid, 16);
@@ -1242,7 +1242,7 @@ vscp_frmw2_vscp2_register_read(uint32_t startreg, uint16_t count)
 {
   int rv;
 
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   vscp_frmw2_setup_event_ex(&ex);
 
   // Read the registers
@@ -1505,7 +1505,7 @@ vscp_frmw2_send_heartbeat(void)
 {
   //int rv;
 
-  vscpEventEx exrply;
+  vscp_event_ex_t exrply;
   vscp_frmw2_setup_event_ex(&exrply);
 
   // Construct reply event
@@ -1534,7 +1534,7 @@ vscp_frmw2_send_heartbeat(void)
 int
 vscp_frmw2_send_caps(void)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   vscp_frmw2_setup_event_ex(&ex);
 
   // Construct reply event
@@ -1576,7 +1576,7 @@ vscp_frmw2_send_caps(void)
 int
 vscp_frmw2_send_high_end_server_probe(void)
 {
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   vscp_frmw2_setup_event_ex(&ex);
 
   // Construct reply event
@@ -1604,7 +1604,7 @@ vscp_frmw2_page_read(uint32_t offset, uint8_t count)
   uint8_t seq = 0;
   uint8_t val;
 
-  vscpEventEx rplyex;
+  vscp_event_ex_t rplyex;
   vscp_frmw2_setup_event_ex(&rplyex);
 
   for (i = 0; i < count; i++) {
@@ -1653,7 +1653,7 @@ vscp_frmw2_page_write(uint32_t offset, uint8_t count, const uint8_t* const pbuf)
   uint8_t i;
   uint8_t val;
 
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   vscp_frmw2_setup_event_ex(&ex);
 
   for (i = 0; i < count; i++) {
@@ -1693,7 +1693,7 @@ vscp_frmw2_whois_response(void)
   int rv;
   uint8_t i, j, k = 0;
 
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   vscp_frmw2_setup_event_ex(&ex);
 
   if (VSCP_LEVEL1 == g_pconfig->m_level) {
@@ -1782,7 +1782,7 @@ vscp_frmw2_extended_page_read(uint16_t nodeid, uint16_t page, uint8_t startoffse
 
   unused(nodeid);
 
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   vscp_frmw2_setup_event_ex(&ex);
 
   // Save the current page
@@ -1869,7 +1869,7 @@ vscp_frmw2_extended_page_write(uint16_t nodeid,
   uint16_t page_save;
 
   // Construct response event
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   vscp_frmw2_setup_event_ex(&ex);
   ex.vscp_class = VSCP_CLASS1_PROTOCOL;
   ex.vscp_type  = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
@@ -1913,7 +1913,7 @@ vscp_frmw2_extended_page_write(uint16_t nodeid,
 int
 vscp_frmw2_report_dmatrix(void)
 {
-  vscpEventEx exrply;
+  vscp_event_ex_t exrply;
   vscp_frmw2_setup_event_ex(&exrply);
 
   if (VSCP_LEVEL1 == g_pconfig->m_level) {

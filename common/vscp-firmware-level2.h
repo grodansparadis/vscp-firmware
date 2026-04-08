@@ -321,14 +321,14 @@ typedef struct vscp_frmw2_firmware_config {
 
 /*!
   Adjusted data for offset
-  vscpEvent and vscpEventEx versions
+  vscp_event_t and vscp_event_ex_t versions
 */
 #define EVDTA(x) (pev->pdata[(x) + g_pconfig->m_offset])
 #define EXDTA(x) (pex->data[(x) + g_pconfig->m_offset])
 
 /*!
  * Ajust size for offset
- * vscpEvent and vscpEventEx versions
+ * vscp_event_t and vscp_event_ex_t versions
  */
 #define ADJSIZEV (pev->sizeData - g_pconfig->m_offset)
 #define ADJSIZEX (pex->sizeData - g_pconfig->m_offset)

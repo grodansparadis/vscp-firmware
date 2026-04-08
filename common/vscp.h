@@ -62,7 +62,7 @@ extern "C" {
   This structure is for VSCP Level II
 */
 
-typedef struct _vscpEvent {
+typedef struct _vscp_event_t {
 
   /*
       Bit 15 - This is a dumb node. No MDF, register, nothing.
@@ -135,7 +135,7 @@ typedef const vscp_event_t *PCVSCPEVENT;
     This structure is for VSCP Level II with data embedded == big!!!
  */
 
-typedef struct _vscpEventEx {
+typedef struct _vscp_event_ex_t {
 
   /*
       Bit 15 - This is a dumb node. No MDF, register, nothing.

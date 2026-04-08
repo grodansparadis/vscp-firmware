@@ -343,7 +343,7 @@ vscp_fwhlp_make_string_from_data(char *buf, size_t len, const uint8_t *data, siz
     @return Pointer to result string or NULL if error such as buffer too small.
 */
 char *
-vscp_fwhlp_get_datestr_from_event(char *buf, size_t len, const vscpEvent *pev);
+vscp_fwhlp_get_datestr_from_event(char *buf, size_t len, const vscp_event_t *pev);
 
 /*!
     Get date string in format "YYYY-MM-DDTHH:MM:SS" from eventex
@@ -353,7 +353,7 @@ vscp_fwhlp_get_datestr_from_event(char *buf, size_t len, const vscpEvent *pev);
     @return Pointer to result string or NULL if error such as buffer too small.
 */
 char *
-vscp_fwhlp_get_datestr_from_eventex(char *buf, size_t len, const vscpEventEx *pex);
+vscp_fwhlp_get_datestr_from_eventex(char *buf, size_t len, const vscp_event_ex_t *pex);
 
 /*!
     Parse date string in format "YYYY-MM-DDTHH:MM:SS" and fill event with the values
@@ -362,7 +362,7 @@ vscp_fwhlp_get_datestr_from_eventex(char *buf, size_t len, const vscpEventEx *pe
     @return VSCP_ERROR_SUCCESS if successful, else error code.
 */
 int
-vscp_fwhlp_parse_event_datestr(vscpEvent *pev, const char *strdate, char **endptr);
+vscp_fwhlp_parse_event_datestr(vscp_event_t *pev, const char *strdate, char **endptr);
 
 /*!
     Parse date string in format "YYYY-MM-DDTHH:MM:SS" and fill eventex with the values
@@ -371,7 +371,7 @@ vscp_fwhlp_parse_event_datestr(vscpEvent *pev, const char *strdate, char **endpt
     @return VSCP_ERROR_SUCCESS if successful, else error code.
 */
 int
-vscp_fwhlp_parse_eventex_datestr(vscpEventEx *pex, const char *strdate, char **endptr);
+vscp_fwhlp_parse_eventex_datestr(vscp_event_ex_t *pex, const char *strdate, char **endptr);
 
 /*!
     Convert traditional VSCP date + timestamp to unix 64-bit timestamp in nanoseconds
@@ -450,7 +450,7 @@ vscp_fwhlp_parseMac(uint8_t *pmac, const char *strmac, char **endptr);
     @return true if message should be delivered false if not.
     */
 int
-vscp_fwhlp_doLevel2Filter(const vscpEvent *pev, const vscpEventFilter *pFilter);
+vscp_fwhlp_doLevel2Filter(const vscp_event_t *pev, const vscpEventFilter *pFilter);
 
 /**
     Check filter/mask to check if filter should be delivered
@@ -475,7 +475,7 @@ vscp_fwhlp_doLevel2Filter(const vscpEvent *pev, const vscpEventFilter *pFilter);
     @return true if message should be delivered false if not.
     */
 int
-vscp_fwhlp_doLevel2FilterEx(const vscpEventEx *pex, const vscpEventFilter *pFilter);
+vscp_fwhlp_doLevel2FilterEx(const vscp_event_ex_t *pex, const vscpEventFilter *pFilter);
 
 /**
     Called by the system when a new connection is made.
@@ -616,7 +616,7 @@ vscp_fwhlp_writeMaskToString(char *strMask, size_t len, const vscpEventFilter *p
   @return VSCP_ERROR_SUCCESS if event was parsed correctly.
 */
 int
-vscp_fwhlp_parseStringToEvent(vscpEvent *pev, const char *buf);
+vscp_fwhlp_parseStringToEvent(vscp_event_t *pev, const char *buf);
 
 /**
   @brief Parse an event on string form and write data to an event ex structure
@@ -625,7 +625,7 @@ vscp_fwhlp_parseStringToEvent(vscpEvent *pev, const char *buf);
   @return VSCP_ERROR_SUCCESS if event was parsed correctly.
 */
 int
-vscp_fwhlp_parseStringToEventEx(vscpEventEx *pex, const char *streventex);
+vscp_fwhlp_parseStringToEventEx(vscp_event_ex_t *pex, const char *streventex);
 
 /**
   @brief Write event to string
@@ -635,7 +635,7 @@ vscp_fwhlp_parseStringToEventEx(vscpEventEx *pex, const char *streventex);
   @return VSCP_ERROR_SUCCESS if event was written correctly.
 */
 int
-vscp_fwhlp_eventToString(char *buf, size_t len, const vscpEvent *pev);
+vscp_fwhlp_eventToString(char *buf, size_t len, const vscp_event_t *pev);
 
 /**
   @brief Write event ex to string
@@ -645,13 +645,13 @@ vscp_fwhlp_eventToString(char *buf, size_t len, const vscpEvent *pev);
   @return VSCP_ERROR_SUCCESS if event was written correctly.
 */
 int
-vscp_fwhlp_eventToStringEx(char *buf, size_t len, const vscpEventEx *pex);
+vscp_fwhlp_eventToStringEx(char *buf, size_t len, const vscp_event_ex_t *pex);
 
 /**
   @brief Allocate a new event with zero data.
   @return Pointer to the new event if successful, NULL if not.
 */
-vscpEvent *
+vscp_event_t *
 vscp_fwhlp_newEvent(void);
 
 /*!
@@ -665,7 +665,7 @@ vscp_fwhlp_newEvent(void);
   @return true if all is OK, false if not.
 */
 bool
-setFrameVersion(vscpEvent *pEvent, uint16_t version);
+setFrameVersion(vscp_event_t *pEvent, uint16_t version);
 
 /*!
   @brief Set VSCP frame version in event ex structure.
@@ -678,7 +678,7 @@ setFrameVersion(vscpEvent *pEvent, uint16_t version);
   @return true if all is OK, false if not.
 */
 bool
-setFrameVersionEx(vscpEventEx *pEventEx, uint16_t version);
+setFrameVersionEx(vscp_event_ex_t *pEventEx, uint16_t version);
 
 /**
  * @brief Convert event to eventex
@@ -689,7 +689,7 @@ setFrameVersionEx(vscpEventEx *pEventEx, uint16_t version);
  */
 
 int
-vscp_fwhlp_convertEventToEventEx(vscpEventEx *pEventEx, const vscpEvent *pEvent);
+vscp_fwhlp_convertEventToEventEx(vscp_event_ex_t *pEventEx, const vscp_event_t *pEvent);
 
 /**
  * @brief Convert eventex to event
@@ -700,7 +700,7 @@ vscp_fwhlp_convertEventToEventEx(vscpEventEx *pEventEx, const vscpEvent *pEvent)
  */
 
 int
-vscp_fwhlp_convertEventExToEvent(vscpEvent *pEvent, const vscpEventEx *pEventEx);
+vscp_fwhlp_convertEventExToEvent(vscp_event_t *pEvent, const vscp_event_ex_t *pEventEx);
 
 /*!
     @brief Make a copy of an event
@@ -708,8 +708,8 @@ vscp_fwhlp_convertEventExToEvent(vscpEvent *pEvent, const vscpEventEx *pEventEx)
     @return Pointer to the new event if successful, NULL if not.
 */
 
-vscpEvent *
-vscp_fwhlp_mkEventCopy(const vscpEvent *pev);
+vscp_event_t *
+vscp_fwhlp_mkEventCopy(const vscp_event_t *pev);
 
 /*!
     @brief Make a copy of an eventex
@@ -717,8 +717,8 @@ vscp_fwhlp_mkEventCopy(const vscpEvent *pev);
     @return Pointer to the new eventex if successful, NULL if not.
 */
 
-vscpEventEx *
-vscp_fwhlp_mkEventExCopy(const vscpEventEx *pex);
+vscp_event_ex_t *
+vscp_fwhlp_mkEventExCopy(const vscp_event_ex_t *pex);
 
 /**
   @brief Delete an event and it's data.
@@ -726,7 +726,7 @@ vscp_fwhlp_mkEventExCopy(const vscpEventEx *pex);
   @return VSCP_ERROR_SUCCESS if event was deleted correctly,
 */
 int
-vscp_fwhlp_deleteEvent(vscpEvent **pev);
+vscp_fwhlp_deleteEvent(vscp_event_t **pev);
 
 /*!
   Compile in binary frame handling support
@@ -744,7 +744,7 @@ vscp_fwhlp_deleteEvent(vscpEvent **pev);
  * @return Size of resulting UDP frame on success. Zero on failure.
  */
 size_t
-vscp_fwhlp_getFrameSizeFromEvent(vscpEvent *pEvent);
+vscp_fwhlp_getFrameSizeFromEvent(vscp_event_t *pEvent);
 
 /*!
  * Get UDP frame size from event
@@ -753,7 +753,7 @@ vscp_fwhlp_getFrameSizeFromEvent(vscpEvent *pEvent);
  * @return Size of resulting UDP frame on success. Zero on failure.
  */
 size_t
-vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx *pEventEx);
+vscp_fwhlp_getFrameSizeFromEventEx(vscp_event_ex_t *pEventEx);
 
 /*!
  * Write event on binary frame format
@@ -770,7 +770,7 @@ vscp_fwhlp_getFrameSizeFromEventEx(vscpEventEx *pEventEx);
  * @return VSCP_ERROR_SUCCESS on success, error code on failure.
  */
 int
-vscp_fwhlp_writeEventToFrame(uint8_t *frame, size_t len, uint8_t encryption, const vscpEvent *pEvent);
+vscp_fwhlp_writeEventToFrame(uint8_t *frame, size_t len, uint8_t encryption, const vscp_event_t *pEvent);
 
 /*!
  * Write event ex on binary frame format
@@ -787,7 +787,7 @@ vscp_fwhlp_writeEventToFrame(uint8_t *frame, size_t len, uint8_t encryption, con
  * @return VSCP_ERROR_SUCCESS on success, error code on failure.
  */
 int
-vscp_fwhlp_writeEventExToFrame(uint8_t *frame, size_t len, uint8_t encryption, const vscpEventEx *pEventEx);
+vscp_fwhlp_writeEventExToFrame(uint8_t *frame, size_t len, uint8_t encryption, const vscp_event_ex_t *pEventEx);
 
 /*!
  * Get VSCP event from binary frame
@@ -803,7 +803,7 @@ vscp_fwhlp_writeEventExToFrame(uint8_t *frame, size_t len, uint8_t encryption, c
  * @return VSCP_ERROR_SUCCESS on success, error code on failure.
  */
 int
-vscp_fwhlp_getEventFromFrame(vscpEvent *pEvent, const uint8_t *buf, size_t len);
+vscp_fwhlp_getEventFromFrame(vscp_event_t *pEvent, const uint8_t *buf, size_t len);
 
 /*!
  * Get VSCP event ex from binary frame
@@ -819,7 +819,7 @@ vscp_fwhlp_getEventFromFrame(vscpEvent *pEvent, const uint8_t *buf, size_t len);
  * @return VSCP_ERROR_SUCCESS on success, error code on failure.
  */
 int
-vscp_fwhlp_getEventExFromFrame(vscpEventEx *pEventEx, const uint8_t *buf, size_t len);
+vscp_fwhlp_getEventExFromFrame(vscp_event_ex_t *pEventEx, const uint8_t *buf, size_t len);
 
 /*!
  * Write a command frame
@@ -970,6 +970,69 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
 #endif
 
 /*
+  PSA (Platform Security Architecture) crypto support
+  
+  [ESP32 ONLY] This feature is only available when building for ESP32 hardware
+  with ESP-IDF. It is not available on other platforms.
+  
+  Define VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO in vscp-projdefs.h and link with PSA crypto library
+  to use PSA crypto backend instead of AES. This provides an alternative implementation
+  of the encrypt/decrypt frame functions.
+  
+  PSA crypto provides a standardized cryptographic API that can be used with various
+  hardware security modules and crypto accelerators.
+*/
+#if defined(VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO) && defined(ESP_PLATFORM)
+
+/**
+ * @fn vscp_fwhlp_encryptFrame_psa
+ * @brief Encrypt VSCP frame using PSA crypto (ESP32 only)
+ * 
+ * PSA crypto variant of encryptFrame using Platform Security Architecture crypto API.
+ * Parameters and return values are identical to vscp_fwhlp_encryptFrame.
+ * 
+ * @param output Buffer that will receive the encrypted result
+ * @param input Buffer containing data to encrypt
+ * @param len Length of data to encrypt
+ * @param key Encryption key
+ * @param iv Initialization vector (optional)
+ * @param nAlgorithm Algorithm to use (0-15)
+ * @return Packet length on success, zero on failure
+ */
+size_t
+vscp_fwhlp_encryptFrame_psa(uint8_t *output,
+                            uint8_t *input,
+                            size_t len,
+                            const uint8_t *key,
+                            const uint8_t *iv,
+                            uint8_t nAlgorithm);
+
+/**
+ * @fn vscp_fwhlp_decryptFrame_psa
+ * @brief Decrypt VSCP frame using PSA crypto (ESP32 only)
+ * 
+ * PSA crypto variant of decryptFrame using Platform Security Architecture crypto API.
+ * Parameters and return values are identical to vscp_fwhlp_decryptFrame.
+ * 
+ * @param output Buffer that will receive the decrypted result
+ * @param input Buffer containing encrypted data
+ * @param len Length of data to decrypt
+ * @param key Decryption key
+ * @param iv Initialization vector (optional)
+ * @param nAlgorithm Algorithm to use (0-15)
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure
+ */
+int
+vscp_fwhlp_decryptFrame_psa(uint8_t *output,
+                            const uint8_t *input,
+                            size_t len,
+                            const uint8_t *key,
+                            const uint8_t *iv,
+                            uint8_t nAlgorithm);
+
+#endif // VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO && ESP_PLATFORM
+
+/*
   JSON support needs VSCP_FWHLP_JSON_SUPPORT to be defined
   in the projdef file and cJSON support linked in (can be found
   in vscp-firmware/third-party or at https://github.com/nopnop2002/esp-idf-json
@@ -987,7 +1050,7 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
  */
 
 int
-vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj);
+vscp_fwhlp_parse_json(vscp_event_t *pev, const char *jsonVscpEventObj);
 
 /**
  * @fn vscp_fwhlp_parse_json_ex
@@ -999,7 +1062,7 @@ vscp_fwhlp_parse_json(vscpEvent *pev, const char *jsonVscpEventObj);
  */
 
 int
-vscp_fwhlp_parse_json_ex(vscpEventEx *pex, const char *jsonVscpEventObj);
+vscp_fwhlp_parse_json_ex(vscp_event_ex_t *pex, const char *jsonVscpEventObj);
 
 /**
  * @fn vscp_fwhlp_create_json
@@ -1011,7 +1074,7 @@ vscp_fwhlp_parse_json_ex(vscpEventEx *pex, const char *jsonVscpEventObj);
  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
  */
 int
-vscp_fwhlp_create_json(char *strObj, size_t len, const vscpEvent *pev);
+vscp_fwhlp_create_json(char *strObj, size_t len, const vscp_event_t *pev);
 
 /**
  * @fn vscp_fwhlp_create_json_ex
@@ -1023,7 +1086,7 @@ vscp_fwhlp_create_json(char *strObj, size_t len, const vscpEvent *pev);
  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
  */
 int
-vscp_fwhlp_create_json_ex(char *strObj, size_t len, const vscpEventEx *pex);
+vscp_fwhlp_create_json_ex(char *strObj, size_t len, const vscp_event_ex_t *pex);
 
 #endif // JSON support
 
@@ -1041,7 +1104,7 @@ vscp_fwhlp_create_json_ex(char *strObj, size_t len, const vscpEventEx *pex);
  *
  */
 int
-vscp_fwhlp_parse_xml_event(vscpEvent *pev, const char *eventstr);
+vscp_fwhlp_parse_xml_event(vscp_event_t *pev, const char *eventstr);
 
 /*!
  * @fn vscp_fwhlp_parse_xml_eventex
@@ -1053,7 +1116,7 @@ vscp_fwhlp_parse_xml_event(vscpEvent *pev, const char *eventstr);
  *
  */
 int
-vscp_fwhlp_parse_xml_eventex(vscpEventEx *pex, const char *eventexstr);
+vscp_fwhlp_parse_xml_eventex(vscp_event_ex_t *pex, const char *eventexstr);
 
 /*!
  * @fn vscp_fwhlp_event_to_xml
@@ -1066,7 +1129,7 @@ vscp_fwhlp_parse_xml_eventex(vscpEventEx *pex, const char *eventexstr);
  * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
  */
 int
-vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscpEvent *pev);
+vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscp_event_t *pev);
 
 /*!
  * @fn vscp_fwhlp_eventex_to_xml
@@ -1080,7 +1143,7 @@ vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscpEvent *pev);
  */
 
 int
-vscp_fwhlp_eventex_to_xml(char *eventexstr, size_t len, const vscpEventEx *pex);
+vscp_fwhlp_eventex_to_xml(char *eventexstr, size_t len, const vscp_event_ex_t *pex);
 
 /*!
  * @fn vscp_fwhlp_parse_topic
@@ -1113,7 +1176,7 @@ vscp_fwhlp_parse_topic(const char *topic, uint8_t *pGuid[16], uint16_t *pVscpCla
  * more efficient than including it in the payload.
  */
 int
-vscp_fwhlp_set_event_info_from_topic(vscpEvent *pev, const char *topic);
+vscp_fwhlp_set_event_info_from_topic(vscp_event_t *pev, const char *topic);
 
 /*!
  * @fn vscp_fwhlp_set_event_info_from_topic
@@ -1133,7 +1196,7 @@ vscp_fwhlp_set_event_info_from_topic(vscpEvent *pev, const char *topic);
  * more efficient than including it in the payload.
  */
 int
-vscp_fwhlp_set_eventex_info_from_topic(vscpEventEx *pex, const char *topic);
+vscp_fwhlp_set_eventex_info_from_topic(vscp_event_ex_t *pex, const char *topic);
 
 #endif
 
@@ -1147,7 +1210,7 @@ vscp_fwhlp_set_eventex_info_from_topic(vscpEventEx *pex, const char *topic);
  * @return uint8_t Measurement data coding value. Returns 0 if not a measurement event or if data coding is not set.
  */
 uint8_t
-vscp_fwhlp_getMeasurementDataCoding(const vscpEvent *pEvent);
+vscp_fwhlp_getMeasurementDataCoding(const vscp_event_t *pEvent);
 
 /*!
  * @fn vscp_fwhlp_getDataCodingBitArray
@@ -1191,7 +1254,7 @@ vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t *pCode, uint8_t length);
  * @return int Measurement unit value. Returns -1 if not a measurement event or if measurement unit is not set.
  */
 int
-vscp_fwhlp_getMeasurementUnit(const vscpEvent *pEvent);
+vscp_fwhlp_getMeasurementUnit(const vscp_event_t *pEvent);
 
 /*!
  * @fn vscp_fwhlp_getMeasurementSensorIndex
@@ -1201,7 +1264,7 @@ vscp_fwhlp_getMeasurementUnit(const vscpEvent *pEvent);
  * @return int Sensor index value. Returns -1 if not a measurement event or if sensor index is not set.
  */
 int
-vscp_fwhlp_getMeasurementSensorIndex(const vscpEvent *pEvent);
+vscp_fwhlp_getMeasurementSensorIndex(const vscp_event_t *pEvent);
 
 /*!
  * @fn vscp_fwhlp_getMeasurementZone
@@ -1211,7 +1274,7 @@ vscp_fwhlp_getMeasurementSensorIndex(const vscpEvent *pEvent);
  * @return int Measurement zone value. Returns -1 if not a measurement event or if measurement zone is not set.
  */
 int
-vscp_fwhlp_getMeasurementZone(const vscpEvent *pEvent);
+vscp_fwhlp_getMeasurementZone(const vscp_event_t *pEvent);
 
 /*!
  * @fn vscp_fwhlp_getMeasurementSubZone
@@ -1221,7 +1284,7 @@ vscp_fwhlp_getMeasurementZone(const vscpEvent *pEvent);
  * @return int Measurement subzone value. Returns -1 if not a measurement event or if measurement subzone is not set.
  */
 int
-vscp_fwhlp_getMeasurementSubZone(const vscpEvent *pEvent);
+vscp_fwhlp_getMeasurementSubZone(const vscp_event_t *pEvent);
 
 /*!
  * @fn vscp_fwhlp_isMeasurement
@@ -1231,7 +1294,7 @@ vscp_fwhlp_getMeasurementSubZone(const vscpEvent *pEvent);
  * @return int Returns 1 if event is a measurement event, 0 if not.
  */
 int
-vscp_fwhlp_isMeasurement(const vscpEvent *pEvent);
+vscp_fwhlp_isMeasurement(const vscp_event_t *pEvent);
 
 /*!
  * @fn vscp_fwhlp_getMeasurementAsFloat
@@ -1254,7 +1317,7 @@ vscp_fwhlp_getMeasurementAsFloat(const unsigned char *pNorm, unsigned char lengt
  * conversion.
  */
 int
-vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent);
+vscp_fwhlp_getMeasurementAsString(char *strValue, const vscp_event_t *pEvent);
 
 /*!
  * @fn vscp_fwhlp_getMeasurementAsFloatEx
@@ -1265,7 +1328,7 @@ vscp_fwhlp_getMeasurementAsString(char *strValue, const vscpEvent *pEvent);
  * conversion.
  */
 int
-vscp_fwhlp_getMeasurementFloat64AsString(char *strValue, const vscpEvent *pEvent);
+vscp_fwhlp_getMeasurementFloat64AsString(char *strValue, const vscp_event_t *pEvent);
 
 /*!
  * @fn vscp_fwhlp_getMeasurementAsDouble
@@ -1276,7 +1339,7 @@ vscp_fwhlp_getMeasurementFloat64AsString(char *strValue, const vscpEvent *pEvent
  * conversion.
  */
 int
-vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscpEvent *pEvent);
+vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscp_event_t *pEvent);
 
 /*!
  * @fn vscp_fwhlp_getMeasurementAsDoubleEx
@@ -1287,7 +1350,7 @@ vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscpEvent *pEvent);
  * conversion.
  */
 int
-vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscpEventEx *pEventEx);
+vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscp_event_ex_t *pEventEx);
 
 /*!
  * @fn vscp_fwhlp_getMeasurementAsDoubleEx
@@ -1298,7 +1361,7 @@ vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscpEventEx *pEventEx)
  * conversion.
  */
 int
-vscp_fwhlp_getMeasurementWithZoneAsString(const vscpEvent *pEvent);
+vscp_fwhlp_getMeasurementWithZoneAsString(const vscp_event_t *pEvent);
 
 /**
     Get VSCP priority
@@ -1306,7 +1369,7 @@ vscp_fwhlp_getMeasurementWithZoneAsString(const vscpEvent *pEvent);
     @return Priority (0-7) for event.
 */
 unsigned char
-vscp_fwhlp_getEventPriority(const vscpEvent *pev);
+vscp_fwhlp_getEventPriority(const vscp_event_t *pev);
 
 /**
     Get VSCP EventEx priority
@@ -1314,7 +1377,7 @@ vscp_fwhlp_getEventPriority(const vscpEvent *pev);
     @return Priority (0-7) for event.
 */
 unsigned char
-vscp_fwhlp_getEventExPriority(const vscpEventEx *pex);
+vscp_fwhlp_getEventExPriority(const vscp_event_ex_t *pex);
 
 /*!
  * @fn vscp_fwhlp_setEventPriority
@@ -1324,7 +1387,7 @@ vscp_fwhlp_getEventExPriority(const vscpEventEx *pex);
  * @param priority Priority (0-7) to set for event.
  */
 void
-vscp_fwhlp_setEventPriority(vscpEvent *pEvent, unsigned char priority);
+vscp_fwhlp_setEventPriority(vscp_event_t *pEvent, unsigned char priority);
 
 /*!
  * @fn vscp_fwhlp_setEventExPriority
@@ -1334,7 +1397,7 @@ vscp_fwhlp_setEventPriority(vscpEvent *pEvent, unsigned char priority);
  * @param priority Priority (0-7) to set for event.
  */
 void
-vscp_fwhlp_setEventExPriority(vscpEventEx *pEventEx, unsigned char priority);
+vscp_fwhlp_setEventExPriority(vscp_event_ex_t *pEventEx, unsigned char priority);
 
 // ****************************
 //            CANAL
@@ -1356,7 +1419,7 @@ uint32_t
 vscp_fwhlp__getCANALidFromData(unsigned char priority, const uint16_t vscp_class, const uint16_t vscp_type);
 
 uint32_t
-vscp_fwhlp__getCANALidFromEvent(const vscpEvent *pEvent);
+vscp_fwhlp__getCANALidFromEvent(const vscp_event_t *pEvent);
 
 #ifdef __cplusplus
 }

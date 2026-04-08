@@ -28,7 +28,7 @@
   Fifo structure 
 */
 typedef struct {
-	vscpEvent **buf;
+	vscp_event_t **buf;
 	size_t head;
 	size_t tail;
 	size_t size;
@@ -58,7 +58,7 @@ void vscp_fifo_clear(vscp_fifo_t *f);
   @param pev Pointer to pointer to event structure
   @return Non zero if successful
 */
-size_t vscp_fifo_read(vscp_fifo_t *f, vscpEvent **pev);
+size_t vscp_fifo_read(vscp_fifo_t *f, vscp_event_t **pev);
 
 /*!
   @brief Put a VSCP event in the fifo
@@ -66,7 +66,7 @@ size_t vscp_fifo_read(vscp_fifo_t *f, vscpEvent **pev);
   @param pev Pointer to VSCP event
   @return Non zero if successful
 */
-size_t vscp_fifo_write(vscp_fifo_t *f, vscpEvent *pev);
+size_t vscp_fifo_write(vscp_fifo_t *f, vscp_event_t *pev);
 
 /*!
   @brief Get the number of events in the fifo

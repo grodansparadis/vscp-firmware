@@ -93,7 +93,7 @@ vscpboot_loader(void)
     vscpboot_goApplication();
   }
 
-  vscpEventEx ex;
+  vscp_event_ex_t ex;
   vscpboot_state state = STATE_BLOCKSTART; // We haven't done anything yet
 
   uint32_t block;                        // Current block to program
