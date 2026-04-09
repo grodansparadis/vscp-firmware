@@ -37,8 +37,7 @@
  * ******************************************************************************
  */
 
-#define CRC_CCITT
-#include "crc.h"
+#include "vscp-crc.h"
 
 #include <inttypes.h>
 #include <stdio.h>

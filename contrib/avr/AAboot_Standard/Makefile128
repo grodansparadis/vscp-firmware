@@ -23,7 +23,7 @@ OBJ = AAboot.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/can_at90can128.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/uart.o
 #OBJ += $(VSCP_FIRMWARE)/common/vscp_firmware.c
-OBJ += $(VSCP_HOME)/src/common/crc.c
+OBJ += $(VSCP_HOME)/src/common/vscp-crc.c
 
 
 

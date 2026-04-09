@@ -1,6 +1,6 @@
 #include <cstring>
 #include <gtest/gtest.h>
-#include <crc.h>
+#include <vscp-crc.h>
 
 TEST(_crc, crc_ccitt_check_value_slow)
 {

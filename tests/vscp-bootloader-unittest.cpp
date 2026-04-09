@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include <crc.h>
+#include <vscp-crc.h>
 #include <vscp.h>
 #include <vscp-class.h>
 #include <vscp-type.h>

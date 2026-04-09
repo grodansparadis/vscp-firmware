@@ -63,7 +63,7 @@
 extern "C" {
 #endif
 
-#include <crc.h>
+#include <vscp-crc.h>
 
 // Macros
 

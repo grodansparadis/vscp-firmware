@@ -5,7 +5,7 @@
 #include <vscp.h>
 #include <vscp-class.h>
 #include <vscp-firmware-helper.h>
-#include <crc.h>
+#include <vscp-crc.h>
 
 //-----------------------------------------------------------------------------
 // Parse datestr for event tests

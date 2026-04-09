@@ -50,7 +50,7 @@
 //#include "version.h"
 
 #define CRC16
-#include "crc.h"
+#include "vscp-crc.h"
 
 #include <avr/io.h>
 #include <avr/pgmspace.h>

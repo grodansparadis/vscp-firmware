@@ -61,7 +61,7 @@
 #include "vscp-firmware-helper.h"
 
 #ifdef VSCP_FWHLP_BINARY_FRAME_SUPPORT
-#include <crc.h>
+#include <vscp-crc.h>
 #endif
 
 #ifdef VSCP_FWHLP_CRYPTO_SUPPORT

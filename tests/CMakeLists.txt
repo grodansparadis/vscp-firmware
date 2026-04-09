@@ -58,7 +58,7 @@ add_executable(vscp_firmware_tests
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-helper.c
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-helper.h
     ${PROJECT_SOURCE_DIR}/../common/vscp-guid-parser.c
-    ${PROJECT_SOURCE_DIR}/../common/crc.c
+    ${PROJECT_SOURCE_DIR}/../common/vscp-crc.c
     ${PROJECT_SOURCE_DIR}/../common/crc8.c
     ${PROJECT_SOURCE_DIR}/../common/fifo.c
     ${PROJECT_SOURCE_DIR}/../common/vscp-fifo.c

@@ -130,13 +130,13 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\..\common\crc.c">
+    <Compile Include="..\..\..\..\common\vscp-crc.c">
       <SubType>compile</SubType>
-      <Link>crc.c</Link>
+      <Link>vscp-crc.c</Link>
     </Compile>
-    <Compile Include="..\..\..\..\common\crc.h">
+    <Compile Include="..\..\..\..\common\vscp-crc.h">
       <SubType>compile</SubType>
-      <Link>crc.h</Link>
+      <Link>vscp-crc.h</Link>
     </Compile>
     <Compile Include="..\..\..\..\common\vscp_bootloader.c">
       <SubType>compile</SubType>
