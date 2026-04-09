@@ -19,8 +19,8 @@
 #define WIDTH  (8 * sizeof(crc))
 #define TOPBIT (1 << (WIDTH - 1))
 
-#define REFLECT_DATA(X)      (X)
-#define REFLECT_REMAINDER(X) (X)
+#define CRC_REFLECT_DATA(X)      (X)
+#define CRC_REFLECT_REMAINDER(X) (X)
 
 static crc crcTable[256];
 
@@ -32,7 +32,7 @@ crcSlow(unsigned char const message[], int nBytes)
   unsigned char bit;
 
   for (byte = 0; byte < nBytes; ++byte) {
-    remainder ^= (REFLECT_DATA(message[byte]) << (WIDTH - 8));
+    remainder ^= (CRC_REFLECT_DATA(message[byte]) << (WIDTH - 8));
 
     for (bit = 8; bit > 0; --bit) {
       if (remainder & TOPBIT) {
@@ -44,7 +44,7 @@ crcSlow(unsigned char const message[], int nBytes)
     }
   }
 
-  return (REFLECT_REMAINDER(remainder) ^ FINAL_XOR_VALUE);
+  return (CRC_REFLECT_REMAINDER(remainder) ^ FINAL_XOR_VALUE);
 }
 
 void
@@ -78,9 +78,9 @@ crcFast(unsigned char const message[], int nBytes)
   int byte;
 
   for (byte = 0; byte < nBytes; ++byte) {
-    data = REFLECT_DATA(message[byte]) ^ (remainder >> (WIDTH - 8));
+    data = CRC_REFLECT_DATA(message[byte]) ^ (remainder >> (WIDTH - 8));
     remainder = crcTable[data] ^ (remainder << 8);
   }
 
-  return (REFLECT_REMAINDER(remainder) ^ FINAL_XOR_VALUE);
+  return (CRC_REFLECT_REMAINDER(remainder) ^ FINAL_XOR_VALUE);
 }
