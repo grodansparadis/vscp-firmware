@@ -2838,6 +2838,73 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_ex_basic)
   }
 }
 
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_legacy_tags)
+{
+  vscp_event_t ev;
+  const char *json = "{"
+                     "\"vscpHead\":9,"
+                     "\"vscpClass\":42,"
+                     "\"vscpType\":3,"
+                     "\"vscpGuid\":\"01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F:10\","
+                     "\"vscpTimeStamp\":7654321,"
+                     "\"vscpDateTime\":\"2024-11-05T08:09:10\","
+                     "\"vscpData\":[10,20,30,40]"
+                     "}";
+
+  int rv = vscp_fwhlp_parse_json(&ev, json);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  uint16_t expected_head = (9 & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+  ASSERT_EQ(expected_head, ev.head);
+  ASSERT_EQ(42, ev.vscp_class);
+  ASSERT_EQ(3, ev.vscp_type);
+  ASSERT_EQ(vscp_fwhlp_to_unix_ns(2024, 11, 5, 8, 9, 10, 7654321), ev.timestamp_ns);
+
+  uint8_t expected_guid[16] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                                0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10 };
+  ASSERT_EQ(0, memcmp(expected_guid, ev.GUID, 16));
+
+  ASSERT_EQ(4, ev.sizeData);
+  ASSERT_EQ(10, ev.pdata[0]);
+  ASSERT_EQ(20, ev.pdata[1]);
+  ASSERT_EQ(30, ev.pdata[2]);
+  ASSERT_EQ(40, ev.pdata[3]);
+
+  free(ev.pdata);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_ex_legacy_tags)
+{
+  vscp_event_ex_t ex;
+  const char *json = "{"
+                     "\"vscpHead\":12,"
+                     "\"vscpClass\":506,"
+                     "\"vscpType\":7,"
+                     "\"vscpGuid\":\"10:0F:0E:0D:0C:0B:0A:09:08:07:06:05:04:03:02:01\","
+                     "\"vscpTimeStamp\":12345,"
+                     "\"vscpDateTime\":\"2025-01-01T00:00:00\","
+                     "\"vscpData\":[1,2,3]"
+                     "}";
+
+  int rv = vscp_fwhlp_parse_json_ex(&ex, json);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
+
+  uint16_t expected_head = (12 & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+  ASSERT_EQ(expected_head, ex.head);
+  ASSERT_EQ(506, ex.vscp_class);
+  ASSERT_EQ(7, ex.vscp_type);
+  ASSERT_EQ(vscp_fwhlp_to_unix_ns(2025, 1, 1, 0, 0, 0, 12345), ex.timestamp_ns);
+
+  uint8_t expected_guid[16] = { 0x10, 0x0F, 0x0E, 0x0D, 0x0C, 0x0B, 0x0A, 0x09,
+                                0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01 };
+  ASSERT_EQ(0, memcmp(expected_guid, ex.GUID, 16));
+
+  ASSERT_EQ(3, ex.sizeData);
+  ASSERT_EQ(1, ex.data[0]);
+  ASSERT_EQ(2, ex.data[1]);
+  ASSERT_EQ(3, ex.data[2]);
+}
+
 TEST(_vscp_firmware_helper, vscp_fwhlp_create_json_basic)
 {
   vscp_event_t ev;
