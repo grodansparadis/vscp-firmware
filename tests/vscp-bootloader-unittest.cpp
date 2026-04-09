@@ -9,8 +9,6 @@ extern "C" {
 #include <vscp-bootloader.h>
 }
 
-extern "C" crc crcTable[256];
-
 namespace {
 
 struct BootloaderStubState {
@@ -131,8 +129,6 @@ int vscpboot_getEventEx(vscpEventEx* pex)
 
 TEST(_vscp_bootloader, init_prepares_crc_for_fast_algorithm)
 {
-  std::memset(crcTable, 0, sizeof(crcTable));
-
   const unsigned char msg[] = "123456789";
 
   vscpboot_init();
