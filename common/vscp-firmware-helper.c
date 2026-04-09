@@ -68,6 +68,10 @@
 #include <vscp-aes.h>
 #endif
 
+#ifdef VSCP_FWHLP_CRYPTO_USE_OPENSSL
+#include <openssl/evp.h>
+#endif
+
 #ifdef VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO
 #ifdef ESP_PLATFORM
 #include <psa/crypto.h>
@@ -3370,7 +3374,10 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
                         const uint8_t *iv,
                         uint8_t nAlgorithm)
 {
-#ifdef VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO
+#ifdef VSCP_FWHLP_CRYPTO_USE_OPENSSL
+  // Use OpenSSL backend when enabled
+  return vscp_fwhlp_encryptFrame_openssl(output, input, len, key, iv, nAlgorithm);
+#elif defined(VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO)
   // Use PSA crypto backend when enabled
   return vscp_fwhlp_encryptFrame_psa(output, input, len, key, iv, nAlgorithm);
 #else
@@ -3486,7 +3493,10 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
                         const uint8_t *iv,
                         uint8_t nAlgorithm)
 {
-#ifdef VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO
+#ifdef VSCP_FWHLP_CRYPTO_USE_OPENSSL
+  // Use OpenSSL backend when enabled
+  return vscp_fwhlp_decryptFrame_openssl(output, input, len, key, iv, nAlgorithm);
+#elif defined(VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO)
   // Use PSA crypto backend when enabled
   return vscp_fwhlp_decryptFrame_psa(output, input, len, key, iv, nAlgorithm);
 #else
@@ -3569,6 +3579,256 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
 }
 
 #endif // VSCP_FWHLP_CRYPTO_SUPPORT
+
+#if defined(VSCP_FWHLP_CRYPTO_SUPPORT) && defined(VSCP_FWHLP_CRYPTO_USE_OPENSSL)
+
+static int
+vscp_fwhlp_openssl_set_algorithm_from_type(uint8_t *nAlgorithm, const uint8_t *input)
+{
+  if (VSCP_ENCRYPTION_FROM_TYPE_BYTE == (*nAlgorithm & 0x0f)) {
+    *nAlgorithm = input[0] & 0x0f;
+  }
+
+  switch (*nAlgorithm) {
+    case VSCP_ENCRYPTION_AES128:
+    case VSCP_ENCRYPTION_AES192:
+    case VSCP_ENCRYPTION_AES256:
+      return VSCP_ERROR_SUCCESS;
+
+    default:
+      return VSCP_ERROR_PARAMETER;
+  }
+}
+
+static const EVP_CIPHER *
+vscp_fwhlp_openssl_get_cipher(uint8_t nAlgorithm)
+{
+  switch (nAlgorithm) {
+    case VSCP_ENCRYPTION_AES128:
+      return EVP_aes_128_cbc();
+
+    case VSCP_ENCRYPTION_AES192:
+      return EVP_aes_192_cbc();
+
+    case VSCP_ENCRYPTION_AES256:
+      return EVP_aes_256_cbc();
+
+    default:
+      return NULL;
+  }
+}
+
+static int
+vscp_fwhlp_openssl_get_iv(uint8_t outiv[16], const uint8_t *iv)
+{
+  if (NULL == iv) {
+    if (16 != getRandomIV(outiv, 16)) {
+      return VSCP_ERROR_ERROR;
+    }
+  }
+  else {
+    memcpy(outiv, iv, 16);
+  }
+
+  return VSCP_ERROR_SUCCESS;
+}
+
+static int
+vscp_fwhlp_openssl_encrypt_payload(uint8_t *output,
+                                   const uint8_t *input,
+                                   size_t input_payload_len,
+                                   size_t padlen,
+                                   const uint8_t *key,
+                                   const uint8_t *iv,
+                                   const EVP_CIPHER *cipher)
+{
+  EVP_CIPHER_CTX *ctx = NULL;
+  uint8_t *tmpin      = NULL;
+  int outlen1         = 0;
+  int outlen2         = 0;
+  int rv              = VSCP_ERROR_ERROR;
+
+  tmpin = (uint8_t *) calloc(1, padlen);
+  if (NULL == tmpin) {
+    return VSCP_ERROR_ERROR;
+  }
+
+  memcpy(tmpin, input + 1, input_payload_len);
+
+  ctx = EVP_CIPHER_CTX_new();
+  if (NULL == ctx) {
+    goto done;
+  }
+
+  if ((1 != EVP_EncryptInit_ex(ctx, cipher, NULL, key, iv)) ||
+      (1 != EVP_CIPHER_CTX_set_padding(ctx, 0)) ||
+      (1 != EVP_EncryptUpdate(ctx, output + 1, &outlen1, tmpin, (int) padlen)) ||
+      (1 != EVP_EncryptFinal_ex(ctx, output + 1 + outlen1, &outlen2)) ||
+      ((size_t) (outlen1 + outlen2) != padlen)) {
+    goto done;
+  }
+
+  rv = VSCP_ERROR_SUCCESS;
+
+done:
+  if (NULL != ctx) {
+    EVP_CIPHER_CTX_free(ctx);
+  }
+
+  if (NULL != tmpin) {
+    free(tmpin);
+  }
+
+  return rv;
+}
+
+static int
+vscp_fwhlp_openssl_decrypt_payload(uint8_t *output,
+                                   const uint8_t *input,
+                                   size_t real_len,
+                                   const uint8_t *key,
+                                   const uint8_t *iv,
+                                   const EVP_CIPHER *cipher)
+{
+  EVP_CIPHER_CTX *ctx = NULL;
+  int outlen1         = 0;
+  int outlen2         = 0;
+  int rv              = VSCP_ERROR_ERROR;
+
+  ctx = EVP_CIPHER_CTX_new();
+  if (NULL == ctx) {
+    return VSCP_ERROR_ERROR;
+  }
+
+  if ((1 != EVP_DecryptInit_ex(ctx, cipher, NULL, key, iv)) ||
+      (1 != EVP_CIPHER_CTX_set_padding(ctx, 0)) ||
+      (1 != EVP_DecryptUpdate(ctx, output + 1, &outlen1, input + 1, (int) (real_len - 1))) ||
+      (1 != EVP_DecryptFinal_ex(ctx, output + 1 + outlen1, &outlen2))) {
+    goto done;
+  }
+
+  rv = VSCP_ERROR_SUCCESS;
+
+done:
+  EVP_CIPHER_CTX_free(ctx);
+  return rv;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_encryptFrame_openssl
+//
+
+size_t
+vscp_fwhlp_encryptFrame_openssl(uint8_t *output,
+                                uint8_t *input,
+                                size_t len,
+                                const uint8_t *key,
+                                const uint8_t *iv,
+                                uint8_t nAlgorithm)
+{
+  const EVP_CIPHER *cipher;
+  uint8_t generated_iv[16];
+  size_t padlen;
+
+  // Check pointers
+  if ((NULL == output) || (NULL == input) || (NULL == key)) {
+    return 0;
+  }
+
+  // If no encryption needed - return
+  if (VSCP_ENCRYPTION_NONE == nAlgorithm) {
+    memcpy(output, input, len);
+    return len;
+  }
+
+  if (VSCP_ERROR_SUCCESS != vscp_fwhlp_openssl_set_algorithm_from_type(&nAlgorithm, input)) {
+    return 0;
+  }
+
+  cipher = vscp_fwhlp_openssl_get_cipher(nAlgorithm);
+
+  // Must be padded to 16-byte blocks (excluding leading type byte)
+  padlen = len - 1;
+  padlen = padlen + (16 - (padlen % 16));
+
+  if (VSCP_ERROR_SUCCESS != vscp_fwhlp_openssl_get_iv(generated_iv, iv)) {
+    return 0;
+  }
+
+  // The frame type is always unencrypted
+  output[0] = input[0];
+
+  if (VSCP_ERROR_SUCCESS !=
+      vscp_fwhlp_openssl_encrypt_payload(output, input, len - 1, padlen, key, generated_iv, cipher)) {
+    return 0;
+  }
+
+  // Append iv
+  memcpy(output + 1 + padlen, generated_iv, 16);
+
+  return 1 + padlen + 16;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_decryptFrame_openssl
+//
+
+int
+vscp_fwhlp_decryptFrame_openssl(uint8_t *output,
+                                const uint8_t *input,
+                                size_t len,
+                                const uint8_t *key,
+                                const uint8_t *iv,
+                                uint8_t nAlgorithm)
+{
+  const EVP_CIPHER *cipher;
+  uint8_t appended_iv[16];
+  size_t real_len = len;
+
+  // Check pointers
+  if ((NULL == output) || (NULL == input) || (NULL == key)) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
+  if (VSCP_ENCRYPTION_NONE == GET_VSCP_BINARY_PACKET_ENCRYPTION(nAlgorithm)) {
+    memcpy(output, input, len);
+    return VSCP_ERROR_SUCCESS;
+  }
+
+  if (VSCP_ERROR_SUCCESS != vscp_fwhlp_openssl_set_algorithm_from_type(&nAlgorithm, input)) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  cipher = vscp_fwhlp_openssl_get_cipher(nAlgorithm);
+  if (NULL == cipher) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // If iv is not given it should be fetched from the end of input (last 16 bytes)
+  if (NULL == iv) {
+    if (len < 17) {
+      return VSCP_ERROR_PARAMETER;
+    }
+
+    memcpy(appended_iv, (input + len - 16), 16);
+    real_len -= 16; // Adjust frame length accordingly
+  }
+  else {
+    memcpy(appended_iv, iv, 16);
+  }
+
+  // Preserve frame type which always is un-encrypted
+  output[0] = input[0];
+
+  if (VSCP_ERROR_SUCCESS !=
+      vscp_fwhlp_openssl_decrypt_payload(output, input, real_len, key, appended_iv, cipher)) {
+    return VSCP_ERROR_ERROR;
+  }
+
+  return VSCP_ERROR_SUCCESS;
+}
+
+#endif // VSCP_FWHLP_CRYPTO_SUPPORT && VSCP_FWHLP_CRYPTO_USE_OPENSSL
 
 ///////////////////////////////////////////////////////////////////////////////
 // PSA Crypto Support

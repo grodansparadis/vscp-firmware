@@ -194,40 +194,49 @@ static const uint8_t Rcon[256] = {
 
 static void init( uint8_t type, aes_state_t *state )
 {
+    if (NULL == state) {
+      return;
+    }
+
+    state->RoundKey = NULL;
+
     switch ( type ) {
-      
+
       case AES256:
-        state->type = AES256;       
-        state->Nk = AES256_Nk;         
-        state->KEYLEN = AES256_KEYLEN;      
-        state->Nr = AES256_Nr;         
+        state->type = AES256;
+        state->Nk = AES256_Nk;
+        state->KEYLEN = AES256_KEYLEN;
+        state->Nr = AES256_Nr;
         state->keyExpSize = AES256_keyExpSize;
-        state->RoundKey = (uint8_t *)malloc( AES256_keyExpSize );
         break;
-      
+
       case AES192:
-        state->type = AES192;       
-        state->Nk = AES192_Nk;         
-        state->KEYLEN = AES192_KEYLEN;      
-        state->Nr = AES192_Nr;         
+        state->type = AES192;
+        state->Nk = AES192_Nk;
+        state->KEYLEN = AES192_KEYLEN;
+        state->Nr = AES192_Nr;
         state->keyExpSize = AES192_keyExpSize;
-        state->RoundKey = (uint8_t *)malloc( AES192_keyExpSize );
         break;
-      
+
       case AES128:
-        state->type = AES128;       
-        state->Nk = AES128_Nk;         
-        state->KEYLEN = AES128_KEYLEN;      
-        state->Nr = AES128_Nr;         
+      default:
+        state->type = AES128;
+        state->Nk = AES128_Nk;
+        state->KEYLEN = AES128_KEYLEN;
+        state->Nr = AES128_Nr;
         state->keyExpSize = AES128_keyExpSize;
-        state->RoundKey = (uint8_t *)malloc( AES128_keyExpSize );
         break;
   }
+
+  state->RoundKey = (uint8_t *) malloc(state->keyExpSize);
 }
 
 static void cleanup( aes_state_t *state ) 
 {
-    free( state->RoundKey );
+    if ((NULL != state) && (NULL != state->RoundKey)) {
+      free(state->RoundKey);
+      state->RoundKey = NULL;
+    }
 }
 
 static uint8_t getSBoxValue(uint8_t num)
@@ -540,6 +549,9 @@ void AES_ECB_encrypt(uint8_t type,const uint8_t* input, const uint8_t* key, uint
   aes_state_t state;  
   
   init( type, &state ); // Init. cypher parameters
+  if (NULL == state.RoundKey) {
+    return;
+  }
     
   // Copy input to output, and work in-memory on output
   memcpy(output, input, length);
@@ -560,6 +572,9 @@ void AES_ECB_decrypt(uint8_t type,const uint8_t* input, const uint8_t* key, uint
   aes_state_t state;
   
   init( type, &state ); // Init. cypher parameters
+  if (NULL == state.RoundKey) {
+    return;
+  }
   
   // Copy input to output, and work in-memory on output
   memcpy(output, input, length);
@@ -600,6 +615,9 @@ void AES_CBC_encrypt_buffer(uint8_t type, uint8_t* output, const uint8_t* input,
   aes_state_t state;
   
   init( type, &state ); // Init. cypher parameters
+  if (NULL == state.RoundKey) {
+    return;
+  }
 
   if ((0 == length) || (0 != (length % BLOCKLEN)))
   {
@@ -641,6 +659,9 @@ void AES_CBC_decrypt_buffer(uint8_t type,uint8_t* output, const uint8_t* input, 
   aes_state_t state;
   
   init( type, &state ); // Init. cypher parameters
+  if (NULL == state.RoundKey) {
+    return;
+  }
 
   if ((0 == length) || (0 != (length % BLOCKLEN)))
   {
@@ -681,7 +702,7 @@ size_t getRandomIV( uint8_t *buf, size_t len )
 #ifdef WIN32
     int random;
     
-    for ( int i=0; i<len; i++ ) {
+  for ( size_t i=0; i<len; i++ ) {
         if ( !rand_s( &random ) ) {
             buf[i] = (uint8_t)random;
         }
@@ -693,7 +714,7 @@ size_t getRandomIV( uint8_t *buf, size_t len )
     return len;
 #else    
     FILE *fp;
-    fp = fopen("/dev/urandom", "r");
+  fp = fopen("/dev/urandom", "rb");
     if (NULL == fp) return 0;
     size_t nread = fread( buf, 1, len, fp);
     fclose(fp);

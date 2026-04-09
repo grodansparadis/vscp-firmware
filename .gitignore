@@ -58,3 +58,7 @@ avr/AAboot/PCsoft/bootloader1/obj
 avr/AAboot/PCsoft/bootloader1/bin
 
 doxygen
+
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md

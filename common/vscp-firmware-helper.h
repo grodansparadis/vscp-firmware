@@ -1033,6 +1033,50 @@ vscp_fwhlp_decryptFrame_psa(uint8_t *output,
 #endif // VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO && ESP_PLATFORM
 
 /*
+  OpenSSL crypto support
+
+  Define VSCP_FWHLP_CRYPTO_USE_OPENSSL in vscp-projdefs.h and link with
+  OpenSSL (libcrypto) to use OpenSSL backend instead of the internal AES
+  implementation for frame encryption/decryption.
+
+  Default behavior is unchanged: if no backend switch is defined, the internal
+  AES implementation is used.
+*/
+#if defined(VSCP_FWHLP_CRYPTO_USE_OPENSSL)
+
+/**
+ * @fn vscp_fwhlp_encryptFrame_openssl
+ * @brief Encrypt VSCP frame using OpenSSL EVP API
+ *
+ * OpenSSL variant of encryptFrame using AES-CBC with no internal padding.
+ * Parameters and return values are identical to vscp_fwhlp_encryptFrame.
+ */
+size_t
+vscp_fwhlp_encryptFrame_openssl(uint8_t *output,
+                                uint8_t *input,
+                                size_t len,
+                                const uint8_t *key,
+                                const uint8_t *iv,
+                                uint8_t nAlgorithm);
+
+/**
+ * @fn vscp_fwhlp_decryptFrame_openssl
+ * @brief Decrypt VSCP frame using OpenSSL EVP API
+ *
+ * OpenSSL variant of decryptFrame using AES-CBC with no internal padding.
+ * Parameters and return values are identical to vscp_fwhlp_decryptFrame.
+ */
+int
+vscp_fwhlp_decryptFrame_openssl(uint8_t *output,
+                                const uint8_t *input,
+                                size_t len,
+                                const uint8_t *key,
+                                const uint8_t *iv,
+                                uint8_t nAlgorithm);
+
+#endif // VSCP_FWHLP_CRYPTO_USE_OPENSSL
+
+/*
   JSON support needs VSCP_FWHLP_JSON_SUPPORT to be defined
   in the projdef file and cJSON support linked in (can be found
   in vscp-firmware/third-party or at https://github.com/nopnop2002/esp-idf-json

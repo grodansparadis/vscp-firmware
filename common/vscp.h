@@ -127,7 +127,7 @@ typedef struct _vscp_event_t {
 
 } vscp_event_t;
 
-typedef  vscp_event_t vscpEvent;
+typedef  vscp_event_t vscpEvent; // For backward compability
 typedef const vscp_event_t *PCVSCPEVENT;
 
 /*
@@ -199,7 +199,7 @@ typedef struct _vscp_event_ex_t {
 
 } vscp_event_ex_t;
 
-typedef  vscp_event_ex_t vscpEventEx;
+typedef  vscp_event_ex_t vscpEventEx; // For backward compability
 typedef const vscp_event_ex_t *PCVSCPEVENTEX;
 
 
