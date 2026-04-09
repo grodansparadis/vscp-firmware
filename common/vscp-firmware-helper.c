@@ -3594,7 +3594,7 @@ vscp_fwhlp_encryptFrame_psa(uint8_t *output,
                             uint8_t nAlgorithm)
 {
   psa_status_t status;
-  psa_cipher_operation_t operation;
+  psa_cipher_operation_t operation = PSA_CIPHER_OPERATION_INIT;
   psa_algorithm_t psa_alg;
   psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
   psa_key_id_t key_id;
@@ -3748,7 +3748,7 @@ vscp_fwhlp_decryptFrame_psa(uint8_t *output,
                             uint8_t nAlgorithm)
 {
   psa_status_t status;
-  psa_cipher_operation_t operation;
+  psa_cipher_operation_t operation = PSA_CIPHER_OPERATION_INIT;
   psa_algorithm_t psa_alg;
   psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
   psa_key_id_t key_id;
