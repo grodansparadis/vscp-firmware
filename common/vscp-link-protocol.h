@@ -51,11 +51,21 @@
    * @{
    */
 
-#define MAX_INQUEUE  10 // Max # events in in-queue
-#define MAX_OUTQUEUE 10 // Max # events in out-queue
+/*!
+  Max buffer for level II events. The buffer size is needed to
+  convert an event to string. To handle all level II events
+  512*5 + 110 = 2670 bytes is needed. In reality this is
+  seldom needed so the value can be set to a lower value. In this
+  case one should check the max data size for events that are of
+  interest and set the max size accordingly
+*/
+#define VSCP_LINK_MAX_BUF (2680u)
 
-#define VSCP_LINK_MAX_USER_NAME_LENGTH 32 // Max length of user name
-#define VSCP_LINK_MAX_PASSWORD_LENGTH  80 // Max length of password
+#define MAX_INQUEUE  10u // Max # events in in-queue
+#define MAX_OUTQUEUE 10u // Max # events in out-queue
+
+#define VSCP_LINK_MAX_USER_NAME_LENGTH 32u // Max length of user name
+#define VSCP_LINK_MAX_PASSWORD_LENGTH  80u // Max length of password
 
 #define VSCP_LINK_MSG_WELCOME       "Welcome to the VSCP Link Protocol Interface.\r\n"
 #define VSCP_LINK_MSG_OK            "+OK - Success.\r\n"
@@ -635,7 +645,7 @@
   vscp_link_callback_write_client(const void* pdata, const char* msg);
 
   /**
-   * @fn vscp_link_callback_disconnect_client
+   * @fn vscp_link_callback_disconnect
    * @brief Disconnect client
    *
    * @param pdata Pointer to user data.
@@ -643,7 +653,7 @@
    */
 
   int
-  vscp_link_callback_disconnect_client(const void* pdata);
+  vscp_link_callback_disconnect(const void* pdata);
 
   /**
    * @fn vscp_link_callback_help
