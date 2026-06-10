@@ -53,6 +53,7 @@ extern "C" {
 #include "vscp-projdefs.h"
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <vscp-aes.h>
 #include <vscp.h>
 
