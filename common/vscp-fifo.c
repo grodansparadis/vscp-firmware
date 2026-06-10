@@ -104,7 +104,7 @@ vscp_fifo_getFree(vscp_fifo_t* f)
 // vscp_fifo_deinit
 //
 
-static void
+void
 vscp_fifo_deinit(vscp_fifo_t *f)
 {
   vscp_event_t *pev = NULL;

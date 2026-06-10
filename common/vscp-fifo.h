@@ -118,7 +118,7 @@ size_t vscp_fifo_getFree(vscp_fifo_t *f);
  *
  * @param  f  Pointer to the FIFO to destroy.
  */
-static void
+void
 vscp_fifo_deinit(vscp_fifo_t *f);
 
 #ifdef __cplusplus
