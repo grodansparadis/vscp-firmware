@@ -100,3 +100,25 @@ vscp_fifo_getFree(vscp_fifo_t* f)
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fifo_deinit
+//
+
+static void
+vscp_fifo_deinit(vscp_fifo_t *f)
+{
+  vscp_event_t *pev = NULL;
+
+  /* Drain and free every event still queued. */
+  while (vscp_fifo_read(f, &pev)) {
+    vscp_fwhlp_deleteEvent(&pev);
+  }
+
+  /* Release the pointer array allocated by vscp_fifo_init(). */
+  free(f->buf);
+  f->buf  = NULL;
+  f->size = 0;
+  f->head = 0;
+  f->tail = 0;
+}
+

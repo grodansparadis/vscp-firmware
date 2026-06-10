@@ -6,6 +6,40 @@
   https://embeddedartistry.com/blog/2017/05/17/creating-a-circular-buffer-in-c-and-c/
 */
 
+/*
+  use
+  =======================================================================
+  vcp_fifo_t is a simple circular buffer for pointers to vscp_event_t 
+  structures.  It is not thread-safe on its own, but can be used in a 
+  single-producer/single-consumer scenario without additional locking 
+  if the producer and consumer are in separate threads.
+  
+  vscp_fifo_t g_vscp_rx_fifo;
+
+  Init  
+  ----
+  vscp_fifo_init(&g_vscp_rx_fifo, VSCP_FIFO_SIZE);  
+  
+  Add event
+  --------
+  vscp_event_t *pev = vscp_fwhlp_newEvent();
+  // fill pev fields ...
+  vscp_fifo_write(&g_vscp_rx_fifo, pev);  // returns 0 if full  
+
+  consume
+  -------
+  vscp_event_t *pev = NULL;
+  while (vscp_fifo_read(&g_vscp_rx_fifo, &pev)) {
+    // process pev ...
+    vscp_fwhlp_deleteEvent(&pev);
+  }
+
+  deinit (without clearing)
+  ------
+  vscp_fifo_deinit(&g_vscp_rx_fifo);  // drains remaining events, frees buffer
+*/
+
+
 /*! 
   Define to prevent recursive inclusion -------------------------------------
 */
@@ -74,6 +108,18 @@ size_t vscp_fifo_write(vscp_fifo_t *f, vscp_event_t *pev);
   @return Number of events in the fifo
 */
 size_t vscp_fifo_getFree(vscp_fifo_t *f);
+
+/*!
+ * @brief  Drain and destroy a VSCP event FIFO, freeing every event still
+ *         queued inside it, then release the FIFO's internal buffer.
+ *
+ * Safe to call even when the FIFO is already empty.  After this call the
+ * vscp_fifo_t object must not be used without a new vscp_fifo_init().
+ *
+ * @param  f  Pointer to the FIFO to destroy.
+ */
+static void
+vscp_fifo_deinit(vscp_fifo_t *f);
 
 #ifdef __cplusplus
 }
