@@ -71,7 +71,7 @@ vscp_fifo_write(vscp_fifo_t* f, vscpEvent* pev)
 {
   // first check to see if there is space in the fifo
   if (((f->head + 1) % f->size) == f->tail) {
-    return 0; // no space levt in the fifo
+    return 0; // no space left in the fifo
   }
   else {
     f->buf[f->head] = pev;    // write the event to the fifo
