@@ -305,7 +305,7 @@ int
 vscp_link_callback_chkData(vscp_link_ctx_t *pctx, uint16_t *pcount);
 
 /**
- * @fn vscp_link_callback_clrAll
+ * @fn vscp_link_callback_clrall
  * @brief Clear the output queue
  *
  * @param pctx Pointer to user data
@@ -313,7 +313,7 @@ vscp_link_callback_chkData(vscp_link_ctx_t *pctx, uint16_t *pcount);
  */
 
 int
-vscp_link_callback_clrAll(vscp_link_ctx_t *pctx);
+vscp_link_callback_clrall(vscp_link_ctx_t *pctx);
 
 /**
  * @fn vscp_link_callback_get_channel_id
@@ -494,6 +494,7 @@ vscp_link_callback_binary(vscp_link_ctx_t *pctx);
  * Pass &vscp_link_default_ops (or a copy with selective overrides) to
  * vscp_link_init().
  * ───────────────────────────────────────────────────────────────────────────*/
+#ifdef VSCP_LINK_PROTOCOL_USE_DEFAULT_OPS
 static const vscp_link_ops_t vscp_link_default_ops = {
   /* ── Transport ──────────────────────────────────────────────── */
   .write_client        = vscp_link_callback_write_client,
@@ -511,7 +512,7 @@ static const vscp_link_ops_t vscp_link_default_ops = {
   /* ── Event I/O ──────────────────────────────────────────────── */
   .send                = vscp_link_callback_send,
   .chkdata             = vscp_link_callback_chkData,
-  .clrall              = vscp_link_callback_clrAll,
+  .clrall              = vscp_link_callback_clrall,
   .retr                = vscp_link_callback_retr,
   .rcvloop             = vscp_link_callback_rcvloop,
   .enable_rcvloop      = vscp_link_callback_enable_rcvloop,
@@ -536,7 +537,7 @@ static const vscp_link_ops_t vscp_link_default_ops = {
   .close_interface     = vscp_link_callback_close_interface,
 
   /* ── Misc ────────────────────────────────────────────────────── */
-  .help_custom         = vscp_link_callback_help,
+  .help_custom         = NULL, // OR vscp_link_callback_help,
   .test                = vscp_link_callback_test,
   .shutdown            = vscp_link_callback_shutdown,
   .restart             = vscp_link_callback_restart,
@@ -544,6 +545,7 @@ static const vscp_link_ops_t vscp_link_default_ops = {
   /* ── Binary mode ─────────────────────────────────────────────── */
   .binary              = vscp_link_callback_binary,
 };
+#endif // VSCP_LINK_PROTOCOL_USE_DEFAULT_OPS
 
 /**
 @}

@@ -131,14 +131,14 @@ typedef enum probe_substate_t {
 #define VSCP_LEVEL1_DM_FLAG_CLASS_MASK    0x02
 #define VSCP_LEVEL1_DM_FLAG_CLASS_FILTER  0x01
 
-#define LEVEL1_DM_OADDR(row)        (pctx->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_OADDR])
-#define LEVEL1_DM_FLAGS(row)        (pctx->m_pDm[(8 * row) + VSCP_LEVEL2_DM_POS_FLAGS])
-#define LEVEL1_DM_CLASS_MASK(row)   (pctx->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSMASK] + (((pctx->m_pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & 0x02) << 9))
-#define LEVEL1_DM_CLASS_FILTER(row) (pctx->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSFILTER] + (((pctx->m_pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & 0x01) << 9))
-#define LEVEL1_DM_TYPE_MASK(row)    (pctx->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_TYPEMASK])
-#define LEVEL1_DM_TYPE_FILTER(row)  (pctx->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_TYPEFILTER])
-#define LEVEL1_DM_ACTION(row)       (pctx->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_ACTION])
-#define LEVEL1_DM_ACTION_PARAM(row) (pctx->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_ACTIONPARAM])
+#define LEVEL1_DM_OADDR(row)        (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_OADDR])
+#define LEVEL1_DM_FLAGS(row)        (pctx->pDm[(8 * row) + VSCP_LEVEL2_DM_POS_FLAGS])
+#define LEVEL1_DM_CLASS_MASK(row)   (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSMASK] + (((pctx->pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & 0x02) << 9))
+#define LEVEL1_DM_CLASS_FILTER(row) (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSFILTER] + (((pctx->pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & 0x01) << 9))
+#define LEVEL1_DM_TYPE_MASK(row)    (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_TYPEMASK])
+#define LEVEL1_DM_TYPE_FILTER(row)  (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_TYPEFILTER])
+#define LEVEL1_DM_ACTION(row)       (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_ACTION])
+#define LEVEL1_DM_ACTION_PARAM(row) (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_ACTIONPARAM])
 
 // Level II decision matrix
 
@@ -157,22 +157,22 @@ typedef enum probe_substate_t {
 #define VSCP_LEVEL2_DM_FLAG_CHECK_SUBZONE 0x00000008 // subzone in third data byte
 
 #define LEVEL2_DM_FLAGS(row) construct_unsigned32(                             \
-  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS],           \
-  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 1],       \
-  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 2],       \
-  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 3])
-#define LEVEL2_DM_OADDR(row, pos) (pctx->m_pDm[(pctx->m_sizeDmRow * row) + \
+  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS],           \
+  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 1],       \
+  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 2],       \
+  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 3])
+#define LEVEL2_DM_OADDR(row, pos) (pctx->pDm[(pctx->sizeDmRow * row) + \
                                                VSCP_LEVEL2_DM_POS_OADDR + pos])
 #define LEVEL2_DM_CLASS(row) construct_unsigned16(                         \
-  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_CLASS],       \
-  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_CLASS + 1])
+  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_CLASS],       \
+  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_CLASS + 1])
 #define LEVEL2_DM_TYPE(row) construct_unsigned16(                         \
-  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_TYPE],       \
-  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_TYPE + 1])
+  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_TYPE],       \
+  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_TYPE + 1])
 #define LEVEL2_DM_ACTION(row) construct_unsigned16(                         \
-  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_ACTION],       \
-  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_ACTION + 1])
-#define LEVEL2_DM_ACTION_PARAM(row) (pctx->m_pDm[(pctx->m_sizeDmRow * row) + \
+  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_ACTION],       \
+  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_ACTION + 1])
+#define LEVEL2_DM_ACTION_PARAM(row) (pctx->pDm[(pctx->sizeDmRow * row) + \
                                                   VSCP_LEVEL2_DM_POS_ACTIONPARAM])
 
 /*
@@ -204,25 +204,25 @@ struct vscp_frmw2_ops;
 */
 typedef struct vscp_frmw2_firmware_context {
 
-  probe_state_t m_state;       // State machine state
-  probe_substate_t m_substate; // state machine substate
-  uint32_t m_timer1;           // Timer used for probe/config restore and other timing tasks
-  // uint16_t m_nickname;         // Nickname (init with persistent value)
+  probe_state_t state;       // State machine state
+  probe_substate_t substate; // state machine substate
+  uint32_t timer1;           // Timer used for probe/config restore and other timing tasks
+  // uint16_t nickname;         // Nickname (init with persistent value)
 
   // Level I nickname discovery
-  uint16_t m_probe_nickname; // 0-253
-  int m_probe_timeout;       // If set to -1 on init will be set to VSCP_PROBE_TIMEOUT
-  int m_probe_timeout_count; // If set to -1 on init will be set to VSCP_PROBE_TIMEOUT_COUNT
+  uint16_t probe_nickname; // 0-253
+  int probe_timeout;       // If set to -1 on init will be set to VSCP_PROBE_TIMEOUT
+  int probe_timeout_count; // If set to -1 on init will be set to VSCP_PROBE_TIMEOUT_COUNT
 
   /*!
     Holders for proxy event information. Set when received.
   */
-  uint8_t m_offset;      // offset in data 0 or 16
-  uint16_t m_vscp_class; // real VSCP class (vscp_class - 512 if proxy event)
-  uint8_t m_ifguid[16];  // interface GUID
+  uint8_t offset;      // offset in data 0 or 16
+  uint16_t vscp_class; // real VSCP class (vscp_class - 512 if proxy event)
+  uint8_t ifguid[16];  // interface GUID
 
   // See CLASS1.PROTOCOL, VSCP_TYPE_PROTOCOL_RESET_DEVICE
-  uint8_t m_reset_device_flags;
+  uint8_t reset_device_flags;
 
   /////////////////////////////////////////////////////////////////////////////
   //                Configuration settings below this point
@@ -231,56 +231,56 @@ typedef struct vscp_frmw2_firmware_context {
   // (init=y) - Initiated to y.
   /////////////////////////////////////////////////////////////////////////////
 
-  uint8_t m_level;   // 0=Level I, 1 = Level II
-  void* m_puserdata; // Points to user supplied data
+  uint8_t level;   // 0=Level I, 1 = Level II
+  void* p_userdata; // Points to user supplied data
 
   /*
     This may (recommended) be a register positions on a device
     Set to zero if not used.
   */
-  uint8_t m_index;   // index for device
-  uint8_t m_zone;    // zone for device
-  uint8_t m_subzone; // subzone for device
+  uint8_t index;   // index for device
+  uint8_t zone;    // zone for device
+  uint8_t subzone; // subzone for device
 
   // Functionality switches
-  int m_bEnableErrorReporting;          // Send error reporting events (FALSE)
-  int m_bEnableLogging;                 // Enable logging events (FALSE)
-  uint8_t m_log_id;                     // Identifies log channel
-  uint8_t m_log_level;                  // Level for logs
-  int m_bHighEndServerResponse;         // React on high end server probe. Only level II (FALSE)
-  int m_bEnableWriteProtectedLocations; // GUID/manufacturer id (FALSE)
-  int m_bUse16BitNickname;              // 16-bit nickname. Default is false. Only for level I (FALSE)
-  int m_bInterestedInAllEvents;         // TRUE if interested in all events. If FALSE
+  int bEnableErrorReporting;          // Send error reporting events (FALSE)
+  int bEnableLogging;                 // Enable logging events (FALSE)
+  uint8_t log_id;                     // Identifies log channel
+  uint8_t log_level;                  // Level for logs
+  int bHighEndServerResponse;         // React on high end server probe. Only level II (FALSE)
+  int bEnableWriteProtectedLocations; // GUID/manufacturer id (FALSE)
+  int bUse16BitNickname;              // 16-bit nickname. Default is false. Only for level I (FALSE)
+  int bInterestedInAllEvents;         // TRUE if interested in all events. If FALSE
   // the callback vscp_frmw2_callback_report_events_of_interest
   // will be called (TRUE)
 
-  uint32_t m_interval_heartbeat; // Interval for heartbeats in milli-seconds (0=off)
-  uint32_t m_last_heartbeat;     // Time for last heartbeat send
-  uint32_t m_interval_caps;      // Interval for capabilities events in milli-seconds (0=off)
-  uint32_t m_last_caps;          // Time for last caps send
+  uint32_t interval_heartbeat; // Interval for heartbeats in milli-seconds (0=off)
+  uint32_t last_heartbeat;     // Time for last heartbeat send
+  uint32_t interval_caps;      // Interval for capabilities events in milli-seconds (0=off)
+  uint32_t last_caps;          // Time for last caps send
 
   // Decision matrix
-  uint8_t* m_pDm;         // Pointer to decision matrix storage (NULL if no DM).
-  uint8_t m_nDmRows;      // Number of DM rows (0 if no DM).
-  uint8_t m_sizeDmRow;    // Size for one DM row.
-  uint32_t m_regOffsetDm; // Register offset for DM (normally zero)
-  uint16_t m_pageDm;      // Register page where DM definition starts
+  uint8_t* pDm;         // Pointer to decision matrix storage (NULL if no DM).
+  uint8_t nDmRows;      // Number of DM rows (0 if no DM).
+  uint8_t sizeDmRow;    // Size for one DM row.
+  uint32_t regOffsetDm; // Register offset for DM (normally zero)
+  uint16_t pageDm;      // Register page where DM definition starts
 
   // MDF
-  const char* m_pInternalMdf; // If the device use internal MDF point to it here (NULL)
+  const char* pInternalMdf; // If the device use internal MDF point to it here (NULL)
                               // If no internal MDF set to NULL
                               // !!! The MDF pointed to MUST be NULL terminated.
 
   // Events of interest
-  const uint32_t* m_pEventsOfInterest; // List with events of interest or NULL
+  const uint32_t* pEventsOfInterest; // List with events of interest or NULL
                                        // if all events are of interest set to null.
                                        // array = (int*) malloc(n * sizeof(int));
                                        // Last event should be 0
 
   // For high end server response
-  uint16_t m_high_end_srv_caps;   // High end server capabilities
-  uint32_t m_high_end_ip_address; // High end server ip-address
-  uint16_t m_high_end_srv_port;   // High end server port
+  uint16_t high_end_srv_caps;   // High end server capabilities
+  uint32_t high_end_ip_address; // High end server ip-address
+  uint16_t high_end_srv_port;   // High end server port
 
   // Standard registers (persistent storage)
   // standard register change callback is called for registers marked with
@@ -289,30 +289,30 @@ typedef struct vscp_frmw2_firmware_context {
   // [C] = Set from define (constant)
   // [P] = Persistent (Write to persistent storage
   // [I] = Init to value on startup. May be constant or may change.
-  // [*/P] = Persistent if m_bEnableWriteProtectedLocations is true.
-  uint8_t m_alarm_status;                 // [I] Alarm. Read only for clients. (init=0)
-  uint8_t m_vscp_major_version;           // [C] VSCP protocol major version. (init=1)
-  uint8_t m_vscp_minor_version;           // [C] VSCP protocol minor version. (init=4)
-  uint8_t m_errorCounter;                 // [I] Error counter. Clear on read. Read only for clients. (init=0)
-  uint32_t m_userId;                      // [P] User id.
-  uint32_t m_manufacturerId;              // [*/P] Manufacturer id.Read only for clients.
-  uint32_t m_manufacturerSubId;           // [*/P] Manufacturer sub id.Read only for clients.
-  uint16_t m_nickname;                    // [P] Device nickname (init=0xff)
-  uint16_t m_page_select;                 // [I] Page select register. (Init = 0)
-  uint8_t m_firmware_major_version;       // [*] This software version. Read only for clients.
-  uint8_t m_firmware_minor_version;       // [*] This software version. Read only for clients.
-  uint8_t m_firmware_sub_minor_version;   // [*] This software version. Read only for clients.
-  uint8_t m_bootloader_algorithm;         // [*] Boot loader algorithm we use.
-  uint32_t m_standard_device_family_code; // [*] Family code. Read only for clients.
-  uint32_t m_standard_device_type_code;   // [*] Family type. Read only for clients.
-  uint16_t m_firmware_device_code;        // [*] Identifier for hardware so correct firmware can be loaded
-  uint8_t m_guid[16];                     // [*/P] GUID for device. Read only for clients
-  uint8_t m_mdfurl[32];                   // [*] URL for MDF. Read only for clients. Make 33 bytes and nill
+  // [*/P] = Persistent if bEnableWriteProtectedLocations is true.
+  uint8_t alarm_status;                 // [I] Alarm. Read only for clients. (init=0)
+  uint8_t vscp_major_version;           // [C] VSCP protocol major version. (init=1)
+  uint8_t vscp_minor_version;           // [C] VSCP protocol minor version. (init=4)
+  uint8_t errorCounter;                 // [I] Error counter. Clear on read. Read only for clients. (init=0)
+  uint32_t userId;                      // [P] User id.
+  uint32_t manufacturerId;              // [*/P] Manufacturer id.Read only for clients.
+  uint32_t manufacturerSubId;           // [*/P] Manufacturer sub id.Read only for clients.
+  uint16_t nickname;                    // [P] Device nickname (init=0xff)
+  uint16_t page_select;                 // [I] Page select register. (Init = 0)
+  uint8_t firmware_major_version;       // [*] This software version. Read only for clients.
+  uint8_t firmware_minor_version;       // [*] This software version. Read only for clients.
+  uint8_t firmware_sub_minor_version;   // [*] This software version. Read only for clients.
+  uint8_t bootloader_algorithm;         // [*] Boot loader algorithm we use.
+  uint32_t standard_device_family_code; // [*] Family code. Read only for clients.
+  uint32_t standard_device_type_code;   // [*] Family type. Read only for clients.
+  uint16_t firmware_device_code;        // [*] Identifier for hardware so correct firmware can be loaded
+  uint8_t guid[16];                     // [*/P] GUID for device. Read only for clients
+  uint8_t mdfurl[32];                   // [*] URL for MDF. Read only for clients. Make 33 bytes and nill
                                           // all unused byte so it is null terminated even if it has
                                           // the maximum length of 32 bytes.
   // Level II devices
-  uint8_t m_ipaddr[16];     // IP address (ipv4/ipv6)
-  uint8_t m_deviceName[64]; // Name of the device
+  uint8_t ipaddr[16];     // IP address (ipv4/ipv6)
+  uint8_t deviceName[64]; // Name of the device
 
   /** Operations table — pointer to the user-supplied callbacks. Must not be NULL. */
   const struct vscp_frmw2_ops *ops;
@@ -390,21 +390,21 @@ typedef struct vscp_frmw2_ops {
   Level I standard registers are at 0x80 - 0xff on page = 0
   Level II standard registers are at 0xffffff00 - 0xffffffff
 */
-#define ADJSTDREG ((VSCP_LEVEL1 == pctx->m_level) ? 0 : 0xffffff00)
+#define ADJSTDREG ((VSCP_LEVEL1 == pctx->level) ? 0 : 0xffffff00)
 
 /*!
   Adjusted data for offset
   vscp_event_t and vscp_event_ex_t versions
 */
-#define EVDTA(x) (pev->pdata[(x) + pctx->m_offset])
-#define EXDTA(x) (pex->data[(x) + pctx->m_offset])
+#define EVDTA(x) (pev->pdata[(x) + pctx->offset])
+#define EXDTA(x) (pex->data[(x) + pctx->offset])
 
 /*!
  * Ajust size for offset
  * vscp_event_t and vscp_event_ex_t versions
  */
-#define ADJSIZEV (pev->sizeData - pctx->m_offset)
-#define ADJSIZEX (pex->sizeData - pctx->m_offset)
+#define ADJSIZEV (pev->sizeData - pctx->offset)
+#define ADJSIZEX (pex->sizeData - pctx->offset)
 
 /*!
 ****************************************************************************

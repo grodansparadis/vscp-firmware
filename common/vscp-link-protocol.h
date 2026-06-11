@@ -187,13 +187,14 @@ extern "C" {
 #define VSCP_LINK_STD_HELP_BINARY    "'binary' Enter binary mode, all communication will be binary if confirmed.\r\n+OK\r\n"
 
 
+
 /* Forward declaration so vscp_link_ctx can hold a pointer to the ops table
    that is defined later in this same header. */
-struct vscp_link_ops;
+typedef struct vscp_link_ops vscp_link_ops_t;
 
 typedef struct vscp_link_ctx {
   struct vscp_link_ctx *next;                // Linkage to list of connections
-  const struct vscp_link_ops *ops;           // Operations table for this connection
+  const vscp_link_ops_t *ops;                // Operations table for this connection
   int id;                                    // Context ID
   int sock;                                  // Socket
   uint8_t guid[16];                          // GUID for client
@@ -210,6 +211,7 @@ typedef struct vscp_link_ctx {
   uint32_t last_rcvloop_time;                // Time in milliseconds of last received event
   void *user_data; // Pointer to transport-specific data (e.g. socket handle, mg_connection*)
 } vscp_link_ctx_t;
+
 
 /**
  * @brief VSCP link protocol operations table.
@@ -284,7 +286,6 @@ typedef struct vscp_link_ops {
   int (*binary)(vscp_link_ctx_t *ctx);
 
 } vscp_link_ops_t;
-
 
   /*!
    * @fn vscp_link_connect
