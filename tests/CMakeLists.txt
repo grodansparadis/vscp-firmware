@@ -55,6 +55,7 @@ add_executable(vscp_firmware_tests
     vscp-bootloader-unittest.cpp
     vscp-firmware-level2-unittest.cpp
     vscp-firmware-unittest.cpp
+    vscp-link-protocol-unittest.cpp
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-helper.c
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-helper.h
     ${PROJECT_SOURCE_DIR}/../common/vscp-guid-parser.c
@@ -66,6 +67,7 @@ add_executable(vscp_firmware_tests
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-level2.c
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware.c
     ${PROJECT_SOURCE_DIR}/../common/vscp-aes.c
+    ${PROJECT_SOURCE_DIR}/../common/vscp-link-protocol.c
     ${PROJECT_SOURCE_DIR}/../third-party/cJSON/cJSON.c
     )
 

@@ -1,6 +1,6 @@
 # vscp-link-protocol
 
-Last updated: 2026-02-19
+Last updated: 2026-06-10
 
 This module implements the VSCP Link text command protocol dispatcher for firmware targets. It parses CRLF-terminated lines, maps commands to handlers, and delegates all transport/application work through callbacks.
 
@@ -18,10 +18,10 @@ This module implements the VSCP Link text command protocol dispatcher for firmwa
 
 Core entry points:
 
-- `vscp_link_connect(const void *pdata)`
-- `vscp_link_disconnect(const void *pdata)`
-- `vscp_link_idle_worker(const void *pdata)`
-- `vscp_link_parser(const void *pdata, char *pbuf, char **pnext)`
+- `vscp_link_connect(const vscp_link_ctx_t *pctx)`
+- `vscp_link_disconnect(const vscp_link_ctx_t *pctx)`
+- `vscp_link_idle_worker(const vscp_link_ctx_t *pctx)`
+- `vscp_link_parser(const vscp_link_ctx_t *pctx, char *pbuf, char **pnext)`
 
 ## Typical integration flow
 
@@ -61,7 +61,7 @@ The parser dispatches to these handlers:
 - Event I/O: `send`, `retr`, `rcvloop`, `quitloop`, `cdta/chkdata`, `clra/clrall`
 - Device/channel: `stat`, `info`, `chid/getchid`, `sgid/setguid`, `ggid/getguid`, `vers/version`
 - Filtering/control: `sflt/setfilter`, `smsk/setmask`, `test`, `wcyd/whatcanyoudo`, `+`, `interface`, `shutdown`, `restart`
-- Binary variants: `bretr`, `bsend`, `brcvloop`, `sec`
+- Binary variants: `binary`
 
 ## Authentication and privilege gates
 
@@ -75,7 +75,8 @@ Observed privilege requirements in this implementation:
 - Level 1: `getguid`, `chkdata`
 - Level 2: `retr`, `rcvloop/quitloop`, `clrall`, `stat`, `info`, `chid`, `interface`
 - Level 4: `send`
-- Level 6: `setguid`, `setfilter`, `setmask`, `test`
+- Level 6: `setguid`, `setfilter`, `setmask`
+- Level 15: `test`, `shutdown`, `restart`
 
 Unauthorized operations typically return:
 
@@ -84,16 +85,29 @@ Unauthorized operations typically return:
 
 ## Callback contract
 
-All platform-specific behavior is delegated. Important callback groups:
+All platform-specific behavior is delegated through the `vscp_link_ops_t` operations table, which is set on `vscp_link_ctx_t.ops` at integration time. Callbacks are invoked as `pctx->ops->xxx(pctx, ...)`. Function pointer fields left NULL cause the library to return `VSCP_ERROR_INIT_MISSING` rather than crash.
 
-- Transport output/lifecycle: `vscp_link_callback_write_client`, `vscp_link_callback_disconnect_client`, `vscp_link_callback_quit`, `vscp_link_callback_welcome`
-- Auth: `vscp_link_callback_check_user`, `vscp_link_callback_check_password`, `vscp_link_callback_challenge`, `vscp_link_callback_check_authenticated`, `vscp_link_callback_check_privilege`
-- Events/queues: `vscp_link_callback_send`, `vscp_link_callback_retr`, `vscp_link_callback_rcvloop`, `vscp_link_callback_chkData`, `vscp_link_callback_clrAll`
-- Channel/device metadata: `vscp_link_callback_get_channel_id`, `vscp_link_callback_set_guid`, `vscp_link_callback_get_guid`, `vscp_link_callback_get_version`, `vscp_link_callback_statistics`, `vscp_link_callback_info`, `vscp_link_callback_wcyd`
-- Interface management: `vscp_link_callback_get_interface_count`, `vscp_link_callback_get_interface`, `vscp_link_callback_close_interface`
-- Binary/security hooks: `vscp_link_callback_bretr`, `vscp_link_callback_bsend`, `vscp_link_callback_brcvloop`, `vscp_link_callback_sec`
+Callback groups in `vscp_link_ops_t`:
 
-The `pdata` pointer is opaque user context supplied by the integration layer and passed through all callbacks.
+- Transport output/lifecycle: `write_client`, `disconnect`, `quit`, `welcome`
+- Auth: `check_user`, `check_password`, `challenge`, `check_authenticated`, `check_privilege`
+- Events/queues: `send`, `retr`, `rcvloop`, `enable_rcvloop`, `get_rcvloop_status`, `chkdata`, `clrall`
+- Channel/device metadata: `get_channel_id`, `set_guid`, `get_guid`, `get_version`, `statistics`, `info`, `wcyd`
+- Filter/mask: `set_filter`, `set_mask`
+- Interface management: `get_interface_count`, `get_interface`, `close_interface`
+- Binary: `binary_`
+- Misc: `help_custom`, `test`, `shutdown`, `restart`
+
+The context struct (`vscp_link_ctx_t`) carries per-connection state including the ops pointer, socket, GUID, FIFO queues, authentication state, privilege level, filter, and a `void *user_data` field for transport-specific data.
+
+### Internal context validation helpers
+
+Two `static inline` helpers guard all public functions:
+
+- `vscp_link_check_ctx(pctx)` — validates `pctx`, `pctx->ops`, and `ops->write_client`.
+- `vscp_link_check_ctx_auth(pctx)` — above plus `ops->check_authenticated` and `ops->check_privilege`.
+
+Every command handler calls one of these on entry, returning `VSCP_ERROR_INIT_MISSING` on any NULL before touching any pointer.
 
 ## Receive-loop idle behavior
 
@@ -120,56 +134,53 @@ The same header also includes standard help text macros (`VSCP_LINK_STD_HELP_*`)
 
 ```c
 // On new client/session
-vscp_link_connect(ctx);
+vscp_link_connect(pctx);
 
 // In input loop
 char *next = NULL;
-int rv = vscp_link_parser(ctx, rxBuffer, &next);
+int rv = vscp_link_parser(pctx, rxBuffer, &next);
 if (VSCP_ERROR_SUCCESS == rv) {
   // consume up to `next`
 }
 
 // Periodic task
-vscp_link_idle_worker(ctx);
+vscp_link_idle_worker(pctx);
 
 // On close
-vscp_link_disconnect(ctx);
+vscp_link_disconnect(pctx);
 ```
 
 ## Quick command reference
 
 | Command | Aliases | Access | Primary callbacks/path |
 |---|---|---|---|
-| `help` | — | none | `vscp_link_doCmdHelp` → `vscp_link_callback_write_client` (or custom help callback) |
-| `noop` | — | none | `vscp_link_doCmdNoop` → `vscp_link_callback_write_client` |
-| `quit` | — | none | `vscp_link_doCmdQuit` → `vscp_link_callback_quit` |
-| `user <name>` | — | none | `vscp_link_doCmdUser` → `vscp_link_callback_check_user` |
-| `pass <password>` | — | none | `vscp_link_doCmdPassword` → `vscp_link_callback_check_password` |
-| `challenge` | — | none | `vscp_link_doCmdChallenge` → `vscp_link_callback_challenge` |
-| `send <event>` | — | authenticated + privilege 4 | `check_authenticated`, `check_privilege`, parse event, `vscp_link_callback_send` |
-| `retr [count]` | — | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `vscp_link_callback_retr` |
-| `rcvloop` | — | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `vscp_link_callback_enable_rcvloop(1)` |
-| `quitloop` | — | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `vscp_link_callback_enable_rcvloop(0)` |
-| `chkdata` | `cdta` | authenticated + privilege 1 | `check_authenticated`, `check_privilege`, `vscp_link_callback_chkData` |
-| `clrall` | `clra` | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `vscp_link_callback_clrAll` |
-| `stat` | — | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `vscp_link_callback_statistics` |
-| `info` | — | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `vscp_link_callback_info` |
-| `chid` | `getchid` | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `vscp_link_callback_get_channel_id` |
-| `setguid <guid>` | `sgid` | authenticated + privilege 6 | `check_authenticated`, `check_privilege`, parse GUID, `vscp_link_callback_set_guid` |
-| `getguid` | `ggid` | authenticated + privilege 1 | `check_authenticated`, `check_privilege`, `vscp_link_callback_get_guid` |
-| `version` | `vers` | none (in current code path) | `vscp_link_doCmdGetVersion` → `vscp_link_callback_get_version` |
-| `setfilter <filter>` | `sflt` | authenticated + privilege 6 | `check_authenticated`, `check_privilege`, parse filter, `vscp_link_callback_setFilter` |
-| `setmask <mask>` | `smsk` | authenticated + privilege 6 | `check_authenticated`, `check_privilege`, parse mask, `vscp_link_callback_setMask` |
-| `test [arg]` | — | authenticated + privilege 6 | `check_authenticated`, `check_privilege`, `vscp_link_callback_test` |
-| `whatcanyoudo` | `wcyd` | none (in current code path) | `vscp_link_doCmdWhatCanYouDo` → `vscp_link_callback_wcyd` |
-| `+` | — | none | `vscp_link_doCmdCommandAgain` (currently responds `+OK`) |
-| `interface [list\|close <guid>]` | — | authenticated + privilege 2 | interface list/close callbacks |
-| `shutdown` | — | none (handler callback decides) | `vscp_link_doCmdShutdown` → `vscp_link_callback_shutdown` |
-| `restart` | — | none (handler callback decides) | `vscp_link_doCmdRestart` → `vscp_link_callback_restart` |
-| `bretr` | — | none (binary callback path) | `vscp_link_doCmdbRetr` → `vscp_link_callback_bretr` |
-| `bsend` | — | none (binary callback path) | `vscp_link_doCmdbSend` → `vscp_link_callback_bsend` |
-| `brcvloop` | — | none (binary callback path) | `vscp_link_doCmdbRcvLoop` (see behavior note below) |
-| `sec` | — | none (binary/security callback path) | `vscp_link_doCmdSec` → `vscp_link_callback_sec` |
+| `help` | — | `write_client` present | `vscp_link_doCmdHelp` → `ops->write_client` (or `ops->help_custom` if `VSCP_LINK_CUSTOM_HELP_TEXT`) |
+| `noop` | — | `write_client` present | `vscp_link_doCmdNoop` → `ops->write_client` |
+| `quit` | — | `ops->quit` present | `vscp_link_doCmdQuit` → `ops->quit` |
+| `user <name>` | — | `ops->check_user` present | `vscp_link_doCmdUser` → `ops->check_user` |
+| `pass <password>` | — | `ops->check_password` present | `vscp_link_doCmdPassword` → `ops->check_password` |
+| `challenge` | — | `ops->challenge` present | `vscp_link_doCmdChallenge` → `ops->challenge` |
+| `send <event>` | — | authenticated + privilege 4 | `check_authenticated`, `check_privilege`, parse event, `ops->send` |
+| `retr [count]` | — | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `ops->retr` |
+| `rcvloop` | — | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `ops->enable_rcvloop(1)` |
+| `quitloop` | — | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `ops->enable_rcvloop(0)` |
+| `chkdata` | `cdta` | authenticated + privilege 1 | `check_authenticated`, `check_privilege`, `ops->chkdata` |
+| `clrall` | `clra` | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `ops->clrall` |
+| `stat` | — | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `ops->statistics` |
+| `info` | — | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `ops->info` |
+| `chid` | `getchid` | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `ops->get_channel_id` |
+| `setguid <guid>` | `sgid` | authenticated + privilege 6 | `check_authenticated`, `check_privilege`, parse GUID, `ops->set_guid` |
+| `getguid` | `ggid` | authenticated + privilege 1 | `check_authenticated`, `check_privilege`, `ops->get_guid` |
+| `version` | `vers` | ops present (no auth gate) | `vscp_link_doCmdGetVersion` → `ops->get_version` |
+| `setfilter <filter>` | `sflt` | authenticated + privilege 6 | `check_authenticated`, `check_privilege`, parse filter, `ops->set_filter` |
+| `setmask <mask>` | `smsk` | authenticated + privilege 6 | `check_authenticated`, `check_privilege`, parse mask, `ops->set_mask` |
+| `test [arg]` | — | authenticated + privilege 15 | `check_authenticated`, `check_privilege`, `ops->test` |
+| `whatcanyoudo` | `wcyd` | ops present (no auth gate) | `vscp_link_doCmdWhatCanYouDo` → `ops->wcyd` |
+| `+` | — | `write_client` present | `vscp_link_doCmdCommandAgain` (responds `+OK`) |
+| `interface [list\|close <guid>]` | — | authenticated + privilege 2 | `ops->get_interface_count`, `ops->get_interface`, `ops->close_interface` |
+| `shutdown` | — | authenticated + privilege 15 | `vscp_link_doCmdShutdown` → `ops->shutdown` |
+| `restart` | — | authenticated + privilege 15 | `vscp_link_doCmdRestart` → `ops->restart` |
+| `binary` | — | `write_client` present | `vscp_link_doCmdBinary` → `ops->binary` |
 
 ## Notes on current implementation behavior
 
@@ -181,65 +192,66 @@ This section documents behavior as implemented in `common/vscp-link-protocol.c` 
 
 If you rely on these commands, verify whether this is intended for your target branch before shipping.
 
-## Callback checklist (copy/paste)
+## Ops table checklist (copy/paste)
 
-Use this as an integration checklist for your target.
-
-A standalone reusable copy is available at [examples/vscp-link-protocol-callback-checklist.md](examples/vscp-link-protocol-callback-checklist.md).
+Use this as an integration checklist for your target. All fields are in `vscp_link_ops_t`.
 
 ### Minimum for a usable text session
 
-- [ ] `vscp_link_callback_welcome`
-- [ ] `vscp_link_callback_quit`
-- [ ] `vscp_link_callback_write_client`
-- [ ] `vscp_link_callback_get_rcvloop_status`
+- [ ] `ops->welcome`
+- [ ] `ops->quit`
+- [ ] `ops->write_client`
+- [ ] `ops->get_rcvloop_status`
 
 ### Authentication and authorization
 
-- [ ] `vscp_link_callback_check_user`
-- [ ] `vscp_link_callback_check_password`
-- [ ] `vscp_link_callback_challenge`
-- [ ] `vscp_link_callback_check_authenticated`
-- [ ] `vscp_link_callback_check_privilege`
+- [ ] `ops->check_user`
+- [ ] `ops->check_password`
+- [ ] `ops->challenge`
+- [ ] `ops->check_authenticated`
+- [ ] `ops->check_privilege`
 
 ### Event queue operations (text protocol)
 
-- [ ] `vscp_link_callback_send`
-- [ ] `vscp_link_callback_retr`
-- [ ] `vscp_link_callback_enable_rcvloop`
-- [ ] `vscp_link_callback_rcvloop`
-- [ ] `vscp_link_callback_chkData`
-- [ ] `vscp_link_callback_clrAll`
+- [ ] `ops->send`
+- [ ] `ops->retr`
+- [ ] `ops->enable_rcvloop`
+- [ ] `ops->rcvloop`
+- [ ] `ops->chkdata`
+- [ ] `ops->clrall`
 
 ### Device/channel metadata
 
-- [ ] `vscp_link_callback_get_channel_id`
-- [ ] `vscp_link_callback_get_guid`
-- [ ] `vscp_link_callback_set_guid`
-- [ ] `vscp_link_callback_get_version`
-- [ ] `vscp_link_callback_statistics`
-- [ ] `vscp_link_callback_info`
-- [ ] `vscp_link_callback_wcyd`
+- [ ] `ops->get_channel_id`
+- [ ] `ops->get_guid`
+- [ ] `ops->set_guid`
+- [ ] `ops->get_version`
+- [ ] `ops->statistics`
+- [ ] `ops->info`
+- [ ] `ops->wcyd`
+
+### Filter/mask
+
+- [ ] `ops->set_filter`
+- [ ] `ops->set_mask`
 
 ### Interface command support
 
-- [ ] `vscp_link_callback_get_interface_count`
-- [ ] `vscp_link_callback_get_interface`
-- [ ] `vscp_link_callback_close_interface` (if `interface close` is supported)
+- [ ] `ops->get_interface_count`
+- [ ] `ops->get_interface`
+- [ ] `ops->close_interface` (if `interface close` is supported)
 
-### Optional binary/security commands
+### Optional binary commands
 
-- [ ] `vscp_link_callback_bretr` (`bretr`)
-- [ ] `vscp_link_callback_bsend` (`bsend`)
-- [ ] `vscp_link_callback_brcvloop` (`brcvloop`)
-- [ ] `vscp_link_callback_sec` (`sec`)
+- [ ] `ops->binary` (`binary`)
+
 
 ### Optional control hooks
 
-- [ ] `vscp_link_callback_test` (`test`)
-- [ ] `vscp_link_callback_shutdown` (`shutdown`)
-- [ ] `vscp_link_callback_restart` (`restart`)
-- [ ] `vscp_link_callback_help` (only if using `VSCP_LINK_CUSTOM_HELP_TEXT`)
+- [ ] `ops->test` (`test`, privilege 15)
+- [ ] `ops->shutdown` (`shutdown`, privilege 15)
+- [ ] `ops->restart` (`restart`, privilege 15)
+- [ ] `ops->help_custom` (only if using `VSCP_LINK_CUSTOM_HELP_TEXT`)
 
 ### Bring-up sanity checklist
 

@@ -1,6 +1,6 @@
 # vscp-fifo
 
-Last updated: 2026-02-19
+Last updated: 2026-06-11
 
 `vscp-fifo` provides a small ring-buffer queue for `vscpEvent*` pointers.
 
@@ -38,6 +38,8 @@ Design notes:
   - Dequeue one pointer. Returns `1` on success, `0` if empty.
 - `size_t vscp_fifo_getFree(vscp_fifo_t *f)`
   - Returns number of free slots available for enqueue.
+- `void vscp_fifo_deinit(vscp_fifo_t *f)`
+  - Drains and destroys the FIFO: frees every event still queued inside it, then releases the internal pointer buffer. Safe to call on an already-empty FIFO. The `vscp_fifo_t` object must not be used again without a new `vscp_fifo_init()`.
 
 ## Usage pattern
 
@@ -59,8 +61,11 @@ if (vscp_fifo_read(&q, &out)) {
 
 - The FIFO stores raw `vscpEvent*` pointers.
 - The caller controls allocation and release strategy for events.
-- There is no dedicated `deinit/free` API for the internal pointer buffer (`f->buf`) in this module.
-  - If your target needs teardown, free `f->buf` in application code and null the pointer.
+- Call `vscp_fifo_deinit()` when the FIFO is no longer needed. It frees all queued events and releases the internal buffer. Example:
+
+  ```c
+  vscp_fifo_deinit(&g_vscp_rx_fifo);  // drains remaining events, frees buffer
+  ```
 
 ## Concurrency model
 
@@ -82,7 +87,7 @@ These notes describe current source behavior in `common/vscp-fifo.c`:
 If you build safety-critical paths, consider wrapping this module with:
 
 - allocation checks,
-- explicit teardown helper,
+- use of `vscp_fifo_deinit()` for deterministic teardown,
 - clear ownership conventions for event memory.
 
 Example skeleton: [examples/vscp-fifo-usage-skeleton.c](examples/vscp-fifo-usage-skeleton.c)

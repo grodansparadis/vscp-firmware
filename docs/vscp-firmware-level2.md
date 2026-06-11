@@ -1,6 +1,6 @@
 # vscp-firmware-level2
 
-Last updated: 2026-02-19
+Last updated: 2026-06-11
 
 This document describes the VSCP Level II firmware framework implemented by:
 
@@ -127,7 +127,7 @@ This structure is passed to `vscp_frmw2_init()` and then used internally by the 
 ### Decision Matrix
 
 - `vscp_frmw2_feed_level1_dm`
-- `vscp_frmw2_feed_leve2_dm`
+- `vscp_frmw2_feed_leve2_dm`  *(note: "leve2" is a known typo in the source — it should read `level2`; kept as-is for ABI compatibility)*
 - `vscp_frmw2_feed_dm`
 - `vscp_frmw2_report_dmatrix`
 

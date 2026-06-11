@@ -1,0 +1,27 @@
+
+BasedOnStyle: Mozilla
+IndentWidth: 2
+TabWidth: 2
+ColumnLimit: 120
+AllowShortBlocksOnASingleLine: true
+
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+Language: Cpp
+# Force pointers to the type for C++.
+AlignAfterOpenBracket: Align
+DerivePointerAlignment: false
+PointerAlignment: Right
+AlignConsecutiveAssignments: true
+AlignConsecutiveMacros: true
+AlignEscapedNewlines: Right
+AlignTrailingComments: true
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+BreakBeforeBraces: Stroustrup
+SpaceAfterCStyleCast: true
+AllowShortFunctionsOnASingleLine: Inline
+BreakBeforeBinaryOperators: None
+#AllowShortBlocksOnASingleLine: true
+SortIncludes: false
+
+# google-readability-braces-around-statements
