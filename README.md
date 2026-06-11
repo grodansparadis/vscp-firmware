@@ -5,8 +5,6 @@
 
 # VCSP Firmware
 
-Last updated: 2026-02-19
-
 <img src="http://vscp.org/images/logo.png" width="200px" alt="VSCP logo">
 
 VSCP firmware contains examples for different hardware architectures of how to
