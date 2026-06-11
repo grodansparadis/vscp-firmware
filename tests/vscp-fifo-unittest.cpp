@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include <gtest/gtest.h>
-#include <vscp-fifo.h>
+#include "vscp-fifo.h"
 
 TEST(_vscp_fifo, init_and_capacity)
 {

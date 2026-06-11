@@ -74,7 +74,8 @@ Substate constants:
 
 ## Core Configuration Structure
 
-`vscp_frmw2_firmware_config_t` is the central runtime and configuration container.
+`vscp_frmw2_firmware_context_t` is the central runtime and configuration container.
+(`vscp_frmw2_firmware_config_t` is a typedef alias provided for backward compatibility.)
 
 Major groups inside the structure:
 
@@ -85,8 +86,9 @@ Major groups inside the structure:
 - Event scheduling (`m_interval_heartbeat`, `m_interval_caps`)
 - Decision matrix storage (`m_pDm`, `m_nDmRows`, `m_sizeDmRow`)
 - Standard registers and persistent fields (`m_userId`, `m_manufacturerId`, `m_mdfurl`, etc.)
+- `ops` — pointer to a `vscp_frmw2_ops_t` operations table (must be set before calling `vscp_frmw2_init()`)
 
-This structure is passed to `vscp_frmw2_init()` and then used internally by the framework.
+The context pointer `pctx` is passed as the first argument to every public function and to every callback.
 
 ---
 
@@ -140,34 +142,36 @@ This structure is passed to `vscp_frmw2_init()` and then used internally by the 
 
 ## Callback Contract (Implemented by Application/Port)
 
-The framework depends on callbacks you provide.
+All platform-specific behavior is provided through a `vscp_frmw2_ops_t` operations table.
+Populate the struct and assign it to `ctx.ops` before calling `vscp_frmw2_init()`.
+Every callback receives `pctx` as its first argument.
 
 Time and lifecycle callbacks:
 
-- `vscp_frmw2_callback_get_milliseconds`
-- `vscp_frmw2_callback_get_timestamp`
-- `vscp_frmw2_callback_enter_bootloader`
-- `vscp_frmw2_callback_restore_defaults`
-- `vscp_frmw2_callback_reset`
-- `vscp_frmw2_callback_feed_watchdog`
+- `get_milliseconds`
+- `get_timestamp`
+- `enter_bootloader`
+- `restore_defaults`
+- `reset`
+- `feed_watchdog`
 
 Transport and event callbacks:
 
-- `vscp_frmw2_callback_send_event_ex`
-- `vscp_frmw2_callback_set_event_time`
-- `vscp_frmw2_callback_report_events_of_interest`
-- `vscp_frmw2_callback_segment_ctrl_heartbeat`
+- `send_event_ex`
+- `set_event_time`
+- `report_events_of_interest`
+- `segment_ctrl_heartbeat`
 
 Decision matrix callback:
 
-- `vscp_frmw2_callback_dm_action`
+- `dm_action`
 
 Register and network callbacks:
 
-- `vscp_frmw2_callback_read_reg`
-- `vscp_frmw2_callback_write_reg`
-- `vscp_frmw2_callback_stdreg_change`
-- `vscp_frmw2_callback_get_ip_addr`
+- `read_reg`
+- `write_reg`
+- `stdreg_change`
+- `get_ip_addr`
 
 ---
 
@@ -175,10 +179,10 @@ Register and network callbacks:
 
 Typical flow:
 
-1. `vscp_frmw2_init()` sets defaults and initial state.
+1. `vscp_frmw2_init(&ctx)` sets defaults and initial state.
 2. Node enters active state immediately in Level II mode.
 3. In Level I compatibility mode, framework may run probe/nickname phases first.
-4. `vscp_frmw2_work(pex)` is called periodically:
+4. `vscp_frmw2_work(&ctx, pex)` is called periodically:
    - with `pex != NULL` when an event is available
    - with `pex == NULL` for periodic/state processing
 5. Framework updates heartbeats/caps/protocol responses and applies decision matrix actions.
@@ -200,8 +204,8 @@ stateDiagram-v2
   PREACTIVE --> ACTIVE: Nickname assigned/accepted
   PREACTIVE --> PROBE: Segment controller response timeout
 
-  ACTIVE --> ACTIVE: vscp_frmw2_work(NULL)
-  ACTIVE --> ACTIVE: vscp_frmw2_work(event)
+  ACTIVE --> ACTIVE: vscp_frmw2_work(&ctx, NULL)
+  ACTIVE --> ACTIVE: vscp_frmw2_work(&ctx, event)
   ACTIVE --> ACTIVE: Heartbeat/caps/protocol/DM handling
 
   ERROR --> PROBE: Reset/recovery path
@@ -244,13 +248,13 @@ Key points:
 - `vscp_frmw2_read_reg()` / `vscp_frmw2_write_reg()` operate across standard and user register spaces.
 - Page-based operations are provided for protocol page reads/writes.
 - Extended page read/write supports larger access patterns.
-- `vscp_frmw2_callback_stdreg_change()` is used to persist changes to standard register-backed data.
+- `ops->stdreg_change` is called to persist changes to standard register-backed data.
 
 ---
 
 ## Decision Matrix Notes
 
-Decision matrix support is configurable through fields in `vscp_frmw2_firmware_config_t`:
+Decision matrix support is configurable through fields in `vscp_frmw2_firmware_context_t`:
 
 - `m_pDm`
 - `m_nDmRows`
@@ -258,28 +262,40 @@ Decision matrix support is configurable through fields in `vscp_frmw2_firmware_c
 - `m_regOffsetDm`
 - `m_pageDm`
 
-Framework helpers feed events into Level I/Level II DM paths and invoke `vscp_frmw2_callback_dm_action()` when rules match.
+Framework helpers feed events into Level I/Level II DM paths and invoke `ops->dm_action` when rules match.
 
 ---
 
 ## Minimal Integration Pattern
 
 ```c
-vscp_frmw2_firmware_config_t cfg;
-memset(&cfg, 0, sizeof(cfg));
+// Define operations table
+static const vscp_frmw2_ops_t my_ops = {
+  .get_milliseconds = my_get_ms,
+  .get_timestamp    = my_get_ts,
+  .send_event_ex    = my_send_event_ex,
+  .set_event_time   = my_set_event_time,
+  .read_reg         = my_read_reg,
+  .write_reg        = my_write_reg,
+  .stdreg_change    = my_stdreg_change,
+  // ... other callbacks
+};
 
-cfg.m_level = VSCP_LEVEL2;
-cfg.m_puserdata = &app_context;
+vscp_frmw2_firmware_context_t ctx;
+memset(&ctx, 0, sizeof(ctx));
 
-int rv = vscp_frmw2_init(&cfg);
+ctx.m_level = VSCP_LEVEL2;
+ctx.ops     = &my_ops;
+
+int rv = vscp_frmw2_init(&ctx);
 if (VSCP_ERROR_SUCCESS == rv) {
   for (;;) {
     // If no incoming event:
-    vscp_frmw2_work(NULL);
+    vscp_frmw2_work(&ctx, NULL);
 
     // If an incoming event is available:
     // vscp_event_ex_t ex; fill from transport...
-    // vscp_frmw2_work(&ex);
+    // vscp_frmw2_work(&ctx, &ex);
   }
 }
 ```

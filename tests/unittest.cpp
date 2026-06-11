@@ -2,10 +2,10 @@
 #include <string.h>
 #include <climits>
 #include <gtest/gtest.h>
-#include <vscp.h>
-#include <vscp-class.h>
-#include <vscp-firmware-helper.h>
-#include <vscp-crc.h>
+#include "vscp.h"
+#include "vscp-class.h"
+#include "vscp-firmware-helper.h"
+#include "vscp-crc.h"
 
 //-----------------------------------------------------------------------------
 // Parse datestr for event tests

@@ -21,10 +21,10 @@
 #define THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD 1
 
 // The header uses extern "C" { } correctly; include directly in C++ mode.
-#include <vscp.h>
-#include <vscp-fifo.h>
-#include <vscp-firmware-helper.h>
-#include <vscp-link-protocol.h>
+#include "vscp.h"
+#include "vscp-fifo.h"
+#include "vscp-firmware-helper.h"
+#include "vscp-link-protocol.h"
 
 // ===========================================================================
 // Stub state
@@ -298,12 +298,16 @@ TEST(VscpLinkNullGuards, parser_null_pnext)
 
 TEST(VscpLinkNullGuards, noop_null_ctx)
 {
-  EXPECT_EQ(VSCP_ERROR_INIT_MISSING, vscp_link_doCmdNoop(nullptr, ""));
+  std::string buf = "noop\r\n";
+  char *next      = nullptr;
+  EXPECT_EQ(VSCP_ERROR_INIT_MISSING, vscp_link_parser(nullptr, buf.data(), &next));
 }
 
 TEST(VscpLinkNullGuards, send_null_ctx)
 {
-  EXPECT_EQ(VSCP_ERROR_INIT_MISSING, vscp_link_doCmdSend(nullptr, ""));
+  std::string buf = "send 0,20,3,0,0,0,00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00,0\r\n";
+  char *next      = nullptr;
+  EXPECT_EQ(VSCP_ERROR_INIT_MISSING, vscp_link_parser(nullptr, buf.data(), &next));
 }
 
 // ===========================================================================
@@ -385,32 +389,32 @@ TEST_F(VscpLinkProtocol, parser_case_insensitive_help)
 
 TEST_F(VscpLinkProtocol, noop_returns_ok)
 {
-  EXPECT_EQ(VSCP_ERROR_SUCCESS, vscp_link_doCmdNoop(&ctx, ""));
+  EXPECT_EQ(VSCP_ERROR_SUCCESS, parse("noop"));
   EXPECT_NE(std::string::npos, g_stub.written.find("+OK"));
 }
 
 TEST_F(VscpLinkProtocol, help_returns_ok)
 {
-  EXPECT_EQ(VSCP_ERROR_SUCCESS, vscp_link_doCmdHelp(&ctx, ""));
+  EXPECT_EQ(VSCP_ERROR_SUCCESS, parse("help"));
   EXPECT_NE(std::string::npos, g_stub.written.find("+OK"));
 }
 
 TEST_F(VscpLinkProtocol, quit_calls_quit_op)
 {
-  EXPECT_EQ(VSCP_ERROR_SUCCESS, vscp_link_doCmdQuit(&ctx, ""));
+  EXPECT_EQ(VSCP_ERROR_SUCCESS, parse("quit"));
   EXPECT_EQ(1, g_stub.quit_calls);
 }
 
 TEST_F(VscpLinkProtocol, user_calls_check_user)
 {
-  EXPECT_EQ(VSCP_ERROR_SUCCESS, vscp_link_doCmdUser(&ctx, "admin"));
+  EXPECT_EQ(VSCP_ERROR_SUCCESS, parse("user admin"));
   EXPECT_EQ(1, g_stub.check_user_calls);
   EXPECT_NE(std::string::npos, g_stub.written.find("+OK"));
 }
 
 TEST_F(VscpLinkProtocol, password_calls_check_password)
 {
-  EXPECT_EQ(VSCP_ERROR_SUCCESS, vscp_link_doCmdPassword(&ctx, "secret"));
+  EXPECT_EQ(VSCP_ERROR_SUCCESS, parse("pass secret"));
   EXPECT_EQ(1, g_stub.check_password_calls);
   EXPECT_NE(std::string::npos, g_stub.written.find("+OK"));
 }

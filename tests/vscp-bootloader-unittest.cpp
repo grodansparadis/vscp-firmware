@@ -2,11 +2,11 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include <vscp-crc.h>
-#include <vscp.h>
-#include <vscp-class.h>
-#include <vscp-type.h>
-#include <vscp-bootloader.h>
+#include "vscp-crc.h"
+#include "vscp.h"
+#include "vscp-class.h"
+#include "vscp-type.h"
+#include "vscp-bootloader.h"
 }
 
 namespace {

@@ -2,10 +2,10 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include <vscp.h>
-#include <vscp-class.h>
-#include <vscp-type.h>
-#include <vscp-firmware-level2.h>
+#include "vscp.h"
+#include "vscp-class.h"
+#include "vscp-type.h"
+#include "vscp-firmware-level2.h"
 }
 
 namespace {
@@ -33,89 +33,57 @@ void reset_stub()
   g_stub.now_ts = 12345678;
 }
 
-void init_config(vscp_frmw2_firmware_config_t& cfg)
+// ---------------------------------------------------------------------------
+// Stub callbacks — referenced by the ops table below.
+// ---------------------------------------------------------------------------
+
+static uint32_t stub_get_milliseconds(vscp_frmw2_firmware_config_t* /*pcfg*/)
 {
-  std::memset(&cfg, 0, sizeof(cfg));
-  cfg.m_level                    = VSCP_LEVEL2;
-  cfg.m_probe_timeout            = VSCP_FRMW2_UNASSIGNED;
-  cfg.m_probe_timeout_count      = VSCP_FRMW2_UNASSIGNED;
-  cfg.m_nickname                 = 0x0022;
-  cfg.m_bInterestedInAllEvents   = 1;
-  cfg.m_bUse16BitNickname        = 0;
-  cfg.m_bEnableWriteProtectedLocations = 1;
-
-  for (int i = 0; i < 16; ++i) {
-    cfg.m_guid[i] = static_cast<uint8_t>(0xA0 + i);
-    cfg.m_ipaddr[i] = static_cast<uint8_t>(i);
-  }
-
-  const char* name = "UnitTestNode";
-  std::memset(cfg.m_deviceName, 0, sizeof(cfg.m_deviceName));
-  std::memcpy(cfg.m_deviceName, name, std::strlen(name));
-}
-
-} // namespace
-
-extern "C" {
-
-uint32_t vscp_frmw2_callback_get_milliseconds(void* const puserdata)
-{
-  (void)puserdata;
   return g_stub.now_ms;
 }
 
-uint64_t vscp_frmw2_callback_get_timestamp(void* const puserdata)
+static uint64_t stub_get_timestamp(vscp_frmw2_firmware_config_t* /*pcfg*/)
 {
-  (void)puserdata;
   return g_stub.now_ts;
 }
 
-void vscp_frmw2_callback_enter_bootloader(void* const puserdata)
+static void stub_enter_bootloader(vscp_frmw2_firmware_config_t* /*pcfg*/)
 {
-  (void)puserdata;
   g_stub.enter_bootloader_calls++;
 }
 
-int vscp_frmw2_callback_send_event_ex(void* const puserdata, vscpEventEx* pex)
+static int stub_send_event_ex(vscp_frmw2_firmware_config_t* /*pcfg*/, vscpEventEx* pex)
 {
-  (void)puserdata;
   g_stub.send_calls++;
   std::memcpy(&g_stub.last_sent, pex, sizeof(vscpEventEx));
   return VSCP_ERROR_SUCCESS;
 }
 
-int vscp_frmw2_callback_dm_action(void* const puserdata,
-                                  const vscpEventEx* const pex,
-                                  uint8_t action,
-                                  const uint8_t* const pparam)
+static int stub_dm_action(vscp_frmw2_firmware_config_t* /*pcfg*/,
+                          const vscpEventEx* const /*pex*/,
+                          uint8_t /*action*/,
+                          const uint8_t* const /*pparam*/)
 {
-  (void)puserdata;
-  (void)pex;
-  (void)action;
-  (void)pparam;
   g_stub.dm_action_calls++;
   return VSCP_ERROR_SUCCESS;
 }
 
-int vscp_frmw2_callback_segment_ctrl_heartbeat(void* const puserdata, uint16_t segcrc, uint32_t time)
+static int stub_segment_ctrl_heartbeat(vscp_frmw2_firmware_config_t* /*pcfg*/,
+                                       uint16_t /*segcrc*/,
+                                       uint32_t /*time*/)
 {
-  (void)puserdata;
-  (void)segcrc;
-  (void)time;
   g_stub.segment_heartbeat_calls++;
   return VSCP_ERROR_SUCCESS;
 }
 
-int vscp_frmw2_callback_report_events_of_interest(void* const puserdata)
+static int stub_report_events_of_interest(vscp_frmw2_firmware_config_t* /*pcfg*/)
 {
-  (void)puserdata;
   g_stub.report_interest_calls++;
   return VSCP_ERROR_SUCCESS;
 }
 
-int vscp_frmw2_callback_set_event_time(void* const puserdata, vscpEventEx* const pex)
+static int stub_set_event_time(vscp_frmw2_firmware_config_t* /*pcfg*/, vscpEventEx* pex)
 {
-  (void)puserdata;
   g_stub.set_time_calls++;
   pex->year      = 2026;
   pex->month     = 3;
@@ -127,59 +95,90 @@ int vscp_frmw2_callback_set_event_time(void* const puserdata, vscpEventEx* const
   return VSCP_ERROR_SUCCESS;
 }
 
-int vscp_frmw2_callback_restore_defaults(void* const puserdata)
+static int stub_restore_defaults(vscp_frmw2_firmware_config_t* /*pcfg*/)
 {
-  (void)puserdata;
   g_stub.restore_defaults_calls++;
   return VSCP_ERROR_SUCCESS;
 }
 
-void vscp_frmw2_callback_reset(void* const puserdata)
-{
-  (void)puserdata;
-}
+static void stub_reset(vscp_frmw2_firmware_config_t* /*pcfg*/) {}
 
-int vscp_frmw2_callback_get_ip_addr(void* const puserdata, uint8_t* pipaddr, uint8_t size)
+static int stub_get_ip_addr(vscp_frmw2_firmware_config_t* /*pcfg*/,
+                            uint8_t* pipaddr,
+                            uint8_t size)
 {
-  (void)puserdata;
   std::memset(pipaddr, 0, size);
   return VSCP_ERROR_SUCCESS;
 }
 
-int vscp_frmw2_callback_read_reg(void* const puserdata, uint16_t page, uint32_t reg, uint8_t* pval)
+static int stub_read_reg(vscp_frmw2_firmware_config_t* /*pcfg*/,
+                         uint16_t /*page*/,
+                         uint32_t /*reg*/,
+                         uint8_t* pval)
 {
-  (void)puserdata;
-  (void)page;
-  (void)reg;
   g_stub.read_reg_calls++;
   *pval = 0;
   return VSCP_ERROR_SUCCESS;
 }
 
-int vscp_frmw2_callback_write_reg(void* const puserdata, uint16_t page, uint32_t reg, uint8_t val)
+static int stub_write_reg(vscp_frmw2_firmware_config_t* /*pcfg*/,
+                          uint16_t /*page*/,
+                          uint32_t /*reg*/,
+                          uint8_t /*val*/)
 {
-  (void)puserdata;
-  (void)page;
-  (void)reg;
-  (void)val;
   g_stub.write_reg_calls++;
   return VSCP_ERROR_SUCCESS;
 }
 
-int vscp_frmw2_callback_stdreg_change(void* const puserdata, uint32_t stdreg)
+static int stub_stdreg_change(vscp_frmw2_firmware_config_t* /*pcfg*/, uint32_t /*stdreg*/)
 {
-  (void)puserdata;
-  (void)stdreg;
   g_stub.stdreg_change_calls++;
   return VSCP_ERROR_SUCCESS;
 }
 
-void vscp_frmw2_callback_feed_watchdog(void* const puserdata)
+static void stub_feed_watchdog(vscp_frmw2_firmware_config_t* /*pcfg*/) {}
+
+static const vscp_frmw2_ops_t g_ops = {
+  stub_get_milliseconds,
+  stub_get_timestamp,
+  stub_send_event_ex,
+  stub_dm_action,
+  stub_segment_ctrl_heartbeat,
+  stub_report_events_of_interest,
+  stub_set_event_time,
+  stub_get_ip_addr,
+  stub_read_reg,
+  stub_write_reg,
+  stub_stdreg_change,
+  stub_restore_defaults,
+  stub_enter_bootloader,
+  stub_reset,
+  stub_feed_watchdog,
+};
+
+void init_config(vscp_frmw2_firmware_config_t& cfg)
 {
-  (void)puserdata;
+  std::memset(&cfg, 0, sizeof(cfg));
+  cfg.m_level                          = VSCP_LEVEL2;
+  cfg.m_probe_timeout                  = VSCP_FRMW2_UNASSIGNED;
+  cfg.m_probe_timeout_count            = VSCP_FRMW2_UNASSIGNED;
+  cfg.m_nickname                       = 0x0022;
+  cfg.m_bInterestedInAllEvents         = 1;
+  cfg.m_bUse16BitNickname              = 0;
+  cfg.m_bEnableWriteProtectedLocations = 1;
+  cfg.ops                              = &g_ops;
+
+  for (int i = 0; i < 16; ++i) {
+    cfg.m_guid[i]   = static_cast<uint8_t>(0xA0 + i);
+    cfg.m_ipaddr[i] = static_cast<uint8_t>(i);
+  }
+
+  const char* name = "UnitTestNode";
+  std::memset(cfg.m_deviceName, 0, sizeof(cfg.m_deviceName));
+  std::memcpy(cfg.m_deviceName, name, std::strlen(name));
 }
 
-} // extern "C"
+} // namespace
 
 TEST(_vscp_frmw2, init_level2_sets_active_state)
 {
@@ -210,7 +209,7 @@ TEST(_vscp_frmw2, setup_event_ex_level1_uses_nickname_in_guid)
 
   vscp_event_ex_t ex;
   std::memset(&ex, 0, sizeof(ex));
-  vscp_frmw2_setup_event_ex(&ex);
+  vscp_frmw2_setup_event_ex(&cfg, &ex);
 
   ASSERT_EQ(VSCP_PRIORITY_NORMAL, ex.head);
   ASSERT_EQ(VSCP_CLASS2_LEVEL1_PROTOCOL, ex.vscp_class);
@@ -228,7 +227,7 @@ TEST(_vscp_frmw2, send_heartbeat_level2_includes_device_name)
   cfg.m_level = VSCP_LEVEL2;
   ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
 
-  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_send_heartbeat());
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_send_heartbeat(&cfg));
   ASSERT_EQ(1, g_stub.send_calls);
   ASSERT_EQ(VSCP_CLASS2_INFORMATION, g_stub.last_sent.vscp_class);
   ASSERT_EQ(VSCP2_TYPE_INFORMATION_HEART_BEAT, g_stub.last_sent.vscp_type);
@@ -244,7 +243,7 @@ TEST(_vscp_frmw2, send_caps_contains_guid_ip_and_name)
   cfg.m_level = VSCP_LEVEL2;
   ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
 
-  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_send_caps());
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_send_caps(&cfg));
 
   ASSERT_EQ(1, g_stub.send_calls);
   ASSERT_EQ(VSCP_CLASS2_PROTOCOL, g_stub.last_sent.vscp_class);

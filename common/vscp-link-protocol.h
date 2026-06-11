@@ -35,9 +35,9 @@
 #ifndef _VSCP_LINK_PROTOCOL_H_
 #define _VSCP_LINK_PROTOCOL_H_
 
-#include <vscp.h>
-#include <vscp-fifo.h>
-#include <vscp-firmware-helper.h>
+#include "vscp.h"
+#include "vscp-fifo.h"
+#include "vscp-firmware-helper.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,6 +53,20 @@ extern "C" {
    */
 
 /*!
+  @brief Major version.
+
+  This is the major version of this vscp link protocol code.
+*/
+#define VSCP_LINK__MAJOR_VERSION 2
+
+/*!
+  @brief Minor Version-
+
+  This is the minor version of this vscp link protocol code.
+*/
+#define VSCP_LINK__MINOR_VERSION 0   
+
+/*!
   Max buffer for level II events. The buffer size is needed to
   convert an event to string. To handle all level II events
   512*5 + 110 = 2670 bytes is needed. In reality this is
@@ -62,8 +76,8 @@ extern "C" {
 */
 #define VSCP_LINK_MAX_BUF (2680u)
 
-#define MAX_INQUEUE  10u // Max # events in in-queue
-#define MAX_OUTQUEUE 10u // Max # events in out-queue
+#define VSCP_LINK_MAX_INQUEUE  10u // Max # events in in-queue
+#define VSCP_LINK_MAX_OUTQUEUE 10u // Max # events in out-queue
 
 #define VSCP_LINK_MAX_USER_NAME_LENGTH 32u // Max length of user name
 #define VSCP_LINK_MAX_PASSWORD_LENGTH  80u // Max length of password
@@ -317,350 +331,6 @@ typedef struct vscp_link_ops {
 
   int
   vscp_link_parser(vscp_link_ctx_t* pctx, char* pbuf, char** pnext);
-
-  ///////////////////////////////////////////////////////////////////////////////
-  //                          Command handlers
-  ///////////////////////////////////////////////////////////////////////////////
-
-  /**
-    @fn vscp_link_doCmdNoop
-    @brief noop command - Just return +OK\r\n
-
-    @param pctx Pointer to user data
-    @param cmd Command string after actual command (arguments)
-    @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-  */
-
-  int
-  vscp_link_doCmdNoop(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdHelp
-   * @brief Provide user help
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   *             Can give specific help on argument
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   *
-   * Can give help about all commands if no argument is given or
-   * just one command if a command name is given as parameter.
-   */
-
-  int
-  vscp_link_doCmdHelp(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdQuit
-   * @brief Quit client session
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdQuit(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdUser
-   * @brief user name for login
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdUser(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdPassword
-   * @brief password for login
-   *
-   * @param pctx Pointer to user data
-   * @param pcmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdPassword(vscp_link_ctx_t* pctx, const char* ppwd);
-
-  /**
-   * @fn vscp_link_doCmdChallenge
-   * @brief challenge for login
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdChallenge(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdSend
-   * @brief Send a VSCP event
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdSend(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdRetrieve
-   * @brief Retrieve a VSCP events if any.
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdRetrieve(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdRcvLoop
-   * @brief Enter receive loop
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdRcvLoop(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdQuitLoop
-   * @brief Quit receive loop
-   *
-   *  @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdQuitLoop(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdCheckData
-   * @brief Check if there are events ready to be received
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdCheckData(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdClearAll
-   * @brief Clear all events in input queue
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdClearAll(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdStatistics
-   * @brief Get VSCP_link_statistics
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdStatistics(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdInfo
-   * @brief Get status information
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdInfo(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdGetChannelId
-   * @brief Get channel id
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdGetChannelId(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdGetGUID
-   * @brief Get channel GUID
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdGetGUID(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdSetGUID
-   * @brief Set channel GUID
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdSetGUID(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdGetVersion
-   * @brief Get version
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdGetVersion(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdSetFilter
-   * @brief Set receive event filter
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdSetFilter(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdSetMask
-   * @brief Set receive event mask
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdSetMask(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdTest
-   * @brief test command - Do test and return result. The command
-   *         is optional and if not implemented return "+OK\r\n"
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdTest(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdWhatCanYouDo
-   * @brief What can you do dommand. Return info about what this node can do.
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdWhatCanYouDo(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdCommandAgain
-   * @brief + command - Do last command again
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdCommandAgain(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdInterface
-   * @brief interface command
-   *     Old versions accepter 'list' and 'close' as argument.
-   *     These arguments has been deprecated.
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   *             list
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-
-  int
-  vscp_link_doCmdInterface(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdShutdown
-   * @brief Shutdown the device into a safe state
-   *
-   * @param pctx Pointer to user data
-   * @param cmd Command string after actual command (arguments)
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   *
-   * The command can do nothing more than returning '+OK\r\n' if
-   * not implemented.
-   */
-
-  int
-  vscp_link_doCmdShutdown(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  /**
-   * @fn vscp_link_doCmdRestart
-   * @brief Restart the device
-   *
-   *  @param pctx Pointer to user data
-   *  @param cmd Command string after actual command (arguments)
-   *  @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   *
-   *  The command can do nothing more than returning '+OK\r\n' if
-   *  not implemented.
-   */
-
-  int
-  vscp_link_doCmdRestart(vscp_link_ctx_t* pctx, const char* pcmd);
-
-  // --------------------------------------------------------------------------
-  //                                  Binary
-  // --------------------------------------------------------------------------
-
-  /**
-   * @fn vscp_link_doBinary
-   * @brief Go to binary mode
-   *
-   * @param pctx Pointer to user data
-   * @return VSCP_ERROR_SUCCESS if all is OK, errorcode otherwise.
-   */
-  int
-  vscp_link_doBinary(vscp_link_ctx_t* pctx);
 
   /**
   @}

@@ -74,14 +74,14 @@ extern "C" {
 
   This is the major version of this vscp  level 2 protocol code..
 */
-#define FRMW2_MAJOR_VERSION 1
+#define FRMW2_MAJOR_VERSION 2
 
 /*!
   @brief Minor Version-
 
   This is the minor version of this vscp  level 2 protocol code.
 */
-#define FRMW2_MINOR_VERSION 6
+#define FRMW2_MINOR_VERSION 0
 
 /*!
   @brief Standard register address start.
@@ -131,14 +131,14 @@ typedef enum probe_substate_t {
 #define VSCP_LEVEL1_DM_FLAG_CLASS_MASK    0x02
 #define VSCP_LEVEL1_DM_FLAG_CLASS_FILTER  0x01
 
-#define LEVEL1_DM_OADDR(row)        (g_pconfig->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_OADDR])
-#define LEVEL1_DM_FLAGS(row)        (g_pconfig->m_pDm[(8 * row) + VSCP_LEVEL2_DM_POS_FLAGS])
-#define LEVEL1_DM_CLASS_MASK(row)   (g_pconfig->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSMASK] + (((g_pconfig->m_pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & 0x02) << 9))
-#define LEVEL1_DM_CLASS_FILTER(row) (g_pconfig->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSFILTER] + (((g_pconfig->m_pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & 0x01) << 9))
-#define LEVEL1_DM_TYPE_MASK(row)    (g_pconfig->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_TYPEMASK])
-#define LEVEL1_DM_TYPE_FILTER(row)  (g_pconfig->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_TYPEFILTER])
-#define LEVEL1_DM_ACTION(row)       (g_pconfig->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_ACTION])
-#define LEVEL1_DM_ACTION_PARAM(row) (g_pconfig->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_ACTIONPARAM])
+#define LEVEL1_DM_OADDR(row)        (pctx->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_OADDR])
+#define LEVEL1_DM_FLAGS(row)        (pctx->m_pDm[(8 * row) + VSCP_LEVEL2_DM_POS_FLAGS])
+#define LEVEL1_DM_CLASS_MASK(row)   (pctx->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSMASK] + (((pctx->m_pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & 0x02) << 9))
+#define LEVEL1_DM_CLASS_FILTER(row) (pctx->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSFILTER] + (((pctx->m_pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & 0x01) << 9))
+#define LEVEL1_DM_TYPE_MASK(row)    (pctx->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_TYPEMASK])
+#define LEVEL1_DM_TYPE_FILTER(row)  (pctx->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_TYPEFILTER])
+#define LEVEL1_DM_ACTION(row)       (pctx->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_ACTION])
+#define LEVEL1_DM_ACTION_PARAM(row) (pctx->m_pDm[(8 * row) + VSCP_LEVEL1_DM_POS_ACTIONPARAM])
 
 // Level II decision matrix
 
@@ -156,24 +156,24 @@ typedef enum probe_substate_t {
 #define VSCP_LEVEL2_DM_FLAG_CHECK_ZONE    0x00000010 // zone in second data byte
 #define VSCP_LEVEL2_DM_FLAG_CHECK_SUBZONE 0x00000008 // subzone in third data byte
 
-#define LEVEL2_DM_FLAGS(row) construct_unsigned32(                                 \
-  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS],     \
-  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 1], \
-  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 2], \
-  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 3])
-#define LEVEL2_DM_OADDR(row, pos) (g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + \
-                                                    VSCP_LEVEL2_DM_POS_OADDR + pos])
-#define LEVEL2_DM_CLASS(row) construct_unsigned16(                             \
-  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_CLASS], \
-  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_CLASS + 1])
-#define LEVEL2_DM_TYPE(row) construct_unsigned16(                             \
-  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_TYPE], \
-  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_TYPE + 1])
-#define LEVEL2_DM_ACTION(row) construct_unsigned16(                             \
-  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_ACTION], \
-  g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_ACTION + 1])
-#define LEVEL2_DM_ACTION_PARAM(row) (g_pconfig->m_pDm[(g_pconfig->m_sizeDmRow * row) + \
-                                                      VSCP_LEVEL2_DM_POS_ACTIONPARAM])
+#define LEVEL2_DM_FLAGS(row) construct_unsigned32(                             \
+  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS],           \
+  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 1],       \
+  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 2],       \
+  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 3])
+#define LEVEL2_DM_OADDR(row, pos) (pctx->m_pDm[(pctx->m_sizeDmRow * row) + \
+                                               VSCP_LEVEL2_DM_POS_OADDR + pos])
+#define LEVEL2_DM_CLASS(row) construct_unsigned16(                         \
+  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_CLASS],       \
+  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_CLASS + 1])
+#define LEVEL2_DM_TYPE(row) construct_unsigned16(                         \
+  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_TYPE],       \
+  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_TYPE + 1])
+#define LEVEL2_DM_ACTION(row) construct_unsigned16(                         \
+  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_ACTION],       \
+  pctx->m_pDm[(pctx->m_sizeDmRow * row) + VSCP_LEVEL2_DM_POS_ACTION + 1])
+#define LEVEL2_DM_ACTION_PARAM(row) (pctx->m_pDm[(pctx->m_sizeDmRow * row) + \
+                                                  VSCP_LEVEL2_DM_POS_ACTIONPARAM])
 
 /*
   Default nickname discovery settings
@@ -190,15 +190,19 @@ typedef enum probe_substate_t {
                                              // to us
 #define VSCP_SEGCTRL_RESPONSE_TIMEOUT 300000 // ms time after a segment ctrl response has been received
                                              // and when nickname discovery process will be taken up again.
-#define VSCP_INIT_BUTTON_TIMEOUT 2000        // Press timeout for init button.
+#define VSCP_INIT_BUTTON_TIMEOUT 2000        // Button press and hold timeout for init button.
 #define VSCP_GUID_RESET_TIMEOUT  1000        // All four GUID reset event must be received withing this time
+
+/* Forward declaration so vscp_frmw2_firmware_context_t can hold a pointer to
+   the ops table that is defined later in this same header. */
+struct vscp_frmw2_ops;
 
 /*!
   Global structure for protocol functionality
 
   Used internally
 */
-typedef struct vscp_frmw2_firmware_config {
+typedef struct vscp_frmw2_firmware_context {
 
   probe_state_t m_state;       // State machine state
   probe_substate_t m_substate; // state machine substate
@@ -310,28 +314,97 @@ typedef struct vscp_frmw2_firmware_config {
   uint8_t m_ipaddr[16];     // IP address (ipv4/ipv6)
   uint8_t m_deviceName[64]; // Name of the device
 
-} vscp_frmw2_firmware_config_t;
+  /** Operations table — pointer to the user-supplied callbacks. Must not be NULL. */
+  const struct vscp_frmw2_ops *ops;
+
+} vscp_frmw2_firmware_context_t;
+
+/** Backward-compatible alias for vscp_frmw2_firmware_context_t. */
+typedef vscp_frmw2_firmware_context_t vscp_frmw2_firmware_config_t;
+
+/**
+ * @brief VSCP level II firmware operations table.
+ *
+ * Populate all function pointers and assign a pointer to this struct to
+ * vscp_frmw2_firmware_context_t::ops before calling vscp_frmw2_init().
+ * The first argument to every callback is the configuration/context pointer.
+ *
+ * Mandatory fields — vscp_frmw2_init() returns VSCP_ERROR_INIT_MISSING if any
+ * of these are NULL:
+ *   get_milliseconds, get_timestamp, send_event_ex, set_event_time,
+ *   read_reg, write_reg, stdreg_change
+ *
+ * All other fields are optional; set unused pointers to NULL.
+ */
+typedef struct vscp_frmw2_ops {
+
+  /* ── Timing ─────────────────────────────────────────────────── */
+  /** Return current time in milliseconds. */
+  uint32_t (*get_milliseconds)(vscp_frmw2_firmware_context_t *pctx);
+  /** Return current timestamp in microseconds. */
+  uint64_t (*get_timestamp)(vscp_frmw2_firmware_context_t *pctx);
+
+  /* ── Transport ──────────────────────────────────────────────── */
+  /** Send an EventEx to the transport layer. The event is copied by the callback. */
+  int (*send_event_ex)(vscp_frmw2_firmware_context_t *pctx, vscpEventEx *pex);
+
+  /* ── Decision matrix ────────────────────────────────────────── */
+  /** Execute a DM action triggered by pex. */
+  int (*dm_action)(vscp_frmw2_firmware_context_t *pctx,
+                   const vscpEventEx *pex,
+                   uint8_t action,
+                   const uint8_t *pparam);
+
+  /* ── Node information ───────────────────────────────────────── */
+  /** Segment controller heartbeat received. */
+  int (*segment_ctrl_heartbeat)(vscp_frmw2_firmware_context_t *pctx, uint16_t segcrc, uint32_t time);
+  /** Report events this node is interested in. */
+  int (*report_events_of_interest)(vscp_frmw2_firmware_context_t *pctx);
+  /** Fill in date/time/timestamp fields of an event. Set to zero if unavailable. */
+  int (*set_event_time)(vscp_frmw2_firmware_context_t *pctx, vscpEventEx *pex);
+  /** Return the IPv4 or IPv6 address of the interface (size = 4 or 16). */
+  int (*get_ip_addr)(vscp_frmw2_firmware_context_t *pctx, uint8_t *pipaddr, uint8_t size);
+
+  /* ── Register I/O ───────────────────────────────────────────── */
+  /** Read one user register (address range 0x00000000 – 0xffff0000). */
+  int (*read_reg)(vscp_frmw2_firmware_context_t *pctx, uint16_t page, uint32_t reg, uint8_t *pval);
+  /** Write one user register (address range 0x00000000 – 0xffff0000). */
+  int (*write_reg)(vscp_frmw2_firmware_context_t *pctx, uint16_t page, uint32_t reg, uint8_t val);
+  /** A standard register has changed; update persistent storage as needed. */
+  int (*stdreg_change)(vscp_frmw2_firmware_context_t *pctx, uint32_t stdreg);
+
+  /* ── System control ─────────────────────────────────────────── */
+  /** Restore factory defaults. Called when 0x55/0xAA reset sequence is received. */
+  int (*restore_defaults)(vscp_frmw2_firmware_context_t *pctx);
+  /** Enter the bootloader. MUST NOT RETURN. */
+  void (*enter_bootloader)(vscp_frmw2_firmware_context_t *pctx);
+  /** Perform a warm reset. */
+  void (*reset)(vscp_frmw2_firmware_context_t *pctx);
+  /** Feed the hardware watchdog during lengthy operations. */
+  void (*feed_watchdog)(vscp_frmw2_firmware_context_t *pctx);
+
+} vscp_frmw2_ops_t;
 
 /*!
   Used to adjust standard registers for Level I/ Level II
   Level I standard registers are at 0x80 - 0xff on page = 0
   Level II standard registers are at 0xffffff00 - 0xffffffff
 */
-#define ADJSTDREG ((VSCP_LEVEL1 == g_pconfig->m_level) ? 0 : 0xffffff00)
+#define ADJSTDREG ((VSCP_LEVEL1 == pctx->m_level) ? 0 : 0xffffff00)
 
 /*!
   Adjusted data for offset
   vscp_event_t and vscp_event_ex_t versions
 */
-#define EVDTA(x) (pev->pdata[(x) + g_pconfig->m_offset])
-#define EXDTA(x) (pex->data[(x) + g_pconfig->m_offset])
+#define EVDTA(x) (pev->pdata[(x) + pctx->m_offset])
+#define EXDTA(x) (pex->data[(x) + pctx->m_offset])
 
 /*!
  * Ajust size for offset
  * vscp_event_t and vscp_event_ex_t versions
  */
-#define ADJSIZEV (pev->sizeData - g_pconfig->m_offset)
-#define ADJSIZEX (pex->sizeData - g_pconfig->m_offset)
+#define ADJSIZEV (pev->sizeData - pctx->m_offset)
+#define ADJSIZEX (pex->sizeData - pctx->m_offset)
 
 /*!
 ****************************************************************************
@@ -342,7 +415,7 @@ typedef struct vscp_frmw2_firmware_config {
 /*!
  * @brief Init subsystem
  *
- * @param pcfg Structure with configuration data. If set to NULL first initialization values
+ * @param pctx Structure with configuration data. If set to NULL first initialization values
  *              are used.
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  *
@@ -352,36 +425,38 @@ typedef struct vscp_frmw2_firmware_config {
  */
 
 int
-vscp_frmw2_init(vscp_frmw2_firmware_config_t* const pcfg);
+vscp_frmw2_init(vscp_frmw2_firmware_context_t *pctx);
 
 /*!
   @brief Initialize persistent storage
 
-  @param pdata Pointer to user data (typical points to context)
+  @param pctx Pointer to context.
   @return VSCP_ERROR_SUCCESS on success, else error code.
  */
 int
-vscp_frmw2_init_persistent_storage(void);
+vscp_frmw2_init_persistent_storage(vscp_frmw2_firmware_context_t *pctx);
 
 /*!
  * @brief Init VSCP ex event with standard data
-
-   @param pex Pointer to ex event
-   @return VSCP_ERROR_SUCCESS on success, else error code.
+ *
+ * @param pctx Pointer to context.
+ * @param pex Pointer to ex event.
+ * @return VSCP_ERROR_SUCCESS on success, else error code.
  */
 
 void
-vscp_frmw2_setup_event_ex(vscpEventEx* const pex);
+vscp_frmw2_setup_event_ex(vscp_frmw2_firmware_context_t *pctx, vscpEventEx *pex);
 
 /*!
  * @brief Send nickname probe
  *
- * @param bNewNodeOnLine If nonzero dataSize will be set to zero (new node on-line)
+ * @param pctx Pointer to context.
+ * @param bNewNodeOnLine If nonzero dataSize will be set to zero (new node on-line).
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  */
 
 int
-vscp_frmw2_send_probe(int bNewNodeOnLine);
+vscp_frmw2_send_probe(vscp_frmw2_firmware_context_t *pctx, int bNewNodeOnLine);
 
 /*!
  * @brief Do periodic VSCP protocol work when nickname is 0xffff
@@ -393,34 +468,37 @@ vscp_frmw2_send_probe(int bNewNodeOnLine);
  *
  * Never used in a LEVEL II system
  *
+ * @param pctx Pointer to context.
  * @param pex Received event ex or NULL if no event received.
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  *
  */
 
 int
-vscp_frmw2_nickname_discovery(const vscpEventEx* const pex);
+vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *pex);
 
 /*!
   Waiting for segment controller to give us a nickname
 
+  @param pctx Pointer to context.
   @param pex Received event or NULL if no event received.
   @return VSCP_ERROR_SUCCESS on success, else error code.
 */
 int
-vscp_frmw2_nickname_wait(const vscpEventEx* const pex);
+vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *pex);
 
 /*!
  * @brief Do periodic VSCP protocol work
  *
- * @param pex Pointer to event ex or a null pointer if no event has been received
+ * @param pctx Pointer to context.
+ * @param pex Pointer to event ex or a null pointer if no event has been received.
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  *
  * Do periodic VSCP protocol work. This function should be called from the
  * main loop on periodic intervals.
  *
  * If there is incoming events to handle a pointer to the event should be
- * sent as a parameter  in **pex**. * Once the function has been called
+ * sent as a parameter  in **pex**. Once the function has been called
  * ownership of the event is left over to the protocol stack and it is up to the
  * function to release the event. This is true also if the function returns an error.
  *
@@ -429,7 +507,7 @@ vscp_frmw2_nickname_wait(const vscpEventEx* const pex);
  */
 
 int
-vscp_frmw2_work(const vscpEventEx* const pex);
+vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *pex);
 
 /*!
   Handle protocol events
@@ -438,449 +516,216 @@ vscp_frmw2_work(const vscpEventEx* const pex);
   @return VSCP_ERROR_SUCCESS on success, else error code.
 */
 int
-vscp_frmw2_handle_protocol_event(const vscpEventEx* const pex);
+vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *pex);
 
 /*!
  * @brief Read VSCP Level II register
  *
- * If the device is a pure level I device
- * the three high bytes of reg should be masked
- * before a register read.
- *
- * @param reg Register to write
- * @param pval Pointer to read value
- * @return VSCP_ERROR_SUCCESS on success, else error code. VSCP_ERROR_INDEX_OOB is returned when trying
-    to read a register that does not exist. This error is actually a warning.
+ * @param pctx Pointer to context.
+ * @param reg Register to read.
+ * @param pval Pointer to read value.
+ * @return VSCP_ERROR_SUCCESS on success, else error code.
  */
 
 int
-vscp_frmw2_read_reg(uint32_t reg, uint8_t* pval);
+vscp_frmw2_read_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t *pval);
 
 /*!
  * @brief Write VSCP level II register
  *
- * If the device is a pure level I device
- * the three high bytes of reg should be masked
- * before a register write.
- *
- * @param reg Register to write
- * @param val Value to write
- * @return VSCP_ERROR_SUCCESS on success, else error code. VSCP_ERROR_INDEX_OOB is returned when trying
-    to read a register that does not exist. This error is actually a warning.
- *
- * Write a value to a standard or a user register.
+ * @param pctx Pointer to context.
+ * @param reg Register to write.
+ * @param val Value to write.
+ * @return VSCP_ERROR_SUCCESS on success, else error code.
  */
 
 int
-vscp_frmw2_write_reg(uint32_t reg, uint8_t val);
+vscp_frmw2_write_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t val);
 
 /*!
  * @brief Send periodic heartbeat
  *
+ * @param pctx Pointer to context.
  * @return VSCP_ERROR_SUCCESS on success, else error code.
- *
- * Send heartbeat event to client. Typically send one every minute.
  */
 
 int
-vscp_frmw2_send_heartbeat(void);
+vscp_frmw2_send_heartbeat(vscp_frmw2_firmware_context_t *pctx);
 
 /*!
  * @brief Send periodic capability heartbeat
  *
+ * @param pctx Pointer to context.
  * @return VSCP_ERROR_SUCCESS on success, else error code.
- *
- * Send capabilities event to client. Typically send every minute.
  */
 
 int
-vscp_frmw2_send_caps(void);
+vscp_frmw2_send_caps(vscp_frmw2_firmware_context_t *pctx);
 
 /*!
  * @brief Do register reads
  *
- * @param reg First register position to write to.
- * @param cnt Number of positions to write to.
+ * @param pctx Pointer to context.
+ * @param startreg First register position to read.
+ * @param cnt Number of registers to read.
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  */
 
 int
-vscp_frmw2_vscp2_register_read(uint32_t startreg, uint16_t cnt);
+vscp_frmw2_vscp2_register_read(vscp_frmw2_firmware_context_t *pctx, uint32_t startreg, uint16_t cnt);
 
 /*!
  * @brief Do register writes
  *
- * @param reg First register position to write to.
- * @param cnt Number of positions to write to.
+ * @param pctx Pointer to context.
+ * @param startreg First register position to write.
+ * @param cnt Number of positions to write.
  * @param pdata Pointer to data to write.
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  */
 
 int
-vscp_frmw2_vscp2_register_write(uint32_t startreg, uint16_t cnt, const uint8_t* const pdata);
+vscp_frmw2_vscp2_register_write(vscp_frmw2_firmware_context_t *pctx, uint32_t startreg, uint16_t cnt, const uint8_t *pdata);
 
 /*!
   @brief Send error event (CLASS=508).
 
-  @param type This is the VSCP type
+  @param pctx Pointer to context.
+  @param type This is the VSCP type.
   @param idx Index to identify possible sub module. Normally set to zero.
   @return VSCP_ERROR_SUCCESS on success, else error code.
-
-  Enable by setting bEnableErroReporting to true in config.
-
-  See specification [here](https://grodansparadis.github.io/vscp-doc-spec/#/./class1.error)
-
-  idx can be used to identify the internal part ("submodule") that was the
-  origin of the error. Both zone and sub zone are always set to zero.
  */
 
 uint8_t
-vscp_frmw2_send_error_event(uint8_t type, uint8_t idx);
+vscp_frmw2_send_error_event(vscp_frmw2_firmware_context_t *pctx, uint8_t type, uint8_t idx);
 
 /*!
   @brief Send log event (CLASS=509).
 
+  @param pctx Pointer to context.
   @param type VSCP logevent type.
   @param id Identifier for the logging channel.
   @param level Loglevel for this log event.
   @param idx index for multi-frame log event starting at zero.
   @param pData Log data (Always 5 bytes).
   @return VSCP_ERROR_SUCCESS on success, else error code.
-
-  Enable by setting bEnableLogging to true in config.
-
-  See specification [here](https://grodansparadis.github.io/vscp-doc-spec/#/./class1.log)
-
-  For logging first send Type = 2(0x01) Log Start then logging events and when
-  log is closed send Type = 3 (0x03) Log Stop. To log several things use a
-  unique if for each and open/close each.
  */
 
 uint8_t
-vscp_frmw2_send_log_event(uint8_t type, uint8_t id, uint8_t level, uint8_t idx, uint8_t* pLogdata);
+vscp_frmw2_send_log_event(vscp_frmw2_firmware_context_t *pctx, uint8_t type, uint8_t id, uint8_t level, uint8_t idx, uint8_t *pLogdata);
 
 /*!
    @brief Send high end server probe
 
-  Enable by setting bSendHighEndServerProbe to true in config
-
-   @return VSCP_ERROR_SUCCESS on success, else error code.
-
-   Inform possible high end servers of our existence.
+  @param pctx Pointer to context.
+  @return VSCP_ERROR_SUCCESS on success, else error code.
  */
 
 int
-vscp_frmw2_send_high_end_server_probe(void);
+vscp_frmw2_send_high_end_server_probe(vscp_frmw2_firmware_context_t *pctx);
 
 /*!
   @brief Do a level I page read
 
-  @param offset Offset into register page
-  @param count Number of registers to read
+  @param pctx Pointer to context.
+  @param offset Offset into register page.
+  @param count Number of registers to read.
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 int
-vscp_frmw2_page_read(uint32_t offset, uint8_t count);
+vscp_frmw2_page_read(vscp_frmw2_firmware_context_t *pctx, uint32_t offset, uint8_t count);
 
 /*!
   @brief Do a level I page write
 
-  @param offset Offset into register page
-  @param count Number of registers to write
-  @param buf Pointer to buffer of
+  @param pctx Pointer to context.
+  @param offset Offset into register page.
+  @param count Number of registers to write.
+  @param pbuf Pointer to buffer of data.
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 
 int
-vscp_frmw2_page_write(uint32_t offset, uint8_t count, const uint8_t* const pbuf);
+vscp_frmw2_page_write(vscp_frmw2_firmware_context_t *pctx, uint32_t offset, uint8_t count, const uint8_t *pbuf);
 
 /*!
   @brief Send whois response
 
-  Send whois response. If level II device a level II response
-  will be sent.
-
+  @param pctx Pointer to context.
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 
 int
-vscp_frmw2_whois_response(void);
+vscp_frmw2_whois_response(vscp_frmw2_firmware_context_t *pctx);
 
 /*!
   @brief Read a full page or part of memory
 
-  @param nodeid Node id from node to read page from
+  @param pctx Pointer to context.
+  @param nodeid Node id from node to read page from.
   @param page Page to read.
   @param offset Offset on page to read from.
   @param cnt Number of bytes from offset to read. A zero value should be treated as 256.
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 int
-vscp_frmw2_extended_page_read(uint16_t nodeid, uint16_t page, uint8_t offset, uint16_t cnt);
+vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx, uint16_t nodeid, uint16_t page, uint8_t offset, uint16_t cnt);
 
 /*!
   @brief Write multiple bytes to memory
 
-  @param page Page to read.
-  @param offset Offset on page to read from.
-  @param cnt Number of bytes from offset to read. A zero value should be treated as 256.
-  @param pbuf Pointer to buffer with data
+  @param pctx Pointer to context.
+  @param nodeid Node id.
+  @param page Page to write.
+  @param offset Offset on page to write from.
+  @param cnt Number of bytes to write.
+  @param pbuf Pointer to buffer with data.
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 
 int
-vscp_frmw2_extended_page_write(uint16_t nodeid, uint16_t page, uint8_t offset, uint16_t cnt, const uint8_t* const pbuf);
+vscp_frmw2_extended_page_write(vscp_frmw2_firmware_context_t *pctx, uint16_t nodeid, uint16_t page, uint8_t offset, uint16_t cnt, const uint8_t *pbuf);
 
 /*!
   @brief Feed the level I decision matrix with one Event
 
+  @param pctx Pointer to context.
   @param pex Event to feed the DM with.
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 
 int
-vscp_frmw2_feed_level1_dm(const vscpEventEx* const pex);
+vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *pex);
 
 /*!
   @brief Feed the level II decision matrix with one Event
 
+  @param pctx Pointer to context.
   @param pex Event to feed the DM with.
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 
 int
-vscp_frmw2_feed_leve2_dm(const vscpEventEx* const pex);
+vscp_frmw2_feed_leve2_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *pex);
 
 /*!
   @brief Feed the decision matrix with one Event
 
+  @param pctx Pointer to context.
   @param pex Event to feed the DM with.
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 int
-vscp_frmw2_feed_dm(const vscpEventEx* const pex);
+vscp_frmw2_feed_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *pex);
 
 /*!
   @brief Send DM info on request
 
-  Response to CLASS1_PROTOCOL, VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO
+  @param pctx Pointer to context.
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 int
-vscp_frmw2_report_dmatrix(void);
-
-/*
- ****************************************************************************
-                                    Callbacks
- *****************************************************************************
- */
-
-/**
-  @name Callbacks for VSCP level II protocol
-*/
-
-/*!
- * @brief Get milliseconds
- *
- * @param pdata Pointer to context.
- * @return Time in milliseconds.
- */
-
-uint32_t
-vscp_frmw2_callback_get_milliseconds(void* const puserdata);
-
-/*!
- * @brief Get timestamp
- *
- * @param pdata Pointer to context.
- * @return Timestamp in microseconds.
- */
-
-uint64_t
-vscp_frmw2_callback_get_timestamp(void* const puserdata);
-
-/*!
- * @brief Enter bootloader.  !!!SHOULD NEVER RETURN!!!
- *
- * @param pdata Pointer to user data (typical points to context).
- */
-
-void
-vscp_frmw2_callback_enter_bootloader(void* const puserdata);
-
-/*!
-  @brief Send eventex to transport sublayer.
-  -
-    ex is copied in the callback.
-
-  - if GUID is all zero then the GUID (if Level II) should be set to the GUID of the node.
-  -
-    if requested to send a full Level II event and we are a Level I node skip the
-    event and return VSCP_ERROR_ERROR
-
-    GUID is not used for LEVEL I nodes. Instead 8-bit nickname is stored
-    in the lowest LSB and 16-bit nickname in the two lower LSB's.
-
-  @param pdata Pointer to user data (typical points to context)
-  @param pex Pointer to EventEx to send.
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-*/
-
-int
-vscp_frmw2_callback_send_event_ex(void* const puserdata, vscpEventEx* pex);
-
-/*!
- * @brief Handle DM action
- *
- * @param puserdata Pointer to user data (typical points to context).
- * @param pex Pointer to event that triggered the action
- * @param action Code for action
- * @param pparam Pointer to action parameter data.
- *    On level II devices size for this data is always (DM-rowsize - 7)
- * @return VSCP_ERROR_SUCCESS on success, or error code.
- */
-
-int
-vscp_frmw2_callback_dm_action(void* const puserdata,
-                              const vscpEventEx* const pex,
-                              uint8_t action,
-                              const uint8_t* const pparam);
-
-/*!
- * @brief Segment controller heartbeat received
- *
- * @param pdata Pointer to user data (typical points to context).
- * @return VSCP_ERROR_SUCCESS on success, or error code.
- */
-int
-vscp_frmw2_callback_segment_ctrl_heartbeat(void* const puserdata, uint16_t segcrc, uint32_t time);
-
-/*!
- * @brief Report back events that this node is interested in
- *
- * The framework sends the required response if the GUID is the same as the probe.
- *
- * @param pdata Pointer to user data (typical points to context)
- * @return VSCP_ERROR_SUCCESS on success, else error code.
- */
-
-int
-vscp_frmw2_callback_report_events_of_interest(void* const puserdata);
-
-/*!
- * @brief  Fill in event date/time/timestamp information
- *
- * @param pdata
- * @param pex Event to get info
- * @return VSCP_ERROR_SUCCESS on success, else error code.
- *
- * Set all to zero or do nothing if not time information is available
- * and the time values are already set to zero.
- */
-
-int
-vscp_frmw2_callback_set_event_time(void* const puserdata, vscpEventEx* const pex);
-
-/*!
-  @brief Restore defaults
-
-  If 0x55/0xaa is written to register location
-  162 within one second defaults should be loaded
-  by the device.
-
-  @param pdata Pointer to user data (typical points to context)
-  @return VSCP_ERROR_SUCCESS on success, or error code.
- */
-
-int
-vscp_frmw2_callback_restore_defaults(void* const puserdata);
-
-/*!
-  @brief Reset the device and do a warm start
-*/
-void
-vscp_frmw2_callback_reset(void* const puserdata);
-
-/**
- * @brief Get ipv6 or ipv4 address
- *
- * Return the ipv6 or ipv4 address of the interface. If the
- * interface is not tcp/ip based just return a positive
- * response or a valid address for the underlying transport protocol.
- *
- * @param pdata Pointer to context.
- * @param pipaddr Pointer to 16 byte address space for (ipv6 or ipv4) address
- *                return value.
- * @param size This is the requested size of the address, 4 or 16 bytes.
- * @return VSCP_ERROR_SUCCESS on success, error code on failure
- */
-
-int
-vscp_frmw2_callback_get_ip_addr(void* const puserdata, uint8_t* pipaddr, uint8_t size);
-
-/*!
- * @brief Read register
- *
- * Read value of one of the user registers. Valid register range
- * is 0x00000000 - 0xffff0000
- *
- * @param pdata Pointer to user data (typical points to context).
- * @param page Register page used at level I
- * @param reg Register to read.
- * @param pval Pointer to variable that will get read value.
- * @return VSCP_ERROR_SUCCESS on success, else error code. VSCP_ERROR_PARAMETER is
- * returned if the register is invalid. VSCP_ERROR_INDEX_OOB is returned when trying
-    to read a register that does not exist. This error is actually a warning.
- *
- */
-int
-vscp_frmw2_callback_read_reg(void* const puserdata, uint16_t page, uint32_t reg, uint8_t* pval);
-
-/*!
- * @brief Write register
- *
- * Write value of one of the user registers. Valid register range
- * is 0x00000000 - 0xffff0000
- *
- * @param pdata Pointer to user data (typical points to context)
- * @param page Register page used at level I
- * @param reg Register to write
- * @param val Value to write
- * @return VSCP_ERROR_SUCCESS on success, else error code. VSCP_ERROR_PARAMETER is
- * returned if the register is invalid. VSCP_ERROR_INDEX_OOB is returned when trying
-    to read a register that does not exist. This error is actually a warning.
- */
-
-int
-vscp_frmw2_callback_write_reg(void* const puserdata, uint16_t page, uint32_t reg, uint8_t val);
-
-/*!
-  @brief Information callback to app that standard register has been changed. Typically
-    persistent storage is updated.
-    VSCP_STD_REGISTER_USER_ID is used for all positions of userid.
-    VSCP_STD_REGISTER_USER_MANDEV_ID is used for all positions of manufacturer id and sub
-      manufacturer id.
-    VSCP_STD_REGISTER_GUID is used for all positions of GUID.
-
-  @param pdata Pointer to user data (typical points to context)
-  @param stdreg Standard register that has been changed. Level I register address
-    is used for all common registers.
-  @return VSCP_ERROR_SUCCESS on success, or error code.
-*/
-int
-vscp_frmw2_callback_stdreg_change(void* const puserdata, uint32_t stdreg);
-
-/*!
-  @brief Feed the watchdog
-
-  Feed the watchdog on systems that need to do
-  that during lengthy operations to prevent restarts.
-*/
-
-void
-vscp_frmw2_callback_feed_watchdog(void* const puserdata);
-
-// ============ END OF CALLBACKS ============
+vscp_frmw2_report_dmatrix(vscp_frmw2_firmware_context_t *pctx);
 
 /**
 @}

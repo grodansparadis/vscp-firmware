@@ -56,6 +56,9 @@ add_executable(vscp_firmware_tests
     vscp-firmware-level2-unittest.cpp
     vscp-firmware-unittest.cpp
     vscp-link-protocol-unittest.cpp
+    vscp-binary-unittest.cpp
+    vscp-ws1-unittest.cpp
+    vscp-ws2-unittest.cpp
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-helper.c
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-helper.h
     ${PROJECT_SOURCE_DIR}/../common/vscp-guid-parser.c
@@ -68,6 +71,9 @@ add_executable(vscp_firmware_tests
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware.c
     ${PROJECT_SOURCE_DIR}/../common/vscp-aes.c
     ${PROJECT_SOURCE_DIR}/../common/vscp-link-protocol.c
+    ${PROJECT_SOURCE_DIR}/../common/vscp-binary.c
+    ${PROJECT_SOURCE_DIR}/../common/vscp-ws1.c
+    ${PROJECT_SOURCE_DIR}/../common/vscp-ws2.c
     ${PROJECT_SOURCE_DIR}/../third-party/cJSON/cJSON.c
     )
 
@@ -76,6 +82,7 @@ set_target_properties(vscp_firmware_tests PROPERTIES OUTPUT_NAME test)
 target_include_directories(vscp_firmware_tests PUBLIC 
     ${PROJECT_SOURCE_DIR}/../common/
     ${PROJECT_SOURCE_DIR}/../third-party/cJSON/
+    ${PROJECT_SOURCE_DIR}/
     )
 
 target_link_libraries(vscp_firmware_tests PRIVATE m

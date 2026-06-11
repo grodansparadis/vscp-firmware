@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <gtest/gtest.h>
-#include <vscp.h>
-#include <vscp-guid-parser.h>
+#include "vscp.h"
+#include "vscp-guid-parser.h"
 
 //-----------------------------------------------------------------------------
 // vscp_guid_parse - Basic parsing tests

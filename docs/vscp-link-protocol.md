@@ -1,6 +1,6 @@
 # vscp-link-protocol
 
-Last updated: 2026-06-10
+Last updated: 2026-06-11
 
 This module implements the VSCP Link text command protocol dispatcher for firmware targets. It parses CRLF-terminated lines, maps commands to handlers, and delegates all transport/application work through callbacks.
 
@@ -52,6 +52,8 @@ flowchart TD
 - Returns `VSCP_LINK_MSG_UNKNOWN_COMMAND` for unknown commands.
 
 While receive loop mode is active, command acceptance is controlled by `THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD` and loop state (`vscp_link_callback_get_rcvloop_status`).
+
+> **Note:** Individual command handler functions (`vscp_link_doCmdNoop`, `vscp_link_doCmdSend`, etc.) are `static` implementation details of `vscp-link-protocol.c`. They are not part of the public API and are not declared in the header. All interaction happens through `vscp_link_parser`.
 
 ## Text commands and handlers
 
@@ -152,14 +154,14 @@ vscp_link_disconnect(pctx);
 
 ## Quick command reference
 
-| Command | Aliases | Access | Primary callbacks/path |
+| Command | Aliases | Access | Notes |
 |---|---|---|---|
-| `help` | — | `write_client` present | `vscp_link_doCmdHelp` → `ops->write_client` (or `ops->help_custom` if `VSCP_LINK_CUSTOM_HELP_TEXT`) |
-| `noop` | — | `write_client` present | `vscp_link_doCmdNoop` → `ops->write_client` |
-| `quit` | — | `ops->quit` present | `vscp_link_doCmdQuit` → `ops->quit` |
-| `user <name>` | — | `ops->check_user` present | `vscp_link_doCmdUser` → `ops->check_user` |
-| `pass <password>` | — | `ops->check_password` present | `vscp_link_doCmdPassword` → `ops->check_password` |
-| `challenge` | — | `ops->challenge` present | `vscp_link_doCmdChallenge` → `ops->challenge` |
+| `help` | — | `write_client` present | Writes help text; `ops->help_custom` used if `VSCP_LINK_CUSTOM_HELP_TEXT` |
+| `noop` | — | `write_client` present | Returns `+OK` |
+| `quit` | — | `ops->quit` present | Calls `ops->quit`, returns goodbye |
+| `user <name>` | — | `ops->check_user` present | Calls `ops->check_user` |
+| `pass <password>` | — | `ops->check_password` present | Calls `ops->check_password` |
+| `challenge` | — | `ops->challenge` present | Calls `ops->challenge` |
 | `send <event>` | — | authenticated + privilege 4 | `check_authenticated`, `check_privilege`, parse event, `ops->send` |
 | `retr [count]` | — | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `ops->retr` |
 | `rcvloop` | — | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `ops->enable_rcvloop(1)` |
@@ -171,16 +173,16 @@ vscp_link_disconnect(pctx);
 | `chid` | `getchid` | authenticated + privilege 2 | `check_authenticated`, `check_privilege`, `ops->get_channel_id` |
 | `setguid <guid>` | `sgid` | authenticated + privilege 6 | `check_authenticated`, `check_privilege`, parse GUID, `ops->set_guid` |
 | `getguid` | `ggid` | authenticated + privilege 1 | `check_authenticated`, `check_privilege`, `ops->get_guid` |
-| `version` | `vers` | ops present (no auth gate) | `vscp_link_doCmdGetVersion` → `ops->get_version` |
+| `version` | `vers` | ops present (no auth gate) | `ops->get_version` |
 | `setfilter <filter>` | `sflt` | authenticated + privilege 6 | `check_authenticated`, `check_privilege`, parse filter, `ops->set_filter` |
 | `setmask <mask>` | `smsk` | authenticated + privilege 6 | `check_authenticated`, `check_privilege`, parse mask, `ops->set_mask` |
 | `test [arg]` | — | authenticated + privilege 15 | `check_authenticated`, `check_privilege`, `ops->test` |
-| `whatcanyoudo` | `wcyd` | ops present (no auth gate) | `vscp_link_doCmdWhatCanYouDo` → `ops->wcyd` |
-| `+` | — | `write_client` present | `vscp_link_doCmdCommandAgain` (responds `+OK`) |
+| `whatcanyoudo` | `wcyd` | ops present (no auth gate) | `ops->wcyd` |
+| `+` | — | `write_client` present | Responds `+OK` |
 | `interface [list\|close <guid>]` | — | authenticated + privilege 2 | `ops->get_interface_count`, `ops->get_interface`, `ops->close_interface` |
-| `shutdown` | — | authenticated + privilege 15 | `vscp_link_doCmdShutdown` → `ops->shutdown` |
-| `restart` | — | authenticated + privilege 15 | `vscp_link_doCmdRestart` → `ops->restart` |
-| `binary` | — | `write_client` present | `vscp_link_doCmdBinary` → `ops->binary` |
+| `shutdown` | — | authenticated + privilege 15 | `ops->shutdown` |
+| `restart` | — | authenticated + privilege 15 | `ops->restart` |
+| `binary` | — | `write_client` present | `ops->binary` |
 
 ## Notes on current implementation behavior
 

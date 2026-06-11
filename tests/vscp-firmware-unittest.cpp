@@ -2,8 +2,8 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include <vscp-class.h>
-#include <vscp-type.h>
+#include "vscp-class.h"
+#include "vscp-type.h"
 
 typedef struct {
   uint8_t flags;

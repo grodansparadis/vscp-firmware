@@ -10,7 +10,7 @@
 #ifndef _VSCP_LINK_PROTOCOL_CALLBACKS_H_
 #define _VSCP_LINK_PROTOCOL_CALLBACKS_H_
 
-#include <vscp-link-protocol.h>
+#include "vscp-link-protocol.h"
 
 #ifdef __cplusplus
 extern "C" {

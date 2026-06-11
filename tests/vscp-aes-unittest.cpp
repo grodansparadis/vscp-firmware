@@ -1,7 +1,7 @@
 #include <cstdint>
 #include <cstring>
 #include <gtest/gtest.h>
-#include <vscp-aes.h>
+#include "vscp-aes.h"
 
 TEST(_vscp_aes, ecb_aes128_encrypt_nist_single_block)
 {
