@@ -159,23 +159,23 @@ static const vscp_frmw2_ops_t g_ops = {
 void init_config(vscp_frmw2_firmware_config_t& cfg)
 {
   std::memset(&cfg, 0, sizeof(cfg));
-  cfg.m_level                          = VSCP_LEVEL2;
-  cfg.m_probe_timeout                  = VSCP_FRMW2_UNASSIGNED;
-  cfg.m_probe_timeout_count            = VSCP_FRMW2_UNASSIGNED;
-  cfg.m_nickname                       = 0x0022;
-  cfg.m_bInterestedInAllEvents         = 1;
-  cfg.m_bUse16BitNickname              = 0;
-  cfg.m_bEnableWriteProtectedLocations = 1;
+  cfg.level                          = VSCP_LEVEL2;
+  cfg.probe_timeout                  = VSCP_FRMW2_UNASSIGNED;
+  cfg.probe_timeout_count            = VSCP_FRMW2_UNASSIGNED;
+  cfg.nickname                       = 0x0022;
+  cfg.bInterestedInAllEvents         = 1;
+  cfg.bUse16BitNickname              = 0;
+  cfg.bEnableWriteProtectedLocations = 1;
   cfg.ops                              = &g_ops;
 
   for (int i = 0; i < 16; ++i) {
-    cfg.m_guid[i]   = static_cast<uint8_t>(0xA0 + i);
-    cfg.m_ipaddr[i] = static_cast<uint8_t>(i);
+    cfg.guid[i]   = static_cast<uint8_t>(0xA0 + i);
+    cfg.ipaddr[i] = static_cast<uint8_t>(i);
   }
 
   const char* name = "UnitTestNode";
-  std::memset(cfg.m_deviceName, 0, sizeof(cfg.m_deviceName));
-  std::memcpy(cfg.m_deviceName, name, std::strlen(name));
+  std::memset(cfg.deviceName, 0, sizeof(cfg.deviceName));
+  std::memcpy(cfg.deviceName, name, std::strlen(name));
 }
 
 } // namespace
@@ -185,14 +185,14 @@ TEST(_vscp_frmw2, init_level2_sets_active_state)
   reset_stub();
   vscp_frmw2_firmware_config_t cfg;
   init_config(cfg);
-  cfg.m_level = VSCP_LEVEL2;
+  cfg.level = VSCP_LEVEL2;
 
   const int rv = vscp_frmw2_init(&cfg);
 
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
-  ASSERT_EQ(FRMW2_STATE_ACTIVE, cfg.m_state);
-  ASSERT_EQ(0u, cfg.m_alarm_status);
-  ASSERT_EQ(0u, cfg.m_errorCounter);
+  ASSERT_EQ(FRMW2_STATE_ACTIVE, cfg.state);
+  ASSERT_EQ(0u, cfg.alarm_status);
+  ASSERT_EQ(0u, cfg.errorCounter);
   ASSERT_GE(g_stub.set_time_calls, 1);
 }
 
@@ -204,8 +204,8 @@ TEST(_vscp_frmw2, setup_event_ex_level1_uses_nickname_in_guid)
 
   ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
 
-  cfg.m_level    = VSCP_LEVEL1;
-  cfg.m_nickname = 0x1234;
+  cfg.level    = VSCP_LEVEL1;
+  cfg.nickname = 0x1234;
 
   vscp_event_ex_t ex;
   std::memset(&ex, 0, sizeof(ex));
@@ -224,15 +224,15 @@ TEST(_vscp_frmw2, send_heartbeat_level2_includes_device_name)
   reset_stub();
   vscp_frmw2_firmware_config_t cfg;
   init_config(cfg);
-  cfg.m_level = VSCP_LEVEL2;
+  cfg.level = VSCP_LEVEL2;
   ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
 
   ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_send_heartbeat(&cfg));
   ASSERT_EQ(1, g_stub.send_calls);
   ASSERT_EQ(VSCP_CLASS2_INFORMATION, g_stub.last_sent.vscp_class);
   ASSERT_EQ(VSCP2_TYPE_INFORMATION_HEART_BEAT, g_stub.last_sent.vscp_type);
-  ASSERT_EQ(std::strlen(reinterpret_cast<const char*>(cfg.m_deviceName)), g_stub.last_sent.sizeData);
-  ASSERT_EQ(0, std::memcmp(cfg.m_deviceName, g_stub.last_sent.data, g_stub.last_sent.sizeData));
+  ASSERT_EQ(std::strlen(reinterpret_cast<const char*>(cfg.deviceName)), g_stub.last_sent.sizeData);
+  ASSERT_EQ(0, std::memcmp(cfg.deviceName, g_stub.last_sent.data, g_stub.last_sent.sizeData));
 }
 
 TEST(_vscp_frmw2, send_caps_contains_guid_ip_and_name)
@@ -240,7 +240,7 @@ TEST(_vscp_frmw2, send_caps_contains_guid_ip_and_name)
   reset_stub();
   vscp_frmw2_firmware_config_t cfg;
   init_config(cfg);
-  cfg.m_level = VSCP_LEVEL2;
+  cfg.level = VSCP_LEVEL2;
   ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
 
   ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_send_caps(&cfg));
@@ -249,7 +249,7 @@ TEST(_vscp_frmw2, send_caps_contains_guid_ip_and_name)
   ASSERT_EQ(VSCP_CLASS2_PROTOCOL, g_stub.last_sent.vscp_class);
   ASSERT_EQ(VSCP2_TYPE_PROTOCOL_HIGH_END_SERVER_CAPS, g_stub.last_sent.vscp_type);
   ASSERT_EQ(104, g_stub.last_sent.sizeData);
-  ASSERT_EQ(0, std::memcmp(cfg.m_guid, g_stub.last_sent.data + 8, 16));
-  ASSERT_EQ(0, std::memcmp(cfg.m_ipaddr, g_stub.last_sent.data + 24, 16));
-  ASSERT_EQ(0, std::memcmp(cfg.m_deviceName, g_stub.last_sent.data + 40, 64));
+  ASSERT_EQ(0, std::memcmp(cfg.guid, g_stub.last_sent.data + 8, 16));
+  ASSERT_EQ(0, std::memcmp(cfg.ipaddr, g_stub.last_sent.data + 24, 16));
+  ASSERT_EQ(0, std::memcmp(cfg.deviceName, g_stub.last_sent.data + 40, 64));
 }
