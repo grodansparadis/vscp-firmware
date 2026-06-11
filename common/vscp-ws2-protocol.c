@@ -40,7 +40,7 @@
 
 #include "vscp.h"
 
-#include "vscp-ws2.h"
+#include "vscp-ws2-protocol.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_ws2_check_ctx

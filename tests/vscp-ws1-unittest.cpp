@@ -23,7 +23,7 @@
 
 #include "vscp.h"
 #include "vscp-firmware-helper.h"
-#include "vscp-ws1.h"
+#include "vscp-ws1-protocol.h"
 
 // ===========================================================================
 // Stub state

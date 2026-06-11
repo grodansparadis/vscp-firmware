@@ -42,7 +42,7 @@
 #include <vscp.h>
 #include <vscp-firmware-helper.h>
 
-#include "vscp-binary.h"
+#include "vscp-binary-protocol.h"
 
 #define VSCP_ERROR_UNKNOWN_COMMAND 72 /* This command is not available */
 

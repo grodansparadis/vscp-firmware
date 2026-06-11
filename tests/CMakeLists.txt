@@ -71,9 +71,9 @@ add_executable(vscp_firmware_tests
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware.c
     ${PROJECT_SOURCE_DIR}/../common/vscp-aes.c
     ${PROJECT_SOURCE_DIR}/../common/vscp-link-protocol.c
-    ${PROJECT_SOURCE_DIR}/../common/vscp-binary.c
-    ${PROJECT_SOURCE_DIR}/../common/vscp-ws1.c
-    ${PROJECT_SOURCE_DIR}/../common/vscp-ws2.c
+    ${PROJECT_SOURCE_DIR}/../common/vscp-binary-protocol.c
+    ${PROJECT_SOURCE_DIR}/../common/vscp-ws1-protocol.c
+    ${PROJECT_SOURCE_DIR}/../common/vscp-ws2-protocol.c
     ${PROJECT_SOURCE_DIR}/../third-party/cJSON/cJSON.c
     )
 

@@ -30,7 +30,7 @@
 
 #include "vscp.h"
 #include "vscp-firmware-helper.h"
-#include "vscp-binary.h"
+#include "vscp-binary-protocol.h"
 
 // ===========================================================================
 // Stub state

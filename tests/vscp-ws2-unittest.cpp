@@ -13,7 +13,7 @@
 #include <gtest/gtest.h>
 
 #include "vscp.h"
-#include "vscp-ws2.h"
+#include "vscp-ws2-protocol.h"
 
 // ===========================================================================
 // Stub state

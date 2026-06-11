@@ -54,8 +54,8 @@
 #include "vscp.h"
 #include "vscp-crc.h"
 
-#include "vscp-binary.h"
-#include "vscp-ws1.h"
+#include "vscp-binary-protocol.h"
+#include "vscp-ws1-protocol.h"
 
 #define TAG __func__
 
