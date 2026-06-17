@@ -226,7 +226,7 @@
           },
           {
             "name": "Send off event LED",
-            "pos": 6,
+            "pos": 4,
             "width": 1,
             "default": 1,
             "access": "rw",
@@ -246,59 +246,75 @@
               "pt": "Defina o bit para enviar um evento OFF quando o LED estiver desligado.",
               "ar": "قم بتعيين البت لتمكين إرسال حدث OFF عند إيقاف تشغيل LED.",
               "sk": "Nastavte bit pro odeslání události OFF, když je LED vypnutá."
-            },
-            {
-              "name": "Send ON event when button is pressed",
-              "pos": 7,
-              "width": 1,
-              "default": 1,
-              "access": "rw",
-              "description": {
-                "en": "Set bit to send on event when button is pressed.",
-                "se": "Sätt bit för att skicka ON event när knapp trycks ner."
-            },
-            {
-              "name": "Send START event when button is pressed",
-              "pos": 8,
-              "width": 1,
-              "default": 1,
-              "access": "rw",
-              "description": {
-                "en": "Set bit to send START event when button is pressed.",
-                "se": "Sätt bit för att skicka START event när knapp trycks ner."
-            },
-            {
-              "name": "Optional byte value for button",
-              "pos": 9,
-              "width": 1,
-              "default": 1,
-              "access": "rw",
-              "description": {
-                "en": "Byte 0 for events sent when button is pressed.",
-                "se": "Byte 0 för events sända när knapp trycks ner."
-            },
-            {
-              "name": "Zone value for button",
-              "pos": 10,
-              "width": 1,
-              "default": 1,
-              "access": "rw",
-              "description": {
-                "en": "Byte 1, zone, for events sent when button is pressed.",
-                "se": "Byte 1, zone, för events sända när knapp trycks ner."
-            },
-            {
-              "name": "Subzone value for button",
-              "pos": 11,
-              "width": 1,
-              "default": 1,
-              "access": "rw",
-              "description": {
-                "en": "Byte 2, subzone, for events sent when button is pressed.",
-                "se": "Byte 2, subzone, för events sända när knapp trycks ner."
-            },
+            }
+          },
+          {
+            "name": "Send ON event when button is pressed",
+            "pos": 3,
+            "width": 1,
+            "default": 1,
+            "access": "rw",
+            "description": {
+              "en": "Set bit to send on event when button is pressed.",
+              "se": "Sätt bit för att skicka ON event när knapp trycks ner."
+            }
+          },
+          {
+            "name": "Send START event when button is pressed",
+            "pos": 2,
+            "width": 1,
+            "default": 1,
+            "access": "rw",
+            "description": {
+              "en": "Set bit to send START event when button is pressed.",
+              "se": "Sätt bit för att skicka START event när knapp trycks ner."
+            }
+          },
+          {
+            "name": "Send STOP event when button is pressed",
+            "pos": 1,
+            "width": 1,
+            "default": 1,
+            "access": "rw",
+            "description": {
+              "en": "Set bit to send STOP event when button is pressed.",
+              "se": "Sätt bit för att skicka STOP event när knapp trycks ner."
+            }
           }
         ]
+      },
+      {
+        "name": "Optional byte value for button",
+        "pos": 9,
+        "width": 1,
+        "default": 1,
+        "access": "rw",
+        "description": {
+          "en": "Byte 0 for events sent when button is pressed.",
+          "se": "Byte 0 för events sända när knapp trycks ner."
+        }
+      },
+      {
+        "name": "Zone value for button",
+        "pos": 10,
+        "width": 1,
+        "default": 1,
+        "access": "rw",
+        "description": {
+          "en": "Byte 1, zone, for events sent when button is pressed.",
+          "se": "Byte 1, zone, för events sända när knapp trycks ner."
+        }
+      },
+      {
+        "name": "Subzone value for button",
+        "pos": 11,
+        "width": 1,
+        "default": 1,
+        "access": "rw",
+        "description": {
+          "en": "Byte 2, subzone, for events sent when button is pressed.",
+          "se": "Byte 2, subzone, för events sända när knapp trycks ner."
+        }
       },
       {
         "name": "Blink interval MSB",
@@ -760,41 +776,41 @@
               "infourl": {
                 "en": "http://www.vscp.org/docs/dm_param_turn_on_off_led.html"
               },
-              "valuelist" : [
+              "valuelist": [
                 {
-                  "value" : "0x00",
-                  "name" : "Off",
-                  "description" : {
-                    "en" : "Turn off the LED",
-                    "se" : "Stäng av LED"
+                  "value": "0x00",
+                  "name": "Off",
+                  "description": {
+                    "en": "Turn off the LED",
+                    "se": "Stäng av LED"
                   },
-                  "infourl" : {
+                  "infourl": {
                     "gb": "English help 1 vl2",
                     "se": "Svensk hjälp 1 vl2",
                     "lt": "Lietuvos padeda 1 vl2"
                   }
                 },
                 {
-                  "value" : "0x01",
-                  "name" : "On",
-                  "description" : {
-                    "en" : "Turn on the LED",
-                    "se" : "Tänd LED"
+                  "value": "0x01",
+                  "name": "On",
+                  "description": {
+                    "en": "Turn on the LED",
+                    "se": "Tänd LED"
                   },
-                  "infourl" : {
+                  "infourl": {
                     "gb": "English help 1 vl2",
                     "se": "Svensk hjälp 1 vl2",
                     "lt": "Lietuvos padeda 1 vl2"
                   }
                 },
                 {
-                  "value" : "0x02",
-                  "name" : "Toggle",
-                  "description" : {
-                    "en" : "Toggle the LED",
-                    "se" : "Växla LED"
+                  "value": "0x02",
+                  "name": "Toggle",
+                  "description": {
+                    "en": "Toggle the LED",
+                    "se": "Växla LED"
                   },
-                  "infourl" : {
+                  "infourl": {
                     "gb": "English help 1 vl2",
                     "se": "Svensk hjälp 1 vl2",
                     "lt": "Lietuvos padeda 1 vl2"
