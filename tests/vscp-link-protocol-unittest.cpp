@@ -249,8 +249,7 @@ protected:
   int parse(const std::string &cmd)
   {
     std::string buf = cmd + "\r\n";
-    char *next      = nullptr;
-    return vscp_link_parser(&ctx, buf.data(), &next);
+    return vscp_link_parser(&ctx, buf.data());
   }
 };
 
@@ -283,31 +282,19 @@ TEST(VscpLinkNullGuards, idle_worker_null_ctx)
 TEST(VscpLinkNullGuards, parser_null_ctx)
 {
   char buf[] = "noop\r\n";
-  char *next = nullptr;
-  EXPECT_EQ(VSCP_ERROR_INIT_MISSING, vscp_link_parser(nullptr, buf, &next));
-}
-
-TEST(VscpLinkNullGuards, parser_null_pnext)
-{
-  vscp_link_ctx_t ctx{};
-  const vscp_link_ops_t ops{ stub_write_client };
-  ctx.ops = &ops;
-  char buf[] = "noop\r\n";
-  EXPECT_EQ(VSCP_ERROR_INVALID_POINTER, vscp_link_parser(&ctx, buf, nullptr));
+  EXPECT_EQ(VSCP_ERROR_INIT_MISSING, vscp_link_parser(nullptr, buf));
 }
 
 TEST(VscpLinkNullGuards, noop_null_ctx)
 {
   std::string buf = "noop\r\n";
-  char *next      = nullptr;
-  EXPECT_EQ(VSCP_ERROR_INIT_MISSING, vscp_link_parser(nullptr, buf.data(), &next));
+  EXPECT_EQ(VSCP_ERROR_INIT_MISSING, vscp_link_parser(nullptr, buf.data()));
 }
 
 TEST(VscpLinkNullGuards, send_null_ctx)
 {
   std::string buf = "send 0,20,3,0,0,0,00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00,0\r\n";
-  char *next      = nullptr;
-  EXPECT_EQ(VSCP_ERROR_INIT_MISSING, vscp_link_parser(nullptr, buf.data(), &next));
+  EXPECT_EQ(VSCP_ERROR_INIT_MISSING, vscp_link_parser(nullptr, buf.data()));
 }
 
 // ===========================================================================
@@ -331,26 +318,11 @@ TEST_F(VscpLinkProtocol, disconnect_calls_disconnect_op)
 // vscp_link_parser mechanics
 // ===========================================================================
 
-TEST_F(VscpLinkProtocol, parser_incomplete_returns_missing)
-{
-  char buf[] = "noop";  // no CRLF
-  char *next = nullptr;
-  EXPECT_EQ(VSCP_ERROR_MISSING, vscp_link_parser(&ctx, buf, &next));
-}
 
 TEST_F(VscpLinkProtocol, parser_empty_line_returns_ok)
 {
   EXPECT_EQ(VSCP_ERROR_SUCCESS, parse(""));
   EXPECT_NE(std::string::npos, g_stub.written.find("+OK"));
-}
-
-TEST_F(VscpLinkProtocol, parser_sets_pnext_past_crlf)
-{
-  std::string buf = "noop\r\nremainder";
-  char *next      = nullptr;
-  vscp_link_parser(&ctx, buf.data(), &next);
-  ASSERT_NE(nullptr, next);
-  EXPECT_STREQ("remainder", next);
 }
 
 TEST_F(VscpLinkProtocol, parser_unknown_command_writes_unknown_msg)
@@ -661,7 +633,6 @@ TEST_F(VscpLinkProtocol, binary_nack_when_ops_binary_null)
   ctx.ops = &ops_no_binary;
 
   std::string buf = "binary\r\n";
-  char *next      = nullptr;
-  vscp_link_parser(&ctx, buf.data(), &next);
+  vscp_link_parser(&ctx, buf.data());
   EXPECT_NE(std::string::npos, g_stub.written.find("Binary mode not supported"));
 }

@@ -925,21 +925,6 @@ vscp_link_parser(vscp_link_ctx_t *pctx, char *pbuf)
     return VSCP_ERROR_INIT_MISSING;
   }
 
-  /*
-    // Check pointers
-    if (NULL == pnext) {
-      return VSCP_ERROR_INVALID_POINTER;
-    }
-    // If buf contains a carriage return, we have a command to handle
-    // If not we are done and need to read more input data
-    if (NULL == (p = strstr(pbuf, "\r\n"))) {
-      return VSCP_ERROR_MISSING;
-    }
-    // Possible command...
-    *p     = '\0';  // Terminate string at \r\n
-    *pnext = p + 2; // Point beyond the \r\n
-  */
-
   // Remove leading whitespace from command
   while (isspace((unsigned char) *pbuf)) {
     pbuf++;
@@ -968,12 +953,6 @@ vscp_link_parser(vscp_link_ctx_t *pctx, char *pbuf)
     return rv;
   }
 
-  // const char *pcmd = pbuf;
-  /*
-   * THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD   bRcvLoop   =   THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD |
-   * !bRcvLoop 0                 0      =   0 | 1 = 1 0                 1      =   0 | 0 = 0 1                 0      =
-   * 1 | 1 = 1 1                 1      =   1 | 0 = 1
-   */
   size_t cmdlen = strlen(pbuf);
   if (NULL != (p = vscp_fwhlp_stristr(pbuf, "help")) && (4 == cmdlen) &&
       (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
