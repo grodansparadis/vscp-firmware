@@ -1,6 +1,6 @@
 # vscp-firmware-level2
 
-Last updated: 2026-06-11
+Last updated: 2026-06-17
 
 This document describes the VSCP Level II firmware framework implemented by:
 
@@ -99,7 +99,7 @@ The context pointer `pctx` is passed as the first argument to every public funct
 - `vscp_frmw2_init`
 - `vscp_frmw2_init_persistent_storage`
 - `vscp_frmw2_work`
-- `vscp_frmw2_setup_event_ex`
+- `vscp_frmw2_setup_event`
 
 ### Nickname and Protocol Handling
 
@@ -129,7 +129,7 @@ The context pointer `pctx` is passed as the first argument to every public funct
 ### Decision Matrix
 
 - `vscp_frmw2_feed_level1_dm`
-- `vscp_frmw2_feed_leve2_dm`  *(note: "leve2" is a known typo in the source — it should read `level2`; kept as-is for ABI compatibility)*
+- `vscp_frmw2_feed_level2_dm`
 - `vscp_frmw2_feed_dm`
 - `vscp_frmw2_report_dmatrix`
 
@@ -157,7 +157,7 @@ Time and lifecycle callbacks:
 
 Transport and event callbacks:
 
-- `send_event_ex`
+- `send_event`
 - `set_event_time`
 - `report_events_of_interest`
 - `segment_ctrl_heartbeat`
@@ -266,14 +266,52 @@ Framework helpers feed events into Level I/Level II DM paths and invoke `ops->dm
 
 ---
 
-## Minimal Integration Pattern
+## Event Data Model
 
+The framework uses `vscpEvent` (`vscp_event_t`) throughout — a pointer-based event struct:
+
+```c
+typedef struct _vscp_event_t {
+  uint16_t head;
+  uint32_t obid;
+  uint16_t year, month, day, hour, minute, second;
+  uint32_t timestamp;
+  uint16_t vscp_class;
+  uint16_t vscp_type;
+  uint8_t  GUID[16];
+  uint16_t sizeData;
+  uint8_t *pdata;   // pointer to external data buffer
+  uint16_t crc;
+} vscp_event_t;
+```
+
+**Important**: `pdata` must point to a valid buffer before passing the event to any framework function.
+For stack-allocated outgoing events, declare a companion buffer and assign `pdata` before calling
+`vscp_frmw2_setup_event()`:
+
+```c
+uint8_t buf[VSCP_MAX_DATA];
+vscp_event_t ev;
+ev.pdata = buf;
+vscp_frmw2_setup_event(pctx, &ev);
+```
+
+`vscp_frmw2_setup_event()` skips the data-buffer zeroing when `pdata == NULL`, so it is safe
+to call with `pdata = NULL` when no data payload is needed.
+
+For incoming events passed to `vscp_frmw2_work()`, `vscp_frmw2_handle_protocol_event()`, or
+the DM feed functions: the framework validates `pdata` at each entry point — if `sizeData > 0`
+and `pdata == NULL` the call returns `VSCP_ERROR_INVALID_POINTER`.
+
+---
+
+## Minimal Integration Pattern
 ```c
 // Define operations table
 static const vscp_frmw2_ops_t my_ops = {
   .get_milliseconds = my_get_ms,
   .get_timestamp    = my_get_ts,
-  .send_event_ex    = my_send_event_ex,
+  .send_event       = my_send_event,    // vscpEvent* (pointer-based)
   .set_event_time   = my_set_event_time,
   .read_reg         = my_read_reg,
   .write_reg        = my_write_reg,
@@ -284,8 +322,8 @@ static const vscp_frmw2_ops_t my_ops = {
 vscp_frmw2_firmware_context_t ctx;
 memset(&ctx, 0, sizeof(ctx));
 
-ctx.m_level = VSCP_LEVEL2;
-ctx.ops     = &my_ops;
+ctx.level = VSCP_LEVEL2;
+ctx.ops   = &my_ops;
 
 int rv = vscp_frmw2_init(&ctx);
 if (VSCP_ERROR_SUCCESS == rv) {
@@ -293,9 +331,11 @@ if (VSCP_ERROR_SUCCESS == rv) {
     // If no incoming event:
     vscp_frmw2_work(&ctx, NULL);
 
-    // If an incoming event is available:
-    // vscp_event_ex_t ex; fill from transport...
-    // vscp_frmw2_work(&ctx, &ex);
+    // If an incoming event is available (buffer must be allocated by transport):
+    // uint8_t buf[VSCP_MAX_DATA];
+    // vscp_event_t ev;  ev.pdata = buf;
+    // /* fill ev from transport */
+    // vscp_frmw2_work(&ctx, &ev);
   }
 }
 ```

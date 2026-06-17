@@ -334,7 +334,7 @@ typedef vscp_frmw2_firmware_context_t vscp_frmw2_firmware_config_t;
  *
  * Mandatory fields — vscp_frmw2_init() returns VSCP_ERROR_INIT_MISSING if any
  * of these are NULL:
- *   get_milliseconds, get_timestamp, send_event_ex, set_event_time,
+ *   get_milliseconds, get_timestamp, send_event, set_event_time,
  *   read_reg, write_reg, stdreg_change
  *
  * All other fields are optional; set unused pointers to NULL.
@@ -348,13 +348,13 @@ typedef struct vscp_frmw2_ops {
   uint64_t (*get_timestamp)(vscp_frmw2_firmware_context_t *pctx);
 
   /* ── Transport ──────────────────────────────────────────────── */
-  /** Send an EventEx to the transport layer. The event is copied by the callback. */
-  int (*send_event_ex)(vscp_frmw2_firmware_context_t *pctx, vscpEventEx *pex);
+  /** Send an event to the transport layer. The event is copied by the callback. */
+  int (*send_event)(vscp_frmw2_firmware_context_t *pctx, vscpEvent *pev);
 
   /* ── Decision matrix ────────────────────────────────────────── */
-  /** Execute a DM action triggered by pex. */
+  /** Execute a DM action triggered by pev. */
   int (*dm_action)(vscp_frmw2_firmware_context_t *pctx,
-                   const vscpEventEx *pex,
+                   const vscpEvent *pev,
                    uint8_t action,
                    const uint8_t *pparam);
 
@@ -364,7 +364,7 @@ typedef struct vscp_frmw2_ops {
   /** Report events this node is interested in. */
   int (*report_events_of_interest)(vscp_frmw2_firmware_context_t *pctx);
   /** Fill in date/time/timestamp fields of an event. Set to zero if unavailable. */
-  int (*set_event_time)(vscp_frmw2_firmware_context_t *pctx, vscpEventEx *pex);
+  int (*set_event_time)(vscp_frmw2_firmware_context_t *pctx, vscpEvent *pev);
   /** Return the IPv4 or IPv6 address of the interface (size = 4 or 16). */
   int (*get_ip_addr)(vscp_frmw2_firmware_context_t *pctx, uint8_t *pipaddr, uint8_t size);
 
@@ -400,7 +400,7 @@ typedef struct vscp_frmw2_ops {
   vscp_event_t and vscp_event_ex_t versions
 */
 #define EVDTA(x) (pev->pdata[(x) + pctx->offset])
-#define EXDTA(x) (pex->data[(x) + pctx->offset])
+#define EXDTA(x) (pex->pdata[(x) + pctx->offset])
 
 /*!
  * Ajust size for offset
@@ -448,7 +448,7 @@ vscp_frmw2_init_persistent_storage(vscp_frmw2_firmware_context_t *pctx);
  */
 
 void
-vscp_frmw2_setup_event_ex(vscp_frmw2_firmware_context_t *pctx, vscpEventEx *pex);
+vscp_frmw2_setup_event(vscp_frmw2_firmware_context_t *pctx, vscpEvent *pev);
 
 /*!
  * @brief Send nickname probe
@@ -478,7 +478,7 @@ vscp_frmw2_send_probe(vscp_frmw2_firmware_context_t *pctx, int bNewNodeOnLine);
  */
 
 int
-vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *pex);
+vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *pev);
 
 /*!
   Waiting for segment controller to give us a nickname
@@ -488,7 +488,7 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscpEve
   @return VSCP_ERROR_SUCCESS on success, else error code.
 */
 int
-vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *pex);
+vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *pev);
 
 /*!
  * @brief Do periodic VSCP protocol work
@@ -510,7 +510,7 @@ vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx 
  */
 
 int
-vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *pex);
+vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *pev);
 
 /*!
   Handle protocol events
@@ -519,7 +519,7 @@ vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *pex);
   @return VSCP_ERROR_SUCCESS on success, else error code.
 */
 int
-vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *pex);
+vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *pev);
 
 /*!
  * @brief Read VSCP Level II register
@@ -698,7 +698,7 @@ vscp_frmw2_extended_page_write(vscp_frmw2_firmware_context_t *pctx, uint16_t nod
 */
 
 int
-vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *pex);
+vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *pev);
 
 /*!
   @brief Feed the level II decision matrix with one Event
@@ -709,7 +709,7 @@ vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx
 */
 
 int
-vscp_frmw2_feed_leve2_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *pex);
+vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *pev);
 
 /*!
   @brief Feed the decision matrix with one Event
@@ -719,7 +719,7 @@ vscp_frmw2_feed_leve2_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx 
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 int
-vscp_frmw2_feed_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *pex);
+vscp_frmw2_feed_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *pev);
 
 /*!
   @brief Send DM info on request
