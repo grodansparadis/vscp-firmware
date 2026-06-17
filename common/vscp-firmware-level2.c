@@ -175,6 +175,10 @@ vscp_frmw2_init(vscp_frmw2_firmware_context_t *const pctx)
 int
 vscp_frmw2_send_probe(vscp_frmw2_firmware_context_t *pctx, int bNewNodeOnLine)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   vscp_event_ex_t ex;
 
   // Send probe
@@ -208,6 +212,10 @@ vscp_frmw2_send_probe(vscp_frmw2_firmware_context_t *pctx, int bNewNodeOnLine)
 int
 vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *const pex)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   int rv = VSCP_ERROR_SUCCESS;
 
   // If there is an event we should check if we should react
@@ -330,6 +338,10 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscpEve
 int
 vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *const pex)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   int rv = VSCP_ERROR_SUCCESS;
 
   // If segment controller does not respond withing set timeout period
@@ -403,6 +415,10 @@ vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx 
 int
 vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *const pex)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   int rv = VSCP_ERROR_SUCCESS;
 
   // Check for init button press   TODO
@@ -486,6 +502,10 @@ vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *const pe
 int
 vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *const pex)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   int rv = VSCP_ERROR_SUCCESS;
 
   if (NULL == pex) {
@@ -1208,8 +1228,8 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 void
 vscp_frmw2_setup_event_ex(vscp_frmw2_firmware_context_t *pctx, vscpEventEx *const pex)
 {
-  // Check pointer
-  if (NULL == pex) {
+  // Check pointers
+  if (NULL == pctx || NULL == pex) {
     return;
   }
 
@@ -1236,6 +1256,10 @@ vscp_frmw2_setup_event_ex(vscp_frmw2_firmware_context_t *pctx, vscpEventEx *cons
 int
 vscp_frmw2_vscp2_register_read(vscp_frmw2_firmware_context_t *pctx, uint32_t startreg, uint16_t count)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   int rv;
 
   vscp_event_ex_t ex;
@@ -1270,6 +1294,10 @@ vscp_frmw2_vscp2_register_read(vscp_frmw2_firmware_context_t *pctx, uint32_t sta
 int
 vscp_frmw2_vscp2_register_write(vscp_frmw2_firmware_context_t *pctx, uint32_t startreg, uint16_t cnt, const uint8_t *const pdata)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   int rv;
 
   for (uint32_t pos = startreg; pos < (startreg + cnt); pos++) {
@@ -1288,6 +1316,10 @@ vscp_frmw2_vscp2_register_write(vscp_frmw2_firmware_context_t *pctx, uint32_t st
 int
 vscp_frmw2_read_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t *pval)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   int rv;
 
   if (reg < (VSCP_STD_REGISTER_START + ADJSTDREG)) {
@@ -1406,6 +1438,10 @@ vscp_frmw2_read_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t *
 int
 vscp_frmw2_write_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t val)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   int rv = VSCP_ERROR_ERROR; // To handle non existent registers
 
   if (reg < VSCP_STD_REGISTER_START + ADJSTDREG) {
@@ -1506,6 +1542,10 @@ vscp_frmw2_write_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t 
 int
 vscp_frmw2_send_heartbeat(vscp_frmw2_firmware_context_t *pctx)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   // int rv;
 
   vscp_event_ex_t exrply;
@@ -1537,6 +1577,10 @@ vscp_frmw2_send_heartbeat(vscp_frmw2_firmware_context_t *pctx)
 int
 vscp_frmw2_send_caps(vscp_frmw2_firmware_context_t *pctx)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   vscp_event_ex_t ex;
   vscp_frmw2_setup_event_ex(pctx, &ex);
 
@@ -1579,6 +1623,10 @@ vscp_frmw2_send_caps(vscp_frmw2_firmware_context_t *pctx)
 int
 vscp_frmw2_send_high_end_server_probe(vscp_frmw2_firmware_context_t *pctx)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   vscp_event_ex_t ex;
   vscp_frmw2_setup_event_ex(pctx, &ex);
 
@@ -1602,6 +1650,10 @@ vscp_frmw2_send_high_end_server_probe(vscp_frmw2_firmware_context_t *pctx)
 int
 vscp_frmw2_page_read(vscp_frmw2_firmware_context_t *pctx, uint32_t offset, uint8_t count)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   int rv = VSCP_ERROR_SUCCESS;
   uint8_t i;
   uint8_t seq = 0;
@@ -1652,6 +1704,10 @@ vscp_frmw2_page_read(vscp_frmw2_firmware_context_t *pctx, uint32_t offset, uint8
 int
 vscp_frmw2_page_write(vscp_frmw2_firmware_context_t *pctx, uint32_t offset, uint8_t count, const uint8_t *const pbuf)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   int rv;
   uint8_t i;
   uint8_t val;
@@ -1693,6 +1749,10 @@ vscp_frmw2_page_write(vscp_frmw2_firmware_context_t *pctx, uint32_t offset, uint
 int
 vscp_frmw2_whois_response(vscp_frmw2_firmware_context_t *pctx)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   int rv;
   uint8_t i, j, k = 0;
 
@@ -1778,6 +1838,10 @@ vscp_frmw2_whois_response(vscp_frmw2_firmware_context_t *pctx)
 int
 vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx, uint16_t nodeid, uint16_t page, uint8_t startoffset, uint16_t cnt)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   int rv;
   uint16_t page_save;
   uint8_t byte = 0;
@@ -1863,6 +1927,10 @@ vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx, uint16_t node
 int
 vscp_frmw2_extended_page_write(vscp_frmw2_firmware_context_t *pctx, uint16_t nodeid, uint16_t page, uint8_t offset, uint16_t cnt, const uint8_t *const pbuf)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   int rv = VSCP_ERROR_SUCCESS;
   uint8_t i;
   uint16_t page_save;
@@ -1910,6 +1978,10 @@ vscp_frmw2_extended_page_write(vscp_frmw2_firmware_context_t *pctx, uint16_t nod
 int
 vscp_frmw2_report_dmatrix(vscp_frmw2_firmware_context_t *pctx)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   vscp_event_ex_t exrply;
   vscp_frmw2_setup_event_ex(pctx, &exrply);
 
@@ -1951,6 +2023,10 @@ vscp_frmw2_report_dmatrix(vscp_frmw2_firmware_context_t *pctx)
 int
 vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *const pex)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   int rv = VSCP_ERROR_SUCCESS;
 
   for (uint8_t row = 0; row < pctx->nDmRows; row++) {
@@ -2005,6 +2081,10 @@ vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx
 int
 vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *const pex)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   int rv = VSCP_ERROR_SUCCESS;
 
   for (uint8_t row = 0; row < pctx->nDmRows; row++) {
@@ -2076,6 +2156,10 @@ vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx
 int
 vscp_frmw2_feed_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEventEx *const pex)
 {
+  if (NULL == pctx) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   int rv = VSCP_ERROR_SUCCESS;
 
   if (NULL != pex) {
