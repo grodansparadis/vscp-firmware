@@ -58,8 +58,8 @@ vscp_link_check_ctx(const vscp_link_ctx_t *pctx)
 static inline int
 vscp_link_check_ctx_auth(const vscp_link_ctx_t *pctx)
 {
-  if (NULL == pctx || NULL == pctx->ops || NULL == pctx->ops->write_client ||
-      NULL == pctx->ops->check_authenticated || NULL == pctx->ops->check_privilege) {
+  if (NULL == pctx || NULL == pctx->ops || NULL == pctx->ops->write_client || NULL == pctx->ops->check_authenticated ||
+      NULL == pctx->ops->check_privilege) {
     return VSCP_ERROR_INIT_MISSING;
   }
   return VSCP_ERROR_SUCCESS;
@@ -192,7 +192,7 @@ vscp_link_doCmdUser(vscp_link_ctx_t *pctx, const char *pcmd)
   if ((NULL == pctx) || (NULL == pctx->ops) || (NULL == pctx->ops->check_user)) {
     return VSCP_ERROR_INIT_MISSING;
   }
-  
+
   // pcmd can be NULL and be accepted or not
   return pctx->ops->check_user(pctx, pcmd);
 }
@@ -662,10 +662,8 @@ vscp_link_doCmdInterface(vscp_link_ctx_t *pctx, const char *pcmd)
   int rv;
   char buf[130], wbuf[50];
   struct vscp_interface_info ifinfo;
-  if (VSCP_ERROR_SUCCESS != vscp_link_check_ctx_auth(pctx) ||
-      NULL == pctx->ops->close_interface ||
-      NULL == pctx->ops->get_interface_count ||
-      NULL == pctx->ops->get_interface) {
+  if (VSCP_ERROR_SUCCESS != vscp_link_check_ctx_auth(pctx) || NULL == pctx->ops->close_interface ||
+      NULL == pctx->ops->get_interface_count || NULL == pctx->ops->get_interface) {
     return VSCP_ERROR_INIT_MISSING;
   }
   if (VSCP_ERROR_SUCCESS != pctx->ops->check_authenticated(pctx)) {
@@ -772,6 +770,7 @@ vscp_link_doCmdCommandAgain(vscp_link_ctx_t *pctx, const char *pcmd)
 static int
 vscp_link_doCmdShutdown(vscp_link_ctx_t *pctx, const char *pcmd)
 {
+  int rv;
   if (VSCP_ERROR_SUCCESS != vscp_link_check_ctx_auth(pctx) || NULL == pctx->ops->shutdown) {
     return VSCP_ERROR_INIT_MISSING;
   }
@@ -781,10 +780,13 @@ vscp_link_doCmdShutdown(vscp_link_ctx_t *pctx, const char *pcmd)
   if (VSCP_ERROR_SUCCESS != pctx->ops->check_privilege(pctx, 15)) {
     return pctx->ops->write_client(pctx, VSCP_LINK_MSG_LOW_PRIVILEGE_ERROR);
   }
-  if (VSCP_ERROR_SUCCESS != pctx->ops->shutdown(pctx)) {
+  if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->shutdown(pctx))) {
+    if (VSCP_ERROR_NOT_SUPPORTED == rv) {
+      return pctx->ops->write_client(pctx, VSCP_LINK_MSG_NOT_SUPPORTED);
+    }
     return pctx->ops->write_client(pctx, VSCP_LINK_MSG_ERROR);
   }
-  return pctx->ops->write_client(pctx, VSCP_LINK_MSG_NOT_SUPPORTED);
+  return pctx->ops->write_client(pctx, VSCP_LINK_MSG_OK);
 }
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_link_doCmdRestart
@@ -792,6 +794,8 @@ vscp_link_doCmdShutdown(vscp_link_ctx_t *pctx, const char *pcmd)
 static int
 vscp_link_doCmdRestart(vscp_link_ctx_t *pctx, const char *pcmd)
 {
+  int rv;
+
   if (VSCP_ERROR_SUCCESS != vscp_link_check_ctx_auth(pctx) || NULL == pctx->ops->restart) {
     return VSCP_ERROR_INIT_MISSING;
   }
@@ -801,7 +805,10 @@ vscp_link_doCmdRestart(vscp_link_ctx_t *pctx, const char *pcmd)
   if (VSCP_ERROR_SUCCESS != pctx->ops->check_privilege(pctx, 15)) {
     return pctx->ops->write_client(pctx, VSCP_LINK_MSG_LOW_PRIVILEGE_ERROR);
   }
-  if (VSCP_ERROR_SUCCESS != pctx->ops->restart(pctx)) {
+  if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->restart(pctx))) {
+    if (VSCP_ERROR_NOT_SUPPORTED == rv) {
+      return pctx->ops->write_client(pctx, VSCP_LINK_MSG_NOT_SUPPORTED);
+    }
     return pctx->ops->write_client(pctx, VSCP_LINK_MSG_ERROR);
   }
   return pctx->ops->write_client(pctx, VSCP_LINK_MSG_OK);
@@ -810,18 +817,23 @@ vscp_link_doCmdRestart(vscp_link_ctx_t *pctx, const char *pcmd)
 //                                   Binary
 // ----------------------------------------------------------------------------
 ///////////////////////////////////////////////////////////////////////////////
-// vscp_link_goBinary
+// vscp_link_doBinary
 //
 static int
 vscp_link_doBinary(vscp_link_ctx_t *pctx)
 {
+  int rv;
+
   if (VSCP_ERROR_SUCCESS != vscp_link_check_ctx(pctx)) {
     return VSCP_ERROR_INIT_MISSING;
   }
   if (NULL == pctx->ops->binary) {
     return pctx->ops->write_client(pctx, VSCP_LINK_MSG_BINARY_NACK);
   }
-  if (VSCP_ERROR_SUCCESS != pctx->ops->binary(pctx)) {
+  if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->binary(pctx))) {
+    if (VSCP_ERROR_NOT_SUPPORTED == rv) {
+      return pctx->ops->write_client(pctx, VSCP_LINK_MSG_NOT_SUPPORTED);
+    }
     return pctx->ops->write_client(pctx, VSCP_LINK_MSG_ERROR);
   }
   return pctx->ops->write_client(pctx, VSCP_LINK_MSG_BINARY_ACK);
@@ -858,8 +870,7 @@ int
 vscp_link_idle_worker(vscp_link_ctx_t *pctx)
 {
   int rv;
-  if (VSCP_ERROR_SUCCESS != vscp_link_check_ctx(pctx) ||
-      NULL == pctx->ops->get_rcvloop_status ||
+  if (VSCP_ERROR_SUCCESS != vscp_link_check_ctx(pctx) || NULL == pctx->ops->get_rcvloop_status ||
       NULL == pctx->ops->rcvloop) {
     return VSCP_ERROR_INIT_MISSING;
   }
@@ -903,8 +914,9 @@ vscp_link_idle_worker(vscp_link_ctx_t *pctx)
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_link_parser
 //
+
 int
-vscp_link_parser(vscp_link_ctx_t *pctx, char *pbuf, char **pnext)
+vscp_link_parser(vscp_link_ctx_t *pctx, char *pbuf)
 {
   char *p;
   int rv;
@@ -912,22 +924,27 @@ vscp_link_parser(vscp_link_ctx_t *pctx, char *pbuf, char **pnext)
   if (VSCP_ERROR_SUCCESS != vscp_link_check_ctx(pctx)) {
     return VSCP_ERROR_INIT_MISSING;
   }
-  // Check pointers
-  if (NULL == pnext) {
-    return VSCP_ERROR_INVALID_POINTER;
-  }
-  // If buf contains a carriage return, we have a command to handle
-  // If not we are done and need to read more input data
-  if (NULL == (p = strstr(pbuf, "\r\n"))) {
-    return VSCP_ERROR_MISSING;
-  }
-  // Possible command...
-  *p     = '\0';  // Terminate string at \r\n
-  *pnext = p + 2; // Point beyond the \r\n
+
+  /*
+    // Check pointers
+    if (NULL == pnext) {
+      return VSCP_ERROR_INVALID_POINTER;
+    }
+    // If buf contains a carriage return, we have a command to handle
+    // If not we are done and need to read more input data
+    if (NULL == (p = strstr(pbuf, "\r\n"))) {
+      return VSCP_ERROR_MISSING;
+    }
+    // Possible command...
+    *p     = '\0';  // Terminate string at \r\n
+    *pnext = p + 2; // Point beyond the \r\n
+  */
+
   // Remove leading whitespace from command
   while (isspace((unsigned char) *pbuf)) {
     pbuf++;
   }
+
   // Remove trailing whitespace from command
   {
     size_t slen = strlen(pbuf);
@@ -939,201 +956,204 @@ vscp_link_parser(vscp_link_ctx_t *pctx, char *pbuf, char **pnext)
       *(end + 1) = '\0';
     }
   }
+
   // Just CRLF (or all-whitespace line)
   if ('\0' == *pbuf) {
-    return pctx->ops->write_client(pctx, VSCP_LINK_MSG_OK); // vscp_link_doCmdNoop(pctx, p);
+    return pctx->ops->write_client(pctx, VSCP_LINK_MSG_OK);
   }
+
   // Get receive loop status
   int bRcvLoop = 0;
   if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->get_rcvloop_status(pctx, &bRcvLoop))) {
     return rv;
   }
-  const char *pcmd = pbuf;
+
+  // const char *pcmd = pbuf;
   /*
    * THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD   bRcvLoop   =   THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD |
    * !bRcvLoop 0                 0      =   0 | 1 = 1 0                 1      =   0 | 0 = 0 1                 0      =
    * 1 | 1 = 1 1                 1      =   1 | 0 = 1
    */
-  size_t cmdlen = strlen(pcmd);
-  if (NULL != (p = vscp_fwhlp_stristr(pcmd, "help")) && (4 == cmdlen) &&
+  size_t cmdlen = strlen(pbuf);
+  if (NULL != (p = vscp_fwhlp_stristr(pbuf, "help")) && (4 == cmdlen) &&
       (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdHelp(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "noop")) && (4 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "noop")) && (4 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdNoop(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "user ")) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "user ")) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 5;
     return vscp_link_doCmdUser(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "pass ")) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "pass ")) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 5;
     return vscp_link_doCmdPassword(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "challenge")) && (9 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "challenge")) && (9 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 9;
     return vscp_link_doCmdChallenge(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "send ")) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "send ")) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 5;
     return vscp_link_doCmdSend(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "retr")) /*&& (4 == cmdlen)*/ &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "retr")) /*&& (4 == cmdlen)*/ &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdRetrieve(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "rcvloop")) && (7 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "rcvloop")) && (7 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdRcvLoop(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "quitloop")) && (8 == cmdlen)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "quitloop")) && (8 == cmdlen)) {
     p += 8;
     return vscp_link_doCmdQuitLoop(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "quit")) && (4 == cmdlen)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "quit")) && (4 == cmdlen)) {
     p += 4;
     return vscp_link_doCmdQuit(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "cdta")) && (4 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "cdta")) && (4 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdCheckData(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "chkdata")) && (7 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "chkdata")) && (7 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdCheckData(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "clra")) && (4 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "clra")) && (4 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdClearAll(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "clrall")) && (6 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "clrall")) && (6 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 6;
     return vscp_link_doCmdClearAll(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "stat")) && (4 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "stat")) && (4 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdStatistics(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "info")) && (4 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "info")) && (4 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdInfo(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "chid")) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "chid")) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdGetChannelId(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "getchid")) && (7 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "getchid")) && (7 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdGetChannelId(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "sgid")) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "sgid")) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdSetGUID(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "setguid")) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "setguid")) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdSetGUID(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "ggid")) && (4 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "ggid")) && (4 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdGetGUID(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "getguid")) && (7 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "getguid")) && (7 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdGetGUID(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "vers")) && (4 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "vers")) && (4 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdGetVersion(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "version")) && (7 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "version")) && (7 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdGetVersion(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "sflt")) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "sflt")) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdSetFilter(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "setfilter")) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "setfilter")) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 9;
     return vscp_link_doCmdSetFilter(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "smsk")) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "smsk")) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdSetMask(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "setmask")) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "setmask")) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdSetMask(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "test")) && (4 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "test")) && (4 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdTest(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "wcyd")) && (4 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "wcyd")) && (4 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 4;
     return vscp_link_doCmdWhatCanYouDo(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "whatcanyoudo")) && (12 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "whatcanyoudo")) && (12 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 12;
     return vscp_link_doCmdWhatCanYouDo(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "+")) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "+")) && (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 1;
     return vscp_link_doCmdCommandAgain(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "interface")) /*&& (9 == cmdlen)*/ &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "interface")) /*&& (9 == cmdlen)*/ &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 9;
     return vscp_link_doCmdInterface(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "shutdown")) && (8 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "shutdown")) && (8 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 8;
     return vscp_link_doCmdShutdown(pctx, p);
   }
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "restart")) && (7 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "restart")) && (7 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 7;
     return vscp_link_doCmdRestart(pctx, p);
   }
   // Binary commands
-  else if (NULL != (p = vscp_fwhlp_stristr(pcmd, "binary")) && (6 == cmdlen) &&
+  else if (NULL != (p = vscp_fwhlp_stristr(pbuf, "binary")) && (6 == cmdlen) &&
            (THIS_FIRMWARE_TCPIP_LINK_ENABLE_RCVLOOP_CMD || !bRcvLoop)) {
     p += 6;
     return vscp_link_doBinary(pctx);
   }
-  
+
   // Unknown command
   pctx->ops->write_client(pctx, VSCP_LINK_MSG_UNKNOWN_COMMAND);
   return VSCP_ERROR_MISSING;

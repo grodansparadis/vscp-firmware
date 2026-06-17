@@ -317,6 +317,9 @@ typedef struct vscp_frmw2_firmware_context {
   /** Operations table — pointer to the user-supplied callbacks. Must not be NULL. */
   const struct vscp_frmw2_ops *ops;
 
+  // Pointer to user data. 
+  void* puserdata;
+
 } vscp_frmw2_firmware_context_t;
 
 /** Backward-compatible alias for vscp_frmw2_firmware_context_t. */

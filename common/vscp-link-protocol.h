@@ -325,13 +325,13 @@ typedef struct vscp_link_ops {
    * @brief Parse command lines
    *
    * @param pctx Pointer to context
-   * @param pbuf Pointer to command buffer holding part or hole incoming command.
-   * @param pnext Pointer to pointer that is set to character after command (after CRLF).
+   * @param pbuf Pointer to null terminated string holding a full command. 
+   * Not including the command terminator (e.g. \r\n).
    * @return VSCP_ERROR_TRUE on success, VSCP error code on failure
    */
 
   int
-  vscp_link_parser(vscp_link_ctx_t* pctx, char* pbuf, char** pnext);
+  vscp_link_parser(vscp_link_ctx_t* pctx, char* pbuf);
 
   /**
   @}
