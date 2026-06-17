@@ -49,6 +49,18 @@
 /* Globals */
 
 // ---------------------------------------------------------------------------
+// Safe memory copy: copies min(src_size, dst_size) bytes to ensure the
+// destination can always hold the source data (CWE-120 mitigation).
+// ---------------------------------------------------------------------------
+static size_t
+vscp_frmw2_memcpy(void *dst, size_t dst_size, const void *src, size_t src_size)
+{
+  size_t n = (src_size < dst_size) ? src_size : dst_size;
+  memcpy(dst, src, n); /* Flawfinder: ignore */
+  return n;
+}
+
+// ---------------------------------------------------------------------------
 // Validate that pctx and all mandatory ops callbacks are non-NULL.
 // Mandatory: get_milliseconds, get_timestamp, send_event, set_event_time,
 //            read_reg, write_reg, stdreg_change
@@ -1269,8 +1281,8 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
         exrply.pdata = exrply_buf;
         vscp_frmw2_setup_event(pctx, &exrply);
 
-        memcpy(exrply.pdata, pctx->guid, sizeof(pctx->guid));
-        memcpy(&exrply.pdata[sizeof(pctx->guid)], pctx->mdfurl, sizeof(pctx->mdfurl));
+        vscp_frmw2_memcpy(exrply.pdata, VSCP_MAX_DATA, pctx->guid, sizeof(pctx->guid));
+        vscp_frmw2_memcpy(&exrply.pdata[sizeof(pctx->guid)], VSCP_MAX_DATA - sizeof(pctx->guid), pctx->mdfurl, sizeof(pctx->mdfurl));
         rv = pctx->ops->send_event(pctx, &exrply);
       } break;
     }
@@ -1296,7 +1308,7 @@ vscp_frmw2_setup_event(vscp_frmw2_firmware_context_t *pctx, vscpEvent *const pex
     memset(pex->pdata, 0, VSCP_MAX_DATA);
   }
   pex->head = VSCP_PRIORITY_NORMAL;
-  memcpy(pex->GUID, pctx->guid, sizeof(pctx->guid));
+  vscp_frmw2_memcpy(pex->GUID, sizeof(pex->GUID), pctx->guid, sizeof(pctx->guid));
   /*!
     If level I we use the GUID as a space for the nickname
   */
@@ -1626,7 +1638,7 @@ vscp_frmw2_send_heartbeat(vscp_frmw2_firmware_context_t *pctx)
     exrply.vscp_class = VSCP_CLASS2_INFORMATION;
     exrply.vscp_type  = VSCP2_TYPE_INFORMATION_HEART_BEAT;
     memset(exrply.pdata, 0, VSCP_MAX_DATA);
-    memcpy(exrply.pdata, pctx->deviceName, sizeof(pctx->deviceName));
+    vscp_frmw2_memcpy(exrply.pdata, VSCP_MAX_DATA, pctx->deviceName, sizeof(pctx->deviceName));
     exrply.sizeData = strlen((const char *) exrply.pdata);
   }
 
@@ -1670,13 +1682,13 @@ vscp_frmw2_send_caps(vscp_frmw2_firmware_context_t *pctx)
                      // Accepts two or more simultaneous connections on TCP/IP interface.
 
   // GUID
-  memcpy(ex.pdata + 8, pctx->guid, sizeof(pctx->guid));
+  vscp_frmw2_memcpy(ex.pdata + 8, VSCP_MAX_DATA - 8, pctx->guid, sizeof(pctx->guid));
 
   // ip address
-  memcpy((ex.pdata + 24), pctx->ipaddr, sizeof(pctx->ipaddr));
+  vscp_frmw2_memcpy(ex.pdata + 24, VSCP_MAX_DATA - 24, pctx->ipaddr, sizeof(pctx->ipaddr));
 
   // Device name
-  memcpy((ex.pdata + 40), pctx->deviceName, sizeof(pctx->deviceName));
+  vscp_frmw2_memcpy(ex.pdata + 40, VSCP_MAX_DATA - 40, pctx->deviceName, sizeof(pctx->deviceName));
 
   // Send event
   return pctx->ops->send_event(pctx, &ex);
@@ -1892,9 +1904,9 @@ vscp_frmw2_whois_response(vscp_frmw2_firmware_context_t *pctx)
     ex.vscp_type  = VSCP2_TYPE_PROTOCOL_WHO_IS_THERE_RESPONSE;
     ex.sizeData   = 16 + MIN(strlen((const char *) pctx->mdfurl), 32);
     memset(ex.pdata, 9, 512);
-    memcpy(ex.pdata, pctx->guid, sizeof(pctx->guid));
+    vscp_frmw2_memcpy(ex.pdata, VSCP_MAX_DATA, pctx->guid, sizeof(pctx->guid));
     if (pctx->mdfurl[0]) {
-      memcpy(ex.pdata + sizeof(pctx->guid), pctx->mdfurl, MIN(strlen((const char *) pctx->mdfurl), sizeof(pctx->mdfurl)));
+      vscp_frmw2_memcpy(ex.pdata + sizeof(pctx->guid), VSCP_MAX_DATA - sizeof(pctx->guid), pctx->mdfurl, MIN(strlen((const char *) pctx->mdfurl), sizeof(pctx->mdfurl)));
     }
 
     // send the event
@@ -2081,7 +2093,7 @@ vscp_frmw2_report_dmatrix(vscp_frmw2_firmware_context_t *pctx)
     exrply.vscp_type  = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
 
     exrply.sizeData = 22;
-    memcpy(exrply.pdata, pctx->guid, sizeof(pctx->guid)); // GUID
+    vscp_frmw2_memcpy(exrply.pdata, VSCP_MAX_DATA, pctx->guid, sizeof(pctx->guid)); // GUID
     exrply.pdata[16] = pctx->sizeDmRow;   // Row size
     exrply.pdata[17] = pctx->nDmRows;     // Size = number of DM rows
     exrply.pdata[18] = (pctx->regOffsetDm >> 24) & 0xff;
