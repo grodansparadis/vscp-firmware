@@ -214,7 +214,7 @@ vscp_frmw2_send_probe(vscp_frmw2_firmware_context_t *pctx, int bNewNodeOnLine)
 //
 
 int
-vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *const pex)
+vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pex)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -344,7 +344,7 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscpEve
 //
 
 int
-vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *const pex)
+vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pex)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -429,7 +429,7 @@ vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *c
 //
 
 int
-vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *const pex)
+vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pex)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -518,7 +518,7 @@ vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *const pex)
 //
 
 int
-vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *const pex)
+vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pex)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -1284,7 +1284,7 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 //
 
 void
-vscp_frmw2_setup_event(vscp_frmw2_firmware_context_t *pctx, vscpEvent *const pex)
+vscp_frmw2_setup_event(vscp_frmw2_firmware_context_t *pctx, vscp_event_t *const pex)
 {
   // Check pointers
   if (NULL == pctx || NULL == pex) {
@@ -2101,7 +2101,7 @@ vscp_frmw2_report_dmatrix(vscp_frmw2_firmware_context_t *pctx)
 //
 
 int
-vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *const pex)
+vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pex)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -2163,7 +2163,7 @@ vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *
 //
 
 int
-vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *const pex)
+vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pex)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -2242,7 +2242,7 @@ vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *
 //
 
 int
-vscp_frmw2_feed_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *const pex)
+vscp_frmw2_feed_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pex)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;

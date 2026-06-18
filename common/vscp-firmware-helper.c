@@ -1099,7 +1099,7 @@ vscp_event_t *
 vscp_fwhlp_newEvent(void)
 {
   static vscp_event_t *pev = NULL;
-  pev                   = (vscp_event_t *) calloc(1, sizeof(vscpEvent));
+  pev                   = (vscp_event_t *) calloc(1, sizeof(vscp_event_t));
   if (NULL == pev) {
     return NULL;
   }
@@ -1276,7 +1276,7 @@ vscp_fwhlp_mkEventCopy(const vscp_event_t *pev)
   }
 
   // Copy the event
-  memcpy(pnewEvent, pev, sizeof(vscpEvent));
+  memcpy(pnewEvent, pev, sizeof(vscp_event_t));
 
   if (pev->sizeData) {
     pnewEvent->pdata = (uint8_t *) malloc(pev->sizeData);
@@ -1305,14 +1305,14 @@ vscp_fwhlp_mkEventExCopy(const vscp_event_ex_t *pex)
     return NULL;
   }
 
-  vscp_event_ex_t *pnewEventEx = (vscp_event_ex_t *) malloc(sizeof(vscpEventEx));
+  vscp_event_ex_t *pnewEventEx = (vscp_event_ex_t *) malloc(sizeof(vscp_event_ex_t));
   ;
   if (NULL == pnewEventEx) {
     return NULL;
   }
 
   // Copy the event
-  memcpy(pnewEventEx, pex, sizeof(vscpEventEx));
+  memcpy(pnewEventEx, pex, sizeof(vscp_event_ex_t));
 
   return pnewEventEx;
 }
@@ -2074,7 +2074,7 @@ vscp_fwhlp_parseStringToEvent(vscp_event_t *pev, const char *buf)
   }
 
   // Set all defaults
-  memset(pev, 0, sizeof(vscpEvent));
+  memset(pev, 0, sizeof(vscp_event_t));
 
   // head
   pev->head = (uint16_t) strtol(p, &p, 0);
@@ -2287,7 +2287,7 @@ vscp_fwhlp_parseStringToEventEx(vscp_event_ex_t *pex, const char *buf)
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  memset(pex, 0, sizeof(vscpEventEx));
+  memset(pex, 0, sizeof(vscp_event_ex_t));
 
   // head
   pex->head = (uint16_t) strtol(p, &p, 0);
@@ -3221,7 +3221,7 @@ vscp_fwhlp_getEventExFromFrame(vscp_event_ex_t *pEventEx, const uint8_t *frame, 
   int rv;
   vscp_event_t *pEvent;
 
-  pEvent = (vscp_event_t *) calloc(1, sizeof(vscpEvent));
+  pEvent = (vscp_event_t *) calloc(1, sizeof(vscp_event_t));
   if (NULL == pEvent) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -4203,7 +4203,7 @@ vscp_fwhlp_parse_json(vscp_event_t *pev, const char *jsonVscpEventObj)
   }
 
   // Set unused path to known value
-  memset(pev, 0, sizeof(vscpEvent));
+  memset(pev, 0, sizeof(vscp_event_t));
 
   item = vscp_fwhlp_get_json_item_compat(root, "head", "vscpHead");
   if (NULL != item) {
@@ -4345,7 +4345,7 @@ vscp_fwhlp_parse_json_ex(vscp_event_ex_t *pex, const char *jsonVscpEventObj)
   }
 
   // Set unused path to known value
-  memset(pex, 0, sizeof(vscpEventEx));
+  memset(pex, 0, sizeof(vscp_event_ex_t));
 
   item = vscp_fwhlp_get_json_item_compat(root, "head", "vscpHead");
   if (NULL != item) {
@@ -4819,7 +4819,7 @@ vscp_fwhlp_parse_xml_event(vscp_event_t *pev, const char *eventstr)
     return rv;
   }
 
-  memset(pev, 0, sizeof(vscpEvent)); // Clear the event structure
+  memset(pev, 0, sizeof(vscp_event_t)); // Clear the event structure
 
   // First pass: collect all attributes into local variables
   for (int i = 0; i < attribute_count; i++) {
@@ -4937,7 +4937,7 @@ vscp_fwhlp_parse_xml_eventex(vscp_event_ex_t *pex, const char *eventexstr)
     return rv;
   }
 
-  memset(pex, 0, sizeof(vscpEventEx)); // Clear the event structure
+  memset(pex, 0, sizeof(vscp_event_ex_t)); // Clear the event structure
 
   // First pass: collect all attributes into local variables
   for (int i = 0; i < attribute_count; i++) {
@@ -6080,7 +6080,7 @@ vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscp_event_t *pEvent)
 int
 vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscp_event_ex_t *pEventEx)
 {
-  vscp_event_t *pev = (vscp_event_t *) malloc(sizeof(vscpEvent));
+  vscp_event_t *pev = (vscp_event_t *) malloc(sizeof(vscp_event_t));
   if (NULL == pev) {
     return -1;
   }

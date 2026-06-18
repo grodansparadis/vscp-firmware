@@ -131,10 +131,14 @@ typedef enum probe_substate_t {
 #define VSCP_LEVEL1_DM_FLAG_CLASS_MASK    0x02
 #define VSCP_LEVEL1_DM_FLAG_CLASS_FILTER  0x01
 
-#define LEVEL1_DM_OADDR(row)        (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_OADDR])
-#define LEVEL1_DM_FLAGS(row)        (pctx->pDm[(8 * row) + VSCP_LEVEL2_DM_POS_FLAGS])
-#define LEVEL1_DM_CLASS_MASK(row)   (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSMASK] + (((pctx->pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & 0x02) << 9))
-#define LEVEL1_DM_CLASS_FILTER(row) (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSFILTER] + (((pctx->pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & 0x01) << 9))
+#define LEVEL1_DM_OADDR(row) (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_OADDR])
+#define LEVEL1_DM_FLAGS(row) (pctx->pDm[(8 * row) + VSCP_LEVEL2_DM_POS_FLAGS])
+#define LEVEL1_DM_CLASS_MASK(row)                                                                                      \
+  (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSMASK] +                                                               \
+   (((pctx->pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & 0x02) << 9))
+#define LEVEL1_DM_CLASS_FILTER(row)                                                                                    \
+  (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSFILTER] +                                                             \
+   (((pctx->pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & 0x01) << 9))
 #define LEVEL1_DM_TYPE_MASK(row)    (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_TYPEMASK])
 #define LEVEL1_DM_TYPE_FILTER(row)  (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_TYPEFILTER])
 #define LEVEL1_DM_ACTION(row)       (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_ACTION])
@@ -156,24 +160,22 @@ typedef enum probe_substate_t {
 #define VSCP_LEVEL2_DM_FLAG_CHECK_ZONE    0x00000010 // zone in second data byte
 #define VSCP_LEVEL2_DM_FLAG_CHECK_SUBZONE 0x00000008 // subzone in third data byte
 
-#define LEVEL2_DM_FLAGS(row) construct_unsigned32(                             \
-  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS],           \
-  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 1],       \
-  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 2],       \
-  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 3])
-#define LEVEL2_DM_OADDR(row, pos) (pctx->pDm[(pctx->sizeDmRow * row) + \
-                                               VSCP_LEVEL2_DM_POS_OADDR + pos])
-#define LEVEL2_DM_CLASS(row) construct_unsigned16(                         \
-  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_CLASS],       \
-  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_CLASS + 1])
-#define LEVEL2_DM_TYPE(row) construct_unsigned16(                         \
-  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_TYPE],       \
-  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_TYPE + 1])
-#define LEVEL2_DM_ACTION(row) construct_unsigned16(                         \
-  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_ACTION],       \
-  pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_ACTION + 1])
-#define LEVEL2_DM_ACTION_PARAM(row) (pctx->pDm[(pctx->sizeDmRow * row) + \
-                                                  VSCP_LEVEL2_DM_POS_ACTIONPARAM])
+#define LEVEL2_DM_FLAGS(row)                                                                                           \
+  construct_unsigned32(pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS],                                  \
+                       pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 1],                              \
+                       pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 2],                              \
+                       pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL1_DM_POS_FLAGS + 3])
+#define LEVEL2_DM_OADDR(row, pos) (pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_OADDR + pos])
+#define LEVEL2_DM_CLASS(row)                                                                                           \
+  construct_unsigned16(pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_CLASS],                                  \
+                       pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_CLASS + 1])
+#define LEVEL2_DM_TYPE(row)                                                                                            \
+  construct_unsigned16(pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_TYPE],                                   \
+                       pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_TYPE + 1])
+#define LEVEL2_DM_ACTION(row)                                                                                          \
+  construct_unsigned16(pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_ACTION],                                 \
+                       pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_ACTION + 1])
+#define LEVEL2_DM_ACTION_PARAM(row) (pctx->pDm[(pctx->sizeDmRow * row) + VSCP_LEVEL2_DM_POS_ACTIONPARAM])
 
 /*
   Default nickname discovery settings
@@ -183,15 +185,18 @@ typedef enum probe_substate_t {
       If no response is received after this amount of tries the the nickname
       will be assigned to the node.
 */
-#define VSCP_PROBE_TIMEOUT 1000              // ms - Time after probe has been sent and a no response
-                                             // is considered as a free nickname discovery
-#define VSCP_PROBE_TIMEOUT_COUNT   3         // # probe timed out probe events before assigning a nickname
-#define VSCP_SEGCTRL_PROBE_TIMEOUT 5000      // ms time to wait for segment controller to assign nickname
-                                             // to us
-#define VSCP_SEGCTRL_RESPONSE_TIMEOUT 300000 // ms time after a segment ctrl response has been received
-                                             // and when nickname discovery process will be taken up again.
-#define VSCP_INIT_BUTTON_TIMEOUT 2000        // Button press and hold timeout for init button.
-#define VSCP_GUID_RESET_TIMEOUT  1000        // All four GUID reset event must be received withing this time
+#define VSCP_PROBE_TIMEOUT                                                                                             \
+  1000                             // ms - Time after probe has been sent and a no response
+                                   // is considered as a free nickname discovery
+#define VSCP_PROBE_TIMEOUT_COUNT 3 // # probe timed out probe events before assigning a nickname
+#define VSCP_SEGCTRL_PROBE_TIMEOUT                                                                                     \
+  5000 // ms time to wait for segment controller to assign nickname
+       // to us
+#define VSCP_SEGCTRL_RESPONSE_TIMEOUT                                                                                  \
+  300000                              // ms time after a segment ctrl response has been received
+                                      // and when nickname discovery process will be taken up again.
+#define VSCP_INIT_BUTTON_TIMEOUT 2000 // Button press and hold timeout for init button.
+#define VSCP_GUID_RESET_TIMEOUT  1000 // All four GUID reset event must be received withing this time
 
 /* Forward declaration so vscp_frmw2_firmware_context_t can hold a pointer to
    the ops table that is defined later in this same header. */
@@ -231,8 +236,7 @@ typedef struct vscp_frmw2_firmware_context {
   // (init=y) - Initiated to y.
   /////////////////////////////////////////////////////////////////////////////
 
-  uint8_t level;   // 0=Level I, 1 = Level II
-  void* p_userdata; // Points to user supplied data
+  uint8_t level; // 0=Level I, 1 = Level II
 
   /*
     This may (recommended) be a register positions on a device
@@ -260,22 +264,22 @@ typedef struct vscp_frmw2_firmware_context {
   uint32_t last_caps;          // Time for last caps send
 
   // Decision matrix
-  uint8_t* pDm;         // Pointer to decision matrix storage (NULL if no DM).
+  uint8_t *pDm;         // Pointer to decision matrix storage (NULL if no DM).
   uint8_t nDmRows;      // Number of DM rows (0 if no DM).
   uint8_t sizeDmRow;    // Size for one DM row.
   uint32_t regOffsetDm; // Register offset for DM (normally zero)
   uint16_t pageDm;      // Register page where DM definition starts
 
   // MDF
-  const char* pInternalMdf; // If the device use internal MDF point to it here (NULL)
-                              // If no internal MDF set to NULL
-                              // !!! The MDF pointed to MUST be NULL terminated.
+  const char *pInternalMdf; // If the device use internal MDF point to it here (NULL)
+                            // If no internal MDF set to NULL
+                            // !!! The MDF data pointed to, MUST be NULL terminated.
 
   // Events of interest
-  const uint32_t* pEventsOfInterest; // List with events of interest or NULL
-                                       // if all events are of interest set to null.
-                                       // array = (int*) malloc(n * sizeof(int));
-                                       // Last event should be 0
+  const uint32_t *pEventsOfInterest; // List with events of interest or NULL
+                                     // if all events are of interest set to null.
+                                     // array = (int*) malloc(n * sizeof(int));
+                                     // Last event should be 0
 
   // For high end server response
   uint16_t high_end_srv_caps;   // High end server capabilities
@@ -308,8 +312,8 @@ typedef struct vscp_frmw2_firmware_context {
   uint16_t firmware_device_code;        // [*] Identifier for hardware so correct firmware can be loaded
   uint8_t guid[16];                     // [*/P] GUID for device. Read only for clients
   uint8_t mdfurl[32];                   // [*] URL for MDF. Read only for clients. Make 33 bytes and nill
-                                          // all unused byte so it is null terminated even if it has
-                                          // the maximum length of 32 bytes.
+                                        // all unused byte so it is null terminated even if it has
+                                        // the maximum length of 32 bytes.
   // Level II devices
   uint8_t ipaddr[16];     // IP address (ipv4/ipv6)
   uint8_t deviceName[64]; // Name of the device
@@ -317,8 +321,8 @@ typedef struct vscp_frmw2_firmware_context {
   /** Operations table — pointer to the user-supplied callbacks. Must not be NULL. */
   const struct vscp_frmw2_ops *ops;
 
-  // Pointer to user data. 
-  void* puserdata;
+  // Pointer to user data.
+  void *puserdata;
 
 } vscp_frmw2_firmware_context_t;
 
@@ -349,14 +353,11 @@ typedef struct vscp_frmw2_ops {
 
   /* ── Transport ──────────────────────────────────────────────── */
   /** Send an event to the transport layer. The event is copied by the callback. */
-  int (*send_event)(vscp_frmw2_firmware_context_t *pctx, vscpEvent *pev);
+  int (*send_event)(vscp_frmw2_firmware_context_t *pctx, vscp_event_t *pev);
 
   /* ── Decision matrix ────────────────────────────────────────── */
   /** Execute a DM action triggered by pev. */
-  int (*dm_action)(vscp_frmw2_firmware_context_t *pctx,
-                   const vscpEvent *pev,
-                   uint8_t action,
-                   const uint8_t *pparam);
+  int (*dm_action)(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *pev, uint8_t action, const uint8_t *pparam);
 
   /* ── Node information ───────────────────────────────────────── */
   /** Segment controller heartbeat received. */
@@ -364,9 +365,9 @@ typedef struct vscp_frmw2_ops {
   /** Report events this node is interested in. */
   int (*report_events_of_interest)(vscp_frmw2_firmware_context_t *pctx);
   /** Fill in date/time/timestamp fields of an event. Set to zero if unavailable. */
-  int (*set_event_time)(vscp_frmw2_firmware_context_t *pctx, vscpEvent *pev);
+  int (*set_event_time)(vscp_frmw2_firmware_context_t *pctx, vscp_event_t *pev);
   /** Return the IPv4 or IPv6 address of the interface (size = 4 or 16). */
-  int (*get_ip_addr)(vscp_frmw2_firmware_context_t *pctx, uint8_t *pipaddr, uint8_t size);
+  int (*get_ip_addr)(vscp_frmw2_firmware_context_t *pctx, uint8_t *ip, uint8_t size);
 
   /* ── Register I/O ───────────────────────────────────────────── */
   /** Read one user register (address range 0x00000000 – 0xffff0000). */
@@ -448,7 +449,7 @@ vscp_frmw2_init_persistent_storage(vscp_frmw2_firmware_context_t *pctx);
  */
 
 void
-vscp_frmw2_setup_event(vscp_frmw2_firmware_context_t *pctx, vscpEvent *pev);
+vscp_frmw2_setup_event(vscp_frmw2_firmware_context_t *pctx, vscp_event_t *pev);
 
 /*!
  * @brief Send nickname probe
@@ -478,7 +479,7 @@ vscp_frmw2_send_probe(vscp_frmw2_firmware_context_t *pctx, int bNewNodeOnLine);
  */
 
 int
-vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *pev);
+vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *pev);
 
 /*!
   Waiting for segment controller to give us a nickname
@@ -488,7 +489,7 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscpEve
   @return VSCP_ERROR_SUCCESS on success, else error code.
 */
 int
-vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *pev);
+vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *pev);
 
 /*!
  * @brief Do periodic VSCP protocol work
@@ -510,7 +511,7 @@ vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *p
  */
 
 int
-vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *pev);
+vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *pev);
 
 /*!
   Handle protocol events
@@ -519,7 +520,7 @@ vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *pev);
   @return VSCP_ERROR_SUCCESS on success, else error code.
 */
 int
-vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *pev);
+vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *pev);
 
 /*!
  * @brief Read VSCP Level II register
@@ -588,7 +589,10 @@ vscp_frmw2_vscp2_register_read(vscp_frmw2_firmware_context_t *pctx, uint32_t sta
  */
 
 int
-vscp_frmw2_vscp2_register_write(vscp_frmw2_firmware_context_t *pctx, uint32_t startreg, uint16_t cnt, const uint8_t *pdata);
+vscp_frmw2_vscp2_register_write(vscp_frmw2_firmware_context_t *pctx,
+                                uint32_t startreg,
+                                uint16_t cnt,
+                                const uint8_t *pdata);
 
 /*!
   @brief Send error event (CLASS=508).
@@ -615,7 +619,12 @@ vscp_frmw2_send_error_event(vscp_frmw2_firmware_context_t *pctx, uint8_t type, u
  */
 
 uint8_t
-vscp_frmw2_send_log_event(vscp_frmw2_firmware_context_t *pctx, uint8_t type, uint8_t id, uint8_t level, uint8_t idx, uint8_t *pLogdata);
+vscp_frmw2_send_log_event(vscp_frmw2_firmware_context_t *pctx,
+                          uint8_t type,
+                          uint8_t id,
+                          uint8_t level,
+                          uint8_t idx,
+                          uint8_t *pLogdata);
 
 /*!
    @brief Send high end server probe
@@ -672,7 +681,11 @@ vscp_frmw2_whois_response(vscp_frmw2_firmware_context_t *pctx);
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 int
-vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx, uint16_t nodeid, uint16_t page, uint8_t offset, uint16_t cnt);
+vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx,
+                              uint16_t nodeid,
+                              uint16_t page,
+                              uint8_t offset,
+                              uint16_t cnt);
 
 /*!
   @brief Write multiple bytes to memory
@@ -687,7 +700,12 @@ vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx, uint16_t node
 */
 
 int
-vscp_frmw2_extended_page_write(vscp_frmw2_firmware_context_t *pctx, uint16_t nodeid, uint16_t page, uint8_t offset, uint16_t cnt, const uint8_t *pbuf);
+vscp_frmw2_extended_page_write(vscp_frmw2_firmware_context_t *pctx,
+                               uint16_t nodeid,
+                               uint16_t page,
+                               uint8_t offset,
+                               uint16_t cnt,
+                               const uint8_t *pbuf);
 
 /*!
   @brief Feed the level I decision matrix with one Event
@@ -698,7 +716,7 @@ vscp_frmw2_extended_page_write(vscp_frmw2_firmware_context_t *pctx, uint16_t nod
 */
 
 int
-vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *pev);
+vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *pev);
 
 /*!
   @brief Feed the level II decision matrix with one Event
@@ -709,7 +727,7 @@ vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *
 */
 
 int
-vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *pev);
+vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *pev);
 
 /*!
   @brief Feed the decision matrix with one Event
@@ -719,7 +737,7 @@ vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 int
-vscp_frmw2_feed_dm(vscp_frmw2_firmware_context_t *pctx, const vscpEvent *pev);
+vscp_frmw2_feed_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *pev);
 
 /*!
   @brief Send DM info on request
