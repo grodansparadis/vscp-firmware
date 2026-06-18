@@ -206,8 +206,7 @@ typedef struct vscp_frmw2_firmware_context {
 
   probe_state_t state;       // State machine state
   probe_substate_t substate; // state machine substate
-  uint32_t timer1;           // Timer used for probe/config restore and other timing tasks
-  // uint16_t nickname;         // Nickname (init with persistent value)
+  uint32_t timer;           // Timer used for probe/config restore and other timing tasks
 
   // Level I nickname discovery
   uint16_t probe_nickname; // 0-253
