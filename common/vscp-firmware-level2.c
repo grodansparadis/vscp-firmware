@@ -31,6 +31,7 @@
  */
 
 #include <inttypes.h>
+#include <stdlib.h>
 #include <string.h>
 #include <vscp-class.h>
 #include <vscp-firmware-helper.h>
@@ -49,6 +50,22 @@
 /* Globals */
 
 // ---------------------------------------------------------------------------
+// Safe memory copy: copies min(src_size, dst_size) bytes to ensure the
+// destination can always hold the source data (CWE-120 mitigation).
+// ---------------------------------------------------------------------------
+static size_t
+vscp_frmw2_memcpy(void *dst, size_t dst_size, const void *src, size_t src_size)
+{
+  size_t n         = (src_size < dst_size) ? src_size : dst_size;
+  uint8_t *d       = (uint8_t *) dst;
+  const uint8_t *s = (const uint8_t *) src;
+  for (size_t i = 0; i < n; i++) {
+    d[i] = s[i];
+  }
+  return n;
+}
+
+// ---------------------------------------------------------------------------
 // Validate that pctx and all mandatory ops callbacks are non-NULL.
 // Mandatory: get_milliseconds, get_timestamp, send_event, set_event_time,
 //            read_reg, write_reg, stdreg_change
@@ -56,15 +73,9 @@
 static inline int
 vscp_frmw2_check_ctx(const vscp_frmw2_firmware_context_t *pctx)
 {
-  if (NULL == pctx ||
-      NULL == pctx->ops ||
-      NULL == pctx->ops->get_milliseconds ||
-      NULL == pctx->ops->get_timestamp ||
-      NULL == pctx->ops->send_event ||
-      NULL == pctx->ops->set_event_time ||
-      NULL == pctx->ops->read_reg ||
-      NULL == pctx->ops->write_reg ||
-      NULL == pctx->ops->stdreg_change) {
+  if (NULL == pctx || NULL == pctx->ops || NULL == pctx->ops->get_milliseconds || NULL == pctx->ops->get_timestamp ||
+      NULL == pctx->ops->send_event || NULL == pctx->ops->set_event_time || NULL == pctx->ops->read_reg ||
+      NULL == pctx->ops->write_reg || NULL == pctx->ops->stdreg_change) {
     return VSCP_ERROR_INIT_MISSING;
   }
   return VSCP_ERROR_SUCCESS;
@@ -88,10 +99,13 @@ vscp_frmw2_init(vscp_frmw2_firmware_context_t *const pctx)
   pctx->page_select        = 0;
   pctx->reset_device_flags = 0; // VSCP_TYPE_PROTOCOL_RESET_DEVICE
 
-  uint8_t exrply_buf[VSCP_MAX_DATA];
-  vscp_event_t exrply;
-  exrply.pdata = exrply_buf;
-  vscp_frmw2_setup_event(pctx, &exrply);
+  /* NOTE: This function owns evrply.pdata; it is freed on all return paths. */
+  vscp_event_t evrply;
+  evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+  if (NULL == evrply.pdata) {
+    return VSCP_ERROR_MEMORY;
+  }
+  vscp_frmw2_setup_event(pctx, &evrply);
 
   if (VSCP_LEVEL1 == pctx->level) {
     /*!
@@ -119,24 +133,25 @@ vscp_frmw2_init(vscp_frmw2_firmware_context_t *const pctx)
       pctx->probe_nickname = 0; // First check for a segment controller
 
       // Get a starttime
-      pctx->timer1 = pctx->ops->get_milliseconds(pctx);
+      pctx->timer = pctx->ops->get_milliseconds(pctx);
 
       // Send probe
-      vscp_frmw2_setup_event(pctx, &exrply);
-      exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-      exrply.vscp_type  = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
+      vscp_frmw2_setup_event(pctx, &evrply);
+      evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+      evrply.vscp_type  = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
       if (pctx->bUse16BitNickname) {
-        exrply.sizeData = 2;
-        exrply.pdata[0]  = 0; // We probe segment controller
-        exrply.pdata[1]  = 0;
+        evrply.sizeData = 2;
+        evrply.pdata[0] = 0; // We probe segment controller
+        evrply.pdata[1] = 0;
       }
       else {
-        exrply.sizeData = 1;
-        exrply.pdata[0]  = 0; // We probe segment controller
+        evrply.sizeData = 1;
+        evrply.pdata[0] = 0; // We probe segment controller
       }
 
       // Send new node online
-      if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &exrply))) {
+      if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &evrply))) {
+        free(evrply.pdata);
         return rv;
       }
 
@@ -167,6 +182,7 @@ vscp_frmw2_init(vscp_frmw2_firmware_context_t *const pctx)
     pctx->state = FRMW2_STATE_ACTIVE;
   }
 
+  free(evrply.pdata);
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -181,32 +197,37 @@ vscp_frmw2_send_probe(vscp_frmw2_firmware_context_t *pctx, int bNewNodeOnLine)
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  uint8_t ex_buf[VSCP_MAX_DATA];
-  vscp_event_t ex;
-  ex.pdata = ex_buf;
+  /* NOTE: This function owns ev.pdata; it is freed on all return paths. */
+  vscp_event_t ev;
+  ev.pdata = calloc(VSCP_MAX_DATA, 1);
+  if (NULL == ev.pdata) {
+    return VSCP_ERROR_MEMORY;
+  }
 
   // Send probe
-  vscp_frmw2_setup_event(pctx, &ex);
-  ex.vscp_class = VSCP_CLASS1_PROTOCOL;
-  ex.vscp_type  = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
+  vscp_frmw2_setup_event(pctx, &ev);
+  ev.vscp_class = VSCP_CLASS1_PROTOCOL;
+  ev.vscp_type  = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
 
   if (bNewNodeOnLine) {
-    ex.sizeData = 0;
+    ev.sizeData = 0;
   }
   else {
     if (pctx->bUse16BitNickname) {
-      ex.sizeData = 2;
-      ex.pdata[0]  = (pctx->nickname >> 8) & 0xff;
-      ex.pdata[1]  = pctx->nickname & 0xff;
+      ev.sizeData = 2;
+      ev.pdata[0] = (pctx->nickname >> 8) & 0xff;
+      ev.pdata[1] = pctx->nickname & 0xff;
     }
     else {
-      ex.sizeData = 1;
-      ex.pdata[0]  = pctx->nickname;
+      ev.sizeData = 1;
+      ev.pdata[0] = pctx->nickname;
     }
   }
 
   // Send probe
-  return pctx->ops->send_event(pctx, &ex);
+  int result = pctx->ops->send_event(pctx, &ev);
+  free(ev.pdata);
+  return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -257,7 +278,7 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_ev
         else if (FRMW2_SUBSTATE_SEGCTRL_PROBE_WAITING == pctx->substate) {
           // Segment controller responded
           pctx->state  = FRMW2_STATE_PREACTIVE;
-          pctx->timer1 = pctx->ops->get_milliseconds(pctx);
+          pctx->timer = pctx->ops->get_milliseconds(pctx);
         }
         else if (FRMW2_SUBSTATE_PROBE_WAITING == pctx->substate) {
 
@@ -266,7 +287,7 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_ev
 
           // reset test time and count
           pctx->probe_timeout_count = 0;
-          pctx->timer1              = pctx->ops->get_milliseconds(pctx);
+          pctx->timer              = pctx->ops->get_milliseconds(pctx);
 
           // Check to see if we have tested all nicknames
           if ((pctx->bUse16BitNickname && (0xffff == pctx->nickname)) ||
@@ -284,7 +305,7 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_ev
       if (FRMW2_SUBSTATE_NONE == pctx->substate) {
         pctx->probe_timeout_count = 0;
       SEND_PROBE:
-        pctx->timer1 = pctx->ops->get_milliseconds(pctx);
+        pctx->timer = pctx->ops->get_milliseconds(pctx);
 
         // Send probe
         if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_send_probe(pctx, OPT_PROBE))) {
@@ -301,18 +322,18 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_ev
       }
       else if (FRMW2_SUBSTATE_SEGCTRL_PROBE_WAITING == pctx->substate) {
         // Timeout
-        if ((pctx->ops->get_milliseconds(pctx) - pctx->timer1) > VSCP_SEGCTRL_PROBE_TIMEOUT) {
+        if ((pctx->ops->get_milliseconds(pctx) - pctx->timer) > VSCP_SEGCTRL_PROBE_TIMEOUT) {
           // revert to normal probe
           pctx->probe_nickname      = 1; // Start with first non segment ctrl node
           pctx->substate            = FRMW2_SUBSTATE_PROBE_WAITING;
           pctx->probe_timeout_count = 0;
-          pctx->timer1              = pctx->ops->get_milliseconds(pctx);
+          pctx->timer              = pctx->ops->get_milliseconds(pctx);
           goto SEND_PROBE;
         }
       }
       else if (FRMW2_SUBSTATE_PROBE_WAITING == pctx->substate) {
         // Timeout
-        if ((pctx->ops->get_milliseconds(pctx) - pctx->timer1) > VSCP_PROBE_TIMEOUT) {
+        if ((pctx->ops->get_milliseconds(pctx) - pctx->timer) > VSCP_PROBE_TIMEOUT) {
           // If we have probed three times we are done
           if (pctx->probe_timeout_count >= VSCP_PROBE_TIMEOUT_COUNT) {
 
@@ -328,7 +349,7 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_ev
           }
           else {
             pctx->probe_timeout_count++;
-            pctx->timer1 = pctx->ops->get_milliseconds(pctx);
+            pctx->timer = pctx->ops->get_milliseconds(pctx);
             goto SEND_PROBE;
           }
         }
@@ -350,11 +371,12 @@ vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t
     return VSCP_ERROR_INVALID_POINTER;
   }
 
+  /* NOTE: Each event allocated within this function (evrply/evrply2) is freed within its own block before return. */
   int rv = VSCP_ERROR_SUCCESS;
 
   // If segment controller does not respond withing set timeout period
   // go back to probe state
-  if ((pctx->ops->get_milliseconds(pctx) - pctx->timer1) > VSCP_SEGCTRL_RESPONSE_TIMEOUT) {
+  if ((pctx->ops->get_milliseconds(pctx) - pctx->timer) > VSCP_SEGCTRL_RESPONSE_TIMEOUT) {
     pctx->nickname = 1; // Skip probing of segment controller this time
     pctx->state    = FRMW2_STATE_NONE;
     pctx->substate = FRMW2_SUBSTATE_NONE;
@@ -385,13 +407,16 @@ vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t
           pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
           pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_LSB);
 
-          uint8_t exrply_buf[VSCP_MAX_DATA];
-          vscp_event_t exrply;
-          exrply.pdata = exrply_buf;
-          vscp_frmw2_setup_event(pctx, &exrply);
-          exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          exrply.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
-          rv                = pctx->ops->send_event(pctx, &exrply);
+          vscp_event_t evrply;
+          evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+          if (NULL == evrply.pdata) {
+            return VSCP_ERROR_MEMORY;
+          }
+          vscp_frmw2_setup_event(pctx, &evrply);
+          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
+          rv                = pctx->ops->send_event(pctx, &evrply);
+          free(evrply.pdata);
         }
       }
       // 16-bit nickname
@@ -406,13 +431,16 @@ vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t
           pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
           pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_LSB);
 
-          uint8_t exrply_buf2[VSCP_MAX_DATA];
-          vscp_event_t exrply2;
-          exrply2.pdata = exrply_buf2;
-          vscp_frmw2_setup_event(pctx, &exrply2);
-          exrply2.vscp_class = VSCP_CLASS1_PROTOCOL;
-          exrply2.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
-          rv                = pctx->ops->send_event(pctx, &exrply2);
+          vscp_event_t evrply2;
+          evrply2.pdata = calloc(VSCP_MAX_DATA, 1);
+          if (NULL == evrply2.pdata) {
+            return VSCP_ERROR_MEMORY;
+          }
+          vscp_frmw2_setup_event(pctx, &evrply2);
+          evrply2.vscp_class = VSCP_CLASS1_PROTOCOL;
+          evrply2.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
+          rv                 = pctx->ops->send_event(pctx, &evrply2);
+          free(evrply2.pdata);
         }
       }
       else {
@@ -458,8 +486,8 @@ vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const p
       if (NULL != pex->pdata && pex->sizeData >= sizeof(pctx->ifguid)) {
         memcpy(pctx->ifguid, pex->pdata, sizeof(pctx->ifguid)); // Save interface GUID
       }
-      pctx->offset = 16;                   // Data is at offset 16
-      pctx->vscp_class -= 512;             // Make it a standard level I event
+      pctx->offset = 16;       // Data is at offset 16
+      pctx->vscp_class -= 512; // Make it a standard level I event
     }
   }
 
@@ -524,6 +552,8 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
     return VSCP_ERROR_INVALID_POINTER;
   }
 
+  /* NOTE: Each switch-case block that allocates event.pdata with calloc is responsible
+   *       for freeing it before exiting the case (including early-return error paths). */
   int rv = VSCP_ERROR_SUCCESS;
 
   if (NULL == pex) {
@@ -548,38 +578,41 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           // If addressed to us?
           if (construct_unsigned16(EXDTA(0), EXDTA(1)) == pctx->nickname) {
             // Confirm probe
-            uint8_t exrply_buf[VSCP_MAX_DATA];
-            vscp_event_t exrply;
-            exrply.pdata = exrply_buf;
-            vscp_frmw2_setup_event(pctx, &exrply);
-            exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-            exrply.vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
-            rv                = pctx->ops->send_event(pctx, &exrply);
+            vscp_event_t evrply;
+            evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+            if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+            vscp_frmw2_setup_event(pctx, &evrply);
+            evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+            evrply.vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
+            rv                = pctx->ops->send_event(pctx, &evrply);
+            free(evrply.pdata);
           }
         }
         else if (2 == ADJSIZEX) {
           // If addressed to us?
           if (construct_unsigned16(EXDTA(0), EXDTA(1)) == pctx->nickname) {
             // Confirm probe
-            uint8_t exrply_buf[VSCP_MAX_DATA];
-            vscp_event_t exrply;
-            exrply.pdata = exrply_buf;
-            vscp_frmw2_setup_event(pctx, &exrply);
-            exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-            exrply.vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
-            rv                = pctx->ops->send_event(pctx, &exrply);
+            vscp_event_t evrply;
+            evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+            if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+            vscp_frmw2_setup_event(pctx, &evrply);
+            evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+            evrply.vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
+            rv                = pctx->ops->send_event(pctx, &evrply);
+            free(evrply.pdata);
           }
         }
         else if (16 == ADJSIZEX) {
           // 16-bit node id
           if (0 == memcmp(pctx->guid, &EXDTA(0), 16)) {
-            uint8_t exrply_buf[VSCP_MAX_DATA];
-            vscp_event_t exrply;
-            exrply.pdata = exrply_buf;
-            vscp_frmw2_setup_event(pctx, &exrply);
-            exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-            exrply.vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
-            rv                = pctx->ops->send_event(pctx, &exrply);
+            vscp_event_t evrply;
+            evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+            if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+            vscp_frmw2_setup_event(pctx, &evrply);
+            evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+            evrply.vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
+            rv                = pctx->ops->send_event(pctx, &evrply);
+            free(evrply.pdata);
           }
         }
         else {
@@ -600,13 +633,14 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
             pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
             pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_LSB);
 
-            uint8_t exrply_buf[VSCP_MAX_DATA];
-            vscp_event_t exrply;
-            exrply.pdata = exrply_buf;
-            vscp_frmw2_setup_event(pctx, &exrply);
-            exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-            exrply.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
-            rv                = pctx->ops->send_event(pctx, &exrply);
+            vscp_event_t evrply;
+            evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+            if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+            vscp_frmw2_setup_event(pctx, &evrply);
+            evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+            evrply.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
+            rv                = pctx->ops->send_event(pctx, &evrply);
+            free(evrply.pdata);
           }
         }
         // 16-bit nickname
@@ -621,13 +655,14 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
             pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
             pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_LSB);
 
-            uint8_t exrply_buf2[VSCP_MAX_DATA];
-            vscp_event_t exrply2;
-            exrply2.pdata = exrply_buf2;
-            vscp_frmw2_setup_event(pctx, &exrply2);
-            exrply2.vscp_class = VSCP_CLASS1_PROTOCOL;
-            exrply2.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
-            rv                = pctx->ops->send_event(pctx, &exrply2);
+            vscp_event_t evrply2;
+            evrply2.pdata = calloc(VSCP_MAX_DATA, 1);
+            if (NULL == evrply2.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+            vscp_frmw2_setup_event(pctx, &evrply2);
+            evrply2.vscp_class = VSCP_CLASS1_PROTOCOL;
+            evrply2.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
+            rv                 = pctx->ops->send_event(pctx, &evrply2);
+            free(evrply2.pdata);
           }
         }
         else {
@@ -687,8 +722,8 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
           // If we should delay before restart
           if (tm) {
-            pctx->timer1 = pctx->ops->get_milliseconds(pctx);
-            while ((pctx->ops->get_milliseconds(pctx) - pctx->timer1) < tm) {
+            pctx->timer = pctx->ops->get_milliseconds(pctx);
+            while ((pctx->ops->get_milliseconds(pctx) - pctx->timer) < tm) {
               // Feed watchdog
               pctx->ops->feed_watchdog(pctx);
             }
@@ -736,16 +771,17 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
         // Send response
         if (VSCP_ERROR_SUCCESS == rv) {
-          uint8_t exrply_buf[VSCP_MAX_DATA];
-          vscp_event_t exrply;
-          exrply.pdata = exrply_buf;
-          vscp_frmw2_setup_event(pctx, &exrply);
-          exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          exrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-          exrply.sizeData   = 2;
-          exrply.pdata[0]    = reg;
-          exrply.pdata[1]    = val;
-          rv                = pctx->ops->send_event(pctx, &exrply);
+          vscp_event_t evrply;
+          evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+          if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+          vscp_frmw2_setup_event(pctx, &evrply);
+          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+          evrply.sizeData   = 2;
+          evrply.pdata[0]   = reg;
+          evrply.pdata[1]   = val;
+          rv                = pctx->ops->send_event(pctx, &evrply);
+          free(evrply.pdata);
         }
       } break;
 
@@ -796,16 +832,17 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
         // Send response
         if (VSCP_ERROR_SUCCESS == rv) {
-          uint8_t exrply_buf[VSCP_MAX_DATA];
-          vscp_event_t exrply;
-          exrply.pdata = exrply_buf;
-          vscp_frmw2_setup_event(pctx, &exrply);
-          exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          exrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-          exrply.sizeData   = 2;
-          exrply.pdata[0]    = reg;
-          exrply.pdata[0]    = val;
-          rv                = pctx->ops->send_event(pctx, &exrply);
+          vscp_event_t evrply;
+          evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+          if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+          vscp_frmw2_setup_event(pctx, &evrply);
+          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+          evrply.sizeData   = 2;
+          evrply.pdata[0]   = reg;
+          evrply.pdata[0]   = val;
+          rv                = pctx->ops->send_event(pctx, &evrply);
+          free(evrply.pdata);
         }
 
       } break;
@@ -816,9 +853,8 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
       case VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER: {
 
-        if ((8 == ADJSIZEX) && (EXDTA(0) == (pctx->nickname & 0xff)) &&
-            (EXDTA(1) == pctx->bootloader_algorithm) && (EXDTA(2) == pctx->guid[0]) &&
-            (EXDTA(3) == pctx->guid[3]) && (EXDTA(4) == pctx->guid[5]) &&
+        if ((8 == ADJSIZEX) && (EXDTA(0) == (pctx->nickname & 0xff)) && (EXDTA(1) == pctx->bootloader_algorithm) &&
+            (EXDTA(2) == pctx->guid[0]) && (EXDTA(3) == pctx->guid[3]) && (EXDTA(4) == pctx->guid[5]) &&
             (EXDTA(5) == pctx->guid[7]) && (EXDTA(6) == ((pctx->page_select >> 8) & 0xff)) &&
             (EXDTA(7) == ((pctx->page_select) & 0xff))) {
 
@@ -828,14 +864,15 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
         }
         else {
           // Send negative response
-          uint8_t exrply_buf[VSCP_MAX_DATA];
-          vscp_event_t exrply;
-          exrply.pdata = exrply_buf;
-          vscp_frmw2_setup_event(pctx, &exrply);
-          exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          exrply.vscp_type  = VSCP_TYPE_PROTOCOL_NACK_BOOT_LOADER;
-          exrply.sizeData   = 0;
-          rv                = pctx->ops->send_event(pctx, &exrply);
+          vscp_event_t evrply;
+          evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+          if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+          vscp_frmw2_setup_event(pctx, &evrply);
+          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_NACK_BOOT_LOADER;
+          evrply.sizeData   = 0;
+          rv                = pctx->ops->send_event(pctx, &evrply);
+          free(evrply.pdata);
         }
       } break;
 
@@ -844,31 +881,31 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
           switch (EXDTA(0)) {
             case 0:
-              if ((EXDTA(1) == pctx->guid[15]) && (EXDTA(2) == pctx->guid[14]) &&
-                  (EXDTA(3) == pctx->guid[13]) && (EXDTA(4) == pctx->guid[12])) {
+              if ((EXDTA(1) == pctx->guid[15]) && (EXDTA(2) == pctx->guid[14]) && (EXDTA(3) == pctx->guid[13]) &&
+                  (EXDTA(4) == pctx->guid[12])) {
                 pctx->reset_device_flags |= 0x01;
                 // One second to receive the rest of the events
-                pctx->timer1 = pctx->ops->get_milliseconds(pctx);
+                pctx->timer = pctx->ops->get_milliseconds(pctx);
               }
               break;
 
             case 1:
-              if ((EXDTA(1) == pctx->guid[11]) && (EXDTA(2) == pctx->guid[10]) &&
-                  (EXDTA(3) == pctx->guid[9]) && (EXDTA(4) == pctx->guid[8])) {
+              if ((EXDTA(1) == pctx->guid[11]) && (EXDTA(2) == pctx->guid[10]) && (EXDTA(3) == pctx->guid[9]) &&
+                  (EXDTA(4) == pctx->guid[8])) {
                 pctx->reset_device_flags |= 0x02;
               }
               break;
 
             case 2:
-              if ((EXDTA(1) == pctx->guid[7]) && (EXDTA(2) == pctx->guid[6]) &&
-                  (EXDTA(3) == pctx->guid[5]) && (EXDTA(4) == pctx->guid[4])) {
+              if ((EXDTA(1) == pctx->guid[7]) && (EXDTA(2) == pctx->guid[6]) && (EXDTA(3) == pctx->guid[5]) &&
+                  (EXDTA(4) == pctx->guid[4])) {
                 pctx->reset_device_flags |= 0x04;
               }
               break;
 
             case 3:
-              if ((EXDTA(1) == pctx->guid[3]) && (EXDTA(2) == pctx->guid[2]) &&
-                  (EXDTA(3) == pctx->guid[1]) && (EXDTA(4) == pctx->guid[0])) {
+              if ((EXDTA(1) == pctx->guid[3]) && (EXDTA(2) == pctx->guid[2]) && (EXDTA(3) == pctx->guid[1]) &&
+                  (EXDTA(4) == pctx->guid[0])) {
                 pctx->reset_device_flags |= 0x08;
               }
               break;
@@ -886,7 +923,7 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           }
           else {
             // all events must be received within the specified time
-            if ((pctx->ops->get_milliseconds(pctx) - pctx->timer1) > VSCP_GUID_RESET_TIMEOUT) {
+            if ((pctx->ops->get_milliseconds(pctx) - pctx->timer) > VSCP_GUID_RESET_TIMEOUT) {
               // Timeout Start over
               pctx->reset_device_flags = 0;
             }
@@ -916,22 +953,23 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
       case VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_PROBE:
         if (pctx->bHighEndServerResponse) {
-          uint8_t exrply_buf[VSCP_MAX_DATA];
-          vscp_event_t exrply;
-          exrply.pdata = exrply_buf;
-          vscp_frmw2_setup_event(pctx, &exrply);
-          exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          exrply.vscp_type  = VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_RESPONSE;
-          exrply.sizeData   = 8;
-          exrply.pdata[0]    = (pctx->high_end_srv_caps >> 8) & 0xff;
-          exrply.pdata[1]    = pctx->high_end_srv_caps & 0xff;
-          exrply.pdata[2]    = (pctx->high_end_ip_address >> 24) & 0xff;
-          exrply.pdata[3]    = (pctx->high_end_ip_address >> 16) & 0xff;
-          exrply.pdata[4]    = (pctx->high_end_ip_address >> 8) & 0xff;
-          exrply.pdata[5]    = pctx->high_end_ip_address & 0xff;
-          exrply.pdata[6]    = (pctx->high_end_srv_port >> 8) & 0xff;
-          exrply.pdata[7]    = pctx->high_end_srv_port & 0xff;
-          rv                = pctx->ops->send_event(pctx, &exrply);
+          vscp_event_t evrply;
+          evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+          if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+          vscp_frmw2_setup_event(pctx, &evrply);
+          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_RESPONSE;
+          evrply.sizeData   = 8;
+          evrply.pdata[0]   = (pctx->high_end_srv_caps >> 8) & 0xff;
+          evrply.pdata[1]   = pctx->high_end_srv_caps & 0xff;
+          evrply.pdata[2]   = (pctx->high_end_ip_address >> 24) & 0xff;
+          evrply.pdata[3]   = (pctx->high_end_ip_address >> 16) & 0xff;
+          evrply.pdata[4]   = (pctx->high_end_ip_address >> 8) & 0xff;
+          evrply.pdata[5]   = pctx->high_end_ip_address & 0xff;
+          evrply.pdata[6]   = (pctx->high_end_srv_port >> 8) & 0xff;
+          evrply.pdata[7]   = pctx->high_end_srv_port & 0xff;
+          rv                = pctx->ops->send_event(pctx, &evrply);
+          free(evrply.pdata);
         }
         break;
 
@@ -942,10 +980,10 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
       case VSCP_TYPE_PROTOCOL_INCREMENT_REGISTER: {
 
         uint8_t val;
-        uint8_t exrply_buf[VSCP_MAX_DATA];
-        vscp_event_t exrply;
-        exrply.pdata = exrply_buf;
-        vscp_frmw2_setup_event(pctx, &exrply);
+        vscp_event_t evrply;
+        evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+        if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+        vscp_frmw2_setup_event(pctx, &evrply);
 
         if ((2 == ADJSIZEX) && (pctx->nickname == EXDTA(0))) {
 
@@ -954,13 +992,13 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           vscp_frmw2_write_reg(pctx, EXDTA(1), val);
 
           // Send confirmation
-          vscp_frmw2_setup_event(pctx, &exrply);
-          exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          exrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-          exrply.sizeData   = 2;
-          exrply.pdata[0]    = EXDTA(1);
-          exrply.pdata[1]    = val;
-          rv                = pctx->ops->send_event(pctx, &exrply);
+          vscp_frmw2_setup_event(pctx, &evrply);
+          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+          evrply.sizeData   = 2;
+          evrply.pdata[0]   = EXDTA(1);
+          evrply.pdata[1]   = val;
+          rv                = pctx->ops->send_event(pctx, &evrply);
         }
         else if ((3 == ADJSIZEX) && (pctx->nickname == construct_unsigned16(EXDTA(0), EXDTA(1)))) {
 
@@ -969,23 +1007,24 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           vscp_frmw2_write_reg(pctx, EXDTA(2), val);
 
           // Send confirmation
-          vscp_frmw2_setup_event(pctx, &exrply);
-          exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          exrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-          exrply.sizeData   = 2;
-          exrply.pdata[0]    = EXDTA(1);
-          exrply.pdata[1]    = val;
-          rv                = pctx->ops->send_event(pctx, &exrply);
+          vscp_frmw2_setup_event(pctx, &evrply);
+          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+          evrply.sizeData   = 2;
+          evrply.pdata[0]   = EXDTA(1);
+          evrply.pdata[1]   = val;
+          rv                = pctx->ops->send_event(pctx, &evrply);
         }
+        free(evrply.pdata);
       } break;
 
       case VSCP_TYPE_PROTOCOL_DECREMENT_REGISTER: {
 
         uint8_t val;
-        uint8_t exrply_buf[VSCP_MAX_DATA];
-        vscp_event_t exrply;
-        exrply.pdata = exrply_buf;
-        vscp_frmw2_setup_event(pctx, &exrply);
+        vscp_event_t evrply;
+        evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+        if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+        vscp_frmw2_setup_event(pctx, &evrply);
 
         if ((2 == ADJSIZEX) && (pctx->nickname == EXDTA(0))) {
 
@@ -994,13 +1033,13 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           vscp_frmw2_write_reg(pctx, EXDTA(1), val);
 
           // Send confirmation
-          vscp_frmw2_setup_event(pctx, &exrply);
-          exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          exrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-          exrply.sizeData   = 2;
-          exrply.pdata[0]    = EXDTA(1);
-          exrply.pdata[1]    = val;
-          rv                = pctx->ops->send_event(pctx, &exrply);
+          vscp_frmw2_setup_event(pctx, &evrply);
+          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+          evrply.sizeData   = 2;
+          evrply.pdata[0]   = EXDTA(1);
+          evrply.pdata[1]   = val;
+          rv                = pctx->ops->send_event(pctx, &evrply);
         }
         else if ((3 == ADJSIZEX) && (pctx->nickname == construct_unsigned16(EXDTA(0), EXDTA(1)))) {
 
@@ -1009,14 +1048,15 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           vscp_frmw2_write_reg(pctx, EXDTA(2), val);
 
           // Send confirmation
-          vscp_frmw2_setup_event(pctx, &exrply);
-          exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          exrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-          exrply.sizeData   = 2;
-          exrply.pdata[0]    = EXDTA(1);
-          exrply.pdata[1]    = val;
-          rv                = pctx->ops->send_event(pctx, &exrply);
+          vscp_frmw2_setup_event(pctx, &evrply);
+          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+          evrply.sizeData   = 2;
+          evrply.pdata[0]   = EXDTA(1);
+          evrply.pdata[1]   = val;
+          rv                = pctx->ops->send_event(pctx, &evrply);
         }
+        free(evrply.pdata);
       } break;
 
       case VSCP_TYPE_PROTOCOL_WHO_IS_THERE:
@@ -1044,13 +1084,13 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
         uint16_t uppermax;
         uint16_t nframes;
-        uint8_t exrply_buf[VSCP_MAX_DATA];
-        vscp_event_t exrply;
-        exrply.pdata = exrply_buf;
-        vscp_frmw2_setup_event(pctx, &exrply);
+        vscp_event_t evrply;
+        evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+        if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+        vscp_frmw2_setup_event(pctx, &evrply);
         if (VSCP_LEVEL1 == pctx->level) {
-          exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          exrply.vscp_type  = VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE;
+          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE;
           uppermax          = 7;
           nframes           = strlen(pctx->pInternalMdf) / 6;
           if (strlen(pctx->pInternalMdf) % 6) {
@@ -1058,8 +1098,8 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           }
         }
         else {
-          exrply.vscp_class = VSCP_CLASS2_PROTOCOL;
-          exrply.vscp_type  = VSCP2_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE;
+          evrply.vscp_class = VSCP_CLASS2_PROTOCOL;
+          evrply.vscp_type  = VSCP2_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE;
           uppermax          = 511;
           nframes           = strlen(pctx->pInternalMdf) / 508;
           if (strlen(pctx->pInternalMdf) % 508) {
@@ -1072,17 +1112,18 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           uint32_t pos  = (VSCP_LEVEL1 == pctx->level) ? 2 : 4;
           const char *p = pctx->pInternalMdf;
           do {
-            exrply.pdata[pos] = *p;
+            evrply.pdata[pos] = *p;
             pos++;
             if (pos > uppermax) {
-              exrply.sizeData = uppermax + 1;
-              exrply.pdata[0]  = (idx >> 8) & 0xff;
-              exrply.pdata[1]  = idx & 0xff;
+              evrply.sizeData = uppermax + 1;
+              evrply.pdata[0] = (idx >> 8) & 0xff;
+              evrply.pdata[1] = idx & 0xff;
               if (VSCP_LEVEL2 == pctx->level) {
-                exrply.pdata[2] = (nframes >> 8) & 0xff;
-                exrply.pdata[3] = nframes & 0xff;
+                evrply.pdata[2] = (nframes >> 8) & 0xff;
+                evrply.pdata[3] = nframes & 0xff;
               }
-              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &exrply))) {
+              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &evrply))) {
+                free(evrply.pdata);
                 return rv;
               }
               pos = (VSCP_LEVEL1 == pctx->level) ? 2 : 4;
@@ -1092,31 +1133,34 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
           if (VSCP_LEVEL1 == pctx->level) {
             if (2 != pos) {
-              exrply.sizeData = 2 + pos - 2;
-              exrply.pdata[0]  = (idx >> 8) & 0xff;
-              exrply.pdata[1]  = idx & 0xff;
-              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &exrply))) {
+              evrply.sizeData = 2 + pos - 2;
+              evrply.pdata[0] = (idx >> 8) & 0xff;
+              evrply.pdata[1] = idx & 0xff;
+              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &evrply))) {
+                free(evrply.pdata);
                 return rv;
               }
             }
           }
           else {
             if (4 != pos) {
-              exrply.sizeData = 4 + pos - 4;
-              exrply.pdata[0]  = (idx >> 8) & 0xff;
-              exrply.pdata[1]  = idx & 0xff;
-              exrply.pdata[2]  = (nframes >> 8) & 0xff;
-              exrply.pdata[3]  = nframes & 0xff;
-              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &exrply))) {
+              evrply.sizeData = 4 + pos - 4;
+              evrply.pdata[0] = (idx >> 8) & 0xff;
+              evrply.pdata[1] = idx & 0xff;
+              evrply.pdata[2] = (nframes >> 8) & 0xff;
+              evrply.pdata[3] = nframes & 0xff;
+              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &evrply))) {
+                free(evrply.pdata);
                 return rv;
               }
             }
           }
         }
         else {
-          exrply.sizeData = 0;
-          rv              = pctx->ops->send_event(pctx, &exrply);
+          evrply.sizeData = 0;
+          rv              = pctx->ops->send_event(pctx, &evrply);
         }
+        free(evrply.pdata);
       } break;
 
       case VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_READ: {
@@ -1124,10 +1168,12 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           rv = vscp_frmw2_extended_page_read(pctx, EXDTA(0), construct_unsigned16(EXDTA(1), EXDTA(2)), EXDTA(3), 1);
         }
         if ((5 == ADJSIZEX) && (pctx->nickname == EXDTA(0))) {
-          rv = vscp_frmw2_extended_page_read(pctx, EXDTA(0), construct_unsigned16(EXDTA(1), EXDTA(2)), EXDTA(3), EXDTA(4));
+          rv =
+            vscp_frmw2_extended_page_read(pctx, EXDTA(0), construct_unsigned16(EXDTA(1), EXDTA(2)), EXDTA(3), EXDTA(4));
         }
         if ((6 == ADJSIZEX) && (pctx->nickname == construct_unsigned16(EXDTA(0), EXDTA(1)))) {
-          rv = vscp_frmw2_extended_page_read(pctx, construct_unsigned16(EXDTA(0), EXDTA(1)),
+          rv = vscp_frmw2_extended_page_read(pctx,
+                                             construct_unsigned16(EXDTA(0), EXDTA(1)),
                                              construct_unsigned16(EXDTA(2), EXDTA(3)),
                                              EXDTA(4),
                                              EXDTA(5));
@@ -1141,22 +1187,24 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
         for (int i = 0; i < cnt; i++) {
           buf[i] = EXDTA(4 + i);
         }
-        rv = vscp_frmw2_extended_page_write(pctx, EXDTA(0), construct_unsigned16(EXDTA(1), EXDTA(2)), EXDTA(3), cnt, buf);
+        rv =
+          vscp_frmw2_extended_page_write(pctx, EXDTA(0), construct_unsigned16(EXDTA(1), EXDTA(2)), EXDTA(3), cnt, buf);
       } break;
 
       case VSCP_TYPE_PROTOCOL_GET_EVENT_INTEREST: {
 
-        uint8_t exrply_buf[VSCP_MAX_DATA];
-        vscp_event_t exrply;
-        exrply.pdata = exrply_buf;
-        vscp_frmw2_setup_event(pctx, &exrply);
+        vscp_event_t evrply;
+        evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+        if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+        vscp_frmw2_setup_event(pctx, &evrply);
 
         if (NULL == pctx->pEventsOfInterest) {
           // All events is of interest
-          exrply.sizeData   = 0;
-          exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          exrply.vscp_type  = VSCP_TYPE_PROTOCOL_GET_EVENT_INTEREST_RESPONSE;
-          if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &exrply))) {
+          evrply.sizeData   = 0;
+          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_GET_EVENT_INTEREST_RESPONSE;
+          if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &evrply))) {
+            free(evrply.pdata);
             return rv;
           }
         }
@@ -1164,13 +1212,14 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           if (VSCP_LEVEL1 == pctx->level) {
             uint16_t idx = 0;
             while (pctx->pEventsOfInterest[idx]) {
-              exrply.sizeData = 5;
-              exrply.pdata[0]  = idx; // Frame index
-              exrply.pdata[1]  = (pctx->pEventsOfInterest[idx] >> 16) & 0xff;
-              exrply.pdata[2]  = pctx->pEventsOfInterest[idx] & 0xff;
-              exrply.pdata[3]  = (pctx->pEventsOfInterest[idx] >> 16) & 0xff;
-              exrply.pdata[4]  = pctx->pEventsOfInterest[idx] & 0xff;
-              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &exrply))) {
+              evrply.sizeData = 5;
+              evrply.pdata[0] = idx; // Frame index
+              evrply.pdata[1] = (pctx->pEventsOfInterest[idx] >> 16) & 0xff;
+              evrply.pdata[2] = pctx->pEventsOfInterest[idx] & 0xff;
+              evrply.pdata[3] = (pctx->pEventsOfInterest[idx] >> 16) & 0xff;
+              evrply.pdata[4] = pctx->pEventsOfInterest[idx] & 0xff;
+              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &evrply))) {
+                free(evrply.pdata);
                 return rv;
               }
               idx++;
@@ -1193,7 +1242,7 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
             for (uint8_t idx = 0; idx < nframes; idx++) {
 
-              exrply.sizeData = 0;
+              evrply.sizeData = 0;
               for (uint16_t j = 0; j < 256; j++) {
 
                 // If we are done
@@ -1201,18 +1250,20 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
                   break;
                 }
 
-                exrply.pdata[2 + j] = (pctx->pEventsOfInterest[pos + j] >> 16) & 0xffff;
-                exrply.pdata[3 + j] = pctx->pEventsOfInterest[pos + j] & 0xffff;
+                evrply.pdata[2 + j] = (pctx->pEventsOfInterest[pos + j] >> 16) & 0xffff;
+                evrply.pdata[3 + j] = pctx->pEventsOfInterest[pos + j] & 0xffff;
 
-                exrply.sizeData += 2;
+                evrply.sizeData += 2;
               }
 
-              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &exrply))) {
+              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &evrply))) {
+                free(evrply.pdata);
                 return rv;
               }
             }
           }
         }
+        free(evrply.pdata);
       } break;
     }
   }
@@ -1264,14 +1315,18 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
         // char devname[64];
         // char url[32];
 
-        uint8_t exrply_buf[VSCP_MAX_DATA];
-        vscp_event_t exrply;
-        exrply.pdata = exrply_buf;
-        vscp_frmw2_setup_event(pctx, &exrply);
+        vscp_event_t evrply;
+        evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+        if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+        vscp_frmw2_setup_event(pctx, &evrply);
 
-        memcpy(exrply.pdata, pctx->guid, sizeof(pctx->guid));
-        memcpy(&exrply.pdata[sizeof(pctx->guid)], pctx->mdfurl, sizeof(pctx->mdfurl));
-        rv = pctx->ops->send_event(pctx, &exrply);
+        vscp_frmw2_memcpy(evrply.pdata, VSCP_MAX_DATA, pctx->guid, sizeof(pctx->guid));
+        vscp_frmw2_memcpy(&evrply.pdata[sizeof(pctx->guid)],
+                          VSCP_MAX_DATA - sizeof(pctx->guid),
+                          pctx->mdfurl,
+                          sizeof(pctx->mdfurl));
+        rv = pctx->ops->send_event(pctx, &evrply);
+        free(evrply.pdata);
       } break;
     }
   }
@@ -1284,29 +1339,30 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 //
 
 void
-vscp_frmw2_setup_event(vscp_frmw2_firmware_context_t *pctx, vscp_event_t *const pex)
+
+vscp_frmw2_setup_event(vscp_frmw2_firmware_context_t *pctx, vscpEvent *const pev)
 {
   // Check pointers
-  if (NULL == pctx || NULL == pex) {
+  if (NULL == pctx || NULL == pev) {
     return;
   }
 
-  pex->sizeData = 0;
-  if (NULL != pex->pdata) {
-    memset(pex->pdata, 0, VSCP_MAX_DATA);
+  pev->sizeData = 0;
+  if (NULL != pev->pdata) {
+    memset(pev->pdata, 0, VSCP_MAX_DATA);
   }
-  pex->head = VSCP_PRIORITY_NORMAL;
-  memcpy(pex->GUID, pctx->guid, sizeof(pctx->guid));
+  pev->head = VSCP_PRIORITY_NORMAL;
+  vscp_frmw2_memcpy(pev->GUID, sizeof(pev->GUID), pctx->guid, sizeof(pctx->guid));
   /*!
     If level I we use the GUID as a space for the nickname
   */
   if (VSCP_LEVEL1 == pctx->level) {
-    pex->GUID[14] = (pctx->nickname >> 8) & 0xff;
-    pex->GUID[15] = pctx->nickname & 0xff;
+    pev->GUID[14] = (pctx->nickname >> 8) & 0xff;
+    pev->GUID[15] = pctx->nickname & 0xff;
   }
-  pex->vscp_class = VSCP_CLASS2_LEVEL1_PROTOCOL;
-  pex->vscp_type  = VSCP2_TYPE_PROTOCOL_READ_WRITE_RESPONSE;
-  pctx->ops->set_event_time(pctx, pex);
+  pev->vscp_class = VSCP_CLASS2_LEVEL1_PROTOCOL;
+  pev->vscp_type  = VSCP2_TYPE_PROTOCOL_READ_WRITE_RESPONSE;
+  pctx->ops->set_event_time(pctx, pev);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1322,14 +1378,18 @@ vscp_frmw2_vscp2_register_read(vscp_frmw2_firmware_context_t *pctx, uint32_t sta
 
   int rv;
 
-  uint8_t ex_buf[VSCP_MAX_DATA];
+  /* NOTE: This function owns ex.pdata; it is freed on all return paths. */
   vscp_event_t ex;
-  ex.pdata = ex_buf;
+  ex.pdata = calloc(VSCP_MAX_DATA, 1);
+  if (NULL == ex.pdata) {
+    return VSCP_ERROR_MEMORY;
+  }
   vscp_frmw2_setup_event(pctx, &ex);
 
   // Read the registers
   for (uint32_t pos = startreg; pos < (startreg + count); pos++) {
     if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_read_reg(pctx, pos, &ex.pdata[pos - startreg + 4]))) {
+      free(ex.pdata);
       return rv;
     }
   }
@@ -1340,13 +1400,15 @@ vscp_frmw2_vscp2_register_read(vscp_frmw2_firmware_context_t *pctx, uint32_t sta
 
   // Data
   ex.sizeData = count + 4;
-  ex.pdata[0]  = (uint8_t) ((startreg >> 24) & 0xff);
-  ex.pdata[1]  = (uint8_t) ((startreg >> 16) & 0xff);
-  ex.pdata[2]  = (uint8_t) ((startreg >> 8) & 0xff);
-  ex.pdata[3]  = (uint8_t) (startreg & 0xff);
+  ex.pdata[0] = (uint8_t) ((startreg >> 24) & 0xff);
+  ex.pdata[1] = (uint8_t) ((startreg >> 16) & 0xff);
+  ex.pdata[2] = (uint8_t) ((startreg >> 8) & 0xff);
+  ex.pdata[3] = (uint8_t) (startreg & 0xff);
 
   // Send event
-  return pctx->ops->send_event(pctx, &ex);
+  int result = pctx->ops->send_event(pctx, &ex);
+  free(ex.pdata);
+  return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1354,7 +1416,10 @@ vscp_frmw2_vscp2_register_read(vscp_frmw2_firmware_context_t *pctx, uint32_t sta
 //
 
 int
-vscp_frmw2_vscp2_register_write(vscp_frmw2_firmware_context_t *pctx, uint32_t startreg, uint16_t cnt, const uint8_t *const pdata)
+vscp_frmw2_vscp2_register_write(vscp_frmw2_firmware_context_t *pctx,
+                                uint32_t startreg,
+                                uint16_t cnt,
+                                const uint8_t *const pdata)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -1398,7 +1463,7 @@ vscp_frmw2_read_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t *
     // * * * standard registers * * *
     if ((VSCP_STD_REGISTER_ALARM_STATUS + ADJSTDREG) == reg) {
       // Writing/reading alarm resets it regardless of value
-      *pval                     = pctx->alarm_status;
+      *pval              = pctx->alarm_status;
       pctx->alarm_status = 0;
       // Inform app. that standard register has been set to zero
       pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_ALARM_STATUS);
@@ -1411,7 +1476,7 @@ vscp_frmw2_read_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t *
     }
     else if ((VSCP_STD_REGISTER_ERROR_COUNTER + ADJSTDREG) == reg) {
       // Writing/reading error counter resets it regardless of value
-      *pval                     = pctx->errorCounter;
+      *pval              = pctx->errorCounter;
       pctx->errorCounter = 0;
       // Inform app that standard register has been set to zero
       pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_ERROR_COUNTER);
@@ -1570,7 +1635,7 @@ vscp_frmw2_write_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t 
       }
       else {
         pctx->guid[reg - VSCP_STD_REGISTER_GUID + ADJSTDREG] = val;
-        rv                                                          = VSCP_ERROR_SUCCESS;
+        rv                                                   = VSCP_ERROR_SUCCESS;
       }
       rv = pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_GUID);
     }
@@ -1581,11 +1646,11 @@ vscp_frmw2_write_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t 
     timer = pctx->ops->get_milliseconds(pctx);
 
     if (0x55 == val) {
-      pctx->timer1 = timer;
+      pctx->timer = timer;
     }
     else if (0xaa == val) {
-      if ((timer - pctx->timer1) < 1000) {
-        pctx->timer1 = 0;
+      if ((timer - pctx->timer) < 1000) {
+        pctx->timer = 0;
         return pctx->ops->restore_defaults(pctx);
       }
       else {
@@ -1610,28 +1675,33 @@ vscp_frmw2_send_heartbeat(vscp_frmw2_firmware_context_t *pctx)
 
   // int rv;
 
-  uint8_t exrply_buf[VSCP_MAX_DATA];
-  vscp_event_t exrply;
-  exrply.pdata = exrply_buf;
-  vscp_frmw2_setup_event(pctx, &exrply);
+  /* NOTE: This function owns evrply.pdata; it is freed on all return paths. */
+  vscp_event_t evrply;
+  evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+  if (NULL == evrply.pdata) {
+    return VSCP_ERROR_MEMORY;
+  }
+  vscp_frmw2_setup_event(pctx, &evrply);
 
   // Construct reply event
   if (VSCP_LEVEL1 == pctx->level) {
-    exrply.vscp_class = VSCP_CLASS1_INFORMATION;
-    exrply.vscp_type  = VSCP_TYPE_INFORMATION_NODE_HEARTBEAT;
-    exrply.sizeData   = 0;
+    evrply.vscp_class = VSCP_CLASS1_INFORMATION;
+    evrply.vscp_type  = VSCP_TYPE_INFORMATION_NODE_HEARTBEAT;
+    evrply.sizeData   = 0;
   }
   else {
     // Level II should add node name in data
-    exrply.vscp_class = VSCP_CLASS2_INFORMATION;
-    exrply.vscp_type  = VSCP2_TYPE_INFORMATION_HEART_BEAT;
-    memset(exrply.pdata, 0, VSCP_MAX_DATA);
-    memcpy(exrply.pdata, pctx->deviceName, sizeof(pctx->deviceName));
-    exrply.sizeData = strlen((const char *) exrply.pdata);
+    evrply.vscp_class = VSCP_CLASS2_INFORMATION;
+    evrply.vscp_type  = VSCP2_TYPE_INFORMATION_HEART_BEAT;
+    memset(evrply.pdata, 0, VSCP_MAX_DATA);
+    vscp_frmw2_memcpy(evrply.pdata, VSCP_MAX_DATA, pctx->deviceName, sizeof(pctx->deviceName));
+    evrply.sizeData = strlen((const char *) evrply.pdata);
   }
 
   // Send event
-  return pctx->ops->send_event(pctx, &exrply);
+  int result = pctx->ops->send_event(pctx, &evrply);
+  free(evrply.pdata);
+  return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1645,9 +1715,12 @@ vscp_frmw2_send_caps(vscp_frmw2_firmware_context_t *pctx)
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  uint8_t ex_buf[VSCP_MAX_DATA];
+  /* NOTE: This function owns ex.pdata; it is freed on all return paths. */
   vscp_event_t ex;
-  ex.pdata = ex_buf;
+  ex.pdata = calloc(VSCP_MAX_DATA, 1);
+  if (NULL == ex.pdata) {
+    return VSCP_ERROR_MEMORY;
+  }
   vscp_frmw2_setup_event(pctx, &ex);
 
   // Construct reply event
@@ -1667,19 +1740,21 @@ vscp_frmw2_send_caps(vscp_frmw2_firmware_context_t *pctx)
   ex.pdata[5] = 0x00;
   ex.pdata[6] = 0x80; // Have VSCP TCP server with VCSP link interface.
   ex.pdata[7] = 0x38; // IP4 support, SLL support
-                     // Accepts two or more simultaneous connections on TCP/IP interface.
+                      // Accepts two or more simultaneous connections on TCP/IP interface.
 
   // GUID
-  memcpy(ex.pdata + 8, pctx->guid, sizeof(pctx->guid));
+  vscp_frmw2_memcpy(ex.pdata + 8, VSCP_MAX_DATA - 8, pctx->guid, sizeof(pctx->guid));
 
   // ip address
-  memcpy((ex.pdata + 24), pctx->ipaddr, sizeof(pctx->ipaddr));
+  vscp_frmw2_memcpy(ex.pdata + 24, VSCP_MAX_DATA - 24, pctx->ipaddr, sizeof(pctx->ipaddr));
 
   // Device name
-  memcpy((ex.pdata + 40), pctx->deviceName, sizeof(pctx->deviceName));
+  vscp_frmw2_memcpy(ex.pdata + 40, VSCP_MAX_DATA - 40, pctx->deviceName, sizeof(pctx->deviceName));
 
   // Send event
-  return pctx->ops->send_event(pctx, &ex);
+  int result = pctx->ops->send_event(pctx, &ex);
+  free(ex.pdata);
+  return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1693,9 +1768,12 @@ vscp_frmw2_send_high_end_server_probe(vscp_frmw2_firmware_context_t *pctx)
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  uint8_t ex_buf[VSCP_MAX_DATA];
+  /* NOTE: This function owns ex.pdata; it is freed on all return paths. */
   vscp_event_t ex;
-  ex.pdata = ex_buf;
+  ex.pdata = calloc(VSCP_MAX_DATA, 1);
+  if (NULL == ex.pdata) {
+    return VSCP_ERROR_MEMORY;
+  }
   vscp_frmw2_setup_event(pctx, &ex);
 
   // Construct reply event
@@ -1708,7 +1786,9 @@ vscp_frmw2_send_high_end_server_probe(vscp_frmw2_firmware_context_t *pctx)
   ex.sizeData = 0;
 
   // Send event
-  return pctx->ops->send_event(pctx, &ex);
+  int result = pctx->ops->send_event(pctx, &ex);
+  free(ex.pdata);
+  return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1727,9 +1807,12 @@ vscp_frmw2_page_read(vscp_frmw2_firmware_context_t *pctx, uint32_t offset, uint8
   uint8_t seq = 0;
   uint8_t val;
 
-  uint8_t rplyex_buf[VSCP_MAX_DATA];
+  /* NOTE: This function owns rplyex.pdata; it is freed on all return paths. */
   vscp_event_t rplyex;
-  rplyex.pdata = rplyex_buf;
+  rplyex.pdata = calloc(VSCP_MAX_DATA, 1);
+  if (NULL == rplyex.pdata) {
+    return VSCP_ERROR_MEMORY;
+  }
   vscp_frmw2_setup_event(pctx, &rplyex);
 
   for (i = 0; i < count; i++) {
@@ -1749,10 +1832,11 @@ vscp_frmw2_page_read(vscp_frmw2_firmware_context_t *pctx, uint32_t offset, uint8
       rplyex.vscp_class = VSCP_CLASS1_PROTOCOL;
       rplyex.vscp_type  = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
       rplyex.sizeData   = nsize + 1;
-      rplyex.pdata[0]    = seq;
+      rplyex.pdata[0]   = seq;
 
       // send the event
       if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &rplyex))) {
+        free(rplyex.pdata);
         return rv;
       }
 
@@ -1760,6 +1844,7 @@ vscp_frmw2_page_read(vscp_frmw2_firmware_context_t *pctx, uint32_t offset, uint8
     }
   }
 
+  free(rplyex.pdata);
   return rv;
 }
 
@@ -1782,19 +1867,24 @@ vscp_frmw2_page_write(vscp_frmw2_firmware_context_t *pctx, uint32_t offset, uint
   uint8_t i;
   uint8_t val;
 
-  uint8_t ex_buf[VSCP_MAX_DATA];
+  /* NOTE: This function owns ex.pdata; it is freed on all return paths. */
   vscp_event_t ex;
-  ex.pdata = ex_buf;
+  ex.pdata = calloc(VSCP_MAX_DATA, 1);
+  if (NULL == ex.pdata) {
+    return VSCP_ERROR_MEMORY;
+  }
   vscp_frmw2_setup_event(pctx, &ex);
 
   for (i = 0; i < count; i++) {
 
     // Write VSCP register
     if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_write_reg(pctx, offset + i, pbuf[i]))) {
+      free(ex.pdata);
       return rv;
     }
 
     if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_read_reg(pctx, i, &val))) {
+      free(ex.pdata);
       return rv;
     }
 
@@ -1804,13 +1894,15 @@ vscp_frmw2_page_write(vscp_frmw2_firmware_context_t *pctx, uint32_t offset, uint
   ex.vscp_class = VSCP_CLASS1_PROTOCOL;
   ex.vscp_type  = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
   ex.sizeData   = count + 1;
-  ex.pdata[0]    = 0; // index
+  ex.pdata[0]   = 0; // index
 
   // send the event
   if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &ex))) {
+    free(ex.pdata);
     return rv;
   }
 
+  free(ex.pdata);
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -1828,9 +1920,12 @@ vscp_frmw2_whois_response(vscp_frmw2_firmware_context_t *pctx)
   int rv;
   uint8_t i, j, k = 0;
 
-  uint8_t ex_buf[VSCP_MAX_DATA];
+  /* NOTE: This function owns ex.pdata; it is freed on all return paths. */
   vscp_event_t ex;
-  ex.pdata = ex_buf;
+  ex.pdata = calloc(VSCP_MAX_DATA, 1);
+  if (NULL == ex.pdata) {
+    return VSCP_ERROR_MEMORY;
+  }
   vscp_frmw2_setup_event(pctx, &ex);
 
   if (VSCP_LEVEL1 == pctx->level) {
@@ -1854,6 +1949,7 @@ vscp_frmw2_whois_response(vscp_frmw2_firmware_context_t *pctx)
 
       // send the event
       if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &ex))) {
+        free(ex.pdata);
         return rv;
       }
     }
@@ -1868,6 +1964,7 @@ vscp_frmw2_whois_response(vscp_frmw2_firmware_context_t *pctx)
 
     // send the event
     if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &ex))) {
+      free(ex.pdata);
       return rv;
     }
 
@@ -1881,27 +1978,32 @@ vscp_frmw2_whois_response(vscp_frmw2_firmware_context_t *pctx)
       }
       // send the event
       if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &ex))) {
+        free(ex.pdata);
         return rv;
       }
     }
   }
   // Level II
   else {
-
     ex.vscp_class = VSCP_CLASS2_PROTOCOL;
     ex.vscp_type  = VSCP2_TYPE_PROTOCOL_WHO_IS_THERE_RESPONSE;
     ex.sizeData   = 16 + MIN(strlen((const char *) pctx->mdfurl), 32);
     memset(ex.pdata, 9, 512);
-    memcpy(ex.pdata, pctx->guid, sizeof(pctx->guid));
+    vscp_frmw2_memcpy(ex.pdata, VSCP_MAX_DATA, pctx->guid, sizeof(pctx->guid));
     if (pctx->mdfurl[0]) {
-      memcpy(ex.pdata + sizeof(pctx->guid), pctx->mdfurl, MIN(strlen((const char *) pctx->mdfurl), sizeof(pctx->mdfurl)));
+      vscp_frmw2_memcpy(ex.pdata + sizeof(pctx->guid),
+                        VSCP_MAX_DATA - sizeof(pctx->guid),
+                        pctx->mdfurl,
+                        MIN(strlen((const char *) pctx->mdfurl), sizeof(pctx->mdfurl)));
     }
 
     // send the event
     if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &ex))) {
+      free(ex.pdata);
       return rv;
     }
   }
+  free(ex.pdata);
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -1910,7 +2012,11 @@ vscp_frmw2_whois_response(vscp_frmw2_firmware_context_t *pctx)
 //
 
 int
-vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx, uint16_t nodeid, uint16_t page, uint8_t startoffset, uint16_t cnt)
+vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx,
+                              uint16_t nodeid,
+                              uint16_t page,
+                              uint8_t startoffset,
+                              uint16_t cnt)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -1923,9 +2029,12 @@ vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx, uint16_t node
 
   unused(nodeid);
 
-  uint8_t ex_buf[VSCP_MAX_DATA];
+  /* NOTE: This function owns ex.pdata; it is freed on all return paths. */
   vscp_event_t ex;
-  ex.pdata = ex_buf;
+  ex.pdata = calloc(VSCP_MAX_DATA, 1);
+  if (NULL == ex.pdata) {
+    return VSCP_ERROR_MEMORY;
+  }
   vscp_frmw2_setup_event(pctx, &ex);
 
   // Save the current page
@@ -1938,9 +2047,9 @@ vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx, uint16_t node
   vscp_frmw2_setup_event(pctx, &ex);
   ex.vscp_class = VSCP_CLASS1_PROTOCOL;
   ex.vscp_type  = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
-  ex.pdata[0]    = 0; // index of event, this is the first
-  ex.pdata[1]    = (page >> 8) & 0xff;
-  ex.pdata[2]    = page & 0xff;
+  ex.pdata[0]   = 0; // index of event, this is the first
+  ex.pdata[1]   = (page >> 8) & 0xff;
+  ex.pdata[2]   = page & 0xff;
 
   do {
     // calculate bytes to transfer in this event
@@ -1953,7 +2062,7 @@ vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx, uint16_t node
 
     // define length of this event
     ex.sizeData = 4 + bytes_this_time;
-    ex.pdata[3]  = startoffset + byte; // first register in this event
+    ex.pdata[3] = startoffset + byte; // first register in this event
 
     // Put up to four registers to data space
     for (cb = 0; cb < bytes_this_time; cb++) {
@@ -1961,6 +2070,7 @@ vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx, uint16_t node
       if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_read_reg(pctx, startoffset + byte + cb, &val))) {
         // Restore the saved page
         pctx->page_select = page_save;
+        free(ex.pdata);
         return rv;
       }
       ex.pdata[(4 + cb)] = val;
@@ -1973,6 +2083,7 @@ vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx, uint16_t node
     if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &ex))) {
       // Restore the saved page
       pctx->page_select = page_save;
+      free(ex.pdata);
       return rv;
     }
 
@@ -1993,6 +2104,7 @@ vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx, uint16_t node
 
   // Restore the saved page
   pctx->page_select = page_save;
+  free(ex.pdata);
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -2001,7 +2113,12 @@ vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx, uint16_t node
 //
 
 int
-vscp_frmw2_extended_page_write(vscp_frmw2_firmware_context_t *pctx, uint16_t nodeid, uint16_t page, uint8_t offset, uint16_t cnt, const uint8_t *const pbuf)
+vscp_frmw2_extended_page_write(vscp_frmw2_firmware_context_t *pctx,
+                               uint16_t nodeid,
+                               uint16_t page,
+                               uint8_t offset,
+                               uint16_t cnt,
+                               const uint8_t *const pbuf)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -2010,14 +2127,6 @@ vscp_frmw2_extended_page_write(vscp_frmw2_firmware_context_t *pctx, uint16_t nod
   int rv = VSCP_ERROR_SUCCESS;
   uint8_t i;
   uint16_t page_save;
-
-  // Construct response event
-  uint8_t ex_buf[VSCP_MAX_DATA];
-  vscp_event_t ex;
-  ex.pdata = ex_buf;
-  vscp_frmw2_setup_event(pctx, &ex);
-  ex.vscp_class = VSCP_CLASS1_PROTOCOL;
-  ex.vscp_type  = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
 
   // Save the current page
   page_save = pctx->page_select;
@@ -2060,38 +2169,43 @@ vscp_frmw2_report_dmatrix(vscp_frmw2_firmware_context_t *pctx)
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  uint8_t exrply_buf[VSCP_MAX_DATA];
-  vscp_event_t exrply;
-  exrply.pdata = exrply_buf;
-  vscp_frmw2_setup_event(pctx, &exrply);
+  /* NOTE: This function owns evrply.pdata; it is freed on all return paths. */
+  vscp_event_t evrply;
+  evrply.pdata = calloc(VSCP_MAX_DATA, 1);
+  if (NULL == evrply.pdata) {
+    return VSCP_ERROR_MEMORY;
+  }
+  vscp_frmw2_setup_event(pctx, &evrply);
 
   if (VSCP_LEVEL1 == pctx->level) {
-    exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-    exrply.vscp_type  = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
+    evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+    evrply.vscp_type  = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
 
-    exrply.sizeData = 4;
-    exrply.pdata[0]  = pctx->nDmRows;     // Size = number of DM rows
-    exrply.pdata[1]  = pctx->regOffsetDm; // Start offset in page of DM
-    exrply.pdata[2]  = (pctx->pageDm >> 8) & 0xff;
-    exrply.pdata[3]  = pctx->pageDm & 0xff;
+    evrply.sizeData = 4;
+    evrply.pdata[0] = pctx->nDmRows;     // Size = number of DM rows
+    evrply.pdata[1] = pctx->regOffsetDm; // Start offset in page of DM
+    evrply.pdata[2] = (pctx->pageDm >> 8) & 0xff;
+    evrply.pdata[3] = pctx->pageDm & 0xff;
   }
   else {
     // Level II response
-    exrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-    exrply.vscp_type  = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
+    evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
+    evrply.vscp_type  = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
 
-    exrply.sizeData = 22;
-    memcpy(exrply.pdata, pctx->guid, sizeof(pctx->guid)); // GUID
-    exrply.pdata[16] = pctx->sizeDmRow;   // Row size
-    exrply.pdata[17] = pctx->nDmRows;     // Size = number of DM rows
-    exrply.pdata[18] = (pctx->regOffsetDm >> 24) & 0xff;
-    exrply.pdata[19] = (pctx->regOffsetDm >> 16) & 0xff;
-    exrply.pdata[20] = (pctx->regOffsetDm >> 8) & 0xff;
-    exrply.pdata[21] = pctx->regOffsetDm & 0xff;
+    evrply.sizeData = 22;
+    vscp_frmw2_memcpy(evrply.pdata, VSCP_MAX_DATA, pctx->guid, sizeof(pctx->guid)); // GUID
+    evrply.pdata[16] = pctx->sizeDmRow;                                             // Row size
+    evrply.pdata[17] = pctx->nDmRows;                                               // Size = number of DM rows
+    evrply.pdata[18] = (pctx->regOffsetDm >> 24) & 0xff;
+    evrply.pdata[19] = (pctx->regOffsetDm >> 16) & 0xff;
+    evrply.pdata[20] = (pctx->regOffsetDm >> 8) & 0xff;
+    evrply.pdata[21] = pctx->regOffsetDm & 0xff;
   }
 
   // send the event
-  return pctx->ops->send_event(pctx, &exrply);
+  int result = pctx->ops->send_event(pctx, &evrply);
+  free(evrply.pdata);
+  return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
