@@ -202,12 +202,21 @@ vscp_link_doCmdUser(vscp_link_ctx_t *pctx, const char *pcmd)
 static int
 vscp_link_doCmdPassword(vscp_link_ctx_t *pctx, const char *pcmd)
 {
+  int rv;
+
   // Need to be initialized
   if ((NULL == pctx) || (NULL == pctx->ops) || (NULL == pctx->ops->check_password)) {
     return VSCP_ERROR_INIT_MISSING;
   }
   // ppwd can be NULL and be accepted or not
-  return pctx->ops->check_password(pctx, pcmd);
+  rv = pctx->ops->check_password(pctx, pcmd);
+  if (VSCP_ERROR_SUCCESS != rv) {
+    // If not accredited message we always disconnect for security reasons, 
+    // even if the callback does not do it itself. This is to avoid leaving a 
+    // connection open with an attacker after failed authentication attempts.
+    pctx->ops->disconnect(pctx);
+  }
+  return rv;
 }
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_link_doCmdChallenge

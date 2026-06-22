@@ -84,7 +84,7 @@ extern "C" {
 
 #define VSCP_LINK_MSG_WELCOME       "Welcome to the VSCP Link Protocol Interface.\r\n"
 #define VSCP_LINK_MSG_OK            "+OK - Success.\r\n"
-#define VSCP_LINK_MSG_GOODBY        "+OK - Goodby. Connection closed.\r\n"
+#define VSCP_LINK_MSG_GOODBYE       "+OK - Goodby. Connection closed.\r\n"
 #define VSCP_LINK_MSG_USENAME_OK    "+OK - User name accepted, password please\r\n"
 #define VSCP_LINK_MSG_PASSWORD_OK   "+OK - Ready to work.\r\n"
 #define VSCP_LINK_MSG_QUEUE_CLEARED "+OK - All events cleared.\r\n"
@@ -199,8 +199,8 @@ typedef struct vscp_link_ctx {
   int sock;                                  // Socket
   uint8_t guid[16];                          // GUID for client
   char user[VSCP_LINK_MAX_USER_NAME_LENGTH]; // Username storage
-  vscp_fifo_t fifoEventsIn;                  // VSCP event receive fifo
-  vscp_fifo_t fifoEventsOut;                 // VSCP event send fifo
+  vscp_fifo_t fifoEventsIn;                  // VSCP event receive fifo (from client)
+  vscp_fifo_t fifoEventsOut;                 // VSCP event send fifo (to client)
   unsigned bValidated : 1;                   // User is validated
   unsigned bRcvLoop : 1;                     // Receive loop is enabled
   unsigned bBinary : 1;                      // Binary mode

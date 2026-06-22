@@ -83,6 +83,9 @@ extern "C" {
 */
 #define FRMW2_MINOR_VERSION 0
 
+
+#define FRMW2_HEARTBEAT_L2_MAX_DATA 64  // Devicename
+
 /*!
   @brief Standard register address start.
 
@@ -403,7 +406,7 @@ typedef struct vscp_frmw2_ops {
 #define EXDTA(x) (pex->pdata[(x) + pctx->offset])
 
 /*!
- * Ajust size for offset
+ * Adjust size for offset
  * vscp_event_t and vscp_event_ex_t versions
  */
 #define ADJSIZEV (pev->sizeData - pctx->offset)

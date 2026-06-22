@@ -235,7 +235,7 @@ vscp_frmw2_send_probe(vscp_frmw2_firmware_context_t *pctx, int bNewNodeOnLine)
 //
 
 int
-vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pex)
+vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pev)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -245,25 +245,25 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_ev
 
   // If there is an event we should check if we should react
   // on it
-  if (NULL != pex) {
+  if (NULL != pev) {
 
-    if (pex->sizeData > 0 && NULL == pex->pdata) {
+    if (pev->sizeData > 0 && NULL == pev->pdata) {
       return VSCP_ERROR_INVALID_POINTER;
     }
 
-    if ((VSCP_CLASS1_PROTOCOL == pex->vscp_class) && (VSCP_TYPE_PROTOCOL_PROBE_ACK == pex->vscp_type)) {
+    if ((VSCP_CLASS1_PROTOCOL == pev->vscp_class) && (VSCP_TYPE_PROTOCOL_PROBE_ACK == pev->vscp_type)) {
       // No check for nickname if we are probing for as egment controller
       if (FRMW2_SUBSTATE_SEGCTRL_PROBE_WAITING != pctx->substate) {
         if (pctx->bUse16BitNickname) {
           // 16-bit nickname
-          if (construct_unsigned16(pex->GUID[14], pex->GUID[15]) != pctx->probe_nickname) {
+          if (construct_unsigned16(pev->GUID[14], pev->GUID[15]) != pctx->probe_nickname) {
             // not to us
             return VSCP_ERROR_SUCCESS;
           }
         }
         else {
           // 8-bit nickname
-          if (pex->GUID[15] != pctx->probe_nickname) {
+          if (pev->GUID[15] != pctx->probe_nickname) {
             // Not to us
             return VSCP_ERROR_SUCCESS;
           }
@@ -277,7 +277,7 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_ev
         }
         else if (FRMW2_SUBSTATE_SEGCTRL_PROBE_WAITING == pctx->substate) {
           // Segment controller responded
-          pctx->state  = FRMW2_STATE_PREACTIVE;
+          pctx->state = FRMW2_STATE_PREACTIVE;
           pctx->timer = pctx->ops->get_milliseconds(pctx);
         }
         else if (FRMW2_SUBSTATE_PROBE_WAITING == pctx->substate) {
@@ -287,7 +287,7 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_ev
 
           // reset test time and count
           pctx->probe_timeout_count = 0;
-          pctx->timer              = pctx->ops->get_milliseconds(pctx);
+          pctx->timer               = pctx->ops->get_milliseconds(pctx);
 
           // Check to see if we have tested all nicknames
           if ((pctx->bUse16BitNickname && (0xffff == pctx->nickname)) ||
@@ -327,7 +327,7 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_ev
           pctx->probe_nickname      = 1; // Start with first non segment ctrl node
           pctx->substate            = FRMW2_SUBSTATE_PROBE_WAITING;
           pctx->probe_timeout_count = 0;
-          pctx->timer              = pctx->ops->get_milliseconds(pctx);
+          pctx->timer               = pctx->ops->get_milliseconds(pctx);
           goto SEND_PROBE;
         }
       }
@@ -365,7 +365,7 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_ev
 //
 
 int
-vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pex)
+vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pev)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -384,24 +384,24 @@ vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t
   }
 
   // If no event to handle noting more to do for now
-  if (NULL == pex) {
+  if (NULL == pev) {
     return VSCP_ERROR_SUCCESS;
   }
 
-  if (pex->sizeData > 0 && NULL == pex->pdata) {
+  if (pev->sizeData > 0 && NULL == pev->pdata) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  if (VSCP_CLASS1_PROTOCOL == pex->vscp_class) {
+  if (VSCP_CLASS1_PROTOCOL == pev->vscp_class) {
 
-    if (VSCP_TYPE_PROTOCOL_SET_NICKNAME == pex->vscp_type) {
+    if (VSCP_TYPE_PROTOCOL_SET_NICKNAME == pev->vscp_type) {
       // 8-bit nickname
-      if (2 == ADJSIZEX) {
+      if (2 == ADJSIZEV) {
         // Addressed to us?
-        if (construct_unsigned16(0, EXDTA(0)) == pctx->nickname) {
+        if (construct_unsigned16(0, EVDTA(0)) == pctx->nickname) {
 
           // Set nickname
-          pctx->nickname = EXDTA(1);
+          pctx->nickname = EVDTA(1);
 
           // Inform app. that nickname changed
           pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
@@ -420,12 +420,12 @@ vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t
         }
       }
       // 16-bit nickname
-      else if (4 == ADJSIZEX) {
+      else if (4 == ADJSIZEV) {
         // Addressed to us?
-        if (construct_unsigned16(EXDTA(0), EXDTA(1)) == pctx->nickname) {
+        if (construct_unsigned16(EVDTA(0), EVDTA(1)) == pctx->nickname) {
 
           // Set nickname
-          pctx->nickname = construct_unsigned16(EXDTA(2), EXDTA(3));
+          pctx->nickname = construct_unsigned16(EVDTA(2), EVDTA(3));
 
           // Inform app. that nickname changed
           pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
@@ -457,7 +457,7 @@ vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t
 //
 
 int
-vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pex)
+vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pev)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -471,20 +471,20 @@ vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const p
   pctx->offset     = 0;
   memset(pctx->ifguid, 0, 16);
 
-  if (NULL != pex) {
+  if (NULL != pev) {
 
     // If there is an event we should check if we should react
     // on it
 
-    pctx->vscp_class = pex->vscp_class;
+    pctx->vscp_class = pev->vscp_class;
 
     /*
       Check if we have a proxy event, if we have
       remove GUID and make it a standard level I event
     */
-    if ((pex->vscp_class >= 512) && (pex->vscp_class < 1024)) {
-      if (NULL != pex->pdata && pex->sizeData >= sizeof(pctx->ifguid)) {
-        memcpy(pctx->ifguid, pex->pdata, sizeof(pctx->ifguid)); // Save interface GUID
+    if ((pev->vscp_class >= 512) && (pev->vscp_class < 1024)) {
+      if (NULL != pev->pdata && pev->sizeData >= sizeof(pctx->ifguid)) {
+        memcpy(pctx->ifguid, pev->pdata, sizeof(pctx->ifguid)); // Save interface GUID
       }
       pctx->offset = 16;       // Data is at offset 16
       pctx->vscp_class -= 512; // Make it a standard level I event
@@ -501,16 +501,16 @@ vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const p
 
     // Probe has been sent (waiting for answer)
     case FRMW2_STATE_PROBE:
-      return vscp_frmw2_nickname_discovery(pctx, pex);
+      return vscp_frmw2_nickname_discovery(pctx, pev);
 
     // Happens when segment controller take probe. Wait for nickname
     case FRMW2_STATE_PREACTIVE:
-      return vscp_frmw2_nickname_wait(pctx, pex);
+      return vscp_frmw2_nickname_wait(pctx, pev);
 
     // Normal working state
     case FRMW2_STATE_ACTIVE:
-      if (NULL != pex) {
-        return vscp_frmw2_handle_protocol_event(pctx, pex);
+      if (NULL != pev) {
+        return vscp_frmw2_handle_protocol_event(pctx, pev);
       }
       break;
 
@@ -534,8 +534,8 @@ vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const p
   }
 
   // Check if the DM is interested in this event
-  if (NULL != pex) {
-    vscp_frmw2_feed_dm(pctx, pex);
+  if (NULL != pev) {
+    vscp_frmw2_feed_dm(pctx, pev);
   }
 
   return rv;
@@ -546,7 +546,7 @@ vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const p
 //
 
 int
-vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pex)
+vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pev)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -556,17 +556,17 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
    *       for freeing it before exiting the case (including early-return error paths). */
   int rv = VSCP_ERROR_SUCCESS;
 
-  if (NULL == pex) {
+  if (NULL == pev) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  if (pex->sizeData > 0 && NULL == pex->pdata) {
+  if (pev->sizeData > 0 && NULL == pev->pdata) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  if (VSCP_CLASS1_PROTOCOL == pex->vscp_class) {
+  if (VSCP_CLASS1_PROTOCOL == pev->vscp_class) {
 
-    switch (pex->vscp_type) {
+    switch (pev->vscp_type) {
 
       case VSCP_TYPE_PROTOCOL_SEGCTRL_HEARTBEAT:
         // We do nothing
@@ -574,13 +574,16 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
       case VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE:
         // 8-bit node id
-        if (1 == ADJSIZEX) {
+        if (1 == ADJSIZEV) {
           // If addressed to us?
-          if (construct_unsigned16(EXDTA(0), EXDTA(1)) == pctx->nickname) {
+          if (construct_unsigned16(EVDTA(0), EVDTA(1)) == pctx->nickname) {
             // Confirm probe
             vscp_event_t evrply;
             evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-            if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+            if (NULL == evrply.pdata) {
+              rv = VSCP_ERROR_MEMORY;
+              break;
+            }
             vscp_frmw2_setup_event(pctx, &evrply);
             evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
             evrply.vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
@@ -588,13 +591,16 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
             free(evrply.pdata);
           }
         }
-        else if (2 == ADJSIZEX) {
+        else if (2 == ADJSIZEV) {
           // If addressed to us?
-          if (construct_unsigned16(EXDTA(0), EXDTA(1)) == pctx->nickname) {
+          if (construct_unsigned16(EVDTA(0), EVDTA(1)) == pctx->nickname) {
             // Confirm probe
             vscp_event_t evrply;
             evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-            if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+            if (NULL == evrply.pdata) {
+              rv = VSCP_ERROR_MEMORY;
+              break;
+            }
             vscp_frmw2_setup_event(pctx, &evrply);
             evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
             evrply.vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
@@ -602,12 +608,15 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
             free(evrply.pdata);
           }
         }
-        else if (16 == ADJSIZEX) {
+        else if (16 == ADJSIZEV) {
           // 16-bit node id
-          if (0 == memcmp(pctx->guid, &EXDTA(0), 16)) {
+          if (0 == memcmp(pctx->guid, &EVDTA(0), 16)) {
             vscp_event_t evrply;
             evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-            if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+            if (NULL == evrply.pdata) {
+              rv = VSCP_ERROR_MEMORY;
+              break;
+            }
             vscp_frmw2_setup_event(pctx, &evrply);
             evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
             evrply.vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
@@ -622,12 +631,12 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
       case VSCP_TYPE_PROTOCOL_SET_NICKNAME:
         // 8-bit nickname
-        if (2 == ADJSIZEX) {
+        if (2 == ADJSIZEV) {
           // Addressed to us?
-          if (construct_unsigned16(0, EXDTA(0)) == pctx->nickname) {
+          if (construct_unsigned16(0, EVDTA(0)) == pctx->nickname) {
 
             // Set new nickname
-            pctx->nickname = EXDTA(1);
+            pctx->nickname = EVDTA(1);
 
             // Inform app. that nickname changed
             pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
@@ -635,7 +644,10 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
             vscp_event_t evrply;
             evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-            if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+            if (NULL == evrply.pdata) {
+              rv = VSCP_ERROR_MEMORY;
+              break;
+            }
             vscp_frmw2_setup_event(pctx, &evrply);
             evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
             evrply.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
@@ -644,12 +656,12 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           }
         }
         // 16-bit nickname
-        else if (4 == ADJSIZEX) {
+        else if (4 == ADJSIZEV) {
           // Addressed to us?
-          if (construct_unsigned16(EXDTA(0), EXDTA(1)) == pctx->nickname) {
+          if (construct_unsigned16(EVDTA(0), EVDTA(1)) == pctx->nickname) {
 
             // Set new nickname
-            pctx->nickname = construct_unsigned16(EXDTA(2), EXDTA(3));
+            pctx->nickname = construct_unsigned16(EVDTA(2), EVDTA(3));
 
             // Inform app. that nickname changed
             pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
@@ -657,7 +669,10 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
             vscp_event_t evrply2;
             evrply2.pdata = calloc(VSCP_MAX_DATA, 1);
-            if (NULL == evrply2.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+            if (NULL == evrply2.pdata) {
+              rv = VSCP_ERROR_MEMORY;
+              break;
+            }
             vscp_frmw2_setup_event(pctx, &evrply2);
             evrply2.vscp_class = VSCP_CLASS1_PROTOCOL;
             evrply2.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
@@ -676,24 +691,24 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
         uint32_t tm   = 0;
 
         // 8-bit nickname
-        if ((ADJSIZEX >= 1) && (ADJSIZEX <= 3)) {
+        if ((ADJSIZEV >= 1) && (ADJSIZEV <= 3)) {
           // Addressed to us?
-          if (construct_unsigned16(0, EXDTA(0)) == pctx->nickname) {
+          if (construct_unsigned16(0, EVDTA(0)) == pctx->nickname) {
 
             // Get flags
-            if (ADJSIZEX > 1) {
-              flags = EXDTA(1);
+            if (ADJSIZEV > 1) {
+              flags = EVDTA(1);
             }
             // Get time to start in seconds
-            if (ADJSIZEX > 2) {
-              tm = EXDTA(2) * 1000;
+            if (ADJSIZEV > 2) {
+              tm = EVDTA(2) * 1000;
             }
           }
         }
         // 16-bit nickname
-        else if (4 == ADJSIZEX) {
-          flags = EXDTA(2);
-          tm    = EXDTA(3) * 1000;
+        else if (4 == ADJSIZEV) {
+          flags = EVDTA(2);
+          tm    = EVDTA(3) * 1000;
         }
         else {
           rv = VSCP_ERROR_INVALID_FRAME;
@@ -738,10 +753,10 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
         uint8_t reg;
 
         // 8-bit id
-        if (2 == ADJSIZEX) {
+        if (2 == ADJSIZEV) {
           // Addressed to us?
-          if (construct_unsigned16(0, EXDTA(0)) == pctx->nickname) {
-            reg = EXDTA(1);
+          if (construct_unsigned16(0, EVDTA(0)) == pctx->nickname) {
+            reg = EVDTA(1);
             if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_read_reg(pctx, reg, &val))) {
               ;
             }
@@ -752,10 +767,10 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           }
         }
         // 16-bit id
-        else if (3 == ADJSIZEX) {
+        else if (3 == ADJSIZEV) {
           // Addressed to us?
-          if (construct_unsigned16(EXDTA(0), EXDTA(1)) == pctx->nickname) {
-            reg = EXDTA(2);
+          if (construct_unsigned16(EVDTA(0), EVDTA(1)) == pctx->nickname) {
+            reg = EVDTA(2);
             if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_read_reg(pctx, reg, &val))) {
               ;
             }
@@ -773,7 +788,10 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
         if (VSCP_ERROR_SUCCESS == rv) {
           vscp_event_t evrply;
           evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-          if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+          if (NULL == evrply.pdata) {
+            rv = VSCP_ERROR_MEMORY;
+            break;
+          }
           vscp_frmw2_setup_event(pctx, &evrply);
           evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
           evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
@@ -791,11 +809,11 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
         uint8_t reg;
 
         // 8-bit id
-        if (3 == ADJSIZEX) {
+        if (3 == ADJSIZEV) {
           // Addressed to us?
-          if (construct_unsigned16(0, EXDTA(0)) == pctx->nickname) {
-            reg = EXDTA(1);
-            val = EXDTA(2);
+          if (construct_unsigned16(0, EVDTA(0)) == pctx->nickname) {
+            reg = EVDTA(1);
+            val = EVDTA(2);
             if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_write_reg(pctx, reg, val))) {
               ;
             }
@@ -809,11 +827,11 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           }
         }
         // 16-bit id
-        else if (4 == ADJSIZEX) {
+        else if (4 == ADJSIZEV) {
           // Addressed to us?
-          if (construct_unsigned16(EXDTA(0), EXDTA(1)) == pctx->nickname) {
-            reg = EXDTA(2);
-            val = EXDTA(3);
+          if (construct_unsigned16(EVDTA(0), EVDTA(1)) == pctx->nickname) {
+            reg = EVDTA(2);
+            val = EVDTA(3);
             if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_write_reg(pctx, reg, val))) {
               ;
             }
@@ -834,13 +852,16 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
         if (VSCP_ERROR_SUCCESS == rv) {
           vscp_event_t evrply;
           evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-          if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+          if (NULL == evrply.pdata) {
+            rv = VSCP_ERROR_MEMORY;
+            break;
+          }
           vscp_frmw2_setup_event(pctx, &evrply);
           evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
           evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
           evrply.sizeData   = 2;
           evrply.pdata[0]   = reg;
-          evrply.pdata[0]   = val;
+          evrply.pdata[1]   = val;
           rv                = pctx->ops->send_event(pctx, &evrply);
           free(evrply.pdata);
         }
@@ -853,10 +874,10 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
       case VSCP_TYPE_PROTOCOL_ENTER_BOOT_LOADER: {
 
-        if ((8 == ADJSIZEX) && (EXDTA(0) == (pctx->nickname & 0xff)) && (EXDTA(1) == pctx->bootloader_algorithm) &&
-            (EXDTA(2) == pctx->guid[0]) && (EXDTA(3) == pctx->guid[3]) && (EXDTA(4) == pctx->guid[5]) &&
-            (EXDTA(5) == pctx->guid[7]) && (EXDTA(6) == ((pctx->page_select >> 8) & 0xff)) &&
-            (EXDTA(7) == ((pctx->page_select) & 0xff))) {
+        if ((8 == ADJSIZEV) && (EVDTA(0) == (pctx->nickname & 0xff)) && (EVDTA(1) == pctx->bootloader_algorithm) &&
+            (EVDTA(2) == pctx->guid[0]) && (EVDTA(3) == pctx->guid[3]) && (EVDTA(4) == pctx->guid[5]) &&
+            (EVDTA(5) == pctx->guid[7]) && (EVDTA(6) == ((pctx->page_select >> 8) & 0xff)) &&
+            (EVDTA(7) == ((pctx->page_select) & 0xff))) {
 
           // Positive response is sent by bootloader
 
@@ -866,7 +887,10 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           // Send negative response
           vscp_event_t evrply;
           evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-          if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+          if (NULL == evrply.pdata) {
+            rv = VSCP_ERROR_MEMORY;
+            break;
+          }
           vscp_frmw2_setup_event(pctx, &evrply);
           evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
           evrply.vscp_type  = VSCP_TYPE_PROTOCOL_NACK_BOOT_LOADER;
@@ -877,12 +901,12 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
       } break;
 
       case VSCP_TYPE_PROTOCOL_RESET_DEVICE: {
-        if (5 == ADJSIZEX) {
+        if (5 == ADJSIZEV) {
 
-          switch (EXDTA(0)) {
+          switch (EVDTA(0)) {
             case 0:
-              if ((EXDTA(1) == pctx->guid[15]) && (EXDTA(2) == pctx->guid[14]) && (EXDTA(3) == pctx->guid[13]) &&
-                  (EXDTA(4) == pctx->guid[12])) {
+              if ((EVDTA(1) == pctx->guid[15]) && (EVDTA(2) == pctx->guid[14]) && (EVDTA(3) == pctx->guid[13]) &&
+                  (EVDTA(4) == pctx->guid[12])) {
                 pctx->reset_device_flags |= 0x01;
                 // One second to receive the rest of the events
                 pctx->timer = pctx->ops->get_milliseconds(pctx);
@@ -890,22 +914,22 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
               break;
 
             case 1:
-              if ((EXDTA(1) == pctx->guid[11]) && (EXDTA(2) == pctx->guid[10]) && (EXDTA(3) == pctx->guid[9]) &&
-                  (EXDTA(4) == pctx->guid[8])) {
+              if ((EVDTA(1) == pctx->guid[11]) && (EVDTA(2) == pctx->guid[10]) && (EVDTA(3) == pctx->guid[9]) &&
+                  (EVDTA(4) == pctx->guid[8])) {
                 pctx->reset_device_flags |= 0x02;
               }
               break;
 
             case 2:
-              if ((EXDTA(1) == pctx->guid[7]) && (EXDTA(2) == pctx->guid[6]) && (EXDTA(3) == pctx->guid[5]) &&
-                  (EXDTA(4) == pctx->guid[4])) {
+              if ((EVDTA(1) == pctx->guid[7]) && (EVDTA(2) == pctx->guid[6]) && (EVDTA(3) == pctx->guid[5]) &&
+                  (EVDTA(4) == pctx->guid[4])) {
                 pctx->reset_device_flags |= 0x04;
               }
               break;
 
             case 3:
-              if ((EXDTA(1) == pctx->guid[3]) && (EXDTA(2) == pctx->guid[2]) && (EXDTA(3) == pctx->guid[1]) &&
-                  (EXDTA(4) == pctx->guid[0])) {
+              if ((EVDTA(1) == pctx->guid[3]) && (EVDTA(2) == pctx->guid[2]) && (EVDTA(3) == pctx->guid[1]) &&
+                  (EVDTA(4) == pctx->guid[0])) {
                 pctx->reset_device_flags |= 0x08;
               }
               break;
@@ -932,18 +956,18 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
       } break;
 
       case VSCP_TYPE_PROTOCOL_PAGE_READ:
-        if ((3 == ADJSIZEX) && (pctx->nickname == EXDTA(0))) {
-          vscp_frmw2_page_read(pctx, EXDTA(1), EXDTA(2)); // index, count
+        if ((3 == ADJSIZEV) && (pctx->nickname == EVDTA(0))) {
+          vscp_frmw2_page_read(pctx, EVDTA(1), EVDTA(2)); // index, count
         }
-        else if ((4 == ADJSIZEX) && (pctx->nickname == construct_unsigned16(EXDTA(0), EXDTA(1)))) {
-          vscp_frmw2_page_read(pctx, EXDTA(3), EXDTA(3)); // index, count
+        else if ((4 == ADJSIZEV) && (pctx->nickname == construct_unsigned16(EVDTA(0), EVDTA(1)))) {
+          vscp_frmw2_page_read(pctx, EVDTA(3), EVDTA(3)); // index, count
         }
         break;
 
       case VSCP_TYPE_PROTOCOL_PAGE_WRITE:
         // Don't handle 16-bit node-id
-        if ((ADJSIZEX > 3) && (pctx->nickname == EXDTA(0))) {
-          vscp_frmw2_page_write(pctx, EXDTA(1), ADJSIZEX - 2, &EXDTA(2)); // index, count, data
+        if ((ADJSIZEV > 3) && (pctx->nickname == EVDTA(0))) {
+          vscp_frmw2_page_write(pctx, EVDTA(1), ADJSIZEV - 2, &EVDTA(2)); // index, count, data
         }
         break;
 
@@ -955,7 +979,10 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
         if (pctx->bHighEndServerResponse) {
           vscp_event_t evrply;
           evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-          if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+          if (NULL == evrply.pdata) {
+            rv = VSCP_ERROR_MEMORY;
+            break;
+          }
           vscp_frmw2_setup_event(pctx, &evrply);
           evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
           evrply.vscp_type  = VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_RESPONSE;
@@ -982,36 +1009,39 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
         uint8_t val;
         vscp_event_t evrply;
         evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-        if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+        if (NULL == evrply.pdata) {
+          rv = VSCP_ERROR_MEMORY;
+          break;
+        }
         vscp_frmw2_setup_event(pctx, &evrply);
 
-        if ((2 == ADJSIZEX) && (pctx->nickname == EXDTA(0))) {
+        if ((2 == ADJSIZEV) && (pctx->nickname == EVDTA(0))) {
 
-          vscp_frmw2_read_reg(pctx, EXDTA(1), &val);
+          vscp_frmw2_read_reg(pctx, EVDTA(1), &val);
           val++;
-          vscp_frmw2_write_reg(pctx, EXDTA(1), val);
+          vscp_frmw2_write_reg(pctx, EVDTA(1), val);
 
           // Send confirmation
           vscp_frmw2_setup_event(pctx, &evrply);
           evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
           evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
           evrply.sizeData   = 2;
-          evrply.pdata[0]   = EXDTA(1);
+          evrply.pdata[0]   = EVDTA(1);
           evrply.pdata[1]   = val;
           rv                = pctx->ops->send_event(pctx, &evrply);
         }
-        else if ((3 == ADJSIZEX) && (pctx->nickname == construct_unsigned16(EXDTA(0), EXDTA(1)))) {
+        else if ((3 == ADJSIZEV) && (pctx->nickname == construct_unsigned16(EVDTA(0), EVDTA(1)))) {
 
-          vscp_frmw2_read_reg(pctx, EXDTA(2), &val);
+          vscp_frmw2_read_reg(pctx, EVDTA(2), &val);
           val++;
-          vscp_frmw2_write_reg(pctx, EXDTA(2), val);
+          vscp_frmw2_write_reg(pctx, EVDTA(2), val);
 
           // Send confirmation
           vscp_frmw2_setup_event(pctx, &evrply);
           evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
           evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
           evrply.sizeData   = 2;
-          evrply.pdata[0]   = EXDTA(1);
+          evrply.pdata[0]   = EVDTA(1);
           evrply.pdata[1]   = val;
           rv                = pctx->ops->send_event(pctx, &evrply);
         }
@@ -1023,36 +1053,39 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
         uint8_t val;
         vscp_event_t evrply;
         evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-        if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+        if (NULL == evrply.pdata) {
+          rv = VSCP_ERROR_MEMORY;
+          break;
+        }
         vscp_frmw2_setup_event(pctx, &evrply);
 
-        if ((2 == ADJSIZEX) && (pctx->nickname == EXDTA(0))) {
+        if ((2 == ADJSIZEV) && (pctx->nickname == EVDTA(0))) {
 
-          vscp_frmw2_read_reg(pctx, EXDTA(1), &val);
+          vscp_frmw2_read_reg(pctx, EVDTA(1), &val);
           val--;
-          vscp_frmw2_write_reg(pctx, EXDTA(1), val);
+          vscp_frmw2_write_reg(pctx, EVDTA(1), val);
 
           // Send confirmation
           vscp_frmw2_setup_event(pctx, &evrply);
           evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
           evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
           evrply.sizeData   = 2;
-          evrply.pdata[0]   = EXDTA(1);
+          evrply.pdata[0]   = EVDTA(1);
           evrply.pdata[1]   = val;
           rv                = pctx->ops->send_event(pctx, &evrply);
         }
-        else if ((3 == ADJSIZEX) && (pctx->nickname == construct_unsigned16(EXDTA(0), EXDTA(1)))) {
+        else if ((3 == ADJSIZEV) && (pctx->nickname == construct_unsigned16(EVDTA(0), EVDTA(1)))) {
 
-          vscp_frmw2_read_reg(pctx, EXDTA(2), &val);
+          vscp_frmw2_read_reg(pctx, EVDTA(2), &val);
           val--;
-          vscp_frmw2_write_reg(pctx, EXDTA(2), val);
+          vscp_frmw2_write_reg(pctx, EVDTA(2), val);
 
           // Send confirmation
           vscp_frmw2_setup_event(pctx, &evrply);
           evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
           evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
           evrply.sizeData   = 2;
-          evrply.pdata[0]   = EXDTA(1);
+          evrply.pdata[0]   = EVDTA(1);
           evrply.pdata[1]   = val;
           rv                = pctx->ops->send_event(pctx, &evrply);
         }
@@ -1060,14 +1093,14 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
       } break;
 
       case VSCP_TYPE_PROTOCOL_WHO_IS_THERE:
-        if (0 == ADJSIZEX) {
+        if (0 == ADJSIZEV) {
           vscp_frmw2_whois_response(pctx);
         }
-        else if ((1 == ADJSIZEX) && ((0xff == EXDTA(0)) || (pctx->nickname == EXDTA(0)))) {
+        else if ((1 == ADJSIZEV) && ((0xff == EVDTA(0)) || (pctx->nickname == EVDTA(0)))) {
           return vscp_frmw2_whois_response(pctx);
         }
-        else if ((2 == ADJSIZEX) && ((0xffff == construct_unsigned16(EXDTA(0), EXDTA(1))) ||
-                                     (pctx->nickname == construct_unsigned16(EXDTA(0), EXDTA(1))))) {
+        else if ((2 == ADJSIZEV) && ((0xffff == construct_unsigned16(EVDTA(0), EVDTA(1))) ||
+                                     (pctx->nickname == construct_unsigned16(EVDTA(0), EVDTA(1))))) {
           return vscp_frmw2_whois_response(pctx);
         }
         break;
@@ -1086,7 +1119,10 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
         uint16_t nframes;
         vscp_event_t evrply;
         evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-        if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+        if (NULL == evrply.pdata) {
+          rv = VSCP_ERROR_MEMORY;
+          break;
+        }
         vscp_frmw2_setup_event(pctx, &evrply);
         if (VSCP_LEVEL1 == pctx->level) {
           evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
@@ -1164,38 +1200,41 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
       } break;
 
       case VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_READ: {
-        if ((4 == ADJSIZEX) && (pctx->nickname == EXDTA(0))) {
-          rv = vscp_frmw2_extended_page_read(pctx, EXDTA(0), construct_unsigned16(EXDTA(1), EXDTA(2)), EXDTA(3), 1);
+        if ((4 == ADJSIZEV) && (pctx->nickname == EVDTA(0))) {
+          rv = vscp_frmw2_extended_page_read(pctx, EVDTA(0), construct_unsigned16(EVDTA(1), EVDTA(2)), EVDTA(3), 1);
         }
-        if ((5 == ADJSIZEX) && (pctx->nickname == EXDTA(0))) {
+        if ((5 == ADJSIZEV) && (pctx->nickname == EVDTA(0))) {
           rv =
-            vscp_frmw2_extended_page_read(pctx, EXDTA(0), construct_unsigned16(EXDTA(1), EXDTA(2)), EXDTA(3), EXDTA(4));
+            vscp_frmw2_extended_page_read(pctx, EVDTA(0), construct_unsigned16(EVDTA(1), EVDTA(2)), EVDTA(3), EVDTA(4));
         }
-        if ((6 == ADJSIZEX) && (pctx->nickname == construct_unsigned16(EXDTA(0), EXDTA(1)))) {
+        if ((6 == ADJSIZEV) && (pctx->nickname == construct_unsigned16(EVDTA(0), EVDTA(1)))) {
           rv = vscp_frmw2_extended_page_read(pctx,
-                                             construct_unsigned16(EXDTA(0), EXDTA(1)),
-                                             construct_unsigned16(EXDTA(2), EXDTA(3)),
-                                             EXDTA(4),
-                                             EXDTA(5));
+                                             construct_unsigned16(EVDTA(0), EVDTA(1)),
+                                             construct_unsigned16(EVDTA(2), EVDTA(3)),
+                                             EVDTA(4),
+                                             EVDTA(5));
         }
       } break;
 
       case VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_WRITE: {
         uint8_t buf[4];
-        uint8_t cnt = ADJSIZEX - 4;
+        uint8_t cnt = ADJSIZEV - 4;
 
         for (int i = 0; i < cnt; i++) {
-          buf[i] = EXDTA(4 + i);
+          buf[i] = EVDTA(4 + i);
         }
         rv =
-          vscp_frmw2_extended_page_write(pctx, EXDTA(0), construct_unsigned16(EXDTA(1), EXDTA(2)), EXDTA(3), cnt, buf);
+          vscp_frmw2_extended_page_write(pctx, EVDTA(0), construct_unsigned16(EVDTA(1), EVDTA(2)), EVDTA(3), cnt, buf);
       } break;
 
       case VSCP_TYPE_PROTOCOL_GET_EVENT_INTEREST: {
 
         vscp_event_t evrply;
         evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-        if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+        if (NULL == evrply.pdata) {
+          rv = VSCP_ERROR_MEMORY;
+          break;
+        }
         vscp_frmw2_setup_event(pctx, &evrply);
 
         if (NULL == pctx->pEventsOfInterest) {
@@ -1268,26 +1307,26 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
     }
   }
   // Level II
-  else if (VSCP_CLASS2_PROTOCOL == pex->vscp_class) {
+  else if (VSCP_CLASS2_PROTOCOL == pev->vscp_class) {
 
-    switch (pex->vscp_type) {
+    switch (pev->vscp_type) {
 
       case VSCP2_TYPE_PROTOCOL_READ_REGISTER: {
 
         // Must be at least GUID + start reg
-        if (pex->sizeData < 22) {
+        if (pev->sizeData < 22) {
           return VSCP_ERROR_PARAMETER;
         }
 
-        if (NULL == pex->pdata) {
+        if (NULL == pev->pdata) {
           return VSCP_ERROR_INVALID_POINTER;
         }
 
         // Get start position
-        uint32_t startpos = construct_unsigned32(pex->pdata[16], pex->pdata[17], pex->pdata[18], pex->pdata[19]);
+        uint32_t startpos = construct_unsigned32(pev->pdata[16], pev->pdata[17], pev->pdata[18], pev->pdata[19]);
 
         // If size is given get it
-        uint16_t cnt = construct_unsigned16(pex->pdata[20], pex->pdata[21]);
+        uint16_t cnt = construct_unsigned16(pev->pdata[20], pev->pdata[21]);
         if (cnt > (512 - 4)) {
           cnt = (512 - 4);
         }
@@ -1297,18 +1336,18 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
       case VSCP2_TYPE_PROTOCOL_WRITE_REGISTER: {
 
         // Must be at least GUID + start reg + one data byte
-        if (pex->sizeData < 23) {
+        if (pev->sizeData < 23) {
           return VSCP_ERROR_PARAMETER;
         }
 
-        if (NULL == pex->pdata) {
+        if (NULL == pev->pdata) {
           return VSCP_ERROR_INVALID_POINTER;
         }
 
         // Get start position
-        uint32_t startpos = construct_unsigned32(pex->pdata[16], pex->pdata[17], pex->pdata[18], pex->pdata[19]);
+        uint32_t startpos = construct_unsigned32(pev->pdata[16], pev->pdata[17], pev->pdata[18], pev->pdata[19]);
 
-        rv = vscp_frmw2_vscp2_register_write(pctx, startpos, pex->sizeData - 20, (const uint8_t *) &pex->pdata[16 + 4]);
+        rv = vscp_frmw2_vscp2_register_write(pctx, startpos, pev->sizeData - 20, (const uint8_t *) &pev->pdata[16 + 4]);
       } break;
 
       case VSCP2_TYPE_PROTOCOL_WHO_IS_THERE_RESPONSE: {
@@ -1317,7 +1356,10 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
         vscp_event_t evrply;
         evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-        if (NULL == evrply.pdata) { rv = VSCP_ERROR_MEMORY; break; }
+        if (NULL == evrply.pdata) {
+          rv = VSCP_ERROR_MEMORY;
+          break;
+        }
         vscp_frmw2_setup_event(pctx, &evrply);
 
         vscp_frmw2_memcpy(evrply.pdata, VSCP_MAX_DATA, pctx->guid, sizeof(pctx->guid));
@@ -1673,10 +1715,11 @@ vscp_frmw2_send_heartbeat(vscp_frmw2_firmware_context_t *pctx)
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  // int rv;
-
   /* NOTE: This function owns evrply.pdata; it is freed on all return paths. */
   vscp_event_t evrply;
+  /* Bug fix: must allocate VSCP_MAX_DATA bytes — vscp_frmw2_setup_event calls
+     memset(pdata, 0, VSCP_MAX_DATA) unconditionally, so any smaller allocation
+     results in a heap buffer overflow and a HardFault on STM32. */
   evrply.pdata = calloc(VSCP_MAX_DATA, 1);
   if (NULL == evrply.pdata) {
     return VSCP_ERROR_MEMORY;
@@ -1685,21 +1728,34 @@ vscp_frmw2_send_heartbeat(vscp_frmw2_firmware_context_t *pctx)
 
   // Construct reply event
   if (VSCP_LEVEL1 == pctx->level) {
+    evrply.sizeData   = 3; // index, zone, subzone
     evrply.vscp_class = VSCP_CLASS1_INFORMATION;
     evrply.vscp_type  = VSCP_TYPE_INFORMATION_NODE_HEARTBEAT;
-    evrply.sizeData   = 0;
+    evrply.pdata[0]   = pctx->index;
+    evrply.pdata[1]   = pctx->zone;
+    evrply.pdata[2]   = pctx->subzone;
   }
   else {
-    // Level II should add node name in data
+    // Level II: include node name in data
     evrply.vscp_class = VSCP_CLASS2_INFORMATION;
     evrply.vscp_type  = VSCP2_TYPE_INFORMATION_HEART_BEAT;
-    memset(evrply.pdata, 0, VSCP_MAX_DATA);
-    vscp_frmw2_memcpy(evrply.pdata, VSCP_MAX_DATA, pctx->deviceName, sizeof(pctx->deviceName));
-    evrply.sizeData = strlen((const char *) evrply.pdata);
+    /* vscp_frmw2_setup_event already zeroed VSCP_MAX_DATA bytes, so
+       the destination is always null-terminated after the bounded copy. */
+    vscp_frmw2_memcpy(evrply.pdata, FRMW2_HEARTBEAT_L2_MAX_DATA, pctx->deviceName, sizeof(pctx->deviceName));
+    evrply.pdata[FRMW2_HEARTBEAT_L2_MAX_DATA - 1] = '\0'; // guarantee null termination
+    evrply.sizeData = (uint16_t) strlen((const char *) evrply.pdata);
+    if (!evrply.sizeData) {
+      // No device name: send with no payload (NULL pdata signals empty event)
+      free(evrply.pdata);
+      evrply.pdata = NULL;
+    }
   }
 
   // Send event
   int result = pctx->ops->send_event(pctx, &evrply);
+  // Bug fix: always free — previously the Level I path and Level II-with-name
+  // path leaked evrply.pdata because the guard was (!evrply.sizeData) which
+  // was false for those cases. free(NULL) is safe per C99 §7.20.3.2.
   free(evrply.pdata);
   return result;
 }
@@ -2215,7 +2271,7 @@ vscp_frmw2_report_dmatrix(vscp_frmw2_firmware_context_t *pctx)
 //
 
 int
-vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pex)
+vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pev)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -2223,7 +2279,7 @@ vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_
 
   int rv = VSCP_ERROR_SUCCESS;
 
-  if (pex->sizeData > 0 && NULL == pex->pdata) {
+  if (pev->sizeData > 0 && NULL == pev->pdata) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
@@ -2233,14 +2289,14 @@ vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_
     if (LEVEL1_DM_FLAGS(row) & VSCP_LEVEL1_DM_FLAG_ENABLED) {
 
       // Should the originating id be checked and if so is it the same?
-      if ((LEVEL1_DM_FLAGS(row) & VSCP_LEVEL1_DM_FLAG_CHECK_OADDR) && (pex->GUID[15] != LEVEL1_DM_OADDR(row))) {
+      if ((LEVEL1_DM_FLAGS(row) & VSCP_LEVEL1_DM_FLAG_CHECK_OADDR) && (pev->GUID[15] != LEVEL1_DM_OADDR(row))) {
         continue;
       }
 
       // Check if zone should match and if so if it match (255 is wildcard)
       if (LEVEL1_DM_FLAGS(row) & VSCP_LEVEL1_DM_FLAG_CHECK_ZONE) {
-        if (pex->sizeData > 1 && 255 != pex->pdata[1]) {
-          if (pex->pdata[1] != pctx->zone) {
+        if (pev->sizeData > 1 && 255 != pev->pdata[1]) {
+          if (pev->pdata[1] != pctx->zone) {
             continue;
           }
         }
@@ -2248,19 +2304,19 @@ vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_
 
       // Check if subzone should match and if so if it match (255 is wildcard)
       if (LEVEL1_DM_FLAGS(row) & VSCP_LEVEL1_DM_FLAG_CHECK_SUBZONE) {
-        if (pex->sizeData > 2 && 255 != pex->pdata[2]) {
-          if (pex->pdata[2] != pctx->subzone) {
+        if (pev->sizeData > 2 && 255 != pev->pdata[2]) {
+          if (pev->pdata[2] != pctx->subzone) {
             continue;
           }
         }
       }
 
-      if (!((LEVEL1_DM_CLASS_FILTER(row) ^ pex->vscp_class) & LEVEL1_DM_CLASS_MASK(row)) &&
-          !((LEVEL1_DM_TYPE_FILTER(row) ^ pex->vscp_type) & LEVEL1_DM_TYPE_MASK(row))) {
+      if (!((LEVEL1_DM_CLASS_FILTER(row) ^ pev->vscp_class) & LEVEL1_DM_CLASS_MASK(row)) &&
+          !((LEVEL1_DM_TYPE_FILTER(row) ^ pev->vscp_type) & LEVEL1_DM_TYPE_MASK(row))) {
 
         // OK Trigger this action
         if (VSCP_ERROR_SUCCESS !=
-            (rv = pctx->ops->dm_action(pctx, pex, LEVEL1_DM_ACTION(row), &LEVEL1_DM_ACTION_PARAM(row)))) {
+            (rv = pctx->ops->dm_action(pctx, pev, LEVEL1_DM_ACTION(row), &LEVEL1_DM_ACTION_PARAM(row)))) {
           break;
         }
 
@@ -2277,7 +2333,7 @@ vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_
 //
 
 int
-vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pex)
+vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pev)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -2285,7 +2341,7 @@ vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_
 
   int rv = VSCP_ERROR_SUCCESS;
 
-  if (pex->sizeData > 0 && NULL == pex->pdata) {
+  if (pev->sizeData > 0 && NULL == pev->pdata) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
@@ -2303,21 +2359,21 @@ vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_
 
     // Should the originating id be checked and if so is it the same?
     if ((LEVEL2_DM_FLAGS(row) & VSCP_LEVEL1_DM_FLAG_CHECK_OADDR) &&
-        ((pex->GUID[0] != LEVEL2_DM_OADDR(row, 0)) || (pex->GUID[1] != LEVEL2_DM_OADDR(row, 1)) ||
-         (pex->GUID[2] != LEVEL2_DM_OADDR(row, 2)) || (pex->GUID[3] != LEVEL2_DM_OADDR(row, 3)) ||
-         (pex->GUID[4] != LEVEL2_DM_OADDR(row, 4)) || (pex->GUID[5] != LEVEL2_DM_OADDR(row, 5)) ||
-         (pex->GUID[6] != LEVEL2_DM_OADDR(row, 6)) || (pex->GUID[7] != LEVEL2_DM_OADDR(row, 7)) ||
-         (pex->GUID[8] != LEVEL2_DM_OADDR(row, 8)) || (pex->GUID[9] != LEVEL2_DM_OADDR(row, 9)) ||
-         (pex->GUID[10] != LEVEL2_DM_OADDR(row, 10)) || (pex->GUID[11] != LEVEL2_DM_OADDR(row, 11)) ||
-         (pex->GUID[12] != LEVEL2_DM_OADDR(row, 12)) || (pex->GUID[13] != LEVEL2_DM_OADDR(row, 13)) ||
-         (pex->GUID[14] != LEVEL2_DM_OADDR(row, 14)) || (pex->GUID[15] != LEVEL2_DM_OADDR(row, 15)))) {
+        ((pev->GUID[0] != LEVEL2_DM_OADDR(row, 0)) || (pev->GUID[1] != LEVEL2_DM_OADDR(row, 1)) ||
+         (pev->GUID[2] != LEVEL2_DM_OADDR(row, 2)) || (pev->GUID[3] != LEVEL2_DM_OADDR(row, 3)) ||
+         (pev->GUID[4] != LEVEL2_DM_OADDR(row, 4)) || (pev->GUID[5] != LEVEL2_DM_OADDR(row, 5)) ||
+         (pev->GUID[6] != LEVEL2_DM_OADDR(row, 6)) || (pev->GUID[7] != LEVEL2_DM_OADDR(row, 7)) ||
+         (pev->GUID[8] != LEVEL2_DM_OADDR(row, 8)) || (pev->GUID[9] != LEVEL2_DM_OADDR(row, 9)) ||
+         (pev->GUID[10] != LEVEL2_DM_OADDR(row, 10)) || (pev->GUID[11] != LEVEL2_DM_OADDR(row, 11)) ||
+         (pev->GUID[12] != LEVEL2_DM_OADDR(row, 12)) || (pev->GUID[13] != LEVEL2_DM_OADDR(row, 13)) ||
+         (pev->GUID[14] != LEVEL2_DM_OADDR(row, 14)) || (pev->GUID[15] != LEVEL2_DM_OADDR(row, 15)))) {
       continue;
     }
 
     // Check if index should match and if so if it match (255 is wildcard)
     if (LEVEL2_DM_FLAGS(row) & VSCP_LEVEL2_DM_FLAG_CHECK_INDEX) {
-      if (pex->sizeData > 1 && 255 != pex->pdata[1]) {
-        if (pex->pdata[1] != pctx->index) {
+      if (pev->sizeData > 1 && 255 != pev->pdata[1]) {
+        if (pev->pdata[1] != pctx->index) {
           continue;
         }
       }
@@ -2325,8 +2381,8 @@ vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_
 
     // Check if zone should match and if so if it match (255 is wildcard)
     if (LEVEL2_DM_FLAGS(row) & VSCP_LEVEL2_DM_FLAG_CHECK_ZONE) {
-      if (pex->sizeData > 1 && 255 != pex->pdata[1]) {
-        if (pex->pdata[1] != pctx->zone) {
+      if (pev->sizeData > 1 && 255 != pev->pdata[1]) {
+        if (pev->pdata[1] != pctx->zone) {
           continue;
         }
       }
@@ -2334,8 +2390,8 @@ vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_
 
     // Check if subzone should match and if so if it match (255 is wildcard)
     if (LEVEL2_DM_FLAGS(row) & VSCP_LEVEL2_DM_FLAG_CHECK_SUBZONE) {
-      if (pex->sizeData > 2 && 255 != pex->pdata[2]) {
-        if (pex->pdata[2] != pctx->subzone) {
+      if (pev->sizeData > 2 && 255 != pev->pdata[2]) {
+        if (pev->pdata[2] != pctx->subzone) {
           continue;
         }
       }
@@ -2343,7 +2399,7 @@ vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_
 
     // OK Trigger this action
     if (VSCP_ERROR_SUCCESS !=
-        (rv = pctx->ops->dm_action(pctx, pex, LEVEL2_DM_ACTION(row), &LEVEL2_DM_ACTION_PARAM(row)))) {
+        (rv = pctx->ops->dm_action(pctx, pev, LEVEL2_DM_ACTION(row), &LEVEL2_DM_ACTION_PARAM(row)))) {
       break;
     }
 
@@ -2356,7 +2412,7 @@ vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_
 //
 
 int
-vscp_frmw2_feed_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pex)
+vscp_frmw2_feed_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const pev)
 {
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
@@ -2364,12 +2420,12 @@ vscp_frmw2_feed_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *cons
 
   int rv = VSCP_ERROR_SUCCESS;
 
-  if (NULL != pex) {
+  if (NULL != pev && NULL != pctx->pDm && pctx->nDmRows) {
     if (VSCP_LEVEL1 == pctx->level) {
-      rv = vscp_frmw2_feed_level1_dm(pctx, pex);
+      rv = vscp_frmw2_feed_level1_dm(pctx, pev);
     }
     else {
-      rv = vscp_frmw2_feed_level2_dm(pctx, pex);
+      rv = vscp_frmw2_feed_level2_dm(pctx, pev);
     }
   }
 

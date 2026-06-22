@@ -1277,6 +1277,7 @@ vscp_fwhlp_mkEventCopy(const vscp_event_t *pev)
 
   // Copy the event
   memcpy(pnewEvent, pev, sizeof(vscp_event_t));
+  pnewEvent->pdata = NULL; // Ensure pdata is NULL before copying
 
   if (pev->sizeData) {
     pnewEvent->pdata = (uint8_t *) malloc(pev->sizeData);

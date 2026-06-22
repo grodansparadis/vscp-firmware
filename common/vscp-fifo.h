@@ -103,9 +103,9 @@ size_t vscp_fifo_read(vscp_fifo_t *f, vscp_event_t **pev);
 size_t vscp_fifo_write(vscp_fifo_t *f, vscp_event_t *pev);
 
 /*!
-  @brief Get the number of events in the fifo
+  @brief Get the number of free slots in the fifo
   @param f Pointer to fifo structure
-  @return Number of events in the fifo
+  @return Number of free slots in the fifo
 */
 size_t vscp_fifo_getFree(vscp_fifo_t *f);
 

@@ -257,9 +257,9 @@ vscp_frmw2_callback_stdreg_change(vscp_frmw2_firmware_context_t *pctx, uint32_t 
 */
 int
 vscp_frmw2_callback_dm_action(vscp_frmw2_firmware_context_t *pctx,
-                   const vscp_event_t *pev,
-                   uint8_t action,
-                   const uint8_t *pparam);
+                              const vscp_event_t *pev,
+                              uint8_t action,
+                              const uint8_t *pparam);
 
 /*!
   Read register
@@ -278,7 +278,7 @@ vscp_frmw2_callback_read_reg(vscp_frmw2_firmware_context_t *pctx, uint16_t page,
   @param pctx Pointer to context.
   @param page Page number.
   @param reg Register to write.
-  @param val Value to write.
+  @param pval Pointer to value to write, return value written on success.
   @return VSCP_ERROR_SUCCESS on success, else error code.
 */
 int
