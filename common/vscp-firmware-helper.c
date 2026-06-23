@@ -2622,10 +2622,10 @@ vscp_fwhlp_eventToStringEx(char *buf, size_t size, const vscp_event_ex_t *pex)
   // Print as two 32-bit halves in case that %llu doesn't work:
   sprintf(buf,
           "%u,%u,%u,%lu,,%lu%09lu,",
-          (unsigned) pev->head,
-          (unsigned) pev->vscp_class,
-          (unsigned) pev->vscp_type,
-          (unsigned long) pev->obid,
+          (unsigned) pex->head,
+          (unsigned) pex->vscp_class,
+          (unsigned) pex->vscp_type,
+          (unsigned long) pex->obid,
           (unsigned long)(timestamp_ns / 1000000000ULL),   // seconds
           (unsigned long)(timestamp_ns % 1000000000ULL));  // nanosecond fraction
 
