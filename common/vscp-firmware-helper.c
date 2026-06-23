@@ -2485,8 +2485,8 @@ vscp_fwhlp_parseStringToEventEx(vscp_event_ex_t *pex, const char *buf)
 // class      6  - 0xFFFF or 65535
 // type       6  - 0xFFFF or 65535
 // obid       10 - 0xFFFFFFFF
-// time       20 - YYYY-MM-DDTHH:MM:SSZ
-// timestamp  10 - 0xFFFFFFFF
+// time       20 - YYYY-MM-DDTHH:MM:SSZ (deprecated, always empty)
+// timestamp  10 - 0xFFFFFFFF (now 64-bit nanosecond timestamp)
 // GUID       47 - 00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF
 // 7 x comma
 // ---------------------------------------------------------------
@@ -2525,13 +2525,16 @@ vscp_fwhlp_eventToString(char *buf, size_t size, const vscp_event_t *pev)
   }
 
   // Always output nanosecond timestamp format
+  // Print as two 32-bit halves in case that %llu doesn't work:
   sprintf(buf,
-          "%u,%u,%u,%lu,,%llu,",
+          "%u,%u,%u,%lu,,%lu%09lu,",
           (unsigned) pev->head,
           (unsigned) pev->vscp_class,
           (unsigned) pev->vscp_type,
           (unsigned long) pev->obid,
-          (unsigned long long) timestamp_ns);
+          (unsigned long)(timestamp_ns / 1000000000ULL),   // seconds
+          (unsigned long)(timestamp_ns % 1000000000ULL));  // nanosecond fraction
+
 
   // GUID
   memset(wrkbuf, 0, sizeof(wrkbuf));
@@ -2616,13 +2619,15 @@ vscp_fwhlp_eventToStringEx(char *buf, size_t size, const vscp_event_ex_t *pex)
   }
 
   // Always output nanosecond timestamp format
+  // Print as two 32-bit halves in case that %llu doesn't work:
   sprintf(buf,
-          "%u,%u,%u,%lu,,%llu,",
-          (unsigned) pex->head,
-          (unsigned) pex->vscp_class,
-          (unsigned) pex->vscp_type,
-          (unsigned long) pex->obid,
-          (unsigned long long) timestamp_ns);
+          "%u,%u,%u,%lu,,%lu%09lu,",
+          (unsigned) pev->head,
+          (unsigned) pev->vscp_class,
+          (unsigned) pev->vscp_type,
+          (unsigned long) pev->obid,
+          (unsigned long)(timestamp_ns / 1000000000ULL),   // seconds
+          (unsigned long)(timestamp_ns % 1000000000ULL));  // nanosecond fraction
 
   // GUID
   memset(wrkbuf, 0, sizeof(wrkbuf));

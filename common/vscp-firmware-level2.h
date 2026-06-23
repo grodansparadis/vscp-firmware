@@ -83,8 +83,7 @@ extern "C" {
 */
 #define FRMW2_MINOR_VERSION 0
 
-
-#define FRMW2_HEARTBEAT_L2_MAX_DATA 64  // Devicename
+#define FRMW2_HEARTBEAT_L2_MAX_DATA 64 // Devicename
 
 /*!
   @brief Standard register address start.
@@ -214,7 +213,7 @@ typedef struct vscp_frmw2_firmware_context {
 
   probe_state_t state;       // State machine state
   probe_substate_t substate; // state machine substate
-  uint32_t timer;           // Timer used for probe/config restore and other timing tasks
+  uint32_t timer;            // Timer used for probe/config restore and other timing tasks
 
   // Level I nickname discovery
   uint16_t probe_nickname; // 0-253
@@ -248,17 +247,19 @@ typedef struct vscp_frmw2_firmware_context {
   uint8_t zone;    // zone for device
   uint8_t subzone; // subzone for device
 
+  uint8_t log_id;    // Identifies log channel
+  uint8_t log_level; // Debuglevel for logs
+
   // Functionality switches
-  int bEnableErrorReporting;          // Send error reporting events (FALSE)
-  int bEnableLogging;                 // Enable logging events (FALSE)
-  uint8_t log_id;                     // Identifies log channel
-  uint8_t log_level;                  // Level for logs
-  int bHighEndServerResponse;         // React on high end server probe. Only level II (FALSE)
-  int bEnableWriteProtectedLocations; // GUID/manufacturer id (FALSE)
-  int bUse16BitNickname;              // 16-bit nickname. Default is false. Only for level I (FALSE)
-  int bInterestedInAllEvents;         // TRUE if interested in all events. If FALSE
-  // the callback vscp_frmw2_callback_report_events_of_interest
-  // will be called (TRUE)
+  unsigned bConnected : 1;                     // Connected to a network (FALSE)
+  unsigned bEnableErrorReporting : 1;          // Send error reporting events (FALSE)
+  unsigned bEnableLogging : 1;                 // Enable logging events (FALSE)
+  unsigned bHighEndServerResponse : 1;         // React on high end server probe. Only level II (FALSE)
+  unsigned bEnableWriteProtectedLocations : 1; // GUID/manufacturer id (FALSE)
+  unsigned bUse16BitNickname : 1;              // 16-bit nickname. Default is false. Only for level I (FALSE)
+  unsigned bInterestedInAllEvents : 1;         // TRUE if interested in all events. If FALSE
+                                               // the callback vscp_frmw2_callback_report_events_of_interest
+                                               // will be called (TRUE)
 
   uint32_t interval_heartbeat; // Interval for heartbeats in milli-seconds (0=off)
   uint32_t last_heartbeat;     // Time for last heartbeat send
