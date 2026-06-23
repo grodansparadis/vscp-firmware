@@ -367,7 +367,7 @@ typedef struct vscp_frmw2_ops {
   int (*segment_ctrl_heartbeat)(vscp_frmw2_firmware_context_t *pctx, uint16_t segcrc, uint32_t time);
   /** Report events this node is interested in. */
   int (*report_events_of_interest)(vscp_frmw2_firmware_context_t *pctx);
-  /** Fill in date/time/timestamp fields of an event. Set to zero if unavailable. */
+  /** Fill in date/time/timestamp fields of an event. Set to zero if unavailable. Always ns timestamp */
   int (*set_event_time)(vscp_frmw2_firmware_context_t *pctx, vscp_event_t *pev);
   /** Return the IPv4 or IPv6 address of the interface (size = 4 or 16). */
   int (*get_ip_addr)(vscp_frmw2_firmware_context_t *pctx, uint8_t *ip, uint8_t size);
@@ -447,12 +447,13 @@ vscp_frmw2_init_persistent_storage(vscp_frmw2_firmware_context_t *pctx);
  * @brief Init VSCP ex event with standard data
  *
  * @param pctx Pointer to context.
- * @param pex Pointer to ex event.
+ * @param pev Pointer to ex event.
+ * @param sizeData Size of data to set. (0 - VSCP_MAX_DATA)
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  */
 
-void
-vscp_frmw2_setup_event(vscp_frmw2_firmware_context_t *pctx, vscp_event_t *pev);
+int
+vscp_frmw2_setup_event(vscp_frmw2_firmware_context_t *pctx, vscp_event_t *pev, size_t sizeData);
 
 /*!
  * @brief Send nickname probe
@@ -476,7 +477,7 @@ vscp_frmw2_send_probe(vscp_frmw2_firmware_context_t *pctx, int bNewNodeOnLine);
  * Never used in a LEVEL II system
  *
  * @param pctx Pointer to context.
- * @param pex Received event ex or NULL if no event received.
+ * @param pev Received event ex or NULL if no event received.
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  *
  */
@@ -488,7 +489,7 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_ev
   Waiting for segment controller to give us a nickname
 
   @param pctx Pointer to context.
-  @param pex Received event or NULL if no event received.
+  @param pev Received event or NULL if no event received.
   @return VSCP_ERROR_SUCCESS on success, else error code.
 */
 int
@@ -498,18 +499,18 @@ vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t
  * @brief Do periodic VSCP protocol work
  *
  * @param pctx Pointer to context.
- * @param pex Pointer to event ex or a null pointer if no event has been received.
+ * @param pev Pointer to event ex or a null pointer if no event has been received.
  * @return VSCP_ERROR_SUCCESS on success, else error code.
  *
  * Do periodic VSCP protocol work. This function should be called from the
  * main loop on periodic intervals.
  *
  * If there is incoming events to handle a pointer to the event should be
- * sent as a parameter  in **pex**. Once the function has been called
+ * sent as a parameter  in **pev**. Once the function has been called
  * ownership of the event is left over to the protocol stack and it is up to the
  * function to release the event. This is true also if the function returns an error.
  *
- * If there is no event to handle for the protocol stack pex should be set to NULL.
+ * If there is no event to handle for the protocol stack pev should be set to NULL.
  *
  */
 
@@ -519,7 +520,7 @@ vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *pev);
 /*!
   Handle protocol events
 
-  @param pex Incoming event
+  @param pev Incoming event
   @return VSCP_ERROR_SUCCESS on success, else error code.
 */
 int
@@ -714,7 +715,7 @@ vscp_frmw2_extended_page_write(vscp_frmw2_firmware_context_t *pctx,
   @brief Feed the level I decision matrix with one Event
 
   @param pctx Pointer to context.
-  @param pex Event to feed the DM with.
+  @param pev Event to feed the DM with.
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 
@@ -725,7 +726,7 @@ vscp_frmw2_feed_level1_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_
   @brief Feed the level II decision matrix with one Event
 
   @param pctx Pointer to context.
-  @param pex Event to feed the DM with.
+  @param pev Event to feed the DM with.
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 
@@ -736,7 +737,7 @@ vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_
   @brief Feed the decision matrix with one Event
 
   @param pctx Pointer to context.
-  @param pex Event to feed the DM with.
+  @param pev Event to feed the DM with.
   @return VSCP_ERROR_SUCCESS on success, or error code.
 */
 int

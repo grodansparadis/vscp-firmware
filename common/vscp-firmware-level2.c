@@ -99,14 +99,6 @@ vscp_frmw2_init(vscp_frmw2_firmware_context_t *const pctx)
   pctx->page_select        = 0;
   pctx->reset_device_flags = 0; // VSCP_TYPE_PROTOCOL_RESET_DEVICE
 
-  /* NOTE: This function owns evrply.pdata; it is freed on all return paths. */
-  vscp_event_t evrply;
-  evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-  if (NULL == evrply.pdata) {
-    return VSCP_ERROR_MEMORY;
-  }
-  vscp_frmw2_setup_event(pctx, &evrply);
-
   if (VSCP_LEVEL1 == pctx->level) {
     /*!
       We do not use the GUID in level I for communication
@@ -136,24 +128,33 @@ vscp_frmw2_init(vscp_frmw2_firmware_context_t *const pctx)
       pctx->timer = pctx->ops->get_milliseconds(pctx);
 
       // Send probe
-      vscp_frmw2_setup_event(pctx, &evrply);
-      evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-      evrply.vscp_type  = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
+      vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+      if (NULL == pevrply) {
+        return VSCP_ERROR_MEMORY;
+      }
+      if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 2))) {
+        vscp_fwhlp_deleteEvent(&pevrply);
+        return rv;
+      }
+      pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+      pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
       if (pctx->bUse16BitNickname) {
-        evrply.sizeData = 2;
-        evrply.pdata[0] = 0; // We probe segment controller
-        evrply.pdata[1] = 0;
+        pevrply->sizeData = 2;
+        pevrply->pdata[0] = 0; // We probe segment controller
+        pevrply->pdata[1] = 0;
       }
       else {
-        evrply.sizeData = 1;
-        evrply.pdata[0] = 0; // We probe segment controller
+        pevrply->sizeData = 1;
+        pevrply->pdata[0] = 0; // We probe segment controller
       }
 
       // Send new node online
-      if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &evrply))) {
-        free(evrply.pdata);
+      if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, pevrply))) {
+        vscp_fwhlp_deleteEvent(&pevrply);
         return rv;
       }
+
+      vscp_fwhlp_deleteEvent(&pevrply);
 
       // We are now in probe state (waiting for segment controller probe)
       pctx->state    = FRMW2_STATE_PROBE;
@@ -182,7 +183,6 @@ vscp_frmw2_init(vscp_frmw2_firmware_context_t *const pctx)
     pctx->state = FRMW2_STATE_ACTIVE;
   }
 
-  free(evrply.pdata);
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -197,36 +197,36 @@ vscp_frmw2_send_probe(vscp_frmw2_firmware_context_t *pctx, int bNewNodeOnLine)
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  /* NOTE: This function owns ev.pdata; it is freed on all return paths. */
-  vscp_event_t ev;
-  ev.pdata = calloc(VSCP_MAX_DATA, 1);
-  if (NULL == ev.pdata) {
+  // Send probe
+  vscp_event_t *pev = vscp_fwhlp_newEvent();
+  if (NULL == pev) {
     return VSCP_ERROR_MEMORY;
   }
-
-  // Send probe
-  vscp_frmw2_setup_event(pctx, &ev);
-  ev.vscp_class = VSCP_CLASS1_PROTOCOL;
-  ev.vscp_type  = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
+  if (VSCP_ERROR_SUCCESS != vscp_frmw2_setup_event(pctx, pev, 2)) {
+    vscp_fwhlp_deleteEvent(&pev);
+    return VSCP_ERROR_MEMORY;
+  }
+  pev->vscp_class = VSCP_CLASS1_PROTOCOL;
+  pev->vscp_type  = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
 
   if (bNewNodeOnLine) {
-    ev.sizeData = 0;
+    pev->sizeData = 0;
   }
   else {
     if (pctx->bUse16BitNickname) {
-      ev.sizeData = 2;
-      ev.pdata[0] = (pctx->nickname >> 8) & 0xff;
-      ev.pdata[1] = pctx->nickname & 0xff;
+      pev->sizeData = 2;
+      pev->pdata[0] = (pctx->nickname >> 8) & 0xff;
+      pev->pdata[1] = pctx->nickname & 0xff;
     }
     else {
-      ev.sizeData = 1;
-      ev.pdata[0] = pctx->nickname;
+      pev->sizeData = 1;
+      pev->pdata[0] = pctx->nickname;
     }
   }
 
   // Send probe
-  int result = pctx->ops->send_event(pctx, &ev);
-  free(ev.pdata);
+  int result = pctx->ops->send_event(pctx, pev);
+  vscp_fwhlp_deleteEvent(&pev);
   return result;
 }
 
@@ -407,16 +407,18 @@ vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t
           pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
           pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_LSB);
 
-          vscp_event_t evrply;
-          evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-          if (NULL == evrply.pdata) {
+          vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+          if (NULL == pevrply) {
             return VSCP_ERROR_MEMORY;
           }
-          vscp_frmw2_setup_event(pctx, &evrply);
-          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
-          rv                = pctx->ops->send_event(pctx, &evrply);
-          free(evrply.pdata);
+          if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 0))) {
+            vscp_fwhlp_deleteEvent(&pevrply);
+            return rv;
+          }
+          pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+          pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
+          rv                  = pctx->ops->send_event(pctx, pevrply);
+          vscp_fwhlp_deleteEvent(&pevrply);
         }
       }
       // 16-bit nickname
@@ -431,16 +433,18 @@ vscp_frmw2_nickname_wait(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t
           pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
           pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_LSB);
 
-          vscp_event_t evrply2;
-          evrply2.pdata = calloc(VSCP_MAX_DATA, 1);
-          if (NULL == evrply2.pdata) {
+          vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+          if (NULL == pevrply) {
             return VSCP_ERROR_MEMORY;
           }
-          vscp_frmw2_setup_event(pctx, &evrply2);
-          evrply2.vscp_class = VSCP_CLASS1_PROTOCOL;
-          evrply2.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
-          rv                 = pctx->ops->send_event(pctx, &evrply2);
-          free(evrply2.pdata);
+          if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 0))) {
+            vscp_fwhlp_deleteEvent(&pevrply);
+            return rv;
+          }
+          pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+          pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
+          rv                  = pctx->ops->send_event(pctx, pevrply);
+          vscp_fwhlp_deleteEvent(&pevrply);
         }
       }
       else {
@@ -578,50 +582,56 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           // If addressed to us?
           if (construct_unsigned16(EVDTA(0), EVDTA(1)) == pctx->nickname) {
             // Confirm probe
-            vscp_event_t evrply;
-            evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-            if (NULL == evrply.pdata) {
+            vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+            if (NULL == pevrply) {
               rv = VSCP_ERROR_MEMORY;
               break;
             }
-            vscp_frmw2_setup_event(pctx, &evrply);
-            evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-            evrply.vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
-            rv                = pctx->ops->send_event(pctx, &evrply);
-            free(evrply.pdata);
+            if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 0))) {
+              vscp_fwhlp_deleteEvent(&pevrply);
+              break;
+            }
+            pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+            pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
+            rv                  = pctx->ops->send_event(pctx, pevrply);
+            vscp_fwhlp_deleteEvent(&pevrply);
           }
         }
         else if (2 == ADJSIZEV) {
           // If addressed to us?
           if (construct_unsigned16(EVDTA(0), EVDTA(1)) == pctx->nickname) {
             // Confirm probe
-            vscp_event_t evrply;
-            evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-            if (NULL == evrply.pdata) {
+            vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+            if (NULL == pevrply) {
               rv = VSCP_ERROR_MEMORY;
               break;
             }
-            vscp_frmw2_setup_event(pctx, &evrply);
-            evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-            evrply.vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
-            rv                = pctx->ops->send_event(pctx, &evrply);
-            free(evrply.pdata);
+            if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 0))) {
+              vscp_fwhlp_deleteEvent(&pevrply);
+              break;
+            }
+            pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+            pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
+            rv                  = pctx->ops->send_event(pctx, pevrply);
+            vscp_fwhlp_deleteEvent(&pevrply);
           }
         }
         else if (16 == ADJSIZEV) {
           // 16-bit node id
           if (0 == memcmp(pctx->guid, &EVDTA(0), 16)) {
-            vscp_event_t evrply;
-            evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-            if (NULL == evrply.pdata) {
+            vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+            if (NULL == pevrply) {
               rv = VSCP_ERROR_MEMORY;
               break;
             }
-            vscp_frmw2_setup_event(pctx, &evrply);
-            evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-            evrply.vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
-            rv                = pctx->ops->send_event(pctx, &evrply);
-            free(evrply.pdata);
+            if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 0))) {
+              vscp_fwhlp_deleteEvent(&pevrply);
+              break;
+            }
+            pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+            pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_PROBE_ACK;
+            rv                  = pctx->ops->send_event(pctx, pevrply);
+            vscp_fwhlp_deleteEvent(&pevrply);
           }
         }
         else {
@@ -642,17 +652,19 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
             pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
             pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_LSB);
 
-            vscp_event_t evrply;
-            evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-            if (NULL == evrply.pdata) {
+            vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+            if (NULL == pevrply) {
               rv = VSCP_ERROR_MEMORY;
               break;
             }
-            vscp_frmw2_setup_event(pctx, &evrply);
-            evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-            evrply.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
-            rv                = pctx->ops->send_event(pctx, &evrply);
-            free(evrply.pdata);
+            if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 0))) {
+              vscp_fwhlp_deleteEvent(&pevrply);
+              break;
+            }
+            pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+            pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
+            rv                  = pctx->ops->send_event(pctx, pevrply);
+            vscp_fwhlp_deleteEvent(&pevrply);
           }
         }
         // 16-bit nickname
@@ -667,17 +679,19 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
             pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
             pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_LSB);
 
-            vscp_event_t evrply2;
-            evrply2.pdata = calloc(VSCP_MAX_DATA, 1);
-            if (NULL == evrply2.pdata) {
+            vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+            if (NULL == pevrply) {
               rv = VSCP_ERROR_MEMORY;
               break;
             }
-            vscp_frmw2_setup_event(pctx, &evrply2);
-            evrply2.vscp_class = VSCP_CLASS1_PROTOCOL;
-            evrply2.vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
-            rv                 = pctx->ops->send_event(pctx, &evrply2);
-            free(evrply2.pdata);
+            if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 0))) {
+              vscp_fwhlp_deleteEvent(&pevrply);
+              break;
+            }
+            pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+            pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_NICKNAME_ACCEPTED;
+            rv                  = pctx->ops->send_event(pctx, pevrply);
+            vscp_fwhlp_deleteEvent(&pevrply);
           }
         }
         else {
@@ -786,20 +800,21 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
         // Send response
         if (VSCP_ERROR_SUCCESS == rv) {
-          vscp_event_t evrply;
-          evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-          if (NULL == evrply.pdata) {
+          vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+          if (NULL == pevrply) {
             rv = VSCP_ERROR_MEMORY;
             break;
           }
-          vscp_frmw2_setup_event(pctx, &evrply);
-          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-          evrply.sizeData   = 2;
-          evrply.pdata[0]   = reg;
-          evrply.pdata[1]   = val;
-          rv                = pctx->ops->send_event(pctx, &evrply);
-          free(evrply.pdata);
+          if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 2))) {
+            vscp_fwhlp_deleteEvent(&pevrply);
+            break;
+          }
+          pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+          pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+          pevrply->pdata[0]   = reg;
+          pevrply->pdata[1]   = val;
+          rv                  = pctx->ops->send_event(pctx, pevrply);
+          vscp_fwhlp_deleteEvent(&pevrply);
         }
       } break;
 
@@ -850,20 +865,21 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
         // Send response
         if (VSCP_ERROR_SUCCESS == rv) {
-          vscp_event_t evrply;
-          evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-          if (NULL == evrply.pdata) {
+          vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+          if (NULL == pevrply) {
             rv = VSCP_ERROR_MEMORY;
             break;
           }
-          vscp_frmw2_setup_event(pctx, &evrply);
-          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-          evrply.sizeData   = 2;
-          evrply.pdata[0]   = reg;
-          evrply.pdata[1]   = val;
-          rv                = pctx->ops->send_event(pctx, &evrply);
-          free(evrply.pdata);
+          if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 2))) {
+            vscp_fwhlp_deleteEvent(&pevrply);
+            break;
+          }
+          pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+          pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+          pevrply->pdata[0]   = reg;
+          pevrply->pdata[1]   = val;
+          rv                  = pctx->ops->send_event(pctx, pevrply);
+          vscp_fwhlp_deleteEvent(&pevrply);
         }
 
       } break;
@@ -885,18 +901,19 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
         }
         else {
           // Send negative response
-          vscp_event_t evrply;
-          evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-          if (NULL == evrply.pdata) {
+          vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+          if (NULL == pevrply) {
             rv = VSCP_ERROR_MEMORY;
             break;
           }
-          vscp_frmw2_setup_event(pctx, &evrply);
-          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_NACK_BOOT_LOADER;
-          evrply.sizeData   = 0;
-          rv                = pctx->ops->send_event(pctx, &evrply);
-          free(evrply.pdata);
+          if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 0))) {
+            vscp_fwhlp_deleteEvent(&pevrply);
+            break;
+          }
+          pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+          pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_NACK_BOOT_LOADER;
+          rv                  = pctx->ops->send_event(pctx, pevrply);
+          vscp_fwhlp_deleteEvent(&pevrply);
         }
       } break;
 
@@ -977,26 +994,27 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
       case VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_PROBE:
         if (pctx->bHighEndServerResponse) {
-          vscp_event_t evrply;
-          evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-          if (NULL == evrply.pdata) {
+          vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+          if (NULL == pevrply) {
             rv = VSCP_ERROR_MEMORY;
             break;
           }
-          vscp_frmw2_setup_event(pctx, &evrply);
-          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_RESPONSE;
-          evrply.sizeData   = 8;
-          evrply.pdata[0]   = (pctx->high_end_srv_caps >> 8) & 0xff;
-          evrply.pdata[1]   = pctx->high_end_srv_caps & 0xff;
-          evrply.pdata[2]   = (pctx->high_end_ip_address >> 24) & 0xff;
-          evrply.pdata[3]   = (pctx->high_end_ip_address >> 16) & 0xff;
-          evrply.pdata[4]   = (pctx->high_end_ip_address >> 8) & 0xff;
-          evrply.pdata[5]   = pctx->high_end_ip_address & 0xff;
-          evrply.pdata[6]   = (pctx->high_end_srv_port >> 8) & 0xff;
-          evrply.pdata[7]   = pctx->high_end_srv_port & 0xff;
-          rv                = pctx->ops->send_event(pctx, &evrply);
-          free(evrply.pdata);
+          if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 8))) {
+            vscp_fwhlp_deleteEvent(&pevrply);
+            break;
+          }
+          pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+          pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_RESPONSE;
+          pevrply->pdata[0]   = (pctx->high_end_srv_caps >> 8) & 0xff;
+          pevrply->pdata[1]   = pctx->high_end_srv_caps & 0xff;
+          pevrply->pdata[2]   = (pctx->high_end_ip_address >> 24) & 0xff;
+          pevrply->pdata[3]   = (pctx->high_end_ip_address >> 16) & 0xff;
+          pevrply->pdata[4]   = (pctx->high_end_ip_address >> 8) & 0xff;
+          pevrply->pdata[5]   = pctx->high_end_ip_address & 0xff;
+          pevrply->pdata[6]   = (pctx->high_end_srv_port >> 8) & 0xff;
+          pevrply->pdata[7]   = pctx->high_end_srv_port & 0xff;
+          rv                  = pctx->ops->send_event(pctx, pevrply);
+          vscp_fwhlp_deleteEvent(&pevrply);
         }
         break;
 
@@ -1007,13 +1025,6 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
       case VSCP_TYPE_PROTOCOL_INCREMENT_REGISTER: {
 
         uint8_t val;
-        vscp_event_t evrply;
-        evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-        if (NULL == evrply.pdata) {
-          rv = VSCP_ERROR_MEMORY;
-          break;
-        }
-        vscp_frmw2_setup_event(pctx, &evrply);
 
         if ((2 == ADJSIZEV) && (pctx->nickname == EVDTA(0))) {
 
@@ -1022,13 +1033,21 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           vscp_frmw2_write_reg(pctx, EVDTA(1), val);
 
           // Send confirmation
-          vscp_frmw2_setup_event(pctx, &evrply);
-          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-          evrply.sizeData   = 2;
-          evrply.pdata[0]   = EVDTA(1);
-          evrply.pdata[1]   = val;
-          rv                = pctx->ops->send_event(pctx, &evrply);
+          vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+          if (NULL == pevrply) {
+            rv = VSCP_ERROR_MEMORY;
+            break;
+          }
+          if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 2))) {
+            vscp_fwhlp_deleteEvent(&pevrply);
+            break;
+          }
+          pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+          pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+          pevrply->pdata[0]   = EVDTA(1);
+          pevrply->pdata[1]   = val;
+          rv                  = pctx->ops->send_event(pctx, pevrply);
+          vscp_fwhlp_deleteEvent(&pevrply);
         }
         else if ((3 == ADJSIZEV) && (pctx->nickname == construct_unsigned16(EVDTA(0), EVDTA(1)))) {
 
@@ -1037,27 +1056,27 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           vscp_frmw2_write_reg(pctx, EVDTA(2), val);
 
           // Send confirmation
-          vscp_frmw2_setup_event(pctx, &evrply);
-          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-          evrply.sizeData   = 2;
-          evrply.pdata[0]   = EVDTA(1);
-          evrply.pdata[1]   = val;
-          rv                = pctx->ops->send_event(pctx, &evrply);
+          vscp_event_t *pevrply2 = vscp_fwhlp_newEvent();
+          if (NULL == pevrply2) {
+            rv = VSCP_ERROR_MEMORY;
+            break;
+          }
+          if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply2, 2))) {
+            vscp_fwhlp_deleteEvent(&pevrply2);
+            break;
+          }
+          pevrply2->vscp_class = VSCP_CLASS1_PROTOCOL;
+          pevrply2->vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+          pevrply2->pdata[0]   = EVDTA(1);
+          pevrply2->pdata[1]   = val;
+          rv                   = pctx->ops->send_event(pctx, pevrply2);
+          vscp_fwhlp_deleteEvent(&pevrply2);
         }
-        free(evrply.pdata);
       } break;
 
       case VSCP_TYPE_PROTOCOL_DECREMENT_REGISTER: {
 
         uint8_t val;
-        vscp_event_t evrply;
-        evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-        if (NULL == evrply.pdata) {
-          rv = VSCP_ERROR_MEMORY;
-          break;
-        }
-        vscp_frmw2_setup_event(pctx, &evrply);
 
         if ((2 == ADJSIZEV) && (pctx->nickname == EVDTA(0))) {
 
@@ -1066,13 +1085,21 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           vscp_frmw2_write_reg(pctx, EVDTA(1), val);
 
           // Send confirmation
-          vscp_frmw2_setup_event(pctx, &evrply);
-          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-          evrply.sizeData   = 2;
-          evrply.pdata[0]   = EVDTA(1);
-          evrply.pdata[1]   = val;
-          rv                = pctx->ops->send_event(pctx, &evrply);
+          vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+          if (NULL == pevrply) {
+            rv = VSCP_ERROR_MEMORY;
+            break;
+          }
+          if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 2))) {
+            vscp_fwhlp_deleteEvent(&pevrply);
+            break;
+          }
+          pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+          pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+          pevrply->pdata[0]   = EVDTA(1);
+          pevrply->pdata[1]   = val;
+          rv                  = pctx->ops->send_event(pctx, pevrply);
+          vscp_fwhlp_deleteEvent(&pevrply);
         }
         else if ((3 == ADJSIZEV) && (pctx->nickname == construct_unsigned16(EVDTA(0), EVDTA(1)))) {
 
@@ -1081,15 +1108,22 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           vscp_frmw2_write_reg(pctx, EVDTA(2), val);
 
           // Send confirmation
-          vscp_frmw2_setup_event(pctx, &evrply);
-          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
-          evrply.sizeData   = 2;
-          evrply.pdata[0]   = EVDTA(1);
-          evrply.pdata[1]   = val;
-          rv                = pctx->ops->send_event(pctx, &evrply);
+          vscp_event_t *pevrply2 = vscp_fwhlp_newEvent();
+          if (NULL == pevrply2) {
+            rv = VSCP_ERROR_MEMORY;
+            break;
+          }
+          if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply2, 2))) {
+            vscp_fwhlp_deleteEvent(&pevrply2);
+            break;
+          }
+          pevrply2->vscp_class = VSCP_CLASS1_PROTOCOL;
+          pevrply2->vscp_type  = VSCP_TYPE_PROTOCOL_RW_RESPONSE;
+          pevrply2->pdata[0]   = EVDTA(1);
+          pevrply2->pdata[1]   = val;
+          rv                   = pctx->ops->send_event(pctx, pevrply2);
+          vscp_fwhlp_deleteEvent(&pevrply2);
         }
-        free(evrply.pdata);
       } break;
 
       case VSCP_TYPE_PROTOCOL_WHO_IS_THERE:
@@ -1115,18 +1149,30 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
       case VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF: {
 
-        uint16_t uppermax;
-        uint16_t nframes;
-        vscp_event_t evrply;
-        evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-        if (NULL == evrply.pdata) {
+        vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+        if (NULL == pevrply) {
           rv = VSCP_ERROR_MEMORY;
           break;
         }
-        vscp_frmw2_setup_event(pctx, &evrply);
+        if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, VSCP_MAX_DATA))) {
+          vscp_fwhlp_deleteEvent(&pevrply);
+          break;
+        }
+
+        // Handle missing MDF before any strlen calls
+        if (NULL == pctx->pInternalMdf) {
+          pevrply->sizeData = 0;
+          rv                = pctx->ops->send_event(pctx, pevrply);
+          vscp_fwhlp_deleteEvent(&pevrply);
+          break;
+        }
+
+        uint16_t uppermax;
+        uint16_t nframes;
+
         if (VSCP_LEVEL1 == pctx->level) {
-          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE;
+          pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+          pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE;
           uppermax          = 7;
           nframes           = strlen(pctx->pInternalMdf) / 6;
           if (strlen(pctx->pInternalMdf) % 6) {
@@ -1134,8 +1180,9 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           }
         }
         else {
-          evrply.vscp_class = VSCP_CLASS2_PROTOCOL;
-          evrply.vscp_type  = VSCP2_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE;
+
+          pevrply->vscp_class = VSCP_CLASS2_PROTOCOL;
+          pevrply->vscp_type  = VSCP2_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE;
           uppermax          = 511;
           nframes           = strlen(pctx->pInternalMdf) / 508;
           if (strlen(pctx->pInternalMdf) % 508) {
@@ -1143,23 +1190,23 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           }
         }
 
-        if (NULL != pctx->pInternalMdf) {
+        {
           uint16_t idx  = 0;
           uint32_t pos  = (VSCP_LEVEL1 == pctx->level) ? 2 : 4;
           const char *p = pctx->pInternalMdf;
           do {
-            evrply.pdata[pos] = *p;
+            pevrply->pdata[pos] = *p;
             pos++;
             if (pos > uppermax) {
-              evrply.sizeData = uppermax + 1;
-              evrply.pdata[0] = (idx >> 8) & 0xff;
-              evrply.pdata[1] = idx & 0xff;
+              pevrply->sizeData = uppermax + 1;
+              pevrply->pdata[0] = (idx >> 8) & 0xff;
+              pevrply->pdata[1] = idx & 0xff;
               if (VSCP_LEVEL2 == pctx->level) {
-                evrply.pdata[2] = (nframes >> 8) & 0xff;
-                evrply.pdata[3] = nframes & 0xff;
+                pevrply->pdata[2] = (nframes >> 8) & 0xff;
+                pevrply->pdata[3] = nframes & 0xff;
               }
-              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &evrply))) {
-                free(evrply.pdata);
+              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, pevrply))) {
+                vscp_fwhlp_deleteEvent(&pevrply);
                 return rv;
               }
               pos = (VSCP_LEVEL1 == pctx->level) ? 2 : 4;
@@ -1169,34 +1216,30 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
           if (VSCP_LEVEL1 == pctx->level) {
             if (2 != pos) {
-              evrply.sizeData = 2 + pos - 2;
-              evrply.pdata[0] = (idx >> 8) & 0xff;
-              evrply.pdata[1] = idx & 0xff;
-              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &evrply))) {
-                free(evrply.pdata);
+              pevrply->sizeData = 2 + pos - 2;
+              pevrply->pdata[0] = (idx >> 8) & 0xff;
+              pevrply->pdata[1] = idx & 0xff;
+              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, pevrply))) {
+                vscp_fwhlp_deleteEvent(&pevrply);
                 return rv;
               }
             }
           }
           else {
             if (4 != pos) {
-              evrply.sizeData = 4 + pos - 4;
-              evrply.pdata[0] = (idx >> 8) & 0xff;
-              evrply.pdata[1] = idx & 0xff;
-              evrply.pdata[2] = (nframes >> 8) & 0xff;
-              evrply.pdata[3] = nframes & 0xff;
-              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &evrply))) {
-                free(evrply.pdata);
+              pevrply->sizeData = 4 + pos - 4;
+              pevrply->pdata[0] = (idx >> 8) & 0xff;
+              pevrply->pdata[1] = idx & 0xff;
+              pevrply->pdata[2] = (nframes >> 8) & 0xff;
+              pevrply->pdata[3] = nframes & 0xff;
+              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, pevrply))) {
+                vscp_fwhlp_deleteEvent(&pevrply);
                 return rv;
               }
             }
           }
         }
-        else {
-          evrply.sizeData = 0;
-          rv              = pctx->ops->send_event(pctx, &evrply);
-        }
-        free(evrply.pdata);
+        vscp_fwhlp_deleteEvent(&pevrply);
       } break;
 
       case VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_READ: {
@@ -1229,38 +1272,47 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
       case VSCP_TYPE_PROTOCOL_GET_EVENT_INTEREST: {
 
-        vscp_event_t evrply;
-        evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-        if (NULL == evrply.pdata) {
-          rv = VSCP_ERROR_MEMORY;
-          break;
-        }
-        vscp_frmw2_setup_event(pctx, &evrply);
-
         if (NULL == pctx->pEventsOfInterest) {
           // All events is of interest
-          evrply.sizeData   = 0;
-          evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-          evrply.vscp_type  = VSCP_TYPE_PROTOCOL_GET_EVENT_INTEREST_RESPONSE;
-          if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &evrply))) {
-            free(evrply.pdata);
+          vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+          if (NULL == pevrply) {
+            rv = VSCP_ERROR_MEMORY;
+            break;
+          }
+          if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 0))) {
+            vscp_fwhlp_deleteEvent(&pevrply);
+            break;
+          }
+          pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+          pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_GET_EVENT_INTEREST_RESPONSE;
+          if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, pevrply))) {
+            vscp_fwhlp_deleteEvent(&pevrply);
             return rv;
           }
+          vscp_fwhlp_deleteEvent(&pevrply);
         }
         else {
           if (VSCP_LEVEL1 == pctx->level) {
             uint16_t idx = 0;
             while (pctx->pEventsOfInterest[idx]) {
-              evrply.sizeData = 5;
-              evrply.pdata[0] = idx; // Frame index
-              evrply.pdata[1] = (pctx->pEventsOfInterest[idx] >> 16) & 0xff;
-              evrply.pdata[2] = pctx->pEventsOfInterest[idx] & 0xff;
-              evrply.pdata[3] = (pctx->pEventsOfInterest[idx] >> 16) & 0xff;
-              evrply.pdata[4] = pctx->pEventsOfInterest[idx] & 0xff;
-              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &evrply))) {
-                free(evrply.pdata);
+              vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+              if (NULL == pevrply) {
+                return VSCP_ERROR_MEMORY;
+              }
+              if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 5))) {
+                vscp_fwhlp_deleteEvent(&pevrply);
                 return rv;
               }
+              pevrply->pdata[0] = idx; // Frame index
+              pevrply->pdata[1] = (pctx->pEventsOfInterest[idx] >> 16) & 0xff;
+              pevrply->pdata[2] = pctx->pEventsOfInterest[idx] & 0xff;
+              pevrply->pdata[3] = (pctx->pEventsOfInterest[idx] >> 16) & 0xff;
+              pevrply->pdata[4] = pctx->pEventsOfInterest[idx] & 0xff;
+              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, pevrply))) {
+                vscp_fwhlp_deleteEvent(&pevrply);
+                return rv;
+              }
+              vscp_fwhlp_deleteEvent(&pevrply);
               idx++;
             }
           }
@@ -1281,7 +1333,16 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
             for (uint8_t idx = 0; idx < nframes; idx++) {
 
-              evrply.sizeData = 0;
+              vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+              if (NULL == pevrply) {
+                return VSCP_ERROR_MEMORY;
+              }
+              if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, VSCP_MAX_DATA))) {
+                vscp_fwhlp_deleteEvent(&pevrply);
+                return rv;
+              }
+              pevrply->sizeData = 0; // Actual data calculated below
+
               for (uint16_t j = 0; j < 256; j++) {
 
                 // If we are done
@@ -1289,20 +1350,21 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
                   break;
                 }
 
-                evrply.pdata[2 + j] = (pctx->pEventsOfInterest[pos + j] >> 16) & 0xffff;
-                evrply.pdata[3 + j] = pctx->pEventsOfInterest[pos + j] & 0xffff;
+                pevrply->pdata[2 + j] = (pctx->pEventsOfInterest[pos + j] >> 16) & 0xffff;
+                pevrply->pdata[3 + j] = pctx->pEventsOfInterest[pos + j] & 0xffff;
 
-                evrply.sizeData += 2;
+                pevrply->sizeData += 2;
               }
 
-              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &evrply))) {
-                free(evrply.pdata);
+              if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, pevrply))) {
+                vscp_fwhlp_deleteEvent(&pevrply);
                 return rv;
               }
+              vscp_fwhlp_deleteEvent(&pevrply);
             }
           }
         }
-        free(evrply.pdata);
+
       } break;
     }
   }
@@ -1354,21 +1416,27 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
         // char devname[64];
         // char url[32];
 
-        vscp_event_t evrply;
-        evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-        if (NULL == evrply.pdata) {
+        vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+        if (NULL == pevrply) {
           rv = VSCP_ERROR_MEMORY;
           break;
         }
-        vscp_frmw2_setup_event(pctx, &evrply);
+        if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, VSCP_MAX_DATA))) {
+          vscp_fwhlp_deleteEvent(&pevrply);
+          break;
+        }
 
-        vscp_frmw2_memcpy(evrply.pdata, VSCP_MAX_DATA, pctx->guid, sizeof(pctx->guid));
-        vscp_frmw2_memcpy(&evrply.pdata[sizeof(pctx->guid)],
+        vscp_frmw2_memcpy(pevrply->pdata, VSCP_MAX_DATA, pctx->guid, sizeof(pctx->guid));
+        vscp_frmw2_memcpy(&pevrply->pdata[sizeof(pctx->guid)],
                           VSCP_MAX_DATA - sizeof(pctx->guid),
                           pctx->mdfurl,
                           sizeof(pctx->mdfurl));
-        rv = pctx->ops->send_event(pctx, &evrply);
-        free(evrply.pdata);
+        pevrply->sizeData = sizeof(pctx->guid) + sizeof(pctx->mdfurl);
+        rv                = pctx->ops->send_event(pctx, pevrply);
+        vscp_fwhlp_deleteEvent(&pevrply);
+        if (VSCP_ERROR_SUCCESS != rv) {
+          return rv;
+        }
       } break;
     }
   }
@@ -1380,21 +1448,34 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 // vscp_frmw2_setup_event
 //
 
-void
-
-vscp_frmw2_setup_event(vscp_frmw2_firmware_context_t *pctx, vscpEvent *const pev)
+int
+vscp_frmw2_setup_event(vscp_frmw2_firmware_context_t *pctx, vscpEvent *const pev, size_t sizeData)
 {
   // Check pointers
   if (NULL == pctx || NULL == pev) {
-    return;
+    return VSCP_ERROR_INVALID_POINTER;
   }
 
-  pev->sizeData = 0;
-  if (NULL != pev->pdata) {
-    memset(pev->pdata, 0, VSCP_MAX_DATA);
+  // Check size
+  if (sizeData > VSCP_MAX_DATA) {
+    return VSCP_ERROR_PARAMETER;
   }
-  pev->head = VSCP_PRIORITY_NORMAL;
+
+  pev->sizeData = sizeData;
+  pev->pdata    = calloc(sizeData, 1);
+  if (NULL == pev->pdata) {
+    return VSCP_ERROR_MEMORY;
+  }
+
+  // We always use 64-bit nanosecond timestamp
+  pev->head         = VSCP_PRIORITY_NORMAL | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+  pev->year         = 0xffff;
+  pev->month        = 0xff;
+  pev->timestamp_ns = 0;
+
+  // Set GUID
   vscp_frmw2_memcpy(pev->GUID, sizeof(pev->GUID), pctx->guid, sizeof(pctx->guid));
+
   /*!
     If level I we use the GUID as a space for the nickname
   */
@@ -1402,9 +1483,12 @@ vscp_frmw2_setup_event(vscp_frmw2_firmware_context_t *pctx, vscpEvent *const pev
     pev->GUID[14] = (pctx->nickname >> 8) & 0xff;
     pev->GUID[15] = pctx->nickname & 0xff;
   }
+  pev->obid = 0; // We dinät use obid here, so set to zero. The application can set it if needed.
   pev->vscp_class = VSCP_CLASS2_LEVEL1_PROTOCOL;
   pev->vscp_type  = VSCP2_TYPE_PROTOCOL_READ_WRITE_RESPONSE;
   pctx->ops->set_event_time(pctx, pev);
+
+  return VSCP_ERROR_SUCCESS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1420,37 +1504,38 @@ vscp_frmw2_vscp2_register_read(vscp_frmw2_firmware_context_t *pctx, uint32_t sta
 
   int rv;
 
-  /* NOTE: This function owns ex.pdata; it is freed on all return paths. */
-  vscp_event_t ex;
-  ex.pdata = calloc(VSCP_MAX_DATA, 1);
-  if (NULL == ex.pdata) {
+  /* NOTE: This function owns ev.pdata; it is freed on all return paths. */
+  vscp_event_t *pev = vscp_fwhlp_newEvent();
+  if (NULL == pev) {
     return VSCP_ERROR_MEMORY;
   }
-  vscp_frmw2_setup_event(pctx, &ex);
+  if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pev, VSCP_MAX_DATA))) {
+    vscp_fwhlp_deleteEvent(&pev);
+    return rv;
+  }
 
   // Read the registers
   for (uint32_t pos = startreg; pos < (startreg + count); pos++) {
-    if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_read_reg(pctx, pos, &ex.pdata[pos - startreg + 4]))) {
-      free(ex.pdata);
+    if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_read_reg(pctx, pos, &pev->pdata[pos - startreg + 4]))) {
+      vscp_fwhlp_deleteEvent(&pev);
       return rv;
     }
   }
 
-  ex.vscp_class = VSCP_CLASS2_PROTOCOL;
-  ex.vscp_type  = VSCP2_TYPE_PROTOCOL_READ_WRITE_RESPONSE;
-  ex.sizeData   = count + 1;
+  pev->vscp_class = VSCP_CLASS2_PROTOCOL;
+  pev->vscp_type  = VSCP2_TYPE_PROTOCOL_READ_WRITE_RESPONSE;
 
   // Data
-  ex.sizeData = count + 4;
-  ex.pdata[0] = (uint8_t) ((startreg >> 24) & 0xff);
-  ex.pdata[1] = (uint8_t) ((startreg >> 16) & 0xff);
-  ex.pdata[2] = (uint8_t) ((startreg >> 8) & 0xff);
-  ex.pdata[3] = (uint8_t) (startreg & 0xff);
+  pev->sizeData = count + 4;
+  pev->pdata[0] = (uint8_t) ((startreg >> 24) & 0xff);
+  pev->pdata[1] = (uint8_t) ((startreg >> 16) & 0xff);
+  pev->pdata[2] = (uint8_t) ((startreg >> 8) & 0xff);
+  pev->pdata[3] = (uint8_t) (startreg & 0xff);
 
   // Send event
-  int result = pctx->ops->send_event(pctx, &ex);
-  free(ex.pdata);
-  return result;
+  rv = pctx->ops->send_event(pctx, pev);
+  vscp_fwhlp_deleteEvent(&pev);
+  return rv;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1715,48 +1800,42 @@ vscp_frmw2_send_heartbeat(vscp_frmw2_firmware_context_t *pctx)
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  /* NOTE: This function owns evrply.pdata; it is freed on all return paths. */
-  vscp_event_t evrply;
-  /* Bug fix: must allocate VSCP_MAX_DATA bytes — vscp_frmw2_setup_event calls
-     memset(pdata, 0, VSCP_MAX_DATA) unconditionally, so any smaller allocation
-     results in a heap buffer overflow and a HardFault on STM32. */
-  evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-  if (NULL == evrply.pdata) {
+  vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+  if (NULL == pevrply) {
     return VSCP_ERROR_MEMORY;
   }
-  vscp_frmw2_setup_event(pctx, &evrply);
+  if (VSCP_ERROR_SUCCESS != vscp_frmw2_setup_event(pctx, pevrply, (VSCP_LEVEL1 == pctx->level) ? 3 : FRMW2_HEARTBEAT_L2_MAX_DATA)) {
+    vscp_fwhlp_deleteEvent(&pevrply);
+    return VSCP_ERROR_MEMORY;
+  }
 
   // Construct reply event
   if (VSCP_LEVEL1 == pctx->level) {
-    evrply.sizeData   = 3; // index, zone, subzone
-    evrply.vscp_class = VSCP_CLASS1_INFORMATION;
-    evrply.vscp_type  = VSCP_TYPE_INFORMATION_NODE_HEARTBEAT;
-    evrply.pdata[0]   = pctx->index;
-    evrply.pdata[1]   = pctx->zone;
-    evrply.pdata[2]   = pctx->subzone;
+    pevrply->vscp_class = VSCP_CLASS1_INFORMATION;
+    pevrply->vscp_type  = VSCP_TYPE_INFORMATION_NODE_HEARTBEAT;
+    pevrply->pdata[0]   = pctx->index;
+    pevrply->pdata[1]   = pctx->zone;
+    pevrply->pdata[2]   = pctx->subzone;
   }
   else {
     // Level II: include node name in data
-    evrply.vscp_class = VSCP_CLASS2_INFORMATION;
-    evrply.vscp_type  = VSCP2_TYPE_INFORMATION_HEART_BEAT;
+    pevrply->vscp_class = VSCP_CLASS2_INFORMATION;
+    pevrply->vscp_type  = VSCP2_TYPE_INFORMATION_HEART_BEAT;
     /* vscp_frmw2_setup_event already zeroed VSCP_MAX_DATA bytes, so
        the destination is always null-terminated after the bounded copy. */
-    vscp_frmw2_memcpy(evrply.pdata, FRMW2_HEARTBEAT_L2_MAX_DATA, pctx->deviceName, sizeof(pctx->deviceName));
-    evrply.pdata[FRMW2_HEARTBEAT_L2_MAX_DATA - 1] = '\0'; // guarantee null termination
-    evrply.sizeData = (uint16_t) strlen((const char *) evrply.pdata);
-    if (!evrply.sizeData) {
+    vscp_frmw2_memcpy(pevrply->pdata, FRMW2_HEARTBEAT_L2_MAX_DATA, pctx->deviceName, sizeof(pctx->deviceName));
+    pevrply->pdata[FRMW2_HEARTBEAT_L2_MAX_DATA - 1] = '\0'; // guarantee null termination
+    pevrply->sizeData                               = (uint16_t) strlen((const char *) pevrply->pdata);
+    if (!pevrply->sizeData) {
       // No device name: send with no payload (NULL pdata signals empty event)
-      free(evrply.pdata);
-      evrply.pdata = NULL;
+      free(pevrply->pdata);
+      pevrply->pdata = NULL;
     }
   }
 
   // Send event
-  int result = pctx->ops->send_event(pctx, &evrply);
-  // Bug fix: always free — previously the Level I path and Level II-with-name
-  // path leaked evrply.pdata because the guard was (!evrply.sizeData) which
-  // was false for those cases. free(NULL) is safe per C99 §7.20.3.2.
-  free(evrply.pdata);
+  int result = pctx->ops->send_event(pctx, pevrply);
+  vscp_fwhlp_deleteEvent(&pevrply);
   return result;
 }
 
@@ -1771,45 +1850,43 @@ vscp_frmw2_send_caps(vscp_frmw2_firmware_context_t *pctx)
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  /* NOTE: This function owns ex.pdata; it is freed on all return paths. */
-  vscp_event_t ex;
-  ex.pdata = calloc(VSCP_MAX_DATA, 1);
-  if (NULL == ex.pdata) {
+  /* NOTE: This function owns ev.pdata; it is freed on all return paths. */
+  vscp_event_t *pev = vscp_fwhlp_newEvent();
+  if (NULL == pev) {
     return VSCP_ERROR_MEMORY;
   }
-  vscp_frmw2_setup_event(pctx, &ex);
+  if (VSCP_ERROR_SUCCESS != vscp_frmw2_setup_event(pctx, pev, VSCP_CAPABILITY_OFFSET_NON_STD_PORTS)) {
+    vscp_fwhlp_deleteEvent(&pev);
+    return VSCP_ERROR_MEMORY;
+  }
 
   // Construct reply event
-  ex.vscp_class = VSCP_CLASS2_PROTOCOL;
-  ex.vscp_type  = VSCP2_TYPE_PROTOCOL_HIGH_END_SERVER_CAPS;
-
-  // Data
-  ex.sizeData = 104;
-  memset(ex.pdata, 0, ex.sizeData);
+  pev->vscp_class = VSCP_CLASS2_PROTOCOL;
+  pev->vscp_type  = VSCP2_TYPE_PROTOCOL_HIGH_END_SERVER_CAPS;
 
   // Capabilities
-  ex.pdata[0] = 0x40; // Node have a standard decision matrix.
-  ex.pdata[1] = 0x00;
-  ex.pdata[2] = 0x00;
-  ex.pdata[3] = 0x00;
-  ex.pdata[4] = 0x00;
-  ex.pdata[5] = 0x00;
-  ex.pdata[6] = 0x80; // Have VSCP TCP server with VCSP link interface.
-  ex.pdata[7] = 0x38; // IP4 support, SLL support
-                      // Accepts two or more simultaneous connections on TCP/IP interface.
+  pev->pdata[0] = 0x40; // Node have a standard decision matrix.
+  pev->pdata[1] = 0x00;
+  pev->pdata[2] = 0x00;
+  pev->pdata[3] = 0x00;
+  pev->pdata[4] = 0x00;
+  pev->pdata[5] = 0x00;
+  pev->pdata[6] = 0x80; // Have VSCP TCP server with VCSP link interface.
+  pev->pdata[7] = 0x38; // IP4 support, SLL support
+                        // Accepts two or more simultaneous connections on TCP/IP interface.
 
   // GUID
-  vscp_frmw2_memcpy(ex.pdata + 8, VSCP_MAX_DATA - 8, pctx->guid, sizeof(pctx->guid));
+  vscp_frmw2_memcpy(pev->pdata + 8, VSCP_MAX_DATA - 8, pctx->guid, sizeof(pctx->guid));
 
   // ip address
-  vscp_frmw2_memcpy(ex.pdata + 24, VSCP_MAX_DATA - 24, pctx->ipaddr, sizeof(pctx->ipaddr));
+  vscp_frmw2_memcpy(pev->pdata + 24, VSCP_MAX_DATA - 24, pctx->ipaddr, sizeof(pctx->ipaddr));
 
   // Device name
-  vscp_frmw2_memcpy(ex.pdata + 40, VSCP_MAX_DATA - 40, pctx->deviceName, sizeof(pctx->deviceName));
+  vscp_frmw2_memcpy(pev->pdata + 40, VSCP_MAX_DATA - 40, pctx->deviceName, sizeof(pctx->deviceName));
 
   // Send event
-  int result = pctx->ops->send_event(pctx, &ex);
-  free(ex.pdata);
+  int result = pctx->ops->send_event(pctx, pev);
+  vscp_fwhlp_deleteEvent(&pev);
   return result;
 }
 
@@ -1824,26 +1901,21 @@ vscp_frmw2_send_high_end_server_probe(vscp_frmw2_firmware_context_t *pctx)
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  /* NOTE: This function owns ex.pdata; it is freed on all return paths. */
-  vscp_event_t ex;
-  ex.pdata = calloc(VSCP_MAX_DATA, 1);
-  if (NULL == ex.pdata) {
+  // Construct reply event
+  vscp_event_t *pev = vscp_fwhlp_newEvent();
+  if (NULL == pev) {
     return VSCP_ERROR_MEMORY;
   }
-  vscp_frmw2_setup_event(pctx, &ex);
-
-  // Construct reply event
-  vscp_frmw2_setup_event(pctx, &ex);
-  ex.vscp_class = VSCP_CLASS1_PROTOCOL;
-  ex.vscp_type  = VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_PROBE;
-  ex.sizeData   = 0;
-
-  // Data
-  ex.sizeData = 0;
+  if (VSCP_ERROR_SUCCESS != vscp_frmw2_setup_event(pctx, pev, 0)) {
+    vscp_fwhlp_deleteEvent(&pev);
+    return VSCP_ERROR_MEMORY;
+  }
+  pev->vscp_class = VSCP_CLASS1_PROTOCOL;
+  pev->vscp_type  = VSCP_TYPE_PROTOCOL_HIGH_END_SERVER_PROBE;
 
   // Send event
-  int result = pctx->ops->send_event(pctx, &ex);
-  free(ex.pdata);
+  int result = pctx->ops->send_event(pctx, pev);
+  vscp_fwhlp_deleteEvent(&pev);
   return result;
 }
 
@@ -1862,19 +1934,12 @@ vscp_frmw2_page_read(vscp_frmw2_firmware_context_t *pctx, uint32_t offset, uint8
   uint8_t i;
   uint8_t seq = 0;
   uint8_t val;
-
-  /* NOTE: This function owns rplyex.pdata; it is freed on all return paths. */
-  vscp_event_t rplyex;
-  rplyex.pdata = calloc(VSCP_MAX_DATA, 1);
-  if (NULL == rplyex.pdata) {
-    return VSCP_ERROR_MEMORY;
-  }
-  vscp_frmw2_setup_event(pctx, &rplyex);
+  uint8_t databuf[8]; // local buffer to accumulate up to 7 register values before send
 
   for (i = 0; i < count; i++) {
 
     vscp_frmw2_read_reg(pctx, offset + i, &val);
-    rplyex.pdata[(i % 7) + 1] = val;
+    databuf[(i % 7) + 1] = val;
 
     if ((i % 7) == 6 || i == (count - 1)) {
       uint8_t nsize;
@@ -1885,22 +1950,32 @@ vscp_frmw2_page_read(vscp_frmw2_firmware_context_t *pctx, uint32_t offset, uint8
         nsize = (i % 7) + 1;
       }
 
-      rplyex.vscp_class = VSCP_CLASS1_PROTOCOL;
-      rplyex.vscp_type  = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
-      rplyex.sizeData   = nsize + 1;
-      rplyex.pdata[0]   = seq;
+      vscp_event_t *prplyev = vscp_fwhlp_newEvent();
+      if (NULL == prplyev) {
+        rv = VSCP_ERROR_MEMORY;
+        break;
+      }
+      if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, prplyev, nsize + 1))) {
+        vscp_fwhlp_deleteEvent(&prplyev);
+        break;
+      }
+      memcpy(&prplyev->pdata[1], &databuf[1], nsize);
+      prplyev->vscp_class = VSCP_CLASS1_PROTOCOL;
+      prplyev->vscp_type  = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
+      prplyev->pdata[0]   = seq;
 
       // send the event
-      if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &rplyex))) {
-        free(rplyex.pdata);
-        return rv;
+      rv = pctx->ops->send_event(pctx, prplyev);
+      vscp_fwhlp_deleteEvent(&prplyev);
+
+      if (VSCP_ERROR_SUCCESS != rv) {
+        break;
       }
 
       offset++;
     }
   }
 
-  free(rplyex.pdata);
   return rv;
 }
 
@@ -1923,42 +1998,43 @@ vscp_frmw2_page_write(vscp_frmw2_firmware_context_t *pctx, uint32_t offset, uint
   uint8_t i;
   uint8_t val;
 
-  /* NOTE: This function owns ex.pdata; it is freed on all return paths. */
-  vscp_event_t ex;
-  ex.pdata = calloc(VSCP_MAX_DATA, 1);
-  if (NULL == ex.pdata) {
+  vscp_event_t *pev = vscp_fwhlp_newEvent();
+  if (NULL == pev) {
     return VSCP_ERROR_MEMORY;
   }
-  vscp_frmw2_setup_event(pctx, &ex);
+  if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pev, VSCP_MAX_DATA))) {
+    vscp_fwhlp_deleteEvent(&pev);
+    return rv;
+  }
 
   for (i = 0; i < count; i++) {
 
     // Write VSCP register
     if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_write_reg(pctx, offset + i, pbuf[i]))) {
-      free(ex.pdata);
+      vscp_fwhlp_deleteEvent(&pev);
       return rv;
     }
 
     if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_read_reg(pctx, i, &val))) {
-      free(ex.pdata);
+      vscp_fwhlp_deleteEvent(&pev);
       return rv;
     }
 
-    ex.pdata[1 + i] = val;
+    pev->pdata[1 + i] = val;
   }
 
-  ex.vscp_class = VSCP_CLASS1_PROTOCOL;
-  ex.vscp_type  = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
-  ex.sizeData   = count + 1;
-  ex.pdata[0]   = 0; // index
+  pev->vscp_class = VSCP_CLASS1_PROTOCOL;
+  pev->vscp_type  = VSCP_TYPE_PROTOCOL_RW_PAGE_RESPONSE;
+  pev->sizeData   = count + 1;
+  pev->pdata[0]   = 0; // index
 
   // send the event
-  if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &ex))) {
-    free(ex.pdata);
+  if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, pev))) {
+    vscp_fwhlp_deleteEvent(&pev);
     return rv;
   }
 
-  free(ex.pdata);
+  vscp_fwhlp_deleteEvent(&pev);
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -1976,26 +2052,27 @@ vscp_frmw2_whois_response(vscp_frmw2_firmware_context_t *pctx)
   int rv;
   uint8_t i, j, k = 0;
 
-  /* NOTE: This function owns ex.pdata; it is freed on all return paths. */
-  vscp_event_t ex;
-  ex.pdata = calloc(VSCP_MAX_DATA, 1);
-  if (NULL == ex.pdata) {
+  vscp_event_t *pev = vscp_fwhlp_newEvent();
+  if (NULL == pev) {
     return VSCP_ERROR_MEMORY;
   }
-  vscp_frmw2_setup_event(pctx, &ex);
+  if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pev, VSCP_MAX_DATA))) {
+    vscp_fwhlp_deleteEvent(&pev);
+    return rv;
+  }
 
   if (VSCP_LEVEL1 == pctx->level) {
 
-    ex.vscp_class = VSCP_CLASS1_PROTOCOL;
-    ex.vscp_type  = VSCP_TYPE_PROTOCOL_WHO_IS_THERE_RESPONSE;
-    ex.sizeData   = 8;
+    pev->vscp_class = VSCP_CLASS1_PROTOCOL;
+    pev->vscp_type  = VSCP_TYPE_PROTOCOL_WHO_IS_THERE_RESPONSE;
+    pev->sizeData   = 8;
 
     for (i = 0; i < 3; i++) // fill up with GUID
     {
-      ex.pdata[0] = i;
+      pev->pdata[0] = i;
 
       for (j = 1; j < 8; j++) {
-        ex.pdata[j] = pctx->guid[15 - k++];
+        pev->pdata[j] = pctx->guid[15 - k++];
         if (k > 16)
           break;
       }
@@ -2004,8 +2081,8 @@ vscp_frmw2_whois_response(vscp_frmw2_firmware_context_t *pctx)
         break;
 
       // send the event
-      if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &ex))) {
-        free(ex.pdata);
+      if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, pev))) {
+        vscp_fwhlp_deleteEvent(&pev);
         return rv;
       }
     }
@@ -2013,53 +2090,53 @@ vscp_frmw2_whois_response(vscp_frmw2_firmware_context_t *pctx)
     for (j = 0; j < 5; j++) // fill up previous event with MDF
     {
       if (pctx->mdfurl[j] > 0)
-        ex.pdata[3 + j] = pctx->mdfurl[j];
+        pev->pdata[3 + j] = pctx->mdfurl[j];
       else
-        ex.pdata[3 + j] = 0;
+        pev->pdata[3 + j] = 0;
     }
 
     // send the event
-    if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &ex))) {
-      free(ex.pdata);
+    if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, pev))) {
+      vscp_fwhlp_deleteEvent(&pev);
       return rv;
     }
 
     k = 5;                  // start offset
     for (i = 3; i < 7; i++) // fill up with the rest of GUID
     {
-      ex.pdata[0] = i;
+      pev->pdata[0] = i;
 
       for (j = 1; j < 8; j++) {
-        ex.pdata[j] = pctx->mdfurl[k++];
+        pev->pdata[j] = pctx->mdfurl[k++];
       }
       // send the event
-      if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &ex))) {
-        free(ex.pdata);
+      if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, pev))) {
+        vscp_fwhlp_deleteEvent(&pev);
         return rv;
       }
     }
   }
   // Level II
   else {
-    ex.vscp_class = VSCP_CLASS2_PROTOCOL;
-    ex.vscp_type  = VSCP2_TYPE_PROTOCOL_WHO_IS_THERE_RESPONSE;
-    ex.sizeData   = 16 + MIN(strlen((const char *) pctx->mdfurl), 32);
-    memset(ex.pdata, 9, 512);
-    vscp_frmw2_memcpy(ex.pdata, VSCP_MAX_DATA, pctx->guid, sizeof(pctx->guid));
+    pev->vscp_class = VSCP_CLASS2_PROTOCOL;
+    pev->vscp_type  = VSCP2_TYPE_PROTOCOL_WHO_IS_THERE_RESPONSE;
+    pev->sizeData   = 16 + MIN(strlen((const char *) pctx->mdfurl), 32);
+    memset(pev->pdata, 9, 512);
+    vscp_frmw2_memcpy(pev->pdata, VSCP_MAX_DATA, pctx->guid, sizeof(pctx->guid));
     if (pctx->mdfurl[0]) {
-      vscp_frmw2_memcpy(ex.pdata + sizeof(pctx->guid),
+      vscp_frmw2_memcpy(pev->pdata + sizeof(pctx->guid),
                         VSCP_MAX_DATA - sizeof(pctx->guid),
                         pctx->mdfurl,
                         MIN(strlen((const char *) pctx->mdfurl), sizeof(pctx->mdfurl)));
     }
 
     // send the event
-    if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &ex))) {
-      free(ex.pdata);
+    if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, pev))) {
+      vscp_fwhlp_deleteEvent(&pev);
       return rv;
     }
   }
-  free(ex.pdata);
+  vscp_fwhlp_deleteEvent(&pev);
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -2085,27 +2162,29 @@ vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx,
 
   unused(nodeid);
 
-  /* NOTE: This function owns ex.pdata; it is freed on all return paths. */
-  vscp_event_t ex;
-  ex.pdata = calloc(VSCP_MAX_DATA, 1);
-  if (NULL == ex.pdata) {
-    return VSCP_ERROR_MEMORY;
-  }
-  vscp_frmw2_setup_event(pctx, &ex);
-
   // Save the current page
   page_save = pctx->page_select;
 
   // set temporary page
   pctx->page_select = page;
 
-  // Construct response event
-  vscp_frmw2_setup_event(pctx, &ex);
-  ex.vscp_class = VSCP_CLASS1_PROTOCOL;
-  ex.vscp_type  = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
-  ex.pdata[0]   = 0; // index of event, this is the first
-  ex.pdata[1]   = (page >> 8) & 0xff;
-  ex.pdata[2]   = page & 0xff;
+  vscp_event_t *pev = vscp_fwhlp_newEvent();
+  if (NULL == pev) {
+    pctx->page_select = page_save;
+    return VSCP_ERROR_MEMORY;
+  }
+
+  // Construct response event — single allocation
+  if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pev, VSCP_MAX_DATA))) {
+    pctx->page_select = page_save;
+    vscp_fwhlp_deleteEvent(&pev);
+    return rv;
+  }
+  pev->vscp_class = VSCP_CLASS1_PROTOCOL;
+  pev->vscp_type  = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
+  pev->pdata[0]   = 0; // index of event, this is the first
+  pev->pdata[1]   = (page >> 8) & 0xff;
+  pev->pdata[2]   = page & 0xff;
 
   do {
     // calculate bytes to transfer in this event
@@ -2117,8 +2196,8 @@ vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx,
     }
 
     // define length of this event
-    ex.sizeData = 4 + bytes_this_time;
-    ex.pdata[3] = startoffset + byte; // first register in this event
+    pev->sizeData = 4 + bytes_this_time;
+    pev->pdata[3] = startoffset + byte; // first register in this event
 
     // Put up to four registers to data space
     for (cb = 0; cb < bytes_this_time; cb++) {
@@ -2126,20 +2205,20 @@ vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx,
       if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_read_reg(pctx, startoffset + byte + cb, &val))) {
         // Restore the saved page
         pctx->page_select = page_save;
-        free(ex.pdata);
+        vscp_fwhlp_deleteEvent(&pev);
         return rv;
       }
-      ex.pdata[(4 + cb)] = val;
+      pev->pdata[(4 + cb)] = val;
     }
 
     // Microseconds is used for a short delay
     uint64_t tm = pctx->ops->get_timestamp(pctx);
 
     // send the event
-    if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, &ex))) {
+    if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, pev))) {
       // Restore the saved page
       pctx->page_select = page_save;
-      free(ex.pdata);
+      vscp_fwhlp_deleteEvent(&pev);
       return rv;
     }
 
@@ -2154,13 +2233,13 @@ vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx,
     byte += bytes_this_time;
 
     // increment the index
-    ex.pdata[0] += 1;
+    pev->pdata[0] += 1;
 
   } while (byte < cnt);
 
   // Restore the saved page
   pctx->page_select = page_save;
-  free(ex.pdata);
+  vscp_fwhlp_deleteEvent(&pev);
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -2201,17 +2280,6 @@ vscp_frmw2_extended_page_write(vscp_frmw2_firmware_context_t *pctx,
   pctx->page_select = page_save;
 
   return vscp_frmw2_extended_page_read(pctx, nodeid, page, offset, cnt);
-
-  // ex.sizeData   = 4 + cnt;
-  // ex.vscp_class = VSCP_CLASS1_PROTOCOL;
-  // ex.vscp_type  = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE;
-  // ex.data[0]    = 0;                  // index (only one event)
-  // ex.data[1]    = (page >> 8) & 0xff; // mirror page msb
-  // ex.data[2]    = page & 0xff;        // mirror page lsb
-  // ex.data[3]    = offset;             // Register base offset
-
-  // // send the event
-  // return pctx->ops->send_event(pctx, &ex);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2221,47 +2289,61 @@ vscp_frmw2_extended_page_write(vscp_frmw2_firmware_context_t *pctx,
 int
 vscp_frmw2_report_dmatrix(vscp_frmw2_firmware_context_t *pctx)
 {
+  int rv;
+
   if (NULL == pctx) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  /* NOTE: This function owns evrply.pdata; it is freed on all return paths. */
-  vscp_event_t evrply;
-  evrply.pdata = calloc(VSCP_MAX_DATA, 1);
-  if (NULL == evrply.pdata) {
-    return VSCP_ERROR_MEMORY;
-  }
-  vscp_frmw2_setup_event(pctx, &evrply);
-
   if (VSCP_LEVEL1 == pctx->level) {
-    evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-    evrply.vscp_type  = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
+    // Level I response
+    vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+    if (NULL == pevrply) {
+      return VSCP_ERROR_MEMORY;
+    }
+    if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 4))) {
+      vscp_fwhlp_deleteEvent(&pevrply);
+      return rv;
+    }
+    pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+    pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
+    pevrply->pdata[0]   = pctx->nDmRows;     // Size = number of DM rows
+    pevrply->pdata[1]   = pctx->regOffsetDm; // Start offset in page of DM
+    pevrply->pdata[2]   = (pctx->pageDm >> 8) & 0xff;
+    pevrply->pdata[3]   = pctx->pageDm & 0xff;
 
-    evrply.sizeData = 4;
-    evrply.pdata[0] = pctx->nDmRows;     // Size = number of DM rows
-    evrply.pdata[1] = pctx->regOffsetDm; // Start offset in page of DM
-    evrply.pdata[2] = (pctx->pageDm >> 8) & 0xff;
-    evrply.pdata[3] = pctx->pageDm & 0xff;
+    // send the event
+    rv = pctx->ops->send_event(pctx, pevrply);
+    vscp_fwhlp_deleteEvent(&pevrply);
   }
   else {
     // Level II response
-    evrply.vscp_class = VSCP_CLASS1_PROTOCOL;
-    evrply.vscp_type  = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
+    vscp_event_t *pevrply = vscp_fwhlp_newEvent();
+    if (NULL == pevrply) {
+      return VSCP_ERROR_MEMORY;
+    }
+    if (VSCP_ERROR_SUCCESS != (rv = vscp_frmw2_setup_event(pctx, pevrply, 22))) {
+      vscp_fwhlp_deleteEvent(&pevrply);
+      return rv;
+    }
+    pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
+    pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_GET_MATRIX_INFO_RESPONSE;
 
-    evrply.sizeData = 22;
-    vscp_frmw2_memcpy(evrply.pdata, VSCP_MAX_DATA, pctx->guid, sizeof(pctx->guid)); // GUID
-    evrply.pdata[16] = pctx->sizeDmRow;                                             // Row size
-    evrply.pdata[17] = pctx->nDmRows;                                               // Size = number of DM rows
-    evrply.pdata[18] = (pctx->regOffsetDm >> 24) & 0xff;
-    evrply.pdata[19] = (pctx->regOffsetDm >> 16) & 0xff;
-    evrply.pdata[20] = (pctx->regOffsetDm >> 8) & 0xff;
-    evrply.pdata[21] = pctx->regOffsetDm & 0xff;
+    pevrply->sizeData = 22;
+    vscp_frmw2_memcpy(pevrply->pdata, VSCP_MAX_DATA, pctx->guid, sizeof(pctx->guid)); // GUID
+    pevrply->pdata[16] = pctx->sizeDmRow;                                             // Row size
+    pevrply->pdata[17] = pctx->nDmRows;                                               // Size = number of DM rows
+    pevrply->pdata[18] = (pctx->regOffsetDm >> 24) & 0xff;
+    pevrply->pdata[19] = (pctx->regOffsetDm >> 16) & 0xff;
+    pevrply->pdata[20] = (pctx->regOffsetDm >> 8) & 0xff;
+    pevrply->pdata[21] = pctx->regOffsetDm & 0xff;
+
+    // send the event
+    rv = pctx->ops->send_event(pctx, pevrply);
+    vscp_fwhlp_deleteEvent(&pevrply);
   }
 
-  // send the event
-  int result = pctx->ops->send_event(pctx, &evrply);
-  free(evrply.pdata);
-  return result;
+  return rv;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

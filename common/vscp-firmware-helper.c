@@ -1103,7 +1103,13 @@ vscp_fwhlp_newEvent(void)
   if (NULL == pev) {
     return NULL;
   }
-  pev->head = VSCP_HEADER16_FRAME_VERSION_UNIX_NS; // Default to Unix nanosecond timestamp format
+
+  // Default to Unix nanosecond timestamp format
+  pev->head = VSCP_PRIORITY_NORMAL | VSCP_HEADER16_FRAME_VERSION_UNIX_NS; 
+  pev->year      = 0xffff;
+  pev->month     = 0xff;
+  pev->timestamp_ns = 0;
+
   return pev;
 }
 
@@ -2579,8 +2585,8 @@ vscp_fwhlp_eventToString(char *buf, size_t size, const vscp_event_t *pev)
 // class      6  - 0xFFFF or 65535
 // type       6  - 0xFFFF or 65535
 // obid       10 - 0xFFFFFFFF
-// time       20 - YYYY-MM-DDTHH:MM:SSZ
-// timestamp  10 - 0xFFFFFFFF
+// time       20 - YYYY-MM-DDTHH:MM:SSZ  (deprecated, always empty)
+// timestamp  10 - 0xFFFFFFFF (now 64-bit nanosecond timestamp)
 // GUID       47 - 00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF
 // 7 x comma
 // ---------------------------------------------------------------
