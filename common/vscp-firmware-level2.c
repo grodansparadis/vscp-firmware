@@ -179,6 +179,14 @@ vscp_frmw2_init(vscp_frmw2_firmware_context_t *const pctx)
   else {
     // In level 2 we use the set GUID
 
+    // Send heartbeat
+    pctx->last_heartbeat = pctx->ops->get_milliseconds(pctx);
+    vscp_frmw2_send_heartbeat(pctx);
+
+    // Send caps
+    pctx->last_caps = pctx->ops->get_milliseconds(pctx);
+    vscp_frmw2_send_caps(pctx);
+
     // We go to active right away if level II
     pctx->state = FRMW2_STATE_ACTIVE;
   }

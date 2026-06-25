@@ -72,7 +72,7 @@ static int stub_welcome(vscp_link_ctx_t *ctx)
 }
 
 static int stub_disconnect(vscp_link_ctx_t *ctx) { (void)ctx; g_stub.disconnect_calls++; return VSCP_ERROR_SUCCESS; }
-static int stub_quit(vscp_link_ctx_t *ctx) { g_stub.quit_calls++; stub_write_client(ctx, VSCP_LINK_MSG_GOODBY); return VSCP_ERROR_SUCCESS; }
+static int stub_quit(vscp_link_ctx_t *ctx) { g_stub.quit_calls++; stub_write_client(ctx, VSCP_LINK_MSG_GOODBYE); return VSCP_ERROR_SUCCESS; }
 
 static int stub_check_user(vscp_link_ctx_t *ctx, const char *user)
 {

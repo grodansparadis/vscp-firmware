@@ -229,9 +229,9 @@ TEST(_vscp_frmw2, setup_event_level1_uses_nickname_in_guid)
   std::memset(&ex, 0, sizeof(ex));
   std::memset(ex_data, 0, sizeof(ex_data));
   ex.pdata = ex_data;
-  vscp_frmw2_setup_event(&cfg, &ex);
+  vscp_frmw2_setup_event(&cfg, &ex, 0);
 
-  ASSERT_EQ(VSCP_PRIORITY_NORMAL, ex.head);
+  ASSERT_EQ(VSCP_PRIORITY_NORMAL | VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ex.head);
   ASSERT_EQ(VSCP_CLASS2_LEVEL1_PROTOCOL, ex.vscp_class);
   ASSERT_EQ(VSCP2_TYPE_PROTOCOL_READ_WRITE_RESPONSE, ex.vscp_type);
   ASSERT_EQ(0u, ex.sizeData);
@@ -246,6 +246,7 @@ TEST(_vscp_frmw2, send_heartbeat_level2_includes_device_name)
   init_config(cfg);
   cfg.level = VSCP_LEVEL2;
   ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
+  g_stub.send_calls = 0; // init sends heartbeat+caps; isolate the explicit call below
 
   ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_send_heartbeat(&cfg));
   ASSERT_EQ(1, g_stub.send_calls);
@@ -262,6 +263,7 @@ TEST(_vscp_frmw2, send_caps_contains_guid_ip_and_name)
   init_config(cfg);
   cfg.level = VSCP_LEVEL2;
   ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
+  g_stub.send_calls = 0; // init sends heartbeat+caps; isolate the explicit call below
 
   ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_send_caps(&cfg));
 
@@ -351,8 +353,8 @@ TEST(_vscp_frmw2, setup_event_null_pdata_does_not_crash)
   std::memset(&ev, 0, sizeof(ev));
   ev.pdata = nullptr; // no buffer — setup_event should skip the memset
 
-  vscp_frmw2_setup_event(&cfg, &ev); // must not crash
-  ASSERT_EQ(VSCP_PRIORITY_NORMAL, ev.head);
+  vscp_frmw2_setup_event(&cfg, &ev, 0); // must not crash
+  ASSERT_EQ(VSCP_PRIORITY_NORMAL | VSCP_HEADER16_FRAME_VERSION_UNIX_NS, ev.head);
 }
 
 // ---------------------------------------------------------------------------
