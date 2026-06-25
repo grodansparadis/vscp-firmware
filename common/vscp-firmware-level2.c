@@ -1173,8 +1173,8 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
         if (VSCP_LEVEL1 == pctx->level) {
           pevrply->vscp_class = VSCP_CLASS1_PROTOCOL;
           pevrply->vscp_type  = VSCP_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE;
-          uppermax          = 7;
-          nframes           = strlen(pctx->pInternalMdf) / 6;
+          uppermax            = 7;
+          nframes             = strlen(pctx->pInternalMdf) / 6;
           if (strlen(pctx->pInternalMdf) % 6) {
             nframes++;
           }
@@ -1183,8 +1183,8 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
           pevrply->vscp_class = VSCP_CLASS2_PROTOCOL;
           pevrply->vscp_type  = VSCP2_TYPE_PROTOCOL_GET_EMBEDDED_MDF_RESPONSE;
-          uppermax          = 511;
-          nframes           = strlen(pctx->pInternalMdf) / 508;
+          uppermax            = 511;
+          nframes             = strlen(pctx->pInternalMdf) / 508;
           if (strlen(pctx->pInternalMdf) % 508) {
             nframes++;
           }
@@ -1483,7 +1483,7 @@ vscp_frmw2_setup_event(vscp_frmw2_firmware_context_t *pctx, vscpEvent *const pev
     pev->GUID[14] = (pctx->nickname >> 8) & 0xff;
     pev->GUID[15] = pctx->nickname & 0xff;
   }
-  pev->obid = 0; // We dinät use obid here, so set to zero. The application can set it if needed.
+  pev->obid       = 0; // We dinät use obid here, so set to zero. The application can set it if needed.
   pev->vscp_class = VSCP_CLASS2_LEVEL1_PROTOCOL;
   pev->vscp_type  = VSCP2_TYPE_PROTOCOL_READ_WRITE_RESPONSE;
   pctx->ops->set_event_time(pctx, pev);
@@ -1804,7 +1804,8 @@ vscp_frmw2_send_heartbeat(vscp_frmw2_firmware_context_t *pctx)
   if (NULL == pevrply) {
     return VSCP_ERROR_MEMORY;
   }
-  if (VSCP_ERROR_SUCCESS != vscp_frmw2_setup_event(pctx, pevrply, (VSCP_LEVEL1 == pctx->level) ? 3 : FRMW2_HEARTBEAT_L2_MAX_DATA)) {
+  if (VSCP_ERROR_SUCCESS !=
+      vscp_frmw2_setup_event(pctx, pevrply, (VSCP_LEVEL1 == pctx->level) ? 3 : FRMW2_HEARTBEAT_L2_MAX_DATA)) {
     vscp_fwhlp_deleteEvent(&pevrply);
     return VSCP_ERROR_MEMORY;
   }

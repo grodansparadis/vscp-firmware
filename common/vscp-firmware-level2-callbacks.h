@@ -91,27 +91,6 @@ vscp_frmw2_callback_write_guid(vscp_frmw2_firmware_context_t *pctx, uint8_t pos,
 
 #endif // THIS_FIRMWARE_ENABLE_WRITE_2PROTECTED_LOCATIONS
 
-/*!
-  Read user register
-
-  @param pctx Pointer to context.
-  @param reg Register to read.
-  @param pval Pointer to read value.
-  @return VSCP_ERROR_SUCCESS on success, else error code.
-*/
-int
-vscp_frmw2_callback_read_user_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t *pval);
-
-/*!
-  Write user register
-
-  @param pctx Pointer to context.
-  @param reg Register to write.
-  @param val Value to write.
-  @return VSCP_ERROR_SUCCESS on success, else error code.
-*/
-int
-vscp_frmw2_callback_write_user_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t val);
 
 /*!
   Enter bootloader mode
@@ -262,18 +241,19 @@ vscp_frmw2_callback_dm_action(vscp_frmw2_firmware_context_t *pctx,
                               const uint8_t *pparam);
 
 /*!
-  Read register
+  Read user register
 
   @param pctx Pointer to context.
+  @param page Page number.
   @param reg Register to read.
   @param pval Pointer to variable to receive the value.
   @return VSCP_ERROR_SUCCESS on success, else error code.
 */
 int
-vscp_frmw2_callback_read_reg(vscp_frmw2_firmware_context_t *pctx, uint16_t page, uint32_t reg, uint8_t *pval);
+vscp_frmw2_callback_read_user_reg(vscp_frmw2_firmware_context_t *pctx, uint16_t page, uint32_t reg, uint8_t *pval);
 
 /*!
-  Write register
+  Write user register
 
   @param pctx Pointer to context.
   @param page Page number.
@@ -282,7 +262,7 @@ vscp_frmw2_callback_read_reg(vscp_frmw2_firmware_context_t *pctx, uint16_t page,
   @return VSCP_ERROR_SUCCESS on success, else error code.
 */
 int
-vscp_frmw2_callback_write_reg(vscp_frmw2_firmware_context_t *pctx, uint16_t page, uint32_t reg, uint8_t val);
+vscp_frmw2_callback_write_user_reg(vscp_frmw2_firmware_context_t *pctx, uint16_t page, uint32_t reg, uint8_t val);
 
 /*!
   Reset callback
