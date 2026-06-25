@@ -297,26 +297,26 @@ typedef struct vscp_frmw2_firmware_context {
   // [P] = Persistent (Write to persistent storage
   // [I] = Init to value on startup. May be constant or may change.
   // [*/P] = Persistent if bEnableWriteProtectedLocations is true.
-  uint8_t alarm_status;                 // [I] Alarm. Read only for clients. (init=0)
-  uint8_t vscp_major_version;           // [C] VSCP protocol major version. (init=1)
-  uint8_t vscp_minor_version;           // [C] VSCP protocol minor version. (init=4)
-  uint8_t errorCounter;                 // [I] Error counter. Clear on read. Read only for clients. (init=0)
-  uint32_t userId;                      // [P] User id.
-  uint32_t manufacturerId;              // [*/P] Manufacturer id.Read only for clients.
-  uint32_t manufacturerSubId;           // [*/P] Manufacturer sub id.Read only for clients.
-  uint16_t nickname;                    // [P] Device nickname (init=0xff)
-  uint16_t page_select;                 // [I] Page select register. (Init = 0)
-  uint8_t firmware_major_version;       // [*] This software version. Read only for clients.
-  uint8_t firmware_minor_version;       // [*] This software version. Read only for clients.
-  uint8_t firmware_sub_minor_version;   // [*] This software version. Read only for clients.
-  uint8_t bootloader_algorithm;         // [*] Boot loader algorithm we use.
-  uint32_t standard_device_family_code; // [*] Family code. Read only for clients.
-  uint32_t standard_device_type_code;   // [*] Family type. Read only for clients.
-  uint16_t firmware_device_code;        // [*] Identifier for hardware so correct firmware can be loaded
-  uint8_t guid[16];                     // [*/P] GUID for device. Read only for clients
-  uint8_t mdfurl[32];                   // [*] URL for MDF. Read only for clients. Make 33 bytes and nill
-                                        // all unused byte so it is null terminated even if it has
-                                        // the maximum length of 32 bytes.
+  uint8_t alarm_status;               // [I] Alarm. Read only for clients. (init=0)
+  uint8_t vscp_major_version;         // [C] VSCP protocol major version. (init=1)
+  uint8_t vscp_minor_version;         // [C] VSCP protocol minor version. (init=4)
+  uint8_t errorCounter;               // [I] Error counter. Clear on read. Read only for clients. (init=0)
+  uint8_t userId[5];                  // [P] User id.
+  uint32_t manufacturerId;            // [*/P] Manufacturer id.Read only for clients.
+  uint32_t manufacturerSubId;         // [*/P] Manufacturer sub id.Read only for clients.
+  uint16_t nickname;                  // [P] Device nickname (init=0xff)
+  uint16_t page_select;               // [I] Page select register. (Init = 0)
+  uint8_t firmware_major_version;     // [*] This software version. Read only for clients.
+  uint8_t firmware_minor_version;     // [*] This software version. Read only for clients.
+  uint8_t firmware_sub_minor_version; // [*] This software version. Read only for clients.
+  uint8_t bootloader_algorithm;       // [*] Boot loader algorithm we use.
+  uint32_t standard_device_family;    // [*] Family code. Read only for clients.
+  uint32_t standard_device_type;      // [*] Family type. Read only for clients.
+  uint16_t firmware_device_code;      // [*] Identifier for hardware so correct firmware can be loaded
+  uint8_t guid[16];                   // [*/P] GUID for device. Read only for clients
+  uint8_t mdfurl[32];                 // [*] URL for MDF. Read only for clients. Make 33 bytes and nill
+                                      // all unused byte so it is null terminated even if it has
+                                      // the maximum length of 32 bytes.
   // Level II devices
   uint8_t ipaddr[16];     // IP address (ipv4/ipv6)
   uint8_t deviceName[64]; // Name of the device

@@ -1617,7 +1617,8 @@ vscp_frmw2_read_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t *
       pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_ERROR_COUNTER);
     }
     else if (((VSCP_STD_REGISTER_USER_ID + ADJSTDREG) >= reg) && (VSCP_STD_REGISTER_USER_ID + ADJSTDREG + 3 <= reg)) {
-      *pval = *(&pctx->userId + (reg - VSCP_STD_REGISTER_USER_ID + ADJSTDREG));
+      //*pval = *(&pctx->userId + (reg - VSCP_STD_REGISTER_USER_ID + ADJSTDREG));
+      *pval = pctx->userId[reg - VSCP_STD_REGISTER_USER_ID + ADJSTDREG];
     }
     else if (((VSCP_STD_REGISTER_USER_MANDEV_ID + ADJSTDREG) == reg) &&
              (VSCP_STD_REGISTER_USER_MANDEV_ID + ADJSTDREG + 3 <= reg)) {
@@ -1657,13 +1658,13 @@ vscp_frmw2_read_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t *
     else if ((VSCP_STD_REGISTER_PAGES_COUNT + ADJSTDREG) == reg) {
       *pval = 0; // Deprecated register value
     }
-    else if (reg >= (VSCP_STD_REGISTER_FAMILY_CODE + ADJSTDREG) &&
-             (reg <= (VSCP_STD_REGISTER_FAMILY_CODE + ADJSTDREG + 3))) {
-      *pval = *(&pctx->standard_device_family_code + reg - VSCP_STD_REGISTER_FAMILY_CODE + ADJSTDREG);
+    else if (reg >= (VSCP_STD_REGISTER_DEVICE_FAMILY + ADJSTDREG) &&
+             (reg <= (VSCP_STD_REGISTER_DEVICE_FAMILY + ADJSTDREG + 3))) {
+      *pval = *(&pctx->standard_device_family + reg - VSCP_STD_REGISTER_DEVICE_FAMILY + ADJSTDREG);
     }
     else if (reg >= (VSCP_STD_REGISTER_DEVICE_TYPE + ADJSTDREG) &&
              (reg <= (VSCP_STD_REGISTER_DEVICE_TYPE + ADJSTDREG + 3))) {
-      *pval = *(&pctx->standard_device_type_code + reg - VSCP_STD_REGISTER_DEVICE_TYPE + ADJSTDREG);
+      *pval = *(&pctx->standard_device_type + reg - VSCP_STD_REGISTER_DEVICE_TYPE + ADJSTDREG);
     }
     else if ((VSCP_STD_REGISTER_NODE_RESET + ADJSTDREG) == reg) {
       *pval = 0; // always read as zero
