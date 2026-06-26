@@ -1731,6 +1731,7 @@ vscp_frmw2_write_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t 
     rv = pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_USER_ID);
   }
 
+#ifdef THIS_FIRMWARE_ENABLE_WRITE_2PROTECTED_LOCATIONS  
   // Write manufacturer id configuration information
   else if ((reg >= (VSCP_STD_REGISTER_USER_MANDEV_ID + ADJSTDREG)) &&
            (reg <= (VSCP_STD_REGISTER_USER_MANDEV_ID + ADJSTDREG + 3))) {
@@ -1776,6 +1777,7 @@ vscp_frmw2_write_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t 
       rv = pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_GUID);
     }
   }
+#endif  
   else if (reg == (VSCP_STD_REGISTER_NODE_RESET + ADJSTDREG)) {
 
     uint32_t timer;
