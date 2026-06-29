@@ -745,20 +745,36 @@ vscp_link_doCmdWhatCanYouDo(vscp_link_ctx_t *pctx, const char *pcmd)
   if (VSCP_ERROR_SUCCESS != pctx->ops->wcyd(pctx, &wcyd)) {
     return pctx->ops->write_client(pctx, VSCP_LINK_MSG_ERROR);
   }
-  memset(buf, '\0', sizeof(buf));
-  // sprintf(buf, "%llu\r\n", wcyd);
-  snprintf(buf,
-           sizeof(buf),
-           "%02X-%02X-%02X-%02X-%02X-%02X-%02X-%02X %llu\r\n",
-           (uint8_t) ((wcyd >> 56) & 0xff),
-           (uint8_t) ((wcyd >> 48) & 0xff),
-           (uint8_t) ((wcyd >> 40) & 0xff),
-           (uint8_t) ((wcyd >> 32) & 0xff),
-           (uint8_t) ((wcyd >> 24) & 0xff),
-           (uint8_t) ((wcyd >> 16) & 0xff),
-           (uint8_t) ((wcyd >> 8) & 0xff),
-           (uint8_t) (wcyd & 0xff),
-           wcyd);
+  /* Convert wcyd to decimal string without relying on %llu (not supported on
+   * all embedded platforms, e.g. newlib-nano on STM32). */
+  char dec_buf[22];
+  {
+    uint64_t tmp  = wcyd;
+    int pos       = 21;
+    dec_buf[pos]  = '\0';
+    if (0 == tmp) {
+      dec_buf[--pos] = '0';
+    }
+    else {
+      while (tmp > 0) {
+        dec_buf[--pos] = (char)('0' + (int)(tmp % 10u));
+        tmp /= 10u;
+      }
+    }
+    memset(buf, '\0', sizeof(buf));
+    snprintf(buf,
+             sizeof(buf),
+             "%02X-%02X-%02X-%02X-%02X-%02X-%02X-%02X %s\r\n",
+             (uint8_t) ((wcyd >> 56) & 0xff),
+             (uint8_t) ((wcyd >> 48) & 0xff),
+             (uint8_t) ((wcyd >> 40) & 0xff),
+             (uint8_t) ((wcyd >> 32) & 0xff),
+             (uint8_t) ((wcyd >> 24) & 0xff),
+             (uint8_t) ((wcyd >> 16) & 0xff),
+             (uint8_t) ((wcyd >> 8) & 0xff),
+             (uint8_t) (wcyd & 0xff),
+             &dec_buf[pos]);
+  }
   pctx->ops->write_client(pctx, buf);
   return pctx->ops->write_client(pctx, VSCP_LINK_MSG_OK);
 }
