@@ -5,7 +5,7 @@
     "level": 0,
     "model": "A",
     "version": "0.0.1",
-    "changed": "2026-06-26",
+    "changed": "2026-06-28",
     "buffersize": 8,
     "description": {
       "en": "This is the simplest possible demo of a VSCP node. It can do one thing, light a led, blink a led, turn a led off. The blink frequency can be set.  It has a decsion matrix with some actions like turn on/off led is defined.",
@@ -59,7 +59,7 @@
             "url": "https://github.com/grodansparadis/vscp/wiki/Blinky-Documentation",
             "format": "html",
             "description": {
-              "en": "English documentaion for the VSCP Blinky demo node."    
+              "en": "English documentaion for the VSCP Blinky demo node."
             }
           }
         ]
@@ -749,6 +749,9 @@
           "sk": "Rozhodovacia matica. Toto definuje umiestnenie úložiska pre rozhodovaciu maticu.",
           "hu": "Döntési mátrix. Ez meghatározza a döntési mátrix tárolási helyét.",
           "kr": "결정 행렬입니다. 결정 행렬의 저장 위치를 정의합니다."
+        },
+        "infourl": {
+          "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-dmatrix"
         }
       }
     ],
@@ -784,7 +787,7 @@
           "ja": "点滅のミリ秒単位の間隔。0は点滅なしを意味します。"
         },
         "infourl": {
-          "en": "Remote var url en"
+          "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-remotevar-interval"
         }
       },
       {
@@ -814,6 +817,9 @@
           "sk": "Hodnota čítača milisekúnd. Zapíšte nulu do ktoréhokoľvek z registrov čítača na resetovanie čítača.",
           "hu": "Milliszekundum számláló értéke. Írjon nullát bármelyik számláló regiszterbe a számláló visszaállításához.",
           "kr": "밀리초 카운터 값. 카운터를 재설정하려면 카운터 레지스터 중 하나에 0을 쓰십시오."
+        },
+        "infourl": {
+          "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-remotevar-counter"
         }
       }
     ],
@@ -844,23 +850,7 @@
         ],
         "infourl": [
           {
-            "en": "https://www.somewhere.com/info7.html",
-            "se": "https://www.somewhere.com/info7.html",
-            "no": "https://www.somewhere.com/info7.html",
-            "dk": "https://www.somewhere.com/info7.html",
-            "de": "https://www.somewhere.com/info7.html",
-            "fr": "https://www.somewhere.com/info7.html",
-            "es": "https://www.somewhere.com/info7.html",
-            "it": "https://www.somewhere.com/info7.html",
-            "ru": "https://www.somewhere.com/info7.html",
-            "fi": "https://www.somewhere.com/info7.html",
-            "zh": "https://www.somewhere.com/info7.html",
-            "ja": "https://www.somewhere.com/info7.html",
-            "pt": "https://www.somewhere.com/info7.html",
-            "ar": "https://www.somewhere.com/info7.html",
-            "sk": "https://www.somewhere.com/info7.html",
-            "hu": "https://www.somewhere.com/info7.html",
-            "kr": "https://www.somewhere.com/info7.html"
+            "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-alarm7"
           }
         ]
       },
@@ -874,23 +864,7 @@
         ],
         "infourl": [
           {
-            "en": "https://www.somewhere.com/info7.html",
-            "se": "https://www.somewhere.com/info7.html",
-            "no": "https://www.somewhere.com/info7.html",
-            "dk": "https://www.somewhere.com/info7.html",
-            "de": "https://www.somewhere.com/info7.html",
-            "fr": "https://www.somewhere.com/info7.html",
-            "es": "https://www.somewhere.com/info7.html",
-            "it": "https://www.somewhere.com/info7.html",
-            "ru": "https://www.somewhere.com/info7.html",
-            "fi": "https://www.somewhere.com/info7.html",
-            "zh": "https://www.somewhere.com/info7.html",
-            "ja": "https://www.somewhere.com/info7.html",
-            "pt": "https://www.somewhere.com/info7.html",
-            "ar": "https://www.somewhere.com/info7.html",
-            "sk": "https://www.somewhere.com/info7.html",
-            "hu": "https://www.somewhere.com/info7.html",
-            "kr": "https://www.somewhere.com/info7.html"
+            "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-alarm6"
           }
         ]
       }
@@ -1010,8 +984,8 @@
       },
       {
         "name": "Level II High end server/service capabilities",
-        "class": 1026,
-        "type": 2,
+        "class": 1024,
+        "type": 20,
         "direction": "out",
         "priority": "low",
         "description": {
@@ -1036,22 +1010,6 @@
         },
         "infourl": {
           "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-          "se": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-          "no": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-          "dk": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-          "de": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-          "fr": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-          "es": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-          "it": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-          "ru": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-          "fi": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-          "zh": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-          "ja": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-          "pt": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-          "ar": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-          "sk": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-          "hu": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-          "kr": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
         },
         "data": [
           {
@@ -1076,23 +1034,7 @@
               "kr": "기능 코드(8바이트)."
             },
             "infourl": {
-              "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "se": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "no": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "dk": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "de": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "fr": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "es": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "it": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "ru": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "fi": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "zh": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "ja": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "pt": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "ar": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "sk": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "hu": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "kr": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
+              "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
             }
           },
           {
@@ -1117,23 +1059,7 @@
               "kr": "서버 GUID(16바이트)."
             },
             "infourl": {
-              "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "se": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "no": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "dk": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "de": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "fr": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "es": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "it": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "ru": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "fi": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "zh": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "ja": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "pt": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "ar": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "sk": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "hu": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "kr": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
+              "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
             }
           },
           {
@@ -1158,23 +1084,7 @@
               "kr": "노드 IP 주소(16바이트)."
             },
             "infourl": {
-              "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "se": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "no": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "dk": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "de": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "fr": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "es": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "it": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "ru": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "fi": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "zh": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "ja": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "pt": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "ar": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "sk": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "hu": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "kr": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
+              "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
             }
           },
           {
@@ -1199,23 +1109,7 @@
               "kr": "노드 이름(64바이트)."
             },
             "infourl": {
-              "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "se": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "no": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "dk": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "de": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "fr": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "es": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "it": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "ru": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "fi": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "zh": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "ja": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "pt": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "ar": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "sk": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "hu": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "kr": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
+              "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
             }
           },
           {
@@ -1240,23 +1134,7 @@
               "kr": "비표준 포트(n바이트)."
             },
             "infourl": {
-              "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "se": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "no": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "dk": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "de": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "fr": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "es": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "it": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "ru": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "fi": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "zh": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "ja": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "pt": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "ar": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "sk": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "hu": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20",
-              "kr": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
+              "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
             }
           }
         ]
@@ -1655,7 +1533,6 @@
           },
           "infourl": {
             "en": "http://www.vscp.org/docs/dm_action_turn_on_off_led.html",
-            "se": "http://www.vscp.org/docs/dm_action_turn_on_off_led.html"
           },
           "param": [
             {
@@ -1680,7 +1557,7 @@
                 "kr": "인수가 상태를 나타냅니다. 0 = 끄기, 1 = 켜기, 2 = 전환"
               },
               "infourl": {
-                "en": "http://www.vscp.org/docs/dm_param_turn_on_off_led.html"
+                "en": "blinky-info-url-dmatrix-action-1-arg-0.html"
               },
               "valuelist": [
                 {
@@ -1706,7 +1583,7 @@
                     "kr": "LED 끄기"
                   },
                   "infourl": {
-                    "en": "English help 1 vl2"
+                    "en": "blinky-info-url-dmatrix-action-1-arg-0-value-0.html"
                   }
                 },
                 {
@@ -1732,7 +1609,7 @@
                     "kr": "LED 켜기"
                   },
                   "infourl": {
-                    "en": "English help 1 vl2"
+                    "en": "blinky-info-url-dmatrix-action-1-arg-0-value-1.html"
                   }
                 },
                 {
@@ -1758,7 +1635,7 @@
                     "kr": "LED 토글"
                   },
                   "infourl": {
-                    "en": "English help 1 vl2"
+                    "en": "blinky-info-url-dmatrix-action-1-arg-0-value-2.html"
                   }
                 }
               ]
@@ -1788,23 +1665,7 @@
             "kr": "LED 켜기."
           },
           "infourl": {
-            "en": "http://www.vscp.org/docs/dm_action_turn_on_led.html",
-            "se": "http://www.vscp.org/docs/dm_action_turn_on_led.html",
-            "no": "http://www.vscp.org/docs/dm_action_turn_on_led.html",
-            "dk": "http://www.vscp.org/docs/dm_action_turn_on_led.html",
-            "de": "http://www.vscp.org/docs/dm_action_turn_on_led.html",
-            "fr": "http://www.vscp.org/docs/dm_action_turn_on_led.html",
-            "es": "http://www.vscp.org/docs/dm_action_turn_on_led.html",
-            "it": "http://www.vscp.org/docs/dm_action_turn_on_led.html",
-            "ru": "http://www.vscp.org/docs/dm_action_turn_on_led.html",
-            "fi": "http://www.vscp.org/docs/dm_action_turn_on_led.html",
-            "zh": "http://www.vscp.org/docs/dm_action_turn_on_led.html",
-            "ja": "http://www.vscp.org/docs/dm_action_turn_on_led.html",
-            "pt": "http://www.vscp.org/docs/dm_action_turn_on_led.html",
-            "ar": "http://www.vscp.org/docs/dm_action_turn_on_led.html",
-            "sk": "http://www.vscp.org/docs/dm_action_turn_on_led.html",
-            "hu": "http://www.vscp.org/docs/dm_action_turn_on_led.html",
-            "kr": "http://www.vscp.org/docs/dm_action_turn_on_led.html"
+            "en": "blinky-info-url-dmatrix-action-1-arg-2.html"
           }
         },
         {
@@ -1830,7 +1691,7 @@
             "kr": "LED 끄기."
           },
           "infourl": {
-            "en": "http://www.vscp.org/docs/dm_action_turn_off_led.html"
+            "en": "blinky-info-url-dmatrix-action-1-arg-3.html"
           }
         },
         {
@@ -1856,7 +1717,7 @@
             "kr": "LED 토글."
           },
           "infourl": {
-            "en": "http://www.vscp.org/docs/dm_action_toggle_led.html"
+            "en": "blinky-info-url-dmatrix-action-1-arg-4.html"
           }
         },
         {
@@ -1882,7 +1743,7 @@
             "kr": "깜박임 시작."
           },
           "infourl": {
-            "en": "http://www.vscp.org/docs/dm_action_start_blink.html"
+            "en": "blinky-info-url-dmatrix-action-1-arg-5.html"
           }
         },
         {
@@ -1908,23 +1769,7 @@
             "kr": "깜박임 중지."
           },
           "infourl": {
-            "en": "http://www.vscp.org/docs/dm_action_stop_blink.html",
-            "se": "http://www.vscp.org/docs/dm_action_stop_blink.html",
-            "no": "http://www.vscp.org/docs/dm_action_stop_blink.html",
-            "dk": "http://www.vscp.org/docs/dm_action_stop_blink.html",
-            "de": "http://www.vscp.org/docs/dm_action_stop_blink.html",
-            "fr": "http://www.vscp.org/docs/dm_action_stop_blink.html",
-            "es": "http://www.vscp.org/docs/dm_action_stop_blink.html",
-            "it": "http://www.vscp.org/docs/dm_action_stop_blink.html",
-            "ru": "http://www.vscp.org/docs/dm_action_stop_blink.html",
-            "fi": "http://www.vscp.org/docs/dm_action_stop_blink.html",
-            "zh": "http://www.vscp.org/docs/dm_action_stop_blink.html",
-            "ja": "http://www.vscp.org/docs/dm_action_stop_blink.html",
-            "pt": "http://www.vscp.org/docs/dm_action_stop_blink.html",
-            "ar": "http://www.vscp.org/docs/dm_action_stop_blink.html",
-            "sk": "http://www.vscp.org/docs/dm_action_stop_blink.html",
-            "hu": "http://www.vscp.org/docs/dm_action_stop_blink.html",
-            "kr": "http://www.vscp.org/docs/dm_action_stop_blink.html"
+            "en": "blinky-info-url-dmatrix-action-1-arg-6.html"
           }
         },
         {
