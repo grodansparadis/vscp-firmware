@@ -57,6 +57,7 @@ add_executable(vscp_firmware_tests
     vscp-firmware-unittest.cpp
     vscp-link-protocol-unittest.cpp
     vscp-binary-unittest.cpp
+    vscp-rs485-unittest.cpp
     vscp-ws1-unittest.cpp
     vscp-ws2-unittest.cpp
     ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-helper.c
