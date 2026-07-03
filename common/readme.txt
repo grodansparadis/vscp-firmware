@@ -24,11 +24,11 @@ Functionality
 
 vscp-firmware.h/c         - Common code for VSCP firmware level I
 vscp-serial.h             - Serial definitions.
+vscp-rs485-protocol.h     - RS-485/RS-422 protocol definitions.
 vscp-fifo.h/c             - fifo for vscpEvent's
 vscp-firmware-level2.h/c  - Common code for VSCP firmware level II
 vscp-firmware-helper.h/c  - VSCP protocol support functionality
 vscp-link-protocol.h/c
-
 
 
 

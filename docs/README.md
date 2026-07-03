@@ -15,6 +15,7 @@ Local module documentation:
 - [vscp-firmware-level2](vscp-firmware-level2.md)
 - [vscp-link-protocol](vscp-link-protocol.md)
 - [vscp-serial](vscp-serial.md)
+- [vscp-rs485-rs422](vscp-rs485-rs422.md)
 - [vscp-bootloader](vscp-bootloader.md)
 - [vscp-bootloader-host-sequence](vscp-bootloader-host-sequence.md)
 
