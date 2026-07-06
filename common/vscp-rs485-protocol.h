@@ -42,7 +42,7 @@ extern "C" {
 #define VSCP_RS485_ETX 0x03
 
 // Bus limits and addressing
-#define VSCP_RS485_MAX_CLIENTS   255
+#define VSCP_RS485_MAX_CLIENTS   254
 #define VSCP_RS485_NICKNAME_SIZE 1
 #define VSCP_RS485_MASTER_ID     0x00
 #define VSCP_RS485_BROADCAST_ID  0xFF

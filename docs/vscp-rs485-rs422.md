@@ -8,8 +8,8 @@ This document describes the RS-485/RS-422 protocol definition header:
 
 The header defines a VSCP-oriented multi-drop transport profile where:
 
-- one master polls up to 255 clients for events
-- every client has a preset 8-bit nickname (`0x00..0xFF`)
+- one master polls up to 254 clients for events
+- every client has a preset 8-bit nickname (`0x01..0xFE`)
 - event payloads use VSCP binary event format
 - encryption is optional (default no encryption, AES-128 selectable)
 
@@ -42,7 +42,7 @@ It includes:
 
 ## Bus model
 
-- `VSCP_RS485_MAX_CLIENTS` = `255`
+- `VSCP_RS485_MAX_CLIENTS` = `254`
 - `VSCP_RS485_MASTER_ID` = `0x00`
 - `VSCP_RS485_BROADCAST_ID` = `0xFF`
 - `VSCP_RS485_NICKNAME_SIZE` = `1` (8-bit preset nickname)
