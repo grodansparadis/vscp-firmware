@@ -5,9 +5,9 @@ extern "C" {
 #include "vscp-rs485-protocol.h"
 }
 
-TEST(VscpRs485Protocol, supports_255_clients_and_8bit_nicknames)
+TEST(VscpRs485Protocol, supports_254_clients_and_8bit_nicknames)
 {
-  EXPECT_EQ(VSCP_RS485_MAX_CLIENTS, 255);
+  EXPECT_EQ(VSCP_RS485_MAX_CLIENTS, 254);
   EXPECT_EQ(VSCP_RS485_NICKNAME_SIZE, 1);
 }
 
@@ -88,12 +88,12 @@ TEST(VscpRs485Protocol, capability_struct_size_matches_macro)
 TEST(VscpRs485Protocol, capability_struct_is_one_byte_fields)
 {
   vscp_rs485_caps caps{};
-  caps.maxClients = 255;
+  caps.maxClients = VSCP_RS485_MAX_CLIENTS;
   caps.encryptionSupported = 1;
   caps.defaultEncryption = VSCP_RS485_ENCRYPTION_AES128;
   caps.reserved = 0;
 
-  EXPECT_EQ(caps.maxClients, 255);
+  EXPECT_EQ(caps.maxClients, VSCP_RS485_MAX_CLIENTS);
   EXPECT_EQ(caps.encryptionSupported, 1);
   EXPECT_EQ(caps.defaultEncryption, VSCP_RS485_ENCRYPTION_AES128);
   EXPECT_EQ(caps.reserved, 0);
