@@ -628,7 +628,7 @@ if (VSCP_ERROR_SUCCESS == rv) {
 Common Failures and Checks:
 
 - Feature flags: ensure both `VSCP_FWHLP_BINARY_FRAME_SUPPORT` and `VSCP_FWHLP_CRYPTO_SUPPORT` are defined.
-- Buffer size: `encrypted` and `decrypted` buffers must be larger than plain frame data (padding + IV).
+- Buffer size/padding: AES uses PKCS#7 to 16-byte blocks, including a full block for aligned payloads. Allow for the padding and appended 16-byte IV in the encrypted buffer; the decrypted buffer must hold the padded plaintext. Decryption validates and removes padding, zeroing the removed tail bytes because the API does not return plaintext length.
 - Key/algorithm mismatch: decrypt with the same key and algorithm used for encrypt.
 - Type-byte decode mode: when using `VSCP_ENCRYPTION_FROM_TYPE_BYTE`, verify the frame encryption nibble is preserved.
 - Frame length: use `vscp_fwhlp_getFrameSizeFromEventEx` before encryption.

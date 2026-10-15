@@ -2435,6 +2435,62 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_decryptFrame_aes128_basic)
   ASSERT_EQ(original[1], decrypted[1]);
 }
 
+TEST(_vscp_firmware_helper, vscp_fwhlp_crypto_pkcs7_padding)
+{
+  uint8_t input[34] = {};
+  uint8_t encrypted[80] = {};
+  uint8_t decrypted[80] = {};
+  uint8_t key[16] = {};
+  uint8_t iv[16] = {};
+
+  input[0] = 0x01;
+  for (size_t i = 0; i < sizeof(key); i++) {
+    key[i] = (uint8_t) i;
+    iv[i] = (uint8_t) (0xA0 + i);
+  }
+
+  const size_t payload_lengths[] = { 1, 15, 16, 32 };
+  for (size_t payload_len : payload_lengths) {
+    for (size_t i = 0; i < payload_len; i++) {
+      input[i + 1] = (uint8_t) (i + 0x21);
+    }
+
+    size_t encrypted_len = vscp_fwhlp_encryptFrame(encrypted,
+                                                   input,
+                                                   payload_len + 1,
+                                                   key,
+                                                   iv,
+                                                   VSCP_ENCRYPTION_AES128);
+    size_t padded_len = payload_len + (16 - (payload_len % 16));
+    ASSERT_EQ(1 + padded_len + 16, encrypted_len);
+    ASSERT_EQ(VSCP_ERROR_SUCCESS,
+              vscp_fwhlp_decryptFrame(decrypted,
+                                      encrypted,
+                                      encrypted_len,
+                                      key,
+                                      NULL,
+                                      VSCP_ENCRYPTION_AES128));
+    ASSERT_EQ(0, memcmp(input, decrypted, payload_len + 1));
+
+    // The API has no plaintext-length result; removed PKCS#7 bytes stay zeroed.
+    for (size_t i = payload_len + 1; i <= padded_len; i++) {
+      ASSERT_EQ(0, decrypted[i]);
+    }
+
+    if (1 == payload_len) {
+      // Alter a non-final padding byte while preserving the padding length byte.
+      encrypted[1 + 14] ^= 0x01;
+      ASSERT_NE(VSCP_ERROR_SUCCESS,
+                vscp_fwhlp_decryptFrame(decrypted,
+                                        encrypted,
+                                        encrypted_len,
+                                        key,
+                                        NULL,
+                                        VSCP_ENCRYPTION_AES128));
+    }
+  }
+}
+
 TEST(_vscp_firmware_helper, vscp_fwhlp_encryptFrame_aes256)
 {
   uint8_t input[32];
@@ -2663,11 +2719,11 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_crypto_different_keys_fail)
 
   // Try to decrypt with key2 (wrong key)
   rv = vscp_fwhlp_decryptFrame(decrypted, encrypted, encrypted_len, key2, NULL, VSCP_ENCRYPTION_AES128);
-  // Decryption will succeed but data will be garbage
-  ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
-
-  // The decrypted data should NOT match original (wrong key)
-  ASSERT_NE(0, memcmp(plaintext + 1, decrypted + 1, 6));
+  // A wrong key usually fails PKCS#7 validation; if it happens to have valid
+  // padding, the decrypted data must still be different.
+  if (VSCP_ERROR_SUCCESS == rv) {
+    ASSERT_NE(0, memcmp(plaintext + 1, decrypted + 1, 6));
+  }
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_crypto_larger_data)
