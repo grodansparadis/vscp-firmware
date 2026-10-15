@@ -877,21 +877,17 @@ vscp_fwhlp_writeReplyToFrame(uint8_t *frame,
  * Encrypt VSCP frame using the selected encryption algorithm. The iv
  * initialization vector) is appended to the end of the encrypted data.
  *
- * @param output Buffer that will receive the encrypted result. The buffer
- *          should be at least 16 bytes larger than the frame. This means
- *          the size must be original size adjusted to 16 upper byte block and one
- *          added to this (encryption code). So if the data that should be encrypted
- *          is 13 byte in size and the first byte is the encryption code byte
- *          (which should not be encrypted) then 16 is the encryption block and 16 + 1
- *          bytes will be the minimum needed output buffer size.
+ * @param output Buffer that will receive the encrypted result. It must hold
+ *          the unencrypted first byte, the PKCS#7-padded ciphertext, and the
+ *          appended 16-byte IV. The padded ciphertext always includes at
+ *          least one 16-byte block.
  * @param input This is the frame that should be encrypted. The first
  *          byte in the frame is the packet type and encryption type which always is left unencrypted.
  * @param len This is the length of the frame to be encrypted. This
  *          length includes the frame encryption type in the first byte.
- * NOTE:   Length for encrypted data (without initial byte) must be evenly
- * divisible by 16 bytes (len % 16 == 0). But the library will take care of that for you
- * and return the new length of the encrypted data. So you can just pass the original length
- * of the data to encrypt and the library will add padding if needed.
+ * The encrypted data is padded using PKCS#7 to a 16-byte AES block size.
+ * A full padding block is added when the payload length is already a multiple
+ * of 16 bytes.
  * @param key This is a pointer to the secret encryption key. This key
  *          should be 128 bits for AES128, 192 bits for AES192, 256 bits
  *          for AES256.
@@ -935,7 +931,8 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
  * @param output Buffer that will receive the decrypted result. The buffer
  *          should have a size of at lest equal to the encrypted block.
  * @param input This is the frame that should be decrypted.
- * @param len This is the length of the frame to be decrypted (not including IV).
+ * @param len Length of the encrypted frame. It includes the appended IV when
+ *            @p iv is NULL; otherwise it covers the frame bytes only.
  * @param key This is a pointer to the secret encryption key. This key
  *            should be 128 bits for AES128, 192 bits for AES192,
  *            256 bits for AES256.
@@ -946,6 +943,8 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
  * with. (vscp.h) If set to 15 (VSCP_ENCRYPTION_FROM_TYPE_BYTE) the algorithm
  * will be set from the four lower bits of the buffer to decrypt.
  * @return VSCP_ERROR_SUCCESS, errorcode on failure on failure.
+ * PKCS#7 padding is validated and removed. Since this API does not return the
+ * decrypted length, removed padding bytes are zeroed in the output.
  *
  * Normally used like
  *

@@ -3374,6 +3374,41 @@ vscp_fwhlp_writeReplyToFrame(uint8_t *frame,
 */
 #ifdef VSCP_FWHLP_CRYPTO_SUPPORT
 
+static size_t
+vscp_fwhlp_pkcs7_padded_length(size_t data_len)
+{
+  return data_len + (16 - (data_len % 16));
+}
+
+static int
+vscp_fwhlp_pkcs7_unpad(uint8_t *data, size_t data_len)
+{
+  uint8_t padding;
+  uint8_t invalid = 0;
+
+  if ((NULL == data) || (0 == data_len) || (0 != (data_len % 16))) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  padding = data[data_len - 1];
+  if ((0 == padding) || (padding > 16) || (padding > data_len)) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  for (size_t i = 0; i < 16; i++) {
+    uint8_t mask = (uint8_t) -(int) (i < padding);
+    invalid |= (data[data_len - 1 - i] ^ padding) & mask;
+  }
+
+  if (0 != invalid) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // Preserve the helper's existing zero-filled tail after removing padding.
+  memset(data + data_len - padding, 0, padding);
+  return VSCP_ERROR_SUCCESS;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_encryptFrame
 //
@@ -3409,16 +3444,25 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
     return 0;
   }
 
+  if (0 == len) {
+    return 0;
+  }
+
   // If no encryption needed - return
   if (VSCP_ENCRYPTION_NONE == nAlgorithm) {
     memcpy(output, input, len);
     return len;
   }
 
-  // Must be padded if needed (should have length multiple of 16).
-  // Encrypted len is len-1 because of leading encryption byte
-  size_t padlen = len - 1;
-  padlen        = padlen + (16 - (padlen % 16));
+  // Encrypted len is len-1 because of leading encryption byte.
+  size_t payload_len = len - 1;
+  size_t padlen      = vscp_fwhlp_pkcs7_padded_length(payload_len);
+  uint8_t *padded_data = (uint8_t *) malloc(padlen);
+  if (NULL == padded_data) {
+    return 0;
+  }
+  memcpy(padded_data, input + 1, payload_len);
+  memset(padded_data + payload_len, (int) (padlen - payload_len), padlen - payload_len);
 
   // The frame type is always unencrypted
   output[0] = input[0];
@@ -3431,6 +3475,7 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
   // If iv is not give it should be generated
   if (NULL == iv) {
     if (16 != getRandomIV(generated_iv, 16)) {
+      free(padded_data);
       return 0;
     }
   }
@@ -3443,7 +3488,7 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
     case VSCP_ENCRYPTION_AES192:
       AES_CBC_encrypt_buffer(AES192,
                              output + 1,
-                             input + 1, // Not frame type byte
+                             padded_data,
                              (uint32_t) padlen,
                              key,
                              (const uint8_t *) generated_iv);
@@ -3455,7 +3500,7 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
     case VSCP_ENCRYPTION_AES256:
       AES_CBC_encrypt_buffer(AES256,
                              output + 1,
-                             input + 1, // Not frame type byte
+                             padded_data,
                              (uint32_t) padlen,
                              key,
                              (const uint8_t *) generated_iv);
@@ -3467,7 +3512,7 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
     case VSCP_ENCRYPTION_AES128:
       AES_CBC_encrypt_buffer(AES128,
                              output + 1,
-                             input + 1, // Not frame type byte
+                             padded_data,
                              (uint32_t) padlen,
                              key,
                              (const uint8_t *) generated_iv);
@@ -3477,13 +3522,16 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
       break;
 
     case VSCP_ENCRYPTION_NONE:
-      memcpy(output + 1, input + 1, padlen);
+      memcpy(output + 1, input + 1, payload_len);
       break;
 
     default:
       // Not a valid encryption algorithm
+      free(padded_data);
       return VSCP_ERROR_PARAMETER;
   }
+
+  free(padded_data);
 
   // This is needed as byte 0 is not counted and the encrypted data should be
   // a multiple of 16
@@ -3534,6 +3582,10 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
     return VSCP_ERROR_SUCCESS;
   }
 
+  if (len < 17) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
   // If iv is not given it should be fetched from the end of input (last 16
   // bytes)
   if (NULL == iv) {
@@ -3542,6 +3594,10 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
   }
   else {
     memcpy(appended_iv, iv, 16);
+  }
+
+  if ((real_len < 17) || (0 != ((real_len - 1) % 16))) {
+    return VSCP_ERROR_PARAMETER;
   }
 
   // Preserve frame type which always is un-encrypted
@@ -3586,7 +3642,7 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
       return VSCP_ERROR_PARAMETER;
   }
 
-  return VSCP_ERROR_SUCCESS;
+  return vscp_fwhlp_pkcs7_unpad(output + 1, real_len - 1);
 #endif
 }
 
@@ -3660,12 +3716,15 @@ vscp_fwhlp_openssl_encrypt_payload(uint8_t *output,
   int outlen2         = 0;
   int rv              = VSCP_ERROR_ERROR;
 
-  tmpin = (uint8_t *) calloc(1, padlen);
+  tmpin = (uint8_t *) malloc(padlen);
   if (NULL == tmpin) {
     return VSCP_ERROR_ERROR;
   }
 
   memcpy(tmpin, input + 1, input_payload_len);
+  memset(tmpin + input_payload_len,
+         (int) (padlen - input_payload_len),
+         padlen - input_payload_len);
 
   ctx = EVP_CIPHER_CTX_new();
   if (NULL == ctx) {
@@ -3753,6 +3812,10 @@ vscp_fwhlp_encryptFrame_openssl(uint8_t *output,
     return len;
   }
 
+  if (0 == len) {
+    return 0;
+  }
+
   if (VSCP_ERROR_SUCCESS != vscp_fwhlp_openssl_set_algorithm_from_type(&nAlgorithm, input)) {
     return 0;
   }
@@ -3760,8 +3823,7 @@ vscp_fwhlp_encryptFrame_openssl(uint8_t *output,
   cipher = vscp_fwhlp_openssl_get_cipher(nAlgorithm);
 
   // Must be padded to 16-byte blocks (excluding leading type byte)
-  padlen = len - 1;
-  padlen = padlen + (16 - (padlen % 16));
+  padlen = vscp_fwhlp_pkcs7_padded_length(len - 1);
 
   if (VSCP_ERROR_SUCCESS != vscp_fwhlp_openssl_get_iv(generated_iv, iv)) {
     return 0;
@@ -3807,6 +3869,10 @@ vscp_fwhlp_decryptFrame_openssl(uint8_t *output,
     return VSCP_ERROR_SUCCESS;
   }
 
+  if (len < 17) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
   if (VSCP_ERROR_SUCCESS != vscp_fwhlp_openssl_set_algorithm_from_type(&nAlgorithm, input)) {
     return VSCP_ERROR_PARAMETER;
   }
@@ -3829,6 +3895,10 @@ vscp_fwhlp_decryptFrame_openssl(uint8_t *output,
     memcpy(appended_iv, iv, 16);
   }
 
+  if ((real_len < 17) || (0 != ((real_len - 1) % 16))) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
   // Preserve frame type which always is un-encrypted
   output[0] = input[0];
 
@@ -3837,7 +3907,7 @@ vscp_fwhlp_decryptFrame_openssl(uint8_t *output,
     return VSCP_ERROR_ERROR;
   }
 
-  return VSCP_ERROR_SUCCESS;
+  return vscp_fwhlp_pkcs7_unpad(output + 1, real_len - 1);
 }
 
 #endif // VSCP_FWHLP_CRYPTO_SUPPORT && VSCP_FWHLP_CRYPTO_USE_OPENSSL
@@ -3873,6 +3943,9 @@ vscp_fwhlp_encryptFrame_psa(uint8_t *output,
   uint8_t generated_iv[16];
   size_t output_len = 0;
   size_t ciphertext_len;
+  size_t payload_len;
+  size_t padlen;
+  uint8_t *padded_data = NULL;
 
   // Check pointers
   if (NULL == output) {
@@ -3893,10 +3966,13 @@ vscp_fwhlp_encryptFrame_psa(uint8_t *output,
     return len;
   }
 
-  // Must be padded if needed (should have length multiple of 16).
-  // Encrypted len is len-1 because of leading encryption byte
-  size_t padlen = len - 1;
-  padlen        = padlen + (16 - (padlen % 16));
+  if (0 == len) {
+    return 0;
+  }
+
+  // Encrypted len is len-1 because of leading encryption byte.
+  payload_len = len - 1;
+  padlen      = vscp_fwhlp_pkcs7_padded_length(payload_len);
 
   // The frame type is always unencrypted
   output[0] = input[0];
@@ -3977,12 +4053,23 @@ vscp_fwhlp_encryptFrame_psa(uint8_t *output,
     return 0;
   }
 
+  padded_data = (uint8_t *) malloc(padlen);
+  if (NULL == padded_data) {
+    psa_cipher_abort(&operation);
+    psa_destroy_key(key_id);
+    psa_reset_key_attributes(&attributes);
+    return 0;
+  }
+  memcpy(padded_data, input + 1, payload_len);
+  memset(padded_data + payload_len, (int) (padlen - payload_len), padlen - payload_len);
+
   // Update with input data (skipping frame type byte)
-  status = psa_cipher_update(&operation, input + 1, padlen, output + 1, padlen, &output_len);
+  status = psa_cipher_update(&operation, padded_data, padlen, output + 1, padlen, &output_len);
   if (PSA_SUCCESS != status) {
     psa_cipher_abort(&operation);
     psa_destroy_key(key_id);
     psa_reset_key_attributes(&attributes);
+    free(padded_data);
     return 0;
   }
 
@@ -3992,12 +4079,14 @@ vscp_fwhlp_encryptFrame_psa(uint8_t *output,
   if (PSA_SUCCESS != status) {
     psa_destroy_key(key_id);
     psa_reset_key_attributes(&attributes);
+    free(padded_data);
     return 0;
   }
 
   // Cleanup
   psa_destroy_key(key_id);
   psa_reset_key_attributes(&attributes);
+  free(padded_data);
 
   // Append iv
   memcpy(output + 1 + padlen, generated_iv, 16);
@@ -4047,6 +4136,10 @@ vscp_fwhlp_decryptFrame_psa(uint8_t *output,
     return VSCP_ERROR_SUCCESS;
   }
 
+  if (len < 17) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
   // If iv is not given it should be fetched from the end of input (last 16 bytes)
   if (NULL == iv) {
     memcpy(appended_iv, (input + len - 16), 16);
@@ -4054,6 +4147,10 @@ vscp_fwhlp_decryptFrame_psa(uint8_t *output,
   }
   else {
     memcpy(appended_iv, iv, 16);
+  }
+
+  if ((real_len < 17) || (0 != ((real_len - 1) % 16))) {
+    return VSCP_ERROR_PARAMETER;
   }
 
   // Preserve frame type which always is un-encrypted
@@ -4147,7 +4244,7 @@ vscp_fwhlp_decryptFrame_psa(uint8_t *output,
   psa_destroy_key(key_id);
   psa_reset_key_attributes(&attributes);
 
-  return VSCP_ERROR_SUCCESS;
+  return vscp_fwhlp_pkcs7_unpad(output + 1, real_len - 1);
 }
 
 #endif // VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO && ESP_PLATFORM
