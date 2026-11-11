@@ -268,9 +268,10 @@ int
 vscp_ws1_clearup(vscp_ws1_ctx_t *pctx, void *pdata);
 
 /*!
-  Generate a 16-byte session ID using the platform random source.  Can be
-  called as the generate_sid ops implementation if a simple rand()-based
-  source is acceptable.
+  Generate a 16-byte session ID. Uses the hardware RNG on ESP-IDF
+  (VSCP_WS1_PLATFORM_ESP_IDF). On other platforms it falls back to rand(),
+  which is predictable and not suitable for security: supply a
+  cryptographically secure source through ops->generate_sid instead.
   @param pctx  Connection context.
   @param sid   Output buffer.
   @param size  Must be >= 16.
@@ -278,6 +279,20 @@ vscp_ws1_clearup(vscp_ws1_ctx_t *pctx, void *pdata);
 */
 int
 vscp_ws1_generate_sid(vscp_ws1_ctx_t *pctx, uint8_t *sid, size_t size);
+
+/*!
+  Check if an event from the device should be delivered to this client.
+
+  The client must be authenticated, have an open channel (OPEN), the event
+  must pass the client's filter (SETFILTER) and ops->is_allowed_event, if set,
+  must allow it. Call this before sending an event to a client.
+
+  @param pctx  Connection context.
+  @param pev   Event to check.
+  @return true if the event should be sent to the client.
+*/
+bool
+vscp_ws1_is_event_for_client(vscp_ws1_ctx_t *pctx, vscp_event_t *pev);
 
 /*!
   Handle a text-framed WS1 protocol packet received from the client.

@@ -43,6 +43,11 @@ struct BinaryStub {
   uint16_t reply_error     = 0xFFFF;
   size_t   reply_data_len  = 0;
 
+  // Authentication state seen by check_authenticated
+  bool        not_authenticated = false;
+  std::string last_user;
+  std::string last_password;
+
   // individual command call counters
   int quit_calls        = 0;
   int user_calls        = 0;
@@ -114,12 +119,12 @@ static int bstub_quit(vscp_binary_ctx_t *pctx)
 
 static int bstub_user(vscp_binary_ctx_t *pctx, const char *user)
 {
-  (void)pctx; (void)user; g_bstub.user_calls++; return VSCP_ERROR_SUCCESS;
+  (void)pctx; g_bstub.last_user = user; g_bstub.user_calls++; return VSCP_ERROR_SUCCESS;
 }
 
 static int bstub_password(vscp_binary_ctx_t *pctx, const char *pass)
 {
-  (void)pctx; (void)pass; g_bstub.password_calls++; return VSCP_ERROR_SUCCESS;
+  (void)pctx; g_bstub.last_password = pass; g_bstub.password_calls++; return VSCP_ERROR_SUCCESS;
 }
 
 static int bstub_challenge(vscp_binary_ctx_t *pctx, uint8_t *ch, size_t len)
@@ -129,7 +134,7 @@ static int bstub_challenge(vscp_binary_ctx_t *pctx, uint8_t *ch, size_t len)
 
 static int bstub_check_authenticated(vscp_binary_ctx_t *pctx)
 {
-  (void)pctx; return VSCP_ERROR_SUCCESS;
+  (void)pctx; return g_bstub.not_authenticated ? VSCP_ERROR_INVALID_PERMISSION : VSCP_ERROR_SUCCESS;
 }
 
 static int bstub_send_event(vscp_binary_ctx_t *pctx, const vscp_event_t *pev)
@@ -695,4 +700,65 @@ TEST_F(VscpBinary, handle_event_calls_send_event_and_sends_confirm_reply)
   EXPECT_EQ(1, g_bstub.send_event_calls);
   EXPECT_EQ(1, g_bstub.reply_calls);
   EXPECT_EQ(VSCP_BINARY_COMMAND_CODE_EVENT_CONFIRM, g_bstub.reply_command);
+}
+
+// ===========================================================================
+// Authentication
+// ===========================================================================
+
+TEST_F(VscpBinary, privileged_commands_refused_before_login)
+{
+  g_bstub.not_authenticated = true;
+  uint8_t guid[16]          = { 0 };
+
+  cmd(VSCP_BINARY_COMMAND_CODE_RESTART);
+  EXPECT_EQ(0, g_bstub.restart_calls);
+  EXPECT_EQ(VSCP_ERROR_INVALID_PERMISSION, g_bstub.reply_error);
+
+  cmd(VSCP_BINARY_COMMAND_CODE_SETGUID, guid, sizeof(guid));
+  EXPECT_EQ(0, g_bstub.set_guid_calls);
+  EXPECT_EQ(VSCP_ERROR_INVALID_PERMISSION, g_bstub.reply_error);
+
+  cmd(VSCP_BINARY_COMMAND_CODE_OPEN);
+  EXPECT_EQ(0, g_bstub.open_calls);
+  EXPECT_EQ(VSCP_ERROR_INVALID_PERMISSION, g_bstub.reply_error);
+}
+
+TEST_F(VscpBinary, login_commands_allowed_before_login)
+{
+  g_bstub.not_authenticated = true;
+  const uint8_t user[]      = "admin";
+  const uint8_t pass[]      = "secret";
+
+  cmd(VSCP_BINARY_COMMAND_CODE_NOOP);
+  EXPECT_EQ(VSCP_ERROR_SUCCESS, g_bstub.reply_error);
+  cmd(VSCP_BINARY_COMMAND_CODE_USER, user, sizeof(user));
+  EXPECT_EQ(1, g_bstub.user_calls);
+  cmd(VSCP_BINARY_COMMAND_CODE_PASS, pass, sizeof(pass));
+  EXPECT_EQ(1, g_bstub.password_calls);
+  cmd(VSCP_BINARY_COMMAND_CODE_CHALLENGE);
+  EXPECT_EQ(1, g_bstub.challenge_calls);
+}
+
+TEST_F(VscpBinary, event_refused_before_login)
+{
+  g_bstub.not_authenticated = true;
+  vscp_event_t ev{};
+  vscp_handle_binary_event(&ctx, &ev);
+  EXPECT_EQ(0, g_bstub.send_event_calls);
+  EXPECT_EQ(VSCP_ERROR_INVALID_PERMISSION, g_bstub.reply_error);
+}
+
+TEST_F(VscpBinary, user_and_pass_args_are_null_terminated_and_bounded)
+{
+  // The argument is not null terminated in the frame
+  const uint8_t user[] = { 'a', 'd', 'm', 'i', 'n' };
+  cmd(VSCP_BINARY_COMMAND_CODE_USER, user, sizeof(user));
+  EXPECT_EQ("admin", g_bstub.last_user);
+
+  // Longer than VSCP_BINARY_MAX_PASSWORD_LENGTH is cut
+  uint8_t pass[100];
+  memset(pass, 'p', sizeof(pass));
+  cmd(VSCP_BINARY_COMMAND_CODE_PASS, pass, sizeof(pass));
+  EXPECT_EQ(std::string(VSCP_BINARY_MAX_PASSWORD_LENGTH, 'p'), g_bstub.last_password);
 }

@@ -59,6 +59,50 @@ vscp_binary_check_ctx(const vscp_binary_ctx_t *pctx)
 }
 
 
+// ---------------------------------------------------------------------------
+// Authentication. Applications that log in clients must set
+// ops->check_authenticated. Without it every client is treated as
+// authenticated (no login on this interface).
+// ---------------------------------------------------------------------------
+static bool
+vscp_binary_is_authenticated(vscp_binary_ctx_t *pctx)
+{
+  if (NULL == pctx->ops->check_authenticated) {
+    return true;
+  }
+  return (VSCP_ERROR_SUCCESS == pctx->ops->check_authenticated(pctx));
+}
+
+// Commands that are allowed before the client has logged in
+static bool
+vscp_binary_is_public_command(uint16_t command)
+{
+  switch (command) {
+    case VSCP_BINARY_COMMAND_CODE_NOOP:
+    case VSCP_BINARY_COMMAND_CODE_QUIT:
+    case VSCP_BINARY_COMMAND_CODE_USER:
+    case VSCP_BINARY_COMMAND_CODE_PASS:
+    case VSCP_BINARY_COMMAND_CODE_CHALLENGE:
+    case VSCP_BINARY_COMMAND_CODE_VERSION:
+      return true;
+    default:
+      return false;
+  }
+}
+
+// Copy a command argument to a null terminated string. The argument is not
+// null terminated within len in the frame.
+static void
+vscp_binary_arg_to_str(char *str, size_t size, const uint8_t *parg, size_t len)
+{
+  size_t n = 0;
+  if (NULL != parg) {
+    n = (len < size - 1) ? len : size - 1;
+    memcpy(str, parg, n);
+  }
+  str[n] = '\0';
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_handle_binary_command
 //
@@ -72,6 +116,10 @@ vscp_handle_binary_command(vscp_binary_ctx_t *pctx, uint16_t command, const uint
     return VSCP_ERROR_INIT_MISSING;
   }
 
+  if (!vscp_binary_is_public_command(command) && !vscp_binary_is_authenticated(pctx)) {
+    return pctx->ops->reply(pctx, command, VSCP_ERROR_INVALID_PERMISSION, NULL, 0);
+  }
+
   if (VSCP_BINARY_COMMAND_CODE_NOOP == command) {
     // No operation, just reply with success
     return pctx->ops->reply(pctx, command, VSCP_ERROR_SUCCESS, NULL, 0);
@@ -81,11 +129,26 @@ vscp_handle_binary_command(vscp_binary_ctx_t *pctx, uint16_t command, const uint
     return pctx->ops->quit(pctx);
   }
   else if (VSCP_BINARY_COMMAND_CODE_USER == command) {
-    rv = pctx->ops->user(pctx, (const char *) parg);
+    char user[VSCP_BINARY_MAX_USERNAME_LENGTH + 1];
+    if (NULL == pctx->ops->user) {
+      return pctx->ops->reply(pctx, command, VSCP_ERROR_NOT_SUPPORTED, NULL, 0);
+    }
+    vscp_binary_arg_to_str(user, sizeof(user), parg, len);
+    rv = pctx->ops->user(pctx, user);
     return pctx->ops->reply(pctx, command, rv, NULL, 0);
   }
   else if (VSCP_BINARY_COMMAND_CODE_PASS == command) {
-    rv = pctx->ops->password(pctx, (const char *) parg);
+    char password[VSCP_BINARY_MAX_PASSWORD_LENGTH + 1];
+    if (NULL == pctx->ops->password) {
+      return pctx->ops->reply(pctx, command, VSCP_ERROR_NOT_SUPPORTED, NULL, 0);
+    }
+    vscp_binary_arg_to_str(password, sizeof(password), parg, len);
+    rv = pctx->ops->password(pctx, password);
+    // Do not leave the password on the stack
+    volatile char *pw = password;
+    for (size_t i = 0; i < sizeof(password); i++) {
+      pw[i] = 0;
+    }
     pctx->ops->reply(pctx, command, rv, NULL, 0);
   }
   else if (VSCP_BINARY_COMMAND_CODE_CHALLENGE == command) {
@@ -490,7 +553,16 @@ vscp_handle_binary_event(vscp_binary_ctx_t *pctx, vscp_event_t *pEvent)
     return VSCP_ERROR_PARAMETER;
   }
 
-  rv = pctx->ops->send_event(pctx, pEvent);
+  // Only logged in clients may send events
+  if (!vscp_binary_is_authenticated(pctx)) {
+    rv = VSCP_ERROR_INVALID_PERMISSION;
+  }
+  else if (NULL == pctx->ops->send_event) {
+    rv = VSCP_ERROR_NOT_SUPPORTED;
+  }
+  else {
+    rv = pctx->ops->send_event(pctx, pEvent);
+  }
 
   // Event is deleted in caller routine
 
