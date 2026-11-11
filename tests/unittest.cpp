@@ -221,6 +221,30 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_5)
 }
 
 // Test Unix nanosecond timestamp parsing (no datestr format, just numeric)
+// endptr must stop at the end of the date, and never move past the end of the string
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_datestr_endptr_bounds)
+{
+  vscp_event_t ev;
+  vscp_event_ex_t ex;
+  char *endptr = NULL;
+
+  const char *s1 = "2024-06-30T23:59:58";
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_fwhlp_parse_event_datestr(&ev, s1, &endptr));
+  ASSERT_EQ(s1 + strlen(s1), endptr);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_fwhlp_parse_eventex_datestr(&ex, s1, &endptr));
+  ASSERT_EQ(s1 + strlen(s1), endptr);
+
+  const char *s2 = "2024-06-30T23:59:58Z";
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_fwhlp_parse_event_datestr(&ev, s2, &endptr));
+  ASSERT_EQ(s2 + strlen(s2), endptr);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_fwhlp_parse_eventex_datestr(&ex, s2, &endptr));
+  ASSERT_EQ(s2 + strlen(s2), endptr);
+
+  const char *s3 = "2024-06-30T23:59:58,NEXT";
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_fwhlp_parse_eventex_datestr(&ex, s3, &endptr));
+  ASSERT_STREQ(",NEXT", endptr);
+}
+
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_unix_ns_1)
 {
   int rv;

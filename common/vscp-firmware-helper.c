@@ -749,11 +749,10 @@ vscp_fwhlp_parse_event_datestr(vscp_event_t *pev, const char *strdate, char **en
 
   // second
   pev->second = (uint8_t) strtol(p, &p, 10);
-  p++; // point beyond second
 
-  // If 'Z' is not preset we still accept
-  if ('Z' != *p) {
-    p++; // point beyond "Z" (for endptr
+  // Optional trailing 'Z'. p must not be moved past the end of the string.
+  if ('Z' == *p) {
+    p++;
   }
 
   if (endptr) {
@@ -860,11 +859,10 @@ vscp_fwhlp_parse_eventex_datestr(vscp_event_ex_t *pex, const char *strdate, char
 
   // second
   pex->second = (uint16_t) strtol(p, &p, 10);
-  p++; // point beyond second
 
-  // If 'Z' is not preset we still accept
-  if ('Z' != *p) {
-    p++; // point beyond "Z" (for endptr
+  // Optional trailing 'Z'. p must not be moved past the end of the string.
+  if ('Z' == *p) {
+    p++;
   }
 
   if (endptr) {
