@@ -4268,6 +4268,86 @@ vscp_fwhlp_get_json_item_compat(cJSON *root, const char *tag, const char *legacy
   return item;
 }
 
+//
+// Convert a JSON number to uint32_t, clamped to [0, UINT32_MAX].
+// Non-numbers give 0. (Casting an out of range double is undefined in C.)
+//
+
+static uint32_t
+vscp_fwhlp_json_to_u32(const cJSON *item)
+{
+  if (!cJSON_IsNumber(item)) {
+    return 0;
+  }
+  double d = item->valuedouble;
+  if (!(d >= 0)) { // Also catches NaN
+    return 0;
+  }
+  if (d >= 4294967295.0) {
+    return UINT32_MAX;
+  }
+  return (uint32_t) d;
+}
+
+//
+// Convert a JSON number to uint64_t, clamped to [0, UINT64_MAX].
+//
+
+static uint64_t
+vscp_fwhlp_json_to_u64(const cJSON *item)
+{
+  if (!cJSON_IsNumber(item)) {
+    return 0;
+  }
+  double d = item->valuedouble;
+  if (!(d >= 0)) {
+    return 0;
+  }
+  if (d >= 18446744073709551615.0) {
+    return UINT64_MAX;
+  }
+  return (uint64_t) d;
+}
+
+//
+// Check a JSON data array: at most VSCP_MAX_DATA elements that are all
+// integers in the range 0-255. On success *pcount holds the number of
+// elements and, if buf is not NULL, the bytes are written to buf.
+//
+
+static int
+vscp_fwhlp_json_get_data(const cJSON *item, uint8_t *buf, uint16_t *pcount)
+{
+  if (!cJSON_IsArray(item)) {
+    return VSCP_ERROR_INVALID_SYNTAX;
+  }
+
+  int count = cJSON_GetArraySize(item);
+  if ((count < 0) || (count > VSCP_MAX_DATA)) {
+    return VSCP_ERROR_SIZE;
+  }
+
+  int i = 0;
+  const cJSON *element;
+  cJSON_ArrayForEach(element, item)
+  {
+    if (!cJSON_IsNumber(element)) {
+      return VSCP_ERROR_INVALID_SYNTAX;
+    }
+    double d = element->valuedouble;
+    if (!(d >= 0) || (d > 255) || (d != (double) (uint8_t) d)) {
+      return VSCP_ERROR_INVALID_SYNTAX;
+    }
+    if (NULL != buf) {
+      buf[i] = (uint8_t) d;
+    }
+    i++;
+  }
+
+  *pcount = (uint16_t) i;
+  return VSCP_ERROR_SUCCESS;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_parse_json
 //
@@ -4320,7 +4400,7 @@ vscp_fwhlp_parse_json(vscp_event_t *pev, const char *jsonVscpEventObj)
   }
 
   if (cJSON_GetObjectItem(root, "obid")) {
-    pev->obid = (uint32_t) cJSON_GetObjectItem(root, "obid")->valuedouble;
+    pev->obid = vscp_fwhlp_json_to_u32(cJSON_GetObjectItem(root, "obid"));
   }
 
   // Parse datetime and timestamp into local variables first
@@ -4332,14 +4412,17 @@ vscp_fwhlp_parse_json(vscp_event_t *pev, const char *jsonVscpEventObj)
   // "2017-01-13T10:16:02",
   item = vscp_fwhlp_get_json_item_compat(root, "datetime", "vscpDateTime");
   if (NULL != item) {
-    const char *str = item->valuestring;
-    sscanf(str, "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second);
+    if (!cJSON_IsString(item) || (NULL == item->valuestring)) {
+      cJSON_Delete(root);
+      return VSCP_ERROR_INVALID_SYNTAX;
+    }
+    sscanf(item->valuestring, "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second);
     has_datetime = 1;
   }
 
   item = vscp_fwhlp_get_json_item_compat(root, "timestamp", "vscpTimeStamp");
   if (NULL != item) {
-    timestamp_us = (uint32_t) item->valuedouble;
+    timestamp_us = vscp_fwhlp_json_to_u32(item);
   }
 
   // Handle timestamp - prefer timestamp_ns if available, otherwise convert datetime + timestamp to timestamp_ns
@@ -4351,7 +4434,7 @@ vscp_fwhlp_parse_json(vscp_event_t *pev, const char *jsonVscpEventObj)
       pev->timestamp_ns = (uint64_t) strtoull(ts_item->valuestring, NULL, 0);
     }
     else {
-      pev->timestamp_ns = (uint64_t) ts_item->valuedouble;
+      pev->timestamp_ns = vscp_fwhlp_json_to_u64(ts_item);
     }
     // Set frame version to UNIX_NS
     pev->head  = (pev->head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
@@ -4380,8 +4463,11 @@ vscp_fwhlp_parse_json(vscp_event_t *pev, const char *jsonVscpEventObj)
 
   item = vscp_fwhlp_get_json_item_compat(root, "guid", "vscpGuid");
   if (NULL != item) {
-    const char *str = item->valuestring;
-    if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseGuid(pev->GUID, str, NULL))) {
+    if (!cJSON_IsString(item) || (NULL == item->valuestring)) {
+      cJSON_Delete(root);
+      return VSCP_ERROR_INVALID_SYNTAX;
+    }
+    if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseGuid(pev->GUID, item->valuestring, NULL))) {
       cJSON_Delete(root);
       return rv;
     }
@@ -4389,21 +4475,23 @@ vscp_fwhlp_parse_json(vscp_event_t *pev, const char *jsonVscpEventObj)
 
   item = vscp_fwhlp_get_json_item_compat(root, "data", "vscpData");
   if (NULL != item) {
+    uint16_t count;
 
-    cJSON *pdata  = item;
-    pev->sizeData = cJSON_GetArraySize(pdata);
-    pev->pdata    = (uint8_t *) malloc(pev->sizeData);
-    if (NULL == pev->pdata) {
+    // Validate first so no memory is allocated for bad data
+    if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_json_get_data(item, NULL, &count))) {
       cJSON_Delete(root);
-      return VSCP_ERROR_MEMORY;
+      return rv;
     }
 
-    for (int i = 0; i < pev->sizeData; i++) {
-      cJSON *pitem = cJSON_GetArrayItem(pdata, i);
-      if (pitem->type == cJSON_Number && i < 512) {
-        pev->pdata[i] = pitem->valueint;
+    if (count > 0) {
+      pev->pdata = (uint8_t *) malloc(count);
+      if (NULL == pev->pdata) {
+        cJSON_Delete(root);
+        return VSCP_ERROR_MEMORY;
       }
+      vscp_fwhlp_json_get_data(item, pev->pdata, &count);
     }
+    pev->sizeData = count;
   }
 
   cJSON_Delete(root);
@@ -4462,7 +4550,7 @@ vscp_fwhlp_parse_json_ex(vscp_event_ex_t *pex, const char *jsonVscpEventObj)
   }
 
   if (cJSON_GetObjectItem(root, "obid")) {
-    pex->obid = (uint32_t) cJSON_GetObjectItem(root, "obid")->valuedouble;
+    pex->obid = vscp_fwhlp_json_to_u32(cJSON_GetObjectItem(root, "obid"));
   }
 
   // Parse datetime and timestamp into local variables first
@@ -4474,14 +4562,17 @@ vscp_fwhlp_parse_json_ex(vscp_event_ex_t *pex, const char *jsonVscpEventObj)
   // "2017-01-13T10:16:02",
   item = vscp_fwhlp_get_json_item_compat(root, "datetime", "vscpDateTime");
   if (NULL != item) {
-    const char *str = item->valuestring;
-    sscanf(str, "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second);
+    if (!cJSON_IsString(item) || (NULL == item->valuestring)) {
+      cJSON_Delete(root);
+      return VSCP_ERROR_INVALID_SYNTAX;
+    }
+    sscanf(item->valuestring, "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second);
     has_datetime = 1;
   }
 
   item = vscp_fwhlp_get_json_item_compat(root, "timestamp", "vscpTimeStamp");
   if (NULL != item) {
-    timestamp_us = (uint32_t) item->valuedouble;
+    timestamp_us = vscp_fwhlp_json_to_u32(item);
   }
 
   // Handle timestamp - prefer timestamp_ns if available, otherwise convert datetime + timestamp to timestamp_ns
@@ -4493,7 +4584,7 @@ vscp_fwhlp_parse_json_ex(vscp_event_ex_t *pex, const char *jsonVscpEventObj)
       pex->timestamp_ns = (uint64_t) strtoull(ts_item->valuestring, NULL, 0);
     }
     else {
-      pex->timestamp_ns = (uint64_t) ts_item->valuedouble;
+      pex->timestamp_ns = vscp_fwhlp_json_to_u64(ts_item);
     }
     // Set frame version to UNIX_NS
     pex->head  = (pex->head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
@@ -4522,8 +4613,11 @@ vscp_fwhlp_parse_json_ex(vscp_event_ex_t *pex, const char *jsonVscpEventObj)
 
   item = vscp_fwhlp_get_json_item_compat(root, "guid", "vscpGuid");
   if (NULL != item) {
-    const char *str = item->valuestring;
-    if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseGuid(pex->GUID, str, NULL))) {
+    if (!cJSON_IsString(item) || (NULL == item->valuestring)) {
+      cJSON_Delete(root);
+      return VSCP_ERROR_INVALID_SYNTAX;
+    }
+    if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_parseGuid(pex->GUID, item->valuestring, NULL))) {
       cJSON_Delete(root);
       return rv;
     }
@@ -4531,15 +4625,9 @@ vscp_fwhlp_parse_json_ex(vscp_event_ex_t *pex, const char *jsonVscpEventObj)
 
   item = vscp_fwhlp_get_json_item_compat(root, "data", "vscpData");
   if (NULL != item) {
-
-    cJSON *pdata  = item;
-    pex->sizeData = cJSON_GetArraySize(pdata);
-
-    for (int i = 0; i < pex->sizeData; i++) {
-      cJSON *pitem = cJSON_GetArrayItem(pdata, i);
-      if (pitem->type == cJSON_Number && i < 512) {
-        pex->data[i] = pitem->valueint;
-      }
+    if (VSCP_ERROR_SUCCESS != (rv = vscp_fwhlp_json_get_data(item, pex->data, &pex->sizeData))) {
+      cJSON_Delete(root);
+      return rv;
     }
   }
 

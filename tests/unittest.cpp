@@ -2852,6 +2852,96 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_basic)
   free(ev.pdata);
 }
 
+// Builds {"class":1040,"type":1,"data":[1,1,...]} with n data bytes
+static std::string
+make_json_with_data(int n)
+{
+  std::string json = "{\"class\":1040,\"type\":1,\"data\":[";
+  for (int i = 0; i < n; i++) {
+    json += (i ? ",1" : "1");
+  }
+  json += "]}";
+  return json;
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_data_max_size)
+{
+  vscp_event_t ev;
+  vscp_event_ex_t ex;
+  std::string json = make_json_with_data(VSCP_MAX_DATA);
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_fwhlp_parse_json(&ev, json.c_str()));
+  ASSERT_EQ(VSCP_MAX_DATA, ev.sizeData);
+  ASSERT_EQ(1, ev.pdata[VSCP_MAX_DATA - 1]);
+  free(ev.pdata);
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_fwhlp_parse_json_ex(&ex, json.c_str()));
+  ASSERT_EQ(VSCP_MAX_DATA, ex.sizeData);
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_data_too_large)
+{
+  vscp_event_t ev;
+  vscp_event_ex_t ex;
+  std::string json = make_json_with_data(VSCP_MAX_DATA + 1);
+
+  // Must be refused, sizeData above VSCP_MAX_DATA overruns ex.data for later users
+  ASSERT_EQ(VSCP_ERROR_SIZE, vscp_fwhlp_parse_json(&ev, json.c_str()));
+  ASSERT_EQ(NULL, ev.pdata);
+  ASSERT_EQ(VSCP_ERROR_SIZE, vscp_fwhlp_parse_json_ex(&ex, json.c_str()));
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_data_invalid_bytes)
+{
+  vscp_event_t ev;
+  vscp_event_ex_t ex;
+  const char *bad[] = {
+    "{\"class\":10,\"type\":6,\"data\":[1,256]}",   // Out of range
+    "{\"class\":10,\"type\":6,\"data\":[1,-1]}",    // Negative
+    "{\"class\":10,\"type\":6,\"data\":[1,2.5]}",   // Not an integer
+    "{\"class\":10,\"type\":6,\"data\":[1,\"2\"]}", // Not a number
+    "{\"class\":10,\"type\":6,\"data\":7}",         // Not an array
+  };
+
+  for (const char *json : bad) {
+    ASSERT_EQ(VSCP_ERROR_INVALID_SYNTAX, vscp_fwhlp_parse_json(&ev, json)) << json;
+    ASSERT_EQ(NULL, ev.pdata) << json;
+    ASSERT_EQ(VSCP_ERROR_INVALID_SYNTAX, vscp_fwhlp_parse_json_ex(&ex, json)) << json;
+  }
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_non_string_fields)
+{
+  vscp_event_t ev;
+  vscp_event_ex_t ex;
+  const char *bad[] = {
+    "{\"class\":10,\"type\":6,\"datetime\":5}",    // valuestring would be NULL
+    "{\"class\":10,\"type\":6,\"vscpDateTime\":{}}",
+    "{\"class\":10,\"type\":6,\"guid\":5}",
+  };
+
+  for (const char *json : bad) {
+    ASSERT_EQ(VSCP_ERROR_INVALID_SYNTAX, vscp_fwhlp_parse_json(&ev, json)) << json;
+    ASSERT_EQ(VSCP_ERROR_INVALID_SYNTAX, vscp_fwhlp_parse_json_ex(&ex, json)) << json;
+  }
+}
+
+TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_out_of_range_numbers)
+{
+  vscp_event_ex_t ex;
+
+  // Out of range values are clamped, not converted with undefined behaviour
+  ASSERT_EQ(VSCP_ERROR_SUCCESS,
+            vscp_fwhlp_parse_json_ex(&ex, "{\"class\":10,\"type\":6,\"obid\":-5,\"timestamp_ns\":-1}"));
+  ASSERT_EQ(0u, ex.obid);
+  ASSERT_EQ(0u, ex.timestamp_ns);
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS,
+            vscp_fwhlp_parse_json_ex(&ex, "{\"class\":10,\"type\":6,\"obid\":1e20,\"timestamp_ns\":1e30}"));
+  ASSERT_EQ(UINT32_MAX, ex.obid);
+  ASSERT_EQ(UINT64_MAX, ex.timestamp_ns);
+}
+
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_ex_basic)
 {
   vscp_event_ex_t ex;
@@ -3293,9 +3383,11 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_empty_data)
   ASSERT_EQ(VSCP_ERROR_SUCCESS, rv);
 
   ASSERT_EQ(0, ev.sizeData);
-  ASSERT_NE(nullptr, ev.pdata); // Should still allocate
+  ASSERT_EQ(nullptr, ev.pdata); // No data, no allocation (malloc(0) may return NULL)
 
-  free(ev.pdata);
+  vscp_event_ex_t ex;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_fwhlp_parse_json_ex(&ex, json));
+  ASSERT_EQ(0, ex.sizeData);
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_create_json_ex_null_pointer)
