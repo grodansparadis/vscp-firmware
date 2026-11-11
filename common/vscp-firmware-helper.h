@@ -391,7 +391,9 @@ vscp_fwhlp_parse_eventex_datestr(vscp_event_ex_t *pex, const char *strdate, char
     @param minute Minute of time (0-59)
     @param second Second of time (0-59)
     @param microsecond Microsecond part of time (0-999999)
-    @return Unix 64-bit timestamp in nanoseconds
+    @return Unix 64-bit timestamp in nanoseconds. Dates outside the range a
+            signed 64-bit nanosecond count can hold (1677-09-21 to
+            2262-04-11) give INT64_MIN or INT64_MAX.
 */
 int64_t
 vscp_fwhlp_to_unix_ns(int year, int month, int day, int hour, int minute, int second, uint32_t microsecond);

@@ -883,9 +883,10 @@ vscp_fwhlp_parse_eventex_datestr(vscp_event_ex_t *pex, const char *strdate, char
 static int64_t
 days_from_civil(int year, int month, int day)
 {
-  year -= (month <= 2);
-  int era      = (year >= 0 ? year : year - 399) / 400;
-  unsigned yoe = (unsigned) (year - era * 400);                            // [0, 399]
+  // 64-bit so extreme int years can not overflow
+  int64_t y    = (int64_t) year - (month <= 2);
+  int64_t era  = (y >= 0 ? y : y - 399) / 400;
+  unsigned yoe = (unsigned) (y - era * 400);                               // [0, 399]
   unsigned doy = (153 * (month + (month > 2 ? -3 : 9)) + 2) / 5 + day - 1; // [0, 365]
   unsigned doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;                    // [0,146096]
   return era * 146097LL + (int64_t) doe - 719468LL;
@@ -899,9 +900,19 @@ vscp_fwhlp_to_unix_ns(int year, int month, int day, int hour, int minute, int se
 
   // Convert everything to seconds
   int64_t total_seconds = days * SECS_PER_DAY + hour * 3600LL + minute * 60LL + second;
+  int64_t frac_ns       = (int64_t) microsecond * 1000LL; // At most ~4.3e12
+
+  // int64_t nanoseconds cover 1677-09-21 to 2262-04-11. Clamp dates outside
+  // that range instead of overflowing (e.g. the all-zero "not set" date, year 0).
+  if (total_seconds > (INT64_MAX - frac_ns) / NS_PER_SEC) {
+    return INT64_MAX;
+  }
+  if (total_seconds < INT64_MIN / NS_PER_SEC) {
+    return INT64_MIN;
+  }
 
   // Convert to nanoseconds
-  return total_seconds * NS_PER_SEC + (int64_t) microsecond * 1000LL;
+  return total_seconds * NS_PER_SEC + frac_ns;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

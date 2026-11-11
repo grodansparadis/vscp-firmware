@@ -245,6 +245,27 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_datestr_endptr_bounds)
   ASSERT_STREQ(",NEXT", endptr);
 }
 
+// Dates outside the int64_t nanosecond range are clamped, not overflowed
+TEST(_vscp_firmware_helper, vscp_fwhlp_to_unix_ns_range)
+{
+  ASSERT_EQ(0, vscp_fwhlp_to_unix_ns(1970, 1, 1, 0, 0, 0, 0));
+  ASSERT_EQ(1719791998000000000LL, vscp_fwhlp_to_unix_ns(2024, 6, 30, 23, 59, 58, 0));
+  ASSERT_EQ(-1000000000LL, vscp_fwhlp_to_unix_ns(1969, 12, 31, 23, 59, 59, 0));
+
+  // Largest representable value: 2262-04-11T23:47:16.854775807
+  ASSERT_EQ(INT64_MAX - 807, vscp_fwhlp_to_unix_ns(2262, 4, 11, 23, 47, 16, 854775));
+  ASSERT_EQ(INT64_MAX, vscp_fwhlp_to_unix_ns(2262, 4, 11, 23, 47, 17, 0));
+  ASSERT_EQ(INT64_MAX, vscp_fwhlp_to_unix_ns(9999, 12, 31, 23, 59, 59, 999999));
+
+  // All-zero "not set" date (year 0) and other early dates
+  ASSERT_EQ(INT64_MIN, vscp_fwhlp_to_unix_ns(0, 0, 0, 0, 0, 0, 0));
+  ASSERT_EQ(INT64_MIN, vscp_fwhlp_to_unix_ns(1600, 1, 1, 0, 0, 0, 0));
+
+  // Extreme int years must not overflow either
+  ASSERT_EQ(INT64_MAX, vscp_fwhlp_to_unix_ns(INT_MAX, 12, 31, 23, 59, 59, 0));
+  ASSERT_EQ(INT64_MIN, vscp_fwhlp_to_unix_ns(INT_MIN, 1, 1, 0, 0, 0, 0));
+}
+
 TEST(_vscp_firmware_helper, vscp_fwhlp_parse_eventex_datestr_unix_ns_1)
 {
   int rv;
