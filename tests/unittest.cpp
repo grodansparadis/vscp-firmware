@@ -4189,7 +4189,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_1)
   ASSERT_EQ(0, ev.pdata[0]);
   ASSERT_EQ(1, ev.pdata[1]);
   ASSERT_EQ(35, ev.pdata[2]);
-  delete[] ev.pdata;
+  free(ev.pdata); // Allocated with malloc() by the parser
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_2)
@@ -4216,7 +4216,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_2)
   ASSERT_EQ(0, ev.pdata[0]);
   ASSERT_EQ(0x44, ev.pdata[1]);
   ASSERT_EQ(35, ev.pdata[2]);
-  delete[] ev.pdata;  
+  free(ev.pdata); // Allocated with malloc() by the parser
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_3)
@@ -4243,7 +4243,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_3)
   ASSERT_EQ(0, ev.pdata[0]);
   ASSERT_EQ(1, ev.pdata[1]);
   ASSERT_EQ(35, ev.pdata[2]);
-  delete[] ev.pdata;
+  free(ev.pdata); // Allocated with malloc() by the parser
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_1)
@@ -4350,7 +4350,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_unix_ns_timestamp)
   ASSERT_EQ(0, ev.pdata[0]);
   ASSERT_EQ(1, ev.pdata[1]);
   ASSERT_EQ(35, ev.pdata[2]);
-  delete[] ev.pdata;
+  free(ev.pdata); // Allocated with malloc() by the parser
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEventEx_unix_ns_timestamp)
@@ -4398,7 +4398,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parseStringToEvent_microsecond_timestamp)
   // Timestamp ns is converted from 2024-06-30T23:59:58 with 12345678 microseconds
   ASSERT_EQ(vscp_fwhlp_to_unix_ns(2024, 6, 30, 23, 59, 58, 12345678), ev.timestamp_ns);
   ASSERT_EQ(0, memcmp(ev.GUID, guid, 16));
-  delete[] ev.pdata;
+  free(ev.pdata); // Allocated with malloc() by the parser
 }
 
 // Test that datetime with microsecond timestamp is converted to nanoseconds
