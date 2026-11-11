@@ -1,5 +1,6 @@
 #include <cstring>
 #include <gtest/gtest.h>
+#include <vector>
 
 extern "C" {
 #include "vscp.h"
@@ -561,4 +562,56 @@ TEST(_vscp_frmw2, handle_protocol_event_read_register_sends_rw_response)
   ASSERT_EQ(2u, g_stub.last_sent.sizeData);
   ASSERT_EQ(kReg, g_stub.last_sent.pdata[0]); // register echoed
   ASSERT_EQ(FRMW2_MAJOR_VERSION, g_stub.last_sent.pdata[1]); // register value
+}
+
+// ---------------------------------------------------------------------------
+// Bounds checks on received protocol events
+// ---------------------------------------------------------------------------
+
+TEST(_vscp_frmw2, handle_protocol_event_probe_ack_on_8bit_nickname_match)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_config(cfg);
+  cfg.level    = VSCP_LEVEL1;
+  cfg.nickname = 0x0042;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
+  reset_stub();
+  cfg.state = FRMW2_STATE_ACTIVE;
+
+  // One data byte (8-bit node id). Used to read a second byte past the data.
+  uint8_t buf[1] = { 0x42 };
+  vscp_event_t ev;
+  std::memset(&ev, 0, sizeof(ev));
+  ev.vscp_class = VSCP_CLASS1_PROTOCOL;
+  ev.vscp_type  = VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE;
+  ev.sizeData   = 1;
+  ev.pdata      = buf;
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_handle_protocol_event(&cfg, &ev));
+  ASSERT_EQ(1, g_stub.send_calls);
+  ASSERT_EQ(VSCP_TYPE_PROTOCOL_PROBE_ACK, g_stub.last_sent.vscp_type);
+}
+
+TEST(_vscp_frmw2, handle_protocol_event_extended_page_write_bad_size_refused)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_config(cfg);
+  cfg.level    = VSCP_LEVEL1;
+  cfg.nickname = 0x0042;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
+  reset_stub();
+  cfg.state = FRMW2_STATE_ACTIVE;
+
+  // Too short made the byte count wrap, too long overran a 4 byte stack buffer
+  for (uint16_t size : { 0, 1, 2, 3, 4, 9, 64, 512 }) {
+    std::vector<uint8_t> buf(size ? size : 1, 0x42);
+    vscp_event_t ev;
+    std::memset(&ev, 0, sizeof(ev));
+    ev.vscp_class = VSCP_CLASS1_PROTOCOL;
+    ev.vscp_type  = VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_WRITE;
+    ev.sizeData   = size;
+    ev.pdata      = size ? buf.data() : nullptr;
+
+    ASSERT_EQ(VSCP_ERROR_INVALID_FRAME, vscp_frmw2_handle_protocol_event(&cfg, &ev)) << size;
+  }
 }

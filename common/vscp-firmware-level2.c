@@ -587,8 +587,8 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
       case VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE:
         // 8-bit node id
         if (1 == ADJSIZEV) {
-          // If addressed to us?
-          if (construct_unsigned16(EVDTA(0), EVDTA(1)) == pctx->nickname) {
+          // If addressed to us? (only one data byte, EVDTA(1) does not exist)
+          if (construct_unsigned16(0, EVDTA(0)) == pctx->nickname) {
             // Confirm probe
             vscp_event_t *pevrply = vscp_fwhlp_newEvent();
             if (NULL == pevrply) {
@@ -1269,7 +1269,15 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
 
       case VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_WRITE: {
         uint8_t buf[4];
-        uint8_t cnt = ADJSIZEV - 4;
+
+        // node, page MSB, page LSB, offset and 1-4 data bytes. Without this
+        // check ADJSIZEV - 4 wrapped or exceeded buf and overwrote the stack.
+        if ((ADJSIZEV < 5) || (ADJSIZEV > 8)) {
+          rv = VSCP_ERROR_INVALID_FRAME;
+          break;
+        }
+
+        uint8_t cnt = (uint8_t) (ADJSIZEV - 4);
 
         for (int i = 0; i < cnt; i++) {
           buf[i] = EVDTA(4 + i);
