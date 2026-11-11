@@ -304,11 +304,13 @@ vscp_link_doCmdRetrieve(vscp_link_ctx_t *pctx, const char *pcmd)
     // We own the event from now on and must
     // delete it and it's data when we are done
     // with it
-    if (VSCP_ERROR_SUCCESS == (rv = vscp_fwhlp_eventToString(buf, sizeof(buf), pev))) {
+    // Leave room for the "\r\n" appended below
+    if (VSCP_ERROR_SUCCESS == (rv = vscp_fwhlp_eventToString(buf, sizeof(buf) - 2, pev))) {
       strcat(buf, "\r\n");
       pctx->ops->write_client(pctx, buf);
     }
     else {
+      vscp_fwhlp_deleteEvent(&pev);
       return pctx->ops->write_client(pctx, VSCP_LINK_MSG_ERROR);
     }
     // Free event
