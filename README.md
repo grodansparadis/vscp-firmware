@@ -57,7 +57,8 @@ It is updated automatically on every push to `master` by the
 [Update version](https://github.com/grodansparadis/vscp-firmware/actions/workflows/update-version.yml)
 workflow: the patch number counts the pushes in a month and starts at 0 in a
 new month. Do not edit the header by hand. Pushes whose commit message
-contains `[skip ci]` do not change the version.
+contains `[skip ci]` (anywhere, also in the body) do not change the version;
+the workflow can also be started by hand from the Actions tab.
 
 This is the version of the library code, not the VSCP protocol version that
 nodes report in registers 0x81/0x82 (`VSCP_MAJOR_VERSION` etc. in
