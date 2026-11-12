@@ -21,7 +21,7 @@ import pathlib
 import re
 import sys
 
-DEFAULT_HEADER = pathlib.Path(__file__).resolve().parent.parent / "common" / "vscp-firmware-version.h"
+DEFAULT_HEADER = pathlib.Path(__file__).resolve().parent.parent / "src" / "vscp-firmware-version.h"
 
 FIELDS = ("YEAR", "MONTH", "PATCH")
 PATCH_MAX = 0xFFFF  # 16 bits in VSCP_FIRMWARE_LIB_VERSION
