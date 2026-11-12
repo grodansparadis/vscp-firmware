@@ -875,6 +875,43 @@ vscp_fwhlp_writeReplyToFrame(uint8_t *frame,
 */
 #ifdef VSCP_FWHLP_CRYPTO_SUPPORT
 
+/*
+  Footprint switch for 8-bit and 32-bit targets
+
+  Default (not defined) - for 32-bit targets:
+    - SHA-256 with the full 64 word message schedule (fastest).
+    - Work buffers from malloc, any frame size.
+    - Reentrant (safe with RTOS threads).
+
+  #define VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT - for 8-bit targets:
+    - SHA-256 with a rolling 16 word schedule (256 -> 64 bytes of stack).
+    - No malloc in vscp_fwhlp_encryptFrame (built in AES backend) or the
+      version 1 (authenticated) frame functions. Static buffers for frames up
+      to VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE bytes (default 128); larger frames
+      are refused.
+    - The HMAC key state is cached (264 bytes), which saves two SHA-256
+      blocks per frame while the key stays the same. Call
+      vscp_fwhlp_clearCryptoCache() to wipe the cached key material (e.g. when
+      changing keys or sleeping). Also define
+      VSCP_FWHLP_CRYPTO_NO_HMAC_CACHE to save that RAM (slower).
+    - Static RAM: 2 * VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE + 64 bytes for work
+      buffers, plus the HMAC cache. Lower VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE to
+      the largest frame the node uses.
+    - NOT reentrant: use from one thread / context only.
+
+  Both settings give identical frames on the wire.
+*/
+#if defined(VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT) && !defined(VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE)
+#define VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE 128
+#endif
+
+/*!
+ * @brief Wipe cached key material (HMAC key state in small footprint mode).
+ * Does nothing when VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT is not defined.
+ */
+void
+vscp_fwhlp_clearCryptoCache(void);
+
 /*!
  * Encrypt VSCP frame using the selected encryption algorithm. The iv
  * initialization vector) is appended to the end of the encrypted data.

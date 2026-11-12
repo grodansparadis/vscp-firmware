@@ -248,3 +248,49 @@ TEST_F(AuthenticatedFrame, InvalidPacketTypeIsRejected)
   ASSERT_EQ(0u, vscp_fwhlp_decodeAuthenticatedFrame(out, sizeof(out), wire, wireLen, aesKey.data(), hmacKey.data(),
                                                     VSCP_ENCRYPTION_AES256));
 }
+
+// Frame size limit of the small footprint (no malloc) mode
+TEST_F(AuthenticatedFrame, SmallFootprintFrameSize)
+{
+  std::vector<uint8_t> plain(300);
+  plain[0] = 0x00;
+  for (size_t i = 1; i < plain.size() - 2; i++) {
+    plain[i] = (uint8_t) i;
+  }
+  crc c                    = crcFast(plain.data() + 1, (int) plain.size() - 3);
+  plain[plain.size() - 2]  = (uint8_t) (c >> 8);
+  plain[plain.size() - 1]  = (uint8_t) c;
+  std::vector<uint8_t> wire(plain.size() + VSCP_FWHLP_FRAME_HEADER_SIZE + VSCP_FWHLP_FRAME_V1_OVERHEAD);
+
+  size_t wireLen = vscp_fwhlp_encodeAuthenticatedFrame(wire.data(), wire.size(), plain.data(), plain.size(),
+                                                       aesKey.data(), hmacKey.data(), NULL, VSCP_ENCRYPTION_AES128);
+#ifdef VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT
+  // Larger than VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE - refused instead of overflowing
+  ASSERT_EQ(0u, wireLen);
+#else
+  ASSERT_GT(wireLen, 0u);
+  std::vector<uint8_t> out(plain.size());
+  ASSERT_EQ(plain.size(), vscp_fwhlp_decodeAuthenticatedFrame(out.data(), out.size(), wire.data(), wireLen,
+                                                              aesKey.data(), hmacKey.data(), VSCP_ENCRYPTION_AES128));
+#endif
+}
+
+// Key changes are picked up (the small footprint mode caches the key state)
+TEST_F(AuthenticatedFrame, KeyChangeAndCacheClear)
+{
+  uint8_t wire[128], out[64];
+  std::vector<uint8_t> otherHmac(32, 0x77);
+  size_t w1 = vscp_fwhlp_encodeAuthenticatedFrame(wire, sizeof(wire), knownPlain.data(), knownPlain.size(),
+                                                  aesKey.data(), otherHmac.data(), fixedIv.data(),
+                                                  VSCP_ENCRYPTION_AES256);
+  ASSERT_GT(w1, 0u);
+  ASSERT_NE(0, memcmp(wire, knownRecord.data(), w1)); // Different key, different tag
+  ASSERT_EQ(knownPlain.size(), vscp_fwhlp_decodeAuthenticatedFrame(out, sizeof(out), wire, w1, aesKey.data(),
+                                                                   otherHmac.data(), VSCP_ENCRYPTION_AES256));
+  vscp_fwhlp_clearCryptoCache();
+  size_t w2 = vscp_fwhlp_encodeAuthenticatedFrame(wire, sizeof(wire), knownPlain.data(), knownPlain.size(),
+                                                  aesKey.data(), hmacKey.data(), fixedIv.data(),
+                                                  VSCP_ENCRYPTION_AES256);
+  ASSERT_EQ(knownRecord.size(), w2);
+  ASSERT_EQ(0, memcmp(wire, knownRecord.data(), w2));
+}

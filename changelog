@@ -1,3 +1,7 @@
+261112 - VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT for 8-bit targets: smaller SHA-256 stack, no malloc in
+         the built in AES and authenticated frame code, cached HMAC key state
+         (VSCP_FWHLP_CRYPTO_NO_HMAC_CACHE, VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE).
+
 261112 - Added authenticated binary frames (version 1, AES-CBC + HMAC-SHA-256, built in SHA-256)
          compatible with the VSCP helper library. Fixed the CRC of command/reply frames (was
          calculated over the not yet written CRC bytes). CLASS2.MEASUREMENT_FLOAT decoded MSB first.

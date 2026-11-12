@@ -46,6 +46,14 @@ The helper API is split into always-available and feature-gated parts.
   - Enables `vscp_fwhlp_encryptFrame` and `vscp_fwhlp_decryptFrame`.
   - Together with `VSCP_FWHLP_BINARY_FRAME_SUPPORT` also the authenticated
     (version 1, AES-CBC + HMAC-SHA-256) frame APIs. SHA-256/HMAC is built in.
+- `VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT` (8-bit targets, optional)
+  - Smaller SHA-256 stack, no `malloc` in the built in AES and authenticated
+    frame code (static buffers), cached HMAC key state. Not reentrant.
+  - `VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE` - largest frame (default 128); larger
+    frames are refused.
+  - `VSCP_FWHLP_CRYPTO_NO_HMAC_CACHE` - do not cache the HMAC key state (saves
+    264 bytes RAM, two more SHA-256 blocks per frame).
+  - See "Footprint: 8-bit and 32-bit targets" below.
 - `VSCP_FWHLP_JSON_SUPPORT`
   - Enables JSON parse/create APIs.
 - `VSCP_FWHLP_XML_SUPPORT`
@@ -392,6 +400,31 @@ if (0 == plainLen) {
   // Not authentic, wrong algorithm/version or corrupt - drop it
 }
 ```
+
+#### Footprint: 8-bit and 32-bit targets
+
+No crypto hardware is needed. SHA-256/HMAC and AES are plain C. One switch in
+`vscp-projdefs.h` selects the footprint; frames on the wire are identical.
+
+| Setting | Use for | Static RAM | Heap | Reentrant |
+| --- | --- | --- | --- | --- |
+| (default) | 32-bit, RTOS | 0 | about one frame, temporary | yes |
+| `VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT` | 8-bit | `2 * MAX_FRAME_SIZE + 64` + 264 (HMAC cache) | none | no |
+| `... + VSCP_FWHLP_CRYPTO_NO_HMAC_CACHE` | 8-bit, very little RAM | `2 * MAX_FRAME_SIZE + 64` | none | no |
+
+```c
+// vscp-projdefs.h for an 8-bit node
+#define VSCP_FWHLP_BINARY_FRAME_SUPPORT
+#define VSCP_FWHLP_CRYPTO_SUPPORT
+#define VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT
+#define VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE 64   // Largest frame this node uses
+// #define VSCP_FWHLP_CRYPTO_NO_HMAC_CACHE    // If RAM is very tight
+```
+
+Measured on Cortex-M0 (`-Os`, `MAX_FRAME_SIZE` 128): deepest decode stack
+about 840 bytes (default), 530 bytes (small) and 670 bytes (small without
+cache); HMAC/authenticated frame code about 1.8-1.9 KB. In small footprint
+mode call `vscp_fwhlp_clearCryptoCache()` to wipe the cached HMAC key state.
 
 The unit tests check the interoperability vector from the VSCP helper library
 documentation (AES-256, command `0007`): the record

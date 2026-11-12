@@ -3389,6 +3389,21 @@ vscp_fwhlp_writeReplyToFrame(uint8_t *frame,
 */
 #ifdef VSCP_FWHLP_CRYPTO_SUPPORT
 
+// Zero memory in a way the compiler does not remove
+static void
+vscp_fwhlp_cleanse(void *p, size_t len)
+{
+  volatile uint8_t *v = (volatile uint8_t *) p;
+  while (len--) {
+    *v++ = 0;
+  }
+}
+
+#ifdef VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT
+// Static work buffers instead of malloc (small targets). Not reentrant.
+static uint8_t vscp_fwhlp_padbuf[VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE + 16];
+#endif
+
 static size_t
 vscp_fwhlp_pkcs7_padded_length(size_t data_len)
 {
@@ -3486,10 +3501,25 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
   // Encrypted len is len-1 because of leading encryption byte.
   size_t payload_len = len - 1;
   size_t padlen      = vscp_fwhlp_pkcs7_padded_length(payload_len);
-  uint8_t *padded_data = (uint8_t *) malloc(padlen);
+  // Size of the padding buffer. (padlen is changed below to the frame length)
+  const size_t padbufLen = padlen;
+#ifdef VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT
+  if (padbufLen > sizeof(vscp_fwhlp_padbuf)) {
+    return 0; // Larger than VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE
+  }
+  uint8_t *padded_data = vscp_fwhlp_padbuf;
+#define VSCP_FWHLP_PADBUF_RELEASE() vscp_fwhlp_cleanse(vscp_fwhlp_padbuf, padbufLen)
+#else
+  uint8_t *padded_data = (uint8_t *) malloc(padbufLen);
   if (NULL == padded_data) {
     return 0;
   }
+#define VSCP_FWHLP_PADBUF_RELEASE()                                                                                    \
+  do {                                                                                                                 \
+    vscp_fwhlp_cleanse(padded_data, padbufLen);                                                                        \
+    free(padded_data);                                                                                                 \
+  } while (0)
+#endif
   memcpy(padded_data, input + 1, payload_len);
   memset(padded_data + payload_len, (int) (padlen - payload_len), padlen - payload_len);
 
@@ -3504,7 +3534,7 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
   // If iv is not give it should be generated
   if (NULL == iv) {
     if (16 != getRandomIV(generated_iv, 16)) {
-      free(padded_data);
+      VSCP_FWHLP_PADBUF_RELEASE();
       return 0;
     }
   }
@@ -3557,11 +3587,12 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
     default:
       // Not a valid encryption algorithm. (Returned VSCP_ERROR_PARAMETER
       // before, which callers took as a frame length.)
-      free(padded_data);
+      VSCP_FWHLP_PADBUF_RELEASE();
       return 0;
   }
 
-  free(padded_data);
+  VSCP_FWHLP_PADBUF_RELEASE();
+#undef VSCP_FWHLP_PADBUF_RELEASE
 
   // This is needed as byte 0 is not counted and the encrypted data should be
   // a multiple of 16
@@ -3735,6 +3766,7 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
 
 // --------------------------- SHA-256 (FIPS 180-4) ---------------------------
 
+
 typedef struct {
   uint32_t state[8];
   uint64_t bitcount;
@@ -3758,23 +3790,42 @@ static const uint32_t vscp_fwhlp_sha256_k[64] = {
 static void
 vscp_fwhlp_sha256_block(vscp_fwhlp_sha256_ctx_t *ctx, const uint8_t *block)
 {
+#ifdef VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT
+  // Rolling 16 word message schedule (64 bytes instead of 256 on the stack)
+  uint32_t w[16];
+#else
   uint32_t w[64];
+#endif
   for (int i = 0; i < 16; i++) {
     w[i] = ((uint32_t) block[4 * i] << 24) | ((uint32_t) block[4 * i + 1] << 16) |
            ((uint32_t) block[4 * i + 2] << 8) | (uint32_t) block[4 * i + 3];
   }
+#ifndef VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT
   for (int i = 16; i < 64; i++) {
     uint32_t s0 = VSCP_FWHLP_ROTR32(w[i - 15], 7) ^ VSCP_FWHLP_ROTR32(w[i - 15], 18) ^ (w[i - 15] >> 3);
     uint32_t s1 = VSCP_FWHLP_ROTR32(w[i - 2], 17) ^ VSCP_FWHLP_ROTR32(w[i - 2], 19) ^ (w[i - 2] >> 10);
     w[i]        = w[i - 16] + s0 + w[i - 7] + s1;
   }
+#endif
 
   uint32_t a = ctx->state[0], b = ctx->state[1], c = ctx->state[2], d = ctx->state[3];
   uint32_t e = ctx->state[4], f = ctx->state[5], g = ctx->state[6], h = ctx->state[7];
   for (int i = 0; i < 64; i++) {
+#ifdef VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT
+    if (i >= 16) {
+      uint32_t w15 = w[(i - 15) & 15];
+      uint32_t w2  = w[(i - 2) & 15];
+      uint32_t s0  = VSCP_FWHLP_ROTR32(w15, 7) ^ VSCP_FWHLP_ROTR32(w15, 18) ^ (w15 >> 3);
+      uint32_t s1  = VSCP_FWHLP_ROTR32(w2, 17) ^ VSCP_FWHLP_ROTR32(w2, 19) ^ (w2 >> 10);
+      w[i & 15] += s0 + w[(i - 7) & 15] + s1;
+    }
+    const uint32_t wi = w[i & 15];
+#else
+    const uint32_t wi = w[i];
+#endif
     uint32_t S1  = VSCP_FWHLP_ROTR32(e, 6) ^ VSCP_FWHLP_ROTR32(e, 11) ^ VSCP_FWHLP_ROTR32(e, 25);
     uint32_t ch  = (e & f) ^ (~e & g);
-    uint32_t t1  = h + S1 + ch + vscp_fwhlp_sha256_k[i] + w[i];
+    uint32_t t1  = h + S1 + ch + vscp_fwhlp_sha256_k[i] + wi;
     uint32_t S0  = VSCP_FWHLP_ROTR32(a, 2) ^ VSCP_FWHLP_ROTR32(a, 13) ^ VSCP_FWHLP_ROTR32(a, 22);
     uint32_t maj = (a & b) ^ (a & c) ^ (b & c);
     uint32_t t2  = S0 + maj;
@@ -3795,6 +3846,8 @@ vscp_fwhlp_sha256_block(vscp_fwhlp_sha256_ctx_t *ctx, const uint8_t *block)
   ctx->state[5] += f;
   ctx->state[6] += g;
   ctx->state[7] += h;
+
+  vscp_fwhlp_cleanse(w, sizeof(w));
 }
 
 static void
@@ -3850,15 +3903,53 @@ vscp_fwhlp_sha256_final(vscp_fwhlp_sha256_ctx_t *ctx, uint8_t digest[32])
   }
 }
 
-// Zero memory in a way the compiler does not remove
+// Hash state after the HMAC inner (ipad) and outer (opad) key blocks
 static void
-vscp_fwhlp_cleanse(void *p, size_t len)
+vscp_fwhlp_hmac_key_states(const uint8_t key[32],
+                           vscp_fwhlp_sha256_ctx_t *pInner,
+                           vscp_fwhlp_sha256_ctx_t *pOuter)
 {
-  volatile uint8_t *v = (volatile uint8_t *) p;
-  while (len--) {
-    *v++ = 0;
+  uint8_t pad[64];
+
+  memset(pad, 0x36, sizeof(pad));
+  for (int i = 0; i < 32; i++) {
+    pad[i] ^= key[i];
   }
+  vscp_fwhlp_sha256_init(pInner);
+  vscp_fwhlp_sha256_update(pInner, pad, sizeof(pad));
+
+  memset(pad, 0x5c, sizeof(pad));
+  for (int i = 0; i < 32; i++) {
+    pad[i] ^= key[i];
+  }
+  vscp_fwhlp_sha256_init(pOuter);
+  vscp_fwhlp_sha256_update(pOuter, pad, sizeof(pad));
+
+  vscp_fwhlp_cleanse(pad, sizeof(pad));
 }
+
+#if defined(VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT) && !defined(VSCP_FWHLP_CRYPTO_NO_HMAC_CACHE)
+// Key states of the last used HMAC key. Saves two SHA-256 blocks per frame
+// as long as the key does not change. Not reentrant.
+static struct {
+  uint8_t valid;
+  uint8_t key[32];
+  vscp_fwhlp_sha256_ctx_t inner;
+  vscp_fwhlp_sha256_ctx_t outer;
+} vscp_fwhlp_hmac_cache;
+
+void
+vscp_fwhlp_clearCryptoCache(void)
+{
+  vscp_fwhlp_cleanse(&vscp_fwhlp_hmac_cache, sizeof(vscp_fwhlp_hmac_cache));
+}
+#else
+void
+vscp_fwhlp_clearCryptoCache(void)
+{
+  // Nothing is cached when VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT is not defined
+}
+#endif
 
 // HMAC-SHA-256 (RFC 2104) with a 32 byte key over hdr || data
 static void
@@ -3869,30 +3960,36 @@ vscp_fwhlp_hmac_sha256(uint8_t digest[32],
                        const uint8_t *data,
                        size_t datalen)
 {
-  uint8_t pad[64];
   uint8_t inner[32];
   vscp_fwhlp_sha256_ctx_t ctx;
 
-  memset(pad, 0x36, sizeof(pad));
-  for (int i = 0; i < 32; i++) {
-    pad[i] ^= key[i];
+#if defined(VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT) && !defined(VSCP_FWHLP_CRYPTO_NO_HMAC_CACHE)
+  if (!vscp_fwhlp_hmac_cache.valid || (0 != memcmp(vscp_fwhlp_hmac_cache.key, key, 32))) {
+    vscp_fwhlp_hmac_key_states(key, &vscp_fwhlp_hmac_cache.inner, &vscp_fwhlp_hmac_cache.outer);
+    memcpy(vscp_fwhlp_hmac_cache.key, key, 32);
+    vscp_fwhlp_hmac_cache.valid = 1;
   }
-  vscp_fwhlp_sha256_init(&ctx);
-  vscp_fwhlp_sha256_update(&ctx, pad, sizeof(pad));
+  memcpy(&ctx, &vscp_fwhlp_hmac_cache.inner, sizeof(ctx));
+#else
+  vscp_fwhlp_sha256_ctx_t outer;
+  vscp_fwhlp_hmac_key_states(key, &ctx, &outer);
+#endif
+
+  // Inner hash
   vscp_fwhlp_sha256_update(&ctx, hdr, hdrlen);
   vscp_fwhlp_sha256_update(&ctx, data, datalen);
   vscp_fwhlp_sha256_final(&ctx, inner);
 
-  memset(pad, 0x5c, sizeof(pad));
-  for (int i = 0; i < 32; i++) {
-    pad[i] ^= key[i];
-  }
-  vscp_fwhlp_sha256_init(&ctx);
-  vscp_fwhlp_sha256_update(&ctx, pad, sizeof(pad));
+  // Outer hash
+#if defined(VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT) && !defined(VSCP_FWHLP_CRYPTO_NO_HMAC_CACHE)
+  memcpy(&ctx, &vscp_fwhlp_hmac_cache.outer, sizeof(ctx));
+#else
+  memcpy(&ctx, &outer, sizeof(ctx));
+  vscp_fwhlp_cleanse(&outer, sizeof(outer));
+#endif
   vscp_fwhlp_sha256_update(&ctx, inner, sizeof(inner));
   vscp_fwhlp_sha256_final(&ctx, digest);
 
-  vscp_fwhlp_cleanse(pad, sizeof(pad));
   vscp_fwhlp_cleanse(inner, sizeof(inner));
   vscp_fwhlp_cleanse(&ctx, sizeof(ctx));
 }
@@ -3928,6 +4025,15 @@ vscp_fwhlp_isAesAlgorithm(uint8_t nAlgorithm)
          (VSCP_ENCRYPTION_AES256 == nAlgorithm);
 }
 
+#ifdef VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT
+// Static work buffer for version 1 frames (no malloc). Encryption and
+// decryption never run at the same time so they share it. Not reentrant.
+static uint8_t vscp_fwhlp_v1buf[VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE + VSCP_FWHLP_FRAME_V1_OVERHEAD];
+#define VSCP_FWHLP_V1_FREE(p) ((void) (p))
+#else
+#define VSCP_FWHLP_V1_FREE(p) free(p)
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // vscp_fwhlp_encryptFrameV1
 //
@@ -3962,31 +4068,35 @@ vscp_fwhlp_encryptFrameV1(uint8_t *output,
     return 0;
   }
 
-  // Work on copies so input and output may be the same buffer
-  uint8_t *plain = (uint8_t *) malloc(len);
+  // Build the frame in a work buffer so input and output may be the same
+  // buffer
+#ifdef VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT
+  if (wireLen > sizeof(vscp_fwhlp_v1buf)) {
+    return 0; // Larger than VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE
+  }
+  uint8_t *frame = vscp_fwhlp_v1buf;
+#else
   uint8_t *frame = (uint8_t *) malloc(wireLen);
-  if ((NULL == plain) || (NULL == frame)) {
-    free(plain);
-    free(frame);
+  if (NULL == frame) {
     return 0;
   }
-  memcpy(plain, input, len);
-  plain[0] = (uint8_t) ((input[0] & 0xf0) | nAlgorithm); // Authenticated type/encryption byte
+#endif
 
-  // [type][ciphertext][IV]
-  size_t encLen = vscp_fwhlp_encryptFrame(frame, plain, len, key, iv, nAlgorithm);
-  vscp_fwhlp_cleanse(plain, len);
-  free(plain);
+  // [type][ciphertext][IV]. vscp_fwhlp_encryptFrame only reads input (it
+  // copies the payload before padding it).
+  size_t encLen = vscp_fwhlp_encryptFrame(frame, (uint8_t *) input, len, key, iv, nAlgorithm);
+  // The type byte is not encrypted. Set the authenticated type/encryption byte.
+  frame[0] = (uint8_t) ((input[0] & 0xf0) | nAlgorithm);
   if ((1 + ciphertextLen + 16) != encLen) {
     vscp_fwhlp_cleanse(frame, wireLen);
-    free(frame);
+    VSCP_FWHLP_V1_FREE(frame);
     return 0;
   }
 
   vscp_fwhlp_frameTagV1(frame + encLen, frame, encLen, hmacKey);
 
   memcpy(output, frame, wireLen);
-  free(frame);
+  VSCP_FWHLP_V1_FREE(frame);
   return wireLen;
 }
 
@@ -4028,10 +4138,17 @@ vscp_fwhlp_decryptFrameV1(uint8_t *output,
   // Decrypt [type][ciphertext][IV] into a work buffer so the caller's
   // output is left unchanged on failure
   const size_t encLen = len - VSCP_FWHLP_FRAME_TAG_SIZE;
-  uint8_t *plain      = (uint8_t *) malloc(encLen);
+#ifdef VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT
+  if (encLen > sizeof(vscp_fwhlp_v1buf)) {
+    return 0;
+  }
+  uint8_t *plain = vscp_fwhlp_v1buf;
+#else
+  uint8_t *plain = (uint8_t *) malloc(encLen);
   if (NULL == plain) {
     return 0;
   }
+#endif
 
   size_t payloadLen = 0;
   size_t rv         = 0;
@@ -4050,7 +4167,7 @@ vscp_fwhlp_decryptFrameV1(uint8_t *output,
   }
 
   vscp_fwhlp_cleanse(plain, encLen);
-  free(plain);
+  VSCP_FWHLP_V1_FREE(plain);
   return rv;
 }
 
@@ -4153,6 +4270,14 @@ vscp_fwhlp_decodeAuthenticatedFrame(uint8_t *output,
   }
 
   return vscp_fwhlp_decryptFrameV1(output, capacity, wire + VSCP_FWHLP_FRAME_HEADER_SIZE, innerLen, key, hmacKey);
+}
+
+#else // VSCP_FWHLP_BINARY_FRAME_SUPPORT
+
+void
+vscp_fwhlp_clearCryptoCache(void)
+{
+  // Nothing is cached without the authenticated frame support
 }
 
 #endif // VSCP_FWHLP_BINARY_FRAME_SUPPORT
