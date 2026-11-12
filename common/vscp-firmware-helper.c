@@ -46,6 +46,7 @@
 #include "vscp-projdefs.h"
 
 #include <ctype.h>
+#include <float.h>
 #include <limits.h>
 #include <math.h>
 #include <stdint.h>
@@ -116,7 +117,8 @@ vscp_fwhlp_isLittleEndian(void)
 int
 vscp_fwhlp_isBigEndian(void)
 {
-  return ~vscp_fwhlp_isLittleEndian();
+  // Logical not. (Bitwise not gave -2 or -1, i.e. always "true")
+  return !vscp_fwhlp_isLittleEndian();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -5990,6 +5992,48 @@ vscp_fwhlp_getMeasurementAsFloat(const unsigned char *pNorm, unsigned char lengt
 //
 //
 
+//////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_readDoubleMsbFirst
+//
+// Read the 64-bit IEEE 754 double of a CLASS2.MEASUREMENT_FLOAT event.
+// The VSCP specification stores it MSB first. This is independent of the
+// host byte order and also works where double is only 32 bits (AVR, PIC
+// XC8 default); the value is then rounded to the precision of double
+// (too large values give +/-INFINITY).
+//
+
+static double
+vscp_fwhlp_readDoubleMsbFirst(const uint8_t *p)
+{
+  uint64_t bits = 0;
+  for (int i = 0; i < 8; i++) {
+    bits = (bits << 8) | p[i];
+  }
+
+#if DBL_MANT_DIG >= 53
+  double value;
+  memcpy(&value, &bits, sizeof(value));
+  return value;
+#else
+  // double is not IEEE 754 binary64 on this platform - decode by hand
+  const int negative     = (int) (bits >> 63);
+  const int exponent     = (int) ((bits >> 52) & 0x7ff);
+  const uint64_t mantissa = bits & 0x000fffffffffffffULL;
+  double value;
+
+  if (0x7ff == exponent) {
+    value = mantissa ? NAN : INFINITY;
+  }
+  else if (0 == exponent) {
+    value = ldexp((double) mantissa, -1074); // Subnormal (or zero)
+  }
+  else {
+    value = ldexp((double) (mantissa | 0x0010000000000000ULL), exponent - 1075);
+  }
+  return negative ? -value : value;
+#endif
+}
+
 int
 vscp_fwhlp_getMeasurementAsString(char *strValue, const vscp_event_t *pEvent)
 {
@@ -6009,33 +6053,29 @@ vscp_fwhlp_getMeasurementAsString(char *strValue, const vscp_event_t *pEvent)
 
   if (VSCP_CLASS2_MEASUREMENT_STR == pEvent->vscp_class) {
 
-    char buf[512];
+    // Index, zone, subzone, unit followed by the string. strValue must be
+    // able to hold 509 characters for a full Level II event.
+    if (pEvent->sizeData < 4) {
+      return -1;
+    }
 
-    memset(buf, 0, sizeof(buf));
-    memcpy(buf, pEvent->pdata + 4, pEvent->sizeData - 4);
-    strncpy(strValue, buf, pEvent->sizeData - 4);
-    strValue[pEvent->sizeData - 4] = '\0';
+    size_t len = pEvent->sizeData - 4;
+    if (len > 508) {
+      len = 508; // Max string in a Level II event (512 - 4)
+    }
+    memcpy(strValue, pEvent->pdata + 4, len);
+    strValue[len] = '\0';
   }
   else if (VSCP_CLASS2_MEASUREMENT_FLOAT == pEvent->vscp_class) {
-
-    uint8_t buf[8];
 
     // Must be correct data
     if (12 != pEvent->sizeData) {
       return -1;
     }
 
-    memset(buf, 0, sizeof(buf));
-    memcpy(buf, pEvent->pdata + 4, 8); // Double
-
-    // Take care of byte order on little endian
-    if (vscp_fwhlp_isLittleEndian()) {
-      for (int i = 7; i > 0; i--) {
-        buf[i] = buf[7 - i];
-      }
-    }
-
-    sprintf(strValue, "%f", *((double *) buf));
+    // Double, MSB first (VSCP specification). The old in-place "swap"
+    // loop mirrored the bytes and gave garbage on little endian hosts.
+    sprintf(strValue, "%f", vscp_fwhlp_readDoubleMsbFirst(pEvent->pdata + 4));
   }
   else if (VSCP_CLASS1_MEASUREMENT32 == pEvent->vscp_class) {
 
@@ -6258,19 +6298,28 @@ vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscp_event_t *pEvent)
 
     char buf[512];
 
-    if (0 == pEvent->sizeData || NULL == pEvent->pdata) {
+    // Index, zone, subzone, unit followed by the string
+    if ((pEvent->sizeData < 4) || (NULL == pEvent->pdata)) {
       return -1;
     }
-    memcpy(buf, pEvent->pdata + 4, pEvent->sizeData - 4);
+    size_t len = pEvent->sizeData - 4;
+    if (len > sizeof(buf) - 1) {
+      len = sizeof(buf) - 1;
+    }
+    memcpy(buf, pEvent->pdata + 4, len);
+    buf[len] = '\0'; // sscanf needs a terminated string
 
-    sscanf(buf, "%lf", pvalue);
+    if (1 != sscanf(buf, "%lf", pvalue)) {
+      return -1;
+    }
   }
   else if (VSCP_CLASS2_MEASUREMENT_FLOAT == pEvent->vscp_class) {
 
-    char buf[8];
-
-    memcpy(buf, pEvent->pdata + 4, 8);
-    *pvalue = *(double *) (buf);
+    // Index, zone, subzone, unit followed by an 8 byte double, MSB first
+    if ((12 != pEvent->sizeData) || (NULL == pEvent->pdata)) {
+      return -1;
+    }
+    *pvalue = vscp_fwhlp_readDoubleMsbFirst(pEvent->pdata + 4);
   }
   else {
     return -1;

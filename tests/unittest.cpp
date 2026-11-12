@@ -470,10 +470,11 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_endian)
   int little = vscp_fwhlp_isLittleEndian();
   int big    = vscp_fwhlp_isBigEndian();
 
-  // isBigEndian returns bitwise NOT of isLittleEndian
-  // So if little is 1, big should be ~1 (-2)
-  // At least one should be non-zero
-  ASSERT_TRUE(little != 0 || big != 0);
+  // Exactly one of them is true (isBigEndian used a bitwise NOT and was
+  // always non zero)
+  ASSERT_TRUE((0 == little) || (1 == little));
+  ASSERT_TRUE((0 == big) || (1 == big));
+  ASSERT_NE(little, big);
 }
 
 //-----------------------------------------------------------------------------
@@ -4113,6 +4114,63 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsDouble)
   ASSERT_EQ(-1, rv);
   rv = vscp_fwhlp_getMeasurementAsDouble(&val, nullptr);
   ASSERT_EQ(-1, rv);
+}
+
+// CLASS2.MEASUREMENT_FLOAT stores the double MSB first (VSCP specification)
+TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsDouble_level2_float)
+{
+  vscp_event_t ev;
+  memset(&ev, 0, sizeof(ev));
+
+  // index, zone, subzone, unit, pi as IEEE 754 binary64 MSB first
+  uint8_t payload[12] = { 1, 2, 3, 4, 0x40, 0x09, 0x21, 0xFB, 0x54, 0x44, 0x2D, 0x18 };
+  ev.vscp_class = VSCP_CLASS2_MEASUREMENT_FLOAT;
+  ev.sizeData   = sizeof(payload);
+  ev.pdata      = payload;
+
+  double val = 0;
+  ASSERT_EQ(0, vscp_fwhlp_getMeasurementAsDouble(&val, &ev));
+  ASSERT_EQ(3.141592653589793, val);
+
+  char out[64];
+  memset(out, 0, sizeof(out));
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_fwhlp_getMeasurementAsString(out, &ev));
+  ASSERT_STREQ("3.141593", out);
+
+  // -1.5 = 0xBFF8000000000000
+  uint8_t negative[12] = { 0, 0, 0, 0, 0xBF, 0xF8, 0, 0, 0, 0, 0, 0 };
+  ev.pdata = negative;
+  ASSERT_EQ(0, vscp_fwhlp_getMeasurementAsDouble(&val, &ev));
+  ASSERT_EQ(-1.5, val);
+
+  // Wrong size is rejected
+  ev.sizeData = 8;
+  ASSERT_EQ(-1, vscp_fwhlp_getMeasurementAsDouble(&val, &ev));
+  ASSERT_EQ(-1, vscp_fwhlp_getMeasurementAsString(out, &ev));
+}
+
+// CLASS2.MEASUREMENT_STR shorter than the 4 byte header is rejected
+TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurement_level2_str_short)
+{
+  vscp_event_t ev;
+  memset(&ev, 0, sizeof(ev));
+
+  uint8_t payload[2] = { 0, 0 };
+  ev.vscp_class = VSCP_CLASS2_MEASUREMENT_STR;
+  ev.sizeData   = sizeof(payload);
+  ev.pdata      = payload;
+
+  char out[64];
+  double val = 0;
+  ASSERT_EQ(-1, vscp_fwhlp_getMeasurementAsString(out, &ev));
+  ASSERT_EQ(-1, vscp_fwhlp_getMeasurementAsDouble(&val, &ev));
+
+  // Value without terminating zero in the event
+  uint8_t full[] = { 0, 0, 0, 0, '4', '2', '.', '5' };
+  ev.pdata    = full;
+  ev.sizeData = sizeof(full);
+  ASSERT_EQ(0, vscp_fwhlp_getMeasurementAsDouble(&val, &ev));
+  ASSERT_EQ(42.5, val);
 }
 
 TEST(_vscp_firmware_helper, vscp_fwhlp_getMeasurementAsDoubleEx)

@@ -1362,6 +1362,18 @@ vscp_fwhlp_getMeasurementAsFloat(const unsigned char *pNorm, unsigned char lengt
  * @return float Measurement value as a float. Returns 0 if not a measurement event or if data is not valid for
  * conversion.
  */
+/*!
+ * @fn vscp_fwhlp_getMeasurementAsString
+ * @brief Get the measurement value of a measurement event as a string
+ *
+ * @param strValue Buffer that receives the zero terminated value. Must hold
+ *        at least 509 bytes for CLASS2.MEASUREMENT_STR events (the string
+ *        part of a Level II event is at most 508 characters).
+ * @param pEvent Pointer to event to get measurement value from.
+ *        CLASS2.MEASUREMENT_FLOAT values are read MSB first as in the VSCP
+ *        specification.
+ * @return 0 on success, -1 on error.
+ */
 int
 vscp_fwhlp_getMeasurementAsString(char *strValue, const vscp_event_t *pEvent);
 
