@@ -5,7 +5,7 @@
 
 # VCSP Firmware
 
-![VSCP Logo](https://github.com/grodansparadis/vscp-logo/blob/master/logo_100.png)
+![VSCP Logo](./docs/images/vscp-firmware.jpg)
 
 VSCP firmware contains examples for different hardware architectures of how to
 implement the Very Simple Control Protocol (VSCP, [http://www.vscp.org](http://www.vscp.org)).
