@@ -172,5 +172,5 @@ stateDiagram-v2
 - `docs/vscp-bootloader.md`
 - `docs/examples/vscp-bootloader-host-updater-skeleton.c`
 - `docs/examples/vscp-bootloader-host-updater-fsm-skeleton.c`
-- `common/vscp-bootloader.h`
-- `common/vscp-bootloader.c`
+- `src/vscp-bootloader.h`
+- `src/vscp-bootloader.c`

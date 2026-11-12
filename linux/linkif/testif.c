@@ -38,7 +38,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "../../common/vscp_link.h"
+#include "../../src/vscp_link.h"
 
 void main()
 {

@@ -1,7 +1,7 @@
 # vscp-ws1 — VSCP WebSocket Protocol WS1
 
 **Date:** 2026-06-11  
-**Module:** `common/vscp-ws1.h`, `common/vscp-ws1.c`  
+**Module:** `src/vscp-ws1-protocol.h`, `src/vscp-ws1-protocol.c`
 **Spec:** [VSCP Websocket WS1](https://grodansparadis.github.io/vscp-doc-spec/#/./vscp_websocket?id=ws1-description)
 
 ---

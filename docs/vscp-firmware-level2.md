@@ -4,8 +4,8 @@ Last updated: 2026-06-17
 
 This document describes the VSCP Level II firmware framework implemented by:
 
-- `common/vscp-firmware-level2.h`
-- `common/vscp-firmware-level2.c`
+- `src/vscp-firmware-level2.h`
+- `src/vscp-firmware-level2.c`
 
 The module provides protocol handling, register abstraction, node state management, and decision-matrix execution for VSCP Level II nodes (and Level I compatibility paths where configured).
 
@@ -354,8 +354,8 @@ if (VSCP_ERROR_SUCCESS == rv) {
 
 ## Related Files
 
-- `common/vscp-firmware-level2.h`
-- `common/vscp-firmware-level2.c`
-- `common/vscp-firmware-helper.h`
-- `common/vscp-firmware.h`
+- `src/vscp-firmware-level2.h`
+- `src/vscp-firmware-level2.c`
+- `src/vscp-firmware-helper.h`
+- `src/vscp-firmware.h`
 - `docs/README.md`

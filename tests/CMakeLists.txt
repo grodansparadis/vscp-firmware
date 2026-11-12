@@ -61,28 +61,28 @@ add_executable(vscp_firmware_tests
     vscp-rs485-unittest.cpp
     vscp-ws1-unittest.cpp
     vscp-ws2-unittest.cpp
-    ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-helper.c
-    ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-helper.h
-    ${PROJECT_SOURCE_DIR}/../common/vscp-guid-parser.c
-    ${PROJECT_SOURCE_DIR}/../common/vscp-crc.c
-    ${PROJECT_SOURCE_DIR}/../common/crc8.c
-    ${PROJECT_SOURCE_DIR}/../common/fifo.c
-    ${PROJECT_SOURCE_DIR}/../common/vscp-fifo.c
-    ${PROJECT_SOURCE_DIR}/../common/vscp-bootloader.c
-    ${PROJECT_SOURCE_DIR}/../common/vscp-firmware-level2.c
-    ${PROJECT_SOURCE_DIR}/../common/vscp-firmware.c
-    ${PROJECT_SOURCE_DIR}/../common/vscp-aes.c
-    ${PROJECT_SOURCE_DIR}/../common/vscp-link-protocol.c
-    ${PROJECT_SOURCE_DIR}/../common/vscp-binary-protocol.c
-    ${PROJECT_SOURCE_DIR}/../common/vscp-ws1-protocol.c
-    ${PROJECT_SOURCE_DIR}/../common/vscp-ws2-protocol.c
+    ${PROJECT_SOURCE_DIR}/../src/vscp-firmware-helper.c
+    ${PROJECT_SOURCE_DIR}/../src/vscp-firmware-helper.h
+    ${PROJECT_SOURCE_DIR}/../src/vscp-guid-parser.c
+    ${PROJECT_SOURCE_DIR}/../src/vscp-crc.c
+    ${PROJECT_SOURCE_DIR}/../src/crc8.c
+    ${PROJECT_SOURCE_DIR}/../src/fifo.c
+    ${PROJECT_SOURCE_DIR}/../src/vscp-fifo.c
+    ${PROJECT_SOURCE_DIR}/../src/vscp-bootloader.c
+    ${PROJECT_SOURCE_DIR}/../src/vscp-firmware-level2.c
+    ${PROJECT_SOURCE_DIR}/../src/vscp-firmware.c
+    ${PROJECT_SOURCE_DIR}/../src/vscp-aes.c
+    ${PROJECT_SOURCE_DIR}/../src/vscp-link-protocol.c
+    ${PROJECT_SOURCE_DIR}/../src/vscp-binary-protocol.c
+    ${PROJECT_SOURCE_DIR}/../src/vscp-ws1-protocol.c
+    ${PROJECT_SOURCE_DIR}/../src/vscp-ws2-protocol.c
     ${PROJECT_SOURCE_DIR}/../third-party/cJSON/cJSON.c
     )
 
 set_target_properties(vscp_firmware_tests PROPERTIES OUTPUT_NAME test)
 
 target_include_directories(vscp_firmware_tests PUBLIC 
-    ${PROJECT_SOURCE_DIR}/../common/
+    ${PROJECT_SOURCE_DIR}/../src/
     ${PROJECT_SOURCE_DIR}/../third-party/cJSON/
     ${PROJECT_SOURCE_DIR}/
     )

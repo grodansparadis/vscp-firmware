@@ -4,8 +4,8 @@ Last updated: 2026-03-12
 
 This document describes the GUID parser module implemented by:
 
-- `common/vscp-guid-parser.h`
-- `common/vscp-guid-parser.c`
+- `src/vscp-guid-parser.h`
+- `src/vscp-guid-parser.c`
 
 The module provides extended GUID parsing with support for multiple string formats, including compact notations, UUID format, and brace-enclosed GUIDs.
 

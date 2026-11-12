@@ -4,8 +4,8 @@ Last updated: 2026-02-19
 
 This document describes the AES helper module implemented by:
 
-- `common/vscp-aes.h`
-- `common/vscp-aes.c`
+- `src/vscp-aes.h`
+- `src/vscp-aes.c`
 
 The module provides AES-128/192/256 primitives for ECB and CBC operation modes plus IV generation support.
 
@@ -182,7 +182,7 @@ The frame helpers also handle VSCP-specific framing details (encryption type byt
 
 ## Related Files
 
-- `common/vscp-aes.h`
-- `common/vscp-aes.c`
-- `common/vscp-firmware-helper.h`
+- `src/vscp-aes.h`
+- `src/vscp-aes.c`
+- `src/vscp-firmware-helper.h`
 - `docs/README.md`

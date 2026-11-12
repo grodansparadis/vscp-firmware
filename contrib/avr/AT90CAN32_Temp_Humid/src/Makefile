@@ -22,7 +22,7 @@ OBJ = temp_humid.o
 OBJ += vscp_actions.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/can_at90can32.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/uart.o
-OBJ += $(VSCP_FIRMWARE)/common/vscp_firmware.o
+OBJ += $(VSCP_FIRMWARE)/src/vscp-firmware.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/onewire.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/ds18x20.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/crc8.o
@@ -32,7 +32,7 @@ MCU_TARGET	= at90can32
 OPTIMIZE	= -Os
 
 
-EXTRAINCDIRS   = $(VSCP_FIRMWARE)/common
+EXTRAINCDIRS   = $(VSCP_FIRMWARE)/src
 EXTRAINCDIRS  += $(VSCP_FIRMWARE)/avr/common
 EXTRAINCDIRS  += $(VSCP_HOME)/src/common
 EXTRAINCDIRS  += $(VSCP_HOME)/src/vscp/common

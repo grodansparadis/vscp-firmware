@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 
 import update_version  # noqa: E402
 
-HEADER = ROOT / "common" / "vscp-firmware-version.h"
+HEADER = ROOT / "src" / "vscp-firmware-version.h"
 
 
 class UpdateVersionTest(unittest.TestCase):
@@ -33,6 +33,9 @@ class UpdateVersionTest(unittest.TestCase):
 
     def test_repository_header_is_valid(self):
         update_version.read_version(HEADER.read_text())
+
+    def test_default_header_is_valid(self):
+        self.assertEqual(0, update_version.main(["--check"]))
 
     def test_same_month_increments_patch(self):
         self.set_version((26, 11, 4))

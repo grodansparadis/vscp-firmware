@@ -4,8 +4,8 @@ Last updated: 2026-02-20
 
 This document describes the helper module implemented by:
 
-- `common/vscp-firmware-helper.h`
-- `common/vscp-firmware-helper.c`
+- `src/vscp-firmware-helper.h`
+- `src/vscp-firmware-helper.c`
 
 The module provides utility functions used across VSCP firmware targets:
 
@@ -767,7 +767,7 @@ if (VSCP_ERROR_SUCCESS == rv) {
 
 ## Related Files
 
-- `common/vscp-firmware-helper.h`
-- `common/vscp-firmware-helper.c`
+- `src/vscp-firmware-helper.h`
+- `src/vscp-firmware-helper.c`
 - `tests/unittest.cpp` (usage and behavior examples)
 - `docs/README.md`

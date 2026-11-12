@@ -4,8 +4,8 @@ Last updated: 2026-06-11
 
 This module implements the VSCP Link text command protocol dispatcher for firmware targets. It parses CRLF-terminated lines, maps commands to handlers, and delegates all transport/application work through callbacks.
 
-- Header: `common/vscp-link-protocol.h`
-- Implementation: `common/vscp-link-protocol.c`
+- Header: `src/vscp-link-protocol.h`
+- Implementation: `src/vscp-link-protocol.c`
 
 ## Scope and model
 
@@ -124,7 +124,7 @@ This allows non-blocking command processing plus asynchronous event push/heartbe
 
 ## Message constants
 
-`common/vscp-link-protocol.h` defines reusable protocol strings, including:
+`src/vscp-link-protocol.h` defines reusable protocol strings, including:
 
 - Success/flow: `VSCP_LINK_MSG_OK`, `VSCP_LINK_MSG_GOODBY`, `VSCP_LINK_MSG_QUEUE_CLEARED`, `VSCP_LINK_MSG_RECEIVE_LOOP`
 - Generic errors: `VSCP_LINK_MSG_ERROR`, `VSCP_LINK_MSG_UNKNOWN_COMMAND`, `VSCP_LINK_MSG_PARAMETER_ERROR`, `VSCP_LINK_MSG_NOT_SUPPORTED`
@@ -186,7 +186,7 @@ vscp_link_disconnect(pctx);
 
 ## Notes on current implementation behavior
 
-This section documents behavior as implemented in `common/vscp-link-protocol.c` at the time of writing:
+This section documents behavior as implemented in `src/vscp-link-protocol.c` at the time of writing:
 
 - `vscp_link_doCmdSetGUID` currently returns `VSCP_LINK_MSG_PARAMETER_ERROR` on callback success.
 - `vscp_link_doCmdShutdown` currently returns `VSCP_LINK_MSG_NOT_SUPPORTED` when shutdown callback succeeds.

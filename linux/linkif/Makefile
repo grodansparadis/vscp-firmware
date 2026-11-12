@@ -4,7 +4,7 @@
 
 CC = gcc
 
-CFLAGS =  -g -O0 -I. -I../../common
+CFLAGS =  -g -O0 -I. -I../../src
 LDFLAGS = 
 EXTRALIBS = 
 
@@ -32,8 +32,8 @@ testif:  $(TESTIF_OBJECTS)
 testif.o: testif.c testif.h
 	$(CC) $(CFLAGS)  -c testif.c -o $@
 
-vscp_link.o: ../../common/vscp_link.c ../../common/vscp_link.h
-	$(CC) $(CFLAGS) -c ../../common/vscp_link.c -o $@
+vscp_link.o: ../../src/vscp_link.c ../../src/vscp_link.h
+	$(CC) $(CFLAGS) -c ../../src/vscp_link.c -o $@
 	
 install: all
 	$(INSTALL_PROGRAM) -d $(VSCP_PROJ_BASE_DIR)
@@ -46,7 +46,6 @@ clean:
 	rm -rf testif
 	rm -rf ./.deps ./.pch
 	rm -f ./*.o
-	rm -f ../../common/*.o
 	rm -rf *~
 	rm -f *.gz
 	rm -f *.deb

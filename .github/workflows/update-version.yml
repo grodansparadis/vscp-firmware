@@ -1,6 +1,6 @@
 name: Update version
 
-# Bumps the library version (common/vscp-firmware-version.h) on every push
+# Bumps the library version (src/vscp-firmware-version.h) on every push
 # to master: year.month.patch, where patch counts the pushes in the month
 # and starts at 0 in a new month. See tools/update_version.py.
 
@@ -47,7 +47,7 @@ jobs:
             git fetch origin master
             git reset --hard origin/master
             version=$(python3 -B tools/update_version.py)
-            git add common/vscp-firmware-version.h
+            git add src/vscp-firmware-version.h
             git commit -m "Update version to ${version} [skip ci]"
             if git push origin HEAD:master; then
               echo "Version ${version}"

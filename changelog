@@ -2,7 +2,7 @@
          optional authenticated encryption (vscp_binary_set_authentication, AES + HMAC-SHA-256),
          compatible with the VSCP helper library TCP client.
 
-261112 - Library version year.month.patch in common/vscp-firmware-version.h, updated automatically on
+261112 - Library version year.month.patch in src/vscp-firmware-version.h, updated automatically on
          every push to master (patch counts pushes in the month) by the Update version workflow.
 
 261112 - VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT for 8-bit targets: smaller SHA-256 stack, no malloc in

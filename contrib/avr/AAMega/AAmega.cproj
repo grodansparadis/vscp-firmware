@@ -163,9 +163,9 @@
       <SubType>compile</SubType>
       <Link>methods.h</Link>
     </Compile>
-    <Compile Include="..\..\..\..\GitHub\vscp_firmware\common\vscp_firmware.c">
+    <Compile Include="..\..\..\..\GitHub\vscp_firmware\src\vscp-firmware.c">
       <SubType>compile</SubType>
-      <Link>vscp_firmware.c</Link>
+      <Link>vscp-firmware.c</Link>
     </Compile>
     <Compile Include="..\common\uart.c">
       <SubType>compile</SubType>

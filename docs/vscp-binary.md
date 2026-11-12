@@ -4,8 +4,8 @@ Last updated: 2026-06-11
 
 This module implements the VSCP Binary Protocol command dispatcher for firmware targets. It decodes binary command frames, delegates all application work through an operations table, and sends binary reply frames back through the same table.
 
-- Header: `common/vscp-binary.h`
-- Implementation: `common/vscp-binary.c`
+- Header: `src/vscp-binary-protocol.h`
+- Implementation: `src/vscp-binary-protocol.c`
 
 ---
 
@@ -234,8 +234,8 @@ frame (AES-CBC + HMAC-SHA-256, see the helper docs):
 
 ## Related files
 
-- `common/vscp-binary.h`
-- `common/vscp-binary.c`
-- `common/vscp-link-protocol.h` — text-mode counterpart
+- `src/vscp-binary-protocol.h`
+- `src/vscp-binary-protocol.c`
+- `src/vscp-link-protocol.h` — text-mode counterpart
 - `docs/vscp-link-protocol.md`
 - `tests/vscp-binary-unittest.cpp`

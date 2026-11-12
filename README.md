@@ -10,14 +10,13 @@
 VSCP firmware contains examples for different hardware architectures of how to
 implement the Very Simple Control Protocol (VSCP, [http://www.vscp.org](http://www.vscp.org)).
 
-Files are organized under hardware architecture with common file folders on
-each level where common files for vscp (folder /common) and common
-files for a specific architecture (folder /{arch}/common) reside. 
+Shared VSCP firmware files reside in `/src`, while architecture-specific
+common files reside in `/{arch}/common`.
 
 Most important files for implementers are:
 
-  * /common/vscp_firmware.* (for Level I nodes) and
-  * /common/vscp_firmware_level2.* (for Level II (and Level I) nodes)
+  * /src/vscp-firmware.* (for Level I nodes) and
+  * /src/vscp-firmware-level2.* (for Level II (and Level I) nodes)
 
 which both implements the VSCP protocol. The first alternative is created for very space limited devices, the second is for devices with more normal resources. 
 
@@ -47,7 +46,7 @@ Reusable VSCP Level I firmware porting checklist is available in [docs/examples/
 ## Version
 
 The library version is `year.month.patch` (for example `26.11.3`) and is in
-[common/vscp-firmware-version.h](common/vscp-firmware-version.h):
+[src/vscp-firmware-version.h](src/vscp-firmware-version.h):
 
 - `VSCP_FIRMWARE_LIB_VERSION_YEAR`, `_MONTH`, `_PATCH` and `_STR`
 - `VSCP_FIRMWARE_LIB_VERSION` as one number for compile time checks, e.g.

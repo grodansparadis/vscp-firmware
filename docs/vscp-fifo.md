@@ -4,8 +4,8 @@ Last updated: 2026-06-11
 
 `vscp-fifo` provides a small ring-buffer queue for `vscpEvent*` pointers.
 
-- Header: `common/vscp-fifo.h`
-- Implementation: `common/vscp-fifo.c`
+- Header: `src/vscp-fifo.h`
+- Implementation: `src/vscp-fifo.c`
 
 ## Data structure
 
@@ -78,7 +78,7 @@ For multi-producer/multi-consumer access, protect operations with external synch
 
 ## Behavior notes from current implementation
 
-These notes describe current source behavior in `common/vscp-fifo.c`:
+These notes describe current source behavior in `src/vscp-fifo.c`:
 
 - `vscp_fifo_init` uses `malloc` for the pointer buffer and does not check allocation failure.
 - `vscp_fifo_clear` resets `head`/`tail` and clears buffer entries.

@@ -4,9 +4,9 @@ Last updated: 2026-02-19
 
 This document describes the VSCP serial protocol definitions provided by:
 
-- `common/vscp-serial.h`
+- `src/vscp-serial.h`
 
-In this workspace snapshot, `vscp-serial` is a definition/header module (protocol constants, frame types, and capabilities struct). No matching `common/vscp-serial.c` implementation file is present here.
+In this workspace snapshot, `vscp-serial` is a definition/header module (protocol constants, frame types, and capabilities struct). No matching `src/vscp-serial.c` implementation file is present here.
 
 ---
 
@@ -211,6 +211,6 @@ for (;;) {
 
 ## Related Files
 
-- `common/vscp-serial.h`
-- `common/vscp.h`
+- `src/vscp-serial.h`
+- `src/vscp.h`
 - `docs/README.md`

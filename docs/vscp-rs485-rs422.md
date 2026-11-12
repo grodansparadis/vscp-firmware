@@ -4,7 +4,7 @@ Last updated: 2026-07-03
 
 This document describes the RS-485/RS-422 protocol definition header:
 
-- `common/vscp-rs485-protocol.h`
+- `src/vscp-rs485-protocol.h`
 
 The header defines a VSCP-oriented multi-drop transport profile where:
 
@@ -151,8 +151,8 @@ Packed size macro:
 
 ## Related files
 
-- `common/vscp-rs485-protocol.h`
-- `common/vscp-serial.h`
-- `common/vscp-binary-protocol.h`
+- `src/vscp-rs485-protocol.h`
+- `src/vscp-serial.h`
+- `src/vscp-binary-protocol.h`
 - `docs/vscp-serial.md`
 - `docs/vscp-binary.md`

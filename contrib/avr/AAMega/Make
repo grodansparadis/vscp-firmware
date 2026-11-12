@@ -19,14 +19,14 @@ PRG = AAmega
 OBJ = AAmega.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/can_at90can128.o
 OBJ += $(VSCP_FIRMWARE)/avr/common/uart.o
-OBJ += $(VSCP_FIRMWARE)/common/vscp_firmware.c
+OBJ += $(VSCP_FIRMWARE)/src/vscp-firmware.c
 
 
 MCU_TARGET	= at90can32
 
 OPTIMIZE	= -Os
 
-EXTRAINCDIRS   = $(VSCP_FIRMWARE)/common
+EXTRAINCDIRS   = $(VSCP_FIRMWARE)/src
 EXTRAINCDIRS  += $(VSCP_FIRMWARE)/avr/common
 EXTRAINCDIRS  += $(VSCP_SOFTWARE)/src/common
 EXTRAINCDIRS  += $(VSCP_SOFTWARE)/src/vscp/common

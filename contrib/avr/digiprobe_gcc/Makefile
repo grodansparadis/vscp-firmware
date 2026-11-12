@@ -41,7 +41,7 @@ endif
 EXTRAINCDIRS +=  .
 EXTRAINCDIRS += $(VSCP_SOFTWARE)/src/common
 EXTRAINCDIRS += $(VSCP_SOFTWARE)/src/vscp/common
-EXTRAINCDIRS += $(VSCP_FIRMWARE)/common
+EXTRAINCDIRS += $(VSCP_FIRMWARE)/src
 EXTRAINCDIRS += $(VSCP_FIRMWARE)/avr/common
 #--------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ OBJ += avr_adc.c
 OBJ += avr_spi.c
 OBJ += mcp355xs.c
 
-OBJ += $(VSCP_FIRMWARE)/common/vscp_firmware.c
+OBJ += $(VSCP_FIRMWARE)/src/vscp-firmware.c
 OBJ += $(VSCP_FIRMWARE)/avr/common/can_at90can128.c
 
 #==========================================================================

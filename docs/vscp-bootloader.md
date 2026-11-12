@@ -4,8 +4,8 @@ Last updated: 2026-02-19
 
 This document describes the VSCP bootloader module implemented by:
 
-- `common/vscp-bootloader.h`
-- `common/vscp-bootloader.c`
+- `src/vscp-bootloader.h`
+- `src/vscp-bootloader.c`
 
 The module provides a protocol-driven firmware update state machine for VSCP nodes.
 
@@ -184,8 +184,8 @@ Typical target-specific implementations include:
 
 ## Related Files
 
-- `common/vscp-bootloader.h`
-- `common/vscp-bootloader.c`
-- `common/vscp-firmware-helper.h`
-- `common/vscp-firmware.h`
+- `src/vscp-bootloader.h`
+- `src/vscp-bootloader.c`
+- `src/vscp-firmware-helper.h`
+- `src/vscp-firmware.h`
 - `docs/README.md`

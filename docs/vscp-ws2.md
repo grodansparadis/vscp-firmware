@@ -1,7 +1,7 @@
 # vscp-ws2 — VSCP WebSocket Protocol WS2
 
 **Date:** 2026-06-11  
-**Module:** `common/vscp-ws2.h`, `common/vscp-ws2.c`  
+**Module:** `src/vscp-ws2-protocol.h`, `src/vscp-ws2-protocol.c`
 **Spec:** [VSCP Websocket WS2](https://grodansparadis.github.io/vscp-doc-spec/#/./vscp_websocket?id=ws2-description)
 
 ---

@@ -1,6 +1,6 @@
 # VSCP Level I firmware porting checklist
 
-Use this checklist when porting `common/vscp-firmware.*` to a new target.
+Use this checklist when porting `src/vscp-firmware.*` to a new target.
 
 ## Transport callbacks
 

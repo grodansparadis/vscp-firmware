@@ -4,10 +4,10 @@ cmake_minimum_required(VERSION 3.10)
 project(multi)
 
 include_directories( PUBLIC .
-                        ../../../../common )
+                        ../../../../../src )
 
-# add the executable ../../../../common/vscp_server.c
+# add the executable ../../../../../src/vscp_server.c
 #add_executable(multi multi-server.c)
 add_executable(multi multi-server.c
-                  ../../../../common/vscp-server.c
-                  ../../../../common/vscp-link-protocol.c)
+                  ../../../../../src/vscp-server.c
+                  ../../../../../src/vscp-link-protocol.c)
