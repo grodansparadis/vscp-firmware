@@ -1,0 +1,56 @@
+name: Update version
+
+# Bumps the library version (common/vscp-firmware-version.h) on every push
+# to master: year.month.patch, where patch counts the pushes in the month
+# and starts at 0 in a new month. See tools/update_version.py.
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+# One run at a time so each push gets its own patch number. GitHub keeps at
+# most one waiting run per group; pushes that arrive while a run is already
+# waiting share that run's bump.
+concurrency:
+  group: update-version
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    # The bot's own commit carries [skip ci] and must not trigger a new bump
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Test version updater
+        run: python3 -B tests/test_update_version.py
+
+      - name: Bump version, commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Retry if someone pushed to master meanwhile (push rejected)
+          for attempt in 1 2 3 4 5; do
+            git fetch origin master
+            git reset --hard origin/master
+            version=$(python3 -B tools/update_version.py)
+            git add common/vscp-firmware-version.h
+            git commit -m "Update version to ${version} [skip ci]"
+            if git push origin HEAD:master; then
+              echo "Version ${version}"
+              exit 0
+            fi
+            echo "Push rejected (attempt ${attempt}), retrying"
+            sleep $((attempt * 5))
+          done
+          echo "Failed to push the version update"
+          exit 1

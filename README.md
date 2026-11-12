@@ -44,9 +44,29 @@ Reusable VSCP Level I firmware porting checklist is available in [docs/examples/
 
 - Added `vscp_fwhlp_parseStringValue` behavior notes in [docs/vscp-firmware-helper.md](docs/vscp-firmware-helper.md), including base-prefix handling (`0x`, `0`, `0b`) and `endptr` token parsing semantics.
 
+## Version
+
+The library version is `year.month.patch` (for example `26.11.3`) and is in
+[common/vscp-firmware-version.h](common/vscp-firmware-version.h):
+
+- `VSCP_FIRMWARE_LIB_VERSION_YEAR`, `_MONTH`, `_PATCH` and `_STR`
+- `VSCP_FIRMWARE_LIB_VERSION` as one number for compile time checks, e.g.
+  `#if VSCP_FIRMWARE_LIB_VERSION >= VSCP_FIRMWARE_LIB_VERSION_CODE(26, 11, 3)`
+
+It is updated automatically on every push to `master` by the
+[Update version](https://github.com/grodansparadis/vscp-firmware/actions/workflows/update-version.yml)
+workflow: the patch number counts the pushes in a month and starts at 0 in a
+new month. Do not edit the header by hand. Pushes whose commit message
+contains `[skip ci]` do not change the version.
+
+This is the version of the library code, not the VSCP protocol version that
+nodes report in registers 0x81/0x82 (`VSCP_MAJOR_VERSION` etc. in
+`vscp-firmware.h`).
+
 ## CI
 
 - Tests workflow: [GitHub Actions - Tests](https://github.com/grodansparadis/vscp-firmware/actions/workflows/tests.yml)
+- Version workflow: [GitHub Actions - Update version](https://github.com/grodansparadis/vscp-firmware/actions/workflows/update-version.yml)
 - Latest workflow runs: [GitHub Actions runs](https://github.com/grodansparadis/vscp-firmware/actions)
 
 The main reference implementations for VSCP over CAN is the Paris and the Kelvin modules. Both can found [here](http://www.grodansparadis.com/products.html) along with other open source products. All modules are available as 
