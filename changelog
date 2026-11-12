@@ -1,3 +1,7 @@
+261112 - Added authenticated binary frames (version 1, AES-CBC + HMAC-SHA-256, built in SHA-256)
+         compatible with the VSCP helper library. Fixed the CRC of command/reply frames (was
+         calculated over the not yet written CRC bytes). CLASS2.MEASUREMENT_FLOAT decoded MSB first.
+
 
 260219 - Documented vscp_fwhlp_parseStringValue parsing semantics (0x/0/0b and endptr behavior) in helper docs and README indexes.
 

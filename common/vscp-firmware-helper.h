@@ -969,6 +969,159 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
                         const uint8_t *iv,
                         uint8_t nAlgorithm);
 
+/*
+  Authenticated binary frames (packet version 1, AES-CBC + HMAC-SHA-256)
+
+  Same format as the VSCP helper library (vscp_encryptFrameV1,
+  vscp_decryptFrameV1, vscp_binary::encode/decode) so firmware and VSCP
+  software interoperate:
+
+    record:  [0x55][version:3 | length:13, big endian][inner frame]
+    inner:   [type/encryption:1][ciphertext:N*16][IV:16][tag:16]
+
+  AES-CBC (128, 192 or 256 bits) with PKCS#7 padding encrypts everything
+  after the type byte, including the CRC. The tag is the leftmost 128 bits of
+  HMAC-SHA-256(hmacKey, prefix || type/encryption || ciphertext || IV), where
+  prefix is 0x55 followed by the big endian word (1 << 13) | inner length
+  (including the tag). The receiver checks the tag in constant time before
+  any decryption, then padding and CRC. Version 1 never carries unencrypted
+  frames.
+
+  The HMAC key is a separate 32 byte key. Never use the AES key as HMAC key.
+  The tag does not give replay protection. A peer that requires
+  authentication must only accept version 1 records with the agreed
+  algorithm and never fall back to legacy (version 0) frames.
+
+  SHA-256/HMAC is built in (no extra library needed). Needs
+  VSCP_FWHLP_CRYPTO_SUPPORT and VSCP_FWHLP_BINARY_FRAME_SUPPORT.
+*/
+#ifdef VSCP_FWHLP_BINARY_FRAME_SUPPORT
+
+#define VSCP_FWHLP_FRAME_PREFIX                0x55   // First byte of a versioned record
+#define VSCP_FWHLP_FRAME_HEADER_SIZE           3      // Prefix byte + version/length word
+#define VSCP_FWHLP_FRAME_TAG_SIZE              16     // Truncated HMAC-SHA-256 tag
+#define VSCP_FWHLP_FRAME_VERSION_LEGACY        0      // Unauthenticated inner frame
+#define VSCP_FWHLP_FRAME_VERSION_AUTHENTICATED 1      // AES-CBC + HMAC-SHA-256
+#define VSCP_FWHLP_FRAME_MAX_INNER_LEN         0x1fff // 13-bit length field
+#define VSCP_FWHLP_FRAME_V1_OVERHEAD           48     // Max extra bytes for encryptFrameV1
+
+/*!
+ * @brief Encrypt and authenticate an inner frame (version 1, no prefix).
+ *
+ * @param output Buffer that gets [type][ciphertext][IV][tag]. May be the
+ *        same buffer as input.
+ * @param capacity Size of output. At most len + VSCP_FWHLP_FRAME_V1_OVERHEAD
+ *        bytes are written.
+ * @param input Plain inner frame: type/encryption byte, body and CRC.
+ * @param len Length of input (at least 5 bytes).
+ * @param key AES key (16, 24 or 32 bytes depending on the algorithm).
+ * @param hmacKey Independent 32 byte HMAC-SHA-256 key.
+ * @param iv 16 byte IV or NULL to generate a random IV (recommended).
+ * @param nAlgorithm VSCP_ENCRYPTION_AES128/192/256, or
+ *        VSCP_ENCRYPTION_FROM_TYPE_BYTE to take it from input[0]. The low
+ *        nibble of the written type byte is set to the algorithm.
+ * @return Length of the written inner frame, 0 on failure.
+ */
+size_t
+vscp_fwhlp_encryptFrameV1(uint8_t *output,
+                          size_t capacity,
+                          const uint8_t *input,
+                          size_t len,
+                          const uint8_t *key,
+                          const uint8_t *hmacKey,
+                          const uint8_t *iv,
+                          uint8_t nAlgorithm);
+
+/*!
+ * @brief Authenticate and decrypt an inner frame (version 1, no prefix).
+ *
+ * The caller must have checked the record prefix and that it is version 1
+ * (or use vscp_fwhlp_decodeAuthenticatedFrame). The tag is checked before
+ * anything is decrypted. On failure output is not changed.
+ *
+ * @param output Buffer that gets the plain inner frame (type, body, CRC).
+ * @param capacity Size of output.
+ * @param input Inner frame [type][ciphertext][IV][tag].
+ * @param len Length of input.
+ * @param key AES key matching the algorithm in input[0].
+ * @param hmacKey 32 byte HMAC-SHA-256 key.
+ * @return Length of the plain inner frame, 0 on failure (bad tag, padding,
+ *         CRC, size or algorithm).
+ */
+size_t
+vscp_fwhlp_decryptFrameV1(uint8_t *output,
+                          size_t capacity,
+                          const uint8_t *input,
+                          size_t len,
+                          const uint8_t *key,
+                          const uint8_t *hmacKey);
+
+/*!
+ * @brief Parse the three byte record prefix [0x55][version:3 | length:13].
+ *
+ * @param buf Record data.
+ * @param len Number of bytes available in buf.
+ * @param pVersion Gets the packet version (0 = legacy, 1 = authenticated).
+ * @param pInnerLen Gets the inner frame length that follows the prefix.
+ * @return VSCP_ERROR_SUCCESS, VSCP_ERROR_PARAMETER or VSCP_ERROR_INVALID_FRAME
+ *         (no 0x55 prefix).
+ */
+int
+vscp_fwhlp_parseFrameHeader(const uint8_t *buf, size_t len, uint8_t *pVersion, size_t *pInnerLen);
+
+/*!
+ * @brief Build a complete authenticated record: prefix + version 1 frame.
+ *
+ * @param wire Buffer that gets the record.
+ * @param capacity Size of wire (len + VSCP_FWHLP_FRAME_HEADER_SIZE +
+ *        VSCP_FWHLP_FRAME_V1_OVERHEAD is always enough).
+ * @param input Plain inner frame (type/encryption byte, body and CRC).
+ * @param len Length of input.
+ * @param key AES key.
+ * @param hmacKey Independent 32 byte HMAC key.
+ * @param iv 16 byte IV or NULL for a random IV (recommended).
+ * @param nAlgorithm AES algorithm (see vscp_fwhlp_encryptFrameV1).
+ * @return Length of the record, 0 on failure.
+ */
+size_t
+vscp_fwhlp_encodeAuthenticatedFrame(uint8_t *wire,
+                                    size_t capacity,
+                                    const uint8_t *input,
+                                    size_t len,
+                                    const uint8_t *key,
+                                    const uint8_t *hmacKey,
+                                    const uint8_t *iv,
+                                    uint8_t nAlgorithm);
+
+/*!
+ * @brief Check and decode one complete authenticated record.
+ *
+ * Only version 1 records whose length matches wireLen exactly are accepted.
+ * Legacy (version 0) records are rejected - there is no fallback. Records
+ * with an invalid packet type (2-13 in the high nibble of the type byte) are
+ * rejected, as in the VSCP helper library.
+ *
+ * @param output Buffer that gets the plain inner frame.
+ * @param capacity Size of output.
+ * @param wire Complete record (prefix + inner frame).
+ * @param wireLen Length of the record.
+ * @param key AES key.
+ * @param hmacKey 32 byte HMAC key.
+ * @param nAlgorithm The agreed AES algorithm; records using another one are
+ *        rejected. VSCP_ENCRYPTION_FROM_TYPE_BYTE accepts any AES algorithm.
+ * @return Length of the plain inner frame, 0 on failure.
+ */
+size_t
+vscp_fwhlp_decodeAuthenticatedFrame(uint8_t *output,
+                                    size_t capacity,
+                                    const uint8_t *wire,
+                                    size_t wireLen,
+                                    const uint8_t *key,
+                                    const uint8_t *hmacKey,
+                                    uint8_t nAlgorithm);
+
+#endif // VSCP_FWHLP_BINARY_FRAME_SUPPORT
+
 #endif
 
 /*

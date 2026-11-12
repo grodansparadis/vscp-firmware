@@ -3310,7 +3310,9 @@ vscp_fwhlp_writeCommandToFrame(uint8_t *frame, size_t len, uint16_t command, con
   }
 
   // Calculate CRC
-  crc framecrc = crcFast((unsigned char const *) frame + 1, (int) calcSize - 1);
+  // Over command/reply and arguments only (not over the CRC bytes, which were
+  // included before and made the CRC depend on uninitialized buffer content)
+  crc framecrc = crcFast((unsigned char const *) frame + 1, (int) calcSize - 3);
 
   // CRC
   frame[calcSize - 2] = (framecrc >> 8) & 0xff;
@@ -3369,7 +3371,9 @@ vscp_fwhlp_writeReplyToFrame(uint8_t *frame,
   }
 
   // Calculate CRC
-  crc framecrc = crcFast((unsigned char const *) frame + 1, (int) calcSize - 1);
+  // Over command/reply and arguments only (not over the CRC bytes, which were
+  // included before and made the CRC depend on uninitialized buffer content)
+  crc framecrc = crcFast((unsigned char const *) frame + 1, (int) calcSize - 3);
 
   // CRC
   frame[calcSize - 2] = (framecrc >> 8) & 0xff;
@@ -3392,7 +3396,18 @@ vscp_fwhlp_pkcs7_padded_length(size_t data_len)
 }
 
 static int
+vscp_fwhlp_pkcs7_unpad_ex(uint8_t *data, size_t data_len, size_t *pUnpaddedLen);
+
+static int
 vscp_fwhlp_pkcs7_unpad(uint8_t *data, size_t data_len)
+{
+  return vscp_fwhlp_pkcs7_unpad_ex(data, data_len, NULL);
+}
+
+// Validate and remove PKCS#7 padding. If pUnpaddedLen is not NULL it gets
+// the data length without padding.
+static int
+vscp_fwhlp_pkcs7_unpad_ex(uint8_t *data, size_t data_len, size_t *pUnpaddedLen)
 {
   uint8_t padding;
   uint8_t invalid = 0;
@@ -3417,6 +3432,9 @@ vscp_fwhlp_pkcs7_unpad(uint8_t *data, size_t data_len)
 
   // Preserve the helper's existing zero-filled tail after removing padding.
   memset(data + data_len - padding, 0, padding);
+  if (NULL != pUnpaddedLen) {
+    *pUnpaddedLen = data_len - padding;
+  }
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -3537,9 +3555,10 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
       break;
 
     default:
-      // Not a valid encryption algorithm
+      // Not a valid encryption algorithm. (Returned VSCP_ERROR_PARAMETER
+      // before, which callers took as a frame length.)
       free(padded_data);
-      return VSCP_ERROR_PARAMETER;
+      return 0;
   }
 
   free(padded_data);
@@ -3556,20 +3575,45 @@ vscp_fwhlp_encryptFrame(uint8_t *output,
 // vscp_fwhlp_decryptFrame
 //
 
-int
-vscp_fwhlp_decryptFrame(uint8_t *output,
-                        const uint8_t *input,
-                        size_t len,
-                        const uint8_t *key,
-                        const uint8_t *iv,
-                        uint8_t nAlgorithm)
+#ifdef VSCP_FWHLP_CRYPTO_USE_OPENSSL
+static int
+vscp_fwhlp_decryptFrame_openssl_ex(uint8_t *output,
+                                   const uint8_t *input,
+                                   size_t len,
+                                   const uint8_t *key,
+                                   const uint8_t *iv,
+                                   uint8_t nAlgorithm,
+                                   size_t *pPlainLen);
+#endif
+#ifdef VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO
+static int
+vscp_fwhlp_decryptFrame_psa_ex(uint8_t *output,
+                               const uint8_t *input,
+                               size_t len,
+                               const uint8_t *key,
+                               const uint8_t *iv,
+                               uint8_t nAlgorithm,
+                               size_t *pPlainLen);
+#endif
+
+// Decrypt a frame with the configured backend. If pPlainLen is not NULL it
+// gets the length of the decrypted payload (without the type byte and
+// without padding).
+static int
+vscp_fwhlp_decryptFrame_ex(uint8_t *output,
+                           const uint8_t *input,
+                           size_t len,
+                           const uint8_t *key,
+                           const uint8_t *iv,
+                           uint8_t nAlgorithm,
+                           size_t *pPlainLen)
 {
 #ifdef VSCP_FWHLP_CRYPTO_USE_OPENSSL
   // Use OpenSSL backend when enabled
-  return vscp_fwhlp_decryptFrame_openssl(output, input, len, key, iv, nAlgorithm);
+  return vscp_fwhlp_decryptFrame_openssl_ex(output, input, len, key, iv, nAlgorithm, pPlainLen);
 #elif defined(VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO)
   // Use PSA crypto backend when enabled
-  return vscp_fwhlp_decryptFrame_psa(output, input, len, key, iv, nAlgorithm);
+  return vscp_fwhlp_decryptFrame_psa_ex(output, input, len, key, iv, nAlgorithm, pPlainLen);
 #else
   // Use AES backend (default)
   uint8_t appended_iv[16];
@@ -3590,6 +3634,9 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
 
   if (VSCP_ENCRYPTION_NONE == GET_VSCP_BINARY_PACKET_ENCRYPTION(nAlgorithm)) {
     memcpy(output, input, len);
+    if ((NULL != pPlainLen) && len) {
+      *pPlainLen = len - 1;
+    }
     return VSCP_ERROR_SUCCESS;
   }
 
@@ -3653,9 +3700,463 @@ vscp_fwhlp_decryptFrame(uint8_t *output,
       return VSCP_ERROR_PARAMETER;
   }
 
-  return vscp_fwhlp_pkcs7_unpad(output + 1, real_len - 1);
+  return vscp_fwhlp_pkcs7_unpad_ex(output + 1, real_len - 1, pPlainLen);
 #endif
 }
+
+int
+vscp_fwhlp_decryptFrame(uint8_t *output,
+                        const uint8_t *input,
+                        size_t len,
+                        const uint8_t *key,
+                        const uint8_t *iv,
+                        uint8_t nAlgorithm)
+{
+  return vscp_fwhlp_decryptFrame_ex(output, input, len, key, iv, nAlgorithm, NULL);
+}
+
+// ----------------------------------------------------------------------------
+//                 Authenticated binary frames (version 1)
+// ----------------------------------------------------------------------------
+//
+// Same format as the VSCP helper library (vscp_encryptFrameV1 /
+// vscp_decryptFrameV1 and vscp_binary::encode/decode):
+//
+//   record:  [0x55][version:3 | length:13 (big endian)][inner frame]
+//   inner:   [type/encryption:1][ciphertext:N*16][IV:16][tag:16]
+//
+// The tag is the leftmost 128 bits of
+// HMAC-SHA-256(hmacKey, prefix || type/encryption || ciphertext || IV)
+// where prefix is 0x55 followed by (1 << 13) | inner length (incl. tag).
+// The tag is checked in constant time before anything is decrypted.
+//
+
+#if defined(VSCP_FWHLP_BINARY_FRAME_SUPPORT)
+
+// --------------------------- SHA-256 (FIPS 180-4) ---------------------------
+
+typedef struct {
+  uint32_t state[8];
+  uint64_t bitcount;
+  uint8_t buffer[64];
+  size_t buflen;
+} vscp_fwhlp_sha256_ctx_t;
+
+static const uint32_t vscp_fwhlp_sha256_k[64] = {
+  0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+  0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+  0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+  0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+  0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+  0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+  0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+  0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+};
+
+#define VSCP_FWHLP_ROTR32(x, n) (((x) >> (n)) | ((x) << (32 - (n))))
+
+static void
+vscp_fwhlp_sha256_block(vscp_fwhlp_sha256_ctx_t *ctx, const uint8_t *block)
+{
+  uint32_t w[64];
+  for (int i = 0; i < 16; i++) {
+    w[i] = ((uint32_t) block[4 * i] << 24) | ((uint32_t) block[4 * i + 1] << 16) |
+           ((uint32_t) block[4 * i + 2] << 8) | (uint32_t) block[4 * i + 3];
+  }
+  for (int i = 16; i < 64; i++) {
+    uint32_t s0 = VSCP_FWHLP_ROTR32(w[i - 15], 7) ^ VSCP_FWHLP_ROTR32(w[i - 15], 18) ^ (w[i - 15] >> 3);
+    uint32_t s1 = VSCP_FWHLP_ROTR32(w[i - 2], 17) ^ VSCP_FWHLP_ROTR32(w[i - 2], 19) ^ (w[i - 2] >> 10);
+    w[i]        = w[i - 16] + s0 + w[i - 7] + s1;
+  }
+
+  uint32_t a = ctx->state[0], b = ctx->state[1], c = ctx->state[2], d = ctx->state[3];
+  uint32_t e = ctx->state[4], f = ctx->state[5], g = ctx->state[6], h = ctx->state[7];
+  for (int i = 0; i < 64; i++) {
+    uint32_t S1  = VSCP_FWHLP_ROTR32(e, 6) ^ VSCP_FWHLP_ROTR32(e, 11) ^ VSCP_FWHLP_ROTR32(e, 25);
+    uint32_t ch  = (e & f) ^ (~e & g);
+    uint32_t t1  = h + S1 + ch + vscp_fwhlp_sha256_k[i] + w[i];
+    uint32_t S0  = VSCP_FWHLP_ROTR32(a, 2) ^ VSCP_FWHLP_ROTR32(a, 13) ^ VSCP_FWHLP_ROTR32(a, 22);
+    uint32_t maj = (a & b) ^ (a & c) ^ (b & c);
+    uint32_t t2  = S0 + maj;
+    h = g;
+    g = f;
+    f = e;
+    e = d + t1;
+    d = c;
+    c = b;
+    b = a;
+    a = t1 + t2;
+  }
+  ctx->state[0] += a;
+  ctx->state[1] += b;
+  ctx->state[2] += c;
+  ctx->state[3] += d;
+  ctx->state[4] += e;
+  ctx->state[5] += f;
+  ctx->state[6] += g;
+  ctx->state[7] += h;
+}
+
+static void
+vscp_fwhlp_sha256_init(vscp_fwhlp_sha256_ctx_t *ctx)
+{
+  static const uint32_t init[8] = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+                                    0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 };
+  memcpy(ctx->state, init, sizeof(init));
+  ctx->bitcount = 0;
+  ctx->buflen   = 0;
+}
+
+static void
+vscp_fwhlp_sha256_update(vscp_fwhlp_sha256_ctx_t *ctx, const uint8_t *data, size_t len)
+{
+  ctx->bitcount += (uint64_t) len * 8;
+  while (len) {
+    size_t n = 64 - ctx->buflen;
+    if (n > len) {
+      n = len;
+    }
+    memcpy(ctx->buffer + ctx->buflen, data, n);
+    ctx->buflen += n;
+    data += n;
+    len -= n;
+    if (64 == ctx->buflen) {
+      vscp_fwhlp_sha256_block(ctx, ctx->buffer);
+      ctx->buflen = 0;
+    }
+  }
+}
+
+static void
+vscp_fwhlp_sha256_final(vscp_fwhlp_sha256_ctx_t *ctx, uint8_t digest[32])
+{
+  const uint64_t bitcount = ctx->bitcount;
+  const uint8_t pad80     = 0x80;
+  const uint8_t zero      = 0x00;
+  vscp_fwhlp_sha256_update(ctx, &pad80, 1);
+  while (56 != ctx->buflen) {
+    vscp_fwhlp_sha256_update(ctx, &zero, 1);
+  }
+  uint8_t lenbuf[8];
+  for (int i = 0; i < 8; i++) {
+    lenbuf[i] = (uint8_t) (bitcount >> (56 - 8 * i));
+  }
+  vscp_fwhlp_sha256_update(ctx, lenbuf, 8);
+  for (int i = 0; i < 8; i++) {
+    digest[4 * i]     = (uint8_t) (ctx->state[i] >> 24);
+    digest[4 * i + 1] = (uint8_t) (ctx->state[i] >> 16);
+    digest[4 * i + 2] = (uint8_t) (ctx->state[i] >> 8);
+    digest[4 * i + 3] = (uint8_t) ctx->state[i];
+  }
+}
+
+// Zero memory in a way the compiler does not remove
+static void
+vscp_fwhlp_cleanse(void *p, size_t len)
+{
+  volatile uint8_t *v = (volatile uint8_t *) p;
+  while (len--) {
+    *v++ = 0;
+  }
+}
+
+// HMAC-SHA-256 (RFC 2104) with a 32 byte key over hdr || data
+static void
+vscp_fwhlp_hmac_sha256(uint8_t digest[32],
+                       const uint8_t key[32],
+                       const uint8_t *hdr,
+                       size_t hdrlen,
+                       const uint8_t *data,
+                       size_t datalen)
+{
+  uint8_t pad[64];
+  uint8_t inner[32];
+  vscp_fwhlp_sha256_ctx_t ctx;
+
+  memset(pad, 0x36, sizeof(pad));
+  for (int i = 0; i < 32; i++) {
+    pad[i] ^= key[i];
+  }
+  vscp_fwhlp_sha256_init(&ctx);
+  vscp_fwhlp_sha256_update(&ctx, pad, sizeof(pad));
+  vscp_fwhlp_sha256_update(&ctx, hdr, hdrlen);
+  vscp_fwhlp_sha256_update(&ctx, data, datalen);
+  vscp_fwhlp_sha256_final(&ctx, inner);
+
+  memset(pad, 0x5c, sizeof(pad));
+  for (int i = 0; i < 32; i++) {
+    pad[i] ^= key[i];
+  }
+  vscp_fwhlp_sha256_init(&ctx);
+  vscp_fwhlp_sha256_update(&ctx, pad, sizeof(pad));
+  vscp_fwhlp_sha256_update(&ctx, inner, sizeof(inner));
+  vscp_fwhlp_sha256_final(&ctx, digest);
+
+  vscp_fwhlp_cleanse(pad, sizeof(pad));
+  vscp_fwhlp_cleanse(inner, sizeof(inner));
+  vscp_fwhlp_cleanse(&ctx, sizeof(ctx));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_frameTagV1
+//
+// Tag over the canonical prefix (0x55, (1 << 13) | wireLen) and the inner
+// frame without its tag (frameLen = wireLen - 16 bytes).
+//
+
+static void
+vscp_fwhlp_frameTagV1(uint8_t tag[VSCP_FWHLP_FRAME_TAG_SIZE],
+                      const uint8_t *frame,
+                      size_t frameLen,
+                      const uint8_t *hmacKey)
+{
+  uint8_t digest[32];
+  const uint16_t word = (uint16_t) ((VSCP_FWHLP_FRAME_VERSION_AUTHENTICATED << 13) |
+                                    (uint16_t) (frameLen + VSCP_FWHLP_FRAME_TAG_SIZE));
+  const uint8_t hdr[VSCP_FWHLP_FRAME_HEADER_SIZE] = { VSCP_FWHLP_FRAME_PREFIX,
+                                                       (uint8_t) (word >> 8),
+                                                       (uint8_t) word };
+  vscp_fwhlp_hmac_sha256(digest, hmacKey, hdr, sizeof(hdr), frame, frameLen);
+  memcpy(tag, digest, VSCP_FWHLP_FRAME_TAG_SIZE);
+  vscp_fwhlp_cleanse(digest, sizeof(digest));
+}
+
+static int
+vscp_fwhlp_isAesAlgorithm(uint8_t nAlgorithm)
+{
+  return (VSCP_ENCRYPTION_AES128 == nAlgorithm) || (VSCP_ENCRYPTION_AES192 == nAlgorithm) ||
+         (VSCP_ENCRYPTION_AES256 == nAlgorithm);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_encryptFrameV1
+//
+
+size_t
+vscp_fwhlp_encryptFrameV1(uint8_t *output,
+                          size_t capacity,
+                          const uint8_t *input,
+                          size_t len,
+                          const uint8_t *key,
+                          const uint8_t *hmacKey,
+                          const uint8_t *iv,
+                          uint8_t nAlgorithm)
+{
+  if ((NULL == output) || (NULL == input) || (NULL == key) || (NULL == hmacKey) || (len < 5) ||
+      (len > VSCP_FWHLP_FRAME_MAX_INNER_LEN)) {
+    return 0;
+  }
+
+  if (VSCP_ENCRYPTION_FROM_TYPE_BYTE == (nAlgorithm & 0x0f)) {
+    nAlgorithm = input[0] & 0x0f;
+  }
+
+  // Version 1 is always encrypted with AES
+  if (!vscp_fwhlp_isAesAlgorithm(nAlgorithm)) {
+    return 0;
+  }
+
+  const size_t ciphertextLen = ((len - 1) / 16 + 1) * 16;
+  const size_t wireLen       = 1 + ciphertextLen + 16 + VSCP_FWHLP_FRAME_TAG_SIZE;
+  if ((capacity < wireLen) || (wireLen > VSCP_FWHLP_FRAME_MAX_INNER_LEN)) {
+    return 0;
+  }
+
+  // Work on copies so input and output may be the same buffer
+  uint8_t *plain = (uint8_t *) malloc(len);
+  uint8_t *frame = (uint8_t *) malloc(wireLen);
+  if ((NULL == plain) || (NULL == frame)) {
+    free(plain);
+    free(frame);
+    return 0;
+  }
+  memcpy(plain, input, len);
+  plain[0] = (uint8_t) ((input[0] & 0xf0) | nAlgorithm); // Authenticated type/encryption byte
+
+  // [type][ciphertext][IV]
+  size_t encLen = vscp_fwhlp_encryptFrame(frame, plain, len, key, iv, nAlgorithm);
+  vscp_fwhlp_cleanse(plain, len);
+  free(plain);
+  if ((1 + ciphertextLen + 16) != encLen) {
+    vscp_fwhlp_cleanse(frame, wireLen);
+    free(frame);
+    return 0;
+  }
+
+  vscp_fwhlp_frameTagV1(frame + encLen, frame, encLen, hmacKey);
+
+  memcpy(output, frame, wireLen);
+  free(frame);
+  return wireLen;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_decryptFrameV1
+//
+
+size_t
+vscp_fwhlp_decryptFrameV1(uint8_t *output,
+                          size_t capacity,
+                          const uint8_t *input,
+                          size_t len,
+                          const uint8_t *key,
+                          const uint8_t *hmacKey)
+{
+  // Smallest frame: type + one cipher block + IV + tag
+  if ((NULL == output) || (NULL == input) || (NULL == key) || (NULL == hmacKey) || (len < 49) ||
+      (len > VSCP_FWHLP_FRAME_MAX_INNER_LEN) || (0 != ((len - 33) % 16))) {
+    return 0;
+  }
+
+  const uint8_t nAlgorithm = input[0] & 0x0f;
+  if (!vscp_fwhlp_isAesAlgorithm(nAlgorithm)) {
+    return 0;
+  }
+
+  // Authenticate before anything is decrypted. Constant time compare.
+  uint8_t tag[VSCP_FWHLP_FRAME_TAG_SIZE];
+  vscp_fwhlp_frameTagV1(tag, input, len - VSCP_FWHLP_FRAME_TAG_SIZE, hmacKey);
+  uint8_t diff = 0;
+  for (int i = 0; i < VSCP_FWHLP_FRAME_TAG_SIZE; i++) {
+    diff |= (uint8_t) (tag[i] ^ input[len - VSCP_FWHLP_FRAME_TAG_SIZE + i]);
+  }
+  vscp_fwhlp_cleanse(tag, sizeof(tag));
+  if (0 != diff) {
+    return 0;
+  }
+
+  // Decrypt [type][ciphertext][IV] into a work buffer so the caller's
+  // output is left unchanged on failure
+  const size_t encLen = len - VSCP_FWHLP_FRAME_TAG_SIZE;
+  uint8_t *plain      = (uint8_t *) malloc(encLen);
+  if (NULL == plain) {
+    return 0;
+  }
+
+  size_t payloadLen = 0;
+  size_t rv         = 0;
+  if ((VSCP_ERROR_SUCCESS ==
+       vscp_fwhlp_decryptFrame_ex(plain, input, encLen, key, NULL, nAlgorithm, &payloadLen)) &&
+      ((payloadLen + 1) >= 5) && (capacity >= (payloadLen + 1))) {
+
+    // The inner frame must have a valid CRC (over everything after the
+    // type byte except the CRC itself)
+    const size_t frameLen = payloadLen + 1;
+    const crc expected    = (crc) (((uint16_t) plain[frameLen - 2] << 8) | plain[frameLen - 1]);
+    if (crcSlow((unsigned char const *) plain + 1, (int) (frameLen - 3)) == expected) {
+      memcpy(output, plain, frameLen);
+      rv = frameLen;
+    }
+  }
+
+  vscp_fwhlp_cleanse(plain, encLen);
+  free(plain);
+  return rv;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_parseFrameHeader
+//
+
+int
+vscp_fwhlp_parseFrameHeader(const uint8_t *buf, size_t len, uint8_t *pVersion, size_t *pInnerLen)
+{
+  if ((NULL == buf) || (NULL == pVersion) || (NULL == pInnerLen) || (len < VSCP_FWHLP_FRAME_HEADER_SIZE)) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  if (VSCP_FWHLP_FRAME_PREFIX != buf[0]) {
+    return VSCP_ERROR_INVALID_FRAME;
+  }
+
+  const uint16_t word = (uint16_t) (((uint16_t) buf[1] << 8) | buf[2]);
+  *pVersion           = (uint8_t) (word >> 13);
+  *pInnerLen          = word & VSCP_FWHLP_FRAME_MAX_INNER_LEN;
+  return VSCP_ERROR_SUCCESS;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_encodeAuthenticatedFrame
+//
+
+size_t
+vscp_fwhlp_encodeAuthenticatedFrame(uint8_t *wire,
+                                    size_t capacity,
+                                    const uint8_t *input,
+                                    size_t len,
+                                    const uint8_t *key,
+                                    const uint8_t *hmacKey,
+                                    const uint8_t *iv,
+                                    uint8_t nAlgorithm)
+{
+  if ((NULL == wire) || (capacity < VSCP_FWHLP_FRAME_HEADER_SIZE)) {
+    return 0;
+  }
+
+  size_t innerLen = vscp_fwhlp_encryptFrameV1(wire + VSCP_FWHLP_FRAME_HEADER_SIZE,
+                                              capacity - VSCP_FWHLP_FRAME_HEADER_SIZE,
+                                              input,
+                                              len,
+                                              key,
+                                              hmacKey,
+                                              iv,
+                                              nAlgorithm);
+  if (0 == innerLen) {
+    return 0;
+  }
+
+  const uint16_t word = (uint16_t) ((VSCP_FWHLP_FRAME_VERSION_AUTHENTICATED << 13) | (uint16_t) innerLen);
+  wire[0]             = VSCP_FWHLP_FRAME_PREFIX;
+  wire[1]             = (uint8_t) (word >> 8);
+  wire[2]             = (uint8_t) word;
+  return VSCP_FWHLP_FRAME_HEADER_SIZE + innerLen;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp_fwhlp_decodeAuthenticatedFrame
+//
+
+size_t
+vscp_fwhlp_decodeAuthenticatedFrame(uint8_t *output,
+                                    size_t capacity,
+                                    const uint8_t *wire,
+                                    size_t wireLen,
+                                    const uint8_t *key,
+                                    const uint8_t *hmacKey,
+                                    uint8_t nAlgorithm)
+{
+  uint8_t version = 0;
+  size_t innerLen = 0;
+
+  if ((NULL == wire) || (wireLen < (size_t) (VSCP_FWHLP_FRAME_HEADER_SIZE + 1)) ||
+      (VSCP_ERROR_SUCCESS != vscp_fwhlp_parseFrameHeader(wire, wireLen, &version, &innerLen))) {
+    return 0;
+  }
+
+  // Only version 1, exactly one complete record, no fallback to legacy frames
+  if ((VSCP_FWHLP_FRAME_VERSION_AUTHENTICATED != version) ||
+      (wireLen != (VSCP_FWHLP_FRAME_HEADER_SIZE + innerLen))) {
+    return 0;
+  }
+
+  // Only valid packet types (0/1 events, 14 command, 15 reply), as the VSCP
+  // helper library checks in vscp_binary::parseHeader
+  const uint8_t packetType = wire[VSCP_FWHLP_FRAME_HEADER_SIZE] >> 4;
+  if ((packetType > 1) && (packetType < 14)) {
+    return 0;
+  }
+
+  // The agreed algorithm must be used (no downgrade to another algorithm)
+  const uint8_t frameAlgorithm = wire[VSCP_FWHLP_FRAME_HEADER_SIZE] & 0x0f;
+  if ((VSCP_ENCRYPTION_FROM_TYPE_BYTE != (nAlgorithm & 0x0f)) && (frameAlgorithm != (nAlgorithm & 0x0f))) {
+    return 0;
+  }
+
+  return vscp_fwhlp_decryptFrameV1(output, capacity, wire + VSCP_FWHLP_FRAME_HEADER_SIZE, innerLen, key, hmacKey);
+}
+
+#endif // VSCP_FWHLP_BINARY_FRAME_SUPPORT
+
 
 #endif // VSCP_FWHLP_CRYPTO_SUPPORT
 
@@ -3858,13 +4359,14 @@ vscp_fwhlp_encryptFrame_openssl(uint8_t *output,
 // vscp_fwhlp_decryptFrame_openssl
 //
 
-int
-vscp_fwhlp_decryptFrame_openssl(uint8_t *output,
-                                const uint8_t *input,
-                                size_t len,
-                                const uint8_t *key,
-                                const uint8_t *iv,
-                                uint8_t nAlgorithm)
+static int
+vscp_fwhlp_decryptFrame_openssl_ex(uint8_t *output,
+                                   const uint8_t *input,
+                                   size_t len,
+                                   const uint8_t *key,
+                                   const uint8_t *iv,
+                                   uint8_t nAlgorithm,
+                                   size_t *pPlainLen)
 {
   const EVP_CIPHER *cipher;
   uint8_t appended_iv[16];
@@ -3877,6 +4379,9 @@ vscp_fwhlp_decryptFrame_openssl(uint8_t *output,
 
   if (VSCP_ENCRYPTION_NONE == GET_VSCP_BINARY_PACKET_ENCRYPTION(nAlgorithm)) {
     memcpy(output, input, len);
+    if ((NULL != pPlainLen) && len) {
+      *pPlainLen = len - 1;
+    }
     return VSCP_ERROR_SUCCESS;
   }
 
@@ -3918,7 +4423,18 @@ vscp_fwhlp_decryptFrame_openssl(uint8_t *output,
     return VSCP_ERROR_ERROR;
   }
 
-  return vscp_fwhlp_pkcs7_unpad(output + 1, real_len - 1);
+  return vscp_fwhlp_pkcs7_unpad_ex(output + 1, real_len - 1, pPlainLen);
+}
+
+int
+vscp_fwhlp_decryptFrame_openssl(uint8_t *output,
+                                const uint8_t *input,
+                                size_t len,
+                                const uint8_t *key,
+                                const uint8_t *iv,
+                                uint8_t nAlgorithm)
+{
+  return vscp_fwhlp_decryptFrame_openssl_ex(output, input, len, key, iv, nAlgorithm, NULL);
 }
 
 #endif // VSCP_FWHLP_CRYPTO_SUPPORT && VSCP_FWHLP_CRYPTO_USE_OPENSSL
@@ -4111,13 +4627,14 @@ vscp_fwhlp_encryptFrame_psa(uint8_t *output,
 // vscp_fwhlp_decryptFrame_psa
 //
 
-int
-vscp_fwhlp_decryptFrame_psa(uint8_t *output,
-                            const uint8_t *input,
-                            size_t len,
-                            const uint8_t *key,
-                            const uint8_t *iv,
-                            uint8_t nAlgorithm)
+static int
+vscp_fwhlp_decryptFrame_psa_ex(uint8_t *output,
+                               const uint8_t *input,
+                               size_t len,
+                               const uint8_t *key,
+                               const uint8_t *iv,
+                               uint8_t nAlgorithm,
+                               size_t *pPlainLen)
 {
   psa_status_t status;
   psa_cipher_operation_t operation = PSA_CIPHER_OPERATION_INIT;
@@ -4144,6 +4661,9 @@ vscp_fwhlp_decryptFrame_psa(uint8_t *output,
 
   if (VSCP_ENCRYPTION_NONE == GET_VSCP_BINARY_PACKET_ENCRYPTION(nAlgorithm)) {
     memcpy(output, input, len);
+    if ((NULL != pPlainLen) && len) {
+      *pPlainLen = len - 1;
+    }
     return VSCP_ERROR_SUCCESS;
   }
 
@@ -4255,7 +4775,18 @@ vscp_fwhlp_decryptFrame_psa(uint8_t *output,
   psa_destroy_key(key_id);
   psa_reset_key_attributes(&attributes);
 
-  return vscp_fwhlp_pkcs7_unpad(output + 1, real_len - 1);
+  return vscp_fwhlp_pkcs7_unpad_ex(output + 1, real_len - 1, pPlainLen);
+}
+
+int
+vscp_fwhlp_decryptFrame_psa(uint8_t *output,
+                            const uint8_t *input,
+                            size_t len,
+                            const uint8_t *key,
+                            const uint8_t *iv,
+                            uint8_t nAlgorithm)
+{
+  return vscp_fwhlp_decryptFrame_psa_ex(output, input, len, key, iv, nAlgorithm, NULL);
 }
 
 #endif // VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO && ESP_PLATFORM

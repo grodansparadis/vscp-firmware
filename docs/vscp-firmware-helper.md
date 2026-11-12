@@ -44,6 +44,8 @@ The helper API is split into always-available and feature-gated parts.
   - Enables binary frame conversion APIs (event/command/reply framing).
 - `VSCP_FWHLP_CRYPTO_SUPPORT`
   - Enables `vscp_fwhlp_encryptFrame` and `vscp_fwhlp_decryptFrame`.
+  - Together with `VSCP_FWHLP_BINARY_FRAME_SUPPORT` also the authenticated
+    (version 1, AES-CBC + HMAC-SHA-256) frame APIs. SHA-256/HMAC is built in.
 - `VSCP_FWHLP_JSON_SUPPORT`
   - Enables JSON parse/create APIs.
 - `VSCP_FWHLP_XML_SUPPORT`
@@ -334,6 +336,66 @@ if (VSCP_ERROR_SUCCESS == rv) {
 
 - `vscp_fwhlp_encryptFrame`
 - `vscp_fwhlp_decryptFrame`
+
+#### Authenticated binary frames (version 1)
+
+(Requires `VSCP_FWHLP_CRYPTO_SUPPORT` and `VSCP_FWHLP_BINARY_FRAME_SUPPORT`)
+
+- `vscp_fwhlp_encryptFrameV1` / `vscp_fwhlp_decryptFrameV1` - inner frame
+- `vscp_fwhlp_encodeAuthenticatedFrame` / `vscp_fwhlp_decodeAuthenticatedFrame` - complete record
+- `vscp_fwhlp_parseFrameHeader` - parse the three byte record prefix
+
+Same format as the VSCP helper library (`vscp_encryptFrameV1`,
+`vscp_decryptFrameV1`, `vscp_binary::encode/decode`), so firmware and VSCP
+software interoperate:
+
+```text
+record:  [0x55][version:3 | length:13, big endian][inner frame]
+inner:   [type/encryption:1][ciphertext:N*16][IV:16][tag:16]
+```
+
+AES-CBC (128/192/256) with PKCS#7 padding encrypts everything after the type
+byte, including the CRC. The tag is the leftmost 128 bits of
+HMAC-SHA-256(hmacKey, prefix || type/encryption || ciphertext || IV), where the
+prefix is `0x55` followed by `(1 << 13) | inner length` (the length includes
+the tag). The receiver compares the tag in constant time before anything is
+decrypted, then checks padding and CRC. On failure the output buffer is not
+changed. Version 1 never carries unencrypted frames.
+
+- Use a separate 32 byte HMAC key. Never reuse the AES key as HMAC key.
+- Pass `NULL` as IV so a fresh random IV is used for every frame.
+- The tag does not protect against replay.
+- A node that requires authentication must only accept version 1 records with
+  the agreed algorithm and must never fall back to legacy (version 0) frames.
+  `vscp_fwhlp_decodeAuthenticatedFrame` enforces this; pass the agreed
+  algorithm (or `VSCP_ENCRYPTION_FROM_TYPE_BYTE` to accept any AES size).
+- An encrypted record is at most `len + VSCP_FWHLP_FRAME_HEADER_SIZE +
+  VSCP_FWHLP_FRAME_V1_OVERHEAD` bytes.
+- `crcInit()` must have been called before frames are built with the
+  `vscp_fwhlp_write*ToFrame` functions.
+
+```c
+uint8_t frame[64], wire[128], plain[64];
+
+crcInit();
+vscp_fwhlp_writeCommandToFrame(frame, sizeof(frame), VSCP_BINARY_COMMAND_CODE_OPEN, NULL, 0);
+
+size_t wireLen = vscp_fwhlp_encodeAuthenticatedFrame(wire, sizeof(wire), frame, 5,
+                                                     aesKey, hmacKey, NULL,
+                                                     VSCP_ENCRYPTION_AES256);
+// ... send wire[0..wireLen) ...
+
+size_t plainLen = vscp_fwhlp_decodeAuthenticatedFrame(plain, sizeof(plain), wire, wireLen,
+                                                      aesKey, hmacKey,
+                                                      VSCP_ENCRYPTION_AES256);
+if (0 == plainLen) {
+  // Not authentic, wrong algorithm/version or corrupt - drop it
+}
+```
+
+The unit tests check the interoperability vector from the VSCP helper library
+documentation (AES-256, command `0007`): the record
+`552031e3b865bcf520d83d2708502ae712638aeb000102030405060708090a0b0c0d0e0f270fec51e9794541f47aab3dd9f947ce`.
 
 ### 8) JSON Helpers (Optional)
 
