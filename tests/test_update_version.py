@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 
 import update_version  # noqa: E402
 
-HEADER = ROOT / "common" / "vscp-firmware-version.h"
+HEADER = ROOT / "src" / "vscp-firmware-version.h"
 
 
 class UpdateVersionTest(unittest.TestCase):

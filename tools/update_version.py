@@ -6,7 +6,7 @@ Used by the "Update version" GitHub workflow on every push to master:
   * same year and month as the current version -> patch + 1
   * new month (or year)                          -> patch = 0
 
-The version lives in common/vscp-firmware-version.h.
+The version lives in src/vscp-firmware-version.h.
 
 Usage:
   tools/update_version.py [--header PATH] [--date YYYY-MM] [--check]
