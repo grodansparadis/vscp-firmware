@@ -163,6 +163,62 @@ int vscp_handle_binary_event(vscp_binary_ctx_t *pctx, vscp_event_t *pEvent);
 
 ---
 
+## TCP record layer and authenticated encryption
+
+Over TCP every binary frame is sent as a record `[length:2, big endian][frame]`.
+Read one record from the stream (the two length bytes, then that many bytes)
+and pass the bytes after the prefix to `vscp_binary_handle_record()`. It checks
+the frame (type, CRC), dispatches commands to `vscp_handle_binary_command()` and
+events to `vscp_handle_binary_event()`, and ignores replies from the client
+(for example event confirmations). Build outgoing records in your `reply` and
+event sending code with `vscp_binary_wrap_record()`.
+
+```c
+// ops->reply
+static int my_reply(vscp_binary_ctx_t *pctx, uint16_t command, uint16_t error,
+                    const uint8_t *parg, size_t len)
+{
+  uint8_t frame[VSCP_BINARY_MAX_FRAME_SIZE];
+  uint8_t record[VSCP_BINARY_MAX_RECORD_SIZE];
+  vscp_fwhlp_writeReplyToFrame(frame, sizeof(frame), command, error, parg, len);
+  size_t n = vscp_binary_wrap_record(pctx, record, sizeof(record), frame, 7 + len);
+  return n ? my_socket_send(record, n) : VSCP_ERROR_ERROR;
+}
+
+// Receive loop
+uint8_t buf[VSCP_BINARY_MAX_RECORD_SIZE];
+size_t len = ...;   // from the two byte prefix, at most sizeof(buf)
+...                 // read len bytes into buf
+if (VSCP_ERROR_INVALID_FRAME == vscp_binary_handle_record(&ctx, buf, len)) {
+  close_connection();   // malformed or not authentic
+}
+```
+
+### Authenticated encryption (optional)
+
+With `VSCP_FWHLP_CRYPTO_SUPPORT` and `VSCP_FWHLP_BINARY_FRAME_SUPPORT`, call
+`vscp_binary_set_authentication(&ctx, VSCP_ENCRYPTION_AES256, aesKey, 32, hmacKey)`
+when the connection is set up. Every record is then a version 1 authenticated
+frame (AES-CBC + HMAC-SHA-256, see the helper docs):
+
+```text
+[length:2][type/encryption:1][ciphertext:N*16][IV:16][tag:16]
+```
+
+- Both ends need the same algorithm and keys; the HMAC key (32 bytes) must
+  differ from the AES key.
+- `vscp_binary_handle_record()` checks the tag in constant time before
+  decrypting (in place) and returns `VSCP_ERROR_INVALID_FRAME` for plain,
+  forged or wrong-key records and for another AES size. Close the connection
+  then; there is no fallback to unauthenticated frames.
+- `vscp_binary_wrap_record()` encrypts and tags with a random IV.
+- It is the same format as the VSCP helper library TCP client
+  (`vscpClientTcp` with `binary-encryption`, `binary-key`, `binary-hmac-key`),
+  so VSCP Works and other clients using it interoperate.
+- The text login before `BINARY` is not covered; use TLS for it if needed.
+- Call `vscp_binary_clear_authentication(&ctx)` when the connection ends to
+  wipe the keys.
+
 ## Minimal integration checklist
 
 - [ ] `ops->reply` — always required

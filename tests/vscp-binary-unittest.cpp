@@ -762,3 +762,131 @@ TEST_F(VscpBinary, user_and_pass_args_are_null_terminated_and_bounded)
   cmd(VSCP_BINARY_COMMAND_CODE_PASS, pass, sizeof(pass));
   EXPECT_EQ(std::string(VSCP_BINARY_MAX_PASSWORD_LENGTH, 'p'), g_bstub.last_password);
 }
+
+// ===========================================================================
+// TCP record layer, plain and authenticated (version 1 frames)
+// ===========================================================================
+
+extern "C" {
+#include "vscp-crc.h"
+}
+
+namespace {
+const uint8_t kAesKey[32]  = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a,
+                               0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15,
+                               0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f };
+const uint8_t kHmacKey[32] = { 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a,
+                               0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35,
+                               0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f };
+}
+
+class VscpBinaryRecord : public VscpBinary {
+protected:
+  void SetUp() override
+  {
+    VscpBinary::SetUp();
+    crcInit();
+  }
+
+  // Wrap a frame with the given context and hand the payload back to it
+  int roundTrip(vscp_binary_ctx_t &sender, const uint8_t *frame, size_t len)
+  {
+    uint8_t record[VSCP_BINARY_MAX_RECORD_SIZE];
+    size_t n = vscp_binary_wrap_record(&sender, record, sizeof(record), frame, len);
+    EXPECT_GT(n, 2u);
+    EXPECT_EQ(n - 2, (size_t) ((record[0] << 8) | record[1]));
+    return vscp_binary_handle_record(&ctx, record + 2, n - 2);
+  }
+};
+
+TEST_F(VscpBinaryRecord, plain_command_is_dispatched)
+{
+  uint8_t frame[5];
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_fwhlp_writeCommandToFrame(frame, sizeof(frame), VSCP_BINARY_COMMAND_CODE_NOOP, NULL, 0));
+  EXPECT_EQ(VSCP_ERROR_SUCCESS, roundTrip(ctx, frame, sizeof(frame)));
+  EXPECT_EQ(1, g_bstub.reply_calls);
+  EXPECT_EQ(VSCP_BINARY_COMMAND_CODE_NOOP, g_bstub.reply_command);
+}
+
+TEST_F(VscpBinaryRecord, bad_crc_is_rejected)
+{
+  uint8_t frame[5];
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_fwhlp_writeCommandToFrame(frame, sizeof(frame), VSCP_BINARY_COMMAND_CODE_NOOP, NULL, 0));
+  frame[4] ^= 1;
+  EXPECT_EQ(VSCP_ERROR_INVALID_FRAME, vscp_binary_handle_record(&ctx, frame, sizeof(frame)));
+  EXPECT_EQ(0, g_bstub.reply_calls);
+}
+
+#if defined(VSCP_FWHLP_CRYPTO_SUPPORT)
+
+TEST_F(VscpBinaryRecord, authenticated_command_and_event)
+{
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_binary_set_authentication(&ctx, VSCP_ENCRYPTION_AES256, kAesKey, 32, kHmacKey));
+
+  // Command
+  uint8_t frame[64];
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_fwhlp_writeCommandToFrame(frame, 5, VSCP_BINARY_COMMAND_CODE_NOOP, NULL, 0));
+  EXPECT_EQ(VSCP_ERROR_SUCCESS, roundTrip(ctx, frame, 5));
+  EXPECT_EQ(1, g_bstub.reply_calls);
+
+  // Event
+  vscpEvent ev = {};
+  uint8_t data[3] = { 1, 2, 3 };
+  ev.head         = VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+  ev.vscp_class   = 10;
+  ev.vscp_type    = 6;
+  ev.sizeData     = sizeof(data);
+  ev.pdata        = data;
+  size_t evlen    = vscp_fwhlp_getFrameSizeFromEvent(&ev);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_fwhlp_writeEventToFrame(frame, sizeof(frame), 0, &ev));
+  EXPECT_EQ(VSCP_ERROR_SUCCESS, roundTrip(ctx, frame, evlen));
+  EXPECT_EQ(1, g_bstub.send_event_calls);
+
+  vscp_binary_clear_authentication(&ctx);
+  EXPECT_EQ(0, ctx.auth);
+}
+
+TEST_F(VscpBinaryRecord, authenticated_rejects_plain_forged_and_wrong_key)
+{
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_binary_set_authentication(&ctx, VSCP_ENCRYPTION_AES256, kAesKey, 32, kHmacKey));
+
+  uint8_t frame[5];
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_fwhlp_writeCommandToFrame(frame, sizeof(frame), VSCP_BINARY_COMMAND_CODE_NOOP, NULL, 0));
+
+  // Plain frame on an authenticated connection
+  uint8_t plain[5];
+  memcpy(plain, frame, sizeof(plain));
+  EXPECT_EQ(VSCP_ERROR_INVALID_FRAME, vscp_binary_handle_record(&ctx, plain, sizeof(plain)));
+
+  // Changed byte in an authentic record
+  uint8_t record[VSCP_BINARY_MAX_RECORD_SIZE];
+  size_t n = vscp_binary_wrap_record(&ctx, record, sizeof(record), frame, sizeof(frame));
+  ASSERT_GT(n, 2u);
+  record[10] ^= 0x01;
+  EXPECT_EQ(VSCP_ERROR_INVALID_FRAME, vscp_binary_handle_record(&ctx, record + 2, n - 2));
+
+  // Sender with another HMAC key
+  vscp_binary_ctx_t other{};
+  other.ops = &k_bops;
+  uint8_t otherHmac[32];
+  memset(otherHmac, 0x77, sizeof(otherHmac));
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_binary_set_authentication(&other, VSCP_ENCRYPTION_AES256, kAesKey, 32, otherHmac));
+  EXPECT_EQ(VSCP_ERROR_INVALID_FRAME, roundTrip(other, frame, sizeof(frame)));
+
+  // Sender with another AES size
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_binary_set_authentication(&other, VSCP_ENCRYPTION_AES128, kAesKey, 16, kHmacKey));
+  EXPECT_EQ(VSCP_ERROR_INVALID_FRAME, roundTrip(other, frame, sizeof(frame)));
+
+  EXPECT_EQ(0, g_bstub.reply_calls);
+}
+
+TEST_F(VscpBinaryRecord, set_authentication_validates)
+{
+  EXPECT_EQ(VSCP_ERROR_PARAMETER, vscp_binary_set_authentication(&ctx, 0, kAesKey, 32, kHmacKey));
+  EXPECT_EQ(VSCP_ERROR_PARAMETER, vscp_binary_set_authentication(&ctx, VSCP_ENCRYPTION_AES256, kAesKey, 16, kHmacKey));
+  EXPECT_EQ(VSCP_ERROR_PARAMETER, vscp_binary_set_authentication(&ctx, VSCP_ENCRYPTION_AES256, kAesKey, 32, kAesKey));
+  EXPECT_EQ(VSCP_ERROR_PARAMETER, vscp_binary_set_authentication(&ctx, VSCP_ENCRYPTION_AES256, NULL, 32, kHmacKey));
+  EXPECT_EQ(0, ctx.auth);
+}
+
+#endif

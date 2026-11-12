@@ -1,3 +1,7 @@
+261112 - Binary protocol TCP record layer (vscp_binary_handle_record, vscp_binary_wrap_record) with
+         optional authenticated encryption (vscp_binary_set_authentication, AES + HMAC-SHA-256),
+         compatible with the VSCP helper library TCP client.
+
 261112 - Library version year.month.patch in common/vscp-firmware-version.h, updated automatically on
          every push to master (patch counts pushes in the month) by the Update version workflow.
 

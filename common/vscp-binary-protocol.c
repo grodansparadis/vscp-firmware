@@ -41,6 +41,9 @@
 
 #include <vscp.h>
 #include <vscp-firmware-helper.h>
+#ifdef VSCP_FWHLP_BINARY_FRAME_SUPPORT
+#include <vscp-crc.h>
+#endif
 
 #include "vscp-binary-protocol.h"
 
@@ -575,3 +578,191 @@ vscp_handle_binary_event(vscp_binary_ctx_t *pctx, vscp_event_t *pEvent)
 
   return pctx->ops->reply(pctx, VSCP_BINARY_COMMAND_CODE_EVENT_CONFIRM, rv, buf, sizeof(buf));
 }
+
+/* ── TCP record layer ─────────────────────────────────────────────────────── */
+
+#if defined(VSCP_FWHLP_CRYPTO_SUPPORT) && defined(VSCP_FWHLP_BINARY_FRAME_SUPPORT)
+
+static void
+vscp_binary_wipe(void *p, size_t len)
+{
+  volatile uint8_t *v = (volatile uint8_t *) p;
+  while (len--) {
+    *v++ = 0;
+  }
+}
+
+int
+vscp_binary_set_authentication(vscp_binary_ctx_t *pctx,
+                               uint8_t algorithm,
+                               const uint8_t *aesKey,
+                               size_t aesKeyLen,
+                               const uint8_t *hmacKey)
+{
+  size_t expected;
+
+  if ((NULL == pctx) || (NULL == aesKey) || (NULL == hmacKey)) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  switch (algorithm) {
+    case VSCP_ENCRYPTION_AES128:
+      expected = 16;
+      break;
+    case VSCP_ENCRYPTION_AES192:
+      expected = 24;
+      break;
+    case VSCP_ENCRYPTION_AES256:
+      expected = 32;
+      break;
+    default:
+      return VSCP_ERROR_PARAMETER;
+  }
+
+  if (aesKeyLen != expected) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  // Never use the AES key as HMAC key
+  if (0 == memcmp(aesKey, hmacKey, expected)) {
+    return VSCP_ERROR_PARAMETER;
+  }
+
+  vscp_binary_clear_authentication(pctx);
+  memcpy(pctx->aes_key, aesKey, expected);
+  memcpy(pctx->hmac_key, hmacKey, sizeof(pctx->hmac_key));
+  pctx->auth_algorithm = algorithm;
+  pctx->auth           = 1;
+  return VSCP_ERROR_SUCCESS;
+}
+
+void
+vscp_binary_clear_authentication(vscp_binary_ctx_t *pctx)
+{
+  if (NULL == pctx) {
+    return;
+  }
+  pctx->auth           = 0;
+  pctx->auth_algorithm = 0;
+  vscp_binary_wipe(pctx->aes_key, sizeof(pctx->aes_key));
+  vscp_binary_wipe(pctx->hmac_key, sizeof(pctx->hmac_key));
+}
+
+#endif
+
+#ifdef VSCP_FWHLP_BINARY_FRAME_SUPPORT
+
+int
+vscp_binary_handle_record(vscp_binary_ctx_t *pctx, uint8_t *buf, size_t len)
+{
+  if (VSCP_ERROR_SUCCESS != vscp_binary_check_ctx(pctx)) {
+    return VSCP_ERROR_INIT_MISSING;
+  }
+
+  if ((NULL == buf) || (0 == len)) {
+    return VSCP_ERROR_INVALID_FRAME;
+  }
+
+#ifdef VSCP_FWHLP_CRYPTO_SUPPORT
+  if (pctx->auth) {
+    // Only authentic version 1 frames with the configured algorithm
+    if ((buf[0] & 0x0f) != pctx->auth_algorithm) {
+      return VSCP_ERROR_INVALID_FRAME;
+    }
+    size_t plainLen = vscp_fwhlp_decryptFrameV1(buf, len, buf, len, pctx->aes_key, pctx->hmac_key);
+    if (0 == plainLen) {
+      return VSCP_ERROR_INVALID_FRAME;
+    }
+    buf[0] &= 0xf0; // Decrypted now
+    len = plainLen;
+  }
+  else
+#endif
+    if (buf[0] & 0x0f) {
+    // Encrypted frames need authentication to be configured
+    return VSCP_ERROR_INVALID_FRAME;
+  }
+
+  const uint8_t type = buf[0] >> 4;
+
+  // Command: type(1) + command(2) [+ arguments] + CRC(2)
+  if (0x0e == type) {
+    if (len < 5) {
+      return VSCP_ERROR_INVALID_FRAME;
+    }
+    const uint16_t expected = (uint16_t) (((uint16_t) buf[len - 2] << 8) | buf[len - 1]);
+    if (crcSlow((unsigned char const *) buf + 1, (int) (len - 3)) != expected) {
+      return VSCP_ERROR_INVALID_FRAME;
+    }
+    const uint16_t command = (uint16_t) (((uint16_t) buf[1] << 8) | buf[2]);
+    return vscp_handle_binary_command(pctx, command, (len > 5) ? (buf + 3) : NULL, len - 5);
+  }
+
+  // Reply from the client (e.g. event confirmation) - nothing to do
+  if (0x0f == type) {
+    return (len >= 7) ? VSCP_ERROR_SUCCESS : VSCP_ERROR_INVALID_FRAME;
+  }
+
+  // Event (frame format 0 or 1)
+  if (type <= 1) {
+    vscp_event_t *pEvent = (vscp_event_t *) calloc(1, sizeof(vscp_event_t));
+    if (NULL == pEvent) {
+      return VSCP_ERROR_MEMORY;
+    }
+    // Checks size and CRC
+    int rv = vscp_fwhlp_getEventFromFrame(pEvent, buf, len);
+    if (VSCP_ERROR_SUCCESS != rv) {
+      vscp_fwhlp_deleteEvent(&pEvent);
+      return VSCP_ERROR_INVALID_FRAME;
+    }
+    rv = vscp_handle_binary_event(pctx, pEvent);
+    vscp_fwhlp_deleteEvent(&pEvent);
+    return rv;
+  }
+
+  return VSCP_ERROR_INVALID_FRAME;
+}
+
+size_t
+vscp_binary_wrap_record(vscp_binary_ctx_t *pctx,
+                        uint8_t *out,
+                        size_t capacity,
+                        const uint8_t *frame,
+                        size_t len)
+{
+  size_t innerLen;
+
+  if ((NULL == pctx) || (NULL == out) || (NULL == frame) || (0 == len) || (capacity < 3)) {
+    return 0;
+  }
+
+#ifdef VSCP_FWHLP_CRYPTO_SUPPORT
+  if (pctx->auth) {
+    innerLen = vscp_fwhlp_encryptFrameV1(out + 2,
+                                         capacity - 2,
+                                         frame,
+                                         len,
+                                         pctx->aes_key,
+                                         pctx->hmac_key,
+                                         NULL, // Random IV
+                                         pctx->auth_algorithm);
+    if (0 == innerLen) {
+      return 0;
+    }
+  }
+  else
+#endif
+  {
+    if ((len > 0xffff) || (capacity < (len + 2))) {
+      return 0;
+    }
+    memmove(out + 2, frame, len);
+    innerLen = len;
+  }
+
+  out[0] = (uint8_t) (innerLen >> 8);
+  out[1] = (uint8_t) innerLen;
+  return innerLen + 2;
+}
+
+#endif // VSCP_FWHLP_BINARY_FRAME_SUPPORT

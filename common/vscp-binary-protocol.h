@@ -41,6 +41,11 @@
 #define __VSCP_BINARY_H__
 
 #include <stdbool.h>
+
+/* Configuration (VSCP_FWHLP_*) decides the layout of vscp_binary_ctx_t, so
+   it must be seen by every file that includes this header. */
+#include "vscp-compiler.h"
+#include "vscp-projdefs.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -217,6 +222,17 @@ typedef struct vscp_binary_ops {
 typedef struct vscp_binary_ctx {
   /** Operations table. Must not be NULL and ops->reply must not be NULL. */
   const vscp_binary_ops_t *ops;
+
+#if defined(VSCP_FWHLP_CRYPTO_SUPPORT) && defined(VSCP_FWHLP_BINARY_FRAME_SUPPORT)
+  /*
+    Authenticated encryption of the TCP record layer (optional), set with
+    vscp_binary_set_authentication(). Zero (as after memset/calloc) = off.
+  */
+  uint8_t auth;            /**< Non zero when set */
+  uint8_t auth_algorithm;  /**< VSCP_ENCRYPTION_AES128/192/256 */
+  uint8_t aes_key[32];     /**< AES key (16/24/32 bytes used) */
+  uint8_t hmac_key[32];    /**< HMAC-SHA-256 key */
+#endif
 } vscp_binary_ctx_t;
 
 /* ── Public API ───────────────────────────────────────────────────────────── */
@@ -243,6 +259,98 @@ int vscp_handle_binary_command(vscp_binary_ctx_t *pctx,
  * @return VSCP_ERROR_SUCCESS on success, error code otherwise.
  */
 int vscp_handle_binary_event(vscp_binary_ctx_t *pctx, vscp_event_t *pEvent);
+
+/* ── TCP record layer ─────────────────────────────────────────────────────── */
+/*
+  In binary mode over TCP every frame is sent as a record:
+
+    [length:2, big endian][frame]
+
+  where frame is a VSCP-GBP frame (type byte, body, CRC). With
+  authentication set (vscp_binary_set_authentication) the frame is a
+  version 1 authenticated frame instead (AES-CBC + HMAC-SHA-256, see
+  vscp_fwhlp_encryptFrameV1), the same as the VSCP helper library
+  (VscpRemoteTcpIf::setBinaryAuthentication / vscpClientTcp
+  "binary-encryption", "binary-key", "binary-hmac-key"):
+
+    [length:2][type/encryption:1][ciphertext:N*16][IV:16][tag:16]
+
+  The application reads one record (length prefix + that many bytes) from
+  its TCP stream and calls vscp_binary_handle_record() with the bytes after
+  the prefix. Use vscp_binary_wrap_record() to build records for replies
+  (ops->reply) and asynchronous events (ops->send_asyncevent).
+*/
+
+/** Largest plain frame: event frame with 512 data bytes */
+#define VSCP_BINARY_MAX_FRAME_SIZE (1 + 35 + 512 + 2)
+
+/** Room needed for a wrapped record: length prefix + frame + V1 overhead */
+#define VSCP_BINARY_MAX_RECORD_SIZE (2 + VSCP_BINARY_MAX_FRAME_SIZE + 48)
+
+/**
+ * @brief Handle one received record (the bytes after the length prefix).
+ *
+ * With authentication set, the record must be an authentic version 1 frame
+ * with the configured algorithm; it is decrypted in place. Without
+ * authentication the frame must be unencrypted. The CRC is checked, then
+ * commands go to vscp_handle_binary_command() and events to
+ * vscp_handle_binary_event(). Replies from the client (e.g. event
+ * confirmations) are accepted and ignored.
+ *
+ * @param pctx  Context.
+ * @param buf   Record payload. Modified (decrypted in place).
+ * @param len   Length of the payload.
+ * @return VSCP_ERROR_SUCCESS, or VSCP_ERROR_INVALID_FRAME when the record
+ *         is malformed or not authentic - the application should then close
+ *         the connection (there is no fallback to unauthenticated frames).
+ *         Other codes are passed on from the handlers.
+ */
+int vscp_binary_handle_record(vscp_binary_ctx_t *pctx, uint8_t *buf, size_t len);
+
+/**
+ * @brief Build a record ([length:2][frame]) to send.
+ *
+ * With authentication set the frame is encrypted and authenticated (random
+ * IV). The frame must be a complete plain VSCP-GBP frame (type, body, CRC),
+ * e.g. from vscp_fwhlp_writeReplyToFrame() or vscp_fwhlp_writeEventToFrame().
+ *
+ * @param pctx      Context.
+ * @param out       Buffer for the record.
+ * @param capacity  Size of out (VSCP_BINARY_MAX_RECORD_SIZE is always enough).
+ * @param frame     Plain frame.
+ * @param len       Length of frame.
+ * @return Length of the record, 0 on failure.
+ */
+size_t vscp_binary_wrap_record(vscp_binary_ctx_t *pctx,
+                               uint8_t *out,
+                               size_t capacity,
+                               const uint8_t *frame,
+                               size_t len);
+
+#if defined(VSCP_FWHLP_CRYPTO_SUPPORT) && defined(VSCP_FWHLP_BINARY_FRAME_SUPPORT)
+/**
+ * @brief Turn on authenticated encryption for this connection.
+ *
+ * Both ends must use the same algorithm and keys. Set it before the first
+ * binary record is exchanged.
+ *
+ * @param pctx        Context.
+ * @param algorithm   VSCP_ENCRYPTION_AES128, _AES192 or _AES256.
+ * @param aesKey      AES key.
+ * @param aesKeyLen   16, 24 or 32 (must match the algorithm).
+ * @param hmacKey     Independent 32 byte HMAC-SHA-256 key (must differ from
+ *                    the AES key).
+ * @return VSCP_ERROR_SUCCESS or VSCP_ERROR_PARAMETER.
+ */
+int vscp_binary_set_authentication(vscp_binary_ctx_t *pctx,
+                                   uint8_t algorithm,
+                                   const uint8_t *aesKey,
+                                   size_t aesKeyLen,
+                                   const uint8_t *hmacKey);
+
+/** @brief Turn authenticated encryption off and wipe the keys. */
+void vscp_binary_clear_authentication(vscp_binary_ctx_t *pctx);
+#endif
 
 #ifdef __cplusplus
 }
