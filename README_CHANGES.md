@@ -7,6 +7,7 @@ tagged, rename **Unreleased** to the version and date, and start a new
 
 ## Unreleased
 
+- Fetch cJSON for the tests with CMake FetchContent instead of the third-party/cJSON submodule (same commit)
 - No changes since the last release.
 
 ## v26.11.4 - 2026-11-12

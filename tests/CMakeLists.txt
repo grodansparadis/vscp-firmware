@@ -1,7 +1,33 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.16)
 
 # set the project name
 project(test LANGUAGES CXX C)
+
+# cJSON, fetched at configure time (it used to be the third-party/cJSON git
+# submodule; same commit). Use -DFETCHCONTENT_SOURCE_DIR_CJSON=<path> for a
+# local checkout.
+include(FetchContent)
+set(_cjson_options)
+if(NOT CMAKE_VERSION VERSION_LESS "3.18")
+    list(APPEND _cjson_options SOURCE_SUBDIR "__sources_only__")
+endif()
+if(NOT CMAKE_VERSION VERSION_LESS "3.24")
+    list(APPEND _cjson_options DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+endif()
+FetchContent_Declare(
+    cjson
+    URL https://codeload.github.com/DaveGamble/cJSON/tar.gz/b2890c8d76bbb64e710585ebc0a917196b9c67e7
+    URL_HASH SHA256=c3866048d822428ab289d20842c75a39c92c26e967fed2f0706f6f15e6894082
+    ${_cjson_options}
+)
+if(CMAKE_VERSION VERSION_LESS "3.18")
+    FetchContent_GetProperties(cjson)
+    if(NOT cjson_POPULATED)
+        FetchContent_Populate(cjson)
+    endif()
+else()
+    FetchContent_MakeAvailable(cjson)
+endif()
 
 include(CTest)
 enable_testing()
@@ -76,14 +102,14 @@ add_executable(vscp_firmware_tests
     ${PROJECT_SOURCE_DIR}/../src/vscp-binary-protocol.c
     ${PROJECT_SOURCE_DIR}/../src/vscp-ws1-protocol.c
     ${PROJECT_SOURCE_DIR}/../src/vscp-ws2-protocol.c
-    ${PROJECT_SOURCE_DIR}/../third-party/cJSON/cJSON.c
+    ${cjson_SOURCE_DIR}/cJSON.c
     )
 
 set_target_properties(vscp_firmware_tests PROPERTIES OUTPUT_NAME test)
 
 target_include_directories(vscp_firmware_tests PUBLIC 
     ${PROJECT_SOURCE_DIR}/../src/
-    ${PROJECT_SOURCE_DIR}/../third-party/cJSON/
+    ${cjson_SOURCE_DIR}/
     ${PROJECT_SOURCE_DIR}/
     )
 
