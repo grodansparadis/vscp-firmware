@@ -42,6 +42,9 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
+#ifdef _MSC_VER
+#include <malloc.h> // _alloca
+#endif
 
 #include <vscp.h>
 #include <vscp-class.h>
@@ -96,7 +99,12 @@ vscpboot_loader(void)
   vscpboot_state state = STATE_BLOCKSTART; // We haven't done anything yet
 
   uint32_t block;                        // Current block to program
+#ifdef _MSC_VER
+  // MSVC has no variable length arrays; _alloca also allocates on the stack
+  uint8_t *blockdata = (uint8_t *)_alloca(vscpboot_getConfig()->blockSize); // Block data buffer
+#else
   uint8_t blockdata[(vscpboot_getConfig()->blockSize)]; // Block data buffer
+#endif
   uint16_t offset;                       // offset into blockdata
   //uint16_t crc;                          // CRC calculated over all received data
   uint8_t memtype;                       // optional memory type to program
