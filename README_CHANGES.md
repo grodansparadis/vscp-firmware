@@ -7,6 +7,7 @@ tagged, rename **Unreleased** to the version and date, and start a new
 
 ## Unreleased
 
+- Fix the CANAL id helper declarations in vscp-firmware-helper.h: they were declared as `vscp_fwhlp__get...` (two underscores) but implemented as `vscp_fwhlp_get...`, so they could not be linked
 - Fetch cJSON for the tests with CMake FetchContent instead of the third-party/cJSON submodule (same commit)
 - No changes since the last release.
 

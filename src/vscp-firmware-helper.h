@@ -1652,22 +1652,22 @@ vscp_fwhlp_setEventExPriority(vscp_event_ex_t *pEventEx, unsigned char priority)
 // ****************************
 
 unsigned char
-vscp_fwhlp__getHeadFromCANALid(uint32_t id);
+vscp_fwhlp_getHeadFromCANALid(uint32_t id);
 
 uint16_t
-vscp_fwhlp__getVscpClassFromCANALid(uint32_t id);
+vscp_fwhlp_getVscpClassFromCANALid(uint32_t id);
 
 uint16_t
-vscp_fwhlp__getVscpTypeFromCANALid(uint32_t id);
+vscp_fwhlp_getVscpTypeFromCANALid(uint32_t id);
 
 uint8_t
-vscp_fwhlp__getNicknameFromCANALid(uint32_t id);
+vscp_fwhlp_getNicknameFromCANALid(uint32_t id);
 
 uint32_t
-vscp_fwhlp__getCANALidFromData(unsigned char priority, const uint16_t vscp_class, const uint16_t vscp_type);
+vscp_fwhlp_getCANALidFromData(unsigned char priority, const uint16_t vscp_class, const uint16_t vscp_type);
 
 uint32_t
-vscp_fwhlp__getCANALidFromEvent(const vscp_event_t *pEvent);
+vscp_fwhlp_getCANALidFromEvent(const vscp_event_t *pEvent);
 
 #ifdef __cplusplus
 }

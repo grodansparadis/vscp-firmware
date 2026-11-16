@@ -480,12 +480,12 @@ and internally converts to `vscpEvent` before extraction.
 
 ### 11) CANAL ID Helpers
 
-- `vscp_fwhlp__getHeadFromCANALid`
-- `vscp_fwhlp__getVscpClassFromCANALid`
-- `vscp_fwhlp__getVscpTypeFromCANALid`
-- `vscp_fwhlp__getNicknameFromCANALid`
-- `vscp_fwhlp__getCANALidFromData`
-- `vscp_fwhlp__getCANALidFromEvent`
+- `vscp_fwhlp_getHeadFromCANALid`
+- `vscp_fwhlp_getVscpClassFromCANALid`
+- `vscp_fwhlp_getVscpTypeFromCANALid`
+- `vscp_fwhlp_getNicknameFromCANALid`
+- `vscp_fwhlp_getCANALidFromData`
+- `vscp_fwhlp_getCANALidFromEvent`
 
 ---
 
