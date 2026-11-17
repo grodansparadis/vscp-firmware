@@ -636,7 +636,7 @@
         "default": 1,
         "access": "rw",
         "description": {
-          "en": "Byte 0 for events sent when button is pressed.",
+          "en": "Byte 0 for the CLASS1.CONTROL TURN-ON event sent when the button is pressed. CLASS1.INFORMATION START and STOP reserve byte 0 and always send zero.",
           "se": "Byte 0 för events sända när knapp trycks ner.",
           "no": "Byte 0 for hendelser sendt når knappen trykkes.",
           "dk": "Byte 0 for hændelser sendt, når knappen trykkes.",
