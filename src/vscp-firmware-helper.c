@@ -7059,7 +7059,7 @@ vscp_fwhlp_getHeadFromCANALid(uint32_t id)
 {
   uint8_t hardcoded = 0;
   uint8_t priority  = (0x07 & (id >> 26));
-  if (id & (1 << 25)) {
+  if (id & ((uint32_t) 1 << 25)) { // not 1 << 25: int is 16 bits on AVR
     hardcoded = VSCP_HEADER_HARD_CODED;
   }
 

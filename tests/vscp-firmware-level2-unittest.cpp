@@ -24,6 +24,17 @@ struct Frmw2StubState {
   int report_interest_calls;
   int read_reg_calls;
   int write_reg_calls;
+  uint16_t last_read_page;
+  uint16_t last_write_page;
+  uint32_t last_write_reg;
+  uint8_t last_write_val;
+  uint8_t last_dm_action;
+  // Timestamp simulation: when ts_step != 0 every get_timestamp() call
+  // advances now_ts; ts_wrap32 makes it behave like a 32-bit micros().
+  uint64_t ts_step;
+  bool ts_wrap32;
+  int ts_calls;
+  bool ts_runaway; // set if a busy-wait never ended
   vscp_event_t last_sent;
   uint8_t last_sent_data[VSCP_MAX_DATA];
 } g_stub;
@@ -47,7 +58,14 @@ static uint32_t stub_get_milliseconds(vscp_frmw2_firmware_config_t* /*pcfg*/)
 
 static uint64_t stub_get_timestamp(vscp_frmw2_firmware_config_t* /*pcfg*/)
 {
-  return g_stub.now_ts;
+  if (g_stub.ts_step) {
+    if (++g_stub.ts_calls > 100000) {
+      g_stub.ts_runaway = true;
+      return UINT64_MAX; // break out of a busy-wait that would never end
+    }
+    g_stub.now_ts += g_stub.ts_step;
+  }
+  return g_stub.ts_wrap32 ? (uint32_t) g_stub.now_ts : g_stub.now_ts;
 }
 
 static void stub_enter_bootloader(vscp_frmw2_firmware_config_t* /*pcfg*/)
@@ -79,10 +97,11 @@ static int stub_send_event(vscp_frmw2_firmware_config_t* /*pcfg*/, vscpEvent* pe
 
 static int stub_dm_action(vscp_frmw2_firmware_config_t* /*pcfg*/,
                           const vscpEvent* const /*pev*/,
-                          uint8_t /*action*/,
+                          uint8_t action,
                           const uint8_t* const /*pparam*/)
 {
   g_stub.dm_action_calls++;
+  g_stub.last_dm_action = action;
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -130,21 +149,25 @@ static int stub_get_ip_addr(vscp_frmw2_firmware_config_t* /*pcfg*/,
 }
 
 static int stub_read_reg(vscp_frmw2_firmware_config_t* /*pcfg*/,
-                         uint16_t /*page*/,
+                         uint16_t page,
                          uint32_t /*reg*/,
                          uint8_t* pval)
 {
   g_stub.read_reg_calls++;
+  g_stub.last_read_page = page;
   *pval = 0;
   return VSCP_ERROR_SUCCESS;
 }
 
 static int stub_write_reg(vscp_frmw2_firmware_config_t* /*pcfg*/,
-                          uint16_t /*page*/,
-                          uint32_t /*reg*/,
-                          uint8_t /*val*/)
+                          uint16_t page,
+                          uint32_t reg,
+                          uint8_t val)
 {
   g_stub.write_reg_calls++;
+  g_stub.last_write_page = page;
+  g_stub.last_write_reg  = reg;
+  g_stub.last_write_val  = val;
   return VSCP_ERROR_SUCCESS;
 }
 
@@ -362,8 +385,9 @@ TEST(_vscp_frmw2, setup_event_null_pdata_does_not_crash)
 // Decision-matrix zone/subzone filtering tests
 // ---------------------------------------------------------------------------
 
-// A raw 8-byte Level I DM row laid out as the macros actually read it:
-//   byte 0: FLAGS   (LEVEL1_DM_FLAGS uses VSCP_LEVEL2_DM_POS_FLAGS=0)
+// A raw 8-byte Level I DM row (VSCP spec layout):
+//   byte 0: originating address (VSCP_LEVEL1_DM_POS_OADDR=0)
+//   byte 1: flags        (VSCP_LEVEL1_DM_POS_FLAGS=1)
 //   byte 2: class-mask   (VSCP_LEVEL1_DM_POS_CLASSMASK=2)
 //   byte 3: class-filter  (VSCP_LEVEL1_DM_POS_CLASSFILTER=3)
 //   byte 4: type-mask    (VSCP_LEVEL1_DM_POS_TYPEMASK=4)
@@ -379,7 +403,7 @@ static Dm1Row make_dm1_row(uint8_t flags, uint8_t class_mask = 0xff,
                             uint8_t type_filter = 0, uint8_t action = 0)
 {
   Dm1Row r = {};
-  r.bytes[0] = flags;        // FLAGS at pos 0
+  r.bytes[1] = flags;        // FLAGS at pos 1
   r.bytes[2] = class_mask;   // CLASS_MASK at pos 2
   r.bytes[3] = class_filter; // CLASS_FILTER at pos 3
   r.bytes[4] = type_mask;    // TYPE_MASK at pos 4
@@ -614,4 +638,323 @@ TEST(_vscp_frmw2, handle_protocol_event_extended_page_write_bad_size_refused)
 
     ASSERT_EQ(VSCP_ERROR_INVALID_FRAME, vscp_frmw2_handle_protocol_event(&cfg, &ev)) << size;
   }
+}
+
+// ---------------------------------------------------------------------------
+// Level I compatibility fixes
+// ---------------------------------------------------------------------------
+
+namespace {
+
+// Level I node that already has a nickname (goes ACTIVE in init)
+void init_level1_active(vscp_frmw2_firmware_config_t& cfg, uint16_t nickname)
+{
+  init_config(cfg);
+  cfg.level    = VSCP_LEVEL1;
+  cfg.nickname = nickname;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
+  ASSERT_EQ(FRMW2_STATE_ACTIVE, cfg.state);
+  reset_stub();
+}
+
+vscp_event_t make_event(uint16_t vscp_class, uint16_t vscp_type, uint8_t* pdata, uint16_t size, uint8_t from = 0)
+{
+  vscp_event_t ev;
+  std::memset(&ev, 0, sizeof(ev));
+  ev.vscp_class = vscp_class;
+  ev.vscp_type  = vscp_type;
+  ev.sizeData   = size;
+  ev.pdata      = pdata;
+  ev.GUID[15]   = from;
+  return ev;
+}
+
+} // namespace
+
+TEST(_vscp_frmw2, send_probe_carries_probe_nickname_8bit)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_config(cfg);
+  cfg.level    = VSCP_LEVEL1;
+  cfg.nickname = 0xffff; // unassigned
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
+  reset_stub();
+
+  cfg.probe_nickname = 0x17;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_send_probe(&cfg, OPT_PROBE));
+  ASSERT_EQ(1, g_stub.send_calls);
+  ASSERT_EQ(VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE, g_stub.last_sent.vscp_type);
+  ASSERT_EQ(1u, g_stub.last_sent.sizeData);
+  ASSERT_EQ(0x17, g_stub.last_sent.pdata[0]); // was 0xff (own nickname)
+  ASSERT_EQ(0xff, g_stub.last_sent.GUID[15]); // sender is still "no nickname"
+}
+
+TEST(_vscp_frmw2, send_probe_carries_probe_nickname_16bit)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_config(cfg);
+  cfg.level             = VSCP_LEVEL1;
+  cfg.bUse16BitNickname = 1;
+  cfg.nickname          = 0xffff;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
+  reset_stub();
+
+  cfg.probe_nickname = 0x1234;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_send_probe(&cfg, OPT_PROBE));
+  ASSERT_EQ(2u, g_stub.last_sent.sizeData);
+  ASSERT_EQ(0x12, g_stub.last_sent.pdata[0]);
+  ASSERT_EQ(0x34, g_stub.last_sent.pdata[1]);
+}
+
+TEST(_vscp_frmw2, nickname_discovery_probes_then_assigns_free_nickname)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_config(cfg);
+  cfg.level    = VSCP_LEVEL1;
+  cfg.nickname = 0xffff;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
+  ASSERT_EQ(FRMW2_STATE_PROBE, cfg.state);
+  ASSERT_EQ(FRMW2_SUBSTATE_SEGCTRL_PROBE_WAITING, cfg.substate);
+  reset_stub();
+
+  // Nobody answers. Run long enough for the segment controller wait plus
+  // VSCP_PROBE_TIMEOUT_COUNT + 1 probes for nickname 1.
+  int probes_for_1 = 0;
+  for (int i = 0; i < 2000 && FRMW2_STATE_ACTIVE != cfg.state; i++) {
+    g_stub.now_ms += 10;
+    int before = g_stub.send_calls;
+    vscp_frmw2_work(&cfg, nullptr);
+    if (g_stub.send_calls != before && FRMW2_STATE_PROBE == cfg.state &&
+        VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE == g_stub.last_sent.vscp_type && 1 == g_stub.last_sent.sizeData) {
+      ASSERT_EQ(1, g_stub.last_sent.pdata[0]);
+      probes_for_1++;
+    }
+  }
+  ASSERT_EQ(FRMW2_STATE_ACTIVE, cfg.state);
+  ASSERT_EQ(1, cfg.nickname);
+  ASSERT_EQ(VSCP_PROBE_TIMEOUT_COUNT + 1, probes_for_1);
+  ASSERT_EQ(2, g_stub.stdreg_change_calls); // app told to persist the nickname (MSB + LSB)
+}
+
+TEST(_vscp_frmw2, nickname_discovery_error_when_all_nicknames_taken)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_config(cfg);
+  cfg.level    = VSCP_LEVEL1;
+  cfg.nickname = 0xffff;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
+  reset_stub();
+
+  cfg.state          = FRMW2_STATE_PROBE;
+  cfg.substate       = FRMW2_SUBSTATE_PROBE_WAITING;
+  cfg.probe_nickname = 0xfe; // last usable 8-bit nickname
+
+  vscp_event_t ack = make_event(VSCP_CLASS1_PROTOCOL, VSCP_TYPE_PROTOCOL_PROBE_ACK, nullptr, 0, 0xfe);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_nickname_discovery(&cfg, &ack));
+  ASSERT_EQ(FRMW2_STATE_ERROR, cfg.state);
+}
+
+TEST(_vscp_frmw2, feed_level1_dm_reads_flags_from_byte_1)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_level1_active(cfg, 0x22);
+
+  // Originating address 0x80 must not be mistaken for the "enabled" flag
+  Dm1Row row = make_dm1_row(0 /* disabled */);
+  row.bytes[0] = 0x80;
+  setup_dm1(cfg, &row, 1);
+
+  uint8_t buf[3] = { 0 };
+  vscp_event_t ev = make_event(VSCP_CLASS1_CONTROL, VSCP_TYPE_CONTROL_TURNON, buf, 3, 0x10);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_feed_level1_dm(&cfg, &ev));
+  ASSERT_EQ(0, g_stub.dm_action_calls);
+
+  // Enabled in byte 1, originating address check against byte 0
+  row = make_dm1_row(VSCP_LEVEL1_DM_FLAG_ENABLED | VSCP_LEVEL1_DM_FLAG_CHECK_OADDR, 0xff, VSCP_CLASS1_CONTROL, 0xff,
+                     VSCP_TYPE_CONTROL_TURNON, 7);
+  row.bytes[0] = 0x10;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_feed_level1_dm(&cfg, &ev));
+  ASSERT_EQ(1, g_stub.dm_action_calls);
+  ASSERT_EQ(7, g_stub.last_dm_action);
+
+  ev.GUID[15] = 0x11; // other sender
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_feed_level1_dm(&cfg, &ev));
+  ASSERT_EQ(1, g_stub.dm_action_calls);
+}
+
+TEST(_vscp_frmw2, feed_level1_dm_class_bit8_from_flags)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_level1_active(cfg, 0x22);
+
+  // Match class 0x102 exactly: mask 0x1ff, filter 0x102
+  Dm1Row row = make_dm1_row(VSCP_LEVEL1_DM_FLAG_ENABLED | VSCP_LEVEL1_DM_FLAG_CLASS_MASK |
+                              VSCP_LEVEL1_DM_FLAG_CLASS_FILTER,
+                            0xff, 0x02, 0x00, 0x00, 1);
+  setup_dm1(cfg, &row, 1);
+
+  vscp_event_t ev = make_event(0x102, 0, nullptr, 0);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_feed_level1_dm(&cfg, &ev));
+  ASSERT_EQ(1, g_stub.dm_action_calls);
+
+  ev.vscp_class = 0x002; // differs only in bit 8
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_feed_level1_dm(&cfg, &ev));
+  ASSERT_EQ(1, g_stub.dm_action_calls);
+}
+
+TEST(_vscp_frmw2, work_active_with_event_feeds_dm_and_runs_heartbeat)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_level1_active(cfg, 0x22);
+  cfg.interval_heartbeat = 1000;
+  cfg.last_heartbeat     = g_stub.now_ms;
+
+  Dm1Row row = make_dm1_row(VSCP_LEVEL1_DM_FLAG_ENABLED, 0xff, VSCP_CLASS1_CONTROL, 0xff, VSCP_TYPE_CONTROL_TURNON, 3);
+  setup_dm1(cfg, &row, 1);
+
+  g_stub.now_ms += 1500; // heartbeat due
+  uint8_t buf[3]  = { 0 };
+  vscp_event_t ev = make_event(VSCP_CLASS1_CONTROL, VSCP_TYPE_CONTROL_TURNON, buf, 3, 0x10);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_work(&cfg, &ev));
+  ASSERT_EQ(1, g_stub.dm_action_calls);
+  ASSERT_EQ(1, g_stub.send_calls);
+  ASSERT_EQ(VSCP_CLASS1_INFORMATION, g_stub.last_sent.vscp_class);
+  ASSERT_EQ(VSCP_TYPE_INFORMATION_NODE_HEARTBEAT, g_stub.last_sent.vscp_type);
+}
+
+TEST(_vscp_frmw2, write_reg_passes_selected_page)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_level1_active(cfg, 0x22);
+
+  cfg.page_select = 0x00ff;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_write_reg(&cfg, 0x05, 0xAB));
+  ASSERT_EQ(1, g_stub.write_reg_calls);
+  ASSERT_EQ(0x00ff, g_stub.last_write_page); // was always 0
+  ASSERT_EQ(0x05u, g_stub.last_write_reg);
+  ASSERT_EQ(0xAB, g_stub.last_write_val);
+
+  uint8_t val;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_read_reg(&cfg, 0x05, &val));
+  ASSERT_EQ(0x00ff, g_stub.last_read_page);
+}
+
+TEST(_vscp_frmw2, page_select_registers_are_writable)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_level1_active(cfg, 0x22);
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_write_reg(&cfg, VSCP_STD_REGISTER_PAGE_SELECT_MSB, 0x12));
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_write_reg(&cfg, VSCP_STD_REGISTER_PAGE_SELECT_LSB, 0x34));
+  ASSERT_EQ(0x1234, cfg.page_select);
+
+  uint8_t msb, lsb;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_read_reg(&cfg, VSCP_STD_REGISTER_PAGE_SELECT_MSB, &msb));
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_read_reg(&cfg, VSCP_STD_REGISTER_PAGE_SELECT_LSB, &lsb));
+  ASSERT_EQ(0x12, msb);
+  ASSERT_EQ(0x34, lsb);
+}
+
+TEST(_vscp_frmw2, read_standard_multibyte_registers_level1)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_level1_active(cfg, 0x22);
+  const uint8_t uid[5] = { 1, 2, 3, 4, 5 };
+  std::memcpy(cfg.userId, uid, 5);
+  cfg.manufacturerId         = 0x11223344;
+  cfg.manufacturerSubId      = 0x55667788;
+  cfg.standard_device_family = 0x99AABBCC;
+  cfg.standard_device_type   = 0xDDEEFF01;
+
+  auto rd = [&](uint32_t reg) {
+    uint8_t v = 0xEE;
+    EXPECT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_read_reg(&cfg, reg, &v));
+    return v;
+  };
+  for (int i = 0; i < 5; i++) {
+    EXPECT_EQ(uid[i], rd(VSCP_STD_REGISTER_USER_ID + i)) << i;
+  }
+  const uint8_t man[4] = { 0x11, 0x22, 0x33, 0x44 }, sub[4] = { 0x55, 0x66, 0x77, 0x88 };
+  const uint8_t fam[4] = { 0x99, 0xAA, 0xBB, 0xCC }, typ[4] = { 0xDD, 0xEE, 0xFF, 0x01 };
+  for (int i = 0; i < 4; i++) {
+    EXPECT_EQ(man[i], rd(VSCP_STD_REGISTER_USER_MANDEV_ID + i)) << i;
+    EXPECT_EQ(sub[i], rd(VSCP_STD_REGISTER_USER_MANSUBDEV_ID + i)) << i;
+    EXPECT_EQ(fam[i], rd(VSCP_STD_REGISTER_DEVICE_FAMILY + i)) << i;
+    EXPECT_EQ(typ[i], rd(VSCP_STD_REGISTER_DEVICE_TYPE + i)) << i;
+  }
+  EXPECT_EQ(0, rd(0xB0)); // reserved range reads as zero
+}
+
+TEST(_vscp_frmw2, standard_registers_level2_addressing)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_config(cfg); // Level II
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
+  cfg.manufacturerId = 0x11223344;
+  reset_stub();
+
+  uint8_t v = 0;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_read_reg(&cfg, 0xffffff00 + VSCP_STD_REGISTER_GUID + 3, &v));
+  ASSERT_EQ(cfg.guid[3], v);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_read_reg(&cfg, 0xffffff00 + VSCP_STD_REGISTER_USER_MANDEV_ID + 1, &v));
+  ASSERT_EQ(0x22, v);
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_write_reg(&cfg, 0xffffff00 + VSCP_STD_REGISTER_USER_ID + 4, 0x5A));
+  ASSERT_EQ(0x5A, cfg.userId[4]);
+}
+
+TEST(_vscp_frmw2, write_user_id_all_bytes)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_level1_active(cfg, 0x22);
+  for (int i = 0; i < 5; i++) {
+    ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_write_reg(&cfg, VSCP_STD_REGISTER_USER_ID + i, (uint8_t) (0x30 + i)));
+    ASSERT_EQ(0x30 + i, cfg.userId[i]);
+  }
+  ASSERT_EQ(5, g_stub.stdreg_change_calls);
+}
+
+TEST(_vscp_frmw2, extended_page_write_for_other_node_ignored)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_level1_active(cfg, 0x42);
+
+  uint8_t buf[6]  = { 0x43, 0x00, 0xff, 0x00, 0xAA, 0xBB }; // node 0x43, page 255
+  vscp_event_t ev = make_event(VSCP_CLASS1_PROTOCOL, VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_WRITE, buf, 6);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_handle_protocol_event(&cfg, &ev));
+  ASSERT_EQ(0, g_stub.write_reg_calls);
+  ASSERT_EQ(0, g_stub.send_calls);
+}
+
+TEST(_vscp_frmw2, extended_page_write_to_us_uses_page_and_responds)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_level1_active(cfg, 0x42);
+  g_stub.ts_step = 10; // the response path busy-waits 100 us on get_timestamp()
+
+  uint8_t buf[6]  = { 0x42, 0x00, 0xff, 0x03, 0xAA, 0xBB };
+  vscp_event_t ev = make_event(VSCP_CLASS1_PROTOCOL, VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_WRITE, buf, 6);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_handle_protocol_event(&cfg, &ev));
+  ASSERT_EQ(2, g_stub.write_reg_calls);
+  ASSERT_EQ(0x00ff, g_stub.last_write_page);
+  ASSERT_EQ(0x04u, g_stub.last_write_reg);
+  ASSERT_EQ(0xBB, g_stub.last_write_val);
+  ASSERT_EQ(0, cfg.page_select); // restored
+  ASSERT_EQ(1, g_stub.send_calls);
+  ASSERT_EQ(VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE, g_stub.last_sent.vscp_type);
+}
+
+TEST(_vscp_frmw2, extended_page_read_wait_survives_timestamp_wrap)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_level1_active(cfg, 0x42);
+
+  // A 32-bit microsecond counter 40 us before it wraps
+  g_stub.ts_wrap32 = true;
+  g_stub.ts_step   = 7;
+  g_stub.now_ts    = 0xFFFFFFFFull - 40;
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_extended_page_read(&cfg, 0x42, 0, 0, 8));
+  ASSERT_FALSE(g_stub.ts_runaway);
+  ASSERT_EQ(2, g_stub.send_calls);
 }

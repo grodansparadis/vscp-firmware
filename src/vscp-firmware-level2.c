@@ -221,14 +221,16 @@ vscp_frmw2_send_probe(vscp_frmw2_firmware_context_t *pctx, int bNewNodeOnLine)
     pev->sizeData = 0;
   }
   else {
+    // A probe carries the nickname being tested, not the node's own
+    // (still unassigned) nickname.
     if (pctx->bUse16BitNickname) {
       pev->sizeData = 2;
-      pev->pdata[0] = (pctx->nickname >> 8) & 0xff;
-      pev->pdata[1] = pctx->nickname & 0xff;
+      pev->pdata[0] = (pctx->probe_nickname >> 8) & 0xff;
+      pev->pdata[1] = pctx->probe_nickname & 0xff;
     }
     else {
       pev->sizeData = 1;
-      pev->pdata[0] = pctx->nickname;
+      pev->pdata[0] = pctx->probe_nickname & 0xff;
     }
   }
 
@@ -298,8 +300,9 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_ev
           pctx->timer               = pctx->ops->get_milliseconds(pctx);
 
           // Check to see if we have tested all nicknames
-          if ((pctx->bUse16BitNickname && (0xffff == pctx->nickname)) ||
-              (!pctx->bUse16BitNickname && (0xff == pctx->nickname))) {
+          // (0xff / 0xffff are reserved for "no nickname")
+          if ((pctx->bUse16BitNickname && (pctx->probe_nickname >= 0xffff)) ||
+              (!pctx->bUse16BitNickname && (pctx->probe_nickname >= 0xff))) {
             // Nothing more we can do.
             pctx->state = FRMW2_STATE_ERROR;
           }
@@ -347,6 +350,11 @@ vscp_frmw2_nickname_discovery(vscp_frmw2_firmware_context_t *pctx, const vscp_ev
 
             // We use this nickname
             pctx->nickname = pctx->probe_nickname;
+
+            // Inform app. that nickname changed so it can be persisted
+            // (as is done when a segment controller sets it)
+            pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_MSB);
+            pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_NICKNAME_ID_LSB);
 
             pctx->state    = FRMW2_STATE_ACTIVE;
             pctx->substate = FRMW2_SUBSTATE_NONE;
@@ -521,8 +529,10 @@ vscp_frmw2_work(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *const p
 
     // Normal working state
     case FRMW2_STATE_ACTIVE:
+      // Don't return here: the heartbeat/caps timers and the decision
+      // matrix below must also run when an event is passed in.
       if (NULL != pev) {
-        return vscp_frmw2_handle_protocol_event(pctx, pev);
+        rv = vscp_frmw2_handle_protocol_event(pctx, pev);
       }
       break;
 
@@ -1277,6 +1287,11 @@ vscp_frmw2_handle_protocol_event(vscp_frmw2_firmware_context_t *pctx, const vscp
           break;
         }
 
+        // Addressed to us? (same check as EXTENDED_PAGE_READ)
+        if (pctx->nickname != EVDTA(0)) {
+          return VSCP_ERROR_SUCCESS;
+        }
+
         uint8_t cnt = (uint8_t) (ADJSIZEV - 4);
 
         for (int i = 0; i < cnt; i++) {
@@ -1580,13 +1595,33 @@ vscp_frmw2_vscp2_register_write(vscp_frmw2_firmware_context_t *pctx,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Multi-byte standard registers (manufacturer id/sub id, device family/type)
+// are presented MSB first, as in vscp-firmware.c.
+//
+
+static uint8_t
+frmw2_be32_byte(uint32_t value, uint32_t idx)
+{
+  return (uint8_t) ((value >> (8 * (3 - idx))) & 0xff);
+}
+
+#ifdef THIS_FIRMWARE_ENABLE_WRITE_2PROTECTED_LOCATIONS
+static uint32_t
+frmw2_be32_set_byte(uint32_t value, uint32_t idx, uint8_t byte)
+{
+  const uint32_t shift = 8 * (3 - idx);
+  return (value & ~((uint32_t) 0xff << shift)) | ((uint32_t) byte << shift);
+}
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // vscp_frmw2_read_reg
 //
 
 int
 vscp_frmw2_read_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t *pval)
 {
-  if (NULL == pctx) {
+  if (NULL == pctx || NULL == pval) {
     return VSCP_ERROR_INVALID_POINTER;
   }
 
@@ -1602,102 +1637,93 @@ vscp_frmw2_read_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t *
     }
     return rv;
   }
-  else {
-    // * * * standard registers * * *
-    if ((VSCP_STD_REGISTER_ALARM_STATUS + ADJSTDREG) == reg) {
-      // Writing/reading alarm resets it regardless of value
-      *pval              = pctx->alarm_status;
-      pctx->alarm_status = 0;
-      // Inform app. that standard register has been set to zero
-      pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_ALARM_STATUS);
-    }
-    else if ((VSCP_STD_REGISTER_MAJOR_VERSION + ADJSTDREG) == reg) {
-      *pval = FRMW2_MAJOR_VERSION;
-    }
-    else if ((VSCP_STD_REGISTER_MINOR_VERSION + ADJSTDREG) == reg) {
-      *pval = FRMW2_MINOR_VERSION;
-    }
-    else if ((VSCP_STD_REGISTER_ERROR_COUNTER + ADJSTDREG) == reg) {
-      // Writing/reading error counter resets it regardless of value
-      *pval              = pctx->errorCounter;
-      pctx->errorCounter = 0;
-      // Inform app that standard register has been set to zero
-      pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_ERROR_COUNTER);
-    }
-    else if (((VSCP_STD_REGISTER_USER_ID + ADJSTDREG) >= reg) && (VSCP_STD_REGISTER_USER_ID + ADJSTDREG + 3 <= reg)) {
-      //*pval = *(&pctx->userId + (reg - VSCP_STD_REGISTER_USER_ID + ADJSTDREG));
-      *pval = pctx->userId[reg - VSCP_STD_REGISTER_USER_ID + ADJSTDREG];
-    }
-    else if (((VSCP_STD_REGISTER_USER_MANDEV_ID + ADJSTDREG) == reg) &&
-             (VSCP_STD_REGISTER_USER_MANDEV_ID + ADJSTDREG + 3 <= reg)) {
-      *pval = *(&pctx->manufacturerId + (reg - VSCP_STD_REGISTER_USER_MANDEV_ID + ADJSTDREG));
-    }
-    else if (((VSCP_STD_REGISTER_USER_MANSUBDEV_ID + ADJSTDREG) == reg) &&
-             (VSCP_STD_REGISTER_USER_MANSUBDEV_ID + ADJSTDREG + 3 <= reg)) {
-      *pval = *(&pctx->manufacturerId + (reg - VSCP_STD_REGISTER_USER_MANSUBDEV_ID + ADJSTDREG));
-    }
-    else if ((VSCP_STD_REGISTER_NICKNAME_ID_LSB + ADJSTDREG) == reg) {
-      *pval = pctx->nickname & 0xff;
-    }
-    else if ((VSCP_STD_REGISTER_NICKNAME_ID_MSB + ADJSTDREG) == reg) {
-      *pval = (pctx->nickname >> 8) & 0xff;
-    }
-    else if ((VSCP_STD_REGISTER_PAGE_SELECT_MSB + ADJSTDREG) == reg) {
-      *pval = (pctx->page_select >> 8) & 0xff;
-    }
-    else if ((VSCP_STD_REGISTER_PAGE_SELECT_LSB + ADJSTDREG) == reg) {
-      *pval = pctx->page_select & 0xff;
-    }
-    else if ((VSCP_STD_REGISTER_FIRMWARE_MAJOR + ADJSTDREG) == reg) {
-      *pval = pctx->firmware_major_version;
-    }
-    else if ((VSCP_STD_REGISTER_FIRMWARE_MINOR + ADJSTDREG) == reg) {
-      *pval = pctx->firmware_minor_version;
-    }
-    else if ((VSCP_STD_REGISTER_FIRMWARE_SUBMINOR + ADJSTDREG) == reg) {
-      *pval = pctx->firmware_sub_minor_version;
-    }
-    else if ((VSCP_STD_REGISTER_BOOT_LOADER + ADJSTDREG) == reg) {
-      *pval = pctx->bootloader_algorithm;
-    }
-    else if ((VSCP_STD_REGISTER_BUFFER_SIZE + ADJSTDREG) == reg) {
-      *pval = 0; // Deprecated register value
-    }
-    else if ((VSCP_STD_REGISTER_PAGES_COUNT + ADJSTDREG) == reg) {
-      *pval = 0; // Deprecated register value
-    }
-    else if (reg >= (VSCP_STD_REGISTER_DEVICE_FAMILY + ADJSTDREG) &&
-             (reg <= (VSCP_STD_REGISTER_DEVICE_FAMILY + ADJSTDREG + 3))) {
-      *pval = *(&pctx->standard_device_family + reg - VSCP_STD_REGISTER_DEVICE_FAMILY + ADJSTDREG);
-    }
-    else if (reg >= (VSCP_STD_REGISTER_DEVICE_TYPE + ADJSTDREG) &&
-             (reg <= (VSCP_STD_REGISTER_DEVICE_TYPE + ADJSTDREG + 3))) {
-      *pval = *(&pctx->standard_device_type + reg - VSCP_STD_REGISTER_DEVICE_TYPE + ADJSTDREG);
-    }
-    else if ((VSCP_STD_REGISTER_NODE_RESET + ADJSTDREG) == reg) {
-      *pval = 0; // always read as zero
-    }
-    else if ((VSCP_STD_REGISTER_FIRMWARE_CODE_MSB + ADJSTDREG) == reg) {
-      *pval = (pctx->firmware_device_code >> 8) & 0xff;
-    }
-    else if ((VSCP_STD_REGISTER_FIRMWARE_CODE_LSB + ADJSTDREG) == reg) {
-      *pval = pctx->firmware_device_code & 0xff;
-    }
-    // * * * Unused register range * * *
-    else if ((reg > (VSCP_STD_REGISTER_NICKNAME_ID_MSB + ADJSTDREG)) && (reg < (VSCP_STD_REGISTER_GUID) + ADJSTDREG)) {
-      *pval = 0;
-    }
-    else if ((reg >= (VSCP_STD_REGISTER_GUID + ADJSTDREG)) && (reg < (VSCP_STD_REGISTER_GUID + ADJSTDREG + 16))) {
-      *pval = pctx->guid[reg - VSCP_STD_REGISTER_GUID + ADJSTDREG];
-    }
-    else if ((reg >= (VSCP_STD_REGISTER_DEVICE_URL + ADJSTDREG)) &&
-             (reg < (VSCP_STD_REGISTER_DEVICE_URL + ADJSTDREG + 32))) {
-      *pval = pctx->mdfurl[reg - VSCP_STD_REGISTER_DEVICE_URL + ADJSTDREG];
-    }
-    else {
-      // This standard register is not available
-    }
-  } // standard register
+
+  // * * * standard registers * * *
+
+  // Level I standard registers are 0x80-0xff and Level II ones are
+  // 0xffffff80-0xffffffff. Work with the Level I offset in both cases.
+  const uint32_t sreg = reg - ADJSTDREG;
+
+  // Reserved/unimplemented standard registers read as zero
+  *pval = 0;
+
+  if (VSCP_STD_REGISTER_ALARM_STATUS == sreg) {
+    // Writing/reading alarm resets it regardless of value
+    *pval              = pctx->alarm_status;
+    pctx->alarm_status = 0;
+    // Inform app. that standard register has been set to zero
+    pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_ALARM_STATUS);
+  }
+  else if (VSCP_STD_REGISTER_MAJOR_VERSION == sreg) {
+    *pval = FRMW2_MAJOR_VERSION;
+  }
+  else if (VSCP_STD_REGISTER_MINOR_VERSION == sreg) {
+    *pval = FRMW2_MINOR_VERSION;
+  }
+  else if (VSCP_STD_REGISTER_ERROR_COUNTER == sreg) {
+    // Writing/reading error counter resets it regardless of value
+    *pval              = pctx->errorCounter;
+    pctx->errorCounter = 0;
+    // Inform app that standard register has been set to zero
+    pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_ERROR_COUNTER);
+  }
+  else if ((sreg >= VSCP_STD_REGISTER_USER_ID) && (sreg < VSCP_STD_REGISTER_USER_ID + sizeof(pctx->userId))) {
+    *pval = pctx->userId[sreg - VSCP_STD_REGISTER_USER_ID];
+  }
+  else if ((sreg >= VSCP_STD_REGISTER_USER_MANDEV_ID) && (sreg < VSCP_STD_REGISTER_USER_MANDEV_ID + 4)) {
+    *pval = frmw2_be32_byte(pctx->manufacturerId, sreg - VSCP_STD_REGISTER_USER_MANDEV_ID);
+  }
+  else if ((sreg >= VSCP_STD_REGISTER_USER_MANSUBDEV_ID) && (sreg < VSCP_STD_REGISTER_USER_MANSUBDEV_ID + 4)) {
+    *pval = frmw2_be32_byte(pctx->manufacturerSubId, sreg - VSCP_STD_REGISTER_USER_MANSUBDEV_ID);
+  }
+  else if (VSCP_STD_REGISTER_NICKNAME_ID_LSB == sreg) {
+    *pval = pctx->nickname & 0xff;
+  }
+  else if (VSCP_STD_REGISTER_NICKNAME_ID_MSB == sreg) {
+    *pval = (pctx->nickname >> 8) & 0xff;
+  }
+  else if (VSCP_STD_REGISTER_PAGE_SELECT_MSB == sreg) {
+    *pval = (pctx->page_select >> 8) & 0xff;
+  }
+  else if (VSCP_STD_REGISTER_PAGE_SELECT_LSB == sreg) {
+    *pval = pctx->page_select & 0xff;
+  }
+  else if (VSCP_STD_REGISTER_FIRMWARE_MAJOR == sreg) {
+    *pval = pctx->firmware_major_version;
+  }
+  else if (VSCP_STD_REGISTER_FIRMWARE_MINOR == sreg) {
+    *pval = pctx->firmware_minor_version;
+  }
+  else if (VSCP_STD_REGISTER_FIRMWARE_SUBMINOR == sreg) {
+    *pval = pctx->firmware_sub_minor_version;
+  }
+  else if (VSCP_STD_REGISTER_BOOT_LOADER == sreg) {
+    *pval = pctx->bootloader_algorithm;
+  }
+  else if ((VSCP_STD_REGISTER_BUFFER_SIZE == sreg) || (VSCP_STD_REGISTER_PAGES_COUNT == sreg)) {
+    *pval = 0; // Deprecated register value
+  }
+  else if ((sreg >= VSCP_STD_REGISTER_DEVICE_FAMILY) && (sreg < VSCP_STD_REGISTER_DEVICE_FAMILY + 4)) {
+    *pval = frmw2_be32_byte(pctx->standard_device_family, sreg - VSCP_STD_REGISTER_DEVICE_FAMILY);
+  }
+  else if ((sreg >= VSCP_STD_REGISTER_DEVICE_TYPE) && (sreg < VSCP_STD_REGISTER_DEVICE_TYPE + 4)) {
+    *pval = frmw2_be32_byte(pctx->standard_device_type, sreg - VSCP_STD_REGISTER_DEVICE_TYPE);
+  }
+  else if (VSCP_STD_REGISTER_NODE_RESET == sreg) {
+    *pval = 0; // always read as zero
+  }
+  else if (VSCP_STD_REGISTER_FIRMWARE_CODE_MSB == sreg) {
+    *pval = (pctx->firmware_device_code >> 8) & 0xff;
+  }
+  else if (VSCP_STD_REGISTER_FIRMWARE_CODE_LSB == sreg) {
+    *pval = pctx->firmware_device_code & 0xff;
+  }
+  else if ((sreg >= VSCP_STD_REGISTER_GUID) && (sreg < VSCP_STD_REGISTER_GUID + sizeof(pctx->guid))) {
+    *pval = pctx->guid[sreg - VSCP_STD_REGISTER_GUID];
+  }
+  else if ((sreg >= VSCP_STD_REGISTER_DEVICE_URL) && (sreg < VSCP_STD_REGISTER_DEVICE_URL + sizeof(pctx->mdfurl))) {
+    *pval = pctx->mdfurl[sreg - VSCP_STD_REGISTER_DEVICE_URL];
+  }
 
   return VSCP_ERROR_SUCCESS;
 }
@@ -1713,86 +1739,92 @@ vscp_frmw2_write_reg(vscp_frmw2_firmware_context_t *pctx, uint32_t reg, uint8_t 
     return VSCP_ERROR_INVALID_POINTER;
   }
 
-  int rv = VSCP_ERROR_ERROR; // To handle non existent registers
+  int rv = VSCP_ERROR_ERROR; // To handle non existent/read only registers
 
   if (reg < VSCP_STD_REGISTER_START + ADJSTDREG) {
-    // User register - Let usr code handle
-    rv = pctx->ops->write_reg(pctx, 0, reg, val);
-    // OOB error is OK but always read as zero
+    // User register - Let usr code handle. Pass the selected page, as reads do.
+    rv = pctx->ops->write_reg(pctx, pctx->page_select, reg, val);
+    // OOB error is OK (the register reads back as zero)
     if (VSCP_ERROR_INDEX_OOB == rv) {
-      val = ~val;
-      rv  = VSCP_ERROR_SUCCESS;
+      rv = VSCP_ERROR_SUCCESS;
     }
+    return rv;
   }
+
   // * * * Standard registers * * *
-  else if ((VSCP_STD_REGISTER_ALARM_STATUS + ADJSTDREG) == reg) {
+
+  // See vscp_frmw2_read_reg
+  const uint32_t sreg = reg - ADJSTDREG;
+
+  if (VSCP_STD_REGISTER_ALARM_STATUS == sreg) {
     // Writing/reading alarm resets it regardless of value
     pctx->alarm_status = 0;
     // Inform app. that standard register has been set to zero
-    pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_ALARM_STATUS);
+    rv = pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_ALARM_STATUS);
   }
-  else if ((reg >= (VSCP_STD_REGISTER_USER_ID + ADJSTDREG)) && (reg <= VSCP_STD_REGISTER_USER_ID + ADJSTDREG)) {
-    uint8_t *p = (uint8_t *) &pctx->userId;
-    // pctx->userId[reg - VSCP_STD_REGISTER_USER_ID + ADJSTDREG] = val;
-    p[reg - VSCP_STD_REGISTER_USER_ID + ADJSTDREG] = val;
+  else if ((sreg >= VSCP_STD_REGISTER_USER_ID) && (sreg < VSCP_STD_REGISTER_USER_ID + sizeof(pctx->userId))) {
+    pctx->userId[sreg - VSCP_STD_REGISTER_USER_ID] = val;
     // Inform app that standard register has been changes
     rv = pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_USER_ID);
   }
+  else if (VSCP_STD_REGISTER_PAGE_SELECT_MSB == sreg) {
+    pctx->page_select = (uint16_t) ((pctx->page_select & 0x00ff) | ((uint16_t) val << 8));
+    rv                = VSCP_ERROR_SUCCESS;
+  }
+  else if (VSCP_STD_REGISTER_PAGE_SELECT_LSB == sreg) {
+    pctx->page_select = (uint16_t) ((pctx->page_select & 0xff00) | val);
+    rv                = VSCP_ERROR_SUCCESS;
+  }
 
-#ifdef THIS_FIRMWARE_ENABLE_WRITE_2PROTECTED_LOCATIONS  
+#ifdef THIS_FIRMWARE_ENABLE_WRITE_2PROTECTED_LOCATIONS
   // Write manufacturer id configuration information
-  else if ((reg >= (VSCP_STD_REGISTER_USER_MANDEV_ID + ADJSTDREG)) &&
-           (reg <= (VSCP_STD_REGISTER_USER_MANDEV_ID + ADJSTDREG + 3))) {
+  else if ((sreg >= VSCP_STD_REGISTER_USER_MANDEV_ID) && (sreg < VSCP_STD_REGISTER_USER_MANDEV_ID + 4)) {
     if (pctx->bEnableWriteProtectedLocations) {
       // page register must be 0xffff for writes to be possible
       if (0xffff != pctx->page_select) {
         rv = VSCP_ERROR_NOT_SUPPORTED;
       }
       else {
-        uint8_t *p                                            = (uint8_t *) &pctx->manufacturerId;
-        p[reg - VSCP_STD_REGISTER_USER_MANDEV_ID + ADJSTDREG] = val;
-        // pctx->manufacturerId[reg - VSCP_STD_REGISTER_USER_MANDEV_ID + ADJSTDREG] = val;
-        rv = VSCP_ERROR_SUCCESS;
+        pctx->manufacturerId =
+          frmw2_be32_set_byte(pctx->manufacturerId, sreg - VSCP_STD_REGISTER_USER_MANDEV_ID, val);
+        rv = pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_USER_MANDEV_ID);
       }
-      rv = pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_USER_MANDEV_ID);
     }
   }
-  else if ((reg >= (VSCP_STD_REGISTER_USER_MANSUBDEV_ID + ADJSTDREG)) &&
-           (reg <= (VSCP_STD_REGISTER_USER_MANSUBDEV_ID + ADJSTDREG + 3))) {
+  else if ((sreg >= VSCP_STD_REGISTER_USER_MANSUBDEV_ID) && (sreg < VSCP_STD_REGISTER_USER_MANSUBDEV_ID + 4)) {
     if (pctx->bEnableWriteProtectedLocations) {
       // page register must be 0xffff for writes to be possible
       if (0xffff != pctx->page_select) {
         rv = VSCP_ERROR_NOT_SUPPORTED;
       }
       else {
-        uint8_t *p                                               = (uint8_t *) &pctx->manufacturerSubId;
-        p[reg - VSCP_STD_REGISTER_USER_MANSUBDEV_ID + ADJSTDREG] = val;
-        // pctx->manufacturerSubId[reg - VSCP_STD_REGISTER_USER_MANSUBDEV_ID + ADJSTDREG] = val;
-        rv = VSCP_ERROR_SUCCESS;
+        pctx->manufacturerSubId =
+          frmw2_be32_set_byte(pctx->manufacturerSubId, sreg - VSCP_STD_REGISTER_USER_MANSUBDEV_ID, val);
+        rv = pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_USER_MANSUBDEV_ID);
       }
-      rv = pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_USER_MANSUBDEV_ID);
     }
   }
-  else if ((reg >= (VSCP_STD_REGISTER_GUID + ADJSTDREG)) && (reg <= (VSCP_STD_REGISTER_GUID + ADJSTDREG + 15))) {
+  else if ((sreg >= VSCP_STD_REGISTER_GUID) && (sreg < VSCP_STD_REGISTER_GUID + sizeof(pctx->guid))) {
     if (pctx->bEnableWriteProtectedLocations) {
+      // page register must be 0xffff for writes to be possible
       if (0xffff != pctx->page_select) {
-        return VSCP_ERROR_NOT_SUPPORTED;
+        rv = VSCP_ERROR_NOT_SUPPORTED;
       }
       else {
-        pctx->guid[reg - VSCP_STD_REGISTER_GUID + ADJSTDREG] = val;
-        rv                                                   = VSCP_ERROR_SUCCESS;
+        pctx->guid[sreg - VSCP_STD_REGISTER_GUID] = val;
+        rv                                        = pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_GUID);
       }
-      rv = pctx->ops->stdreg_change(pctx, VSCP_STD_REGISTER_GUID);
     }
   }
-#endif  
-  else if (reg == (VSCP_STD_REGISTER_NODE_RESET + ADJSTDREG)) {
+#endif
+  else if (VSCP_STD_REGISTER_NODE_RESET == sreg) {
 
     uint32_t timer;
     timer = pctx->ops->get_milliseconds(pctx);
 
     if (0x55 == val) {
       pctx->timer = timer;
+      rv          = VSCP_ERROR_SUCCESS;
     }
     else if (0xaa == val) {
       if ((timer - pctx->timer) < 1000) {
@@ -2245,7 +2277,10 @@ vscp_frmw2_extended_page_read(vscp_frmw2_firmware_context_t *pctx,
     // wait at bit before next message is sent
     // prevent overflow of bus or receiver
     // 100 usec should be sufficient, but requires separate timer
-    while (pctx->ops->get_timestamp(pctx) < (tm + 100)) {
+    // Compare elapsed time, not absolute time: get_timestamp() may be a
+    // wrapping counter (e.g. a 32-bit micros()), and "now < tm + 100"
+    // never becomes false if it wraps during the wait.
+    while ((uint64_t) (pctx->ops->get_timestamp(pctx) - tm) < 100) {
       ;
     }
 

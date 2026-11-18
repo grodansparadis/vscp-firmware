@@ -134,13 +134,14 @@ typedef enum probe_substate_t {
 #define VSCP_LEVEL1_DM_FLAG_CLASS_FILTER  0x01
 
 #define LEVEL1_DM_OADDR(row) (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_OADDR])
-#define LEVEL1_DM_FLAGS(row) (pctx->pDm[(8 * row) + VSCP_LEVEL2_DM_POS_FLAGS])
+#define LEVEL1_DM_FLAGS(row) (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_FLAGS])
+// Bit 8 of the 9-bit class mask/filter lives in flags bit 1 (mask) and bit 0 (filter)
 #define LEVEL1_DM_CLASS_MASK(row)                                                                                      \
-  (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSMASK] +                                                               \
-   (((pctx->pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & 0x02) << 9))
+  ((uint16_t) pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSMASK] +                                                    \
+   ((uint16_t) ((pctx->pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & VSCP_LEVEL1_DM_FLAG_CLASS_MASK) << 7))
 #define LEVEL1_DM_CLASS_FILTER(row)                                                                                    \
-  (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSFILTER] +                                                             \
-   (((pctx->pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & 0x01) << 9))
+  ((uint16_t) pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_CLASSFILTER] +                                                  \
+   ((uint16_t) ((pctx->pDm[8 * row + VSCP_LEVEL1_DM_POS_FLAGS]) & VSCP_LEVEL1_DM_FLAG_CLASS_FILTER) << 8))
 #define LEVEL1_DM_TYPE_MASK(row)    (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_TYPEMASK])
 #define LEVEL1_DM_TYPE_FILTER(row)  (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_TYPEFILTER])
 #define LEVEL1_DM_ACTION(row)       (pctx->pDm[(8 * row) + VSCP_LEVEL1_DM_POS_ACTION])
