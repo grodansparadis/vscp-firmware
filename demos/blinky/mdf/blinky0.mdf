@@ -624,7 +624,7 @@
         "default": 1,
         "access": "rw",
         "description": {
-          "en": "Byte 0 for events sent when button is pressed.",
+          "en": "Byte 0 for the CLASS1.CONTROL TURN-ON event sent when the button is pressed. CLASS1.INFORMATION START and STOP reserve byte 0 and always send zero.",
           "se": "Byte 0 för events sända när knapp trycks ner.",
           "no": "Byte 0 for hendelser sendt når knappen trykkes.",
           "dk": "Byte 0 for hændelser sendt, når knappen trykkes.",
@@ -1353,8 +1353,8 @@
       },
       {
         "name": "Start Event",
-        "class": 30,
-        "type": 7,
+        "class": 20,
+        "type": 25,
         "direction": "out",
         "priority": "low",
         "description": {
@@ -1381,36 +1381,29 @@
         },
         "data": [
           {
-            "name": "test event data 1",
+            "name": "Reserved",
             "description": {
-              "en": "English event data description 3",
-              "se": "Svensk event data beskrivning 3",
-              "es": "Descripción de los datos del evento en español 3",
-              "no": "Norsk event data beskrivelse 3",
-              "dk": "Dansk event data beskrivelse 3",
-              "de": "Deutscher Ereignisdatenbeschreibung 3",
-              "fr": "Description des données d'événement en français 3",
-              "it": "Descrizione dei dati dell'evento in italiano 3",
-              "ru": "Описание данных события на русском языке 3",
-              "fi": "Tapahtumatietojen kuvaus suomeksi 3",
-              "zh": "事件数据描述中文 3",
-              "ja": "イベントデータの説明日本語 3",
-              "pt": "Descrição dos dados do evento em português 3",
-              "ar": "وصف بيانات الحدث باللغة العربية 3",
-              "sk": "Popis údajov o udalosti v slovenčine 3",
-              "hu": "Eseményadatok leírása magyarul 3",
-              "kr": "이벤트 데이터 설명 한국어 3"
-            },
-            "infourl": {
-              "en": "English event data help 3"
+              "en": "Reserved for future use. Set to 0."
+            }
+          },
+          {
+            "name": "Zone",
+            "description": {
+              "en": "Zone associated with the button event."
+            }
+          },
+          {
+            "name": "Subzone",
+            "description": {
+              "en": "Subzone associated with the button event."
             }
           }
         ]
       },
       {
         "name": "Stop Event",
-        "class": 30,
-        "type": 8,
+        "class": 20,
+        "type": 24,
         "direction": "out",
         "priority": "low",
         "description": {
@@ -1437,28 +1430,21 @@
         },
         "data": [
           {
-            "name": "test event data 1",
+            "name": "Reserved",
             "description": {
-              "en": "English event data description 3",
-              "se": "Svensk event data beskrivning 3",
-              "es": "Descripción de los datos del evento en español 3",
-              "no": "Norsk event data beskrivelse 3",
-              "dk": "Dansk event data beskrivelse 3",
-              "de": "Deutscher Ereignisdatenbeschreibung 3",
-              "fr": "Description des données d'événement en français 3",
-              "it": "Descrizione dei dati dell'evento in italiano 3",
-              "ru": "Описание данных события на русском языке 3",
-              "fi": "Tapahtumatietojen kuvaus suomeksi 3",
-              "zh": "事件数据描述中文 3",
-              "ja": "イベントデータの説明日本語 3",
-              "pt": "Descrição dos dados do evento em português 3",
-              "ar": "وصف بيانات الحدث باللغة العربية 3",
-              "sk": "Popis údajov o udalosti v slovenčine 3",
-              "hu": "Eseményadatok leírása magyarul 3",
-              "kr": "이벤트 데이터 설명 한국어 3"
-            },
-            "infourl": {
-              "en": "English event data help 3"
+              "en": "Reserved for future use. Set to 0."
+            }
+          },
+          {
+            "name": "Zone",
+            "description": {
+              "en": "Zone associated with the button event."
+            }
+          },
+          {
+            "name": "Subzone",
+            "description": {
+              "en": "Subzone associated with the button event."
             }
           }
         ]

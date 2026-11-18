@@ -387,7 +387,7 @@
         <infourl lang="en">https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-6</infourl>
       </reg>
       <reg name="Optional byte zero value for button" page="0" offset="10" width="1" access="rw" default="1">
-        <description lang="en">Byte 0 for events sent when button is pressed.</description>
+        <description lang="en">Byte 0 for the CLASS1.CONTROL TURN-ON event sent when the button is pressed. CLASS1.INFORMATION START and STOP reserve byte 0 and always send zero.</description>
         <description lang="se">Byte 0 för events sända när knapp trycks ner.</description>
         <description lang="no">Byte 0 for hendelser sendt når knappen trykkes.</description>
         <description lang="dk">Byte 0 for hændelser sendt, når knappen trykkes.</description>
@@ -1147,7 +1147,7 @@
           <infourl lang="en">English event data help 3</infourl>
         </data>
       </event>
-      <event name="Start Event" class="30" type="7" priority="low" direction="out">
+      <event name="Start Event" class="20" type="25" priority="low" direction="out">
         <description lang="en">START Event sent when button is pressed.</description>
         <description lang="se">START Event skickas när knappen trycks ner.</description>
         <description lang="no">START Event sendes når knappen trykkes.</description>
@@ -1166,28 +1166,17 @@
         <description lang="hu">START esemény elküldve, amikor a gombot megnyomják.</description>
         <description lang="kr">버튼을 누를 때 START 이벤트가 전송됩니다.</description>
         <infourl lang="en">English event help 3</infourl>
-        <data name="test event data 1">
-          <description lang="en">English event data description 3</description>
-          <description lang="se">Svensk event data beskrivning 3</description>
-          <description lang="es">Descripción de los datos del evento en español 3</description>
-          <description lang="no">Norsk event data beskrivelse 3</description>
-          <description lang="dk">Dansk event data beskrivelse 3</description>
-          <description lang="de">Deutscher Ereignisdatenbeschreibung 3</description>
-          <description lang="fr">Description des données d'événement en français 3</description>
-          <description lang="it">Descrizione dei dati dell'evento in italiano 3</description>
-          <description lang="ru">Описание данных события на русском языке 3</description>
-          <description lang="fi">Tapahtumatietojen kuvaus suomeksi 3</description>
-          <description lang="zh">事件数据描述中文 3</description>
-          <description lang="ja">イベントデータの説明日本語 3</description>
-          <description lang="pt">Descrição dos dados do evento em português 3</description>
-          <description lang="ar">وصف بيانات الحدث باللغة العربية 3</description>
-          <description lang="sk">Popis údajov o udalosti v slovenčine 3</description>
-          <description lang="hu">Eseményadatok leírása magyarul 3</description>
-          <description lang="kr">이벤트 데이터 설명 한국어 3</description>
-          <infourl lang="en">English event data help 3</infourl>
+        <data name="Reserved">
+          <description lang="en">Reserved for future use. Set to 0.</description>
+        </data>
+        <data name="Zone">
+          <description lang="en">Zone associated with the button event.</description>
+        </data>
+        <data name="Subzone">
+          <description lang="en">Subzone associated with the button event.</description>
         </data>
       </event>
-      <event name="Stop Event" class="30" type="8" priority="low" direction="out">
+      <event name="Stop Event" class="20" type="24" priority="low" direction="out">
         <description lang="en">STOP Event sent when button is released (if enabled).</description>
         <description lang="se">STOP Event skickas när knappen släpps (om aktiverad).</description>
         <description lang="no">STOP Event sendes når knappen slippes (hvis aktivert).</description>
@@ -1206,25 +1195,14 @@
         <description lang="hu">STOP esemény elküldve, amikor a gombot elengedik (ha engedélyezve).</description>
         <description lang="kr">버튼을 놓을 때 STOP 이벤트가 전송됩니다 (활성화된 경우).</description>
         <infourl lang="en">English event help 3</infourl>
-        <data name="test event data 1">
-          <description lang="en">English event data description 3</description>
-          <description lang="se">Svensk event data beskrivning 3</description>
-          <description lang="es">Descripción de los datos del evento en español 3</description>
-          <description lang="no">Norsk event data beskrivelse 3</description>
-          <description lang="dk">Dansk event data beskrivelse 3</description>
-          <description lang="de">Deutscher Ereignisdatenbeschreibung 3</description>
-          <description lang="fr">Description des données d'événement en français 3</description>
-          <description lang="it">Descrizione dei dati dell'evento in italiano 3</description>
-          <description lang="ru">Описание данных события на русском языке 3</description>
-          <description lang="fi">Tapahtumatietojen kuvaus suomeksi 3</description>
-          <description lang="zh">事件数据描述中文 3</description>
-          <description lang="ja">イベントデータの説明日本語 3</description>
-          <description lang="pt">Descrição dos dados do evento em português 3</description>
-          <description lang="ar">وصف بيانات الحدث باللغة العربية 3</description>
-          <description lang="sk">Popis údajov o udalosti v slovenčine 3</description>
-          <description lang="hu">Eseményadatok leírása magyarul 3</description>
-          <description lang="kr">이벤트 데이터 설명 한국어 3</description>
-          <infourl lang="en">English event data help 3</infourl>
+        <data name="Reserved">
+          <description lang="en">Reserved for future use. Set to 0.</description>
+        </data>
+        <data name="Zone">
+          <description lang="en">Zone associated with the button event.</description>
+        </data>
+        <data name="Subzone">
+          <description lang="en">Subzone associated with the button event.</description>
         </data>
       </event>
     </events>
