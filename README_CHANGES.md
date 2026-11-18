@@ -9,6 +9,16 @@ tagged, rename **Unreleased** to the version and date, and start a new
 
 - Fix the CANAL id helper declarations in vscp-firmware-helper.h: they were declared as `vscp_fwhlp__get...` (two underscores) but implemented as `vscp_fwhlp_get...`, so they could not be linked
 - Fetch cJSON for the tests with CMake FetchContent instead of the third-party/cJSON submodule (same commit)
+- level2: Level I compatibility fixes. Nickname probes now carry the probed nickname (they sent 0xff), the "all nicknames taken" check works, and a nickname won by probing is reported through `stdreg_change`
+- level2: Level I decision matrix reads flags from row byte 1 (was byte 0, the originating address) and puts class bit 8 at 0x100
+- level2: `vscp_frmw2_work()` runs the decision matrix and heartbeat/caps timers also when an event is passed in ACTIVE state
+- level2: `vscp_frmw2_write_reg()` passes the selected page to `ops->write_reg` (was always 0); page select registers are writable
+- level2: EXTENDED_PAGE_WRITE is only applied by the addressed node
+- level2: the 100 us wait in extended page read no longer hangs when a 32-bit `get_timestamp()` wraps
+- level2: standard registers user id, manufacturer id/sub id and device family/type read correctly (MSB first), Level II standard register addresses are handled, reserved ones read as zero
+- helper: `vscp_fwhlp_getHeadFromCANALid` hard coded bit check no longer overflows a 16-bit int
+- demos/blinky: blinky0.json is valid JSON again, its `files` section uses the object form the MDF parser reads, and the Level I heartbeat (CLASS1.INFORMATION), Turn OFF (type 6) and Stop (type 8) event codes are corrected
+- demos/blinky: blinky0.mdf and blinky0.xml are regenerated from blinky0.json (the XML was from an older register layout); `tools/mdf-json2xml.py` does the conversion
 - No changes since the last release.
 
 ## v26.11.4 - 2026-11-12
