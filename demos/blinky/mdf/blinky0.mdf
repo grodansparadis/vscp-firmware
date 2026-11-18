@@ -26,7 +26,22 @@
       "hu": "Ez a legegyszerűbb lehetséges bemutató egy VSCP csomópontnak. Egy dolgot tud csinálni, egy LED-et világít, egy LED-et villogtat, egy LED-et kikapcsol. A villogás gyakorisága beállítható. Van egy döntési mátrixa néhány olyan művelettel, mint a LED bekapcsolása/kikapcsolása definiálva.",
       "kr": "이것은 VSCP 노드의 가장 간단한 데모입니다. 하나의 작업을 수행할 수 있습니다. LED를 켜고, LED를 깜박이고, LED를 끌 수 있습니다. 깜박이는 빈도는 설정할 수 있습니다. LED 켜기/끄기와 같은 몇 가지 작업이 정의된 의사 결정 매트릭스가 있습니다.",
       "zh": "这是一个VSCP节点的最简单演示。它可以做一件事，点亮一个LED，让一个LED闪烁，关闭一个LED。闪烁频率可以设置。它有一个决策矩阵，其中定义了一些操作，如打开/关闭LED。",
-      "ja": "これはVSCPノードの最も簡単なデモです。1つのことができます。LEDを点灯させ、LEDを点滅させ、LEDを消灯させることができます。点滅の頻度は設定できます。いくつかのアクションが定義された意思決定マトリックスがあります。"
+      "ja": "これはVSCPノードの最も簡単なデモです。1つのことができます。LEDを点灯させ、LEDを点滅させ、LEDを消灯させることができます。点滅の頻度は設定できます。いくつかのアクションが定義された意思決定マトリックスがあります。",
+      "bg": "Това е възможно най-простата демонстрация на VSCP възел. Той може да прави едно нещо: да включва LED, да мига с LED или да го изключва. Честотата на мигане може да се задава. Има матрица на решенията, в която са дефинирани действия като включване/изключване на LED.",
+      "hr": "Ovo je najjednostavniji mogući demo VSCP čvora. Može raditi jednu stvar: uključiti LED, treperiti LED-om ili ga isključiti. Frekvencija treperenja može se postaviti. Ima matricu odlučivanja u kojoj su definirane radnje poput uključivanja/isključivanja LED-a.",
+      "cs": "Toto je nejjednodušší možná ukázka uzlu VSCP. Umí jednu věc: rozsvítit LED, blikat LED nebo ji vypnout. Frekvenci blikání lze nastavit. Má rozhodovací matici, ve které jsou definovány akce, jako je zapnutí/vypnutí LED.",
+      "da": "Dette er den enklest mulige demo af en VSCP-node. Den kan gøre én ting: tænde en LED, blinke med en LED eller slukke en LED. Blinkefrekvensen kan indstilles. Den har en beslutningsmatrix, hvor nogle handlinger, f.eks. at tænde/slukke LED'en, er defineret.",
+      "nl": "Dit is de eenvoudigst mogelijke demo van een VSCP-node. De node kan één ding doen: een led aanzetten, laten knipperen of uitzetten. De knipperfrequentie kan worden ingesteld. De node heeft een beslismatrix waarin enkele acties zijn gedefinieerd, zoals de led aan- of uitzetten.",
+      "et": "See on VSCP-sõlme kõige lihtsam demo. See suudab teha üht asja: LED-i sisse lülitada, vilkuma panna või välja lülitada. Vilkumissagedust saab seadistada. Sõlmel on otsustusmaatriks, milles on määratletud mõned toimingud, näiteks LED-i sisse- ja väljalülitamine.",
+      "el": "Αυτή είναι η απλούστερη δυνατή επίδειξη ενός κόμβου VSCP. Μπορεί να κάνει ένα πράγμα: να ανάβει ένα LED, να αναβοσβήνει ένα LED και να σβήνει ένα LED. Μπορείτε να ορίσετε τη συχνότητα αναλαμπής. Διαθέτει πίνακα αποφάσεων, στον οποίο ορίζονται ορισμένες ενέργειες, όπως η ενεργοποίηση και η απενεργοποίηση του LED.",
+      "ga": "Seo an léiriú is simplí is féidir ar nód VSCP. Is féidir leis rud amháin a dhéanamh: LED a lasadh, LED a splancadh agus LED a mhúchadh. Is féidir minicíocht na splancála a shocrú. Tá maitrís cinnidh ann ina sainítear roinnt gníomhartha, amhail an LED a chasadh air nó as.",
+      "lv": "Šī ir visvienkāršākā iespējamā VSCP mezgla demonstrācija. Tas spēj paveikt vienu darbību: ieslēgt LED, mirgot ar LED un izslēgt LED. Mirgošanas frekvenci var iestatīt. Mezglam ir lēmumu matrica, kurā definētas tādas darbības kā LED ieslēgšana un izslēgšana.",
+      "lt": "Tai paprasčiausias įmanomas VSCP mazgo demonstracinis pavyzdys. Jis gali atlikti vieną veiksmą: įjungti LED, mirksėti LED arba išjungti LED. Mirksėjimo dažnį galima nustatyti. Jame yra sprendimų matrica, kurioje apibrėžti tokie veiksmai kaip LED įjungimas ir išjungimas.",
+      "mt": "Din hija l-aktar dimostrazzjoni sempliċi possibbli ta’ nodu VSCP. Jista’ jagħmel ħaġa waħda: jixgħel LED, iteptpu jew jitfih. Il-frekwenza tat-teptip tista’ tiġi ssettjata. Għandu matriċi tad-deċiżjonijiet li tiddefinixxi xi azzjonijiet, bħat-tixgħil u t-tifi tal-LED.",
+      "pl": "To najprostsza możliwa demonstracja węzła VSCP. Może wykonać jedną czynność: włączyć LED, sprawić, by migała, lub ją wyłączyć. Częstotliwość migania można ustawić. Węzeł ma macierz decyzyjną definiującą pewne działania, takie jak włączanie i wyłączanie LED.",
+      "ro": "Aceasta este cea mai simplă demonstrație posibilă a unui nod VSCP. Poate face un singur lucru: să aprindă un LED, să-l facă să clipească sau să-l stingă. Frecvența clipirii poate fi setată. Are o matrice de decizie care definește câteva acțiuni, precum aprinderea și stingerea LED-ului.",
+      "sl": "To je najpreprostejši možni prikaz vozlišča VSCP. Zna narediti eno stvar: prižgati LED, utripati z LED ali ugasniti LED. Frekvenco utripanja je mogoče nastaviti. Ima odločitveno matriko, v kateri so določena nekatera dejanja, na primer prižiganje ali ugašanje LED.",
+      "sv": "Det här är den enklast möjliga demonstrationen av en VSCP-nod. Den kan göra en sak: tända en LED, blinka med en LED eller släcka en LED. Blinkfrekvensen kan ställas in. Den har en beslutsmatris med vissa definierade åtgärder, till exempel att tända eller släcka en LED."
     },
     "manufacturer": {
       "name": "Grodans Paradis AB",
@@ -54,7 +69,30 @@
           "url": "https://github.com/grodansparadis/vscp/wiki/Blinky-Documentation",
           "format": "html",
           "description": {
-            "en": "English documentaion for the VSCP Blinky demo node."
+            "en": "English documentaion for the VSCP Blinky demo node.",
+            "bg": "Документация на английски за демонстрационния възел VSCP Blinky.",
+            "hr": "Dokumentacija na engleskom za demo čvor VSCP Blinky.",
+            "cs": "Anglická dokumentace k ukázkovému uzlu VSCP Blinky.",
+            "da": "Engelsk dokumentation til VSCP Blinky-demo-noden.",
+            "nl": "Engelse documentatie voor de VSCP Blinky-demonstratienode.",
+            "et": "VSCP Blinky demosõlme ingliskeelne dokumentatsioon.",
+            "fi": "VSCP Blinky -esimerkkisolmun englanninkielinen dokumentaatio.",
+            "fr": "Documentation en anglais du nœud de démonstration VSCP Blinky.",
+            "de": "Englische Dokumentation des VSCP-Blinky-Demoknotens.",
+            "el": "Αγγλική τεκμηρίωση για τον κόμβο επίδειξης VSCP Blinky.",
+            "hu": "A VSCP Blinky bemutatócsomópont angol nyelvű dokumentációja.",
+            "ga": "Doiciméadacht Bhéarla don nód taispeána VSCP Blinky.",
+            "it": "Documentazione in inglese per il nodo dimostrativo VSCP Blinky.",
+            "lv": "VSCP Blinky demonstrācijas mezgla dokumentācija angļu valodā.",
+            "lt": "VSCP Blinky demonstracinio mazgo dokumentacija anglų kalba.",
+            "mt": "Dokumentazzjoni bl-Ingliż għan-nodu demo VSCP Blinky.",
+            "pl": "Dokumentacja w języku angielskim węzła demonstracyjnego VSCP Blinky.",
+            "pt": "Documentação em inglês do nó de demonstração VSCP Blinky.",
+            "ro": "Documentație în limba engleză pentru nodul demonstrativ VSCP Blinky.",
+            "sk": "Anglická dokumentácia k ukážkovému uzlu VSCP Blinky.",
+            "sl": "Angleška dokumentacija za demonstracijsko vozlišče VSCP Blinky.",
+            "es": "Documentación en inglés del nodo de demostración VSCP Blinky.",
+            "sv": "Engelsk dokumentation för demonstrationsnoden VSCP Blinky."
           }
         }
       ],
@@ -93,7 +131,22 @@
           "ar": "المنطقة للعقدة. هذه طريقة لتمييز بين العقد المختلفة.",
           "sk": "Zóna pro uzel. Toto je způsob, jak rozlišit různé uzly.",
           "hu": "Zóna a csomópont számára. Ez egy módja annak, hogy megkülönböztesse a különböző csomópontokat.",
-          "kr": "노드의 영역입니다. 이것은 서로 다른 노드를 구별하는 방법입니다."
+          "kr": "노드의 영역입니다. 이것은 서로 다른 노드를 구별하는 방법입니다.",
+          "bg": "Зона на възела. Това е начин за разграничаване на различни възли.",
+          "hr": "Zona čvora. To je način razlikovanja različitih čvorova.",
+          "cs": "Zóna uzlu. Slouží k rozlišení různých uzlů.",
+          "da": "Zone for noden. Dette er en måde at skelne mellem forskellige noder på.",
+          "nl": "Zone voor de node. Dit is een manier om onderscheid te maken tussen verschillende nodes.",
+          "et": "Sõlme tsoon. See võimaldab eri sõlmi eristada.",
+          "el": "Ζώνη του κόμβου. Αυτός είναι ένας τρόπος διάκρισης μεταξύ διαφορετικών κόμβων.",
+          "ga": "Crios an nóid. Is bealach é seo chun idirdhealú a dhéanamh idir nóid éagsúla.",
+          "lv": "Mezgla zona. Tas ir veids, kā atšķirt dažādus mezglus.",
+          "lt": "Mazgo zona. Taip galima atskirti skirtingus mazgus.",
+          "mt": "Żona għan-nodu. Dan huwa mod kif issir distinzjoni bejn nodi differenti.",
+          "pl": "Strefa węzła. Pozwala odróżniać od siebie różne węzły.",
+          "ro": "Zona nodului. Aceasta este o modalitate de a distinge între noduri diferite.",
+          "sl": "Območje vozlišča. Tako je mogoče razlikovati med različnimi vozlišči.",
+          "sv": "Nodens zon. Detta är ett sätt att skilja mellan olika noder."
         },
         "infourl": {
           "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-0"
@@ -129,7 +182,22 @@
           "sk": "Subzóna pro uzel. Toto je způsob, jak rozlišit různé uzly v rámci stejné zóny.",
           "hu": "Alzóna a csomópont számára. Ez egy módja annak, hogy megkülönböztesse a különböző csomópontokat ugyanazon zónán belül.",
           "kr": "노드의 하위 영역입니다. 이것은 동일한 영역 내에서 서로 다른 노드를 구별하는 방법입니다.",
-          "fi": "Alialue solmulle. Tämä on tapa erottaa eri solmut toisistaan samassa alueessa."
+          "fi": "Alialue solmulle. Tämä on tapa erottaa eri solmut toisistaan samassa alueessa.",
+          "bg": "Подзона на възела. Това е начин за разграничаване на различни възли в една и съща зона.",
+          "hr": "Podzona čvora. To je način razlikovanja različitih čvorova unutar iste zone.",
+          "cs": "Podzóna uzlu. Slouží k rozlišení různých uzlů v rámci stejné zóny.",
+          "da": "Subzone for noden. Dette er en måde at skelne mellem forskellige noder inden for samme zone på.",
+          "nl": "Subzone voor de node. Dit is een manier om onderscheid te maken tussen verschillende nodes binnen dezelfde zone.",
+          "et": "Sõlme alamtsoon. See võimaldab eristada eri sõlmi samas tsoonis.",
+          "el": "Υποζώνη του κόμβου. Αυτός είναι ένας τρόπος διάκρισης μεταξύ διαφορετικών κόμβων στην ίδια ζώνη.",
+          "ga": "Fo-chrios an nóid. Is bealach é seo chun idirdhealú a dhéanamh idir nóid éagsúla sa chrios céanna.",
+          "lv": "Mezgla apakšzona. Tas ir veids, kā atšķirt dažādus mezglus vienā zonā.",
+          "lt": "Mazgo subzona. Taip galima atskirti skirtingus mazgus toje pačioje zonoje.",
+          "mt": "Subżona għan-nodu. Dan huwa mod kif issir distinzjoni bejn nodi differenti fl-istess żona.",
+          "pl": "Podstrefa węzła. Pozwala odróżniać od siebie różne węzły w tej samej strefie.",
+          "ro": "Subzona nodului. Aceasta este o modalitate de a distinge între noduri diferite din aceeași zonă.",
+          "sl": "Podobmočje vozlišča. Tako je mogoče razlikovati med različnimi vozlišči znotraj istega območja.",
+          "sv": "Nodens subzon. Detta är ett sätt att skilja mellan olika noder inom samma zon."
         },
         "infourl": {
           "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-1"
@@ -165,7 +233,22 @@
           "ar": "حالة العقدة. هذا يشير إلى الحالة الحالية للLED، 0 = ON، 1 = OFF.",
           "sk": "Stav uzlu. To ukazuje aktuální stav LED, 0 = ON, 1 = OFF.",
           "hu": "A csomópont állapota. Ez jelzi a LED aktuális állapotát, 0=ON, 1=OFF.",
-          "kr": "노드의 상태입니다. 이것은 LED의 현재 상태를 나타냅니다. 0=ON, 1=OFF."
+          "kr": "노드의 상태입니다. 이것은 LED의 현재 상태를 나타냅니다. 0=ON, 1=OFF.",
+          "bg": "Състояние на възела. Показва текущото състояние на LED: 0=ON, 1=OFF.",
+          "hr": "Status čvora. Označava trenutačno stanje LED-a: 0=ON, 1=OFF.",
+          "cs": "Stav uzlu. Udává aktuální stav LED: 0=ON, 1=OFF.",
+          "da": "Status for noden. Dette angiver LED'ens aktuelle tilstand: 0=ON, 1=OFF.",
+          "nl": "Status van de node. Dit geeft de huidige status van de led aan: 0=ON, 1=OFF.",
+          "et": "Sõlme olek. See näitab LED-i praegust olekut: 0=ON, 1=OFF.",
+          "el": "Κατάσταση του κόμβου. Υποδεικνύει την τρέχουσα κατάσταση του LED, 0=ON, 1=OFF.",
+          "ga": "Stádas an nóid. Léiríonn sé seo staid reatha an LED, 0=ON, 1=OFF.",
+          "lv": "Mezgla statuss. Tas norāda pašreizējo LED stāvokli: 0=ON, 1=OFF.",
+          "lt": "Mazgo būsena. Ji nurodo dabartinę LED būseną: 0=ON, 1=OFF.",
+          "mt": "L-istatus tan-nodu. Dan jindika l-istat attwali tal-LED: 0=ON, 1=OFF.",
+          "pl": "Stan węzła. Wskazuje bieżący stan LED: 0=ON, 1=OFF.",
+          "ro": "Starea nodului. Indică starea curentă a LED-ului: 0=ON, 1=OFF.",
+          "sl": "Stanje vozlišča. Označuje trenutno stanje LED: 0=ON, 1=OFF.",
+          "sv": "Nodens status. Anger LED-lampans aktuella tillstånd: 0=ON, 1=OFF."
         },
         "infourl": {
           "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-2"
@@ -194,7 +277,22 @@
               "ar": "بت الحالة الذي يشير إلى أن LED نشط. 0=LED مغلق، 1=LED مفتوح. عند الكتابة إليه، سيتم تشغيل أو إيقاف تشغيل LED بناءً على القيمة المكتوبة. إذا كان LED ممكّناً في سجل التحكم، فسيتم تشغيل أو إيقاف تشغيل LED بناءً على القيمة المكتوبة.",
               "sk": "Stavový bit, ktorý indikuje, že LED je aktívny. 0=LED vypnutý, 1=LED zapnutý. Ak sa doň zapisuje, LED sa zapne alebo vypne v závislosti od zapísanej hodnoty. Ak je LED povolený v riadiacom registri, LED sa zapne alebo vypne v závislosti od zapísanej hodnoty.",
               "hu": "Állapotbit, amely jelzi, hogy a LED aktív. 0=LED ki, 1=LED be. Ha írják, a LED be- vagy kikapcsol az írt értéktől függően. Ha a LED engedélyezve van a vezérlőregiszterben, a LED be- vagy kikapcsol az írt értéktől függően.",
-              "kr": "상태 비트로 LED가 활성 상태인지 나타냅니다. 0=LED 꺼짐, 1=LED 켜짐. 쓰여지면 쓰여진 값에 따라 LED가 켜지거나 꺼집니다. LED가 제어 레지스터에서 활성화된 경우, 쓰여진 값에 따라 LED가 켜지거나 꺼집니다."
+              "kr": "상태 비트로 LED가 활성 상태인지 나타냅니다. 0=LED 꺼짐, 1=LED 켜짐. 쓰여지면 쓰여진 값에 따라 LED가 켜지거나 꺼집니다. LED가 제어 레지스터에서 활성화된 경우, 쓰여진 값에 따라 LED가 켜지거나 꺼집니다.",
+              "bg": "Бит за състоянието, показващ дали LED е активен. 0=LED е изключен, 1=LED е включен. При запис LED ще се включи или изключи според записаната стойност. Ако LED е разрешен в контролния регистър, той ще се включи или изключи според записаната стойност.",
+              "hr": "Bit statusa koji označava je li LED aktivan. 0=LED je isključen, 1=LED je uključen. Ako se u njega upiše vrijednost, LED će se uključiti ili isključiti ovisno o upisanoj vrijednosti. Ako je LED omogućen u upravljačkom registru, uključit će se ili isključiti ovisno o upisanoj vrijednosti.",
+              "cs": "Stavový bit určující, zda je LED aktivní. 0=LED je vypnutá, 1=LED je zapnutá. Při zápisu se LED zapne nebo vypne podle zapsané hodnoty. Pokud je LED povolena v řídicím registru, zapne se nebo vypne podle zapsané hodnoty.",
+              "da": "Statusbit, der angiver, om LED'en er aktiv. 0=LED er slukket, 1=LED er tændt. Hvis der skrives til biten, tændes eller slukkes LED'en afhængigt af den skrevne værdi. Hvis LED'en er aktiveret i kontrolregistret, tændes eller slukkes den afhængigt af den skrevne værdi.",
+              "nl": "Statusbit dat aangeeft of de led actief is. 0=Led is uit, 1=Led is aan. Als ernaar wordt geschreven, wordt de led aan- of uitgezet, afhankelijk van de geschreven waarde. Als de led is ingeschakeld in het controleregister, wordt deze aan- of uitgezet afhankelijk van de geschreven waarde.",
+              "et": "Olekubitt, mis näitab, kas LED on aktiivne. 0=LED on väljas, 1=LED on sees. Bitile kirjutamisel lülitatakse LED vastavalt kirjutatud väärtusele sisse või välja. Kui LED on juhtregistris lubatud, lülitatakse see vastavalt kirjutatud väärtusele sisse või välja.",
+              "el": "Δυαδικό ψηφίο κατάστασης που υποδεικνύει ότι το LED είναι ενεργό. 0=το LED είναι σβηστό, 1=το LED είναι αναμμένο. Αν γίνει εγγραφή σε αυτό, το LED θα ανάψει ή θα σβήσει ανάλογα με την τιμή που εγγράφηκε. Αν το LED είναι ενεργοποιημένο στον καταχωρητή ελέγχου, θα ανάψει ή θα σβήσει ανάλογα με την τιμή που εγγράφηκε.",
+              "ga": "Giotán stádais a léiríonn go bhfuil an LED gníomhach. 0=tá an LED múchta, 1=tá an LED ar siúl. Má scríobhtar chuige, cuirfear an LED ar siúl nó múchfar é de réir na luacha a scríobhadh. Má tá an LED cumasaithe sa chlár rialaithe, cuirfear ar siúl nó múchfar é de réir na luacha a scríobhadh.",
+              "lv": "Statusa bits, kas norāda, ka LED ir aktīvs. 0=LED ir izslēgts, 1=LED ir ieslēgts. Ja šajā bitā ieraksta vērtību, LED tiks ieslēgts vai izslēgts atbilstoši ierakstītajai vērtībai. Ja LED ir iespējots vadības reģistrā, tas tiks ieslēgts vai izslēgts atbilstoši ierakstītajai vērtībai.",
+              "lt": "Būsenos bitas, nurodantis, ar LED yra aktyvus. 0=LED išjungtas, 1=LED įjungtas. Įrašius reikšmę, LED bus įjungtas arba išjungtas pagal įrašytą reikšmę. Jei LED įjungtas valdymo registre, jis bus įjungtas arba išjungtas pagal įrašytą reikšmę.",
+              "mt": "Bit tal-istatus li jindika jekk il-LED huwiex attiv. 0=il-LED huwa mitfi, 1=il-LED huwa mixgħul. Jekk tinkiteb fih, il-LED jinxtegħel jew jintfew skont il-valur miktub. Jekk il-LED ikun attivat fir-reġistru tal-kontroll, jinxtegħel jew jintfew skont il-valur miktub.",
+              "pl": "Bit stanu wskazujący, czy LED jest aktywna. 0=LED jest wyłączona, 1=LED jest włączona. Zapisanie wartości powoduje włączenie lub wyłączenie LED, zależnie od zapisanej wartości. Jeśli LED jest włączona w rejestrze sterującym, zostanie włączona lub wyłączona zależnie od zapisanej wartości.",
+              "ro": "Bit de stare care indică dacă LED-ul este activ. 0=LED-ul este stins, 1=LED-ul este aprins. Dacă se scrie în acest bit, LED-ul va fi aprins sau stins în funcție de valoarea scrisă. Dacă LED-ul este activat în registrul de control, acesta va fi aprins sau stins în funcție de valoarea scrisă.",
+              "sl": "Bit stanja, ki označuje, ali je LED aktivna. 0=LED je ugasnjena, 1=LED sveti. Če bit zapišete, se bo LED glede na zapisano vrednost prižgala ali ugasnila. Če je LED omogočena v registru za upravljanje, se bo glede na zapisano vrednost prižgala ali ugasnila.",
+              "sv": "Statusbit som anger att LED-lampan är aktiv. 0=LED-lampan är släckt, 1=LED-lampan lyser. Om biten skrivs till tänds eller släcks LED-lampan beroende på det skrivna värdet. Om LED-lampan är aktiverad i styrregistret tänds eller släcks den beroende på det skrivna värdet."
             }
           },
           {
@@ -220,7 +318,22 @@
               "ar": "بت الحالة الذي يشير إلى أن الزر نشط. 0=الزر غير نشط، 1=الزر نشط.",
               "sk": "Stavový bit, ktorý indikuje, že tlačidlo je aktívne. 0=Tlačidlo nie je aktívne, 1=Tlačidlo je aktívne.",
               "hu": "Állapotbit, amely jelzi, hogy a gomb aktív. 0=A gomb nem aktív, 1=A gomb aktív.",
-              "kr": "상태 비트로 버튼이 활성 상태인지 나타냅니다. 0=버튼 비활성, 1=버튼 활성"
+              "kr": "상태 비트로 버튼이 활성 상태인지 나타냅니다. 0=버튼 비활성, 1=버튼 활성",
+              "bg": "Бит за състоянието, показващ дали бутонът е активен. 0=бутонът не е активен, 1=бутонът е активен.",
+              "hr": "Bit statusa koji označava je li tipka aktivna. 0=tipka nije aktivna, 1=tipka je aktivna.",
+              "cs": "Stavový bit určující, zda je tlačítko aktivní. 0=tlačítko není aktivní, 1=tlačítko je aktivní.",
+              "da": "Statusbit, der angiver, om knappen er aktiv. 0=Knappen er ikke aktiv, 1=Knappen er aktiv.",
+              "nl": "Statusbit dat aangeeft of de knop actief is. 0=Knop is niet actief, 1=Knop is actief.",
+              "et": "Olekubitt, mis näitab, kas nupp on aktiivne. 0=Nupp ei ole aktiivne, 1=Nupp on aktiivne.",
+              "el": "Δυαδικό ψηφίο κατάστασης που υποδεικνύει ότι το κουμπί είναι ενεργό. 0=το κουμπί δεν είναι ενεργό, 1=το κουμπί είναι ενεργό.",
+              "ga": "Giotán stádais a léiríonn go bhfuil an cnaipe gníomhach. 0=níl an cnaipe gníomhach, 1=tá an cnaipe gníomhach.",
+              "lv": "Statusa bits, kas norāda, ka poga ir aktīva. 0=poga nav aktīva, 1=poga ir aktīva.",
+              "lt": "Būsenos bitas, nurodantis, ar mygtukas aktyvus. 0=mygtukas neaktyvus, 1=mygtukas aktyvus.",
+              "mt": "Bit tal-istatus li jindika jekk il-buttuna hijiex attiva. 0=il-buttuna mhijiex attiva, 1=il-buttuna hija attiva.",
+              "pl": "Bit stanu wskazujący, czy przycisk jest aktywny. 0=przycisk nie jest aktywny, 1=przycisk jest aktywny.",
+              "ro": "Bit de stare care indică dacă butonul este activ. 0=butonul nu este activ, 1=butonul este activ.",
+              "sl": "Bit stanja, ki označuje, ali je gumb aktiven. 0=gumb ni aktiven, 1=gumb je aktiven.",
+              "sv": "Statusbit som anger att knappen är aktiv. 0=knappen är inte aktiv, 1=knappen är aktiv."
             }
           }
         ]
@@ -262,7 +375,22 @@
               "ar": "قم بتعيين البت لتمكين التحكم في LED. امسح البت لتعطيل التحكم في LED.",
               "sk": "Nastavte bit pro povolení ovládání LED. Vymažte bit pro zakázání ovládání LED.",
               "hu": "Állítsa be a bitet az LED vezérlésének engedélyezéséhez. Törölje a bitet az LED vezérlésének letiltásához.",
-              "kr": "비트를 설정하여 LED 제어를 활성화합니다. 비트를 지워 LED 제어를 비활성화합니다."
+              "kr": "비트를 설정하여 LED 제어를 활성화합니다. 비트를 지워 LED 제어를 비활성화합니다.",
+              "bg": "Задайте бита, за да разрешите управлението на LED. Изчистете бита, за да забраните управлението на LED.",
+              "hr": "Postavite bit da biste omogućili upravljanje LED-om. Očistite bit da biste onemogućili upravljanje LED-om.",
+              "cs": "Nastavením bitu povolíte ovládání LED. Vynulováním bitu ovládání LED zakážete.",
+              "da": "Sæt biten for at aktivere styring af LED'en. Ryd biten for at deaktivere styring af LED'en.",
+              "nl": "Zet de bit om de besturing van de led in te schakelen. Wis de bit om de besturing van de led uit te schakelen.",
+              "et": "LED-i juhtimise lubamiseks sea bitt. LED-i juhtimise keelamiseks tühjenda bitt.",
+              "el": "Ορίστε το δυαδικό ψηφίο για να ενεργοποιήσετε τον έλεγχο του LED. Μηδενίστε το για να απενεργοποιήσετε τον έλεγχο του LED.",
+              "ga": "Socraigh an giotán chun rialú an LED a chumasú. Glan an giotán chun rialú an LED a dhíchumasú.",
+              "lv": "Iestatiet bitu, lai iespējotu LED vadību. Notīriet bitu, lai atspējotu LED vadību.",
+              "lt": "Nustatykite bitą, kad įjungtumėte LED valdymą. Išvalykite bitą, kad išjungtumėte LED valdymą.",
+              "mt": "Issettja l-bit biex tippermetti l-kontroll tal-LED. Ħassar il-bit biex tiddiżattiva l-kontroll tal-LED.",
+              "pl": "Ustaw bit, aby włączyć sterowanie LED. Wyczyść bit, aby wyłączyć sterowanie LED.",
+              "ro": "Setați bitul pentru a activa controlul LED-ului. Ștergeți bitul pentru a dezactiva controlul LED-ului.",
+              "sl": "Nastavite bit, da omogočite upravljanje LED. Počistite bit, da onemogočite upravljanje LED.",
+              "sv": "Sätt biten för att aktivera styrning av LED-lampan. Rensa biten för att inaktivera styrning av LED-lampan."
             },
             "infourl": {
               "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-3"
@@ -291,7 +419,22 @@
               "fr": "Activer le bouton, enverra des événements on/off lorsque le bouton est pressé.",
               "it": "Abilitare il pulsante, invierà eventi on/off quando il pulsante viene premuto.",
               "hu": "Engedélyezze a gombot, be/ki kapcsoló eseményeket küld, amikor a gombot megnyomják.",
-              "kr": "버튼을 활성화하면 버튼을 누를 때 켜기/끄기 이벤트가 전송됩니다."
+              "kr": "버튼을 활성화하면 버튼을 누를 때 켜기/끄기 이벤트가 전송됩니다.",
+              "bg": "Разрешаване на бутона; при натискане той изпраща събития за включване/изключване.",
+              "hr": "Omogućite tipku; pri pritisku će slati događaje uključivanja/isključivanja.",
+              "cs": "Povolte tlačítko; při stisknutí bude odesílat události zapnutí/vypnutí.",
+              "da": "Aktivér knappen; der sendes tænd/sluk-hændelser, når der trykkes på knappen.",
+              "nl": "Knop inschakelen; er worden aan-/uitgebeurtenissen verzonden wanneer de knop wordt ingedrukt.",
+              "et": "Nupu lubamisel saadetakse nupu vajutamisel sisse-/väljalülitamise sündmused.",
+              "el": "Ενεργοποίηση του κουμπιού: θα αποστέλλονται συμβάντα ενεργοποίησης/απενεργοποίησης όταν πατηθεί το κουμπί.",
+              "ga": "Cumasaigh an cnaipe; seolfar imeachtaí casadh air/as nuair a bhrúitear an cnaipe.",
+              "lv": "Iespējojiet pogu; nospiežot pogu, tiks nosūtīti ieslēgšanas/izslēgšanas notikumi.",
+              "lt": "Įjunkite mygtuką; jį paspaudus bus siunčiami įjungimo ir išjungimo įvykiai.",
+              "mt": "Attiva l-buttuna; din tibgħat avvenimenti ta’ tixgħil u tifi meta tingħafas.",
+              "pl": "Włącz przycisk; po jego naciśnięciu będą wysyłane zdarzenia włączenia i wyłączenia.",
+              "ro": "Activați butonul; la apăsare, acesta va trimite evenimente de aprindere și stingere.",
+              "sl": "Omogočite gumb; ob pritisku bo poslal dogodka za prižig in ugasnitev.",
+              "sv": "Aktivera knappen; den skickar händelser för att tända och släcka när knappen trycks ned."
             }
           },
           {
@@ -317,7 +460,22 @@
               "ar": "قم بتعيين البت لإرسال حدث التشغيل عند الضغط على الزر.",
               "sk": "Nastavte bit pre odoslanie udalosti zapnutia, keď sa tlačidlo stlačí.",
               "hu": "Állítsa be a bitet a bekapcsolási esemény küldéséhez, amikor a gombot megnyomják.",
-              "kr": "버튼을 누를 때 켜기 이벤트를 보내려면 비트를 설정합니다."
+              "kr": "버튼을 누를 때 켜기 이벤트를 보내려면 비트를 설정합니다.",
+              "bg": "Задайте бита, за да се изпраща събитие за включване при натискане на бутона.",
+              "hr": "Postavite bit za slanje događaja uključivanja pri pritisku tipke.",
+              "cs": "Nastavením bitu se při stisknutí tlačítka odešle událost zapnutí.",
+              "da": "Sæt biten for at sende en tænd-hændelse, når der trykkes på knappen.",
+              "nl": "Zet de bit om een inschakelgebeurtenis te verzenden wanneer de knop wordt ingedrukt.",
+              "et": "Sea bitt, et saata nupu vajutamisel sisselülitamise sündmus.",
+              "el": "Ορίστε το δυαδικό ψηφίο ώστε να αποστέλλεται συμβάν ενεργοποίησης όταν πατηθεί το κουμπί.",
+              "ga": "Socraigh an giotán chun imeacht casadh air a sheoladh nuair a bhrúitear an cnaipe.",
+              "lv": "Iestatiet bitu, lai, nospiežot pogu, nosūtītu ieslēgšanas notikumu.",
+              "lt": "Nustatykite bitą, kad paspaudus mygtuką būtų siunčiamas įjungimo įvykis.",
+              "mt": "Issettja l-bit biex jintbagħat avveniment ta’ tixgħil meta tingħafas il-buttuna.",
+              "pl": "Ustaw bit, aby po naciśnięciu przycisku wysłać zdarzenie włączenia.",
+              "ro": "Setați bitul pentru a trimite un eveniment de aprindere la apăsarea butonului.",
+              "sl": "Nastavite bit za pošiljanje dogodka za prižig ob pritisku gumba.",
+              "sv": "Sätt biten för att skicka en tändningshändelse när knappen trycks ned."
             }
           },
           {
@@ -343,7 +501,22 @@
               "ar": "قم بتعيين البت لإرسال حدث START عند الضغط على الزر.",
               "sk": "Nastavte bit pre odoslanie udalosti START, keď sa tlačidlo stlačí.",
               "hu": "Állítsa be a bitet a START esemény küldéséhez, amikor a gombot megnyomják.",
-              "kr": "버튼을 누를 때 START 이벤트를 보내려면 비트를 설정합니다."
+              "kr": "버튼을 누를 때 START 이벤트를 보내려면 비트를 설정합니다.",
+              "bg": "Задайте бита, за да се изпраща събитие START при натискане на бутона.",
+              "hr": "Postavite bit za slanje događaja START pri pritisku tipke.",
+              "cs": "Nastavením bitu se při stisknutí tlačítka odešle událost START.",
+              "da": "Sæt biten for at sende en START-hændelse, når der trykkes på knappen.",
+              "nl": "Zet de bit om een START-gebeurtenis te verzenden wanneer de knop wordt ingedrukt.",
+              "et": "Sea bitt, et saata nupu vajutamisel START-sündmus.",
+              "el": "Ορίστε το δυαδικό ψηφίο ώστε να αποστέλλεται συμβάν START όταν πατηθεί το κουμπί.",
+              "ga": "Socraigh an giotán chun imeacht START a sheoladh nuair a bhrúitear an cnaipe.",
+              "lv": "Iestatiet bitu, lai, nospiežot pogu, nosūtītu START notikumu.",
+              "lt": "Nustatykite bitą, kad paspaudus mygtuką būtų siunčiamas START įvykis.",
+              "mt": "Issettja l-bit biex jintbagħat avveniment START meta tingħafas il-buttuna.",
+              "pl": "Ustaw bit, aby po naciśnięciu przycisku wysłać zdarzenie START.",
+              "ro": "Setați bitul pentru a trimite un eveniment START la apăsarea butonului.",
+              "sl": "Nastavite bit za pošiljanje dogodka START ob pritisku gumba.",
+              "sv": "Sätt biten för att skicka en START-händelse när knappen trycks ned."
             }
           },
           {
@@ -369,7 +542,22 @@
               "ar": "قم بتعيين البت لإرسال حدث STOP عند تحرير الزر.",
               "sk": "Nastavte bit pre odoslanie udalosti STOP, keď sa tlačidlo uvoľní.",
               "hu": "Állítsa be a bitet a STOP esemény küldéséhez, amikor a gombot elengedik.",
-              "kr": "버튼을 놓을 때 STOP 이벤트를 보내려면 비트를 설정합니다."
+              "kr": "버튼을 놓을 때 STOP 이벤트를 보내려면 비트를 설정합니다.",
+              "bg": "Задайте бита, за да се изпраща събитие STOP при отпускане на бутона.",
+              "hr": "Postavite bit za slanje događaja STOP pri otpuštanju tipke.",
+              "cs": "Nastavením bitu se při uvolnění tlačítka odešle událost STOP.",
+              "da": "Sæt biten for at sende en STOP-hændelse, når knappen slippes.",
+              "nl": "Zet de bit om een STOP-gebeurtenis te verzenden wanneer de knop wordt losgelaten.",
+              "et": "Sea bitt, et saata nupu vabastamisel STOP-sündmus.",
+              "el": "Ορίστε το δυαδικό ψηφίο ώστε να αποστέλλεται συμβάν STOP όταν αφεθεί το κουμπί.",
+              "ga": "Socraigh an giotán chun imeacht STOP a sheoladh nuair a scaoiltear an cnaipe.",
+              "lv": "Iestatiet bitu, lai, atlaižot pogu, nosūtītu STOP notikumu.",
+              "lt": "Nustatykite bitą, kad atleidus mygtuką būtų siunčiamas STOP įvykis.",
+              "mt": "Issettja l-bit biex jintbagħat avveniment STOP meta tinħeles il-buttuna.",
+              "pl": "Ustaw bit, aby po zwolnieniu przycisku wysłać zdarzenie STOP.",
+              "ro": "Setați bitul pentru a trimite un eveniment STOP la eliberarea butonului.",
+              "sl": "Nastavite bit za pošiljanje dogodka STOP ob sprostitvi gumba.",
+              "sv": "Sätt biten för att skicka en STOP-händelse när knappen släpps upp."
             }
           },
           {
@@ -395,7 +583,22 @@
               "ar": "قم بتعيين البت لتمكين عداد المللي ثانية.",
               "sk": "Nastavte bit pre aktiváciu milisekundového čítača.",
               "hu": "Állítsa be a bitet a milliszekundum számláló engedélyezéséhez.",
-              "kr": "밀리초 카운터를 활성화하려면 비트를 설정합니다."
+              "kr": "밀리초 카운터를 활성화하려면 비트를 설정합니다.",
+              "bg": "Задайте бита, за да разрешите брояча на милисекундите.",
+              "hr": "Postavite bit da biste omogućili brojač milisekundi.",
+              "cs": "Nastavením bitu povolíte milisekundový čítač.",
+              "da": "Sæt biten for at aktivere millisekundtælleren.",
+              "nl": "Zet de bit om de milliseconden-teller in te schakelen.",
+              "et": "Sea bitt millisekundiloenduri lubamiseks.",
+              "el": "Ορίστε το δυαδικό ψηφίο για να ενεργοποιήσετε τον μετρητή χιλιοστών του δευτερολέπτου.",
+              "ga": "Socraigh an giotán chun an cuntar milleasoicindí a chumasú.",
+              "lv": "Iestatiet bitu, lai iespējotu milisekunžu skaitītāju.",
+              "lt": "Nustatykite bitą, kad įjungtumėte milisekundžių skaitiklį.",
+              "mt": "Issettja l-bit biex tattiva l-kontatur tal-millisekondi.",
+              "pl": "Ustaw bit, aby włączyć licznik milisekund.",
+              "ro": "Setați bitul pentru a activa contorul de milisecunde.",
+              "sl": "Nastavite bit za omogočanje milisekundnega števca.",
+              "sv": "Sätt biten för att aktivera millisekundräknaren."
             }
           }
         ]
@@ -430,7 +633,22 @@
           "ar": "البايت الأكثر أهمية لفاصل الوميض.",
           "sk": "Najvýznamnejší bajt intervalu blikania.",
           "hu": "A villogási intervallum legjelentősebb bájtja.",
-          "kr": "깜박임 간격의 최상위 바이트."
+          "kr": "깜박임 간격의 최상위 바이트.",
+          "bg": "Най-значимият байт на интервала на мигане.",
+          "hr": "Najznačajniji bajt intervala treperenja.",
+          "cs": "Nejvýznamnější bajt intervalu blikání.",
+          "da": "Mest betydende byte i blinkintervallet.",
+          "nl": "Meest significante byte van het knipperinterval.",
+          "et": "Vilkumisintervalli kõige olulisem bait.",
+          "el": "Πιο σημαντικό byte του διαστήματος αναλαμπής.",
+          "ga": "Beart is suntasaí den eatramh splancála.",
+          "lv": "Mirgošanas intervāla visnozīmīgākais baits.",
+          "lt": "Vyriausiasis mirksėjimo intervalo baitas.",
+          "mt": "Byte l-aktar sinifikanti tal-intervall tat-teptip.",
+          "pl": "Najbardziej znaczący bajt interwału migania.",
+          "ro": "Octetul cel mai semnificativ al intervalului de clipire.",
+          "sl": "Najpomembnejši bajt intervala utripanja.",
+          "sv": "Den mest signifikanta byten i blinkintervallet."
         },
         "infourl": {
           "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-4"
@@ -466,7 +684,22 @@
           "ar": "البايت الأقل أهمية لفاصل الوميض.",
           "sk": "Najmenej významný bajt intervalu blikania.",
           "hu": "A villogási intervallum legkevésbé jelentős bájtja.",
-          "kr": "깜박임 간격의 최하위 바이트."
+          "kr": "깜박임 간격의 최하위 바이트.",
+          "bg": "Най-малко значимият байт на интервала на мигане.",
+          "hr": "Najmanje značajan bajt intervala treperenja.",
+          "cs": "Nejméně významný bajt intervalu blikání.",
+          "da": "Mindst betydende byte i blinkintervallet.",
+          "nl": "Minst significante byte van het knipperinterval.",
+          "et": "Vilkumisintervalli kõige vähem oluline bait.",
+          "el": "Λιγότερο σημαντικό byte του διαστήματος αναλαμπής.",
+          "ga": "Beart is lú suntas den eatramh splancála.",
+          "lv": "Mirgošanas intervāla vismazāk nozīmīgais baits.",
+          "lt": "Jauniausiasis mirksėjimo intervalo baitas.",
+          "mt": "Byte l-inqas sinifikanti tal-intervall tat-teptip.",
+          "pl": "Najmniej znaczący bajt interwału migania.",
+          "ro": "Octetul cel mai puțin semnificativ al intervalului de clipire.",
+          "sl": "Najmanj pomemben bajt intervala utripanja.",
+          "sv": "Den minst signifikanta byten i blinkintervallet."
         },
         "infourl": {
           "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-4"
@@ -502,7 +735,22 @@
           "ar": "البايت الأكثر أهمية لعداد المللي ثانية.",
           "sk": "Najvýznamnejší bajt čítača milisekúnd.",
           "hu": "A milliszekundum-számláló legjelentősebb bájtja.",
-          "kr": "밀리초 카운터의 최상위 바이트."
+          "kr": "밀리초 카운터의 최상위 바이트.",
+          "bg": "Най-значимият байт на брояча на милисекундите.",
+          "hr": "Najznačajniji bajt brojača milisekundi.",
+          "cs": "Nejvýznamnější bajt milisekundového čítače.",
+          "da": "Mest betydende byte i millisekundtælleren.",
+          "nl": "Meest significante byte van de milliseconden-teller.",
+          "et": "Millisekundiloenduri kõige olulisem bait.",
+          "el": "Πιο σημαντικό byte του μετρητή χιλιοστών του δευτερολέπτου.",
+          "ga": "Beart is suntasaí den chuntar milleasoicindí.",
+          "lv": "Milisekunžu skaitītāja visnozīmīgākais baits.",
+          "lt": "Vyriausiasis milisekundžių skaitiklio baitas.",
+          "mt": "Byte l-aktar sinifikanti tal-kontatur tal-millisekondi.",
+          "pl": "Najbardziej znaczący bajt licznika milisekund.",
+          "ro": "Octetul cel mai semnificativ al contorului de milisecunde.",
+          "sl": "Najpomembnejši bajt milisekundnega števca.",
+          "sv": "Den mest signifikanta byten i millisekundräknaren."
         },
         "infourl": {
           "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-6"
@@ -538,7 +786,22 @@
           "ar": "البايت الثاني الأكثر أهمية لعداد المللي ثانية.",
           "sk": "Druhý najvýznamnejší bajt čítača milisekúnd.",
           "hu": "A milliszekundum-számláló második legjelentősebb bájtja.",
-          "kr": "밀리초 카운터의 두 번째 최상위 바이트."
+          "kr": "밀리초 카운터의 두 번째 최상위 바이트.",
+          "bg": "Вторият по значимост байт на брояча на милисекундите.",
+          "hr": "Drugi najznačajniji bajt brojača milisekundi.",
+          "cs": "Druhý nejvýznamnější bajt milisekundového čítače.",
+          "da": "Næstmest betydende byte i millisekundtælleren.",
+          "nl": "Op één na meest significante byte van de milliseconden-teller.",
+          "et": "Millisekundiloenduri tähtsuselt teine bait.",
+          "el": "Δεύτερο πιο σημαντικό byte του μετρητή χιλιοστών του δευτερολέπτου.",
+          "ga": "An dara beart is suntasaí den chuntar milleasoicindí.",
+          "lv": "Milisekunžu skaitītāja otrais visnozīmīgākais baits.",
+          "lt": "Antrasis pagal reikšmingumą milisekundžių skaitiklio baitas.",
+          "mt": "It-tieni byte l-aktar sinifikanti tal-kontatur tal-millisekondi.",
+          "pl": "Drugi najbardziej znaczący bajt licznika milisekund.",
+          "ro": "Al doilea octet cel mai semnificativ al contorului de milisecunde.",
+          "sl": "Drugi najpomembnejši bajt milisekundnega števca.",
+          "sv": "Den näst mest signifikanta byten i millisekundräknaren."
         },
         "infourl": {
           "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-6"
@@ -574,7 +837,22 @@
           "ar": "البايت الثاني الأقل أهمية لعداد المللي ثانية.",
           "sk": "Druhý najmenej významný bajt čítača milisekúnd.",
           "hu": "A milliszekundum-számláló második legkevésbé jelentős bájtja.",
-          "kr": "밀리초 카운터의 두 번째 최하위 바이트."
+          "kr": "밀리초 카운터의 두 번째 최하위 바이트.",
+          "bg": "Вторият по малка значимост байт на брояча на милисекундите.",
+          "hr": "Drugi najmanje značajan bajt brojača milisekundi.",
+          "cs": "Druhý nejméně významný bajt milisekundového čítače.",
+          "da": "Næstmindst betydende byte i millisekundtælleren.",
+          "nl": "Op één na minst significante byte van de milliseconden-teller.",
+          "et": "Millisekundiloenduri tähtsuselt eelviimane bait.",
+          "el": "Δεύτερο λιγότερο σημαντικό byte του μετρητή χιλιοστών του δευτερολέπτου.",
+          "ga": "An dara beart is lú suntas den chuntar milleasoicindí.",
+          "lv": "Milisekunžu skaitītāja otrais vismazāk nozīmīgais baits.",
+          "lt": "Antrasis nuo galo milisekundžių skaitiklio baitas.",
+          "mt": "It-tieni byte l-inqas sinifikanti tal-kontatur tal-millisekondi.",
+          "pl": "Drugi najmniej znaczący bajt licznika milisekund.",
+          "ro": "Al doilea octet cel mai puțin semnificativ al contorului de milisecunde.",
+          "sl": "Drugi najmanj pomemben bajt milisekundnega števca.",
+          "sv": "Den näst minst signifikanta byten i millisekundräknaren."
         },
         "infourl": {
           "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-6"
@@ -610,7 +888,22 @@
           "ar": "Least significant byte of the millisecond counter.",
           "sk": "Least significant byte of the millisecond counter.",
           "hu": "Least significant byte of the millisecond counter.",
-          "kr": "Least significant byte of the millisecond counter."
+          "kr": "Least significant byte of the millisecond counter.",
+          "bg": "Най-малко значимият байт на брояча на милисекундите.",
+          "hr": "Najmanje značajan bajt brojača milisekundi.",
+          "cs": "Nejméně významný bajt milisekundového čítače.",
+          "da": "Mindst betydende byte i millisekundtælleren.",
+          "nl": "Minst significante byte van de milliseconden-teller.",
+          "et": "Millisekundiloenduri kõige vähem oluline bait.",
+          "el": "Λιγότερο σημαντικό byte του μετρητή χιλιοστών του δευτερολέπτου.",
+          "ga": "Beart is lú suntas den chuntar milleasoicindí.",
+          "lv": "Milisekunžu skaitītāja vismazāk nozīmīgais baits.",
+          "lt": "Jauniausiasis milisekundžių skaitiklio baitas.",
+          "mt": "Byte l-inqas sinifikanti tal-kontatur tal-millisekondi.",
+          "pl": "Najmniej znaczący bajt licznika milisekund.",
+          "ro": "Octetul cel mai puțin semnificativ al contorului de milisecunde.",
+          "sl": "Najmanj pomemben bajt milisekundnega števca.",
+          "sv": "Den minst signifikanta byten i millisekundräknaren."
         },
         "infourl": {
           "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-6"
@@ -640,7 +933,22 @@
           "ar": "البايت 0 للأحداث المرسلة عند الضغط على الزر.",
           "sk": "Bajt 0 pre udalosti odoslané pri stlačení tlačidla.",
           "hu": "0. bájt az eseményekhez, amikor a gombot megnyomják.",
-          "kr": "버튼을 누를 때 보내는 이벤트의 바이트 0."
+          "kr": "버튼을 누를 때 보내는 이벤트의 바이트 0.",
+          "bg": "Байт 0 за събитието CLASS1.CONTROL TURN-ON, изпращано при натискане на бутона. CLASS1.INFORMATION START и STOP запазват байт 0 и винаги изпращат нула.",
+          "hr": "Bajt 0 za događaj CLASS1.CONTROL TURN-ON koji se šalje pri pritisku tipke. CLASS1.INFORMATION START i STOP rezerviraju bajt 0 i uvijek šalju nulu.",
+          "cs": "Bajt 0 pro událost CLASS1.CONTROL TURN-ON odesílanou při stisknutí tlačítka. CLASS1.INFORMATION START a STOP vyhrazují bajt 0 a vždy odesílají nulu.",
+          "da": "Byte 0 for CLASS1.CONTROL TURN-ON-hændelsen, der sendes, når der trykkes på knappen. CLASS1.INFORMATION START og STOP reserverer byte 0 og sender altid nul.",
+          "nl": "Byte 0 voor de CLASS1.CONTROL TURN-ON-gebeurtenis die wordt verzonden wanneer de knop wordt ingedrukt. CLASS1.INFORMATION START en STOP reserveren byte 0 en verzenden altijd nul.",
+          "et": "Bait 0 nupu vajutamisel saadetava CLASS1.CONTROL TURN-ON-sündmuse jaoks. CLASS1.INFORMATION START ja STOP reserveerivad baidi 0 ning saadavad alati nulli.",
+          "el": "Byte 0 για το συμβάν CLASS1.CONTROL TURN-ON που αποστέλλεται όταν πατηθεί το κουμπί. Τα συμβάντα CLASS1.INFORMATION START και STOP δεσμεύουν το byte 0 και αποστέλλουν πάντα μηδενική τιμή.",
+          "ga": "Beart 0 don imeacht CLASS1.CONTROL TURN-ON a sheoltar nuair a bhrúitear an cnaipe. Cuireann imeachtaí CLASS1.INFORMATION START agus STOP beart 0 in áirithe agus seolann siad náid i gcónaí.",
+          "lv": "Baits 0 CLASS1.CONTROL TURN-ON notikumam, kas tiek nosūtīts, nospiežot pogu. CLASS1.INFORMATION START un STOP notikumi rezervē baitu 0 un vienmēr nosūta nulli.",
+          "lt": "0 baitas, skirtas CLASS1.CONTROL TURN-ON įvykiui, siunčiamam paspaudus mygtuką. CLASS1.INFORMATION START ir STOP įvykiai rezervuoja 0 baitą ir visada siunčia nulį.",
+          "mt": "Byte 0 għall-avveniment CLASS1.CONTROL TURN-ON mibgħut meta tingħafas il-buttuna. CLASS1.INFORMATION START u STOP jirriżervaw il-byte 0 u dejjem jibagħtu żero.",
+          "pl": "Bajt 0 zdarzenia CLASS1.CONTROL TURN-ON wysyłanego po naciśnięciu przycisku. CLASS1.INFORMATION START i STOP rezerwują bajt 0 i zawsze wysyłają zero.",
+          "ro": "Octetul 0 al evenimentului CLASS1.CONTROL TURN-ON trimis la apăsarea butonului. CLASS1.INFORMATION START și STOP rezervă octetul 0 și trimit întotdeauna zero.",
+          "sl": "Bajt 0 za dogodek CLASS1.CONTROL TURN-ON, poslan ob pritisku gumba. Dogodka CLASS1.INFORMATION START in STOP si rezervirata bajt 0 in vedno pošljeta ničlo.",
+          "sv": "Byte 0 för CLASS1.CONTROL TURN-ON-händelsen som skickas när knappen trycks ned. Händelserna CLASS1.INFORMATION START och STOP reserverar byte 0 och skickar alltid noll."
         },
         "infourl": {
           "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-10"
@@ -670,7 +978,22 @@
           "ar": "البايت 1، المنطقة، للأحداث المرسلة عند الضغط على الزر.",
           "sk": "Bajt 1, zóna, pre udalosti odoslané pri stlačení tlačidla.",
           "hu": "1. bájt, zóna, az eseményekhez, amikor a gombot megnyomják.",
-          "kr": "버튼을 누를 때 보내는 이벤트의 바이트 1, 영역."
+          "kr": "버튼을 누를 때 보내는 이벤트의 바이트 1, 영역.",
+          "bg": "Байт 1, зона, за събитията, изпращани при натискане на бутона.",
+          "hr": "Bajt 1, zona, za događaje koji se šalju pri pritisku tipke.",
+          "cs": "Bajt 1, zóna, pro události odesílané při stisknutí tlačítka.",
+          "da": "Byte 1, zone, for hændelser, der sendes, når der trykkes på knappen.",
+          "nl": "Byte 1, zone, voor gebeurtenissen die worden verzonden wanneer de knop wordt ingedrukt.",
+          "et": "Bait 1, tsoon, nupu vajutamisel saadetavate sündmuste jaoks.",
+          "el": "Byte 1, ζώνη, για συμβάντα που αποστέλλονται όταν πατηθεί το κουμπί.",
+          "ga": "Beart 1, crios, d'imeachtaí a sheoltar nuair a bhrúitear an cnaipe.",
+          "lv": "Baits 1 — zona — notikumiem, kas tiek nosūtīti, nospiežot pogu.",
+          "lt": "1 baitas – zona – įvykiams, siunčiamiems paspaudus mygtuką.",
+          "mt": "Byte 1, iż-żona, għall-avvenimenti mibgħuta meta tingħafas il-buttuna.",
+          "pl": "Bajt 1, strefa, dla zdarzeń wysyłanych po naciśnięciu przycisku.",
+          "ro": "Octetul 1, zona, pentru evenimentele trimise la apăsarea butonului.",
+          "sl": "Bajt 1, območje, za dogodke, poslane ob pritisku gumba.",
+          "sv": "Byte 1, zon, för händelser som skickas när knappen trycks ned."
         },
         "infourl": {
           "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-11"
@@ -700,7 +1023,22 @@
           "ar": "البايت 2، المنطقة الفرعية، للأحداث المرسلة عند الضغط على الزر.",
           "sk": "Bajt 2, subzóna, pre udalosti odoslané pri stlačení tlačidla.",
           "hu": "2. bájt, alzóna, az eseményekhez, amikor a gombot megnyomják.",
-          "kr": "버튼을 누를 때 보내는 이벤트의 바이트 2, 하위 영역."
+          "kr": "버튼을 누를 때 보내는 이벤트의 바이트 2, 하위 영역.",
+          "bg": "Байт 2, подзона, за събитията, изпращани при натискане на бутона.",
+          "hr": "Bajt 2, podzona, za događaje koji se šalju pri pritisku tipke.",
+          "cs": "Bajt 2, podzóna, pro události odesílané při stisknutí tlačítka.",
+          "da": "Byte 2, subzone, for hændelser, der sendes, når der trykkes på knappen.",
+          "nl": "Byte 2, subzone, voor gebeurtenissen die worden verzonden wanneer de knop wordt ingedrukt.",
+          "et": "Bait 2, alamtsoon, nupu vajutamisel saadetavate sündmuste jaoks.",
+          "el": "Byte 2, υποζώνη, για συμβάντα που αποστέλλονται όταν πατηθεί το κουμπί.",
+          "ga": "Beart 2, fo-chrios, d'imeachtaí a sheoltar nuair a bhrúitear an cnaipe.",
+          "lv": "Baits 2 — apakšzona — notikumiem, kas tiek nosūtīti, nospiežot pogu.",
+          "lt": "2 baitas – subzona – įvykiams, siunčiamiems paspaudus mygtuką.",
+          "mt": "Byte 2, is-subżona, għall-avvenimenti mibgħuta meta tingħafas il-buttuna.",
+          "pl": "Bajt 2, podstrefa, dla zdarzeń wysyłanych po naciśnięciu przycisku.",
+          "ro": "Octetul 2, subzona, pentru evenimentele trimise la apăsarea butonului.",
+          "sl": "Bajt 2, podobmočje, za dogodke, poslane ob pritisku gumba.",
+          "sv": "Byte 2, subzon, för händelser som skickas när knappen trycks ned."
         },
         "infourl": {
           "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-12"
@@ -736,7 +1074,22 @@
           "ar": "مصفوفة القرار. هذا يحدد موقع تخزين مصفوفة القرار.",
           "sk": "Rozhodovacia matica. Toto definuje umiestnenie úložiska pre rozhodovaciu maticu.",
           "hu": "Döntési mátrix. Ez meghatározza a döntési mátrix tárolási helyét.",
-          "kr": "결정 행렬입니다. 결정 행렬의 저장 위치를 정의합니다."
+          "kr": "결정 행렬입니다. 결정 행렬의 저장 위치를 정의합니다.",
+          "bg": "Матрица на решенията. Тук се задава мястото за съхранение на матрицата на решенията.",
+          "hr": "Matrica odlučivanja. Ovdje se definira mjesto pohrane matrice odlučivanja.",
+          "cs": "Rozhodovací matice. Zde se určuje umístění rozhodovací matice v úložišti.",
+          "da": "Beslutningsmatrix. Dette definerer lagerplaceringen for beslutningsmatrixen.",
+          "nl": "Beslismatrix. Dit definieert de opslaglocatie voor de beslismatrix.",
+          "et": "Otsustusmaatriks. See määratleb otsustusmaatriksi salvestuskoha.",
+          "el": "Πίνακας αποφάσεων. Ορίζει τη θέση αποθήκευσης του πίνακα αποφάσεων.",
+          "ga": "Maitrís cinnidh. Sainíonn sé seo suíomh stórála na maitríse cinnidh.",
+          "lv": "Lēmumu matrica. Tā nosaka lēmumu matricas glabāšanas vietu.",
+          "lt": "Sprendimų matrica. Joje nurodoma sprendimų matricos saugojimo vieta.",
+          "mt": "Matriċi tad-deċiżjonijiet. Din tiddefinixxi l-post tal-ħażna għall-matriċi tad-deċiżjonijiet.",
+          "pl": "Macierz decyzyjna. Określa lokalizację pamięci, w której przechowywana jest macierz decyzyjna.",
+          "ro": "Matrice de decizie. Aceasta definește locația de stocare a matricei de decizie.",
+          "sl": "Odločitvena matrika. Določa mesto shranjevanja odločitvene matrike.",
+          "sv": "Beslutsmatris. Anger lagringsplatsen för beslutsmatrisen."
         },
         "infourl": {
           "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-dmatrix"
@@ -772,7 +1125,22 @@
           "hu": "Intervallum milliszekundumban a villogáshoz. 0 azt jelenti, hogy nincs villogás.",
           "kr": "점멸의 밀리초 단위 간격입니다. 0은 점멸이 없음을 의미합니다.",
           "zh": "点亮的毫秒间隔。0表示不闪烁。",
-          "ja": "点滅のミリ秒単位の間隔。0は点滅なしを意味します。"
+          "ja": "点滅のミリ秒単位の間隔。0は点滅なしを意味します。",
+          "bg": "Интервалът в милисекунди за мигането. 0 означава, че няма мигане.",
+          "hr": "Interval treperenja u milisekundama. 0 znači da nema treperenja.",
+          "cs": "Interval blikání v milisekundách. 0 znamená, že blikání není aktivní.",
+          "da": "Interval i millisekunder for blink. 0 betyder ingen blink.",
+          "nl": "Interval in milliseconden voor het knipperen. 0 betekent niet knipperen.",
+          "et": "Vilkumise intervall millisekundites. 0 tähendab, et ei vilgu.",
+          "el": "Διάστημα αναλαμπής σε χιλιοστά του δευτερολέπτου. 0 σημαίνει ότι δεν υπάρχει αναλαμπή.",
+          "ga": "Eatramh splancála i milleasoicindí. Ciallaíonn 0 nach mbíonn splancadh ar siúl.",
+          "lv": "Mirgošanas intervāls milisekundēs. 0 nozīmē, ka nemirgo.",
+          "lt": "Mirksėjimo intervalas milisekundėmis. 0 reiškia, kad nemirksima.",
+          "mt": "Intervall f’millisekondi għat-teptip. 0 ifisser li ma jkunx hemm teptip.",
+          "pl": "Interwał migania w milisekundach. 0 oznacza brak migania.",
+          "ro": "Intervalul de clipire, în milisecunde. 0 înseamnă că nu există clipire.",
+          "sl": "Interval utripanja v milisekundah. 0 pomeni, da ni utripanja.",
+          "sv": "Blinkintervall i millisekunder. 0 innebär ingen blinkning."
         },
         "infourl": {
           "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-remotevar-interval"
@@ -804,7 +1172,22 @@
           "ar": "قيمة عداد المللي ثانية. اكتب صفرًا في أي من سجلات العداد لإعادة تعيين العداد.",
           "sk": "Hodnota čítača milisekúnd. Zapíšte nulu do ktoréhokoľvek z registrov čítača na resetovanie čítača.",
           "hu": "Milliszekundum számláló értéke. Írjon nullát bármelyik számláló regiszterbe a számláló visszaállításához.",
-          "kr": "밀리초 카운터 값. 카운터를 재설정하려면 카운터 레지스터 중 하나에 0을 쓰십시오."
+          "kr": "밀리초 카운터 값. 카운터를 재설정하려면 카운터 레지스터 중 하나에 0을 쓰십시오.",
+          "bg": "Стойност на брояча на милисекундите. Запишете нула в който и да е от регистрите на брояча, за да го нулирате.",
+          "hr": "Vrijednost brojača milisekundi. Upišite nulu u bilo koji registar brojača da biste ga ponovno postavili na nulu.",
+          "cs": "Hodnota milisekundového čítače. Zápisem nuly do kteréhokoli registru čítače jej vynulujete.",
+          "da": "Millisekundtællerens værdi. Skriv nul til et vilkårligt tællerregister for at nulstille tælleren.",
+          "nl": "Waarde van de milliseconden-teller. Schrijf nul naar een van de tellerregisters om de teller opnieuw in te stellen.",
+          "et": "Millisekundiloenduri väärtus. Loenduri lähtestamiseks kirjuta suvalisse loenduriregistrisse null.",
+          "el": "Τιμή του μετρητή χιλιοστών του δευτερολέπτου. Εγγράψτε μηδενική τιμή σε οποιονδήποτε από τους καταχωρητές του μετρητή για να τον επαναφέρετε.",
+          "ga": "Luach an chuntair milleasoicindí. Scríobh náid chuig aon cheann de chláir an chuntair chun é a athshocrú.",
+          "lv": "Milisekunžu skaitītāja vērtība. Ierakstiet nulli jebkurā skaitītāja reģistrā, lai atiestatītu skaitītāju.",
+          "lt": "Milisekundžių skaitiklio reikšmė. Įrašius nulį į bet kurį skaitiklio registrą, skaitiklis nustatomas iš naujo.",
+          "mt": "Valur tal-kontatur tal-millisekondi. Ikteb żero f’wieħed mir-reġistri tal-kontatur biex tirrisettja l-kontatur.",
+          "pl": "Wartość licznika milisekund. Zapisz zero w dowolnym rejestrze licznika, aby go wyzerować.",
+          "ro": "Valoarea contorului de milisecunde. Scrieți zero în oricare dintre registrele contorului pentru a-l reseta.",
+          "sl": "Vrednost milisekundnega števca. Zapis ničle v kateri koli register števca ponastavi števec.",
+          "sv": "Millisekundräknarens värde. Skriv noll till valfritt räknarregister för att återställa räknaren."
         },
         "infourl": {
           "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-remotevar-counter"
@@ -833,7 +1216,22 @@
             "ar": "تم الوصول إلى حد العداد",
             "sk": "Dosiahnutá hranica čítača",
             "hu": "Elérte a számláló határát",
-            "kr": "카운터 한도에 도달했습니다."
+            "kr": "카운터 한도에 도달했습니다.",
+            "bg": "Достигнато е ограничението на брояча",
+            "hr": "Dosegnuto je ograničenje brojača",
+            "cs": "Bylo dosaženo limitu čítače",
+            "da": "Tællergrænsen er nået",
+            "nl": "Tellerlimiet bereikt",
+            "et": "Loenduri piirväärtus on saavutatud",
+            "el": "Το όριο του μετρητή επιτεύχθηκε",
+            "ga": "Teorainn an chuntair bainte amach",
+            "lv": "Skaitītāja limits sasniegts",
+            "lt": "Pasiekta skaitiklio riba.",
+            "mt": "Intlaħaq il-limitu tal-kontatur",
+            "pl": "Osiągnięto limit licznika",
+            "ro": "Limita contorului a fost atinsă",
+            "sl": "Dosežena je bila omejitev števca.",
+            "sv": "Räknargränsen har nåtts."
           }
         ],
         "infourl": [
@@ -847,7 +1245,30 @@
         "name": "test event data 1",
         "description": [
           {
-            "en": "test"
+            "en": "test",
+            "bg": "test",
+            "hr": "test",
+            "cs": "test",
+            "da": "test",
+            "nl": "test",
+            "et": "test",
+            "fi": "testi",
+            "fr": "test",
+            "de": "Test",
+            "el": "δοκιμή",
+            "hu": "teszt",
+            "ga": "tástáil",
+            "it": "test",
+            "lv": "tests",
+            "lt": "testas",
+            "mt": "test",
+            "pl": "test",
+            "pt": "teste",
+            "ro": "test",
+            "sk": "test",
+            "sl": "test",
+            "es": "prueba",
+            "sv": "test"
           }
         ],
         "infourl": [
@@ -881,7 +1302,22 @@
           "ar": "يتم إرسال حدث نبض القلب كل X ثانية إذا كان الجهاز جهازًا من المستوى الأول.",
           "sk": "Udalosť srdcového tepu sa odosiela každých X sekúnd, ak je zariadenie úrovne I.",
           "hu": "Szívverés esemény küldése minden X másodpercben, ha az eszköz I. szintű eszköz.",
-          "kr": "장치가 레벨 I 장치인 경우 X초마다 하트비트 이벤트가 전송됩니다."
+          "kr": "장치가 레벨 I 장치인 경우 X초마다 하트비트 이벤트가 전송됩니다.",
+          "bg": "Събитие Heartbeat, изпращано на всеки X секунди, ако устройството е от ниво I.",
+          "hr": "Događaj Heartbeat šalje se svakih X sekundi ako je uređaj razine I.",
+          "cs": "Událost Heartbeat se odesílá každých X sekund, pokud je zařízení úrovně I.",
+          "da": "Heartbeat-hændelse, der sendes hvert X sekund, hvis enheden er en Level I-enhed.",
+          "nl": "Heartbeat-gebeurtenis die elke X seconden wordt verzonden als het apparaat een Level I-apparaat is.",
+          "et": "Heartbeat-sündmus saadetakse iga X sekundi järel, kui seade on Level I seade.",
+          "el": "Συμβάν Heartbeat που αποστέλλεται κάθε X δευτερόλεπτα, αν η συσκευή είναι συσκευή επιπέδου I.",
+          "ga": "Imeacht Heartbeat a sheoltar gach X soicind má ghléas leibhéal I atá san fheiste.",
+          "lv": "Heartbeat notikums, kas tiek nosūtīts ik pēc X sekundēm, ja ierīce ir I līmeņa ierīce.",
+          "lt": "Heartbeat įvykis siunčiamas kas X sekundžių, jei įrenginys yra I lygio įrenginys.",
+          "mt": "Avveniment Heartbeat mibgħut kull X sekondi jekk l-apparat ikun ta’ livell I.",
+          "pl": "Zdarzenie Heartbeat wysyłane co X sekund, jeśli urządzenie jest urządzeniem poziomu I.",
+          "ro": "Eveniment Heartbeat trimis la fiecare X secunde dacă dispozitivul este de nivel I.",
+          "sl": "Dogodek Heartbeat, poslan vsakih X sekund, če je naprava naprava ravni I.",
+          "sv": "Heartbeat-händelse som skickas var X:e sekund om enheten är en nivå I-enhet."
         },
         "infourl": {
           "en": "English event help 3"
@@ -906,7 +1342,22 @@
               "ar": "وصف بيانات الحدث باللغة العربية 3",
               "sk": "Popis údajov o udalosti v slovenčine 3",
               "hu": "Eseményadatok leírása magyarul 3",
-              "kr": "이벤트 데이터 설명 한국어 3"
+              "kr": "이벤트 데이터 설명 한국어 3",
+              "bg": "Описание на данните за събитие на английски 3",
+              "hr": "Opis podataka događaja na engleskom 3",
+              "cs": "Anglický popis dat události 3",
+              "da": "Engelsk beskrivelse af hændelsesdata 3.",
+              "nl": "Engelse beschrijving van gebeurtenisgegevens 3.",
+              "et": "Sündmuse andmete ingliskeelne kirjeldus 3.",
+              "el": "Περιγραφή δεδομένων συμβάντος στα αγγλικά 3",
+              "ga": "Cur síos ar shonraí imeachta Béarla 3",
+              "lv": "Notikuma datu apraksts angļu valodā 3",
+              "lt": "Įvykio duomenų aprašymas anglų kalba 3.",
+              "mt": "Deskrizzjoni bl-Ingliż tad-dejta tal-avveniment 3",
+              "pl": "Angielski opis danych zdarzenia 3",
+              "ro": "Descrierea în limba engleză a datelor evenimentului 3",
+              "sl": "Angleški opis podatkov dogodka 3.",
+              "sv": "Engelsk beskrivning av händelsedata 3."
             },
             "infourl": {
               "en": "English event data help 3"
@@ -937,7 +1388,22 @@
           "ar": "يتم إرسال حدث نبض العقدة من المستوى الثاني كل X ثانية إذا كان الجهاز جهازًا من المستوى الثاني.",
           "sk": "Level II Node Heartbeat Event odosielané každých X sekúnd, ak je zariadenie úrovne II.",
           "hu": "Level II Node Heartbeat Event küldése minden X másodpercben, ha az eszköz II. szintű.",
-          "kr": "Level II Node Heartbeat Event는 장치가 레벨 II 장치인 경우 X초마다 전송됩니다."
+          "kr": "Level II Node Heartbeat Event는 장치가 레벨 II 장치인 경우 X초마다 전송됩니다.",
+          "bg": "Събитие Heartbeat на възел от ниво II, изпращано на всеки X секунди, ако устройството е от ниво II.",
+          "hr": "Događaj Heartbeat čvora razine II šalje se svakih X sekundi ako je uređaj razine II.",
+          "cs": "Událost Heartbeat uzlu úrovně II se odesílá každých X sekund, pokud je zařízení úrovně II.",
+          "da": "Level II Node Heartbeat-hændelse, der sendes hvert X sekund, hvis enheden er en Level II-enhed.",
+          "nl": "Level II Node Heartbeat-gebeurtenis die elke X seconden wordt verzonden als het apparaat een Level II-apparaat is.",
+          "et": "Level II Node Heartbeat-sündmus saadetakse iga X sekundi järel, kui seade on Level II seade.",
+          "el": "Συμβάν Heartbeat κόμβου επιπέδου II που αποστέλλεται κάθε X δευτερόλεπτα, αν η συσκευή είναι συσκευή επιπέδου II.",
+          "ga": "Imeacht Heartbeat nóid leibhéal II a sheoltar gach X soicind má ghléas leibhéal II atá san fheiste.",
+          "lv": "II līmeņa mezgla Heartbeat notikums, kas tiek nosūtīts ik pēc X sekundēm, ja ierīce ir II līmeņa ierīce.",
+          "lt": "II lygio mazgo Heartbeat įvykis siunčiamas kas X sekundžių, jei įrenginys yra II lygio įrenginys.",
+          "mt": "Avveniment Node Heartbeat ta’ livell II mibgħut kull X sekondi jekk l-apparat ikun ta’ livell II.",
+          "pl": "Zdarzenie Node Heartbeat poziomu II wysyłane co X sekund, jeśli urządzenie jest urządzeniem poziomu II.",
+          "ro": "Eveniment Node Heartbeat de nivel II trimis la fiecare X secunde dacă dispozitivul este de nivel II.",
+          "sl": "Dogodek Heartbeat vozlišča ravni II, poslan vsakih X sekund, če je naprava naprava ravni II.",
+          "sv": "Heartbeat-händelse för nivå II-nod som skickas var X:e sekund om enheten är en nivå II-enhet."
         },
         "infourl": {
           "en": "English event help 3"
@@ -962,7 +1428,22 @@
               "ar": "اسم الجهاز الذي يرسل الحدث (0-63 بايت).",
               "sk": "Názov zariadenia odosielajúceho udalosť (0-63 bajtov).",
               "hu": "Az eseményt küldő eszköz neve (0-63 bájt).",
-              "kr": "이벤트를 보내는 장치의 이름(0-63바이트)."
+              "kr": "이벤트를 보내는 장치의 이름(0-63바이트).",
+              "bg": "Името на устройството, което изпраща събитието (0-63 байта).",
+              "hr": "Naziv uređaja koji šalje događaj (0-63 bajta).",
+              "cs": "Název zařízení odesílajícího událost (0-63 bajtů).",
+              "da": "Navnet på enheden, der sender hændelsen (0-63 byte).",
+              "nl": "De naam van het apparaat dat de gebeurtenis verzendt (0-63 bytes).",
+              "et": "Sündmuse saatva seadme nimi (0–63 baiti).",
+              "el": "Το όνομα της συσκευής που αποστέλλει το συμβάν (0-63 byte).",
+              "ga": "Ainm na feiste a sheolann an t-imeacht (0-63 beart).",
+              "lv": "Notikumu sūtošās ierīces nosaukums (0–63 baiti).",
+              "lt": "Įvykį siunčiančio įrenginio pavadinimas (0–63 baitai).",
+              "mt": "L-isem tal-apparat li jibgħat l-avveniment (0-63 byte).",
+              "pl": "Nazwa urządzenia wysyłającego zdarzenie (0–63 bajty).",
+              "ro": "Numele dispozitivului care trimite evenimentul (0–63 de octeți).",
+              "sl": "Ime naprave, ki pošilja dogodek (0–63 bajtov).",
+              "sv": "Namnet på enheten som skickar händelsen (0–63 byte)."
             },
             "infourl": {
               "en": "English event data help 3"
@@ -994,7 +1475,21 @@
           "ar": "يتم إرسال حدث Level II High end server/service capabilities كل X ثانية إذا كان الجهاز جهازًا من المستوى الثاني.",
           "sk": "Level II High end server/service capabilities Event odosielané každých X sekúnd, ak je zariadenie úrovne II.",
           "hu": "Level II High end server/service capabilities Event küldése minden X másodpercben, ha az eszköz II. szintű.",
-          "kr": "Level II High end server/service capabilities Event는 장치가 레벨 II 장치인 경우 X초마다 전송됩니다."
+          "kr": "Level II High end server/service capabilities Event는 장치가 레벨 II 장치인 경우 X초마다 전송됩니다.",
+          "bg": "Събитие за възможностите на сървър/услуга от висок клас, ниво II, изпращано на всеки X секунди, ако устройството е от ниво II.",
+          "hr": "Događaj o mogućnostima poslužitelja/usluge visoke klase razine II šalje se svakih X sekundi ako je uređaj razine II.",
+          "cs": "Událost o schopnostech serveru/služby vyšší třídy úrovně II se odesílá každých X sekund, pokud je zařízení úrovně II.",
+          "da": "Level II High end server/service capabilities-hændelse, der sendes hvert X sekund, hvis enheden er en Level II-enhed.",
+          "nl": "Level II High end server/service capabilities-gebeurtenis die elke X seconden wordt verzonden als het apparaat een Level II-apparaat is.",
+          "et": "Level II High end server/service capabilities-sündmus saadetakse iga X sekundi järel, kui seade on Level II seade.",
+          "el": "Συμβάν δυνατοτήτων διακομιστή/υπηρεσίας υψηλών προδιαγραφών επιπέδου II που αποστέλλεται κάθε X δευτερόλεπτα, αν η συσκευή είναι συσκευή επιπέδου II.",
+          "ga": "Imeacht cumais freastalaí/seirbhíse ardleibhéil leibhéal II a sheoltar gach X soicind má ghléas leibhéal II atá san fheiste.",
+          "lv": "II līmeņa augstas klases servera/pakalpojuma iespēju notikums, kas tiek nosūtīts ik pēc X sekundēm, ja ierīce ir II līmeņa ierīce.",
+          "mt": "Avveniment tal-kapaċitajiet ta’ server/servizz high-end ta’ livell II, mibgħut kull X sekondi jekk l-apparat ikun ta’ livell II.",
+          "pl": "Zdarzenie dotyczące możliwości serwera/usługi high-end poziomu II, wysyłane co X sekund, jeśli urządzenie jest urządzeniem poziomu II.",
+          "ro": "Eveniment privind capacitățile unui server/serviciu high-end de nivel II, trimis la fiecare X secunde dacă dispozitivul este de nivel II.",
+          "sl": "Dogodek zmogljivosti visokozmogljivega strežnika/storitve ravni II, poslan vsakih X sekund, če je naprava naprava ravni II.",
+          "sv": "Händelse för kapacitet hos nivå II-server/-tjänst i högre klass, som skickas var X:e sekund om enheten är en nivå II-enhet."
         },
         "infourl": {
           "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
@@ -1019,7 +1514,22 @@
               "ar": "رمز القدرة (8 بايت).",
               "sk": "Kód schopností (8 bajtov).",
               "hu": "Képesség kód (8 bájt).",
-              "kr": "기능 코드(8바이트)."
+              "kr": "기능 코드(8바이트).",
+              "bg": "Код на възможностите (8 байта).",
+              "hr": "Kod mogućnosti (8 bajtova).",
+              "cs": "Kód schopností (8 bajtů).",
+              "da": "Kapabilitetskode (8 byte).",
+              "nl": "Capaciteitscode (8 bytes).",
+              "et": "Võimekuse kood (8 baiti).",
+              "el": "Κωδικός δυνατότητας (8 byte).",
+              "ga": "Cód cumais (8 mbeart).",
+              "lv": "Iespējas kods (8 baiti).",
+              "lt": "Galimybės kodas (8 baitai).",
+              "mt": "Kodiċi tal-kapaċità (8 byte).",
+              "pl": "Kod możliwości (8 bajtów).",
+              "ro": "Codul capacității (8 octeți).",
+              "sl": "Koda zmogljivosti (8 bajtov).",
+              "sv": "Kapacitetskod (8 byte)."
             },
             "infourl": {
               "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
@@ -1044,7 +1554,22 @@
               "ar": "GUID الخادم (16 بايت).",
               "sk": "Server GUID (16 bajtov).",
               "hu": "Szerver GUID (16 bájt).",
-              "kr": "서버 GUID(16바이트)."
+              "kr": "서버 GUID(16바이트).",
+              "bg": "GUID на сървъра (16 байта).",
+              "hr": "GUID poslužitelja (16 bajtova).",
+              "cs": "GUID serveru (16 bajtů).",
+              "da": "Serverens GUID (16 byte).",
+              "nl": "GUID van de server (16 bytes).",
+              "et": "Serveri GUID (16 baiti).",
+              "el": "GUID διακομιστή (16 byte).",
+              "ga": "GUID an fhreastalaí (16 bheart).",
+              "lv": "Servera GUID (16 baiti).",
+              "lt": "Serverio GUID (16 baitų).",
+              "mt": "GUID tas-server (16-il byte).",
+              "pl": "GUID serwera (16 bajtów).",
+              "ro": "GUID-ul serverului (16 octeți).",
+              "sl": "GUID strežnika (16 bajtov).",
+              "sv": "Serverns GUID (16 byte)."
             },
             "infourl": {
               "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
@@ -1069,7 +1594,22 @@
               "ar": "عنوان IP للعقدة (16 بايت).",
               "sk": "IP adresa uzla (16 bajtov).",
               "hu": "Csomópont IP-cím (16 bájt).",
-              "kr": "노드 IP 주소(16바이트)."
+              "kr": "노드 IP 주소(16바이트).",
+              "bg": "IP адрес на възела (16 байта).",
+              "hr": "IP adresa čvora (16 bajtova).",
+              "cs": "IP adresa uzlu (16 bajtů).",
+              "da": "Nodens IP-adresse (16 byte).",
+              "nl": "IP-adres van de node (16 bytes).",
+              "et": "Sõlme IP-aadress (16 baiti).",
+              "el": "Διεύθυνση IP κόμβου (16 byte).",
+              "ga": "Seoladh IP an nóid (16 bheart).",
+              "lv": "Mezgla IP adrese (16 baiti).",
+              "lt": "Mazgo IP adresas (16 baitų).",
+              "mt": "Indirizz IP tan-nodu (16-il byte).",
+              "pl": "Adres IP węzła (16 bajtów).",
+              "ro": "Adresa IP a nodului (16 octeți).",
+              "sl": "Naslov IP vozlišča (16 bajtov).",
+              "sv": "Nodens IP-adress (16 byte)."
             },
             "infourl": {
               "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
@@ -1094,7 +1634,22 @@
               "ar": "اسم العقدة (64 بايت).",
               "sk": "Názov uzla (64 bajtov).",
               "hu": "Csomópont neve (64 bájt).",
-              "kr": "노드 이름(64바이트)."
+              "kr": "노드 이름(64바이트).",
+              "bg": "Име на възела (64 байта).",
+              "hr": "Naziv čvora (64 bajta).",
+              "cs": "Název uzlu (64 bajtů).",
+              "da": "Nodens navn (64 byte).",
+              "nl": "Naam van de node (64 bytes).",
+              "et": "Sõlme nimi (64 baiti).",
+              "el": "Όνομα κόμβου (64 byte).",
+              "ga": "Ainm an nóid (64 beart).",
+              "lv": "Mezgla nosaukums (64 baiti).",
+              "lt": "Mazgo pavadinimas (64 baitai).",
+              "mt": "Isem tan-nodu (64 byte).",
+              "pl": "Nazwa węzła (64 bajty).",
+              "ro": "Numele nodului (64 de octeți).",
+              "sl": "Ime vozlišča (64 bajtov).",
+              "sv": "Nodens namn (64 byte)."
             },
             "infourl": {
               "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
@@ -1119,7 +1674,22 @@
               "ar": "منافذ غير قياسية (n بايت).",
               "sk": "Neštandardné porty (n bajtov).",
               "hu": "Nem szabványos portok (n bájt).",
-              "kr": "비표준 포트(n바이트)."
+              "kr": "비표준 포트(n바이트).",
+              "bg": "Нестандартни портове (n байта).",
+              "hr": "Nestandardni portovi (n bajtova).",
+              "cs": "Nestandardní porty (n bajtů).",
+              "da": "Ikke-standardiserede porte (n byte).",
+              "nl": "Niet-standaardpoorten (n bytes).",
+              "et": "Mittestandardsed pordid (n baiti).",
+              "el": "Μη τυπικές θύρες (n byte).",
+              "ga": "Poirt neamhchaighdeánacha (n mbeart).",
+              "lv": "Nestandarta porti (n baiti).",
+              "lt": "Nestandartiniai prievadai (n baitų).",
+              "mt": "Portijiet mhux standard (n byte).",
+              "pl": "Porty niestandardowe (n bajtów).",
+              "ro": "Porturi nestandard (n octeți).",
+              "sl": "Nestandardna vrata (n bajtov).",
+              "sv": "Icke-standardiserade portar (n byte)."
             },
             "infourl": {
               "en": "https://grodansparadis.github.io/vscp-doc-spec/#/./class2.protocol?id=type20"
@@ -1150,7 +1720,22 @@
           "ar": "يتم إرسال حدث ON عند تشغيل LED.",
           "sk": "Udalosť ON odoslaná, keď je LED zapnutá.",
           "hu": "ON esemény elküldve, amikor a LED bekapcsol.",
-          "kr": "LED가 켜질 때 ON 이벤트가 전송됩니다."
+          "kr": "LED가 켜질 때 ON 이벤트가 전송됩니다.",
+          "bg": "Събитие ON, изпращано при включване на LED.",
+          "hr": "Događaj ON šalje se kada se LED uključi.",
+          "cs": "Událost ON odesílaná při rozsvícení LED.",
+          "da": "ON-hændelse, der sendes, når LED'en tændes.",
+          "nl": "ON-gebeurtenis die wordt verzonden wanneer de led wordt aangezet.",
+          "et": "ON-sündmus saadetakse LED-i sisselülitamisel.",
+          "el": "Συμβάν ON που αποστέλλεται όταν ανάψει το LED.",
+          "ga": "Imeacht ON a sheoltar nuair a chuirtear an LED ar siúl.",
+          "lv": "ON notikums, kas tiek nosūtīts, kad LED tiek ieslēgts.",
+          "lt": "ON įvykis siunčiamas įjungus LED.",
+          "mt": "Avveniment ON mibgħut meta jinxtegħel il-LED.",
+          "pl": "Zdarzenie ON wysyłane po włączeniu LED.",
+          "ro": "Eveniment ON trimis când LED-ul este aprins.",
+          "sl": "Dogodek ON, poslan, ko se LED prižge.",
+          "sv": "ON-händelse som skickas när LED-lampan tänds."
         },
         "infourl": {
           "en": "English event help 3"
@@ -1175,7 +1760,22 @@
               "ar": "وصف بيانات الحدث باللغة العربية 3",
               "sk": "Popis údajov o udalosti v slovenčine 3",
               "hu": "Eseményadatok leírása magyarul 3",
-              "kr": "이벤트 데이터 설명 한국어 3"
+              "kr": "이벤트 데이터 설명 한국어 3",
+              "bg": "Описание на данните за събитие на английски 3",
+              "hr": "Opis podataka događaja na engleskom 3",
+              "cs": "Anglický popis dat události 3",
+              "da": "Engelsk beskrivelse af hændelsesdata 3.",
+              "nl": "Engelse beschrijving van gebeurtenisgegevens 3.",
+              "et": "Sündmuse andmete ingliskeelne kirjeldus 3.",
+              "el": "Περιγραφή δεδομένων συμβάντος στα αγγλικά 3",
+              "ga": "Cur síos ar shonraí imeachta Béarla 3",
+              "lv": "Notikuma datu apraksts angļu valodā 3",
+              "lt": "Įvykio duomenų aprašymas anglų kalba 3.",
+              "mt": "Deskrizzjoni bl-Ingliż tad-dejta tal-avveniment 3",
+              "pl": "Angielski opis danych zdarzenia 3",
+              "ro": "Descrierea în limba engleză a datelor evenimentului 3",
+              "sl": "Angleški opis podatkov dogodka 3.",
+              "sv": "Engelsk beskrivning av händelsedata 3."
             },
             "infourl": {
               "en": "English event data help 3"
@@ -1206,7 +1806,22 @@
           "ar": "يتم إرسال حدث OFF عند إيقاف تشغيل LED.",
           "sk": "Udalosť OFF odoslaná, keď je LED vypnutá.",
           "hu": "OFF esemény elküldve, amikor a LED kikapcsol.",
-          "kr": "LED가 꺼질 때 OFF 이벤트가 전송됩니다."
+          "kr": "LED가 꺼질 때 OFF 이벤트가 전송됩니다.",
+          "bg": "Събитие OFF, изпращано при изключване на LED.",
+          "hr": "Događaj OFF šalje se kada se LED isključi.",
+          "cs": "Událost OFF odesílaná při zhasnutí LED.",
+          "da": "OFF-hændelse, der sendes, når LED'en slukkes.",
+          "nl": "OFF-gebeurtenis die wordt verzonden wanneer de led wordt uitgezet.",
+          "et": "OFF-sündmus saadetakse LED-i väljalülitamisel.",
+          "el": "Συμβάν OFF που αποστέλλεται όταν σβήσει το LED.",
+          "ga": "Imeacht OFF a sheoltar nuair a mhúchtar an LED.",
+          "lv": "OFF notikums, kas tiek nosūtīts, kad LED tiek izslēgts.",
+          "lt": "OFF įvykis siunčiamas išjungus LED.",
+          "mt": "Avveniment OFF mibgħut meta jintefa l-LED.",
+          "pl": "Zdarzenie OFF wysyłane po wyłączeniu LED.",
+          "ro": "Eveniment OFF trimis când LED-ul este stins.",
+          "sl": "Dogodek OFF, poslan, ko se LED ugasne.",
+          "sv": "OFF-händelse som skickas när LED-lampan släcks."
         },
         "infourl": {
           "en": "English event help 3"
@@ -1231,7 +1846,22 @@
               "ar": "وصف بيانات الحدث باللغة العربية 3",
               "sk": "Popis údajov o udalosti v slovenčine 3",
               "hu": "Eseményadatok leírása magyarul 3",
-              "kr": "이벤트 데이터 설명 한국어 3"
+              "kr": "이벤트 데이터 설명 한국어 3",
+              "bg": "Описание на данните за събитие на английски 3",
+              "hr": "Opis podataka događaja na engleskom 3",
+              "cs": "Anglický popis dat události 3",
+              "da": "Engelsk beskrivelse af hændelsesdata 3.",
+              "nl": "Engelse beschrijving van gebeurtenisgegevens 3.",
+              "et": "Sündmuse andmete ingliskeelne kirjeldus 3.",
+              "el": "Περιγραφή δεδομένων συμβάντος στα αγγλικά 3",
+              "ga": "Cur síos ar shonraí imeachta Béarla 3",
+              "lv": "Notikuma datu apraksts angļu valodā 3",
+              "lt": "Įvykio duomenų aprašymas anglų kalba 3.",
+              "mt": "Deskrizzjoni bl-Ingliż tad-dejta tal-avveniment 3",
+              "pl": "Angielski opis danych zdarzenia 3",
+              "ro": "Descrierea în limba engleză a datelor evenimentului 3",
+              "sl": "Angleški opis podatkov dogodka 3.",
+              "sv": "Engelsk beskrivning av händelsedata 3."
             },
             "infourl": {
               "en": "English event data help 3"
@@ -1262,7 +1892,22 @@
           "ar": "يتم إرسال حدث Turn ON عند الضغط على الزر.",
           "sk": "Udalosť Turn ON odoslaná, keď sa tlačidlo stlačí.",
           "hu": "Turn ON esemény elküldve, amikor a gombot megnyomják.",
-          "kr": "버튼을 누를 때 Turn ON 이벤트가 전송됩니다."
+          "kr": "버튼을 누를 때 Turn ON 이벤트가 전송됩니다.",
+          "bg": "Събитие TURN ON, изпращано при натискане на бутона.",
+          "hr": "Događaj TURN ON šalje se pri pritisku tipke.",
+          "cs": "Událost TURN ON odesílaná při stisknutí tlačítka.",
+          "da": "Turn ON-hændelse, der sendes, når der trykkes på knappen.",
+          "nl": "Turn ON-gebeurtenis die wordt verzonden wanneer de knop wordt ingedrukt.",
+          "et": "Turn ON-sündmus saadetakse nupu vajutamisel.",
+          "el": "Συμβάν Turn ON που αποστέλλεται όταν πατηθεί το κουμπί.",
+          "ga": "Imeacht Turn ON a sheoltar nuair a bhrúitear an cnaipe.",
+          "lv": "Turn ON notikums, kas tiek nosūtīts, nospiežot pogu.",
+          "lt": "Turn ON įvykis siunčiamas paspaudus mygtuką.",
+          "mt": "Avveniment Turn ON mibgħut meta tingħafas il-buttuna.",
+          "pl": "Zdarzenie Turn ON wysyłane po naciśnięciu przycisku.",
+          "ro": "Eveniment Turn ON trimis la apăsarea butonului.",
+          "sl": "Dogodek Turn ON, poslan ob pritisku gumba.",
+          "sv": "Turn ON-händelse som skickas när knappen trycks ned."
         },
         "infourl": {
           "en": "English event help 3"
@@ -1287,7 +1932,22 @@
               "ar": "وصف بيانات الحدث باللغة العربية 3",
               "sk": "Popis údajov o udalosti v slovenčine 3",
               "hu": "Eseményadatok leírása magyarul 3",
-              "kr": "이벤트 데이터 설명 한국어 3"
+              "kr": "이벤트 데이터 설명 한국어 3",
+              "bg": "Описание на данните за събитие на английски 3",
+              "hr": "Opis podataka događaja na engleskom 3",
+              "cs": "Anglický popis dat události 3",
+              "da": "Engelsk beskrivelse af hændelsesdata 3.",
+              "nl": "Engelse beschrijving van gebeurtenisgegevens 3.",
+              "et": "Sündmuse andmete ingliskeelne kirjeldus 3.",
+              "el": "Περιγραφή δεδομένων συμβάντος στα αγγλικά 3",
+              "ga": "Cur síos ar shonraí imeachta Béarla 3",
+              "lv": "Notikuma datu apraksts angļu valodā 3",
+              "lt": "Įvykio duomenų aprašymas anglų kalba 3.",
+              "mt": "Deskrizzjoni bl-Ingliż tad-dejta tal-avveniment 3",
+              "pl": "Angielski opis danych zdarzenia 3",
+              "ro": "Descrierea în limba engleză a datelor evenimentului 3",
+              "sl": "Angleški opis podatkov dogodka 3.",
+              "sv": "Engelsk beskrivning av händelsedata 3."
             },
             "infourl": {
               "en": "English event data help 3"
@@ -1318,7 +1978,22 @@
           "ar": "يتم إرسال حدث Turn OFF عند تحرير الزر (إذا كان مفعلاً).",
           "sk": "Udalosť Turn OFF odoslaná, keď sa tlačidlo uvoľní (ak je povolené).",
           "hu": "Turn OFF esemény elküldve, amikor a gombot elengedik (ha engedélyezve).",
-          "kr": "버튼을 놓을 때 Turn OFF 이벤트가 전송됩니다 (활성화된 경우)."
+          "kr": "버튼을 놓을 때 Turn OFF 이벤트가 전송됩니다 (활성화된 경우).",
+          "bg": "Събитие TURN OFF, изпращано при отпускане на бутона (ако е разрешено).",
+          "hr": "Događaj TURN OFF šalje se pri otpuštanju tipke (ako je omogućen).",
+          "cs": "Událost TURN OFF odesílaná při uvolnění tlačítka (je-li povolena).",
+          "da": "Turn OFF-hændelse, der sendes, når knappen slippes (hvis aktiveret).",
+          "nl": "Turn OFF-gebeurtenis die wordt verzonden wanneer de knop wordt losgelaten (indien ingeschakeld).",
+          "et": "Turn OFF-sündmus saadetakse nupu vabastamisel (kui see on lubatud).",
+          "el": "Συμβάν Turn OFF που αποστέλλεται όταν αφεθεί το κουμπί (αν είναι ενεργοποιημένο).",
+          "ga": "Imeacht Turn OFF a sheoltar nuair a scaoiltear an cnaipe (má tá sé cumasaithe).",
+          "lv": "Turn OFF notikums, kas tiek nosūtīts, atlaižot pogu (ja iespējots).",
+          "lt": "Turn OFF įvykis siunčiamas atleidus mygtuką (jei įjungta).",
+          "mt": "Avveniment Turn OFF mibgħut meta tinħeles il-buttuna (jekk ikun attivat).",
+          "pl": "Zdarzenie Turn OFF wysyłane po zwolnieniu przycisku (jeśli włączone).",
+          "ro": "Eveniment Turn OFF trimis la eliberarea butonului (dacă este activat).",
+          "sl": "Dogodek Turn OFF, poslan ob sprostitvi gumba (če je omogočen).",
+          "sv": "Turn OFF-händelse som skickas när knappen släpps upp (om den är aktiverad)."
         },
         "infourl": {
           "en": "English event help 3"
@@ -1343,7 +2018,22 @@
               "ar": "وصف بيانات الحدث باللغة العربية 3",
               "sk": "Popis údajov o udalosti v slovenčine 3",
               "hu": "Eseményadatok leírása magyarul 3",
-              "kr": "이벤트 데이터 설명 한국어 3"
+              "kr": "이벤트 데이터 설명 한국어 3",
+              "bg": "Описание на данните за събитие на английски 3",
+              "hr": "Opis podataka događaja na engleskom 3",
+              "cs": "Anglický popis dat události 3",
+              "da": "Engelsk beskrivelse af hændelsesdata 3.",
+              "nl": "Engelse beschrijving van gebeurtenisgegevens 3.",
+              "et": "Sündmuse andmete ingliskeelne kirjeldus 3.",
+              "el": "Περιγραφή δεδομένων συμβάντος στα αγγλικά 3",
+              "ga": "Cur síos ar shonraí imeachta Béarla 3",
+              "lv": "Notikuma datu apraksts angļu valodā 3",
+              "lt": "Įvykio duomenų aprašymas anglų kalba 3.",
+              "mt": "Deskrizzjoni bl-Ingliż tad-dejta tal-avveniment 3",
+              "pl": "Angielski opis danych zdarzenia 3",
+              "ro": "Descrierea în limba engleză a datelor evenimentului 3",
+              "sl": "Angleški opis podatkov dogodka 3.",
+              "sv": "Engelsk beskrivning av händelsedata 3."
             },
             "infourl": {
               "en": "English event data help 3"
@@ -1374,7 +2064,22 @@
           "ar": "يتم إرسال حدث START عند الضغط على الزر.",
           "sk": "Udalosť START odoslaná, keď sa tlačidlo stlačí.",
           "hu": "START esemény elküldve, amikor a gombot megnyomják.",
-          "kr": "버튼을 누를 때 START 이벤트가 전송됩니다."
+          "kr": "버튼을 누를 때 START 이벤트가 전송됩니다.",
+          "bg": "Събитие START, изпращано при натискане на бутона.",
+          "hr": "Događaj START šalje se pri pritisku tipke.",
+          "cs": "Událost START odesílaná při stisknutí tlačítka.",
+          "da": "START-hændelse, der sendes, når der trykkes på knappen.",
+          "nl": "START-gebeurtenis die wordt verzonden wanneer de knop wordt ingedrukt.",
+          "et": "START-sündmus saadetakse nupu vajutamisel.",
+          "el": "Συμβάν START που αποστέλλεται όταν πατηθεί το κουμπί.",
+          "ga": "Imeacht START a sheoltar nuair a bhrúitear an cnaipe.",
+          "lv": "START notikums, kas tiek nosūtīts, nospiežot pogu.",
+          "lt": "START įvykis siunčiamas paspaudus mygtuką.",
+          "mt": "Avveniment START mibgħut meta tingħafas il-buttuna.",
+          "pl": "Zdarzenie START wysyłane po naciśnięciu przycisku.",
+          "ro": "Eveniment START trimis la apăsarea butonului.",
+          "sl": "Dogodek START, poslan ob pritisku gumba.",
+          "sv": "START-händelse som skickas när knappen trycks ned."
         },
         "infourl": {
           "en": "English event help 3"
@@ -1383,19 +2088,88 @@
           {
             "name": "Reserved",
             "description": {
-              "en": "Reserved for future use. Set to 0."
+              "en": "Reserved for future use. Set to 0.",
+              "bg": "Запазено за бъдеща употреба. Задайте стойност 0.",
+              "hr": "Rezervirano za buduću upotrebu. Postavite na 0.",
+              "cs": "Vyhrazeno pro budoucí použití. Nastavte na 0.",
+              "da": "Reserveret til fremtidig brug. Sæt til 0.",
+              "nl": "Gereserveerd voor toekomstig gebruik. Stel in op 0.",
+              "et": "Reserveeritud tulevaseks kasutuseks. Määra väärtuseks 0.",
+              "fi": "Varattu tulevaa käyttöä varten. Aseta arvoksi 0.",
+              "fr": "Réservé à un usage futur. Définir sur 0.",
+              "de": "Für zukünftige Verwendung reserviert. Auf 0 setzen.",
+              "el": "Δεσμευμένο για μελλοντική χρήση. Ορίστε το σε 0.",
+              "hu": "Jövőbeli használatra fenntartva. Állítsa 0-ra.",
+              "ga": "Curtha in áirithe d'úsáid amach anseo. Socraigh go 0 é.",
+              "it": "Riservato per uso futuro. Impostare su 0.",
+              "lv": "Rezervēts turpmākai lietošanai. Iestatiet uz 0.",
+              "lt": "Rezervuota būsimam naudojimui. Nustatykite 0.",
+              "mt": "Riservat għal użu fil-futur. Issettja għal 0.",
+              "pl": "Zarezerwowane do wykorzystania w przyszłości. Ustaw na 0.",
+              "pt": "Reservado para utilização futura. Definir como 0.",
+              "ro": "Rezervat pentru utilizare ulterioară. Setați la 0.",
+              "sk": "Vyhradené na budúce použitie. Nastavte na 0.",
+              "sl": "Rezervirano za prihodnjo uporabo. Nastavite na 0.",
+              "es": "Reservado para uso futuro. Establecer en 0.",
+              "sv": "Reserverat för framtida bruk. Sätt till 0."
             }
           },
           {
             "name": "Zone",
             "description": {
-              "en": "Zone associated with the button event."
+              "en": "Zone associated with the button event.",
+              "bg": "Зона, свързана със събитието на бутона.",
+              "hr": "Zona povezana s događajem tipke.",
+              "cs": "Zóna přiřazená k události tlačítka.",
+              "da": "Zone, der er knyttet til knaphændelsen.",
+              "nl": "Zone die is gekoppeld aan de knopgebeurtenis.",
+              "et": "Nupusündmusega seotud tsoon.",
+              "fi": "Painiketapahtumaan liittyvä vyöhyke.",
+              "fr": "Zone associée à l’événement du bouton.",
+              "de": "Zone, die dem Tasterereignis zugeordnet ist.",
+              "el": "Ζώνη που σχετίζεται με το συμβάν του κουμπιού.",
+              "hu": "A gombeseményhez társított zóna.",
+              "ga": "Crios a bhaineann le himeacht an chnaipe.",
+              "it": "Zona associata all’evento del pulsante.",
+              "lv": "Zona, kas saistīta ar pogas notikumu.",
+              "lt": "Su mygtuko įvykiu susieta zona.",
+              "mt": "Żona assoċjata mal-avveniment tal-buttuna.",
+              "pl": "Strefa powiązana ze zdarzeniem przycisku.",
+              "pt": "Zona associada ao evento do botão.",
+              "ro": "Zona asociată evenimentului butonului.",
+              "sk": "Zóna priradená k udalosti tlačidla.",
+              "sl": "Območje, povezano z dogodkom gumba.",
+              "es": "Zona asociada al evento del botón.",
+              "sv": "Zon som är kopplad till knapphändelsen."
             }
           },
           {
             "name": "Subzone",
             "description": {
-              "en": "Subzone associated with the button event."
+              "en": "Subzone associated with the button event.",
+              "bg": "Подзона, свързана със събитието на бутона.",
+              "hr": "Podzona povezana s događajem tipke.",
+              "cs": "Podzóna přiřazená k události tlačítka.",
+              "da": "Subzone, der er knyttet til knaphændelsen.",
+              "nl": "Subzone die is gekoppeld aan de knopgebeurtenis.",
+              "et": "Nupusündmusega seotud alamtsoon.",
+              "fi": "Painiketapahtumaan liittyvä alivyöhyke.",
+              "fr": "Sous-zone associée à l’événement du bouton.",
+              "de": "Unterzone, die dem Tasterereignis zugeordnet ist.",
+              "el": "Υποζώνη που σχετίζεται με το συμβάν του κουμπιού.",
+              "hu": "A gombeseményhez társított alzóna.",
+              "ga": "Fo-chrios a bhaineann le himeacht an chnaipe.",
+              "it": "Sottozona associata all’evento del pulsante.",
+              "lv": "Apakšzona, kas saistīta ar pogas notikumu.",
+              "lt": "Su mygtuko įvykiu susieta subzona.",
+              "mt": "Subżona assoċjata mal-avveniment tal-buttuna.",
+              "pl": "Podstrefa powiązana ze zdarzeniem przycisku.",
+              "pt": "Subzona associada ao evento do botão.",
+              "ro": "Subzona asociată evenimentului butonului.",
+              "sk": "Podzóna priradená k udalosti tlačidla.",
+              "sl": "Podobmočje, povezano z dogodkom gumba.",
+              "es": "Subzona asociada al evento del botón.",
+              "sv": "Subzon som är kopplad till knapphändelsen."
             }
           }
         ]
@@ -1423,7 +2197,22 @@
           "ar": "يتم إرسال حدث STOP عند تحرير الزر (إذا كان مفعلاً).",
           "sk": "Udalosť STOP odoslaná, keď sa tlačidlo uvoľní (ak je povolené).",
           "hu": "STOP esemény elküldve, amikor a gombot elengedik (ha engedélyezve).",
-          "kr": "버튼을 놓을 때 STOP 이벤트가 전송됩니다 (활성화된 경우)."
+          "kr": "버튼을 놓을 때 STOP 이벤트가 전송됩니다 (활성화된 경우).",
+          "bg": "Събитие STOP, изпращано при отпускане на бутона (ако е разрешено).",
+          "hr": "Događaj STOP šalje se pri otpuštanju tipke (ako je omogućen).",
+          "cs": "Událost STOP odesílaná při uvolnění tlačítka (je-li povolena).",
+          "da": "STOP-hændelse, der sendes, når knappen slippes (hvis aktiveret).",
+          "nl": "STOP-gebeurtenis die wordt verzonden wanneer de knop wordt losgelaten (indien ingeschakeld).",
+          "et": "STOP-sündmus saadetakse nupu vabastamisel (kui see on lubatud).",
+          "el": "Συμβάν STOP που αποστέλλεται όταν αφεθεί το κουμπί (αν είναι ενεργοποιημένο).",
+          "ga": "Imeacht STOP a sheoltar nuair a scaoiltear an cnaipe (má tá sé cumasaithe).",
+          "lv": "STOP notikums, kas tiek nosūtīts, atlaižot pogu (ja iespējots).",
+          "lt": "STOP įvykis siunčiamas atleidus mygtuką (jei įjungta).",
+          "mt": "Avveniment STOP mibgħut meta tinħeles il-buttuna (jekk ikun attivat).",
+          "pl": "Zdarzenie STOP wysyłane po zwolnieniu przycisku (jeśli włączone).",
+          "ro": "Eveniment STOP trimis la eliberarea butonului (dacă este activat).",
+          "sl": "Dogodek STOP, poslan ob sprostitvi gumba (če je omogočen).",
+          "sv": "STOP-händelse som skickas när knappen släpps upp (om den är aktiverad)."
         },
         "infourl": {
           "en": "English event help 3"
@@ -1432,19 +2221,88 @@
           {
             "name": "Reserved",
             "description": {
-              "en": "Reserved for future use. Set to 0."
+              "en": "Reserved for future use. Set to 0.",
+              "bg": "Запазено за бъдеща употреба. Задайте стойност 0.",
+              "hr": "Rezervirano za buduću upotrebu. Postavite na 0.",
+              "cs": "Vyhrazeno pro budoucí použití. Nastavte na 0.",
+              "da": "Reserveret til fremtidig brug. Sæt til 0.",
+              "nl": "Gereserveerd voor toekomstig gebruik. Stel in op 0.",
+              "et": "Reserveeritud tulevaseks kasutuseks. Määra väärtuseks 0.",
+              "fi": "Varattu tulevaa käyttöä varten. Aseta arvoksi 0.",
+              "fr": "Réservé à un usage futur. Définir sur 0.",
+              "de": "Für zukünftige Verwendung reserviert. Auf 0 setzen.",
+              "el": "Δεσμευμένο για μελλοντική χρήση. Ορίστε το σε 0.",
+              "hu": "Jövőbeli használatra fenntartva. Állítsa 0-ra.",
+              "ga": "Curtha in áirithe d'úsáid amach anseo. Socraigh go 0 é.",
+              "it": "Riservato per uso futuro. Impostare su 0.",
+              "lv": "Rezervēts turpmākai lietošanai. Iestatiet uz 0.",
+              "lt": "Rezervuota būsimam naudojimui. Nustatykite 0.",
+              "mt": "Riservat għal użu fil-futur. Issettja għal 0.",
+              "pl": "Zarezerwowane do wykorzystania w przyszłości. Ustaw na 0.",
+              "pt": "Reservado para utilização futura. Definir como 0.",
+              "ro": "Rezervat pentru utilizare ulterioară. Setați la 0.",
+              "sk": "Vyhradené na budúce použitie. Nastavte na 0.",
+              "sl": "Rezervirano za prihodnjo uporabo. Nastavite na 0.",
+              "es": "Reservado para uso futuro. Establecer en 0.",
+              "sv": "Reserverat för framtida bruk. Sätt till 0."
             }
           },
           {
             "name": "Zone",
             "description": {
-              "en": "Zone associated with the button event."
+              "en": "Zone associated with the button event.",
+              "bg": "Зона, свързана със събитието на бутона.",
+              "hr": "Zona povezana s događajem tipke.",
+              "cs": "Zóna přiřazená k události tlačítka.",
+              "da": "Zone, der er knyttet til knaphændelsen.",
+              "nl": "Zone die is gekoppeld aan de knopgebeurtenis.",
+              "et": "Nupusündmusega seotud tsoon.",
+              "fi": "Painiketapahtumaan liittyvä vyöhyke.",
+              "fr": "Zone associée à l’événement du bouton.",
+              "de": "Zone, die dem Tasterereignis zugeordnet ist.",
+              "el": "Ζώνη που σχετίζεται με το συμβάν του κουμπιού.",
+              "hu": "A gombeseményhez társított zóna.",
+              "ga": "Crios a bhaineann le himeacht an chnaipe.",
+              "it": "Zona associata all’evento del pulsante.",
+              "lv": "Zona, kas saistīta ar pogas notikumu.",
+              "lt": "Su mygtuko įvykiu susieta zona.",
+              "mt": "Żona assoċjata mal-avveniment tal-buttuna.",
+              "pl": "Strefa powiązana ze zdarzeniem przycisku.",
+              "pt": "Zona associada ao evento do botão.",
+              "ro": "Zona asociată evenimentului butonului.",
+              "sk": "Zóna priradená k udalosti tlačidla.",
+              "sl": "Območje, povezano z dogodkom gumba.",
+              "es": "Zona asociada al evento del botón.",
+              "sv": "Zon som är kopplad till knapphändelsen."
             }
           },
           {
             "name": "Subzone",
             "description": {
-              "en": "Subzone associated with the button event."
+              "en": "Subzone associated with the button event.",
+              "bg": "Подзона, свързана със събитието на бутона.",
+              "hr": "Podzona povezana s događajem tipke.",
+              "cs": "Podzóna přiřazená k události tlačítka.",
+              "da": "Subzone, der er knyttet til knaphændelsen.",
+              "nl": "Subzone die is gekoppeld aan de knopgebeurtenis.",
+              "et": "Nupusündmusega seotud alamtsoon.",
+              "fi": "Painiketapahtumaan liittyvä alivyöhyke.",
+              "fr": "Sous-zone associée à l’événement du bouton.",
+              "de": "Unterzone, die dem Tasterereignis zugeordnet ist.",
+              "el": "Υποζώνη που σχετίζεται με το συμβάν του κουμπιού.",
+              "hu": "A gombeseményhez társított alzóna.",
+              "ga": "Fo-chrios a bhaineann le himeacht an chnaipe.",
+              "it": "Sottozona associata all’evento del pulsante.",
+              "lv": "Apakšzona, kas saistīta ar pogas notikumu.",
+              "lt": "Su mygtuko įvykiu susieta subzona.",
+              "mt": "Subżona assoċjata mal-avveniment tal-buttuna.",
+              "pl": "Podstrefa powiązana ze zdarzeniem przycisku.",
+              "pt": "Subzona associada ao evento do botão.",
+              "ro": "Subzona asociată evenimentului butonului.",
+              "sk": "Podzóna priradená k udalosti tlačidla.",
+              "sl": "Podobmočje, povezano z dogodkom gumba.",
+              "es": "Subzona asociada al evento del botón.",
+              "sv": "Subzon som är kopplad till knapphändelsen."
             }
           }
         ]
@@ -1477,7 +2335,22 @@
             "ar": "لا عملية، لا يفعل شيئاً",
             "sk": "Žiadna operácia, nerobí nič",
             "hu": "Nincs művelet, nem csinál semmit",
-            "kr": "작업 없음, 아무것도 하지 않습니다"
+            "kr": "작업 없음, 아무것도 하지 않습니다",
+            "bg": "Няма операция; не прави нищо.",
+            "hr": "Nema operacije; ne radi ništa.",
+            "cs": "Žádná operace, nic nedělá.",
+            "da": "Ingen handling; gør ingenting.",
+            "nl": "Geen bewerking; doet niets.",
+            "et": "Toiming puudub; ei tee midagi.",
+            "el": "Καμία λειτουργία, δεν κάνει τίποτα.",
+            "ga": "Gan oibríocht; ní dhéanann sé tada.",
+            "lv": "Nav darbības; neko nedara.",
+            "lt": "Jokios operacijos neatlieka.",
+            "mt": "Ebda Operazzjoni; ma jagħmel xejn.",
+            "pl": "Brak operacji; nie wykonuje żadnej czynności.",
+            "ro": "Nicio operație; nu face nimic.",
+            "sl": "Brez operacije; ne naredi ničesar.",
+            "sv": "Ingen åtgärd; gör ingenting."
           },
           "infourl": {
             "en": "http://www.vscp.org/docs/dm_action_noop.html"
@@ -1503,7 +2376,22 @@
             "ar": "تشغيل/إيقاف تشغيل LED. يشير الوسيط إلى الحالة.",
             "sk": "Zapnúť/vypnúť LED. Argument udáva stav.",
             "hu": "LED bekapcsolása/kikapcsolása. Az argumentum megadja az állapotot.",
-            "kr": "LED 켜기/끄기. 인수가 상태를 나타냅니다."
+            "kr": "LED 켜기/끄기. 인수가 상태를 나타냅니다.",
+            "bg": "Включване/изключване на LED. Аргументът указва състоянието.",
+            "hr": "Uključivanje/isključivanje LED-a. Argument određuje stanje.",
+            "cs": "Zapnutí/vypnutí LED. Argument určuje stav.",
+            "da": "Tænd/sluk LED'en. Argumentet angiver tilstanden.",
+            "nl": "Led aan- of uitzetten. Het argument geeft de status aan.",
+            "et": "Lülita LED sisse või välja. Argument määrab oleku.",
+            "el": "Ενεργοποίηση/απενεργοποίηση LED. Το όρισμα υποδεικνύει την κατάσταση.",
+            "ga": "Cas an LED air/as. Léiríonn an argóint an staid.",
+            "lv": "Ieslēgt/izslēgt LED. Arguments norāda stāvokli.",
+            "lt": "Įjungia arba išjungia LED. Argumentas nurodo būseną.",
+            "mt": "Ixgħel jew itfi l-LED. L-argument jindika l-istat.",
+            "pl": "Włącz lub wyłącz LED. Argument określa stan.",
+            "ro": "Aprindeți sau stingeți LED-ul. Argumentul indică starea.",
+            "sl": "Prižge ali ugasne LED. Argument določa stanje.",
+            "sv": "Tänd eller släck LED-lampan. Argumentet anger tillståndet."
           },
           "infourl": {
             "en": "http://www.vscp.org/docs/dm_action_turn_on_off_led.html"
@@ -1528,7 +2416,22 @@
                 "ar": "يشير الوسيط إلى الحالة. 0 = إيقاف، 1 = تشغيل، 2 = تبديل",
                 "sk": "Argument udáva stav. 0 = vypnuté, 1 = zapnuté, 2 = prepnúť",
                 "hu": "Az argumentum megadja az állapotot. 0 = ki, 1 = be, 2 = váltás",
-                "kr": "인수가 상태를 나타냅니다. 0 = 끄기, 1 = 켜기, 2 = 전환"
+                "kr": "인수가 상태를 나타냅니다. 0 = 끄기, 1 = 켜기, 2 = 전환",
+                "bg": "Аргументът указва състоянието. 0 = изключен, 1 = включен, 2 = превключване",
+                "hr": "Argument određuje stanje. 0 = isključeno, 1 = uključeno, 2 = prebacivanje",
+                "cs": "Argument určuje stav. 0 = vypnuto, 1 = zapnuto, 2 = přepnout",
+                "da": "Argumentet angiver tilstanden. 0 = slukket, 1 = tændt, 2 = skift.",
+                "nl": "Het argument geeft de status aan. 0 = uit, 1 = aan, 2 = omschakelen.",
+                "et": "Argument määrab oleku. 0 = väljas, 1 = sees, 2 = lülita ümber.",
+                "el": "Το όρισμα υποδεικνύει την κατάσταση. 0 = σβηστό, 1 = αναμμένο, 2 = εναλλαγή.",
+                "ga": "Léiríonn an argóint an staid. 0 = as, 1 = ar siúl, 2 = scoránaigh",
+                "lv": "Arguments norāda stāvokli. 0 = izslēgts, 1 = ieslēgts, 2 = pārslēgt",
+                "lt": "Argumentas nurodo būseną. 0 = off, 1 = on, 2 = toggle.",
+                "mt": "L-argument jindika l-istat. 0 = mitfi, 1 = mixgħul, 2 = aqleb l-istat",
+                "pl": "Argument określa stan. 0 = wyłączona, 1 = włączona, 2 = przełącz",
+                "ro": "Argumentul indică starea. 0 = stins, 1 = aprins, 2 = comutare",
+                "sl": "Argument določa stanje. 0 = off, 1 = on, 2 = toggle.",
+                "sv": "Argumentet anger tillståndet. 0 = off, 1 = on, 2 = toggle."
               },
               "infourl": {
                 "en": "blinky-info-url-dmatrix-action-1-arg-0.html"
@@ -1554,7 +2457,22 @@
                     "ar": "إيقاف تشغيل LED",
                     "sk": "Vypnúť LED",
                     "hu": "LED kikapcsolása",
-                    "kr": "LED 끄기"
+                    "kr": "LED 끄기",
+                    "bg": "Изключване на LED",
+                    "hr": "Isključite LED",
+                    "cs": "Vypnout LED",
+                    "da": "Sluk LED'en.",
+                    "nl": "Zet de led uit.",
+                    "et": "Lülita LED välja.",
+                    "el": "Σβήσιμο του LED",
+                    "ga": "Múch an LED",
+                    "lv": "Izslēgt LED",
+                    "lt": "Išjungia LED.",
+                    "mt": "Itfi l-LED.",
+                    "pl": "Wyłącz LED.",
+                    "ro": "Stingeți LED-ul.",
+                    "sl": "Ugasne LED.",
+                    "sv": "Släck LED-lampan."
                   },
                   "infourl": {
                     "en": "blinky-info-url-dmatrix-action-1-arg-0-value-0.html"
@@ -1580,7 +2498,22 @@
                     "ar": "تشغيل LED",
                     "sk": "Zapnúť LED",
                     "hu": "LED bekapcsolása",
-                    "kr": "LED 켜기"
+                    "kr": "LED 켜기",
+                    "bg": "Включване на LED",
+                    "hr": "Uključite LED",
+                    "cs": "Zapnout LED",
+                    "da": "Tænd LED'en.",
+                    "nl": "Zet de led aan.",
+                    "et": "Lülita LED sisse.",
+                    "el": "Άναμμα του LED",
+                    "ga": "Cuir an LED ar siúl",
+                    "lv": "Ieslēgt LED",
+                    "lt": "Įjungia LED.",
+                    "mt": "Ixgħel il-LED.",
+                    "pl": "Włącz LED.",
+                    "ro": "Aprindeți LED-ul.",
+                    "sl": "Prižge LED.",
+                    "sv": "Tänd LED-lampan."
                   },
                   "infourl": {
                     "en": "blinky-info-url-dmatrix-action-1-arg-0-value-1.html"
@@ -1606,7 +2539,22 @@
                     "ar": "تبديل LED",
                     "sk": "Prepnúť LED",
                     "hu": "LED váltása",
-                    "kr": "LED 토글"
+                    "kr": "LED 토글",
+                    "bg": "Превключване на LED",
+                    "hr": "Prebacite stanje LED-a",
+                    "cs": "Přepnout LED",
+                    "da": "Skift LED'ens tilstand.",
+                    "nl": "Schakel de status van de led om.",
+                    "et": "Lülita LED-i olek ümber.",
+                    "el": "Εναλλαγή της κατάστασης του LED",
+                    "ga": "Scoránaigh an LED",
+                    "lv": "Pārslēgt LED stāvokli",
+                    "lt": "Perjungia LED būseną.",
+                    "mt": "Aqleb l-istat tal-LED.",
+                    "pl": "Przełącz stan LED.",
+                    "ro": "Comutați starea LED-ului.",
+                    "sl": "Preklopi stanje LED.",
+                    "sv": "Växla LED-lampans tillstånd."
                   },
                   "infourl": {
                     "en": "blinky-info-url-dmatrix-action-1-arg-0-value-2.html"
@@ -1636,7 +2584,22 @@
             "ar": "تشغيل LED.",
             "sk": "Zapnúť LED.",
             "hu": "LED bekapcsolása.",
-            "kr": "LED 켜기."
+            "kr": "LED 켜기.",
+            "bg": "Включване на LED.",
+            "hr": "Uključite LED.",
+            "cs": "Zapnout LED.",
+            "da": "Tænd LED'en.",
+            "nl": "Zet de led aan.",
+            "et": "Lülita LED sisse.",
+            "el": "Άναμμα του LED.",
+            "ga": "Cuir an LED ar siúl.",
+            "lv": "Ieslēgt LED.",
+            "lt": "Įjungia LED.",
+            "mt": "Ixgħel l-LED.",
+            "pl": "Włącz LED.",
+            "ro": "Aprindeți LED-ul.",
+            "sl": "Prižge LED.",
+            "sv": "Tänd LED-lampan."
           },
           "infourl": {
             "en": "blinky-info-url-dmatrix-action-1-arg-2.html"
@@ -1662,7 +2625,22 @@
             "ar": "إيقاف تشغيل LED.",
             "sk": "Vypnúť LED.",
             "hu": "LED kikapcsolása.",
-            "kr": "LED 끄기."
+            "kr": "LED 끄기.",
+            "bg": "Изключване на LED.",
+            "hr": "Isključite LED.",
+            "cs": "Vypnout LED.",
+            "da": "Sluk LED'en.",
+            "nl": "Zet de led uit.",
+            "et": "Lülita LED välja.",
+            "el": "Σβήσιμο του LED.",
+            "ga": "Múch an LED.",
+            "lv": "Izslēgt LED.",
+            "lt": "Išjungia LED.",
+            "mt": "Itfi l-LED.",
+            "pl": "Wyłącz LED.",
+            "ro": "Stingeți LED-ul.",
+            "sl": "Ugasne LED.",
+            "sv": "Släck LED-lampan."
           },
           "infourl": {
             "en": "blinky-info-url-dmatrix-action-1-arg-3.html"
@@ -1688,7 +2666,22 @@
             "ar": "تبديل LED.",
             "sk": "Prepnúť LED.",
             "hu": "LED váltása.",
-            "kr": "LED 토글."
+            "kr": "LED 토글.",
+            "bg": "Превключване на LED.",
+            "hr": "Prebacite stanje LED-a.",
+            "cs": "Přepnout LED.",
+            "da": "Skift LED'ens tilstand.",
+            "nl": "Schakel de status van de led om.",
+            "et": "Lülita LED-i olek ümber.",
+            "el": "Εναλλαγή της κατάστασης του LED.",
+            "ga": "Scoránaigh an LED.",
+            "lv": "Pārslēgt LED stāvokli.",
+            "lt": "Perjungia LED būseną.",
+            "mt": "Aqleb l-istat tal-LED.",
+            "pl": "Przełącz stan LED.",
+            "ro": "Comutați starea LED-ului.",
+            "sl": "Preklopi stanje LED.",
+            "sv": "Växla LED-lampans tillstånd."
           },
           "infourl": {
             "en": "blinky-info-url-dmatrix-action-1-arg-4.html"
@@ -1714,7 +2707,22 @@
             "ar": "بدء الوميض.",
             "sk": "Spustiť blikanie.",
             "hu": "Villogás indítása.",
-            "kr": "깜박임 시작."
+            "kr": "깜박임 시작.",
+            "bg": "Стартиране на мигането.",
+            "hr": "Pokrenite treperenje.",
+            "cs": "Spustit blikání.",
+            "da": "Start blink.",
+            "nl": "Start het knipperen.",
+            "et": "Alusta vilkumist.",
+            "el": "Έναρξη αναλαμπής.",
+            "ga": "Tosaigh ag splancadh.",
+            "lv": "Sākt mirgot.",
+            "lt": "Pradeda mirksėti.",
+            "mt": "Ibda t-teptip.",
+            "pl": "Rozpocznij miganie.",
+            "ro": "Porniți clipirea.",
+            "sl": "Začne utripanje.",
+            "sv": "Starta blinkning."
           },
           "infourl": {
             "en": "blinky-info-url-dmatrix-action-1-arg-5.html"
@@ -1740,7 +2748,22 @@
             "ar": "إيقاف الوميض.",
             "sk": "Zastaviť blikanie.",
             "hu": "Villogás leállítása.",
-            "kr": "깜박임 중지."
+            "kr": "깜박임 중지.",
+            "bg": "Спиране на мигането.",
+            "hr": "Zaustavite treperenje.",
+            "cs": "Zastavit blikání.",
+            "da": "Stop blink.",
+            "nl": "Stop het knipperen.",
+            "et": "Lõpeta vilkumine.",
+            "el": "Διακοπή αναλαμπής.",
+            "ga": "Stop ag splancadh.",
+            "lv": "Apturēt mirgošanu.",
+            "lt": "Nustoja mirksėti.",
+            "mt": "Waqqaf it-teptip.",
+            "pl": "Zatrzymaj miganie.",
+            "ro": "Opriți clipirea.",
+            "sl": "Ustavi utripanje.",
+            "sv": "Stoppa blinkning."
           },
           "infourl": {
             "en": "blinky-info-url-dmatrix-action-1-arg-6.html"
@@ -1766,7 +2789,22 @@
             "ar": "مسح عداد المللي ثانية.",
             "sk": "Vymazať počítadlo milisekúnd.",
             "hu": "Milliszekundum számláló törlése.",
-            "kr": "밀리초 카운터 초기화."
+            "kr": "밀리초 카운터 초기화.",
+            "bg": "Изчистване на брояча на милисекундите.",
+            "hr": "Očistite brojač milisekundi.",
+            "cs": "Vynulovat milisekundový čítač.",
+            "da": "Nulstil millisekundtælleren.",
+            "nl": "Wis de milliseconden-teller.",
+            "et": "Tühjenda millisekundiloendur.",
+            "el": "Μηδενισμός του μετρητή χιλιοστών του δευτερολέπτου.",
+            "ga": "Glan an cuntar milleasoicindí.",
+            "lv": "Notīrīt milisekunžu skaitītāju.",
+            "lt": "Išvalo milisekundžių skaitiklį.",
+            "mt": "Ħassar il-kontatur tal-millisekondi.",
+            "pl": "Wyczyść licznik milisekund.",
+            "ro": "Ștergeți contorul de milisecunde.",
+            "sl": "Počisti milisekundni števec.",
+            "sv": "Nollställ millisekundräknaren."
           },
           "infourl": {
             "en": "http://www.vscp.org/docs/dm_action_clear_counter.html"
