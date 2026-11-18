@@ -19,7 +19,7 @@ tagged, rename **Unreleased** to the version and date, and start a new
 - helper: `vscp_fwhlp_getHeadFromCANALid` hard coded bit check no longer overflows a 16-bit int
 - demos/blinky: blinky0.json is valid JSON again, its `files` section uses the object form the MDF parser reads, and the Level I heartbeat (CLASS1.INFORMATION), Turn OFF (type 6) and Stop (type 8) event codes are corrected
 - demos/blinky: blinky0.mdf and blinky0.xml are regenerated from blinky0.json (the XML was from an older register layout); `tools/mdf-json2xml.py` does the conversion
-- No changes since the last release.
+- demos/blinky: module `level` in blinky0.json is 1 (Level I), not 0; the specification uses 1 and 2
 
 ## v26.11.4 - 2026-11-12
 
