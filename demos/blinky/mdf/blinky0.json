@@ -2,7 +2,7 @@
   "module": {
     "name": "VSCP Blink",
     "copyright": "Grodans Paradis AB",
-    "level": 0,
+    "level": 1,
     "model": "A",
     "version": "0.0.1",
     "changed": "2026-11-18",

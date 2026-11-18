@@ -4,7 +4,7 @@
   <module>
     <name>VSCP Blink</name>
     <copyright>Grodans Paradis AB</copyright>
-    <level>0</level>
+    <level>1</level>
     <model>A</model>
     <version>0.0.1</version>
     <changed>2026-11-18</changed>
