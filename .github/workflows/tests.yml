@@ -25,3 +25,47 @@ jobs:
 
       - name: Run Google Tests
         run: ./build-tests/test
+
+      - name: Arduino library host test
+        run: ./tests/arduino/run.sh
+
+  arduino:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - example: Blinky
+            board: uno
+          - example: MinimalNode
+            board: uno
+          - example: TemperatureSensor
+            board: uno
+          - example: Blinky
+            board: megaatmega2560
+          - example: MinimalNode
+            board: esp32dev
+          - example: Esp32Twai
+            board: esp32dev
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install PlatformIO
+        run: pip install platformio intelhex
+
+      - name: Library sources match src/
+        run: ./tools/arduino-sync-library.sh --check
+
+      - name: Build ${{ matrix.example }} for ${{ matrix.board }}
+        run: >
+          pio ci --lib=arduino/VscpFirmware --board=${{ matrix.board }}
+          -O "lib_deps=coryjfowler/mcp_can"
+          arduino/VscpFirmware/examples/${{ matrix.example }}/${{ matrix.example }}.ino

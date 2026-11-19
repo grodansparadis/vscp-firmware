@@ -7,6 +7,9 @@ tagged, rename **Unreleased** to the version and date, and start a new
 
 ## Unreleased
 
+- Arduino: new VscpFirmware Arduino library (`arduino/VscpFirmware`) that makes an Arduino a VSCP Level I node on a CAN bus, built on vscp-firmware-level2. `VscpNode` does nickname discovery, heartbeats, standard registers, register read/write, the decision matrix and saves the configuration (`VscpEepromStorage`); transports for the MCP2515 (`VscpCanMcp2515`, mcp_can library) and the ESP32 CAN controller (`VscpCanTwai`). Examples: MinimalNode, Blinky (follows the Blinky MDF), TemperatureSensor, Esp32Twai. Documentation in docs/vscp-arduino.md
+- Arduino: `tests/arduino/run.sh` runs the library and the Blinky example against scripted CAN traffic on the PC; CI runs it and builds the examples with PlatformIO (Uno, Mega, ESP32). `tools/arduino-sync-library.sh` keeps the library's copies of the framework files in step with `src/` (`--check`, `--zip`)
+- level2: the Level I "who is there" response read one byte before the GUID and one byte after the 32-byte MDF URL (found with the address sanitizer); the last byte of frame 6 is now always 0 as the specification says
 - Fix the CANAL id helper declarations in vscp-firmware-helper.h: they were declared as `vscp_fwhlp__get...` (two underscores) but implemented as `vscp_fwhlp_get...`, so they could not be linked
 - Fetch cJSON for the tests with CMake FetchContent instead of the third-party/cJSON submodule (same commit)
 - level2: Level I compatibility fixes. Nickname probes now carry the probed nickname (they sent 0xff), the "all nicknames taken" check works, and a nickname won by probing is reported through `stdreg_change`

@@ -2119,19 +2119,21 @@ vscp_frmw2_whois_response(vscp_frmw2_firmware_context_t *pctx)
     pev->vscp_type  = VSCP_TYPE_PROTOCOL_WHO_IS_THERE_RESPONSE;
     pev->sizeData   = 8;
 
-    for (i = 0; i < 3; i++) // fill up with GUID
-    {
+    // Seven frames (specification, CLASS1.PROTOCOL Type=32):
+    //   0-2  GUID15..GUID0, then MDF0-MDF4 in bytes 3-7 of frame 2
+    //   3-6  MDF5..MDF31, and a terminating zero in byte 7 of frame 6
+    // (this used to read one byte before the GUID and one byte after the
+    // MDF URL)
+    for (i = 0; i < 3; i++) {
       pev->pdata[0] = i;
-
       for (j = 1; j < 8; j++) {
-        pev->pdata[j] = pctx->guid[15 - k++];
-        if (k > 16)
-          break;
+        if (k < 16) {
+          pev->pdata[j] = pctx->guid[15 - k++];
+        }
+        else {
+          pev->pdata[j] = pctx->mdfurl[j - 3]; // Frame 2, bytes 3-7
+        }
       }
-
-      if (k > 16)
-        break;
-
       // send the event
       if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, pev))) {
         vscp_fwhlp_deleteEvent(&pev);
@@ -2139,27 +2141,12 @@ vscp_frmw2_whois_response(vscp_frmw2_firmware_context_t *pctx)
       }
     }
 
-    for (j = 0; j < 5; j++) // fill up previous event with MDF
-    {
-      if (pctx->mdfurl[j] > 0)
-        pev->pdata[3 + j] = pctx->mdfurl[j];
-      else
-        pev->pdata[3 + j] = 0;
-    }
-
-    // send the event
-    if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, pev))) {
-      vscp_fwhlp_deleteEvent(&pev);
-      return rv;
-    }
-
-    k = 5;                  // start offset
-    for (i = 3; i < 7; i++) // fill up with the rest of GUID
-    {
+    k = 5; // MDF5 is next
+    for (i = 3; i < 7; i++) {
       pev->pdata[0] = i;
-
       for (j = 1; j < 8; j++) {
-        pev->pdata[j] = pctx->mdfurl[k++];
+        pev->pdata[j] = (k < sizeof(pctx->mdfurl)) ? pctx->mdfurl[k] : 0;
+        k++;
       }
       // send the event
       if (VSCP_ERROR_SUCCESS != (rv = pctx->ops->send_event(pctx, pev))) {

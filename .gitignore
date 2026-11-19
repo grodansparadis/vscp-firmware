@@ -62,3 +62,6 @@ doxygen
 
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
+
+# Arduino library zip made by tools/arduino-sync-library.sh --zip
+arduino/VscpFirmware.zip

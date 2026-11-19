@@ -18,6 +18,7 @@ Local module documentation:
 - [vscp-rs485-rs422](vscp-rs485-rs422.md)
 - [vscp-bootloader](vscp-bootloader.md)
 - [vscp-bootloader-host-sequence](vscp-bootloader-host-sequence.md)
+- [vscp-arduino](vscp-arduino.md) - the VscpFirmware Arduino library
 
 Examples:
 

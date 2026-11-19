@@ -1,0 +1,27 @@
+{
+  "name": "VscpFirmware",
+  "version": "26.11.12",
+  "description": "Make an Arduino a VSCP (Very Simple Control Protocol) node on a CAN bus (CAN4VSCP), built on vscp-firmware-level2",
+  "keywords": "vscp, can, can4vscp, mcp2515, twai, home automation, control",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/grodansparadis/vscp-firmware.git"
+  },
+  "authors": [
+    {
+      "name": "Ake Hedman",
+      "email": "info@grodansparadis.com",
+      "maintainer": true
+    }
+  ],
+  "license": "MIT",
+  "homepage": "https://www.vscp.org",
+  "frameworks": "arduino",
+  "platforms": "*",
+  "dependencies": [
+    {
+      "owner": "coryjfowler",
+      "name": "mcp_can"
+    }
+  ]
+}

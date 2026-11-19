@@ -27,6 +27,8 @@ that second repository (and not to make redundant copies if possible).
 
 Documentation on how to build your own nodes from this code is [here](https://grodansparadis.github.io/vscp-doc-firmware/#/) 
 
+**Arduino:** the [VscpFirmware Arduino library](arduino/VscpFirmware) makes an Arduino (Uno, Mega, ESP32 ...) a VSCP node on a CAN bus with a few lines of code. See [docs/vscp-arduino.md](docs/vscp-arduino.md).
+
 Local module documentation for the helper library is available in [docs/vscp-firmware-helper.md](docs/vscp-firmware-helper.md).
 Local module documentation for the VSCP FIFO helper is available in [docs/vscp-fifo.md](docs/vscp-fifo.md).
 Local module documentation for the Level I firmware core is available in [docs/vscp-firmware.md](docs/vscp-firmware.md).

@@ -1,0 +1,1676 @@
+/**
+ * @brief           VSCP firmware helper functions
+ * @file            vscp_firmware_helper.h
+ * @author          Ake Hedman, The VSCP Project, www.vscp.org
+ *
+ * @section description Description
+ **********************************
+ * This module contains the definitions for the
+ * available VSCP class id's
+ *********************************************************************/
+
+/* ******************************************************************************
+ * VSCP (Very Simple Control Protocol)
+ * http://www.vscp.org
+ *
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2000-2026 Ake Hedman,
+ * The VSCP Project <info@grodansparadis.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ *  This file is part of VSCP - Very Simple Control Protocol
+ *  http://www.vscp.org
+ *
+ * ******************************************************************************
+ */
+
+#ifndef __VSCP_FIRMWARE_HELPER_H__
+#define __VSCP_FIRMWARE_HELPER_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "vscp-compiler.h"
+#include "vscp-projdefs.h"
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <vscp-aes.h>
+#include <vscp.h>
+
+/* Macros */
+
+/* This macro construct a signed integer from two unsigned chars in a safe way */
+#if !defined(construct_signed16)
+#define construct_signed16(msb, lsb) ((int16_t) ((((uint16_t) msb) << 8) + (uint16_t) lsb))
+#endif
+
+/* This macro construct a unsigned integer from two unsigned chars in a safe way */
+#if !defined(construct_unsigned16)
+#define construct_unsigned16(msb, lsb) ((uint16_t) ((((uint16_t) msb) << 8) + (uint16_t) lsb))
+#endif
+
+/* This macro construct a signed long from four unsigned chars in a safe way */
+#if !defined(construct_signed32)
+#define construct_signed32(b0, b1, b2, b3)                                                                             \
+  ((int32_t) ((((uint32_t) b0) << 24) + (((uint32_t) b1) << 16) + (((uint32_t) b2) << 8) + (uint32_t) b3))
+#endif
+
+/* This macro construct a unsigned long from four unsigned chars in a safe way */
+#if !defined(construct_unsigned32)
+#define construct_unsigned32(b0, b1, b2, b3)                                                                           \
+  ((uint32_t) ((((uint32_t) b0) << 24) + (((uint32_t) b1) << 16) + (((uint32_t) b2) << 8) + (uint32_t) b3))
+#endif
+
+/*  byte swapping */
+
+#if !defined(VSCP_UINT16_SWAP_ALWAYS)
+#define VSCP_UINT16_SWAP_ALWAYS(val)                                                                                   \
+  ((uint16_t) ((((uint16_t) (val) & (uint16_t) 0x00ffU) << 8) | (((uint16_t) (val) & (uint16_t) 0xff00U) >> 8)))
+#endif
+
+#if !defined(VSCP_INT16_SWAP_ALWAYS)
+#define VSCP_INT16_SWAP_ALWAYS(val)                                                                                    \
+  ((int16_t) ((((uint16_t) (val) & (uint16_t) 0x00ffU) << 8) | (((uint16_t) (val) & (uint16_t) 0xff00U) >> 8)))
+#endif
+
+#if !defined(VSCP_UINT32_SWAP_ALWAYS)
+#define VSCP_UINT32_SWAP_ALWAYS(val)                                                                                   \
+  ((uint32_t) ((((uint32_t) (val) & (uint32_t) 0x000000ffU) << 24) |                                                   \
+               (((uint32_t) (val) & (uint32_t) 0x0000ff00U) << 8) |                                                    \
+               (((uint32_t) (val) & (uint32_t) 0x00ff0000U) >> 8) |                                                    \
+               (((uint32_t) (val) & (uint32_t) 0xff000000U) >> 24)))
+#endif
+
+#if !defined(VSCP_INT32_SWAP_ALWAYS)
+#define VSCP_INT32_SWAP_ALWAYS(val)                                                                                    \
+  ((int32_t) ((((uint32_t) (val) & (uint32_t) 0x000000ffU) << 24) |                                                    \
+              (((uint32_t) (val) & (uint32_t) 0x0000ff00U) << 8) |                                                     \
+              (((uint32_t) (val) & (uint32_t) 0x00ff0000U) >> 8) |                                                     \
+              (((uint32_t) (val) & (uint32_t) 0xff000000U) >> 24)))
+#endif
+
+/*  machine specific byte swapping */
+
+#if !defined(VSCP_UINT64_SWAP_ALWAYS)
+#define VSCP_UINT64_SWAP_ALWAYS(val)                                                                                   \
+  ((uint64_t) ((((uint64_t) (val) & (uint64_t) (0x00000000000000ff)) << 56) |                                          \
+               (((uint64_t) (val) & (uint64_t) (0x000000000000ff00)) << 40) |                                          \
+               (((uint64_t) (val) & (uint64_t) (0x0000000000ff0000)) << 24) |                                          \
+               (((uint64_t) (val) & (uint64_t) (0x00000000ff000000)) << 8) |                                           \
+               (((uint64_t) (val) & (uint64_t) (0x000000ff00000000)) >> 8) |                                           \
+               (((uint64_t) (val) & (uint64_t) (0x0000ff0000000000)) >> 24) |                                          \
+               (((uint64_t) (val) & (uint64_t) (0x00ff000000000000)) >> 40) |                                          \
+               (((uint64_t) (val) & (uint64_t) (0xff00000000000000)) >> 56)))
+#endif
+
+#if !defined(VSCP_INT64_SWAP_ALWAYS)
+#define VSCP_INT64_SWAP_ALWAYS(val)                                                                                    \
+  ((int64_t) ((((uint64_t) (val) & (uint64_t) (0x00000000000000ff)) << 56) |                                           \
+              (((uint64_t) (val) & (uint64_t) (0x000000000000ff00)) << 40) |                                           \
+              (((uint64_t) (val) & (uint64_t) (0x0000000000ff0000)) << 24) |                                           \
+              (((uint64_t) (val) & (uint64_t) (0x00000000ff000000)) << 8) |                                            \
+              (((uint64_t) (val) & (uint64_t) (0x000000ff00000000)) >> 8) |                                            \
+              (((uint64_t) (val) & (uint64_t) (0x0000ff0000000000)) >> 24) |                                           \
+              (((uint64_t) (val) & (uint64_t) (0x00ff000000000000)) >> 40) |                                           \
+              (((uint64_t) (val) & (uint64_t) (0xff00000000000000)) >> 56)))
+#endif
+
+#ifdef __BIG_ENDIAN__
+#if !defined(VSCP_UINT16_SWAP_ON_BE)
+#define VSCP_UINT16_SWAP_ON_BE(val) VSCP_UINT16_SWAP_ALWAYS(val)
+#define VSCP_INT16_SWAP_ON_BE(val)  VSCP_INT16_SWAP_ALWAYS(val)
+#define VSCP_UINT16_SWAP_ON_LE(val) (val)
+#define VSCP_INT16_SWAP_ON_LE(val)  (val)
+#define VSCP_UINT32_SWAP_ON_BE(val) VSCP_UINT32_SWAP_ALWAYS(val)
+#define VSCP_INT32_SWAP_ON_BE(val)  VSCP_INT32_SWAP_ALWAYS(val)
+#define VSCP_UINT32_SWAP_ON_LE(val) (val)
+#define VSCP_INT32_SWAP_ON_LE(val)  (val)
+#define VSCP_UINT64_SWAP_ON_BE(val) VSCP_UINT64_SWAP_ALWAYS(val)
+#define VSCP_UINT64_SWAP_ON_LE(val) (val)
+#define VSCP_INT64_SWAP_ON_BE(val)  VSCP_INT64_SWAP_ALWAYS(val)
+#define VSCP_INT64_SWAP_ON_LE(val)  (val)
+#endif
+#else
+#if !defined(VSCP_UINT16_SWAP_ON_LE)
+#define VSCP_UINT16_SWAP_ON_LE(val) VSCP_UINT16_SWAP_ALWAYS(val)
+#define VSCP_INT16_SWAP_ON_LE(val)  VSCP_INT16_SWAP_ALWAYS(val)
+#define VSCP_UINT16_SWAP_ON_BE(val) (val)
+#define VSCP_INT16_SWAP_ON_BE(val)  (val)
+#define VSCP_UINT32_SWAP_ON_LE(val) VSCP_UINT32_SWAP_ALWAYS(val)
+#define VSCP_INT32_SWAP_ON_LE(val)  VSCP_INT32_SWAP_ALWAYS(val)
+#define VSCP_UINT32_SWAP_ON_BE(val) (val)
+#define VSCP_INT32_SWAP_ON_BE(val)  (val)
+#define VSCP_UINT64_SWAP_ON_LE(val) VSCP_UINT64_SWAP_ALWAYS(val)
+#define VSCP_UINT64_SWAP_ON_BE(val) (val)
+#define VSCP_INT64_SWAP_ON_LE(val)  VSCP_INT64_SWAP_ALWAYS(val)
+#define VSCP_INT64_SWAP_ON_BE(val)  (val)
+#endif
+#endif
+
+#if !defined(Swap8Bytes)
+#define Swap8Bytes(val)                                                                                                \
+  ((((val) >> 56) & 0x00000000000000FF) | (((val) >> 40) & 0x000000000000FF00) |                                       \
+   (((val) >> 24) & 0x0000000000FF0000) | (((val) >> 8) & 0x00000000FF000000) | (((val) << 8) & 0x000000FF00000000) |  \
+   (((val) << 24) & 0x0000FF0000000000) | (((val) << 40) & 0x00FF000000000000) | (((val) << 56) & 0xFF00000000000000))
+#endif
+
+/*!
+ * @name Min/max macros
+ * @{
+ */
+#if !defined(MIN)
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#endif
+
+#if !defined(MAX)
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#endif
+/* @} */
+
+/**
+ * @fn vscp_fwhlp_isLittleEndian
+ * @brief Check if little endian system
+ * @return Non zero fo rlittle endian system.
+ */
+int
+vscp_fwhlp_isLittleEndian(void);
+
+/**
+ * @fn vscp_fwhlp_isBigEndian
+ * @brief Check if big endian system
+ * @return int Return Non zero for big endian system.
+ */
+int
+vscp_fwhlp_isBigEndian(void);
+
+/**
+    Convert ASCII substring to unsigned long number
+    Copyright (C) 1998, 1999  Henry Spencer.
+    http://www.koders.com/c/fid83F5660A86069B2E2D29B9D3FC9013F76A9BCEB7.aspx
+
+    @param src NULL terminated string to convert.
+    @param srclen length of string, 0 means strlen( src )
+    @param base The base for the conversion, 0 means figure it out.
+    @param resultp Pointer that holds unsigned long result after conversion.
+    @param endptr Pointer to pointer that will be set to first character after parsed value. Can be NULL.
+    @return  VSCP_ERROR_SUCCESS for success, else VSCP_ERROR_ERROR.
+*/
+int
+vscp_fwhlp_a2ul(const char *src, uint8_t srclen, uint8_t base, uint64_t *resultp, char **endptr);
+
+/**
+    Convert decimal byte to hex string
+    @param d Decimal byte to convert
+    @param pBuf Pointer to string buffer that will hold the result.
+    @param len Number of digits to convert.
+*/
+void
+vscp_fwhlp_dec2hex(uint8_t d, char *pBuf, uint16_t len);
+
+/**
+    Convert hexadecimal integer to a decimal value
+    @param pHex Pointer to hexadecimal string.
+    @return Converted value in decimal form.
+*/
+uint32_t
+vscp_fwhlp_hex2dec(const char *pHex);
+
+/**
+ * @brief Convert one hex character
+ *
+ * @param c Hex character to convert (0-f)
+ * @return unsigned char Hex value for character (0-15)
+ */
+unsigned char
+vscp_fwhlp_hexchar(char c);
+
+/**
+ * @brief Create string with hex values from binary values in buffer
+ *
+ * @param output Result buffer for output string
+ * @param outLength Size of result buffer
+ * @param buf Buf with binary values
+ * @param length Size of buffer
+ */
+
+void
+vscp_fwhlp_bin2hex(char *output, size_t outLength, const unsigned char *buf, size_t length);
+
+/**
+ * @brief Convert a string of hex values to binary values in buffer
+ *
+ * @param buf Buffer to fill
+ * @param length Size of buffer
+ * @param s String to convert
+ * @return int Resulting length
+ */
+
+int
+vscp_fwhlp_hex2bin(unsigned char *buf, size_t length, const char *s);
+
+/**
+ * @fn vscp_fwhlp_strsubst
+ * @brief Substitute all occurrences of a string in a string
+ *
+ * @param pNewStr The result string
+ * @param len The len of the buffer for the result string
+ * @param pStr The string to replace strings in.
+ * @param pTarget This is the substring that should be replaced.
+ * @param pReplace This is the string that should replace the substring.
+ * @return char* A pointer to the result string or NULL if an error such as
+ * to small result buffer len for the result.
+ */
+
+char *
+vscp_fwhlp_strsubst(char *pNewStr, size_t len, const char *pStr, const char *pTarget, const char *pReplace);
+
+/**
+    Read a value (hex or decimal)
+    @param pString Pointe to value. A hex value should be
+    be preceded by "0x" or "0X"
+    @return Converted value in decimal form.
+*/
+uint64_t
+vscp_fwhlp_readStringValue(const char *pString);
+
+/**
+    Read a value (hex or decimal)
+    @param pString Pointe to value. A hex value should be
+    be preceded by "0x" or "0X". Binary values can also be specified with "0b" or "0B" prefix.
+    Octal values can be specified with "0o" or "0O" prefix.
+      @param endptr Pointer to pointer that will be set to first character after parsed value. Can be NULL.
+    @return Converted value in decimal form.
+*/
+uint64_t
+vscp_fwhlp_parseStringValue(const char *pString, char **endptr);
+
+/**
+  Find substring of other string and return pointer to it
+  @param haystack String to search in.
+  @param needle String to search for.
+  @return Pointer to substring or NULL if not found.
+*/
+char *
+vscp_fwhlp_stristr(const char *haystack, const char *needle);
+
+/*!
+  Read VSCP data string into byte array. String should be in format "1,2,3,255,0x05,0x55,0o7,0b10101010"
+  @param data Buffer to fill with data bytes.
+  @param length Size of data buffer.
+  @param datastr String to parse.
+  @param endptr Pointer to pointer that will be set to first character after parsed data. Can be NULL.
+  @return Number of bytes read or -1 if error such as invalid format or buffer too small.
+
+*/
+int
+vscp_fwhlp_parse_data(uint8_t *data, size_t length, const char *datastr, const char **endptr);
+
+/*!
+    Make a string with hex values from binary values in buffer
+    @param buf Buffer to hold result string.
+    @param len Size of result buffer.
+    @param data Buffer with binary values.
+    @param data_len Size of data buffer.
+    @return Pointer to result string or NULL if error such as buffer too small.
+*/
+char *
+vscp_fwhlp_make_string_from_data(char *buf, size_t len, const uint8_t *data, size_t data_len);
+
+/*!
+    Get date string in format "YYYY-MM-DDTHH:MM:SS" from event
+    @param pev Pointer to VSCP event to get date values from.
+    @param buf Buffer to hold result string.
+    @param len Size of buffer.
+    @return Pointer to result string or NULL if error such as buffer too small.
+*/
+char *
+vscp_fwhlp_get_datestr_from_event(char *buf, size_t len, const vscp_event_t *pev);
+
+/*!
+    Get date string in format "YYYY-MM-DDTHH:MM:SS" from eventex
+    @param pex Pointer to VSCP event ex to get date values from.
+    @param buf Buffer to hold result string.
+    @param len Size of buffer.
+    @return Pointer to result string or NULL if error such as buffer too small.
+*/
+char *
+vscp_fwhlp_get_datestr_from_eventex(char *buf, size_t len, const vscp_event_ex_t *pex);
+
+/*!
+    Parse date string in format "YYYY-MM-DDTHH:MM:SS" and fill event with the values
+    @param pev Pointer to VSCP event to fill with date values.
+    @param strdate Date string to parse.
+    @return VSCP_ERROR_SUCCESS if successful, else error code.
+*/
+int
+vscp_fwhlp_parse_event_datestr(vscp_event_t *pev, const char *strdate, char **endptr);
+
+/*!
+    Parse date string in format "YYYY-MM-DDTHH:MM:SS" and fill eventex with the values
+    @param pex Pointer to VSCP eventex to fill with date values.
+    @param strdate Date string to parse.
+    @return VSCP_ERROR_SUCCESS if successful, else error code.
+*/
+int
+vscp_fwhlp_parse_eventex_datestr(vscp_event_ex_t *pex, const char *strdate, char **endptr);
+
+/*!
+    Convert traditional VSCP date + timestamp to unix 64-bit timestamp in nanoseconds
+
+    unix_ns =
+    (unix_seconds * 1_000_000_000)
+  + (microsecond * 1_000)
+
+     where unix_seconds is the number of seconds since 1970-01-01T00:00:00Z
+     and microsecond is the microsecond part of the time (0-999999)
+
+    @param year Year of date
+    @param month Month of date (1-12)
+    @param day Day of date (1-31)
+    @param hour Hour of time (0-23)
+    @param minute Minute of time (0-59)
+    @param second Second of time (0-59)
+    @param microsecond Microsecond part of time (0-999999)
+    @return Unix 64-bit timestamp in nanoseconds. Dates outside the range a
+            signed 64-bit nanosecond count can hold (1677-09-21 to
+            2262-04-11) give INT64_MIN or INT64_MAX.
+*/
+int64_t
+vscp_fwhlp_to_unix_ns(int year, int month, int day, int hour, int minute, int second, uint32_t microsecond);
+
+/*!
+    Convert unix 64-bit timestamp in nanoseconds to traditional VSCP date + timestamp
+    @param unix_ns Unix timestamp in nanoseconds
+    @param year Pointer to variable that will hold year of date
+    @param month Pointer to variable that will hold month of date (1-12)
+    @param day Pointer to variable that will hold day of date (1-31)
+    @param hour Pointer to variable that will hold hour of time (0-23)
+    @param minute Pointer to variable that will hold minute of time (0-59)
+    @param second Pointer to variable that will hold second of time (0-59)
+    @param microsecond Pointer to variable that will hold microsecond part of time (0-999999)
+*/
+void
+vscp_fwhlp_from_unix_ns(int *year,
+                        int *month,
+                        int *day,
+                        int *hour,
+                        int *minute,
+                        int *second,
+                        uint32_t *microsecond,
+                        int64_t unix_ns);
+
+/**
+ * @brief Parse MAC address on string form to binary array
+ *
+ * @param pmac Six byte binary array for MAC address.
+ * @param strmac Null terminated string with MAC address.
+ * @param endptr Points to first character after MAC string. Can be NULL.
+ * @return int Returns VSCP_ERROR_SUCCESS if OK, else error code.
+ */
+int
+vscp_fwhlp_parseMac(uint8_t *pmac, const char *strmac, char **endptr);
+
+/**
+    Check filter/mask to check if filter should be delivered
+
+    filter ^ bit    mask    out
+    ============================
+        0           0       1    filter == bit, mask = don't care result = true
+        0           1       1    filter == bit, mask = valid, result = true
+        1           0       1    filter != bit, mask = don't care, result = true
+        1           1       0    filter != bit, mask = valid, result = false
+
+    Mask tells *which* bits that are of interest means
+    it always returns true if bit set to zero (0=don't care).
+
+    Filter tells the value for valid bits. If filter bit is == 1 the bits
+    must be equal to get a true filter return.
+
+    So a nill mask will let everything through
+
+    A filter pointer set to NULL will let every event through.
+
+    @return true if message should be delivered false if not.
+    */
+int
+vscp_fwhlp_doLevel2Filter(const vscp_event_t *pev, const vscpEventFilter *pFilter);
+
+/**
+    Check filter/mask to check if filter should be delivered
+
+    filter ^ bit    mask    out
+    ============================
+        0           0       1    filter == bit, mask = don't care result = true
+        0           1       1    filter == bit, mask = valid, result = true
+        1           0       1    filter != bit, mask = don't care, result = true
+        1           1       0    filter != bit, mask = valid, result = false
+
+    Mask tells *which* bits that are of interest means
+    it always returns true if bit set to zero (0=don't care).
+
+    Filter tells the value for valid bits. If filter bit is == 1 the bits
+    must be equal to get a true filter return.
+
+    So a nill mask will let everything through
+
+    A filter pointer set to NULL will let every event through.
+
+    @return true if message should be delivered false if not.
+    */
+int
+vscp_fwhlp_doLevel2FilterEx(const vscp_event_ex_t *pex, const vscpEventFilter *pFilter);
+
+/**
+    Called by the system when a new connection is made.
+    @param pdata  Pointer to user data
+    @return VSCP_ERROR_SUCCESS if command was executed correctly,
+*/
+
+int
+vscp_fwhlp_connect(const void *pdata);
+
+/**
+    @brief Called by the system when a connection is closed.
+    @param pdata  Pointer to user data
+    @return VSCP_ERROR_SUCCESS if command was executed correctly,
+
+    Can be used to clean up any resources used by the connection.
+*/
+
+int
+vscp_fwhlp_disconnect(const void *pdata);
+
+/**
+    Called by the system when no command is available
+    @param pdata  Pointer to user data
+    @return VSCP_ERROR_SUCCESS if command was executed correctly,
+*/
+int
+vscp_fwhlp_idle_worker(const void *pdata);
+
+/**
+  @brief Parse a command from the client
+  @param pdata  Pointer to user data
+  @param cmd    Pointer to string that holds command to parse.
+  @return VSCP_ERROR_SUCCESS if command was executed correctly,
+    VSCP_ERROR_MISSING if command is not recognized, possible other error
+    return if command was not executed correctly.
+*/
+
+// int
+// vscp_fwhlp_parser(const void* pdata, const char* cmd);
+
+/**
+  @brief Parse GUID string into GUID array
+  @param guid     Pointer to GUID array of 16 bytes to fill.
+  @param strguid  Pointer to string that holds GUID to parse.
+  @param endptr   Pointer to character after last parsed character.
+                    Can be NULL.
+  @return VSCP_ERROR_SUCCESS if GUID was parsed correctly,
+*/
+
+int
+vscp_fwhlp_parseGuid(uint8_t *guid, const char *strguid, char **endptr);
+
+/**
+  @brief Write GUID to string
+  @param strguid Buffer that the GUID string will be written to. This buffer
+    must be at least 48 bytes long to hold GUID string on the form
+    "FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF" including a terminating
+    null character.
+  @param guid Pointer to GUID array of 16 bytes to write.
+  @return VSCP_ERROR_SUCCESS if GUID was written correctly,
+*/
+
+int
+vscp_fwhlp_writeGuidToString(char *strguid, const uint8_t *guid);
+
+/*!
+  @brief Write GUID to string in compact form
+  @param strguid Buffer that the GUID string will be written to. This buffer
+    must be at least 48 bytes long to hold GUID string on the form
+    "FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF" including a terminating
+    null character.
+  @param guid Pointer to GUID array of 16 bytes to write.
+  @return VSCP_ERROR_SUCCESS if GUID was written correctly,
+
+*/
+int
+vscp_fwhlp_writeGuidToStringCompact(char *strguid, const uint8_t *guid);
+
+/*!
+  @brief Write GUID to string in UUID form
+  @param strguid Buffer that the GUID string will be written to. This buffer
+    must be at least 48 bytes long to hold GUID string on the form
+    "FFFFFFFF-FFFF-FFFF-0102-03AABB440130" including a terminating
+    null character.
+  @param guid Pointer to GUID array of 16 bytes to write.
+  @return VSCP_ERROR_SUCCESS if GUID was written correctly.
+*/
+int
+vscp_fwhlp_writeGuidToStringUUID(char *strguid, const uint8_t *guid);
+
+/**
+  @brief Parse a filter string and write data to a filter structure
+  @param pfilter Pointer to filter structure to fill.
+  @param strfilter Pointer to string that holds filter to parse.
+  @return VSCP_ERROR_SUCCESS if filter was parsed correctly.
+*/
+int
+vscp_fwhlp_parseFilter(vscpEventFilter *pfilter, const char *strfilter);
+
+/*!
+  @fn vscp_fwhlp_writeFilterToString
+  @brief Write filter to string
+  @param strFilter Filter in string form
+          filter-priority, filter-class, filter-type, filter-GUID
+  @param len Size of string buffer
+  @param pFilter Filter structure to write out to string.
+  @return true on success, false on failure.
+*/
+int
+vscp_fwhlp_writeFilterToString(char *strFilter, size_t len, const vscpEventFilter *pFilter);
+
+/**
+  @brief Parse a filter mask and write data to a filter structure
+  @param pfilter Pointer to filter structure to fill.
+  @param strmask Pointer to string that holds mask to parse.
+  @return VSCP_ERROR_SUCCESS if mask was parsed correctly.
+*/
+int
+vscp_fwhlp_parseMask(vscpEventFilter *pfilter, const char *strmask);
+
+/*!
+  @fn vscp_writeMaskToString
+  @brief Write mask to string
+  @param strMask Mask in string form
+          mask-priority, mask-class, mask-type, mask-GUID
+  @param len Size of string buffer
+  @param pFilter Filter structure to write out to string.
+  @return true on success, false on failure.
+*/
+int
+vscp_fwhlp_writeMaskToString(char *strMask, size_t len, const vscpEventFilter *pFilter);
+
+/**
+  @brief Parse an event on string form and write data to an event structure
+  @param pev Pointer to event structure to fill.
+  @param buf Pointer to string that holds event to parse.
+  @return VSCP_ERROR_SUCCESS if event was parsed correctly.
+*/
+int
+vscp_fwhlp_parseStringToEvent(vscp_event_t *pev, const char *buf);
+
+/**
+  @brief Parse an event on string form and write data to an event ex structure
+  @param pev Pointer to event ex structure to fill.
+  @param buf Pointer to string that holds event to parse.
+  @return VSCP_ERROR_SUCCESS if event was parsed correctly.
+*/
+int
+vscp_fwhlp_parseStringToEventEx(vscp_event_ex_t *pex, const char *streventex);
+
+/**
+  @brief Write event to string
+  @param buf String buffer that will get event on string form
+  @param size Size of string buffer
+  @param pev Pointer to event
+  @return VSCP_ERROR_SUCCESS if event was written correctly.
+*/
+int
+vscp_fwhlp_eventToString(char *buf, size_t len, const vscp_event_t *pev);
+
+/**
+  @brief Write event ex to string
+  @param buf String buffer that will get event on string form
+  @param size Size of string buffer
+  @param pev Pointer to event
+  @return VSCP_ERROR_SUCCESS if event was written correctly.
+*/
+int
+vscp_fwhlp_eventToStringEx(char *buf, size_t len, const vscp_event_ex_t *pex);
+
+/**
+  @brief Allocate a new event with zero data.
+  @return Pointer to the new event if successful, NULL if not.
+*/
+vscp_event_t *
+vscp_fwhlp_newEvent(void);
+
+/*!
+  @brief Set VSCP frame version in event structure.
+  This is used to indicate which version of the VSCP frame
+  format the event is using. The version is stored in the head
+  of the data array and can be used by the receiving end to
+  determine how to parse the rest of the data.
+  @param pEvent Pointer to event structure to set frame version in.
+  @param version Version number (0-3) to set in event data.
+  @return true if all is OK, false if not.
+*/
+bool
+setFrameVersion(vscp_event_t *pEvent, uint16_t version);
+
+/*!
+  @brief Set VSCP frame version in event ex structure.
+  This is used to indicate which version of the VSCP frame
+  format the event ex is using. The version is stored in the head
+  of the data array and can be used by the receiving end to
+  determine how to parse the rest of the data.
+  @param pEventEx Pointer to event ex structure to set frame version in.
+  @param version Version number (0-3) to set in event ex data.
+  @return true if all is OK, false if not.
+*/
+bool
+setFrameVersionEx(vscp_event_ex_t *pEventEx, uint16_t version);
+
+/**
+ * @brief Convert event to eventex
+ *
+ * @param pEventEx Pointer to eventex that will get result of conversion.
+ * @param pEvent Pointer to event that should be converted
+ * @return int VSCP_ERROR_SUCCESS is returned on success, otherwise an error code is returned.
+ */
+
+int
+vscp_fwhlp_convertEventToEventEx(vscp_event_ex_t *pEventEx, const vscp_event_t *pEvent);
+
+/**
+ * @brief Convert eventex to event
+ *
+ * @param pEvent  Pointer to event that will get result of conversion.
+ * @param pEventEx  Pointer to eventex that should be converted
+ * @return int VSCP_ERROR_SUCCESS is returned on success, otherwise an error code is returned.
+ */
+
+int
+vscp_fwhlp_convertEventExToEvent(vscp_event_t *pEvent, const vscp_event_ex_t *pEventEx);
+
+/*!
+    @brief Make a copy of an event
+    @param pev Pointer to event structure to make copy of.
+    @return Pointer to the new event if successful, NULL if not.
+*/
+
+vscp_event_t *
+vscp_fwhlp_mkEventCopy(const vscp_event_t *pev);
+
+/*!
+    @brief Make a copy of an eventex
+    @param pex Pointer to eventex structure to make copy of.
+    @return Pointer to the new eventex if successful, NULL if not.
+*/
+
+vscp_event_ex_t *
+vscp_fwhlp_mkEventExCopy(const vscp_event_ex_t *pex);
+
+/**
+  @brief Delete an event and it's data.
+  @param pev Address of event to delete.
+  @return VSCP_ERROR_SUCCESS if event was deleted correctly,
+*/
+int
+vscp_fwhlp_deleteEvent(vscp_event_t **pev);
+
+/*!
+  Compile in binary frame handling support
+
+  AES crypto support  requires the vscp-crc.c lib to be
+  linked in (from the vscp-firmware src folder).
+*/
+
+#ifdef VSCP_FWHLP_BINARY_FRAME_SUPPORT
+
+/*!
+ * Get binary frame size from event
+ *
+ * @param pEventEx Pointer to event.
+ * @return Size of resulting UDP frame on success. Zero on failure.
+ */
+size_t
+vscp_fwhlp_getFrameSizeFromEvent(vscp_event_t *pEvent);
+
+/*!
+ * Get UDP frame size from event
+ *
+ * @param pEventEx Pointer to event ex.
+ * @return Size of resulting UDP frame on success. Zero on failure.
+ */
+size_t
+vscp_fwhlp_getFrameSizeFromEventEx(vscp_event_ex_t *pEventEx);
+
+/*!
+ * Write event on binary frame format
+ *
+ * Note! Will always convert frames to version 1 (Unix timestamp with nanosecond precision) format.
+ *
+ * @param buf A pointer to a buffer that will receive the event.
+ * @param len Size of the buffer.
+ * @param encryption Set encryption that should be used for the binary frame.
+                      0 means no encryption, 1-15 means the VSCP defined encryption
+                      algorithm to use. If set to 15 (VSCP_ENCRYPTION_FROM_TYPE_BYTE)
+                      the algorithm will be set from the four lower bits of the buffer.
+ * @param pEvent Pointer to event that should be handled.
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure.
+ */
+int
+vscp_fwhlp_writeEventToFrame(uint8_t *frame, size_t len, uint8_t encryption, const vscp_event_t *pEvent);
+
+/*!
+ * Write event ex on binary frame format
+ *
+ * note! Will always convert frames to version 1 (Unix timestamp with nanosecond precision) format.
+ *
+ * @param buf A pointer to a buffer that will receive the event.
+ * @param len Size of the buffer.
+ * @param encryption Set encryption that should be used for the binary frame.
+                      0 means no encryption, 1-15 means the VSCP defined encryption
+                      algorithm to use. If set to 15 (VSCP_ENCRYPTION_FROM_TYPE_BYTE)
+                      the algorithm will be set from the four lower bits of the buffer.
+ * @param pEventEx Pointer to event that should be handled.
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure.
+ */
+int
+vscp_fwhlp_writeEventExToFrame(uint8_t *frame, size_t len, uint8_t encryption, const vscp_event_ex_t *pEventEx);
+
+/*!
+ * Get VSCP event from binary frame
+ *
+ * Note! Will always convert frames to version 1 
+ * (Unix timestamp with nanosecond precision) format.
+ *
+ * @param pEvent Pointer to VSCP event that will get data from the frame,
+ * @param buf A pointer to a buffer that holds the binary frame data. First
+ * byte in the buffer is the frame version and encryption type byte, followed 
+ * by the rest of the frame data. 
+ * @param len Size of the buffer.
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure.
+ */
+int
+vscp_fwhlp_getEventFromFrame(vscp_event_t *pEvent, const uint8_t *buf, size_t len);
+
+/*!
+ * Get VSCP event ex from binary frame
+ *
+ * Note! Will always convert frames to version 1 (Unix timestamp with nanosecond precision) format.
+ *
+ * @param pEventEx Pointer to VSCP event ex that will get data from the
+ * frame,
+ * @param buf A pointer to a buffer that holds the binary frame data. First
+ * byte in the buffer is the frame version and encryption type byte, followed
+ * by the rest of the frame data.
+ * @param len Size of the buffer.
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure.
+ */
+int
+vscp_fwhlp_getEventExFromFrame(vscp_event_ex_t *pEventEx, const uint8_t *buf, size_t len);
+
+/*!
+ * Write a command frame
+ *
+ * @param frame A pointer to a buffer that will receive the command frame.
+ * @param len Size of the buffer.
+ * @param command The command to be written to the frame.
+ * @param arg Optional argument data to include in the command frame. Can be NULL if no argument data should be included.
+ * @param arg_len Size of argument data. Should be zero if arg is NULL.
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure.
+ *
+ * Encryption is set to none by this function (byte 0 of frame). If encryption is needed the caller should encrypt the
+ * resulting frame with vscp_fwhlp_encryptFrame() before sending it.
+ */
+int
+vscp_fwhlp_writeCommandToFrame(uint8_t *frame, size_t len, uint16_t command, const uint8_t *arg, size_t arg_len);
+
+/*!
+ * Write a reply to a frame
+ *
+ * Note! Will always convert frames to version 1 (Unix timestamp with nanosecond precision) format.
+ *
+ * @param frame A pointer to a buffer that will receive the reply frame.
+ * @param len Size of the buffer.
+ * @param command The command that is being replied to. This will be included in the reply frame.
+ * @param error The error code for the reply. This will be included in the reply frame.
+ * @param arg Optional argument data to include in the reply frame. Can be NULL if no argument data should be included.
+ * @param arg_len Size of argument data. Should be zero if arg is NULL.
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure.
+ *
+ * Encryption is set to none by this function (byte 0 of frame). If encryption is needed the caller should encrypt the
+ * resulting frame with vscp_fwhlp_encryptFrame() before sending it.
+ */
+int
+vscp_fwhlp_writeReplyToFrame(uint8_t *frame,
+                             size_t len,
+                             uint16_t command,
+                             uint16_t error,
+                             const uint8_t *arg,
+                             size_t arg_len);
+
+#endif // VSCP_FWHLP_BINARY_FRAME_SUPPORT
+
+/*
+  AES crypto support  requires the vscp-aes.c lib to be
+  linked in (from the vscp-firmware src folder).
+
+  Define VSCP_FWHLP_CRYPTO_SUPPORT in vscp-projefs.h to
+  compile.
+*/
+#ifdef VSCP_FWHLP_CRYPTO_SUPPORT
+
+/*
+  Footprint switch for 8-bit and 32-bit targets
+
+  Default (not defined) - for 32-bit targets:
+    - SHA-256 with the full 64 word message schedule (fastest).
+    - Work buffers from malloc, any frame size.
+    - Reentrant (safe with RTOS threads).
+
+  #define VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT - for 8-bit targets:
+    - SHA-256 with a rolling 16 word schedule (256 -> 64 bytes of stack).
+    - No malloc in vscp_fwhlp_encryptFrame (built in AES backend) or the
+      version 1 (authenticated) frame functions. Static buffers for frames up
+      to VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE bytes (default 128); larger frames
+      are refused.
+    - The HMAC key state is cached (264 bytes), which saves two SHA-256
+      blocks per frame while the key stays the same. Call
+      vscp_fwhlp_clearCryptoCache() to wipe the cached key material (e.g. when
+      changing keys or sleeping). Also define
+      VSCP_FWHLP_CRYPTO_NO_HMAC_CACHE to save that RAM (slower).
+    - Static RAM: 2 * VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE + 64 bytes for work
+      buffers, plus the HMAC cache. Lower VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE to
+      the largest frame the node uses.
+    - NOT reentrant: use from one thread / context only.
+
+  Both settings give identical frames on the wire.
+*/
+#if defined(VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT) && !defined(VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE)
+#define VSCP_FWHLP_CRYPTO_MAX_FRAME_SIZE 128
+#endif
+
+/*!
+ * @brief Wipe cached key material (HMAC key state in small footprint mode).
+ * Does nothing when VSCP_FWHLP_CRYPTO_SMALL_FOOTPRINT is not defined.
+ */
+void
+vscp_fwhlp_clearCryptoCache(void);
+
+/*!
+ * Encrypt VSCP frame using the selected encryption algorithm. The iv
+ * initialization vector) is appended to the end of the encrypted data.
+ *
+ * @param output Buffer that will receive the encrypted result. It must hold
+ *          the unencrypted first byte, the PKCS#7-padded ciphertext, and the
+ *          appended 16-byte IV. The padded ciphertext always includes at
+ *          least one 16-byte block.
+ * @param input This is the frame that should be encrypted. The first
+ *          byte in the frame is the packet type and encryption type which always is left unencrypted.
+ * @param len This is the length of the frame to be encrypted. This
+ *          length includes the frame encryption type in the first byte.
+ * The encrypted data is padded using PKCS#7 to a 16-byte AES block size.
+ * A full padding block is added when the payload length is already a multiple
+ * of 16 bytes.
+ * @param key This is a pointer to the secret encryption key. This key
+ *          should be 128 bits for AES128, 192 bits for AES192, 256 bits
+ *          for AES256.
+ * @param iv Pointer to the initialization vector. Should always point to a
+ *           128 bit content. If NULL the iv will be created from random
+ *            system data. In both cases the end result will have the iv
+ *            appended to the encrypted block.
+ * @param nAlgorithm The VSCP defined algorithm (0-15) to encrypt the frame
+ * with. If set to 15 (VSCP_ENCRYPTION_FROM_TYPE_BYTE) the algorithm will be
+ * set from the four lower bits of the buffer to decrypt.
+ * @return Packet length on success, zero on failure.
+ *
+ * Normally used like this
+ *
+ * (strlen(test)+1 - to include the encryption type byte in the length of the data to encrypt.
+ * The first byte of the test string should be reserved for packet type and the encryption type 
+ * and should not be encrypted.
+ *
+ * pmk - 128 bit primary key
+ * piv - 128 bit iv
+ * char buf[128];
+ * const char test[128];
+ * strcpy(test+1, "admin:secret"); // First byte is reserved for encryption type and should not be encrypted.
+ * if (!(len = vscp_fwhlp_encryptFrame(buf, test, strlen(test)+1, pmk, piv, 1))) {
+ *   ESP_LOGE(TAG, "Failed to encrypt credentials with error %d", len);
+ *   return VSCP_ERROR_ERROR;
+  }
+ */
+size_t
+vscp_fwhlp_encryptFrame(uint8_t *output,
+                        uint8_t *input,
+                        size_t len,
+                        const uint8_t *key,
+                        const uint8_t *iv,
+                        uint8_t nAlgorithm);
+
+/*!
+ * Decrypt VSCP frame using the selected encryption algorithm. The iv
+ * initialization vector) is appended to the end of the encrypted data.
+ *
+ * @param output Buffer that will receive the decrypted result. The buffer
+ *          should have a size of at lest equal to the encrypted block.
+ * @param input This is the frame that should be decrypted.
+ * @param len Length of the encrypted frame. It includes the appended IV when
+ *            @p iv is NULL; otherwise it covers the frame bytes only.
+ * @param key This is a pointer to the secret encryption key. This key
+ *            should be 128 bits for AES128, 192 bits for AES192,
+ *            256 bits for AES256.
+ * @param iv Pointer to the initialization vector. Should always point to a
+ *           128 bit content. If NULL the iv is expected to be the last
+ *           16 bytes of the encrypted data.
+ * @param nAlgorithm The VSCP defined algorithm (0-15) to decrypt the frame
+ * with. (vscp.h) If set to 15 (VSCP_ENCRYPTION_FROM_TYPE_BYTE) the algorithm
+ * will be set from the four lower bits of the buffer to decrypt.
+ * @return VSCP_ERROR_SUCCESS, errorcode on failure on failure.
+ * PKCS#7 padding is validated and removed. Since this API does not return the
+ * decrypted length, removed padding bytes are zeroed in the output.
+ *
+ * Normally used like
+ *
+ *  if (VSCP_ERROR_SUCCESS != vscp_fwhlp_decryptFrame(encbuf,
+ *                                                      buf,
+ *                                                      buflen - 16,
+ *                                                      key,
+ *                                                      buf + buflen - 16,
+ *                                                      VSCP_ENCRYPTION_FROM_TYPE_BYTE)) {
+ *  };
+ *
+ * where buf is the incoming frame. Encryption type will be found from the first byte
+ * of the frame. The last 16 bytes of the frame is the iv.
+ */
+int
+vscp_fwhlp_decryptFrame(uint8_t *output,
+                        const uint8_t *input,
+                        size_t len,
+                        const uint8_t *key,
+                        const uint8_t *iv,
+                        uint8_t nAlgorithm);
+
+/*
+  Authenticated binary frames (packet version 1, AES-CBC + HMAC-SHA-256)
+
+  Same format as the VSCP helper library (vscp_encryptFrameV1,
+  vscp_decryptFrameV1, vscp_binary::encode/decode) so firmware and VSCP
+  software interoperate:
+
+    record:  [0x55][version:3 | length:13, big endian][inner frame]
+    inner:   [type/encryption:1][ciphertext:N*16][IV:16][tag:16]
+
+  AES-CBC (128, 192 or 256 bits) with PKCS#7 padding encrypts everything
+  after the type byte, including the CRC. The tag is the leftmost 128 bits of
+  HMAC-SHA-256(hmacKey, prefix || type/encryption || ciphertext || IV), where
+  prefix is 0x55 followed by the big endian word (1 << 13) | inner length
+  (including the tag). The receiver checks the tag in constant time before
+  any decryption, then padding and CRC. Version 1 never carries unencrypted
+  frames.
+
+  The HMAC key is a separate 32 byte key. Never use the AES key as HMAC key.
+  The tag does not give replay protection. A peer that requires
+  authentication must only accept version 1 records with the agreed
+  algorithm and never fall back to legacy (version 0) frames.
+
+  SHA-256/HMAC is built in (no extra library needed). Needs
+  VSCP_FWHLP_CRYPTO_SUPPORT and VSCP_FWHLP_BINARY_FRAME_SUPPORT.
+*/
+#ifdef VSCP_FWHLP_BINARY_FRAME_SUPPORT
+
+#define VSCP_FWHLP_FRAME_PREFIX                0x55   // First byte of a versioned record
+#define VSCP_FWHLP_FRAME_HEADER_SIZE           3      // Prefix byte + version/length word
+#define VSCP_FWHLP_FRAME_TAG_SIZE              16     // Truncated HMAC-SHA-256 tag
+#define VSCP_FWHLP_FRAME_VERSION_LEGACY        0      // Unauthenticated inner frame
+#define VSCP_FWHLP_FRAME_VERSION_AUTHENTICATED 1      // AES-CBC + HMAC-SHA-256
+#define VSCP_FWHLP_FRAME_MAX_INNER_LEN         0x1fff // 13-bit length field
+#define VSCP_FWHLP_FRAME_V1_OVERHEAD           48     // Max extra bytes for encryptFrameV1
+
+/*!
+ * @brief Encrypt and authenticate an inner frame (version 1, no prefix).
+ *
+ * @param output Buffer that gets [type][ciphertext][IV][tag]. May be the
+ *        same buffer as input.
+ * @param capacity Size of output. At most len + VSCP_FWHLP_FRAME_V1_OVERHEAD
+ *        bytes are written.
+ * @param input Plain inner frame: type/encryption byte, body and CRC.
+ * @param len Length of input (at least 5 bytes).
+ * @param key AES key (16, 24 or 32 bytes depending on the algorithm).
+ * @param hmacKey Independent 32 byte HMAC-SHA-256 key.
+ * @param iv 16 byte IV or NULL to generate a random IV (recommended).
+ * @param nAlgorithm VSCP_ENCRYPTION_AES128/192/256, or
+ *        VSCP_ENCRYPTION_FROM_TYPE_BYTE to take it from input[0]. The low
+ *        nibble of the written type byte is set to the algorithm.
+ * @return Length of the written inner frame, 0 on failure.
+ */
+size_t
+vscp_fwhlp_encryptFrameV1(uint8_t *output,
+                          size_t capacity,
+                          const uint8_t *input,
+                          size_t len,
+                          const uint8_t *key,
+                          const uint8_t *hmacKey,
+                          const uint8_t *iv,
+                          uint8_t nAlgorithm);
+
+/*!
+ * @brief Authenticate and decrypt an inner frame (version 1, no prefix).
+ *
+ * The caller must have checked the record prefix and that it is version 1
+ * (or use vscp_fwhlp_decodeAuthenticatedFrame). The tag is checked before
+ * anything is decrypted. On failure output is not changed.
+ *
+ * @param output Buffer that gets the plain inner frame (type, body, CRC).
+ * @param capacity Size of output.
+ * @param input Inner frame [type][ciphertext][IV][tag].
+ * @param len Length of input.
+ * @param key AES key matching the algorithm in input[0].
+ * @param hmacKey 32 byte HMAC-SHA-256 key.
+ * @return Length of the plain inner frame, 0 on failure (bad tag, padding,
+ *         CRC, size or algorithm).
+ */
+size_t
+vscp_fwhlp_decryptFrameV1(uint8_t *output,
+                          size_t capacity,
+                          const uint8_t *input,
+                          size_t len,
+                          const uint8_t *key,
+                          const uint8_t *hmacKey);
+
+/*!
+ * @brief Parse the three byte record prefix [0x55][version:3 | length:13].
+ *
+ * @param buf Record data.
+ * @param len Number of bytes available in buf.
+ * @param pVersion Gets the packet version (0 = legacy, 1 = authenticated).
+ * @param pInnerLen Gets the inner frame length that follows the prefix.
+ * @return VSCP_ERROR_SUCCESS, VSCP_ERROR_PARAMETER or VSCP_ERROR_INVALID_FRAME
+ *         (no 0x55 prefix).
+ */
+int
+vscp_fwhlp_parseFrameHeader(const uint8_t *buf, size_t len, uint8_t *pVersion, size_t *pInnerLen);
+
+/*!
+ * @brief Build a complete authenticated record: prefix + version 1 frame.
+ *
+ * @param wire Buffer that gets the record.
+ * @param capacity Size of wire (len + VSCP_FWHLP_FRAME_HEADER_SIZE +
+ *        VSCP_FWHLP_FRAME_V1_OVERHEAD is always enough).
+ * @param input Plain inner frame (type/encryption byte, body and CRC).
+ * @param len Length of input.
+ * @param key AES key.
+ * @param hmacKey Independent 32 byte HMAC key.
+ * @param iv 16 byte IV or NULL for a random IV (recommended).
+ * @param nAlgorithm AES algorithm (see vscp_fwhlp_encryptFrameV1).
+ * @return Length of the record, 0 on failure.
+ */
+size_t
+vscp_fwhlp_encodeAuthenticatedFrame(uint8_t *wire,
+                                    size_t capacity,
+                                    const uint8_t *input,
+                                    size_t len,
+                                    const uint8_t *key,
+                                    const uint8_t *hmacKey,
+                                    const uint8_t *iv,
+                                    uint8_t nAlgorithm);
+
+/*!
+ * @brief Check and decode one complete authenticated record.
+ *
+ * Only version 1 records whose length matches wireLen exactly are accepted.
+ * Legacy (version 0) records are rejected - there is no fallback. Records
+ * with an invalid packet type (2-13 in the high nibble of the type byte) are
+ * rejected, as in the VSCP helper library.
+ *
+ * @param output Buffer that gets the plain inner frame.
+ * @param capacity Size of output.
+ * @param wire Complete record (prefix + inner frame).
+ * @param wireLen Length of the record.
+ * @param key AES key.
+ * @param hmacKey 32 byte HMAC key.
+ * @param nAlgorithm The agreed AES algorithm; records using another one are
+ *        rejected. VSCP_ENCRYPTION_FROM_TYPE_BYTE accepts any AES algorithm.
+ * @return Length of the plain inner frame, 0 on failure.
+ */
+size_t
+vscp_fwhlp_decodeAuthenticatedFrame(uint8_t *output,
+                                    size_t capacity,
+                                    const uint8_t *wire,
+                                    size_t wireLen,
+                                    const uint8_t *key,
+                                    const uint8_t *hmacKey,
+                                    uint8_t nAlgorithm);
+
+#endif // VSCP_FWHLP_BINARY_FRAME_SUPPORT
+
+#endif
+
+/*
+  PSA (Platform Security Architecture) crypto support
+  
+  [ESP32 ONLY] This feature is only available when building for ESP32 hardware
+  with ESP-IDF. It is not available on other platforms.
+  
+  Define VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO in vscp-projdefs.h and link with PSA crypto library
+  to use PSA crypto backend instead of AES. This provides an alternative implementation
+  of the encrypt/decrypt frame functions.
+  
+  PSA crypto provides a standardized cryptographic API that can be used with various
+  hardware security modules and crypto accelerators.
+*/
+#if defined(VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO) && defined(ESP_PLATFORM)
+
+/**
+ * @fn vscp_fwhlp_encryptFrame_psa
+ * @brief Encrypt VSCP frame using PSA crypto (ESP32 only)
+ * 
+ * PSA crypto variant of encryptFrame using Platform Security Architecture crypto API.
+ * Parameters and return values are identical to vscp_fwhlp_encryptFrame.
+ * 
+ * @param output Buffer that will receive the encrypted result
+ * @param input Buffer containing data to encrypt
+ * @param len Length of data to encrypt
+ * @param key Encryption key
+ * @param iv Initialization vector (optional)
+ * @param nAlgorithm Algorithm to use (0-15)
+ * @return Packet length on success, zero on failure
+ */
+size_t
+vscp_fwhlp_encryptFrame_psa(uint8_t *output,
+                            uint8_t *input,
+                            size_t len,
+                            const uint8_t *key,
+                            const uint8_t *iv,
+                            uint8_t nAlgorithm);
+
+/**
+ * @fn vscp_fwhlp_decryptFrame_psa
+ * @brief Decrypt VSCP frame using PSA crypto (ESP32 only)
+ * 
+ * PSA crypto variant of decryptFrame using Platform Security Architecture crypto API.
+ * Parameters and return values are identical to vscp_fwhlp_decryptFrame.
+ * 
+ * @param output Buffer that will receive the decrypted result
+ * @param input Buffer containing encrypted data
+ * @param len Length of data to decrypt
+ * @param key Decryption key
+ * @param iv Initialization vector (optional)
+ * @param nAlgorithm Algorithm to use (0-15)
+ * @return VSCP_ERROR_SUCCESS on success, error code on failure
+ */
+int
+vscp_fwhlp_decryptFrame_psa(uint8_t *output,
+                            const uint8_t *input,
+                            size_t len,
+                            const uint8_t *key,
+                            const uint8_t *iv,
+                            uint8_t nAlgorithm);
+
+#endif // VSCP_FWHLP_CRYPTO_USE_PSA_CRYPTO && ESP_PLATFORM
+
+/*
+  OpenSSL crypto support
+
+  Define VSCP_FWHLP_CRYPTO_USE_OPENSSL in vscp-projdefs.h and link with
+  OpenSSL (libcrypto) to use OpenSSL backend instead of the internal AES
+  implementation for frame encryption/decryption.
+
+  Default behavior is unchanged: if no backend switch is defined, the internal
+  AES implementation is used.
+*/
+#if defined(VSCP_FWHLP_CRYPTO_USE_OPENSSL)
+
+/**
+ * @fn vscp_fwhlp_encryptFrame_openssl
+ * @brief Encrypt VSCP frame using OpenSSL EVP API
+ *
+ * OpenSSL variant of encryptFrame using AES-CBC with no internal padding.
+ * Parameters and return values are identical to vscp_fwhlp_encryptFrame.
+ */
+size_t
+vscp_fwhlp_encryptFrame_openssl(uint8_t *output,
+                                uint8_t *input,
+                                size_t len,
+                                const uint8_t *key,
+                                const uint8_t *iv,
+                                uint8_t nAlgorithm);
+
+/**
+ * @fn vscp_fwhlp_decryptFrame_openssl
+ * @brief Decrypt VSCP frame using OpenSSL EVP API
+ *
+ * OpenSSL variant of decryptFrame using AES-CBC with no internal padding.
+ * Parameters and return values are identical to vscp_fwhlp_decryptFrame.
+ */
+int
+vscp_fwhlp_decryptFrame_openssl(uint8_t *output,
+                                const uint8_t *input,
+                                size_t len,
+                                const uint8_t *key,
+                                const uint8_t *iv,
+                                uint8_t nAlgorithm);
+
+#endif // VSCP_FWHLP_CRYPTO_USE_OPENSSL
+
+/*
+  JSON support needs VSCP_FWHLP_JSON_SUPPORT to be defined
+  in the projdef file and cJSON support linked in (can be found
+  in vscp-firmware/third-party or at https://github.com/nopnop2002/esp-idf-json
+*/
+
+#ifdef VSCP_FWHLP_JSON_SUPPORT
+
+/**
+ * @fn vscp_fwhlp_parse_json
+ * @brief Convert JSON string to VSCP event
+ *
+ * @param jsonVscpEventObj1
+ * @param pev Pointer to event that will get data
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ */
+
+int
+vscp_fwhlp_parse_json(vscp_event_t *pev, const char *jsonVscpEventObj);
+
+/**
+ * @fn vscp_fwhlp_parse_json_ex
+ * @brief Convert JSON string to VSCP event ex
+ *
+ * @param jsonVscpEventObj1
+ * @param pex Pointer to event ex that will get data
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ */
+
+int
+vscp_fwhlp_parse_json_ex(vscp_event_ex_t *pex, const char *jsonVscpEventObj);
+
+/**
+ * @fn vscp_fwhlp_create_json
+ * @brief Convert pointer to VSCP event to VSCP JSON string
+ *
+ * @param strObj String buffer that will get result
+ * @param len Size of string buffer
+ * @param pev Pointer to event
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ */
+int
+vscp_fwhlp_create_json(char *strObj, size_t len, const vscp_event_t *pev);
+
+/**
+ * @fn vscp_fwhlp_create_json_ex
+ * @brief Convert pointer to VSCP event to VSCP JSON string
+ *
+ * @param strObj String buffer that will get result
+ * @param len Size of string buffer
+ * @param pex Pointer to event ex
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ */
+int
+vscp_fwhlp_create_json_ex(char *strObj, size_t len, const vscp_event_ex_t *pex);
+
+#endif // JSON support
+
+// ----------------------------------------------------------------------------
+
+#ifdef VSCP_FWHLP_XML_SUPPORT
+
+/*!
+ * @fn vscp_fwhlp_parse_xml_event
+ * @brief Convert XML string to VSCP event
+ *
+ * @param pev Pointer to event that will get data
+ * @param eventstr Null terminated string with XML event data.
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ *
+ */
+int
+vscp_fwhlp_parse_xml_event(vscp_event_t *pev, const char *eventstr);
+
+/*!
+ * @fn vscp_fwhlp_parse_xml_eventex
+ * @brief Convert XML string to VSCP event ex
+ *
+ * @param pev Pointer to event ex that will get data
+ * @param eventstr Null terminated string with XML event data.
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ *
+ */
+int
+vscp_fwhlp_parse_xml_eventex(vscp_event_ex_t *pex, const char *eventexstr);
+
+/*!
+ * @fn vscp_fwhlp_event_to_xml
+ * @brief Convert pointer to VSCP event to XML string
+ *
+ * @param eventstr String buffer that will get result. Must be at least
+ * 2960 bytes to hold max result.
+ * @param len Size of string buffer
+ * @param pev Pointer to event
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ */
+int
+vscp_fwhlp_event_to_xml(char *eventstr, size_t len, const vscp_event_t *pev);
+
+/*!
+ * @fn vscp_fwhlp_eventex_to_xml
+ * @brief Convert pointer to VSCP event ex to XML string
+ *
+ * @param eventexstr String buffer that will get result. Must be at least
+ * 2960 bytes to hold max result.
+ * @param len Size of string buffer
+ * @param pev Pointer to event ex
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ */
+
+int
+vscp_fwhlp_eventex_to_xml(char *eventexstr, size_t len, const vscp_event_ex_t *pex);
+
+/*!
+ * @fn vscp_fwhlp_parse_topic
+ * @brief Parse topic string to extract GUID, VSCP class, and VSCP type
+ *
+ * @param topic Null terminated string with topic data.
+ * @param pGuid Array to store extracted GUID (16 bytes).
+ * @param pVscpClass Pointer to store extracted VSCP class.
+ * @param pVscpType Pointer to store extracted VSCP type.
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ */
+int
+vscp_fwhlp_parse_topic(const char *topic, uint8_t *pGuid[16], uint16_t *pVscpClass, uint16_t *pVscpType);
+
+/*!
+ * @fn vscp_fwhlp_set_event_info_from_topic
+ * @brief Parse topic string and set event GUID, VSCP class, and VSCP type
+ *
+ * @param pev Pointer to event to set data for.
+ * @param topic Null terminated string with topic data.
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ *
+ * topic is on form "vscp/guid/CLASS/TYPE" where guid is 16 bytes in hex format
+ * with ":" as separator, CLASS and TYPE are in decimal format. We can get this
+ * information from MQTT topic when MQTT is used as transport and the topic is
+ * on the above form. This allows us to set guid, class and type of the event
+ * from the topic without needing to include this information in the payload of
+ * the event. This is useful for MQTT where the topic is often used to route the
+ * event to the correct place and including guid, class and type in the topic is
+ * more efficient than including it in the payload.
+ */
+int
+vscp_fwhlp_set_event_info_from_topic(vscp_event_t *pev, const char *topic);
+
+/*!
+ * @fn vscp_fwhlp_set_event_info_from_topic
+ * @brief Parse topic string and set event GUID, VSCP class, and VSCP type
+ *
+ * @param pev Pointer to event to set data for.
+ * @param topic Null terminated string with topic data.
+ * @return int Returns VSCP_ERROR_SUCCESS on OK, error code else.
+ *
+ * topic is on form "vscp/guid/CLASS/TYPE" where guid is 16 bytes in hex format
+ * with ":" as separator, CLASS and TYPE are in decimal format. We can get this
+ * information from MQTT topic when MQTT is used as transport and the topic is
+ * on the above form. This allows us to set guid, class and type of the event
+ * from the topic without needing to include this information in the payload of
+ * the event. This is useful for MQTT where the topic is often used to route the
+ * event to the correct place and including guid, class and type in the topic is
+ * more efficient than including it in the payload.
+ */
+int
+vscp_fwhlp_set_eventex_info_from_topic(vscp_event_ex_t *pex, const char *topic);
+
+#endif
+
+// ----------------------------------------------------------------------------
+
+/*!
+ * @fn vscp_fwhlp_getMeasurementDataCoding
+ * @brief Get the measurement data coding from a VSCP event
+ *
+ * @param pEvent Pointer to event to get data coding from.
+ * @return uint8_t Measurement data coding value. Returns 0 if not a measurement event or if data coding is not set.
+ */
+uint8_t
+vscp_fwhlp_getMeasurementDataCoding(const vscp_event_t *pEvent);
+
+/*!
+ * @fn vscp_fwhlp_getDataCodingBitArray
+ * @brief Get the data coding bit array from a measurement event
+ *
+ * @param pCode Pointer to data coding byte array.
+ * @param length Length of data coding byte array.
+ * @return uint64_t Data coding bit array. Returns 0 if data coding is not a bit array or if length is invalid.
+ */
+uint64_t
+vscp_fwhlp_getDataCodingBitArray(const uint8_t *pCode, const uint8_t length);
+
+/*!
+ * @fn vscp_fwhlp_getDataCodingInteger
+ * @brief Get the data coding integer value from a measurement event
+ *
+ * @param pCode Pointer to data coding byte array.
+ * @param length Length of data coding byte array.
+ * @return int64_t Data coding integer value. Returns 0 if data coding is not an integer or if length is invalid.
+ */
+int64_t
+vscp_fwhlp_getDataCodingInteger(const uint8_t *pCode, uint8_t length);
+
+/*!
+ * @fn vscp_fwhlp_getDataCodingNormalizedInteger
+ * @brief Get the data coding normalized integer value from a measurement event
+ *
+ * @param pCode Pointer to data coding byte array.
+ * @param length Length of data coding byte array.
+ * @return double Data coding normalized integer value. Returns 0 if data coding is not a normalized integer or if
+ * length is invalid.
+ */
+double
+vscp_fwhlp_getDataCodingNormalizedInteger(const uint8_t *pCode, uint8_t length);
+
+/*!
+ * @fn vscp_fwhlp_getMeasurementUnit
+ * @brief Get the measurement unit of a measurement event
+ *
+ * @param pEvent Pointer to event to get measurement unit from.
+ * @return int Measurement unit value. Returns -1 if not a measurement event or if measurement unit is not set.
+ */
+int
+vscp_fwhlp_getMeasurementUnit(const vscp_event_t *pEvent);
+
+/*!
+ * @fn vscp_fwhlp_getMeasurementSensorIndex
+ * @brief Get the sensor index of a measurement event
+ *
+ * @param pEvent Pointer to event to get sensor index from.
+ * @return int Sensor index value. Returns -1 if not a measurement event or if sensor index is not set.
+ */
+int
+vscp_fwhlp_getMeasurementSensorIndex(const vscp_event_t *pEvent);
+
+/*!
+ * @fn vscp_fwhlp_getMeasurementZone
+ * @brief Get the measurement zone of a measurement event
+ *
+ * @param pEvent Pointer to event to get measurement zone from.
+ * @return int Measurement zone value. Returns -1 if not a measurement event or if measurement zone is not set.
+ */
+int
+vscp_fwhlp_getMeasurementZone(const vscp_event_t *pEvent);
+
+/*!
+ * @fn vscp_fwhlp_getMeasurementSubZone
+ * @brief Get the measurement subzone of a measurement event
+ *
+ * @param pEvent Pointer to event to get measurement subzone from.
+ * @return int Measurement subzone value. Returns -1 if not a measurement event or if measurement subzone is not set.
+ */
+int
+vscp_fwhlp_getMeasurementSubZone(const vscp_event_t *pEvent);
+
+/*!
+ * @fn vscp_fwhlp_isMeasurement
+ * @brief Check if a VSCP event is a measurement event
+ *
+ * @param pEvent Pointer to event to check.
+ * @return int Returns 1 if event is a measurement event, 0 if not.
+ */
+int
+vscp_fwhlp_isMeasurement(const vscp_event_t *pEvent);
+
+/*!
+ * @fn vscp_fwhlp_getMeasurementAsFloat
+ * @brief Get the measurement value of a measurement event as a float
+ *
+ * @param pNorm Pointer to normalized data bytes of the measurement event.
+ * @param length Length of the normalized data bytes.
+ * @return float Measurement value as a float. Returns 0 if not a measurement event or if data is not valid for
+ * conversion.
+ */
+float
+vscp_fwhlp_getMeasurementAsFloat(const unsigned char *pNorm, unsigned char length);
+
+/*!
+ * @fn vscp_fwhlp_getMeasurementAsFloatEx
+ * @brief Get the measurement value of a measurement event as a float
+ *
+ * @param pEvent Pointer to event to get measurement value from.
+ * @return float Measurement value as a float. Returns 0 if not a measurement event or if data is not valid for
+ * conversion.
+ */
+/*!
+ * @fn vscp_fwhlp_getMeasurementAsString
+ * @brief Get the measurement value of a measurement event as a string
+ *
+ * @param strValue Buffer that receives the zero terminated value. Must hold
+ *        at least 509 bytes for CLASS2.MEASUREMENT_STR events (the string
+ *        part of a Level II event is at most 508 characters).
+ * @param pEvent Pointer to event to get measurement value from.
+ *        CLASS2.MEASUREMENT_FLOAT values are read MSB first as in the VSCP
+ *        specification.
+ * @return 0 on success, -1 on error.
+ */
+int
+vscp_fwhlp_getMeasurementAsString(char *strValue, const vscp_event_t *pEvent);
+
+/*!
+ * @fn vscp_fwhlp_getMeasurementAsFloatEx
+ * @brief Get the measurement value of a measurement event as a float
+ *
+ * @param pEvent Pointer to event to get measurement value from.
+ * @return float Measurement value as a float. Returns 0 if not a measurement event or if data is not valid for
+ * conversion.
+ */
+int
+vscp_fwhlp_getMeasurementFloat64AsString(char *strValue, const vscp_event_t *pEvent);
+
+/*!
+ * @fn vscp_fwhlp_getMeasurementAsDouble
+ * @brief Get the measurement value of a measurement event as a double
+ *
+ * @param pEvent Pointer to event to get measurement value from.
+ * @return double Measurement value as a double. Returns 0 if not a measurement event or if data is not valid for
+ * conversion.
+ */
+int
+vscp_fwhlp_getMeasurementAsDouble(double *pvalue, const vscp_event_t *pEvent);
+
+/*!
+ * @fn vscp_fwhlp_getMeasurementAsDoubleEx
+ * @brief Get the measurement value of a measurement event as a double
+ *
+ * @param pEvent Pointer to event to get measurement value from.
+ * @return double Measurement value as a double. Returns 0 if not a measurement event or if data is not valid for
+ * conversion.
+ */
+int
+vscp_fwhlp_getMeasurementAsDoubleEx(double *pvalue, const vscp_event_ex_t *pEventEx);
+
+/*!
+ * @fn vscp_fwhlp_getMeasurementAsDoubleEx
+ * @brief Get the measurement value of a measurement event as a double
+ *
+ * @param pEvent Pointer to event to get measurement value from.
+ * @return double Measurement value as a double. Returns 0 if not a measurement event or if data is not valid for
+ * conversion.
+ */
+int
+vscp_fwhlp_getMeasurementWithZoneAsString(const vscp_event_t *pEvent);
+
+/**
+    Get VSCP priority
+    @param pEvent Pointer to VSCP event to set priority for.
+    @return Priority (0-7) for event.
+*/
+unsigned char
+vscp_fwhlp_getEventPriority(const vscp_event_t *pev);
+
+/**
+    Get VSCP EventEx priority
+    @param pEvent Pointer to VSCP event ex to set priority for.
+    @return Priority (0-7) for event.
+*/
+unsigned char
+vscp_fwhlp_getEventExPriority(const vscp_event_ex_t *pex);
+
+/*!
+ * @fn vscp_fwhlp_setEventPriority
+ * @brief Set the priority of a VSCP event
+ *
+ * @param pEvent Pointer to event to set priority for.
+ * @param priority Priority (0-7) to set for event.
+ */
+void
+vscp_fwhlp_setEventPriority(vscp_event_t *pEvent, unsigned char priority);
+
+/*!
+ * @fn vscp_fwhlp_setEventExPriority
+ * @brief Set the priority of a VSCP event ex
+ *
+ * @param pEvent Pointer to event ex to set priority for.
+ * @param priority Priority (0-7) to set for event.
+ */
+void
+vscp_fwhlp_setEventExPriority(vscp_event_ex_t *pEventEx, unsigned char priority);
+
+// ****************************
+//            CANAL
+// ****************************
+
+unsigned char
+vscp_fwhlp_getHeadFromCANALid(uint32_t id);
+
+uint16_t
+vscp_fwhlp_getVscpClassFromCANALid(uint32_t id);
+
+uint16_t
+vscp_fwhlp_getVscpTypeFromCANALid(uint32_t id);
+
+uint8_t
+vscp_fwhlp_getNicknameFromCANALid(uint32_t id);
+
+uint32_t
+vscp_fwhlp_getCANALidFromData(unsigned char priority, const uint16_t vscp_class, const uint16_t vscp_type);
+
+uint32_t
+vscp_fwhlp_getCANALidFromEvent(const vscp_event_t *pEvent);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
