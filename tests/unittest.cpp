@@ -3035,6 +3035,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_legacy_tags)
   vscp_event_t ev;
   const char *json = "{"
                      "\"vscpHead\":9,"
+                     "\"vscpObId\":77,"
                      "\"vscpClass\":42,"
                      "\"vscpType\":3,"
                      "\"vscpGuid\":\"01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F:10\","
@@ -3049,6 +3050,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_legacy_tags)
   uint16_t expected_head = (9 & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
   ASSERT_EQ(expected_head, ev.head);
   ASSERT_EQ(42, ev.vscp_class);
+  ASSERT_EQ(77u, ev.obid);
   ASSERT_EQ(3, ev.vscp_type);
   ASSERT_EQ(vscp_fwhlp_to_unix_ns(2024, 11, 5, 8, 9, 10, 7654321), ev.timestamp_ns);
 
@@ -3070,6 +3072,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_ex_legacy_tags)
   vscp_event_ex_t ex;
   const char *json = "{"
                      "\"vscpHead\":12,"
+                     "\"vscpObId\":88,"
                      "\"vscpClass\":506,"
                      "\"vscpType\":7,"
                      "\"vscpGuid\":\"10:0F:0E:0D:0C:0B:0A:09:08:07:06:05:04:03:02:01\","
@@ -3084,6 +3087,7 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_parse_json_ex_legacy_tags)
   uint16_t expected_head = (12 & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
   ASSERT_EQ(expected_head, ex.head);
   ASSERT_EQ(506, ex.vscp_class);
+  ASSERT_EQ(88u, ex.obid);
   ASSERT_EQ(7, ex.vscp_type);
   ASSERT_EQ(vscp_fwhlp_to_unix_ns(2025, 1, 1, 0, 0, 0, 12345), ex.timestamp_ns);
 

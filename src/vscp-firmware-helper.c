@@ -5066,8 +5066,8 @@ vscp_fwhlp_parse_json(vscp_event_t *pev, const char *jsonVscpEventObj)
     pev->head = (uint16_t) item->valueint;
   }
 
-  if (cJSON_GetObjectItem(root, "obid")) {
-    pev->obid = vscp_fwhlp_json_to_u32(cJSON_GetObjectItem(root, "obid"));
+  if (NULL != (item = vscp_fwhlp_get_json_item_compat(root, "obid", "vscpObId"))) {
+    pev->obid = vscp_fwhlp_json_to_u32(item);
   }
 
   // Parse datetime and timestamp into local variables first
@@ -5216,8 +5216,8 @@ vscp_fwhlp_parse_json_ex(vscp_event_ex_t *pex, const char *jsonVscpEventObj)
     pex->head = (uint16_t) item->valueint;
   }
 
-  if (cJSON_GetObjectItem(root, "obid")) {
-    pex->obid = vscp_fwhlp_json_to_u32(cJSON_GetObjectItem(root, "obid"));
+  if (NULL != (item = vscp_fwhlp_get_json_item_compat(root, "obid", "vscpObId"))) {
+    pex->obid = vscp_fwhlp_json_to_u32(item);
   }
 
   // Parse datetime and timestamp into local variables first
