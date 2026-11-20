@@ -533,7 +533,7 @@ vscp_link_doCmdSetGUID(vscp_link_ctx_t *pctx, const char *pcmd)
     return pctx->ops->write_client(pctx, VSCP_LINK_MSG_ERROR);
   }
   if (VSCP_ERROR_SUCCESS == (rv = pctx->ops->set_guid(pctx, guid))) {
-    return pctx->ops->write_client(pctx, VSCP_LINK_MSG_PARAMETER_ERROR);
+    return pctx->ops->write_client(pctx, VSCP_LINK_MSG_OK);
   }
   else if (VSCP_ERROR_NOT_SUPPORTED == rv) {
     return pctx->ops->write_client(pctx, VSCP_LINK_MSG_NOT_SUPPORTED);

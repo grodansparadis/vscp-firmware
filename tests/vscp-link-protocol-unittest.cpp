@@ -451,6 +451,15 @@ TEST_F(VscpLinkProtocol, setguid_requires_priv_6)
   EXPECT_NE(std::string::npos, g_stub.written.find("higher privilege"));
 }
 
+TEST_F(VscpLinkProtocol, setguid_success_replies_ok)
+{
+  g_stub.authenticated = true;
+  g_stub.priv_level    = 6;
+  parse("sgid 00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F");
+  EXPECT_NE(std::string::npos, g_stub.written.find("+OK"));
+  EXPECT_EQ(std::string::npos, g_stub.written.find("-OK"));
+}
+
 TEST_F(VscpLinkProtocol, shutdown_requires_priv_15)
 {
   g_stub.authenticated = true;

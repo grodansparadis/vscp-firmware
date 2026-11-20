@@ -7,6 +7,7 @@ tagged, rename **Unreleased** to the version and date, and start a new
 
 ## Unreleased
 
+- link protocol: `setguid` answered with a parameter error when the GUID was set; it now answers `+OK`
 - helper: the JSON parsers also read `vscpObId` (the obid was only read from `obid`). JSON is written with the short keys (`head`, `class`, `type`, `obid`, `guid`, `data`, ...) and read with either those or the `vscpHead`, `vscpClass`, ... keys
 - fifo: `vscp_fifo_clear()` now deletes the queued events; before it only dropped the pointers (a leak), and its check of the event data was reversed so the data was never freed
 - helper: `vscp_fwhlp_create_json()`/`_ex()` wrote the timestamp with `%llx`, which newlib-nano prints as "lx"; it is now written as two 32-bit halves. For Unix ns events the date/time is taken from the timestamp (it was printed from the unset 0xffff/0xff fields)
