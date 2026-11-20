@@ -3139,6 +3139,27 @@ TEST(_vscp_firmware_helper, vscp_fwhlp_create_json_basic)
   ASSERT_NE(nullptr, strstr(json, "2024-03-20T14:25:30"));
 }
 
+TEST(_vscp_firmware_helper, vscp_fwhlp_create_json_unix_ns_event)
+{
+  // A Unix ns frame: the date/time fields are "not set" (0xffff/0xff) and the
+  // date/time is taken from the timestamp
+  vscp_event_t ev;
+  char json[1024];
+  memset(&ev, 0, sizeof(ev));
+  ev.head         = VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+  ev.vscp_class   = 20;
+  ev.vscp_type    = 3;
+  ev.year         = 0xffff;
+  ev.month        = 0xff;
+  ev.day          = 0xff;
+  ev.timestamp_ns = 1700000000123456789ULL; // 2023-11-14T22:13:20 UTC
+
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_fwhlp_create_json(json, sizeof(json), &ev));
+  EXPECT_NE(nullptr, strstr(json, "\"0x17979cfe3d85cd15\"")) << json;
+  EXPECT_NE(nullptr, strstr(json, "2023-11-14T22:13:20")) << json;
+  EXPECT_EQ(nullptr, strstr(json, "65535")) << json;
+}
+
 TEST(_vscp_firmware_helper, vscp_fwhlp_create_json_ex_basic)
 {
   vscp_event_ex_t ex;

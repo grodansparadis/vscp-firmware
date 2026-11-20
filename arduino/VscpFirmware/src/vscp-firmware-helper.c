@@ -5338,12 +5338,24 @@ vscp_fwhlp_create_json(char *strObj, size_t len, const vscp_event_t *pev)
     timestamp_ns =
       vscp_fwhlp_to_unix_ns(pev->year, pev->month, pev->day, pev->hour, pev->minute, pev->second, pev->timestamp);
   }
-  sprintf(str, "0x%016llx", (unsigned long long) timestamp_ns);
+  // Two 32-bit halves: %llx is not supported by all C libraries (newlib-nano)
+  sprintf(str,
+          "0x%08lx%08lx",
+          (unsigned long) (timestamp_ns >> 32),
+          (unsigned long) (timestamp_ns & 0xffffffffUL));
   cJSON_AddStringToObject(root, "timestamp_ns", str);
 
   vscp_fwhlp_writeGuidToString(str, pev->GUID);
   cJSON_AddStringToObject(root, "guid", str);
-  sprintf(str, "%04d-%02d-%02dT%02d:%02d:%02d", pev->year, pev->month, pev->day, pev->hour, pev->minute, pev->second);
+
+  // A Unix ns frame does not use the date/time fields (they are 0xffff/0xff):
+  // the date/time is taken from the timestamp
+  int year = pev->year, month = pev->month, day = pev->day, hour = pev->hour, minute = pev->minute, second = pev->second;
+  if (((pev->head & VSCP_HEADER16_FRAME_VERSION_MASK) == VSCP_HEADER16_FRAME_VERSION_UNIX_NS)) {
+    uint32_t usec;
+    vscp_fwhlp_from_unix_ns(&year, &month, &day, &hour, &minute, &second, &usec, (int64_t) timestamp_ns);
+  }
+  sprintf(str, "%04d-%02d-%02dT%02d:%02d:%02d", year, month, day, hour, minute, second);
   cJSON_AddStringToObject(root, "datetime", str);
   cJSON *array;
   array = cJSON_AddArrayToObject(root, "data");
@@ -5405,12 +5417,24 @@ vscp_fwhlp_create_json_ex(char *strObj, size_t len, const vscp_event_ex_t *pex)
     timestamp_ns =
       vscp_fwhlp_to_unix_ns(pex->year, pex->month, pex->day, pex->hour, pex->minute, pex->second, pex->timestamp);
   }
-  sprintf(str, "0x%016llx", (unsigned long long) timestamp_ns);
+  // Two 32-bit halves: %llx is not supported by all C libraries (newlib-nano)
+  sprintf(str,
+          "0x%08lx%08lx",
+          (unsigned long) (timestamp_ns >> 32),
+          (unsigned long) (timestamp_ns & 0xffffffffUL));
   cJSON_AddStringToObject(root, "timestamp_ns", str);
 
   vscp_fwhlp_writeGuidToString(str, pex->GUID);
   cJSON_AddStringToObject(root, "guid", str);
-  sprintf(str, "%04d-%02d-%02dT%02d:%02d:%02d", pex->year, pex->month, pex->day, pex->hour, pex->minute, pex->second);
+
+  // A Unix ns frame does not use the date/time fields (they are 0xffff/0xff):
+  // the date/time is taken from the timestamp
+  int year = pex->year, month = pex->month, day = pex->day, hour = pex->hour, minute = pex->minute, second = pex->second;
+  if (((pex->head & VSCP_HEADER16_FRAME_VERSION_MASK) == VSCP_HEADER16_FRAME_VERSION_UNIX_NS)) {
+    uint32_t usec;
+    vscp_fwhlp_from_unix_ns(&year, &month, &day, &hour, &minute, &second, &usec, (int64_t) timestamp_ns);
+  }
+  sprintf(str, "%04d-%02d-%02dT%02d:%02d:%02d", year, month, day, hour, minute, second);
   cJSON_AddStringToObject(root, "datetime", str);
   cJSON *array;
   array = cJSON_AddArrayToObject(root, "data");

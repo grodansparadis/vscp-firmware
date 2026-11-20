@@ -7,6 +7,7 @@ tagged, rename **Unreleased** to the version and date, and start a new
 
 ## Unreleased
 
+- helper: `vscp_fwhlp_create_json()`/`_ex()` wrote the timestamp with `%llx`, which newlib-nano prints as "lx"; it is now written as two 32-bit halves. For Unix ns events the date/time is taken from the timestamp (it was printed from the unset 0xffff/0xff fields)
 - level2: Level II decision matrix fixes: rows now match the event class and type (they triggered on every event); the 32-bit control word is read from byte 0 (it was read from byte 1, so no flag was seen right); the origin check uses VSCP_LEVEL2_DM_FLAG_CHECK_OADDR (it used the Level I value); the index is matched against data byte 0 (it used byte 1); a NULL event is refused
 - level2: new `bDmLevel1Rows` in the context: a Level II device can use Level I (8-byte) decision matrix rows, as the Blinky MDF describes
 - demos/blinky MDF: the status register is 1=ON, 0=OFF (said 0=ON, 1=OFF); removed the leftover "test" alarm at bit 6
