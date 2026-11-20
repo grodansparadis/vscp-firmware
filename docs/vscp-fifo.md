@@ -1,6 +1,6 @@
 # vscp-fifo
 
-Last updated: 2026-06-11
+Last updated: 2026-11-20
 
 `vscp-fifo` provides a small ring-buffer queue for `vscpEvent*` pointers.
 
@@ -31,7 +31,7 @@ Design notes:
 - `void vscp_fifo_init(vscp_fifo_t *f, uint16_t size)`
   - Initializes indices, allocates pointer array, zeros storage.
 - `void vscp_fifo_clear(vscp_fifo_t *f)`
-  - Resets indices and attempts to clear queued entries.
+  - Deletes every queued event (`vscp_fwhlp_deleteEvent()`: the event and its data) and empties the queue. The FIFO stays usable. The events must have been allocated on the heap (`vscp_fwhlp_newEvent()`, `vscp_fwhlp_mkEventCopy()`, ...).
 - `size_t vscp_fifo_write(vscp_fifo_t *f, vscp_event_t *pev)`
   - Enqueue one pointer. Returns `1` on success, `0` if full.
 - `size_t vscp_fifo_read(vscp_fifo_t *f, vscp_event_t **pev)`
@@ -60,7 +60,8 @@ if (vscp_fifo_read(&q, &out)) {
 ## Ownership and lifetime
 
 - The FIFO stores raw `vscpEvent*` pointers.
-- The caller controls allocation and release strategy for events.
+- An event read from the FIFO belongs to the reader, which frees it.
+- `vscp_fifo_clear()` and `vscp_fifo_deinit()` free the events still in the queue, so only put heap-allocated events in a FIFO that is cleared or deinitialized.
 - Call `vscp_fifo_deinit()` when the FIFO is no longer needed. It frees all queued events and releases the internal buffer. Example:
 
   ```c
@@ -81,8 +82,8 @@ For multi-producer/multi-consumer access, protect operations with external synch
 These notes describe current source behavior in `src/vscp-fifo.c`:
 
 - `vscp_fifo_init` uses `malloc` for the pointer buffer and does not check allocation failure.
-- `vscp_fifo_clear` resets `head`/`tail` and clears buffer entries.
-- `vscp_fifo_getFree` returns free slots, not used slots.
+- `vscp_fifo_clear` deletes the queued events and resets `head`/`tail` (before 2026-11-20 it only dropped the pointers, so the events leaked).
+- `vscp_fifo_getFree` returns free slots, not used slots (used = capacity - free).
 
 If you build safety-critical paths, consider wrapping this module with:
 

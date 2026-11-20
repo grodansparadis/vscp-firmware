@@ -1,60 +1,61 @@
 # VSCP Link Protocol callback checklist
 
-Use this checklist when bringing up a new VSCP Link protocol transport/integration.
+Use this checklist when bringing up a new VSCP Link protocol transport/integration. All callbacks are fields of the `vscp_link_ops_t` table that `vscp_link_ctx_t.ops` points to (any function names can be used). See [vscp-link-protocol](../vscp-link-protocol.md).
 
-## Minimum for a usable text session
+## Required
 
-- [ ] `vscp_link_callback_welcome`
-- [ ] `vscp_link_callback_quit`
-- [ ] `vscp_link_callback_write_client`
-- [ ] `vscp_link_callback_get_rcvloop_status`
+- [ ] `write_client` (every command)
+- [ ] `check_authenticated`, `check_privilege` (every command that needs a login)
+- [ ] `get_rcvloop_status`, `rcvloop` (`vscp_link_idle_worker`)
 
-## Authentication and authorization
+## Session
 
-- [ ] `vscp_link_callback_check_user`
-- [ ] `vscp_link_callback_check_password`
-- [ ] `vscp_link_callback_challenge`
-- [ ] `vscp_link_callback_check_authenticated`
-- [ ] `vscp_link_callback_check_privilege`
+- [ ] `welcome` (`vscp_link_connect`)
+- [ ] `quit`
+- [ ] `disconnect` (`vscp_link_disconnect`)
 
-## Event queue operations (text protocol)
+## Authentication
 
-- [ ] `vscp_link_callback_send`
-- [ ] `vscp_link_callback_retr`
-- [ ] `vscp_link_callback_enable_rcvloop`
-- [ ] `vscp_link_callback_rcvloop`
-- [ ] `vscp_link_callback_chkData`
-- [ ] `vscp_link_callback_clrAll`
+- [ ] `check_user`
+- [ ] `check_password` (set `bValidated` and `privLevel` on success)
+- [ ] `challenge`
+
+## Event queue operations
+
+- [ ] `send` — owns the event on success and frees it (or passes it on); return `VSCP_ERROR_TRM_FULL` when the queue is full (the library frees it then)
+- [ ] `retr` — hand over a heap event (the library frees it); `VSCP_ERROR_RCV_EMPTY` when there is none
+- [ ] `enable_rcvloop`
+- [ ] `rcvloop` — like `retr`; return `VSCP_ERROR_TIMEOUT` about once a second without events (`+OK` keepalive)
+- [ ] `chkdata`
+- [ ] `clrall` — free the queued events (`vscp_fifo_clear()`)
 
 ## Device and channel metadata
 
-- [ ] `vscp_link_callback_get_channel_id`
-- [ ] `vscp_link_callback_get_guid`
-- [ ] `vscp_link_callback_set_guid`
-- [ ] `vscp_link_callback_get_version`
-- [ ] `vscp_link_callback_statistics`
-- [ ] `vscp_link_callback_info`
-- [ ] `vscp_link_callback_wcyd`
+- [ ] `get_channel_id`
+- [ ] `get_guid`
+- [ ] `set_guid`
+- [ ] `get_version`
+- [ ] `statistics`
+- [ ] `info`
+- [ ] `wcyd`
+
+## Filter
+
+- [ ] `set_filter`, `set_mask` (and apply `vscp_fwhlp_doLevel2Filter()` with the client's filter when events are queued for it)
 
 ## Interface command support
 
-- [ ] `vscp_link_callback_get_interface_count`
-- [ ] `vscp_link_callback_get_interface`
-- [ ] `vscp_link_callback_close_interface` (if `interface close` is supported)
+- [ ] `get_interface_count`
+- [ ] `get_interface`
+- [ ] `close_interface` (if `interface close` is supported)
 
-## Optional binary and security commands
+## Optional
 
-- [ ] `vscp_link_callback_bretr` (`bretr`)
-- [ ] `vscp_link_callback_bsend` (`bsend`)
-- [ ] `vscp_link_callback_brcvloop` (`brcvloop`)
-- [ ] `vscp_link_callback_sec` (`sec`)
-
-## Optional control hooks
-
-- [ ] `vscp_link_callback_test` (`test`)
-- [ ] `vscp_link_callback_shutdown` (`shutdown`)
-- [ ] `vscp_link_callback_restart` (`restart`)
-- [ ] `vscp_link_callback_help` (only if `VSCP_LINK_CUSTOM_HELP_TEXT` is enabled)
+- [ ] `binary` (`binary`)
+- [ ] `test` (`test`, privilege 15)
+- [ ] `shutdown` (`shutdown`, privilege 15)
+- [ ] `restart` (`restart`, privilege 15)
+- [ ] `help_custom` (only if `VSCP_LINK_CUSTOM_HELP_TEXT` is enabled)
 
 ## Bring-up sanity checks
 
@@ -63,3 +64,4 @@ Use this checklist when bringing up a new VSCP Link protocol transport/integrati
 - [ ] Low-privilege account returns `VSCP_LINK_MSG_LOW_PRIVILEGE_ERROR` where expected.
 - [ ] `retr 1` returns one event line followed by `+OK` when data exists.
 - [ ] `rcvloop` emits periodic keepalive (`+OK`) on timeout path.
+- [ ] Thousands of `send` commands do not use up the memory (events are freed).

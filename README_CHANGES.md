@@ -7,6 +7,7 @@ tagged, rename **Unreleased** to the version and date, and start a new
 
 ## Unreleased
 
+- docs: Level II firmware, link protocol and fifo pages brought up to date with the code (context field names, decision matrix row formats, `vscp_frmw2_setup_event()`, `vscp_link_parser()`, the `ops` callbacks, who frees events); docs index lists all pages and where to start; link protocol callback checklist uses the `ops` fields
 - link protocol: `setguid` answered with a parameter error when the GUID was set; it now answers `+OK`
 - helper: the JSON parsers also read `vscpObId` (the obid was only read from `obid`). JSON is written with the short keys (`head`, `class`, `type`, `obid`, `guid`, `data`, ...) and read with either those or the `vscpHead`, `vscpClass`, ... keys
 - fifo: `vscp_fifo_clear()` now deletes the queued events; before it only dropped the pointers (a leak), and its check of the event data was reversed so the data was never freed

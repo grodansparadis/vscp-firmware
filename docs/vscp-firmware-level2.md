@@ -1,6 +1,6 @@
 # vscp-firmware-level2
 
-Last updated: 2026-06-17
+Last updated: 2026-11-20
 
 This document describes the VSCP Level II firmware framework implemented by:
 
@@ -79,14 +79,18 @@ Substate constants:
 
 Major groups inside the structure:
 
-- Runtime state and timers (`m_state`, `m_substate`, `m_timer1`)
-- Node identity (`m_nickname`, `m_guid`, level selection)
-- Probe/discovery behavior (`m_probe_*`)
-- Optional behavior switches (`m_bEnableErrorReporting`, `m_bEnableLogging`, etc.)
-- Event scheduling (`m_interval_heartbeat`, `m_interval_caps`)
-- Decision matrix storage (`m_pDm`, `m_nDmRows`, `m_sizeDmRow`)
-- Standard registers and persistent fields (`m_userId`, `m_manufacturerId`, `m_mdfurl`, etc.)
+- Runtime state and timers (`state`, `substate`, `timer`)
+- Level (`level`: `VSCP_LEVEL1` or `VSCP_LEVEL2`)
+- Node identity (`nickname`, `guid`, `zone`, `subzone`, `index`)
+- Probe/discovery behavior (`probe_nickname`, `probe_timeout`, `probe_timeout_count`)
+- Optional behavior switches (`bEnableErrorReporting`, `bEnableLogging`, `bHighEndServerResponse`, `bEnableWriteProtectedLocations`, `bUse16BitNickname`, `bInterestedInAllEvents`, `bDmLevel1Rows`)
+- Event scheduling (`interval_heartbeat`, `interval_caps`, in milliseconds, 0 = off)
+- Decision matrix storage (`pDm`, `nDmRows`, `sizeDmRow`, `regOffsetDm`, `pageDm`)
+- Standard registers and persistent fields (`userId`, `manufacturerId`, `manufacturerSubId`, `mdfurl`, `deviceName`, firmware versions, `standard_device_family`/`_type`, ...)
 - `ops` — pointer to a `vscp_frmw2_ops_t` operations table (must be set before calling `vscp_frmw2_init()`)
+- `puserdata` — free for the application (for example its transport context)
+
+`zone` and `subzone` are what the decision matrix compares with when a row asks for a zone/subzone match. If they are user registers on your device, update the context when they are written.
 
 The context pointer `pctx` is passed as the first argument to every public function and to every callback.
 
@@ -97,7 +101,6 @@ The context pointer `pctx` is passed as the first argument to every public funct
 ### Initialization and Main Work
 
 - `vscp_frmw2_init`
-- `vscp_frmw2_init_persistent_storage`
 - `vscp_frmw2_work`
 - `vscp_frmw2_setup_event`
 
@@ -133,11 +136,6 @@ The context pointer `pctx` is passed as the first argument to every public funct
 - `vscp_frmw2_feed_dm`
 - `vscp_frmw2_report_dmatrix`
 
-### Diagnostics and Logging
-
-- `vscp_frmw2_send_error_event`
-- `vscp_frmw2_send_log_event`
-
 ---
 
 ## Callback Contract (Implemented by Application/Port)
@@ -145,6 +143,8 @@ The context pointer `pctx` is passed as the first argument to every public funct
 All platform-specific behavior is provided through a `vscp_frmw2_ops_t` operations table.
 Populate the struct and assign it to `ctx.ops` before calling `vscp_frmw2_init()`.
 Every callback receives `pctx` as its first argument.
+
+Mandatory (`vscp_frmw2_init()` returns `VSCP_ERROR_INIT_MISSING` if one is NULL): `get_milliseconds`, `get_timestamp`, `send_event`, `set_event_time`, `read_reg`, `write_reg`, `stdreg_change`. Set the others to NULL if they are not used.
 
 Time and lifecycle callbacks:
 
@@ -157,20 +157,19 @@ Time and lifecycle callbacks:
 
 Transport and event callbacks:
 
-- `send_event`
+- `send_event` — the event belongs to the framework (it is often on its stack). Copy it (`vscp_fwhlp_mkEventCopy()`) if it is queued; do not free it
 - `set_event_time`
 - `report_events_of_interest`
 - `segment_ctrl_heartbeat`
 
 Decision matrix callback:
 
-- `dm_action`
+- `dm_action(pctx, pev, action, pparam)` — called for each enabled row that matches the event. `pparam` points at the action parameter in the row (one byte for Level I rows, the parameter area for Level II rows)
 
 Register and network callbacks:
 
-- `read_reg`
-- `write_reg`
-- `stdreg_change`
+- `read_reg(pctx, page, reg, pval)` / `write_reg(pctx, page, reg, val)` — the user registers (below the standard registers). The decision matrix registers are user registers too: map `regOffsetDm` and up to `pDm`
+- `stdreg_change(pctx, stdreg)` — a standard register that should be saved (user id, nickname, ...) was written. The new value is in the context; save it
 - `get_ip_addr`
 
 ---
@@ -182,9 +181,9 @@ Typical flow:
 1. `vscp_frmw2_init(&ctx)` sets defaults and initial state.
 2. Node enters active state immediately in Level II mode.
 3. In Level I compatibility mode, framework may run probe/nickname phases first.
-4. `vscp_frmw2_work(&ctx, pex)` is called periodically:
-   - with `pex != NULL` when an event is available
-   - with `pex == NULL` for periodic/state processing
+4. `vscp_frmw2_work(&ctx, pev)` is called periodically:
+   - with `pev != NULL` for every event received from the transport. It handles protocol events (register read/write, who is there, ...) and runs the event through the decision matrix. The caller still owns the event afterwards and frees it
+   - with `pev == NULL` for periodic/state processing (heartbeat, capabilities)
 5. Framework updates heartbeats/caps/protocol responses and applies decision matrix actions.
 
 ## Level II Startup/Runtime Diagram
@@ -256,48 +255,53 @@ Key points:
 
 Decision matrix support is configurable through fields in `vscp_frmw2_firmware_context_t`:
 
-- `m_pDm`
-- `m_nDmRows`
-- `m_sizeDmRow`
-- `m_regOffsetDm`
-- `m_pageDm`
+- `pDm` — row storage (NULL = no decision matrix)
+- `nDmRows` — number of rows
+- `sizeDmRow` — bytes per row
+- `regOffsetDm` — first register of the matrix, reported by `vscp_frmw2_report_dmatrix()` (the register mapping itself is done in `read_reg`/`write_reg`)
+- `pageDm` — register page of the matrix
+- `bDmLevel1Rows` — use Level I rows on a Level II device
 
-Framework helpers feed events into Level I/Level II DM paths and invoke `ops->dm_action` when rules match.
+`vscp_frmw2_feed_dm()` (called from `vscp_frmw2_work()`) uses Level I rows when `level == VSCP_LEVEL1` or `bDmLevel1Rows` is set, else Level II rows, and calls `ops->dm_action` for every enabled row that matches.
+
+**Level I row** (8 bytes, `VSCP_LEVEL1_DM_POS_*`):
+
+| Byte | |
+| --- | --- |
+| 0 | Origin (nickname, compared with GUID byte 15 when flag 0x40 is set) |
+| 1 | Flags: 0x80 enabled, 0x40 check origin, 0x20 hardcoded, 0x10 match zone (data byte 1), 0x08 match subzone (data byte 2), 0x02/0x01 bit 8 of class mask/filter |
+| 2, 3 | Class mask, class filter |
+| 4, 5 | Type mask, type filter |
+| 6 | Action |
+| 7 | Action parameter |
+
+An event matches when `(class & mask) == (filter & mask)` for both class and type. Zone/subzone 255 in the event matches any zone.
+
+**Level II row** (`VSCP_LEVEL2_DM_POS_*`): flags (32 bits, MSB first) at 0, class (16 bits) at 4, type (16 bits) at 6, origin GUID at 8, action (16 bits) at 24 and parameters from 26. Flags: `VSCP_LEVEL2_DM_FLAG_ENABLED`, `_CHECK_OADDR` (GUID must match), `_END_MARK`, `_CHECK_INDEX`/`_CHECK_ZONE`/`_CHECK_SUBZONE` (data bytes 0/1/2). The class and type must match exactly.
 
 ---
 
 ## Event Data Model
 
-The framework uses `vscpEvent` (`vscp_event_t`) throughout — a pointer-based event struct:
+The framework uses `vscpEvent` (`vscp_event_t`, see `vscp.h`) throughout — a pointer-based event struct: `head`, `obid`, the time block, `vscp_class`, `vscp_type`, `GUID[16]`, `sizeData` and `pdata` (pointer to the data, max 512 bytes).
+
+The time block is either date/time (`year`, `month`, `day`, `hour`, `minute`, `second`) plus a relative `timestamp` in microseconds, or — when the header has `VSCP_HEADER16_FRAME_VERSION_UNIX_NS` and `year`/`month` are 0xffff/0xff — a 64-bit Unix time in nanoseconds, `timestamp_ns`, which shares memory with `day` ... `timestamp` (a union).
+
+To make an event from the node use `vscp_frmw2_setup_event(pctx, pev, sizeData)`. It sets the header (normal priority, Unix ns time), the GUID of the node and the time (`ops->set_event_time`), and allocates a zeroed data buffer of `sizeData` bytes in `pev->pdata`, which the caller frees:
 
 ```c
-typedef struct _vscp_event_t {
-  uint16_t head;
-  uint32_t obid;
-  uint16_t year, month, day, hour, minute, second;
-  uint32_t timestamp;
-  uint16_t vscp_class;
-  uint16_t vscp_type;
-  uint8_t  GUID[16];
-  uint16_t sizeData;
-  uint8_t *pdata;   // pointer to external data buffer
-  uint16_t crc;
-} vscp_event_t;
-```
-
-**Important**: `pdata` must point to a valid buffer before passing the event to any framework function.
-For stack-allocated outgoing events, declare a companion buffer and assign `pdata` before calling
-`vscp_frmw2_setup_event()`:
-
-```c
-uint8_t buf[VSCP_MAX_DATA];
 vscp_event_t ev;
-ev.pdata = buf;
-vscp_frmw2_setup_event(pctx, &ev);
+memset(&ev, 0, sizeof(ev));
+if (VSCP_ERROR_SUCCESS == vscp_frmw2_setup_event(pctx, &ev, 3)) {
+  ev.vscp_class = VSCP_CLASS1_INFORMATION;
+  ev.vscp_type  = VSCP_TYPE_INFORMATION_ON;
+  ev.pdata[0]   = 0;             // index
+  ev.pdata[1]   = pctx->zone;
+  ev.pdata[2]   = pctx->subzone;
+  pctx->ops->send_event(pctx, &ev);
+  free(ev.pdata);
+}
 ```
-
-`vscp_frmw2_setup_event()` skips the data-buffer zeroing when `pdata == NULL`, so it is safe
-to call with `pdata = NULL` when no data payload is needed.
 
 For incoming events passed to `vscp_frmw2_work()`, `vscp_frmw2_handle_protocol_event()`, or
 the DM feed functions: the framework validates `pdata` at each entry point — if `sizeData > 0`
@@ -331,11 +335,10 @@ if (VSCP_ERROR_SUCCESS == rv) {
     // If no incoming event:
     vscp_frmw2_work(&ctx, NULL);
 
-    // If an incoming event is available (buffer must be allocated by transport):
-    // uint8_t buf[VSCP_MAX_DATA];
-    // vscp_event_t ev;  ev.pdata = buf;
-    // /* fill ev from transport */
-    // vscp_frmw2_work(&ctx, &ev);
+    // If an incoming event is available (for example parsed from a frame,
+    // JSON or the link protocol into an event from vscp_fwhlp_newEvent()):
+    // vscp_frmw2_work(&ctx, pev);
+    // vscp_fwhlp_deleteEvent(&pev);   // still owned by the caller
   }
 }
 ```
@@ -348,7 +351,16 @@ if (VSCP_ERROR_SUCCESS == rv) {
 - Missing callback implementations (especially send-event, register read/write, and time callbacks).
 - Inconsistent register persistence handling after standard-register changes.
 - Misconfigured decision matrix row size or storage pointer.
-- Mixing Level I/Level II assumptions without setting `m_level` and transport behavior accordingly.
+- Mixing Level I/Level II assumptions without setting `level` and transport behavior accordingly.
+- Freeing the event in `send_event` (it belongs to the framework), or not freeing events passed to `vscp_frmw2_work()` (they still belong to the caller).
+- Forgetting `crcInit()` (`vscp-crc.h`) before frames are made or checked: the frame CRCs are then 0 and received CRCs are not checked.
+
+## Examples
+
+Complete Level II nodes (the Blinky demo):
+
+- [vscp-demo-esp32-wifi-blinky](https://github.com/grodansparadis/vscp-demo-esp32-wifi-blinky) — ESP32, link protocol, UDP, multicast, MQTT. See `main/blinky.c`
+- [vscp-demo-link-stm32f401-wiz-ip20-blinky](https://github.com/grodansparadis/vscp-demo-link-stm32f401-wiz-ip20-blinky) — STM32F401 with a WIZ-IP20 module. See `firmware/callbacks-frm2.c`
 
 ---
 
