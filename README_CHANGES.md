@@ -7,6 +7,7 @@ tagged, rename **Unreleased** to the version and date, and start a new
 
 ## Unreleased
 
+- level2: the capabilities event (CLASS2.PROTOCOL 1024/20) no longer claims SSL support: byte 7 is 0x28 (IPv4, two connections), it was 0x38
 - docs: Level II firmware, link protocol and fifo pages brought up to date with the code (context field names, decision matrix row formats, `vscp_frmw2_setup_event()`, `vscp_link_parser()`, the `ops` callbacks, who frees events); docs index lists all pages and where to start; link protocol callback checklist uses the `ops` fields
 - link protocol: `setguid` answered with a parameter error when the GUID was set; it now answers `+OK`
 - helper: the JSON parsers also read `vscpObId` (the obid was only read from `obid`). JSON is written with the short keys (`head`, `class`, `type`, `obid`, `guid`, `data`, ...) and read with either those or the `vscpHead`, `vscpClass`, ... keys

@@ -295,6 +295,9 @@ TEST(_vscp_frmw2, send_caps_contains_guid_ip_and_name)
   ASSERT_EQ(VSCP_CLASS2_PROTOCOL, g_stub.last_sent.vscp_class);
   ASSERT_EQ(VSCP2_TYPE_PROTOCOL_HIGH_END_SERVER_CAPS, g_stub.last_sent.vscp_type);
   ASSERT_EQ(104, g_stub.last_sent.sizeData);
+  ASSERT_EQ(0x40, g_stub.last_sent.pdata[0]); // Decision matrix
+  ASSERT_EQ(0x80, g_stub.last_sent.pdata[6]); // VSCP link protocol (TCP/IP)
+  ASSERT_EQ(0x28, g_stub.last_sent.pdata[7]); // IPv4, two connections, no SSL
   ASSERT_EQ(0, std::memcmp(cfg.guid, g_stub.last_sent.pdata + 8, 16));
   ASSERT_EQ(0, std::memcmp(cfg.ipaddr, g_stub.last_sent.pdata + 24, 16));
   ASSERT_EQ(0, std::memcmp(cfg.deviceName, g_stub.last_sent.pdata + 40, 64));

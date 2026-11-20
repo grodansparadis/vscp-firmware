@@ -1924,7 +1924,7 @@ vscp_frmw2_send_caps(vscp_frmw2_firmware_context_t *pctx)
   pev->pdata[4] = 0x00;
   pev->pdata[5] = 0x00;
   pev->pdata[6] = 0x80; // Have VSCP TCP server with VCSP link interface.
-  pev->pdata[7] = 0x38; // IP4 support, SLL support
+  pev->pdata[7] = (uint8_t) ((VSCP_SERVER_CAPABILITY_IP4 | VSCP_SERVER_CAPABILITY_TWO_CONNECTIONS) & 0xff); // 0x28: IPv4, two connections (no SSL)
                         // Accepts two or more simultaneous connections on TCP/IP interface.
 
   // GUID
