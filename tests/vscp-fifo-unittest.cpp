@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <gtest/gtest.h>
 #include "vscp-fifo.h"
+#include "vscp-firmware-helper.h"
 
 TEST(_vscp_fifo, init_and_capacity)
 {
@@ -90,11 +91,16 @@ TEST(_vscp_fifo, clear_resets_fifo_state)
   vscp_fifo_t fifo;
   vscp_fifo_init(&fifo, 3);
 
-  vscp_event_t e1 = {};
-  vscp_event_t e2 = {};
+  // Clear deletes the queued events (and their data)
+  vscp_event_t *e1 = vscp_fwhlp_newEvent();
+  vscp_event_t *e2 = vscp_fwhlp_newEvent();
+  ASSERT_NE(nullptr, e1);
+  ASSERT_NE(nullptr, e2);
+  e2->sizeData = 4;
+  e2->pdata    = (uint8_t *) std::malloc(4);
 
-  ASSERT_EQ(1u, vscp_fifo_write(&fifo, &e1));
-  ASSERT_EQ(1u, vscp_fifo_write(&fifo, &e2));
+  ASSERT_EQ(1u, vscp_fifo_write(&fifo, e1));
+  ASSERT_EQ(1u, vscp_fifo_write(&fifo, e2));
 
   vscp_fifo_clear(&fifo);
 

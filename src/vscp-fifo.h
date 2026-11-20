@@ -81,7 +81,8 @@ typedef struct {
 void vscp_fifo_init(vscp_fifo_t *f, uint16_t size);
 
 /*!
-  @brief Clear the fifo
+  @brief Clear the fifo. Events still in it are deleted
+         (vscp_fwhlp_deleteEvent), so they must be allocated on the heap.
   @param f Pointer to fifo structure
 */
 void vscp_fifo_clear(vscp_fifo_t *f);

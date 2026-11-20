@@ -27,18 +27,14 @@ vscp_fifo_init(vscp_fifo_t* f, uint16_t size)
 void
 vscp_fifo_clear(vscp_fifo_t* f)
 {
+  vscp_event_t *pev = NULL;
+
+  /* Free every event still queued (the fifo owns them) */
+  while (vscp_fifo_read(f, &pev)) {
+    vscp_fwhlp_deleteEvent(&pev);
+  }
   f->head = 0;
   f->tail = 0;
-  for (int i = 0; i < f->size; i++) {
-    if (NULL != f->buf[i]) {
-      vscpEvent* pev = f->buf[i];
-      if (NULL == pev->pdata) {
-        free(pev->pdata);
-        pev->pdata = NULL;
-      }
-      f->buf[i] = NULL;
-    }
-  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
