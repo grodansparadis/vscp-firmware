@@ -7,6 +7,9 @@ tagged, rename **Unreleased** to the version and date, and start a new
 
 ## Unreleased
 
+- level2: Level II decision matrix fixes: rows now match the event class and type (they triggered on every event); the 32-bit control word is read from byte 0 (it was read from byte 1, so no flag was seen right); the origin check uses VSCP_LEVEL2_DM_FLAG_CHECK_OADDR (it used the Level I value); the index is matched against data byte 0 (it used byte 1); a NULL event is refused
+- level2: new `bDmLevel1Rows` in the context: a Level II device can use Level I (8-byte) decision matrix rows, as the Blinky MDF describes
+- demos/blinky MDF: the status register is 1=ON, 0=OFF (said 0=ON, 1=OFF); removed the leftover "test" alarm at bit 6
 - Arduino: new VscpFirmware Arduino library (`arduino/VscpFirmware`) that makes an Arduino a VSCP Level I node on a CAN bus, built on vscp-firmware-level2. `VscpNode` does nickname discovery, heartbeats, standard registers, register read/write, the decision matrix and saves the configuration (`VscpEepromStorage`); transports for the MCP2515 (`VscpCanMcp2515`, mcp_can library) and the ESP32 CAN controller (`VscpCanTwai`). Examples: MinimalNode, Blinky (follows the Blinky MDF), TemperatureSensor, Esp32Twai. Documentation in docs/vscp-arduino.md
 - Arduino: `tests/arduino/run.sh` runs the library and the Blinky example against scripted CAN traffic on the PC; CI runs it and builds the examples with PlatformIO (Uno, Mega, ESP32). `tools/arduino-sync-library.sh` keeps the library's copies of the framework files in step with `src/` (`--check`, `--zip`)
 - level2: the Level I "who is there" response read one byte before the GUID and one byte after the 32-byte MDF URL (found with the address sanitizer); the last byte of frame 6 is now always 0 as the specification says

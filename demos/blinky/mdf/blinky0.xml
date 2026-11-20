@@ -160,38 +160,38 @@
         <infourl lang="en">https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-1</infourl>
       </reg>
       <reg name="Status" page="0" offset="2" span="1" width="8" type="std" access="rw" default="UNDEF" min="0" max="255" fgcolor="0x0" bgcolor="0xffffff">
-        <description lang="en">Status of the node. This indicates the current state of the LED, 0=ON, 1=OFF.</description>
-        <description lang="se">Status för noden. Detta indikerar det aktuella tillståndet för LED, 0=ON, 1=OFF.</description>
-        <description lang="no">Status for noden. Dette indikerer den nåværende tilstanden til LED, 0=ON, 1=OFF.</description>
-        <description lang="dk">Status for noden. Dette indikerer den aktuelle tilstand for LED, 0=ON, 1=OFF.</description>
-        <description lang="de">Status des Knotens. Dies zeigt den aktuellen Zustand der LED an, 0=ON, 1=OFF.</description>
-        <description lang="fr">Statut du nœud. Cela indique l'état actuel de la LED, 0=ON, 1=OFF.</description>
-        <description lang="es">Estado del nodo. Esto indica el estado actual del LED, 0=ON, 1=OFF.</description>
-        <description lang="it">Stato del nodo. Questo indica lo stato attuale del LED, 0=ON, 1=OFF.</description>
+        <description lang="en">Status of the node. This indicates the current state of the LED, 1=ON, 0=OFF.</description>
+        <description lang="se">Status för noden. Detta indikerar det aktuella tillståndet för LED, 1=ON, 0=OFF.</description>
+        <description lang="no">Status for noden. Dette indikerer den nåværende tilstanden til LED, 1=ON, 0=OFF.</description>
+        <description lang="dk">Status for noden. Dette indikerer den aktuelle tilstand for LED, 1=ON, 0=OFF.</description>
+        <description lang="de">Status des Knotens. Dies zeigt den aktuellen Zustand der LED an, 1=ON, 0=OFF.</description>
+        <description lang="fr">Statut du nœud. Cela indique l'état actuel de la LED, 1=ON, 0=OFF.</description>
+        <description lang="es">Estado del nodo. Esto indica el estado actual del LED, 1=ON, 0=OFF.</description>
+        <description lang="it">Stato del nodo. Questo indica lo stato attuale del LED, 1=ON, 0=OFF.</description>
         <description lang="ru">Статус узла. Это указывает текущее состояние светодиода, 0=ВКЛ, 1=ВЫКЛ.</description>
-        <description lang="fi">Solmun tila. Tämä osoittaa LEDin nykyisen tilan, 0=ON, 1=OFF.</description>
-        <description lang="zh">节点的状态。这表示LED的当前状态，0 = ON，1 = OFF。</description>
-        <description lang="ja">ノードのステータス。これはLEDの現在の状態を示します。0 = ON、1 = OFF。</description>
-        <description lang="pt">Status do nó. Isso indica o estado atual do LED, 0 = ON, 1 = OFF.</description>
-        <description lang="ar">حالة العقدة. هذا يشير إلى الحالة الحالية للLED، 0 = ON، 1 = OFF.</description>
-        <description lang="sk">Stav uzlu. To ukazuje aktuální stav LED, 0 = ON, 1 = OFF.</description>
-        <description lang="hu">A csomópont állapota. Ez jelzi a LED aktuális állapotát, 0=ON, 1=OFF.</description>
-        <description lang="kr">노드의 상태입니다. 이것은 LED의 현재 상태를 나타냅니다. 0=ON, 1=OFF.</description>
-        <description lang="bg">Състояние на възела. Показва текущото състояние на LED: 0=ON, 1=OFF.</description>
-        <description lang="hr">Status čvora. Označava trenutačno stanje LED-a: 0=ON, 1=OFF.</description>
-        <description lang="cs">Stav uzlu. Udává aktuální stav LED: 0=ON, 1=OFF.</description>
-        <description lang="da">Status for noden. Dette angiver LED'ens aktuelle tilstand: 0=ON, 1=OFF.</description>
-        <description lang="nl">Status van de node. Dit geeft de huidige status van de led aan: 0=ON, 1=OFF.</description>
-        <description lang="et">Sõlme olek. See näitab LED-i praegust olekut: 0=ON, 1=OFF.</description>
-        <description lang="el">Κατάσταση του κόμβου. Υποδεικνύει την τρέχουσα κατάσταση του LED, 0=ON, 1=OFF.</description>
-        <description lang="ga">Stádas an nóid. Léiríonn sé seo staid reatha an LED, 0=ON, 1=OFF.</description>
-        <description lang="lv">Mezgla statuss. Tas norāda pašreizējo LED stāvokli: 0=ON, 1=OFF.</description>
-        <description lang="lt">Mazgo būsena. Ji nurodo dabartinę LED būseną: 0=ON, 1=OFF.</description>
-        <description lang="mt">L-istatus tan-nodu. Dan jindika l-istat attwali tal-LED: 0=ON, 1=OFF.</description>
-        <description lang="pl">Stan węzła. Wskazuje bieżący stan LED: 0=ON, 1=OFF.</description>
-        <description lang="ro">Starea nodului. Indică starea curentă a LED-ului: 0=ON, 1=OFF.</description>
-        <description lang="sl">Stanje vozlišča. Označuje trenutno stanje LED: 0=ON, 1=OFF.</description>
-        <description lang="sv">Nodens status. Anger LED-lampans aktuella tillstånd: 0=ON, 1=OFF.</description>
+        <description lang="fi">Solmun tila. Tämä osoittaa LEDin nykyisen tilan, 1=ON, 0=OFF.</description>
+        <description lang="zh">节点的状态。这表示LED的当前状态，1 = ON，0 = OFF。</description>
+        <description lang="ja">ノードのステータス。これはLEDの現在の状態を示します。1 = ON、0 = OFF。</description>
+        <description lang="pt">Status do nó. Isso indica o estado atual do LED, 1 = ON, 0 = OFF.</description>
+        <description lang="ar">حالة العقدة. هذا يشير إلى الحالة الحالية للLED، 1 = ON، 0 = OFF.</description>
+        <description lang="sk">Stav uzlu. To ukazuje aktuální stav LED, 1 = ON, 0 = OFF.</description>
+        <description lang="hu">A csomópont állapota. Ez jelzi a LED aktuális állapotát, 1=ON, 0=OFF.</description>
+        <description lang="kr">노드의 상태입니다. 이것은 LED의 현재 상태를 나타냅니다. 1=ON, 0=OFF.</description>
+        <description lang="bg">Състояние на възела. Показва текущото състояние на LED: 1=ON, 0=OFF.</description>
+        <description lang="hr">Status čvora. Označava trenutačno stanje LED-a: 1=ON, 0=OFF.</description>
+        <description lang="cs">Stav uzlu. Udává aktuální stav LED: 1=ON, 0=OFF.</description>
+        <description lang="da">Status for noden. Dette angiver LED'ens aktuelle tilstand: 1=ON, 0=OFF.</description>
+        <description lang="nl">Status van de node. Dit geeft de huidige status van de led aan: 1=ON, 0=OFF.</description>
+        <description lang="et">Sõlme olek. See näitab LED-i praegust olekut: 1=ON, 0=OFF.</description>
+        <description lang="el">Κατάσταση του κόμβου. Υποδεικνύει την τρέχουσα κατάσταση του LED, 1=ON, 0=OFF.</description>
+        <description lang="ga">Stádas an nóid. Léiríonn sé seo staid reatha an LED, 1=ON, 0=OFF.</description>
+        <description lang="lv">Mezgla statuss. Tas norāda pašreizējo LED stāvokli: 1=ON, 0=OFF.</description>
+        <description lang="lt">Mazgo būsena. Ji nurodo dabartinę LED būseną: 1=ON, 0=OFF.</description>
+        <description lang="mt">L-istatus tan-nodu. Dan jindika l-istat attwali tal-LED: 1=ON, 0=OFF.</description>
+        <description lang="pl">Stan węzła. Wskazuje bieżący stan LED: 1=ON, 0=OFF.</description>
+        <description lang="ro">Starea nodului. Indică starea curentă a LED-ului: 1=ON, 0=OFF.</description>
+        <description lang="sl">Stanje vozlišča. Označuje trenutno stanje LED: 1=ON, 0=OFF.</description>
+        <description lang="sv">Nodens status. Anger LED-lampans aktuella tillstånd: 1=ON, 0=OFF.</description>
         <infourl lang="en">https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-2</infourl>
         <bit name="LED active" pos="1" width="1" default="1" access="rw">
           <description lang="en">Status bit telling that the LED is active. 0=LED is off, 1=LED is on. If written to, the LED will be turned on or off depending on the value written. If the LED is enabled in the control register, the LED will be turned on or off depending on the value written.</description>
@@ -929,33 +929,6 @@
         <description lang="sl">Dosežena je bila omejitev števca.</description>
         <description lang="sv">Räknargränsen har nåtts.</description>
         <infourl lang="en">https://github.com/grodansparadis/vscp/wiki/blinky-info-url-alarm7</infourl>
-      </bit>
-      <bit name="test event data 1" pos="0x06">
-        <description lang="en">test</description>
-        <description lang="bg">test</description>
-        <description lang="hr">test</description>
-        <description lang="cs">test</description>
-        <description lang="da">test</description>
-        <description lang="nl">test</description>
-        <description lang="et">test</description>
-        <description lang="fi">testi</description>
-        <description lang="fr">test</description>
-        <description lang="de">Test</description>
-        <description lang="el">δοκιμή</description>
-        <description lang="hu">teszt</description>
-        <description lang="ga">tástáil</description>
-        <description lang="it">test</description>
-        <description lang="lv">tests</description>
-        <description lang="lt">testas</description>
-        <description lang="mt">test</description>
-        <description lang="pl">test</description>
-        <description lang="pt">teste</description>
-        <description lang="ro">test</description>
-        <description lang="sk">test</description>
-        <description lang="sl">test</description>
-        <description lang="es">prueba</description>
-        <description lang="sv">test</description>
-        <infourl lang="en">https://github.com/grodansparadis/vscp/wiki/blinky-info-url-alarm6</infourl>
       </bit>
     </alarm>
     <dmatrix>

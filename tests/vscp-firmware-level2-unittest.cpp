@@ -958,3 +958,187 @@ TEST(_vscp_frmw2, extended_page_read_wait_survives_timestamp_wrap)
   ASSERT_FALSE(g_stub.ts_runaway);
   ASSERT_EQ(2, g_stub.send_calls);
 }
+
+// ---------------------------------------------------------------------------
+// Level II decision matrix rows
+//   bytes 0-3   control (MSB first)
+//   bytes 4-5   class
+//   bytes 6-7   type
+//   bytes 8-23  originating GUID
+//   bytes 24-25 action
+//   bytes 26-31 action parameter
+// ---------------------------------------------------------------------------
+
+struct Dm2Row {
+  uint8_t bytes[32];
+};
+
+static Dm2Row make_dm2_row(uint32_t flags, uint16_t vscp_class, uint16_t vscp_type, uint8_t action)
+{
+  Dm2Row r   = {};
+  r.bytes[0] = static_cast<uint8_t>(flags >> 24);
+  r.bytes[1] = static_cast<uint8_t>(flags >> 16);
+  r.bytes[2] = static_cast<uint8_t>(flags >> 8);
+  r.bytes[3] = static_cast<uint8_t>(flags);
+  r.bytes[4] = static_cast<uint8_t>(vscp_class >> 8);
+  r.bytes[5] = static_cast<uint8_t>(vscp_class);
+  r.bytes[6] = static_cast<uint8_t>(vscp_type >> 8);
+  r.bytes[7] = static_cast<uint8_t>(vscp_type);
+  r.bytes[25] = action;
+  return r;
+}
+
+static void setup_dm2(vscp_frmw2_firmware_config_t& cfg, Dm2Row* rows, uint8_t n)
+{
+  cfg.pDm       = rows[0].bytes;
+  cfg.nDmRows   = n;
+  cfg.sizeDmRow = sizeof(Dm2Row);
+}
+
+TEST(_vscp_frmw2, feed_level2_dm_matches_class_and_type_exactly)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_config(cfg);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
+  reset_stub();
+
+  Dm2Row row = make_dm2_row(VSCP_LEVEL2_DM_FLAG_ENABLED, 30, 5, 7);
+  setup_dm2(cfg, &row, 1);
+
+  uint8_t buf[3] = { 0, 0, 0 };
+  vscp_event_t ev;
+  std::memset(&ev, 0, sizeof(ev));
+  ev.sizeData   = 3;
+  ev.pdata      = buf;
+  ev.vscp_class = 30;
+  ev.vscp_type  = 6; // Other type
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_feed_level2_dm(&cfg, &ev));
+  ASSERT_EQ(0, g_stub.dm_action_calls);
+
+  ev.vscp_class = 20; // Other class
+  ev.vscp_type  = 5;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_feed_level2_dm(&cfg, &ev));
+  ASSERT_EQ(0, g_stub.dm_action_calls);
+
+  ev.vscp_class = 30;
+  ev.vscp_type  = 5;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_feed_level2_dm(&cfg, &ev));
+  ASSERT_EQ(1, g_stub.dm_action_calls);
+  ASSERT_EQ(7, g_stub.last_dm_action);
+}
+
+TEST(_vscp_frmw2, feed_level2_dm_flags_are_read_from_byte_0)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_config(cfg);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
+  reset_stub();
+
+  // Enabled bit only in byte 0: the row must trigger
+  Dm2Row row = make_dm2_row(VSCP_LEVEL2_DM_FLAG_ENABLED, 30, 5, 2);
+  setup_dm2(cfg, &row, 1);
+  vscp_event_t ev;
+  std::memset(&ev, 0, sizeof(ev));
+  ev.vscp_class = 30;
+  ev.vscp_type  = 5;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_feed_level2_dm(&cfg, &ev));
+  ASSERT_EQ(1, g_stub.dm_action_calls);
+
+  // Disabled row (0x80 only in byte 1, as the old macro read it) must not trigger
+  reset_stub();
+  Dm2Row off = make_dm2_row(0x00800000, 30, 5, 2);
+  setup_dm2(cfg, &off, 1);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_feed_level2_dm(&cfg, &ev));
+  ASSERT_EQ(0, g_stub.dm_action_calls);
+}
+
+TEST(_vscp_frmw2, feed_level2_dm_origin_check_uses_level2_flag)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_config(cfg);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
+  reset_stub();
+
+  Dm2Row row = make_dm2_row(VSCP_LEVEL2_DM_FLAG_ENABLED | VSCP_LEVEL2_DM_FLAG_CHECK_OADDR, 30, 5, 3);
+  for (int i = 0; i < 16; i++) {
+    row.bytes[8 + i] = static_cast<uint8_t>(0x10 + i);
+  }
+  setup_dm2(cfg, &row, 1);
+
+  vscp_event_t ev;
+  std::memset(&ev, 0, sizeof(ev));
+  ev.vscp_class = 30;
+  ev.vscp_type  = 5;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_feed_level2_dm(&cfg, &ev)); // GUID all zero
+  ASSERT_EQ(0, g_stub.dm_action_calls);
+
+  for (int i = 0; i < 16; i++) {
+    ev.GUID[i] = static_cast<uint8_t>(0x10 + i);
+  }
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_feed_level2_dm(&cfg, &ev));
+  ASSERT_EQ(1, g_stub.dm_action_calls);
+}
+
+TEST(_vscp_frmw2, feed_level2_dm_index_is_data_byte_0)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_config(cfg);
+  cfg.index = 3;
+  cfg.zone  = 9;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
+  reset_stub();
+
+  Dm2Row row = make_dm2_row(VSCP_LEVEL2_DM_FLAG_ENABLED | VSCP_LEVEL2_DM_FLAG_CHECK_INDEX, 20, 3, 4);
+  setup_dm2(cfg, &row, 1);
+
+  uint8_t buf[3] = { 3, 0, 0 }; // index 3 in byte 0
+  vscp_event_t ev;
+  std::memset(&ev, 0, sizeof(ev));
+  ev.vscp_class = 20;
+  ev.vscp_type  = 3;
+  ev.sizeData   = 3;
+  ev.pdata      = buf;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_feed_level2_dm(&cfg, &ev));
+  ASSERT_EQ(1, g_stub.dm_action_calls);
+
+  buf[0] = 4; // Other index
+  buf[1] = 3; // Byte 1 holding the index value must not matter
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_feed_level2_dm(&cfg, &ev));
+  ASSERT_EQ(1, g_stub.dm_action_calls);
+}
+
+TEST(_vscp_frmw2, feed_level2_dm_null_event_returns_error)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_config(cfg);
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
+  ASSERT_EQ(VSCP_ERROR_INVALID_POINTER, vscp_frmw2_feed_level2_dm(&cfg, nullptr));
+}
+
+TEST(_vscp_frmw2, feed_dm_level2_device_with_level1_rows)
+{
+  vscp_frmw2_firmware_config_t cfg;
+  init_config(cfg); // Level II device
+  cfg.bDmLevel1Rows = 1;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_init(&cfg));
+  reset_stub();
+
+  // Level I row: CLASS1.CONTROL (30), TURN-ON (5) -> action 2
+  Dm1Row row = make_dm1_row(VSCP_LEVEL1_DM_FLAG_ENABLED, 0xff, 30, 0xff, 5, 2);
+  setup_dm1(cfg, &row, 1);
+
+  uint8_t buf[3] = { 0, 0, 0 };
+  vscp_event_t ev;
+  std::memset(&ev, 0, sizeof(ev));
+  ev.vscp_class = 30;
+  ev.vscp_type  = 5;
+  ev.sizeData   = 3;
+  ev.pdata      = buf;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_feed_dm(&cfg, &ev));
+  ASSERT_EQ(1, g_stub.dm_action_calls);
+  ASSERT_EQ(2, g_stub.last_dm_action);
+
+  ev.vscp_type = 6;
+  ASSERT_EQ(VSCP_ERROR_SUCCESS, vscp_frmw2_feed_dm(&cfg, &ev));
+  ASSERT_EQ(1, g_stub.dm_action_calls);
+}

@@ -2465,6 +2465,10 @@ vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_
 
   int rv = VSCP_ERROR_SUCCESS;
 
+  if (NULL == pev) {
+    return VSCP_ERROR_INVALID_POINTER;
+  }
+
   if (pev->sizeData > 0 && NULL == pev->pdata) {
     return VSCP_ERROR_INVALID_POINTER;
   }
@@ -2482,7 +2486,12 @@ vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_
     }
 
     // Should the originating id be checked and if so is it the same?
-    if ((LEVEL2_DM_FLAGS(row) & VSCP_LEVEL1_DM_FLAG_CHECK_OADDR) &&
+    // The row is for one class and type
+    if ((LEVEL2_DM_CLASS(row) != pev->vscp_class) || (LEVEL2_DM_TYPE(row) != pev->vscp_type)) {
+      continue;
+    }
+
+    if ((LEVEL2_DM_FLAGS(row) & VSCP_LEVEL2_DM_FLAG_CHECK_OADDR) &&
         ((pev->GUID[0] != LEVEL2_DM_OADDR(row, 0)) || (pev->GUID[1] != LEVEL2_DM_OADDR(row, 1)) ||
          (pev->GUID[2] != LEVEL2_DM_OADDR(row, 2)) || (pev->GUID[3] != LEVEL2_DM_OADDR(row, 3)) ||
          (pev->GUID[4] != LEVEL2_DM_OADDR(row, 4)) || (pev->GUID[5] != LEVEL2_DM_OADDR(row, 5)) ||
@@ -2494,10 +2503,10 @@ vscp_frmw2_feed_level2_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_
       continue;
     }
 
-    // Check if index should match and if so if it match (255 is wildcard)
+    // Check if index (data byte 0) should match and if so if it match (255 is wildcard)
     if (LEVEL2_DM_FLAGS(row) & VSCP_LEVEL2_DM_FLAG_CHECK_INDEX) {
-      if (pev->sizeData > 1 && 255 != pev->pdata[1]) {
-        if (pev->pdata[1] != pctx->index) {
+      if (pev->sizeData > 0 && 255 != pev->pdata[0]) {
+        if (pev->pdata[0] != pctx->index) {
           continue;
         }
       }
@@ -2545,7 +2554,9 @@ vscp_frmw2_feed_dm(vscp_frmw2_firmware_context_t *pctx, const vscp_event_t *cons
   int rv = VSCP_ERROR_SUCCESS;
 
   if (NULL != pev && NULL != pctx->pDm && pctx->nDmRows) {
-    if (VSCP_LEVEL1 == pctx->level) {
+    // A Level II device can use Level I rows (bDmLevel1Rows), as for example
+    // the Blinky demo does, so one MDF describes the matrix on all transports
+    if ((VSCP_LEVEL1 == pctx->level) || pctx->bDmLevel1Rows) {
       rv = vscp_frmw2_feed_level1_dm(pctx, pev);
     }
     else {

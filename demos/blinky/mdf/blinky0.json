@@ -217,38 +217,38 @@
         "fgcolor": "0x0",
         "bgcolor": "0xffffff",
         "description": {
-          "en": "Status of the node. This indicates the current state of the LED, 0=ON, 1=OFF.",
-          "se": "Status för noden. Detta indikerar det aktuella tillståndet för LED, 0=ON, 1=OFF.",
-          "no": "Status for noden. Dette indikerer den nåværende tilstanden til LED, 0=ON, 1=OFF.",
-          "dk": "Status for noden. Dette indikerer den aktuelle tilstand for LED, 0=ON, 1=OFF.",
-          "de": "Status des Knotens. Dies zeigt den aktuellen Zustand der LED an, 0=ON, 1=OFF.",
-          "fr": "Statut du nœud. Cela indique l'état actuel de la LED, 0=ON, 1=OFF.",
-          "es": "Estado del nodo. Esto indica el estado actual del LED, 0=ON, 1=OFF.",
-          "it": "Stato del nodo. Questo indica lo stato attuale del LED, 0=ON, 1=OFF.",
+          "en": "Status of the node. This indicates the current state of the LED, 1=ON, 0=OFF.",
+          "se": "Status för noden. Detta indikerar det aktuella tillståndet för LED, 1=ON, 0=OFF.",
+          "no": "Status for noden. Dette indikerer den nåværende tilstanden til LED, 1=ON, 0=OFF.",
+          "dk": "Status for noden. Dette indikerer den aktuelle tilstand for LED, 1=ON, 0=OFF.",
+          "de": "Status des Knotens. Dies zeigt den aktuellen Zustand der LED an, 1=ON, 0=OFF.",
+          "fr": "Statut du nœud. Cela indique l'état actuel de la LED, 1=ON, 0=OFF.",
+          "es": "Estado del nodo. Esto indica el estado actual del LED, 1=ON, 0=OFF.",
+          "it": "Stato del nodo. Questo indica lo stato attuale del LED, 1=ON, 0=OFF.",
           "ru": "Статус узла. Это указывает текущее состояние светодиода, 0=ВКЛ, 1=ВЫКЛ.",
-          "fi": "Solmun tila. Tämä osoittaa LEDin nykyisen tilan, 0=ON, 1=OFF.",
-          "zh": "节点的状态。这表示LED的当前状态，0 = ON，1 = OFF。",
-          "ja": "ノードのステータス。これはLEDの現在の状態を示します。0 = ON、1 = OFF。",
-          "pt": "Status do nó. Isso indica o estado atual do LED, 0 = ON, 1 = OFF.",
-          "ar": "حالة العقدة. هذا يشير إلى الحالة الحالية للLED، 0 = ON، 1 = OFF.",
-          "sk": "Stav uzlu. To ukazuje aktuální stav LED, 0 = ON, 1 = OFF.",
-          "hu": "A csomópont állapota. Ez jelzi a LED aktuális állapotát, 0=ON, 1=OFF.",
-          "kr": "노드의 상태입니다. 이것은 LED의 현재 상태를 나타냅니다. 0=ON, 1=OFF.",
-          "bg": "Състояние на възела. Показва текущото състояние на LED: 0=ON, 1=OFF.",
-          "hr": "Status čvora. Označava trenutačno stanje LED-a: 0=ON, 1=OFF.",
-          "cs": "Stav uzlu. Udává aktuální stav LED: 0=ON, 1=OFF.",
-          "da": "Status for noden. Dette angiver LED'ens aktuelle tilstand: 0=ON, 1=OFF.",
-          "nl": "Status van de node. Dit geeft de huidige status van de led aan: 0=ON, 1=OFF.",
-          "et": "Sõlme olek. See näitab LED-i praegust olekut: 0=ON, 1=OFF.",
-          "el": "Κατάσταση του κόμβου. Υποδεικνύει την τρέχουσα κατάσταση του LED, 0=ON, 1=OFF.",
-          "ga": "Stádas an nóid. Léiríonn sé seo staid reatha an LED, 0=ON, 1=OFF.",
-          "lv": "Mezgla statuss. Tas norāda pašreizējo LED stāvokli: 0=ON, 1=OFF.",
-          "lt": "Mazgo būsena. Ji nurodo dabartinę LED būseną: 0=ON, 1=OFF.",
-          "mt": "L-istatus tan-nodu. Dan jindika l-istat attwali tal-LED: 0=ON, 1=OFF.",
-          "pl": "Stan węzła. Wskazuje bieżący stan LED: 0=ON, 1=OFF.",
-          "ro": "Starea nodului. Indică starea curentă a LED-ului: 0=ON, 1=OFF.",
-          "sl": "Stanje vozlišča. Označuje trenutno stanje LED: 0=ON, 1=OFF.",
-          "sv": "Nodens status. Anger LED-lampans aktuella tillstånd: 0=ON, 1=OFF."
+          "fi": "Solmun tila. Tämä osoittaa LEDin nykyisen tilan, 1=ON, 0=OFF.",
+          "zh": "节点的状态。这表示LED的当前状态，1 = ON，0 = OFF。",
+          "ja": "ノードのステータス。これはLEDの現在の状態を示します。1 = ON、0 = OFF。",
+          "pt": "Status do nó. Isso indica o estado atual do LED, 1 = ON, 0 = OFF.",
+          "ar": "حالة العقدة. هذا يشير إلى الحالة الحالية للLED، 1 = ON، 0 = OFF.",
+          "sk": "Stav uzlu. To ukazuje aktuální stav LED, 1 = ON, 0 = OFF.",
+          "hu": "A csomópont állapota. Ez jelzi a LED aktuális állapotát, 1=ON, 0=OFF.",
+          "kr": "노드의 상태입니다. 이것은 LED의 현재 상태를 나타냅니다. 1=ON, 0=OFF.",
+          "bg": "Състояние на възела. Показва текущото състояние на LED: 1=ON, 0=OFF.",
+          "hr": "Status čvora. Označava trenutačno stanje LED-a: 1=ON, 0=OFF.",
+          "cs": "Stav uzlu. Udává aktuální stav LED: 1=ON, 0=OFF.",
+          "da": "Status for noden. Dette angiver LED'ens aktuelle tilstand: 1=ON, 0=OFF.",
+          "nl": "Status van de node. Dit geeft de huidige status van de led aan: 1=ON, 0=OFF.",
+          "et": "Sõlme olek. See näitab LED-i praegust olekut: 1=ON, 0=OFF.",
+          "el": "Κατάσταση του κόμβου. Υποδεικνύει την τρέχουσα κατάσταση του LED, 1=ON, 0=OFF.",
+          "ga": "Stádas an nóid. Léiríonn sé seo staid reatha an LED, 1=ON, 0=OFF.",
+          "lv": "Mezgla statuss. Tas norāda pašreizējo LED stāvokli: 1=ON, 0=OFF.",
+          "lt": "Mazgo būsena. Ji nurodo dabartinę LED būseną: 1=ON, 0=OFF.",
+          "mt": "L-istatus tan-nodu. Dan jindika l-istat attwali tal-LED: 1=ON, 0=OFF.",
+          "pl": "Stan węzła. Wskazuje bieżący stan LED: 1=ON, 0=OFF.",
+          "ro": "Starea nodului. Indică starea curentă a LED-ului: 1=ON, 0=OFF.",
+          "sl": "Stanje vozlišča. Označuje trenutno stanje LED: 1=ON, 0=OFF.",
+          "sv": "Nodens status. Anger LED-lampans aktuella tillstånd: 1=ON, 0=OFF."
         },
         "infourl": {
           "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-register-2"
@@ -1237,43 +1237,6 @@
         "infourl": [
           {
             "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-alarm7"
-          }
-        ]
-      },
-      {
-        "pos": "0x06",
-        "name": "test event data 1",
-        "description": [
-          {
-            "en": "test",
-            "bg": "test",
-            "hr": "test",
-            "cs": "test",
-            "da": "test",
-            "nl": "test",
-            "et": "test",
-            "fi": "testi",
-            "fr": "test",
-            "de": "Test",
-            "el": "δοκιμή",
-            "hu": "teszt",
-            "ga": "tástáil",
-            "it": "test",
-            "lv": "tests",
-            "lt": "testas",
-            "mt": "test",
-            "pl": "test",
-            "pt": "teste",
-            "ro": "test",
-            "sk": "test",
-            "sl": "test",
-            "es": "prueba",
-            "sv": "test"
-          }
-        ],
-        "infourl": [
-          {
-            "en": "https://github.com/grodansparadis/vscp/wiki/blinky-info-url-alarm6"
           }
         ]
       }
