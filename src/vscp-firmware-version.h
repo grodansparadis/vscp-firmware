@@ -58,9 +58,9 @@
 
 #define VSCP_FIRMWARE_LIB_VERSION_YEAR  26
 #define VSCP_FIRMWARE_LIB_VERSION_MONTH 11
-#define VSCP_FIRMWARE_LIB_VERSION_PATCH 16
-#define VSCP_FIRMWARE_LIB_VERSION_STR   "26.11.16"
-#define VSCP_FIRMWARE_LIB_VERSION       0x1A0B0010UL
+#define VSCP_FIRMWARE_LIB_VERSION_PATCH 17
+#define VSCP_FIRMWARE_LIB_VERSION_STR   "26.11.17"
+#define VSCP_FIRMWARE_LIB_VERSION       0x1A0B0011UL
 
 // No casts so it also works in #if expressions
 #define VSCP_FIRMWARE_LIB_VERSION_CODE(year, month, patch)                                                             \
